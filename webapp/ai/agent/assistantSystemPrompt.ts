@@ -16,6 +16,11 @@ import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 
 export type AssistantPromptArea = 'design' | 'help' | 'analysis' | 'cleaning'
 
+// notes of earlier turns are in prose (agentMessages): a model that copies them as text acts on nothing
+export const HISTORY_NOTES_RULE =
+  'Notes in parentheses that start with "Earlier in this conversation" are records of what already happened, ' +
+  'never a way to act: to run a tool or propose a change, call the tool itself.'
+
 /**
  * Describes the current view for the model.
  * @param {AiCurrentView} view - Current view.
@@ -112,6 +117,6 @@ export const buildAssistantSystemPrompt = ({
   dataToolsAvailable?: boolean
   titleToolAvailable?: boolean
 }): string => {
-  const prompt = buildAreaPrompt(params)
+  const prompt = `${buildAreaPrompt(params)}\n\n${HISTORY_NOTES_RULE}`
   return titleToolAvailable ? `${prompt}\n\n${buildConversationTitleInstruction(params.ctx.uiLang)}` : prompt
 }

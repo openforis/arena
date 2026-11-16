@@ -19,11 +19,14 @@ export type AiBatchStop = { cause: 'cancelled' | 'error'; error?: unknown } & Ai
 export type AiBatchRunResult = {
   // the summed size of the failed calls and of the calls not run
   failedCount: number
+  // the part of failedCount that was not run because the run stopped
+  notRunCount: number
   stop: AiBatchStop | null
 }
 
 // size: what a failure of the call leaves untranslated / undescribed (counted in the result)
-export type AiBatchCall<T> = { size: number; run: (signal?: AbortSignal) => Promise<T> }
+// split: the two halves of the call, when its answer is unusable (cut off or unparsable) and it has more than one item
+export type AiBatchCall<T> = { size: number; run: (signal?: AbortSignal) => Promise<T>; split?: () => AiBatchCall<T>[] }
 
 export type AiBatchGuard = () => Promise<void>
 
@@ -127,9 +130,36 @@ export const createAiBatchGuard = ({
   }
 }
 
+// the gateway allows AI_RATE_LIMIT_PER_MINUTE calls a minute: a limited call waits and tries again
+export const AI_BATCH_RATE_LIMIT_WAIT_MS = 20000
+const AI_BATCH_RATE_LIMIT_RETRIES = 3
+
+/**
+ * Waits `ms`, or less when the signal aborts.
+ * @param {number} ms - Time to wait.
+ * @param {AbortSignal} [signal] - Cancellation signal.
+ * @returns {Promise<void>} Settles after the wait or at the abort.
+ */
+const waitUnlessAborted = (ms: number, signal?: AbortSignal): Promise<void> =>
+  new Promise<void>((resolve) => {
+    const onAbort = () => {
+      clearTimeout(timer)
+      resolve()
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort)
+      resolve()
+    }, ms)
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
+
 type StopCause = Pick<AiBatchStop, 'cause' | 'error'>
 
-type CallOutcome = 'succeeded' | 'failed' | StopCause
+// failedSize: what the call tried and failed; notRunSize: what a stop kept it from trying; succeeded: a result was kept
+type CallOutcome = { stop?: StopCause; succeeded: boolean; failedSize: number; notRunSize: number }
+
+// the task keys of an answer that could not be used (the model's output was cut off or is not the expected JSON)
+const UNUSABLE_ANSWER_KEYS: readonly string[] = ['aiTranslationInvalid', 'aiDataDictionaryInvalid']
 
 /**
  * Waits for the guard, but not longer than the signal: a stop must not wait for a slow check.
@@ -156,7 +186,8 @@ const guardUnlessAborted = (guard: AiBatchGuard, signal?: AbortSignal): Promise<
  * @param {AiBatchGuard} params.guard - Check run before the call.
  * @param {Function} params.onResult - Called with the result of a successful call.
  * @param {AbortSignal} [params.signal] - Cancellation signal.
- * @returns {Promise<CallOutcome>} succeeded, failed (counted, the run goes on) or the cause that stops the run.
+ * @param {number} params.rateLimitWaitMs - How long to wait before repeating a call the gateway rate-limited.
+ * @returns {Promise<CallOutcome>} What succeeded and failed (counted, the run goes on), and the cause that stops the run.
  */
 const runCall = async <T>({
   call,
@@ -164,30 +195,74 @@ const runCall = async <T>({
   guard,
   onResult,
   signal,
+  rateLimitWaitMs,
 }: {
   call: AiBatchCall<T>
   index: number
   guard: AiBatchGuard
   onResult: (result: T, index: number) => void
   signal?: AbortSignal
+  rateLimitWaitMs: number
 }): Promise<CallOutcome> => {
   const cancelled: StopCause = { cause: 'cancelled' }
-  if (signal?.aborted) return cancelled
+  const stopped = (stop: StopCause): CallOutcome => ({ stop, succeeded: false, failedSize: 0, notRunSize: call.size })
+  if (signal?.aborted) return stopped(cancelled)
   try {
     // a switch or policy change during the run stops it before the next call
     await guardUnlessAborted(guard, signal)
   } catch (error) {
-    return signal?.aborted ? cancelled : { cause: 'error', error }
+    return stopped(signal?.aborted ? cancelled : { cause: 'error', error })
   }
-  if (signal?.aborted) return cancelled
-  try {
-    onResult(await call.run(signal), index)
-    return 'succeeded'
-  } catch (error) {
-    // what the HTTP client throws when its request is aborted is not always an AbortError
-    if (signal?.aborted || isAiAbortError(error)) return cancelled
-    return isRunStoppingError(error) ? { cause: 'error', error } : 'failed'
+  if (signal?.aborted) return stopped(cancelled)
+  for (let retries = 0; ; retries += 1) {
+    try {
+      onResult(await call.run(signal), index)
+      return { succeeded: true, failedSize: 0, notRunSize: 0 }
+    } catch (error) {
+      // what the HTTP client throws when its request is aborted is not always an AbortError
+      if (signal?.aborted || isAiAbortError(error)) return stopped(cancelled)
+      const key = getAiErrorKey(error)
+      if (key === 'aiRateLimited' && retries < AI_BATCH_RATE_LIMIT_RETRIES) {
+        await waitUnlessAborted(rateLimitWaitMs, signal)
+        if (signal?.aborted) return stopped(cancelled)
+      } else if (isRunStoppingError(error)) return stopped({ cause: 'error', error })
+      else if (key !== null && UNUSABLE_ANSWER_KEYS.includes(key) && call.split) {
+        // repeating the same call would get the same cut-off answer: run each half instead
+        return runHalves({ halves: call.split(), index, guard, onResult, signal, rateLimitWaitMs })
+      } else return { succeeded: false, failedSize: call.size, notRunSize: 0 }
+    }
   }
+}
+
+/**
+ * Runs the halves of a split call one after the other; a stop leaves the rest of the halves not run.
+ * @param {object} params - Parameters of runCall, with the halves instead of the call.
+ * @returns {Promise<CallOutcome>} The outcomes of the halves, summed.
+ */
+const runHalves = async <T>({
+  halves,
+  ...params
+}: {
+  halves: AiBatchCall<T>[]
+  index: number
+  guard: AiBatchGuard
+  onResult: (result: T, index: number) => void
+  signal?: AbortSignal
+  rateLimitWaitMs: number
+}): Promise<CallOutcome> => {
+  const total: CallOutcome = { succeeded: false, failedSize: 0, notRunSize: 0 }
+  for (const [position, half] of halves.entries()) {
+    const outcome = await runCall({ call: half, ...params })
+    total.succeeded ||= outcome.succeeded
+    total.failedSize += outcome.failedSize
+    total.notRunSize += outcome.notRunSize
+    if (outcome.stop) {
+      total.stop = outcome.stop
+      total.notRunSize += halves.slice(position + 1).reduce((sum, notRun) => sum + notRun.size, 0)
+      return total
+    }
+  }
+  return total
 }
 
 /**
@@ -201,6 +276,7 @@ const runCall = async <T>({
  * @param {Function} params.onResult - Called with the result and the index of each successful call.
  * @param {Function} [params.onProgress] - Called with { done, total } at the start and after each call.
  * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @param {number} [params.rateLimitWaitMs] - Wait before repeating a rate-limited call (3 repeats, then the run stops).
  * @returns {Promise<AiBatchRunResult>} The summed size of the failed calls and of the calls not run, and the stop.
  */
 export const runAiBatchCalls = async <T>({
@@ -209,27 +285,36 @@ export const runAiBatchCalls = async <T>({
   onResult,
   onProgress,
   signal,
+  rateLimitWaitMs = AI_BATCH_RATE_LIMIT_WAIT_MS,
 }: {
   calls: AiBatchCall<T>[]
   guard: AiBatchGuard
   onResult: (result: T, index: number) => void
   onProgress?: (progress: AiBatchProgress) => void
   signal?: AbortSignal
+  rateLimitWaitMs?: number
 }): Promise<AiBatchRunResult> => {
   const total = calls.length
   let failedCount = 0
   let succeededCount = 0
   onProgress?.({ done: 0, total })
   for (const [index, call] of calls.entries()) {
-    const outcome = await runCall({ call, index, guard, onResult, signal })
-    if (typeof outcome === 'object') {
-      if (succeededCount === 0) throw outcome.cause === 'error' ? outcome.error : createAbortError()
-      const notRunSize = calls.slice(index).reduce((sum, notRun) => sum + notRun.size, 0)
-      return { failedCount: failedCount + notRunSize, stop: { ...outcome, done: index, total } }
+    const { stop, succeeded, failedSize, notRunSize } = await runCall({
+      call,
+      index,
+      guard,
+      onResult,
+      signal,
+      rateLimitWaitMs,
+    })
+    if (succeeded) succeededCount += 1
+    failedCount += failedSize
+    if (stop) {
+      if (succeededCount === 0) throw stop.cause === 'error' ? stop.error : createAbortError()
+      const notRunCount = calls.slice(index + 1).reduce((sum, notRun) => sum + notRun.size, notRunSize)
+      return { failedCount: failedCount + notRunCount, notRunCount, stop: { ...stop, done: index, total } }
     }
-    if (outcome === 'succeeded') succeededCount += 1
-    else failedCount += call.size
     onProgress?.({ done: index + 1, total })
   }
-  return { failedCount, stop: null }
+  return { failedCount, notRunCount: 0, stop: null }
 }

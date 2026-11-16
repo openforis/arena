@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'criou o inventário',
     [ActivityLog.type.surveyPropUpdate]: 'atualizou {{key}} do inventário',
+    [ActivityLog.type.surveyAiPolicyUpdate]: 'alterou a política de IA do inventário',
     [ActivityLog.type.surveyPublish]: 'publicou o inventário',
     [ActivityLog.type.surveyCollectImport]: 'importou o inventário do Collect',
 

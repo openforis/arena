@@ -1571,6 +1571,20 @@ $t(common.cantUndoWarning)`,
   aiBatch: {
     translateTitle: 'ИИ: Перевести метки',
     dataDictionaryTitle: 'ИИ: Описания полей',
+    categoryLabelsTitle: 'ИИ: Перевести метки категорий',
+    categoryLabelsNothing: 'Нет меток категорий для перевода: у элементов нет метки на другом языке.',
+    categoryLabelsSaved_one: 'Сохранена {{count}} метка категорий.',
+    categoryLabelsSaved_few: 'Сохранено {{count}} метки категорий.',
+    categoryLabelsSaved_many: 'Сохранено {{count}} меток категорий.',
+    categoryLabelsSaved_other: 'Сохранено {{count}} метки категорий.',
+    categoryLabelsNotSaved_one:
+      'Не удалось сохранить {{count}} метку категорий (изменена за это время или не принята); сохранено: {{saved}}.',
+    categoryLabelsNotSaved_few:
+      'Не удалось сохранить {{count}} метки категорий (изменены за это время или не приняты); сохранено: {{saved}}.',
+    categoryLabelsNotSaved_many:
+      'Не удалось сохранить {{count}} меток категорий (изменены за это время или не приняты); сохранено: {{saved}}.',
+    categoryLabelsNotSaved_other:
+      'Не удалось сохранить {{count}} метки категорий (изменены за это время или не приняты); сохранено: {{saved}}.',
     preparing: 'Подготовка…',
     progress: 'Выполнено запросов к ИИ: {{done}} из {{total}}',
     stop: 'Остановить',
@@ -1658,6 +1672,7 @@ $t(common.cantUndoWarning)`,
     rowAction: {
       askAssistant: 'Спросить ассистента',
       question: 'Почему это значение недопустимо и как его исправить?',
+      busy: 'Ассистент ещё отвечает. Дождитесь окончания или сначала остановите его.',
     },
     card: {
       empty: '(пусто)',

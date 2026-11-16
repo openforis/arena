@@ -37,7 +37,7 @@ const KEY_BY_STATUS: Record<number, string> = {
  * @param {number} status - HTTP status.
  * @returns {string} The error key.
  */
-export const getErrorKeyForHttpStatus = (status: number): string => KEY_BY_STATUS[status] ?? 'aiProviderUnavailable'
+const getErrorKeyForHttpStatus = (status: number): string => KEY_BY_STATUS[status] ?? 'aiProviderUnavailable'
 
 const isFunctionTool = (tool: { type: string }): tool is LanguageModelV4FunctionTool => tool.type === 'function'
 

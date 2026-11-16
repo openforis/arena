@@ -57,7 +57,9 @@ For code attributes the column "<name>" contains the code and "<name>_label" the
 for taxon attributes "<name>" contains the taxon code and "<name>_scientific_name" the scientific name.
 
 Sort (optional, empty list if not needed): list of { "attribute", "order" } where attribute is one of the
-selected raw attributes (raw mode) or one of the dimensions (aggregate mode) and order is "asc" or "desc".
+selected raw attributes (raw mode), or one of the dimensions or measures (aggregate mode; a measure is named by its
+attribute, or by the entity name for the count), and order is "asc" or "desc". Sort a measure "desc" to get the top
+groups, e.g. the species with most trees.
 
 Also write a short explanation of the query for the user.`
 

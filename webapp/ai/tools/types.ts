@@ -51,6 +51,8 @@ export type AiToolContext = {
   getPendingChangeSets?: () => ChangeSet[]
   // category items listed in this conversation, by ref (categoryItems_listMissingLabels → categoryItemLabels_proposeSet)
   categoryItemRefs?: CategoryItemRefs
+  // cap of a result in this turn (set by the registry on every call; read with getResultBudget)
+  resultCapChars?: number
 }
 
 export type AiTool<I = any, O = unknown> = {

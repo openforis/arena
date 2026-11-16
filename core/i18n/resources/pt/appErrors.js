@@ -16,6 +16,8 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
   aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
+  aiAssistantStepLimit:
+    'O assistente atingiu o limite de passos sem escrever uma resposta. Tente novamente ou faça uma pergunta mais específica.',
   aiLocalServerUnreachable:
     'Não foi possível conectar ao servidor de IA em {{baseUrl}}. Ele está em execução, com CORS ativado? O navegador bloqueou o acesso a dispositivos da rede local?',
   aiLocalServerModelMissing:
@@ -112,6 +114,8 @@ export default {
     nodesBatchInvalid: 'Pedido de edição em lote inválido ({{reason}}).',
     nodesBatchBusy: 'Outra edição em lote ainda está em andamento; tente novamente em alguns segundos.',
     nodesBatchInvalidValue: 'O novo valor de "{{attributeName}}" não é válido para este atributo.',
+    nodesBatchWouldClearValues:
+      'Esta edição apagaria outros valores que deixam de ser aplicáveis; edite este valor no formulário para confirmar.',
     nodesBatchUnexpected: 'Não foi possível aplicar a edição devido a um erro inesperado no servidor.',
   },
   recordPrintableExport: {

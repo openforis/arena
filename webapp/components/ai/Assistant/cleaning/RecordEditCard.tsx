@@ -1,6 +1,6 @@
 import './RecordEditCard.scss'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
@@ -14,7 +14,7 @@ import {
 import { chunkOperationsByRecord } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { Button } from '@webapp/components/buttons'
 import { useNotifyError } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { runWithFailureNotice } from '../runWithFailureNotice'
@@ -39,14 +39,14 @@ type EditRowProps = {
 
 /**
  * Returns the translated text of an edit result.
- * @param {object} i18n - Translator.
+ * @param {Function} t - Translation function (unescaped: the message is translated twice).
  * @param {OperationResult} result - The result.
  * @returns {string} The text.
  */
-const getResultText = (i18n: any, result: OperationResult): string => {
-  if (result.status !== 'failed') return i18n.t(`aiCleaning.result.${result.status}`)
-  const message = result.message ? i18n.t(result.message, result.params ?? {}) : ''
-  return i18n.t('aiCleaning.result.failed', { message })
+const getResultText = (t: (key: string, params?: any) => string, result: OperationResult): string => {
+  if (result.status !== 'failed') return t(`aiCleaning.result.${result.status}`)
+  const message = result.message ? t(result.message, result.params ?? {}) : ''
+  return t('aiCleaning.result.failed', { message })
 }
 
 /**
@@ -55,9 +55,9 @@ const getResultText = (i18n: any, result: OperationResult): string => {
  * @returns {React.ReactElement} The row.
  */
 const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowProps) => {
-  const i18n = useI18n()
+  const t = useI18nT({ unescapeHtml: true })
   const { badge, messages } = operation.preview
-  const empty = i18n.t('aiCleaning.card.empty')
+  const empty = t('aiCleaning.card.empty')
   return (
     <li className="ai-cleaning-card__edit" data-testid={TestId.aiCleaning.edit} data-node-uuid={operation.nodeUuid}>
       <input
@@ -81,7 +81,7 @@ const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowP
           data-value={badge}
           title={messages.join('\n')}
         >
-          {i18n.t(`aiCleaning.badge.${badge}`)}
+          {t(`aiCleaning.badge.${badge}`)}
         </span>
         {result && (
           <div
@@ -89,7 +89,7 @@ const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowP
             data-testid={TestId.aiCleaning.result}
             data-value={result.status}
           >
-            {getResultText(i18n, result)}
+            {getResultText(t, result)}
           </div>
         )}
       </div>
@@ -103,20 +103,22 @@ const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowP
  * @returns {React.ReactElement} The card.
  */
 export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props) => {
-  const i18n = useI18n()
+  const t = useI18nT({ unescapeHtml: true })
   const operations = useMemo(() => changeSet.operations.filter(isRecordEditOperation), [changeSet])
   const groups = useMemo(() => groupOperationsByRecord(operations), [operations])
   const selectableIds = useMemo(() => getSelectableOperationIds(operations, results), [operations, results])
   const { selectedIds, toggle } = useOperationSelection({ selectableIds })
   const notifyError = useNotifyError()
+  // where the focus goes after an Apply: the actions can unmount (nothing left to apply)
+  const statusRef = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const resultById = useMemo(() => new Map(results.map((result) => [result.id, result])), [results])
   const counts = countOperationResults(results)
 
   // the conversation holds the guard against a second Apply; a rejection (store error) is shown on the card
   const apply = useCallback(
-    (operationIds: string[]) =>
-      runWithFailureNotice({
+    async (operationIds: string[]) => {
+      const ok = await runWithFailureNotice({
         action: async () => {
           // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
           const selected = operations.filter((operation) => operationIds.includes(operation.id))
@@ -129,7 +131,10 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
         },
         notifyError,
         key: 'aiAssistant.card.applyFailed',
-      }),
+      })
+      if (ok) statusRef.current?.focus()
+      return ok
+    },
     [notifyError, onApply, operations]
   )
 
@@ -146,7 +151,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
             </Link>
             {group.recordNewErrors > 0 && (
               <span className="ai-cleaning-card__new-errors">
-                {i18n.t('aiCleaning.card.newErrors', { count: group.recordNewErrors })}
+                {t('aiCleaning.card.newErrors', { count: group.recordNewErrors })}
               </span>
             )}
           </header>
@@ -166,10 +171,12 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
       ))}
       {progress && (
         <div className="ai-cleaning-card__progress" data-testid={TestId.aiCleaning.progress}>
-          {i18n.t('aiCleaning.card.applying', progress)}
+          {t('aiCleaning.card.applying', progress)}
         </div>
       )}
-      {results.length > 0 && <div className="ai-cleaning-card__counts">{i18n.t('aiCleaning.card.counts', counts)}</div>}
+      <div className="ai-cleaning-card__counts" ref={statusRef} role="status" tabIndex={-1}>
+        {results.length > 0 && t('aiCleaning.card.counts', counts)}
+      </div>
       <div className="ai-cleaning-card__actions">
         <Button
           primary

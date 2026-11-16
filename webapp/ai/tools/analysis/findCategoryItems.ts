@@ -8,7 +8,7 @@ import { Authorizer } from '@openforis/arena-core'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
 import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
-import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
@@ -101,7 +101,7 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
       ...(totalIsLowerBound ? {} : { total: found.length }),
       truncated: totalIsLowerBound || found.length > categoryItemsMax,
     }
-    const fitted = fitListToBudget(result, 'items')
+    const fitted = fitListToBudget(result, 'items', getResultBudget(ctx))
     return { ...fitted, truncated: result.truncated || (fitted.truncated ?? false) }
   }
 

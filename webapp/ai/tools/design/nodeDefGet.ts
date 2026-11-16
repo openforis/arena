@@ -7,7 +7,7 @@ import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
 import { canViewCurrentSurvey } from '../common/toolPermissions'
-import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
+import { getResultBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
 import {
   getDesignNodeDefs,
@@ -94,9 +94,9 @@ export const describeNodeDef = (survey: any, nodeDef: any, t: Translate) => {
  * @param {Translate} t - Translator.
  * @returns {object} The description.
  */
-export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Translate) => {
+export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Translate, maxChars?: number) => {
   const description: any = describeNodeDef(survey, nodeDef, t)
-  if (JSON.stringify(description).length <= TOOL_RESULT_BUDGET_CHARS) return description
+  if (JSON.stringify(description).length <= (maxChars ?? getResultBudget())) return description
   const expressions: Record<string, object[]> = {}
   for (const [prop, views] of Object.entries(description.expressions as Record<string, any[]>)) {
     expressions[prop] = views.map(({ messages: _messages, ...rest }) => rest)
@@ -118,6 +118,6 @@ export const nodeDefGetTool: AiTool<z.infer<typeof inputSchema>> = {
   requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)
-    return describeNodeDefWithinBudget(survey, requireNodeDefByName(survey, name), ctx.t)
+    return describeNodeDefWithinBudget(survey, requireNodeDefByName(survey, name), ctx.t, getResultBudget(ctx))
   },
 }

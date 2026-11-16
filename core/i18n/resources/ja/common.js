@@ -1479,6 +1479,11 @@ $t(common.cantUndoWarning)`,
   aiBatch: {
     translateTitle: 'AI：ラベルを翻訳',
     dataDictionaryTitle: 'AI：フィールドの説明',
+    categoryLabelsTitle: 'AI：カテゴリのラベルを翻訳',
+    categoryLabelsNothing: '翻訳するカテゴリのラベルがありません。項目には他の言語のラベルがありません。',
+    categoryLabelsSaved_other: 'カテゴリのラベルを{{count}}件保存しました。',
+    categoryLabelsNotSaved_other:
+      'カテゴリのラベル{{count}}件を保存できませんでした（その間に変更されたか、受け付けられませんでした）。{{saved}}件を保存しました。',
     preparing: '準備中…',
     progress: 'AIリクエスト {{done}} / {{total}} 件完了',
     stop: '停止',
@@ -1564,6 +1569,7 @@ $t(common.cantUndoWarning)`,
     rowAction: {
       askAssistant: 'アシスタントに質問',
       question: 'この値が無効なのはなぜですか？どう修正すればよいですか？',
+      busy: 'アシスタントはまだ回答中です。完了を待つか、先に停止してください。',
     },
     card: {
       empty: '(空)',

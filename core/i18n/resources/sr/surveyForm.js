@@ -45,6 +45,12 @@ Nastaviti?`,
     'AI opisi nisu mogli biti generisani za {{count}} polja; ostavljena su prazna.',
   schemaSummaryAiDescriptionsFailed_other:
     'AI opisi nisu mogli biti generisani za {{count}} polja; ostavljena su prazna.',
+  schemaSummaryAiDescriptionsNotDone_one:
+    'AI opis nije generisan za {{count}} polje jer je izvršavanje zaustavljeno; ostavljeno je prazno.',
+  schemaSummaryAiDescriptionsNotDone_few:
+    'AI opisi nisu generisani za {{count}} polja jer je izvršavanje zaustavljeno; ostavljena su prazna.',
+  schemaSummaryAiDescriptionsNotDone_other:
+    'AI opisi nisu generisani za {{count}} polja jer je izvršavanje zaustavljeno; ostavljena su prazna.',
   hidePages: 'Sakrij stranice',
   showPages: 'Prikaži stranice',
   move: `Premjesti '{{nodeDefLabel}}'`,
@@ -218,6 +224,10 @@ U aplikaciji Arena Mobile:
     failed_one: 'AI nije mogao da napravi {{count}} prevod; za njega nema AI prijedloga.',
     failed_few: 'AI nije mogao da napravi {{count}} prevoda; za njih nema AI prijedloga.',
     failed_other: 'AI nije mogao da napravi {{count}} prevoda; za njih nema AI prijedloga.',
+    notDone_one: 'Izvršavanje je zaustavljeno pre nego što je zatražen {{count}} prevod; za njega nema AI prijedloga.',
+    notDone_few: 'Izvršavanje je zaustavljeno pre nego što su zatražena {{count}} prevoda; za njih nema AI prijedloga.',
+    notDone_other:
+      'Izvršavanje je zaustavljeno pre nego što je zatraženo {{count}} prevoda; za njih nema AI prijedloga.',
     path: 'Putanja',
     showDescriptions: 'Prikaži opise',
     title: 'Prevedi oznake definicija čvorova',

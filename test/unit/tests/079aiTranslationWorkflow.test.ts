@@ -4,7 +4,7 @@ import { translateLabelsWorkflow } from '@webapp/ai/workflows/translation'
 
 describe('translateLabelsWorkflow', () => {
   test('returns the translations from the model answer', async () => {
-    const answer = JSON.stringify({ translations: [{ id: 'label', byLang: { es: 'Árbol' } }] })
+    const answer = JSON.stringify({ translations: [{ id: '1', byLang: { es: 'Árbol' } }] })
     const model = new MockLanguageModelV4({
       doGenerate: async () =>
         ({

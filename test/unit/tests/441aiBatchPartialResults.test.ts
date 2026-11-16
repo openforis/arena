@@ -163,7 +163,7 @@ describe('AI batch partial results (441)', () => {
   })
 
   describe('translate all labels', () => {
-    test('a stop after some batches keeps their translations and counts the rest as not produced', async () => {
+    test('a stop after some batches keeps their translations and counts the rest as not done', async () => {
       const survey = await SB.survey(
         { uuid: 'test-ai-batch-partial-user' },
         SB.entity('root', ...Array.from({ length: 45 }, (_v, i) => SB.attribute(`a_${i}`).label(`Attribute ${i}`)))
@@ -186,8 +186,9 @@ describe('AI batch partial results (441)', () => {
       expect(result.stop).toMatchObject({ cause: 'error', done: 2, total: 3 })
       const translated = result.items.filter((item) => Object.keys(item.aiLabelsByLang).length > 0)
       expect(translated).toHaveLength(40)
-      // the last batch (5 texts x 1 language) was not translated
-      expect(result.failedCount).toBe(5)
+      // the last batch (5 texts x 1 language) was not translated: not done, not failed
+      expect(result.failedCount).toBe(0)
+      expect(result.notDoneCount).toBe(5)
     })
 
     test('a run that ends normally has no stop', async () => {
@@ -215,7 +216,7 @@ describe('AI batch partial results (441)', () => {
         parentPath: 'plot',
       }))
       let calls = 0
-      const { aiDescriptions, failedCount, stop } = await runDataDictionaryDescriptions({
+      const { aiDescriptions, failedCount, notDoneCount, stop } = await runDataDictionaryDescriptions({
         items: { surveyName: 'forest', nodeDefs },
         generateText,
         guard: noGuard,
@@ -226,7 +227,9 @@ describe('AI batch partial results (441)', () => {
         },
       })
       expect(Object.keys(aiDescriptions)).toHaveLength(AiLimits.dataDictionaryBatchSize)
-      expect(failedCount).toBe(25 - AiLimits.dataDictionaryBatchSize)
+      // the batches a stop kept from being tried are not failures
+      expect(failedCount).toBe(0)
+      expect(notDoneCount).toBe(25 - AiLimits.dataDictionaryBatchSize)
       expect(stop).toMatchObject({ cause: 'error', done: 1, total: 3 })
     })
   })

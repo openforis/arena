@@ -6,30 +6,35 @@ import type { ModelMessage } from 'ai'
 
 import type { AssistantMessage, ConversationMessage, ConversationToolPart } from '@webapp/ai/conversations/types'
 import { toWebMcpDescriptor } from '@webapp/ai/tools/registry'
+import { getToolResultCap } from '@webapp/ai/tools/common/toolResult'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 export const APPLY_NOTE_PREFIX = 'Note from Arena (not the user): '
 
-const STOPPED_NOTE = '[stopped by the user]'
+// records of the past, in prose: bracketed tool names look like a call the model could write itself
+const STOPPED_NOTE = '(The user stopped this answer.)'
+const EARLIER = 'Earlier in this conversation'
 const HISTORY_SHARE = 0.8
+// the history keeps this share of the limit even when the tool results of all steps would not fit
+const MIN_HISTORY_SHARE = 0.1
 
 type TextMessage = { role: 'user' | 'assistant'; content: string }
 
 /**
  * Describes a tool call of an earlier turn.
  * @param {ConversationToolPart} part - Tool part.
- * @returns {string} A short bracketed note.
+ * @returns {string} A short sentence in parentheses.
  */
 export const describeToolPart = (part: ConversationToolPart): string => {
   const output = part.output as any
-  if (part.state === 'running') return `[${part.toolName} was interrupted]`
+  if (part.state === 'running') return `(${EARLIER}, ${part.toolName} was interrupted.)`
   if (part.state === 'failed' || output?.error)
-    return `[${part.toolName} failed: ${output?.error?.code ?? 'toolFailed'}]`
+    return `(${EARLIER}, ${part.toolName} failed: ${output?.error?.code ?? 'toolFailed'}.)`
   if (typeof output?.changeSetId === 'string') {
-    return `[${part.toolName}: change set ${output.changeSetId} (${output.operations} operations) shown to the user]`
+    return `(${EARLIER} a change set with ${output.operations} operations was shown to the user.)`
   }
   const list = output && typeof output === 'object' ? Object.values(output).find(Array.isArray) : null
-  return list ? `[${part.toolName} returned ${list.length} items]` : `[${part.toolName} done]`
+  return list ? `(${EARLIER}, ${part.toolName} returned ${list.length} items.)` : `(${EARLIER}, ${part.toolName} ran.)`
 }
 
 /**
@@ -141,15 +146,21 @@ export const getToolDefinitionChars = (tools: AiTool[]): number =>
  * @param {number} params.maxPromptChars - Prompt limit of the engine.
  * @param {string} params.systemPrompt - System prompt.
  * @param {AiTool[]} params.tools - Tools offered (their schemas count toward the limit).
+ * @param {number} params.maxSteps - Steps of the turn: each may add a tool result of the capped size.
  * @returns {number} The budget, at least 0.
  */
 export const getHistoryBudget = ({
   maxPromptChars,
   systemPrompt,
   tools,
+  maxSteps,
 }: {
   maxPromptChars: number
   systemPrompt: string
   tools: AiTool[]
-}): number =>
-  Math.max(0, Math.floor(maxPromptChars * HISTORY_SHARE) - systemPrompt.length - getToolDefinitionChars(tools))
+  maxSteps: number
+}): number => {
+  const available = Math.floor(maxPromptChars * HISTORY_SHARE) - systemPrompt.length - getToolDefinitionChars(tools)
+  const reserved = tools.length > 0 ? maxSteps * getToolResultCap(maxPromptChars) : 0
+  return Math.max(0, available - reserved, Math.min(available, Math.floor(maxPromptChars * MIN_HISTORY_SHARE)))
+}

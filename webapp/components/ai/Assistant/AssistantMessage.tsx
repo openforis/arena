@@ -156,13 +156,13 @@ const AnswerFooter = ({
   const capabilities = useAiCapabilities()
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
-  // only the key is stored with the message: engine errors get their own Retry / Open settings buttons
+  // engine errors get their own Retry / Open settings buttons
   const engineError = { key: message.errorKey }
   const canChooseProvider = canOpenProviderChooser(capabilities)
   const hasEngineRetry = getAiEngineErrorView(engineError)?.retry === true
   return (
     <div className="ai-assistant-message__error" role="alert">
-      <span>{t(`appErrors:${message.errorKey ?? 'aiProviderUnavailable'}`)}</span>
+      <span>{t(`appErrors:${message.errorKey ?? 'aiProviderUnavailable'}`, message.errorParams)}</span>
       {isLast && !recordDataNotice && (
         <AiEngineErrorActions disabled={api.busy} error={engineError} onRetry={api.retry} />
       )}

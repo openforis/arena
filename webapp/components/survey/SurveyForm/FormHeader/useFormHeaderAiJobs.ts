@@ -51,7 +51,7 @@ export const useFormHeaderAiJobs = () => {
       start({
         titleKey: 'aiBatch.dataDictionaryTitle',
         run: async ({ signal, abandonSignal, onProgress }) => {
-          const { aiDescriptions, failedCount, stop } = await AiWorkflows.generateDataDictionary({
+          const { aiDescriptions, failedCount, notDoneCount, stop } = await AiWorkflows.generateDataDictionary({
             surveyId,
             cycle,
             signal,
@@ -65,6 +65,7 @@ export const useFormHeaderAiJobs = () => {
             fileFormat,
             aiDescriptions,
             aiDescriptionsFailedCount: failedCount,
+            aiDescriptionsNotDoneCount: notDoneCount,
             signal: abandonSignal,
           })
           // abandoned while the export was being requested: no job monitor

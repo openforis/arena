@@ -8,6 +8,8 @@ export type CleaningRowContext = {
   recordUuid: string
   recordKeys: string
   nodeUuid: string
+  // node of the entity that holds the attribute: record_getValues reads its siblings with it
+  parentNodeUuid?: string
   path: string
   messages: string[]
 }
@@ -31,7 +33,9 @@ export const buildRowContextDraft = ({
     '',
     cleaningRowContextMarker,
     `record: ${context.recordKeys} (recordUuid: ${context.recordUuid})`,
-    `attribute: ${context.path} (nodeUuid: ${context.nodeUuid})`,
+    `attribute: ${context.path} (nodeUuid: ${context.nodeUuid})${
+      context.parentNodeUuid ? ` (parentNodeUuid: ${context.parentNodeUuid})` : ''
+    }`,
     `messages: ${context.messages.join('; ')}`,
   ].join('\n')
 
@@ -54,5 +58,7 @@ export const parseRowContext = (text: string): { recordUuid: string; nodeUuid: s
  */
 export const toRowContextDisplayText = (text: string): string | null =>
   text.includes(cleaningRowContextMarker)
-    ? text.replace(`${cleaningRowContextMarker}\n`, '').replaceAll(/ \((?:recordUuid|nodeUuid): [\w-]+\)/g, '')
+    ? text
+        .replace(`${cleaningRowContextMarker}\n`, '')
+        .replaceAll(/ \((?:recordUuid|nodeUuid|parentNodeUuid): [\w-]+\)/g, '')
     : null

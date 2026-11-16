@@ -2,14 +2,20 @@ import './ChangeSetCard.scss'
 
 import React, { useEffect, useId, useState } from 'react'
 
-import type { ChangeSetCardState, OperationConflict, OperationStatus } from '@webapp/ai/changeSets/types'
+import type { ChangeSetCardState, OperationConflict } from '@webapp/ai/changeSets/types'
 import { Button } from '@webapp/components/buttons'
 import { useIsSurveyDirty } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ChangeItemConflict } from './ChangeItem'
-import { getReviewLabelText, getValuePreview, groupReviewItems, type ReviewItem } from './changeSetReviewModel'
+import {
+  getReviewLabelText,
+  getStatusLineText,
+  getValuePreview,
+  groupReviewItems,
+  type ReviewItem,
+} from './changeSetReviewModel'
 import { summarizeSelection } from './changeSetSelectionModel'
 import { createConfirmationFocus, type ConfirmationFocus } from './confirmationFocus'
 import type { ChangeSetSelection } from './useChangeSetSelection'
@@ -17,16 +23,6 @@ import type { ChangeSetSelection } from './useChangeSetSelection'
 // preview rows and kinds of change shown before "+ N more"
 const PREVIEW_ROWS = 3
 const MAX_KIND_CHIPS = 4
-
-/**
- * Counts the results of an Apply by status.
- * @param {ReviewItem[]} items - Items.
- * @returns {[OperationStatus, number][]} The statuses with results, in a fixed order.
- */
-const countResults = (items: ReviewItem[]): [OperationStatus, number][] =>
-  (['applied', 'conflict', 'failed', 'skipped'] as OperationStatus[])
-    .map((status): [OperationStatus, number] => [status, items.filter((item) => item.result?.status === status).length])
-    .filter(([, count]) => count > 0)
 
 /**
  * Asks to confirm an Apply of changes that were not reviewed, with the selected changes counted by kind.
@@ -150,9 +146,17 @@ export const ChangeSetCompactCard = ({
   const [applyButton, setApplyButton] = useState<HTMLButtonElement | null>(null)
   // the line of statuses and results: where the focus goes when the confirmation closes after Apply
   const [statusLine, setStatusLine] = useState<HTMLUListElement | null>(null)
-  const { pendingIds, conflicts, conflictIds, selectableIds, selectedIds, unselectedBehaviourIds } = selection
+  const {
+    pendingIds,
+    conflicts,
+    conflictIds,
+    selectableIds,
+    selectedIds,
+    unselectedBehaviourIds,
+    discard,
+    setStatusElement,
+  } = selection
   const kinds = groupReviewItems(items, 'field')
-  const results = countResults(items)
   const conflictItems = items.filter((item) => conflictIds.includes(item.id))
   const allSelected = selectedIds.length === selectableIds.length
   const showConfirmation = confirming && selectedIds.length > 0
@@ -213,11 +217,6 @@ export const ChangeSetCompactCard = ({
             {`${t('aiAssistant.card.status.conflict')}: ${conflictIds.length}`}
           </li>
         )}
-        {results.map(([status, count]) => (
-          <li className={`ai-assistant-card__chip ai-assistant-card__chip--${status}`} key={status}>
-            {`${t('aiAssistant.card.status.' + status)}: ${count}`}
-          </li>
-        ))}
       </ul>
       <ul className="ai-assistant-card__preview">
         {items.slice(0, PREVIEW_ROWS).map((item) => (
@@ -247,7 +246,9 @@ export const ChangeSetCompactCard = ({
           )}
         </ul>
       )}
-      {cardState.discarded && <p className="ai-assistant-card__hint">{t('aiAssistant.card.discarded')}</p>}
+      <p className="ai-assistant-card__hint" ref={setStatusElement} role="status" tabIndex={-1}>
+        {getStatusLineText({ items, discarded: Boolean(cardState.discarded), t })}
+      </p>
       {unselectedBehaviourIds.length > 0 && (
         <p className="ai-assistant-card__hint">
           {t('aiAssistant.card.behaviourUnselected', { count: unselectedBehaviourIds.length })}
@@ -289,7 +290,7 @@ export const ChangeSetCompactCard = ({
             <Button
               disabled={busy}
               label="aiAssistant.card.discard"
-              onClick={selection.discard}
+              onClick={discard}
               testId={TestId.aiAssistant.discardBtn}
               variant="text"
             />

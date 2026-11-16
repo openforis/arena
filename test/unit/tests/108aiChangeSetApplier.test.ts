@@ -1,8 +1,10 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import { applyChangeSet, getChangedProps, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import { applyOperationToNodeDef } from '@webapp/ai/changeSets/operations'
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeOperation, ChangeSet } from '@webapp/ai/changeSets/types'
@@ -236,6 +238,36 @@ describe('applyChangeSet', () => {
     const { deps } = createFakeDeps()
     const results = await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['o2'], deps })
     expect(results).toEqual([{ id: 'o2', status: 'skipped', message: 'dependencyNotApplied' }])
+  })
+})
+
+describe('applyOperationToNodeDef: the designer side effects of multiple and key', () => {
+  const notes = () => getDefByName(initialSurvey, 'cluster_notes')
+  const withValidations = (validations: any) => NodeDef.assocValidations(validations)(notes())
+  const update = (prop: 'multiple' | 'key', to: boolean): any => ({
+    id: 'u',
+    type: 'nodeDef.update',
+    nodeDefUuid: uuidOf('cluster_notes'),
+    prop,
+    from: !to,
+    to,
+  })
+
+  test('becoming multiple removes required and requiredIf, becoming single removes count', () => {
+    const single = withValidations({ required: true, requiredIf: [{ expression: 'true' }] })
+    const multiple = applyOperationToNodeDef(single, update('multiple', true), initialSurvey)
+    expect(NodeDefValidations.isRequired(NodeDef.getValidations(multiple))).toBe(false)
+    expect(NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(multiple))).toBe(false)
+    const counted = withValidations({ count: { min: 1, max: 2 } })
+    const back = applyOperationToNodeDef(counted, update('multiple', false), initialSurvey)
+    expect(NodeDef.getValidations(back).count).toBeUndefined()
+  })
+
+  test('becoming a key removes requiredIf', () => {
+    const def = withValidations({ required: true, requiredIf: [{ expression: 'true' }] })
+    const key = applyOperationToNodeDef(def, update('key', true), initialSurvey)
+    expect(NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(key))).toBe(false)
+    expect(NodeDefValidations.isRequired(NodeDef.getValidations(key))).toBe(true)
   })
 })
 

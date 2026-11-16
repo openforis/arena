@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import type { ChangeSetCardState, OperationConflict } from '@webapp/ai/changeSets/types'
 import { useConfirm, useNotifyError } from '@webapp/components/hooks'
@@ -20,6 +20,8 @@ export type ChangeSetSelection = {
   unselectedBehaviourIds: string[]
   toggle: (id: string) => void
   setSelected: (ids: string[], selected: boolean) => void
+  // the card's status line: gets the focus once Apply or Discard succeeded, as the footer with the button unmounts
+  setStatusElement: (element: HTMLElement | null) => void
   apply: () => Promise<boolean>
   // asks first: a discarded proposal can't be brought back
   discard: () => void
@@ -59,6 +61,8 @@ export const useChangeSetSelection = ({
   })
   const confirm = useConfirm()
   const notifyError = useNotifyError()
+  // state, not a ref: the status line is always mounted, and the lint rule forbids refs in the returned object
+  const [statusElement, setStatusElement] = useState<HTMLElement | null>(null)
 
   const unselectedBehaviourIds = useMemo(
     () =>
@@ -67,6 +71,11 @@ export const useChangeSetSelection = ({
       ),
     [cardState.changeSet, selectableIds, selectedIds]
   )
+
+  const focusStatusOnSuccess = (ok: boolean): boolean => {
+    if (ok) statusElement?.focus()
+    return ok
+  }
 
   return {
     pendingIds,
@@ -78,18 +87,23 @@ export const useChangeSetSelection = ({
     toggle,
     setSelected,
     // a rejection (designer or store error) is shown, not left unhandled
+    setStatusElement,
     apply: () =>
       runWithFailureNotice({
         action: () => onApply(selectedIds),
         notifyError,
         key: 'aiAssistant.card.applyFailed',
-      }),
+      }).then(focusStatusOnSuccess),
     // onCancel is required by useConfirm's inferred (untyped) parameter
     discard: () =>
       confirm({
         key: 'aiAssistant.discardConfirm',
         onOk: () =>
-          void runWithFailureNotice({ action: onDiscard, notifyError, key: 'aiAssistant.card.discardFailed' }),
+          void runWithFailureNotice({
+            action: onDiscard,
+            notifyError,
+            key: 'aiAssistant.card.discardFailed',
+          }).then(focusStatusOnSuccess),
         onCancel: undefined,
       }),
   }

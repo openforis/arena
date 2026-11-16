@@ -110,8 +110,8 @@ export const applyCategoryItemLabels = async ({
     setAll(results, operations, 'skipped', 'notSupported')
     return
   }
-  // another survey was opened meanwhile
-  if (Survey.getId(getSurvey()) !== changeSet.surveyId) {
+  // another survey was opened meanwhile (the store id may be a string: a bigint from the database)
+  if (Number(Survey.getId(getSurvey())) !== Number(changeSet.surveyId)) {
     setAll(results, operations, 'skipped', 'surveyChanged')
     return
   }

@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { collectNodeDefIssues, type NodeDefIssue } from '@webapp/ai/changeSets/validationIssues'
 
 import { canViewCurrentSurvey } from '../common/toolPermissions'
-import { takeWithinBudget } from '../common/toolResult'
+import { getResultBudget, takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
 import { getDesignNodeDefsDepthFirst, getNodeDefPathNames, requireNodeDefByName, requireSurvey } from './surveyLookup'
 
@@ -61,15 +61,18 @@ export const buildSurveyValidation = ({
   survey,
   t,
   maxNodeDefs = VALIDATION_MAX_NODE_DEFS,
+  maxChars,
 }: {
   survey: any
   t: Translate
   maxNodeDefs?: number
+  maxChars?: number
 }) => {
   const withIssues = getNodeDefsWithIssues(survey)
   const withoutEntries = { total: withIssues.length, truncated: false, nodeDefs: [] }
   const nodeDefs = takeWithinBudget(withIssues.slice(0, maxNodeDefs), {
     baseChars: JSON.stringify(withoutEntries).length + 'true'.length,
+    maxChars,
     toEntry: (nodeDef) => describeIssues(survey, nodeDef, t),
   })
   return { ...withoutEntries, truncated: nodeDefs.length < withIssues.length, nodeDefs }
@@ -91,7 +94,7 @@ export const surveyGetValidationTool: AiTool<z.infer<typeof inputSchema>> = {
   requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)
-    if (!name) return buildSurveyValidation({ survey, t: ctx.t })
+    if (!name) return buildSurveyValidation({ survey, t: ctx.t, maxChars: getResultBudget(ctx) })
     const entry = describeIssues(survey, requireNodeDefByName(survey, name), ctx.t)
     return { total: entry.issues.length > 0 ? 1 : 0, truncated: false, nodeDefs: [entry] }
   },

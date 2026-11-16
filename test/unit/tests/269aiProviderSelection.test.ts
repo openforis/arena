@@ -218,6 +218,19 @@ describe('single-provider selection (269)', () => {
     ])
   })
 
+  test('a local provider that is down fails with its probe error (the URL), not the generic one', async () => {
+    const error = { key: 'aiLocalServerUnreachable', params: { baseUrl: LOCAL_URL } }
+    const caps = capabilities({ defaultProviderId: 'local:l1' })
+    caps.local[LOCAL.id] = { ...PROBE, reachable: false, models: [], error }
+    caps.providers = caps.providers.map((entry) =>
+      entry.id === LOCAL.id ? { ...entry, status: 'notAvailable' } : entry
+    )
+    const { resolve, state } = setupResolver(caps, ['continue'])
+    const thrown = await resolve({ feature: 'activityLogSummary', surveyId: 1 }).catch((e) => e)
+    expect({ key: thrown.key, params: thrown.params }).toEqual(error)
+    expect(state.requests).toEqual([])
+  })
+
   test('a local provider is called with its own probe, after the consent for its URL', async () => {
     const { resolve, state } = setupResolver(capabilities({ defaultProviderId: 'local:l1' }), ['continue'])
     const { engine } = await resolve({ feature: 'activityLogSummary', surveyId: 1 })

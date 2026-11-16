@@ -1,11 +1,7 @@
 import { generateText, streamText } from 'ai'
 
 import { createLocalServerEngine } from '@webapp/ai/engines/localServerEngine'
-import {
-  DEFAULT_LOCAL_CONTEXT_TOKENS,
-  getLocalServerMaxOutputTokens,
-  LOCAL_SERVER_MAX_OUTPUT_TOKENS,
-} from '@webapp/ai/engines/localServerProbe'
+import { createGatewayTextGenerator } from '@webapp/ai/runtime/textGenerators'
 import type { AiLocalServerCapability } from '@webapp/ai/engines/types'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
@@ -54,43 +50,34 @@ const recorder = (respond: () => Response) => {
 
 const modelOptions = { feature: 'expressionExplain', dataClass: 'schema' } as const
 
-describe('getLocalServerMaxOutputTokens (370)', () => {
-  test('the quarter of the context kept for the answer, at most the gateway cap', () => {
-    expect(getLocalServerMaxOutputTokens(4096)).toBe(1024)
-    expect(getLocalServerMaxOutputTokens(8192)).toBe(2048)
-    expect(getLocalServerMaxOutputTokens(32768)).toBe(LOCAL_SERVER_MAX_OUTPUT_TOKENS)
-    expect(getLocalServerMaxOutputTokens(1_000_000)).toBe(LOCAL_SERVER_MAX_OUTPUT_TOKENS)
-  })
-
-  test('an unknown context size uses the default size', () => {
-    expect(getLocalServerMaxOutputTokens(null)).toBe(Math.floor(DEFAULT_LOCAL_CONTEXT_TOKENS * 0.25))
-    expect(getLocalServerMaxOutputTokens(0)).toBe(Math.floor(DEFAULT_LOCAL_CONTEXT_TOKENS * 0.25))
-  })
-})
-
-describe('the local engine limits its output (370)', () => {
-  test('a request without a cap gets the cap of the engine', async () => {
-    const { bodies, fetchImpl } = recorder(completion)
-    const engine = createLocalServerEngine({ localServer: localServer(), fetchImpl })
-    await generateText({ model: engine.createModel(modelOptions), prompt: 'hi', maxRetries: 0 })
-    expect(bodies[0].max_tokens).toBe(1024)
-  })
-
-  test('a caller can ask for less, not for more', async () => {
+describe('the local engine does not cap its output (370)', () => {
+  test('no max_tokens is sent, whatever the context or the caller asks', async () => {
     const { bodies, fetchImpl } = recorder(completion)
     const engine = createLocalServerEngine({ localServer: localServer(), fetchImpl })
     const model = engine.createModel(modelOptions)
+    await generateText({ model, prompt: 'hi', maxRetries: 0 })
     await generateText({ model, prompt: 'hi', maxOutputTokens: 100, maxRetries: 0 })
-    await generateText({ model, prompt: 'hi', maxOutputTokens: 100000, maxRetries: 0 })
-    expect(bodies.map((body) => body.max_tokens)).toEqual([100, 1024])
+    expect(bodies.map((body) => 'max_tokens' in body)).toEqual([false, false])
   })
 
-  test('a stream asks for the cap too', async () => {
+  test('a stream sends none either', async () => {
     const { bodies, fetchImpl } = recorder(() => sse(['ok']))
     const engine = createLocalServerEngine({ localServer: localServer({ contextTokens: 32768 }), fetchImpl })
     const result = streamText({ model: engine.createModel(modelOptions), prompt: 'hi', maxRetries: 0 })
     await result.consumeStream()
-    expect(bodies[0].max_tokens).toBe(LOCAL_SERVER_MAX_OUTPUT_TOKENS)
+    expect('max_tokens' in bodies[0]).toBe(false)
+  })
+})
+
+describe('reasoning of the local engine (370)', () => {
+  test('a task call sends reasoning_effort none; a chat call (no provider options) does not', async () => {
+    const { bodies, fetchImpl } = recorder(completion)
+    const engine = createLocalServerEngine({ localServer: localServer(), fetchImpl })
+    const model = engine.createModel(modelOptions)
+    await createGatewayTextGenerator(model)({ prompt: 'translate' })
+    await generateText({ model, prompt: 'chat', maxRetries: 0 })
+    expect(bodies[0].reasoning_effort).toBe('none')
+    expect('reasoning_effort' in bodies[1]).toBe(false)
   })
 })
 

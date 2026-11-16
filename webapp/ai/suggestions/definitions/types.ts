@@ -18,8 +18,8 @@ export type SuggestionDefinition = {
     suggestion: AssistantSuggestion,
     ctx: SuggestionDescribeContext
   ) => { key: string; params: Record<string, unknown> }
-  // English prompt, built from the visible targets only
-  prompt: (suggestion: AssistantSuggestion, ctx: SuggestionDescribeContext) => string
+  // English prompt, built from the visible targets only (none: Do it does not start a chat turn)
+  prompt?: (suggestion: AssistantSuggestion, ctx: SuggestionDescribeContext) => string
   // what Do it does to the suggestion: in progress until its cards settle (default), or removed (no card expected)
   acceptMode?: 'progress' | 'remove'
   // the kind has no change-set card: a completed answer settles it (default: it needs a card)

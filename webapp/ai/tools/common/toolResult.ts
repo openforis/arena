@@ -9,8 +9,31 @@ import type { AiToolErrorResult } from '../types'
 // the most the wrapper lets through; a longer result is cut by `limitToolResult`
 export const TOOL_RESULT_MAX_CHARS = AiLimits.assistantToolResultMaxChars
 
-// what a tool fills by itself: the rest is room for the fields added around its result (truncated, shownToUser...)
-export const TOOL_RESULT_BUDGET_CHARS = TOOL_RESULT_MAX_CHARS - 500
+// a large context lets a result grow up to this (the default above is for callers without a context size)
+export const TOOL_RESULT_LARGE_MAX_CHARS = 32000
+
+/**
+ * Returns the most a tool result may take in a turn: an eighth of the prompt limit, so a few results cannot fill a
+ * small local context, and more than the default when the context is large.
+ * @param {number} maxPromptChars - Prompt limit of the engine.
+ * @returns {number} The cap, at most TOOL_RESULT_LARGE_MAX_CHARS.
+ */
+export const getToolResultCap = (maxPromptChars: number): number =>
+  Math.min(TOOL_RESULT_LARGE_MAX_CHARS, Math.floor(maxPromptChars / 8))
+
+// the room left for the fields added around a tool result (truncated, shownToUser...)
+const TOOL_RESULT_RESERVE_CHARS = 500
+
+// what a tool fills by itself, for a caller without a turn (the cap of the turn: getResultBudget)
+export const TOOL_RESULT_BUDGET_CHARS = TOOL_RESULT_MAX_CHARS - TOOL_RESULT_RESERVE_CHARS
+
+/**
+ * Returns what a tool may fill of its result in the current turn (follows the cap of the turn).
+ * @param {object} [ctx] - Tool context (the registry sets resultCapChars on every call).
+ * @returns {number} The budget.
+ */
+export const getResultBudget = (ctx?: { resultCapChars?: number }): number =>
+  ctx?.resultCapChars ? ctx.resultCapChars - TOOL_RESULT_RESERVE_CHARS : TOOL_RESULT_BUDGET_CHARS
 
 const DETAILS_DROPPED_MESSAGE_MAX_CHARS = 1000
 

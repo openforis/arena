@@ -31,7 +31,7 @@ const KIND_HINTS = {
  * @param {{message: string}} [args.previousError] - Parser/validator error from a prior attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The prompt pair.
  */
-export const buildTranslationPrompt = ({ sourceLang, targetLangs, items, glossary, previousError }) => {
+export const buildTranslationPrompt = ({ sourceLang, targetLangs, items, glossary, previousError = null }) => {
   const system = `You translate survey labels for the Open Foris Arena platform (FAO field-data
 collection). The labels are short, terminologically consistent, and often
 domain-specific (forestry, agriculture, biodiversity).
@@ -44,22 +44,18 @@ Style:
 - Use the supplied glossary to keep recurring terminology consistent.
 
 Output format (very important):
-Reply with EXACTLY one JSON object, nothing else, in this exact shape:
-{
-  "translations": [
-    { "id": "<original id>", "byLang": { "<langCode>": "<translation>" } }
-  ]
-}
-- Include every item from the request, keyed by its original id.
+Reply with EXACTLY one JSON object, nothing else, in this exact shape, compact (no indentation, no line breaks):
+{"translations":[{"id":"<item id>","byLang":{"<langCode>":"<translation>"}}]}
+- Include every item from the request, keyed by its id.
 - Include every requested target language for every item.
 - Do not wrap the JSON in code fences or backticks.
 - Do not add prose before or after the JSON.`
 
   const itemsBlock = items
-    .map((it, idx) => {
+    .map((it) => {
       const kind = it.kind || 'generic'
       const hint = KIND_HINTS[kind] || KIND_HINTS.generic
-      return `[${idx + 1}] id=${pq(it.id, 200)} kind=${pq(kind, 64)} (${hint})\n` + `    text: ${pq(it.text)}`
+      return `id=${pq(it.id, 200)} kind=${pq(kind, 64)} (${hint})\n` + `    text: ${pq(it.text)}`
     })
     .join('\n')
 

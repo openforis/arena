@@ -78,6 +78,42 @@ describe('AI batch runner (253)', () => {
     expect(failedCount).toBe(6)
   })
 
+  test('an unusable answer runs the two halves instead of the same call again', async () => {
+    const tried: string[][] = []
+    const make = (items: string[]): AiBatchCall<string[]> => ({
+      size: items.length,
+      run: async () => {
+        tried.push(items)
+        // cut off with more than one item; the item 'c' fails alone too
+        if (items.length > 1 || items[0] === 'c') throw new SystemError('aiTranslationInvalid', {}, 502)
+        return items
+      },
+      split:
+        items.length > 1
+          ? () => [make(items.slice(0, items.length / 2)), make(items.slice(items.length / 2))]
+          : undefined,
+    })
+    const results: string[][] = []
+    const progress: unknown[] = []
+    const { failedCount, notRunCount } = await runAiBatchCalls({
+      calls: [make(['a', 'b', 'c', 'd'])],
+      guard: noGuard,
+      onResult: (result) => {
+        results.push(result)
+      },
+      onProgress: (value) => progress.push(value),
+    })
+    expect(tried).toEqual([['a', 'b', 'c', 'd'], ['a', 'b'], ['a'], ['b'], ['c', 'd'], ['c'], ['d']])
+    expect(results).toEqual([['a'], ['b'], ['d']])
+    expect(failedCount).toBe(1)
+    expect(notRunCount).toBe(0)
+    // the halves are not calls of the run: the progress stays on its calls
+    expect(progress).toEqual([
+      { done: 0, total: 1 },
+      { done: 1, total: 1 },
+    ])
+  })
+
   test('an error that fails every call stops the run at once', async () => {
     let ran = 0
     const failing = async () => {
@@ -89,6 +125,35 @@ describe('AI batch runner (253)', () => {
       'aiProviderAuth'
     )
     expect(ran).toBe(1)
+  })
+
+  test('a rate-limited call is repeated after a wait, at most 3 times, then the run stops', async () => {
+    let ran = 0
+    const limitedTwice = async () => {
+      ran += 1
+      if (ran <= 2) throw new SystemError('aiRateLimited', {}, 429)
+      return 'ok'
+    }
+    const results: string[] = []
+    await runAiBatchCalls({
+      calls: [call(1, limitedTwice)],
+      guard: noGuard,
+      onResult: (result) => results.push(result),
+      rateLimitWaitMs: 0,
+    })
+    expect(results).toEqual(['ok'])
+    expect(ran).toBe(3)
+
+    ran = 0
+    const alwaysLimited = async () => {
+      ran += 1
+      throw new SystemError('aiRateLimited', {}, 429)
+    }
+    await expectSystemErrorKey(
+      runAiBatchCalls({ calls: [call(1, alwaysLimited)], guard: noGuard, onResult: () => {}, rateLimitWaitMs: 0 }),
+      'aiRateLimited'
+    )
+    expect(ran).toBe(4)
   })
 
   test('a policy change during the run stops it before the next call and keeps the results so far', async () => {

@@ -173,6 +173,7 @@ export const startCreateSurveyJob = ({ user, surveyInfo }) => {
  * @param {string} params.fileFormat - csv or xlsx.
  * @param {Record<string, string>|null} [params.aiDescriptions] - Validated AI descriptions (null: no AI column).
  * @param {number} [params.aiDescriptionsFailedCount] - Node defs the browser could not describe.
+ * @param {number} [params.aiDescriptionsNotDoneCount] - Node defs the browser did not try (the run was stopped).
  * @returns {object} The enqueued job.
  */
 export const startSchemaSummaryExportJob = ({
@@ -182,6 +183,7 @@ export const startSchemaSummaryExportJob = ({
   fileFormat,
   aiDescriptions = null,
   aiDescriptionsFailedCount = 0,
+  aiDescriptionsNotDoneCount = 0,
 }) => {
   const job = new SchemaSummaryExportJob({
     user,
@@ -190,6 +192,7 @@ export const startSchemaSummaryExportJob = ({
     fileFormat,
     aiDescriptions,
     aiDescriptionsFailedCount,
+    aiDescriptionsNotDoneCount,
   })
   JobManager.enqueueJob(job)
   return job

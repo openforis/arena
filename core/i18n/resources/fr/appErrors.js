@@ -16,6 +16,8 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
   aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
+  aiAssistantStepLimit:
+    "L'assistant a atteint sa limite d'étapes sans rédiger de réponse. Réessayez ou posez une question plus ciblée.",
   aiLocalServerUnreachable:
     "Le serveur d'IA à l'adresse {{baseUrl}} est injoignable. Est-il démarré, avec CORS activé ? Le navigateur a-t-il bloqué l'accès aux appareils du réseau local ?",
   aiLocalServerModelMissing:
@@ -118,6 +120,8 @@ export default {
     nodesBatchInvalid: 'Requête de modification groupée invalide ({{reason}}).',
     nodesBatchBusy: 'Une autre modification groupée est en cours ; réessayez dans quelques secondes.',
     nodesBatchInvalidValue: "La nouvelle valeur de « {{attributeName}} » n'est pas valide pour cet attribut.",
+    nodesBatchWouldClearValues:
+      "Cette modification effacerait d'autres valeurs qui ne sont plus applicables ; modifiez cette valeur dans le formulaire pour confirmer.",
     nodesBatchUnexpected: "La modification n'a pas pu être appliquée à cause d'une erreur inattendue du serveur.",
   },
   recordPrintableExport: {

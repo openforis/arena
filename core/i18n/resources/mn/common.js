@@ -1481,6 +1481,14 @@ $t(common.cantUndoWarning)`,
   aiBatch: {
     translateTitle: 'AI: Шошгыг орчуулах',
     dataDictionaryTitle: 'AI: Талбарын тайлбар',
+    categoryLabelsTitle: 'AI: Ангиллын шошгыг орчуулах',
+    categoryLabelsNothing: 'Орчуулах ангиллын шошго алга: зүйлсэд өөр хэл дээрх шошго байхгүй.',
+    categoryLabelsSaved_one: 'Ангиллын {{count}} шошго хадгалагдлаа.',
+    categoryLabelsSaved_other: 'Ангиллын {{count}} шошго хадгалагдлаа.',
+    categoryLabelsNotSaved_one:
+      'Ангиллын {{count}} шошгыг хадгалж чадсангүй (энэ хооронд өөрчлөгдсөн эсвэл хүлээн аваагүй); {{saved}} хадгалагдлаа.',
+    categoryLabelsNotSaved_other:
+      'Ангиллын {{count}} шошгыг хадгалж чадсангүй (энэ хооронд өөрчлөгдсөн эсвэл хүлээн аваагүй); {{saved}} хадгалагдлаа.',
     preparing: 'Бэлтгэж байна…',
     progress: '{{total}} AI хүсэлтээс {{done}} нь дууссан',
     stop: 'Зогсоох',
@@ -1565,6 +1573,7 @@ $t(common.cantUndoWarning)`,
     rowAction: {
       askAssistant: 'Туслахаас асуух',
       question: 'Энэ утга яагаад буруу байна, үүнийг хэрхэн засах вэ?',
+      busy: 'Туслах хараахан хариулж байна. Дуустал хүлээх эсвэл эхлээд зогсооно уу.',
     },
     card: {
       empty: '(хоосон)',

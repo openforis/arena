@@ -37,14 +37,16 @@ import * as SurveyService from '../service/surveyService'
  * @param {object} params.user - Acting user.
  * @param {unknown} params.aiDescriptions - Descriptions by uuid from the request.
  * @param {unknown} params.aiDescriptionsFailedCount - Failed count from the request.
- * @returns {{aiDescriptions: object, aiDescriptionsFailedCount: number}} The validated values.
+ * @param {unknown} params.aiDescriptionsNotDoneCount - Not done (stopped) count from the request.
+ * @returns {{aiDescriptions: object, aiDescriptionsFailedCount: number, aiDescriptionsNotDoneCount: number}} The validated values.
  */
-const parseExportAiDescriptions = ({ user, aiDescriptions, aiDescriptionsFailedCount }) => {
+const parseExportAiDescriptions = ({ user, aiDescriptions, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount }) => {
   // the descriptions come from the user's AI: their data dictionary switch still applies
   assertFeatureEnabled('dataDictionary', user)
   return {
     aiDescriptions: parseAiDescriptions({ raw: aiDescriptions }),
     aiDescriptionsFailedCount: parseAiDescriptionsFailedCount(aiDescriptionsFailedCount),
+    aiDescriptionsNotDoneCount: parseAiDescriptionsFailedCount(aiDescriptionsNotDoneCount),
   }
 }
 
@@ -371,10 +373,13 @@ export const init = (app) => {
         fileFormat = FileFormats.xlsx,
         aiDescriptions = null,
         aiDescriptionsFailedCount = 0,
+        aiDescriptionsNotDoneCount = 0,
       } = params
       const user = Request.getUser(req)
       const ai =
-        aiDescriptions === null ? {} : parseExportAiDescriptions({ user, aiDescriptions, aiDescriptionsFailedCount })
+        aiDescriptions === null
+          ? {}
+          : parseExportAiDescriptions({ user, aiDescriptions, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount })
       const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {

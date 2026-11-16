@@ -1497,6 +1497,15 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
   aiBatch: {
     translateTitle: 'IA : Traduire les étiquettes',
     dataDictionaryTitle: 'IA : Descriptions des champs',
+    categoryLabelsTitle: 'IA : Traduire les libellés de catégories',
+    categoryLabelsNothing:
+      "Aucun libellé de catégorie à traduire : les éléments n'ont de libellé dans aucune autre langue.",
+    categoryLabelsSaved_one: '{{count}} libellé de catégorie enregistré.',
+    categoryLabelsSaved_other: '{{count}} libellés de catégories enregistrés.',
+    categoryLabelsNotSaved_one:
+      "{{count}} libellé de catégorie n'a pas pu être enregistré (modifié entre-temps ou refusé) ; {{saved}} enregistrés.",
+    categoryLabelsNotSaved_other:
+      "{{count}} libellés de catégories n'ont pas pu être enregistrés (modifiés entre-temps ou refusés) ; {{saved}} enregistrés.",
     preparing: 'Préparation…',
     progress: '{{done}} requêtes IA terminées sur {{total}}',
     stop: 'Arrêter',
@@ -1582,6 +1591,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     rowAction: {
       askAssistant: "Demander à l'assistant",
       question: "Pourquoi cette valeur n'est-elle pas valide et comment la corriger ?",
+      busy: "L'assistant répond encore. Attendez la fin de sa réponse ou arrêtez-le d'abord.",
     },
     card: {
       empty: '(vide)',

@@ -54,7 +54,7 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
         </div>
 
         {error ? (
-          <div className="ai-activity-log-summary-modal__error">
+          <div className="ai-activity-log-summary-modal__error" role="alert">
             {tUnescaped('aiActivityLog.error', { message: getAiErrorMessage({ error, i18n }) })}
             <AiEngineErrorActions error={error} onRetry={onRetry} />
           </div>

@@ -89,6 +89,8 @@ describe('query_run', () => {
     expect(result.rows[3]).toEqual(['T3', 'Type 3', 3.5])
     expect(result).toMatchObject({ queryId: 'q1', mode: 'aggregate', total: 250, truncated: true })
     expect(JSON.stringify(result).length).toBeLessThanOrEqual(TOOL_RESULT_BUDGET_CHARS)
+    expect(result.note).toContain('first 200 of 250 rows')
+    expect(result.note).toContain('sort order')
   })
 
   test('aggregate: few groups, no count request', async () => {

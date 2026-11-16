@@ -1474,6 +1474,14 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
   aiBatch: {
     translateTitle: 'AI: Translate labels',
     dataDictionaryTitle: 'AI: Field descriptions',
+    categoryLabelsTitle: 'AI: Translate category labels',
+    categoryLabelsNothing: 'No category label to translate: the items have no label in another language.',
+    categoryLabelsSaved_one: '{{count}} category label saved.',
+    categoryLabelsSaved_other: '{{count}} category labels saved.',
+    categoryLabelsNotSaved_one:
+      '{{count}} category label could not be saved (changed meanwhile or not accepted); {{saved}} saved.',
+    categoryLabelsNotSaved_other:
+      '{{count}} category labels could not be saved (changed meanwhile or not accepted); {{saved}} saved.',
     preparing: 'Preparing…',
     progress: '{{done}} of {{total}} AI requests done',
     stop: 'Stop',
@@ -1557,6 +1565,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     rowAction: {
       askAssistant: 'Ask the assistant',
       question: 'Why is this value invalid, and how can I fix it?',
+      busy: 'The assistant is still answering. Wait for it to finish or stop it first.',
     },
     card: {
       empty: '(empty)',

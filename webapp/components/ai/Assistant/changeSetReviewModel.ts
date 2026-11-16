@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import type { TranslationSource } from '@webapp/ai/changeSets/translationSource'
-import type { ChangeOperation, ChangeSetCardState, OperationResult } from '@webapp/ai/changeSets/types'
+import type { ChangeOperation, ChangeSetCardState, OperationResult, OperationStatus } from '@webapp/ai/changeSets/types'
 
 import { buildCategoryLabelGroups } from './categoryLabelCardModel'
 import { buildCardRows, findNodeDefName, type CardDetail, type CardValue } from './changeSetCardModel'
@@ -285,4 +285,29 @@ export const getValuePreview = (value: CardValue, t: Translate): string => {
   if (value.kind === 'boolean') return t(value.value ? 'aiAssistant.card.yes' : 'aiAssistant.card.no')
   const text = value.kind === 'text' ? value.text : value.items.map((item) => item.expression).join('; ')
   return text || t('aiAssistant.card.empty')
+}
+
+/**
+ * Returns the text of the card's status line: the results of an Apply by status, or that the card was discarded.
+ * @param {object} params - Parameters.
+ * @param {ReviewItem[]} params.items - Items.
+ * @param {boolean} params.discarded - The card was discarded.
+ * @param {Function} params.t - Translation function.
+ * @returns {string} The text; empty while nothing happened.
+ */
+export const getStatusLineText = ({
+  items,
+  discarded,
+  t,
+}: {
+  items: ReviewItem[]
+  discarded: boolean
+  t: Translate
+}): string => {
+  if (discarded) return t('aiAssistant.card.discarded')
+  return (['applied', 'conflict', 'failed', 'skipped'] as OperationStatus[])
+    .map((status) => [status, items.filter((item) => item.result?.status === status).length] as const)
+    .filter(([, count]) => count > 0)
+    .map(([status, count]) => `${t('aiAssistant.card.status.' + status)}: ${count}`)
+    .join(', ')
 }

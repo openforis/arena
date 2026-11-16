@@ -48,6 +48,8 @@ export type AssistantMessage = {
   status: AssistantMessageStatus
   // appErrors key of a failed turn
   errorKey?: string
+  // interpolation params of the error (absent on answers saved before them)
+  errorParams?: Record<string, unknown>
   // absent on answers saved before the meter, and when no request was sent
   usage?: AssistantMessageUsage
   createdAt: string

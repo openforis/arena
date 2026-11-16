@@ -226,6 +226,7 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
       data-testid={TestId.aiAssistant.panel}
       onKeyDown={onKeyDown}
       ref={dialogRef}
+      role="complementary"
     >
       <div className="ai-assistant-panel__header">
         <h2 className="ai-assistant-panel__title">{t('aiAssistant.title')}</h2>

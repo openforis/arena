@@ -3,10 +3,10 @@ import { Dates } from '@openforis/arena-core'
 
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
-import type { AiTool } from '@webapp/ai/tools/types'
+import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
 import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
-import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
@@ -66,8 +66,11 @@ const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
   requires: canCleanseCurrentSurvey,
 }
 
-const invalidProposal = (message: string, issues: { operation: number; field: string; message: string }[]) =>
-  new AiToolFailure('invalidProposal', message, fitListToBudget({ issues }, 'issues'))
+const invalidProposal = (
+  message: string,
+  issues: { operation: number; field: string; message: string }[],
+  ctx: AiToolContext
+) => new AiToolFailure('invalidProposal', message, fitListToBudget({ issues }, 'issues', getResultBudget(ctx)))
 
 /**
  * Creates records_proposeEdits.
@@ -100,13 +103,17 @@ export const createRecordsProposeEditsTool = ({
    */
   execute: async ({ summary, edits }, ctx) => {
     if (new Set(edits.map((edit) => edit.recordUuid)).size > NodesBatchLimits.maxRecords) {
-      throw invalidProposal('Too many records in one change set.', [
-        {
-          operation: 0,
-          field: 'tooManyRecords',
-          message: `At most ${NodesBatchLimits.maxRecords} records per change set: split into smaller change sets.`,
-        },
-      ])
+      throw invalidProposal(
+        'Too many records in one change set.',
+        [
+          {
+            operation: 0,
+            field: 'tooManyRecords',
+            message: `At most ${NodesBatchLimits.maxRecords} records per change set: split into smaller change sets.`,
+          },
+        ],
+        ctx
+      )
     }
     const { survey, surveyId, cycle, lang } = getCleaningContext(ctx)
     if (!cycle) throw new AiToolFailure('noCycle', 'No survey cycle is selected: ask the user to open one.')
@@ -126,14 +133,15 @@ export const createRecordsProposeEditsTool = ({
       if (drafts.length === 0) {
         throw invalidProposal(
           'No edit can be proposed.',
-          rejected.map(({ index, code, message }) => ({ operation: index, field: code, message }))
+          rejected.map(({ index, code, message }) => ({ operation: index, field: code, message })),
+          ctx
         )
       }
       const changeSet = buildChangeSet({ drafts, survey, summary })
       ctx.onChangeSet(changeSet)
       // `operations` is what the history note of the agent reads
       const result = { changeSetId: changeSet.id, proposed: drafts.length, operations: drafts.length, rejected }
-      return { ...fitListToBudget(result, 'rejected'), shownToUser: true }
+      return { ...fitListToBudget(result, 'rejected', getResultBudget(ctx)), shownToUser: true }
     } catch (error) {
       throw toRequestFailure(error, TIMEOUT_HINT)
     }

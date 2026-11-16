@@ -65,6 +65,27 @@ describe('AI data query generation', () => {
       expect(Query.hasSelection(query)).toBe(true)
     })
 
+    test('a column name stands for its attribute; an aggregate query sorts by the count', () => {
+      const { query, errors } = convert({
+        dimensions: ['tree_species_scientific_name'],
+        measures: [{ attribute: 'tree', functions: ['cnt'] }],
+        sort: [{ attribute: 'tree', order: 'desc' }],
+      })
+      expect(errors).toEqual([])
+      expect(Query.getDimensions(query)).toEqual([getUuid('cluster/plot/tree/tree_species')])
+      const [sortCriteria] = Query.getSort(query)
+      expect(SortCriteria.getVariable(sortCriteria)).toBe('tree_uuid_cnt')
+      expect(SortCriteria.isOrderDesc(sortCriteria)).toBe(true)
+
+      const raw = convert({
+        mode: Query.modes.raw,
+        attributes: ['tree_species'],
+        sort: [{ attribute: 'tree_species_scientific_name' }],
+      })
+      expect(raw.errors).toEqual([])
+      expect(SortCriteria.getVariable(Query.getSort(raw.query)[0])).toBe('tree_species_scientific_name')
+    })
+
     test('aggregate query with ancestor dimension, measure functions, filter and sort', () => {
       const { query, errors } = convert({
         dimensions: ['plot_id'],

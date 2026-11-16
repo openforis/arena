@@ -1487,6 +1487,14 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
   aiBatch: {
     translateTitle: 'IA: Traduzir rótulos',
     dataDictionaryTitle: 'IA: Descrições dos campos',
+    categoryLabelsTitle: 'IA: Traduzir rótulos de categorias',
+    categoryLabelsNothing: 'Nenhum rótulo de categoria para traduzir: os itens não têm rótulo em outro idioma.',
+    categoryLabelsSaved_one: '{{count}} rótulo de categoria salvo.',
+    categoryLabelsSaved_other: '{{count}} rótulos de categorias salvos.',
+    categoryLabelsNotSaved_one:
+      '{{count}} rótulo de categoria não pôde ser salvo (alterado entretanto ou não aceito); {{saved}} salvos.',
+    categoryLabelsNotSaved_other:
+      '{{count}} rótulos de categorias não puderam ser salvos (alterados entretanto ou não aceitos); {{saved}} salvos.',
     preparing: 'Preparando…',
     progress: '{{done}} de {{total}} pedidos à IA concluídos',
     stop: 'Parar',
@@ -1572,6 +1580,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     rowAction: {
       askAssistant: 'Perguntar ao assistente',
       question: 'Por que este valor é inválido e como posso corrigi-lo?',
+      busy: 'O assistente ainda está respondendo. Aguarde o fim ou pare-o primeiro.',
     },
     card: {
       empty: '(vazio)',

@@ -23,7 +23,7 @@ export const normalizeUsage = (usage) => ({
 })
 
 const describeContext = (ctx) =>
-  `feature=${ctx.feature} source=${ctx.source} provider=${ctx.provider} model=${ctx.model} user=${ctx.userUuid}`
+  `feature=${ctx.feature} source=${ctx.source} provider=${ctx.provider} model=${String(ctx.model).replaceAll(/[\r\n]/g, ' ')} user=${ctx.userUuid}`
 
 /**
  * Logs the outcome of one model call (exactly one line per call).
@@ -37,7 +37,7 @@ const describeContext = (ctx) =>
  */
 export const record = (ctx, { latencyMs, usage, error }) => {
   if (error) {
-    logger.error(`fail ${describeContext(ctx)} latencyMs=${latencyMs} error=${error?.message || error}`)
+    logger.error(`fail ${describeContext(ctx)} latencyMs=${latencyMs}`)
     return
   }
   if (!logger.infoEnabled) return

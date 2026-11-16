@@ -12,7 +12,7 @@ import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft, ChangeSetIssue } from '@webapp/ai/changeSets/types'
 
-import { takeWithinBudget } from '../common/toolResult'
+import { getResultBudget, takeWithinBudget } from '../common/toolResult'
 import { summaryTextSchema } from '../common/toolSchemas'
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'
@@ -69,7 +69,8 @@ const changesNothing = (draft: ChangeOperationDraft): boolean => {
  * @param {ChangeSetIssue[]} issues - All issues.
  * @returns {ChangeSetIssue[]} The leading issues that fit.
  */
-const capIssues = (issues: ChangeSetIssue[]): ChangeSetIssue[] => takeWithinBudget(issues, { baseChars: 2 })
+const capIssues = (issues: ChangeSetIssue[], maxChars: number): ChangeSetIssue[] =>
+  takeWithinBudget(issues, { baseChars: 2, maxChars })
 
 /**
  * Validates the proposed operations and hands the change set to the conversation.
@@ -110,7 +111,8 @@ export const proposeChangeSet = async ({
           validation.issues.map((issue) => ({
             ...issue,
             operation: originalIndexes[issue.operation] ?? issue.operation,
-          }))
+          })),
+          getResultBudget(ctx)
         ),
         issuesTotal: validation.issues.length,
       }

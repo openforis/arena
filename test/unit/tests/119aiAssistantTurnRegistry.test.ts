@@ -16,6 +16,19 @@ describe('assistant turn registry', () => {
     expect(registry.getGeneration()).toBe(before + 1)
   })
 
+  test('isRunning is true from register to unregister, and false after abortAll', () => {
+    const registry = createAssistantTurnRegistry()
+    const controller = new AbortController()
+    expect(registry.isRunning()).toBe(false)
+    registry.register(controller)
+    expect(registry.isRunning()).toBe(true)
+    registry.unregister(controller)
+    expect(registry.isRunning()).toBe(false)
+    registry.register(controller)
+    registry.abortAll()
+    expect(registry.isRunning()).toBe(false)
+  })
+
   test('settle waits for the tracked saves, including ones added meanwhile', async () => {
     const registry = createAssistantTurnRegistry()
     const done: string[] = []

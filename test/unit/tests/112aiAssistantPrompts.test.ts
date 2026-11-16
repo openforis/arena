@@ -4,7 +4,7 @@ import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { mockAnswerFor } from '@server/modules/ai/service/mockProvider'
-import { buildAssistantSystemPrompt, describeView } from '@webapp/ai/agent/assistantSystemPrompt'
+import { HISTORY_NOTES_RULE, buildAssistantSystemPrompt, describeView } from '@webapp/ai/agent/assistantSystemPrompt'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 
 const asPrompt = (content: string): any => [{ role: 'system', content }]
@@ -87,6 +87,7 @@ describe('buildAssistantSystemPrompt', () => {
     expect(prompt.startsWith(assistantMarkers.design)).toBe(true)
     expect(prompt).toContain('do_not_use__test_')
     expect(prompt).toContain('Selected node definition: `tree_dec_1`.')
+    expect(prompt).toContain(HISTORY_NOTES_RULE)
   })
 
   test('help: no survey content, only the module names', () => {

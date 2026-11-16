@@ -1,4 +1,5 @@
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
@@ -53,6 +54,32 @@ describe('getRecordValues', () => {
     expect(result.nodes).toHaveLength(3)
     expect(result.truncated).toBe(true)
     expect(result.total).toBeGreaterThan(3)
+  })
+
+  test('parentNodeUuid keeps the nodes below that entity (its siblings)', () => {
+    const treeDef = Survey.getNodeDefByName('tree')(survey)
+    const [firstTree] = Record.getNodesByDefUuid(NodeDef.getUuid(treeDef))(record)
+    const all = getRecordValues({ survey, cycle, record, nodeDefs: [dbhDef], i18n: fakeI18n })
+    const below = getRecordValues({
+      survey,
+      cycle,
+      record,
+      nodeDefs: [dbhDef],
+      i18n: fakeI18n,
+      parentNodeUuid: Node.getUuid(firstTree),
+    })
+    expect(below.nodes.length).toBeGreaterThan(0)
+    expect(below.nodes.length).toBeLessThan(all.nodes.length)
+    expect(below.nodes.every(({ parentKeys }) => parentKeys.endsWith('tree[1]'))).toBe(true)
+  })
+
+  test('the tool takes an optional parentNodeUuid', () => {
+    const { api } = newFakeCleaningApi({})
+    const tool = createRecordGetValuesTool({ api, getI18n: () => fakeI18n })
+    const base = { recordUuid: uuidv4(), attributes: ['dbh'] }
+    expect(tool.inputSchema.safeParse(base).success).toBe(true)
+    expect(tool.inputSchema.safeParse({ ...base, parentNodeUuid: uuidv4() }).success).toBe(true)
+    expect(tool.inputSchema.safeParse({ ...base, parentNodeUuid: 'not-a-uuid' }).success).toBe(false)
   })
 
   test('the default cap is 100 nodes', () => {

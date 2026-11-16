@@ -9,6 +9,7 @@ import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValid
 
 import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
@@ -46,12 +47,14 @@ const ExpressionResult = ({ result, validationError = null, isValid, i18n }) => 
     </div>
     <div className="ai-expression-popup__explanation">{result.explanation}</div>
     {!result.isValid && result.parseError ? (
-      <div className="ai-expression-popup__error">
+      <div className="ai-expression-popup__error" role="alert">
         {i18n.t('aiExpression.parseError', { message: result.parseError })}
       </div>
     ) : null}
     {result.isValid && validationError ? (
-      <div className="ai-expression-popup__error">{i18n.t(validationError.key, validationError.params)}</div>
+      <div className="ai-expression-popup__error" role="alert">
+        {i18n.t(validationError.key, validationError.params)}
+      </div>
     ) : null}
   </>
 )
@@ -114,7 +117,7 @@ const AiExpressionPopup = (props) => {
         setValidationError(validatorError)
       }
     } catch (err) {
-      setError(getAiErrorMessage({ error: err, i18n }))
+      setError(err)
     } finally {
       setBusy(false)
     }
@@ -138,6 +141,7 @@ const AiExpressionPopup = (props) => {
         <textarea
           ref={textareaRef}
           className="ai-textarea"
+          aria-label={i18n.t('aiExpression.placeholder')}
           placeholder={i18n.t('aiExpression.placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -154,7 +158,12 @@ const AiExpressionPopup = (props) => {
           <ExpressionResult result={result} validationError={validationError} isValid={isValid} i18n={i18n} />
         ) : null}
 
-        {error ? <div className="ai-expression-popup__error">{error}</div> : null}
+        {error ? (
+          <div className="ai-expression-popup__error" role="alert">
+            {getAiErrorMessage({ error, i18n })}
+            <AiEngineErrorActions disabled={busy} error={error} onRetry={() => void onGenerate()} />
+          </div>
+        ) : null}
       </ModalBody>
 
       <ModalFooter>

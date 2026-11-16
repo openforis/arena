@@ -10,7 +10,7 @@ import { AiLimits } from '@common/ai/limits'
 import type { AiPolicy } from '@common/ai/policy'
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
 
-import { isDataToolResult } from '@webapp/ai/conversations/dataClass'
+import { getConversationDataClass, isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
@@ -19,6 +19,7 @@ import { loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import { resolveModel, type ResolveModelParams, type ResolvedModel } from '@webapp/ai/engines/resolveModel'
 import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import { getToolResultCap } from '@webapp/ai/tools/common/toolResult'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
@@ -46,6 +47,18 @@ export const assistantAreaFeatures: Record<AssistantPromptArea, AiFeatureKey> = 
 }
 
 const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
+export const STEP_LIMIT_ERROR_KEY = 'aiAssistantStepLimit'
+
+/**
+ * Builds the prepareStep of a turn: the last allowed step gets no tools, so the model answers with what it has.
+ * @param {number} maxSteps - Step limit of the turn.
+ * @returns {Function} The prepareStep function.
+ */
+export const getPrepareStep =
+  (maxSteps: number) =>
+  ({ stepNumber }: { stepNumber: number }) =>
+    // a single-step limit keeps its tools: the model could never act otherwise
+    maxSteps > 1 && stepNumber >= maxSteps - 1 ? { toolChoice: 'none' as const } : undefined
 
 export type RunAssistantTurnParams = {
   conversation: Conversation
@@ -93,6 +106,9 @@ type StreamOutcome = {
   error: unknown
   // tokens reported by the last finish-step (null: not reported)
   stepTokens: number | null
+  // steps started so far, and the limit of the turn (set once the engine is resolved)
+  steps: number
+  maxSteps: number
   // set once the request is built: from then on the answer gets a usage
   sent: TurnUsageInputs | null
 }
@@ -123,6 +139,9 @@ const handleStreamPart = (part: TurnStreamPart, state: TurnState, outcome: Strea
       break
     case 'tool-error':
       state.endTool({ toolCallId: part.toolCallId, output: toolFailedOutput(part.error) })
+      break
+    case 'start-step':
+      outcome.steps += 1
       break
     case 'finish-step':
       // the last step is what the model held at the end of the turn
@@ -163,15 +182,45 @@ const escalateOnDataResult = ({
 }
 
 /**
+ * Returns the interpolation params of an AI error (the `{{baseUrl}}` of the unreachable server).
+ * @param {unknown} error - The error.
+ * @returns {Record<string, unknown>|undefined} The params.
+ */
+const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined => {
+  const key = getAiErrorKey(error)
+  const holders = [error, (error as any)?.lastError, (error as any)?.cause, (error as any)?.error]
+  return holders.find((holder) => key && holder?.key === key)?.params
+}
+
+/**
+ * Returns true when the answer of the turn has no text and no card (the model spent the steps on tool calls).
+ * @param {Conversation} after - Conversation at the end of the turn.
+ * @param {Conversation} before - Conversation before the turn.
+ * @returns {boolean} True for a silent turn.
+ */
+const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
+  const answer = after.messages.at(-1)
+  const hasText = answer?.role === 'assistant' && answer.parts.some((part) => part.type === 'text' && part.text.trim())
+  const count = (c: Conversation) => Object.keys(c.changeSets).length + Object.keys(c.queries ?? {}).length
+  return !hasText && count(after) === count(before)
+}
+
+/**
  * Ends the turn from what the stream reported.
  * @param {TurnState} state - Turn state.
  * @param {StreamOutcome} outcome - Abort / error.
  * @param {AbortSignal} signal - Turn signal.
+ * @param {Conversation} before - Conversation before the turn.
  * @returns {void}
  */
-const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSignal): void => {
+const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSignal, before: Conversation): void => {
+  const { maxSteps } = outcome
+  // a model that calls a tool on the last step, where none is allowed, makes the SDK fail: that is the step limit
+  const toolCallOnLastStep = outcome.steps >= maxSteps && maxSteps > 1 && !getAiErrorKey(outcome.error)
   if (outcome.aborted || signal.aborted || isAiAbortError(outcome.error)) state.finish('stopped')
-  else if (outcome.error) state.finish('error', getAiErrorKey(outcome.error) ?? PROVIDER_ERROR_KEY)
+  else if (outcome.error && !toolCallOnLastStep) {
+    state.finish('error', getAiErrorKey(outcome.error) ?? PROVIDER_ERROR_KEY, getAiErrorParams(outcome.error))
+  } else if (isSilentTurn(state.get(), before)) state.finish('error', STEP_LIMIT_ERROR_KEY)
   else state.finish('done')
 }
 
@@ -217,7 +266,14 @@ export const runAssistantTurn = async ({
     // the model names the conversation on its first message (the later turns keep the title)
     setConversationTitle: conversation.messages.length === 0 ? state.setTitle : undefined,
   }
-  const outcome: StreamOutcome = { aborted: false, error: null, stepTokens: null, sent: null }
+  const outcome: StreamOutcome = {
+    aborted: false,
+    error: null,
+    stepTokens: null,
+    steps: 0,
+    maxSteps: Infinity,
+    sent: null,
+  }
   try {
     const feature = assistantAreaFeatures[area]
     // Help sends no survey content and no surveyId
@@ -230,7 +286,7 @@ export const runAssistantTurn = async ({
       feature,
       surveyId,
       // the conversation's class ('schema' for the assistant)
-      dataClass: conversation.dataClass,
+      dataClass: getConversationDataClass(conversation),
       // the provider picked in the chat (the default when absent or removed)
       providerId: conversation.providerId,
       signal,
@@ -265,6 +321,7 @@ export const runAssistantTurn = async ({
       maxPromptChars: turn.limits.maxPromptChars,
       systemPrompt: system,
       tools: toolList,
+      maxSteps: turn.limits.maxSteps,
     })
     const history = buildTrimmedHistory({ messages: conversation.messages, userMessage, budgetChars })
     outcome.sent = {
@@ -276,13 +333,16 @@ export const runAssistantTurn = async ({
       model: turn.model,
       system,
       messages: history.messages,
-      tools: toolList.length > 0 ? toAiSdkTools(toolList, turnCtx) : undefined,
+      tools:
+        toolList.length > 0 ? toAiSdkTools(toolList, turnCtx, getToolResultCap(turn.limits.maxPromptChars)) : undefined,
       stopWhen: stepCountIs(turn.limits.maxSteps),
+      prepareStep: getPrepareStep(turn.limits.maxSteps),
       abortSignal: signal,
       maxRetries: 0,
       // errors arrive as 'error' parts of the full stream
       onError: () => undefined,
     })
+    outcome.maxSteps = turn.limits.maxSteps
     for await (const part of result.stream) {
       handleStreamPart(part, state, outcome)
       escalateOnDataResult({ part, toolList, state })
@@ -292,6 +352,6 @@ export const runAssistantTurn = async ({
   }
   // also on a stopped or failed answer: the meter then shows how full the context was
   if (outcome.sent) state.setUsage(buildTurnUsage({ stepTokens: outcome.stepTokens, ...outcome.sent }))
-  finishTurn(state, outcome, signal)
+  finishTurn(state, outcome, signal, conversation)
   return state.get()
 }

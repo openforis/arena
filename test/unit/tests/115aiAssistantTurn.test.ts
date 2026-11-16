@@ -3,7 +3,13 @@ import { z } from 'zod'
 
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
-import { DEFAULT_ASSISTANT_LIMITS, assistantAreaFeatures, runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
+import {
+  DEFAULT_ASSISTANT_LIMITS,
+  STEP_LIMIT_ERROR_KEY,
+  assistantAreaFeatures,
+  getPrepareStep,
+  runAssistantTurn,
+} from '@webapp/ai/agent/runAssistantTurn'
 import type { AiTool } from '@webapp/ai/tools/types'
 import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 
@@ -219,14 +225,52 @@ describe('runAssistantTurn', () => {
     })
   })
 
-  test('stops at the step cap', async () => {
+  test('stops at the step cap: the last step has no tools, and a turn without text gets the step-limit notice', async () => {
     const echo = makeTool('test_echo', async () => ({ ok: true }))
     let call = 0
     const model = scriptedModel(() => toolCallStream(`call-${call++}`, 'test_echo', { summary: 'x' }))
     const result = await run({ model, tools: [echo], limits: { maxPromptChars: 200000, maxSteps: 3 } })
     expect(model.doStreamCalls).toHaveLength(3)
+    expect(model.doStreamCalls.map((streamCall) => streamCall.toolChoice?.type)).toEqual(['auto', 'auto', 'none'])
+    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: STEP_LIMIT_ERROR_KEY })
+    // an error without params stores none (as the messages saved before them)
+    expect(answerOf(result).errorParams).toBeUndefined()
+    // the tool call of the last step, where none is allowed, is not run
+    expect(answerOf(result).parts).toHaveLength(2)
+  })
+
+  test('the model answers on the last step: the turn is done', async () => {
+    const echo = makeTool('test_echo', async () => ({ ok: true }))
+    const model = scriptedModel(
+      () => toolCallStream('c1', 'test_echo', { summary: 'x' }),
+      () => textStream('Here is what I found.')
+    )
+    const result = await run({ model, tools: [echo], limits: { maxPromptChars: 200000, maxSteps: 2 } })
     expect(answerOf(result).status).toBe('done')
-    expect(answerOf(result).parts).toHaveLength(3)
+  })
+
+  test('getPrepareStep removes the tools on the last step only (and not with a single step)', () => {
+    const prepare = getPrepareStep(3)
+    expect(prepare({ stepNumber: 1 })).toBeUndefined()
+    expect(prepare({ stepNumber: 2 })).toEqual({ toolChoice: 'none' })
+    expect(getPrepareStep(1)({ stepNumber: 0 })).toBeUndefined()
+  })
+
+  test('an error stores its params with the answer', async () => {
+    const model = new MockLanguageModelV4({
+      doStream: async () => {
+        throw Object.assign(new Error('x'), {
+          key: 'aiLocalServerUnreachable',
+          params: { baseUrl: 'http://localhost:1234' },
+        })
+      },
+    })
+    const result = await run({ model })
+    expect(answerOf(result)).toMatchObject({
+      status: 'error',
+      errorKey: 'aiLocalServerUnreachable',
+      errorParams: { baseUrl: 'http://localhost:1234' },
+    })
   })
 
   test('abort keeps the partial answer', async () => {
@@ -324,9 +368,10 @@ describe('runAssistantTurn', () => {
       }
       const result = await run({ tools: [echo], extra: { resolve } })
       expect(calls).toHaveLength(1)
-      // maxSteps 1: the loop stops after the first model call
+      // maxSteps 1: the loop stops after the first model call, which had its tools
       expect(model.doStreamCalls).toHaveLength(1)
-      expect(answerOf(result).status).toBe('done')
+      expect(model.doStreamCalls[0].toolChoice?.type).not.toBe('none')
+      expect(answerOf(result).status).toBe('error')
     })
 
     test('a data tool makes the turn declare data in the one resolution, and the model receives the tool', async () => {

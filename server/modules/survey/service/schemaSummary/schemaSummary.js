@@ -263,11 +263,12 @@ const getDefaultLang = (surveyInfo) =>
 
 /**
  * Returns the node defs of the schema summary that need an AI description: not the root, no description in the
- * default language; at most AiLimits.dataDictionaryMaxDescriptions. Only names, types and paths.
+ * default language; at most AiLimits.dataDictionaryMaxDescriptions. Only names, labels (default language, when not the
+ * name), types and paths.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey with its node defs.
  * @param {string} params.cycle - Cycle key.
- * @returns {{surveyName: string, nodeDefs: {uuid: string, name: string, type: string, parentPath: string}[]}} The items.
+ * @returns {{surveyName: string, nodeDefs: {uuid: string, name: string, label?: string, type: string, parentPath: string}[]}} The items.
  */
 export const getSchemaSummaryAiItems = ({ survey, cycle }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -275,12 +276,18 @@ export const getSchemaSummaryAiItems = ({ survey, cycle }) => {
   const nodeDefs = extractSchemaSummaryNodeDefs(survey, cycle)
     .filter((nodeDef) => !NodeDef.isRoot(nodeDef) && !(NodeDef.getDescription(defaultLang)(nodeDef) || '').trim())
     .slice(0, AiLimits.dataDictionaryMaxDescriptions)
-    .map((nodeDef) => ({
-      uuid: NodeDef.getUuid(nodeDef),
-      name: NodeDef.getName(nodeDef),
-      type: NodeDef.getType(nodeDef),
-      parentPath: getParentPath(nodeDef, survey),
-    }))
+    .map((nodeDef) => {
+      const name = NodeDef.getName(nodeDef)
+      // the label explains abbreviated names (rp, dbh, …)
+      const label = NodeDef.getLabels(nodeDef)[defaultLang]
+      return {
+        uuid: NodeDef.getUuid(nodeDef),
+        name,
+        ...(label && label !== name ? { label } : {}),
+        type: NodeDef.getType(nodeDef),
+        parentPath: getParentPath(nodeDef, survey),
+      }
+    })
   return { surveyName: Survey.getName(surveyInfo) || `survey-${Survey.getIdSurveyInfo(surveyInfo)}`, nodeDefs }
 }
 

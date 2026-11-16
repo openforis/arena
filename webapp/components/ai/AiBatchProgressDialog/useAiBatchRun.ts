@@ -65,16 +65,38 @@ export const useAiBatchRun = () => {
    * @param {StartParams} params - Title, run function and completion callback.
    * @returns {Promise<void>} Resolves when the run ends.
    */
+  /**
+   * Shows the notice of a stopped run.
+   * @param {AiBatchStop} stop - Where and why the run stopped.
+   * @returns {void}
+   */
+  const notifyStop = useCallback(
+    (stop: AiBatchStop) => {
+      const text = getBatchStopText({ stop, i18n })
+      dispatch(
+        NotificationActions.notifyWarning({
+          key: undefined,
+          params: undefined,
+          text,
+          timeout: stopNoticeTimeoutMs,
+        }) as any
+      )
+    },
+    [dispatch, i18n]
+  )
+
   const start = useCallback(
     async <T extends { stop?: AiBatchStop | null }>({ titleKey, run: runBatch, onDone }: StartParams<T>) => {
       controlRef.current?.abandon()
       const control = createBatchRunControl()
       controlRef.current = control
       setRun({ titleKey, progress: null, error: null, stopping: false })
+      const last: { progress: AiBatchProgress | null } = { progress: null }
       const settled = await runBatch({
         signal: control.signal,
         abandonSignal: control.abandonSignal,
         onProgress: (progress) => {
+          last.progress = progress
           if (!control.isAbandoned()) setRun((prev) => (prev ? { ...prev, progress } : prev))
         },
       }).then(
@@ -91,23 +113,17 @@ export const useAiBatchRun = () => {
         return
       }
       setRun(null)
+      // a Stop before the first result closes the dialog: say so (the first-use dialog closed has no stop request)
+      if (outcome.kind === 'closed' && control.isStopRequested() && last.progress) {
+        notifyStop({ cause: 'cancelled', done: 0, total: last.progress.total })
+      }
       // the run is cleared before onDone: an error of onDone is not an AI error
       if (outcome.kind === 'done') {
-        if (outcome.stop) {
-          const text = getBatchStopText({ stop: outcome.stop, i18n })
-          dispatch(
-            NotificationActions.notifyWarning({
-              key: undefined,
-              params: undefined,
-              text,
-              timeout: stopNoticeTimeoutMs,
-            }) as any
-          )
-        }
+        if (outcome.stop) notifyStop(outcome.stop)
         onDone(outcome.result)
       }
     },
-    [dispatch, i18n]
+    [i18n, notifyStop]
   )
 
   /**

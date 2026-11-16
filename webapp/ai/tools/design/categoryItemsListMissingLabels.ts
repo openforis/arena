@@ -21,7 +21,7 @@ import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItem
 import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
 
 import { canEditCurrentSurvey } from '../common/toolPermissions'
-import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
+import { getResultBudget } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { createCategoryItemRefs, type CategoryItemRefs } from './categoryItemRefs'
@@ -70,6 +70,7 @@ type PageParams = {
   languages: string[]
   pendingItemUuids: Set<string>
   limit: number
+  maxChars: number
 }
 
 /**
@@ -166,17 +167,13 @@ const toListedItem = (item: MissingLabelsItem, lang: string, languages: string[]
  * @returns {void}
  */
 const collectItems = (items: MissingLabelsItem[], state: PageState, params: PageParams): void => {
-  const { refs, surveyId, categoryUuid, lang, languages, pendingItemUuids, limit } = params
+  const { refs, surveyId, categoryUuid, lang, languages, pendingItemUuids, limit, maxChars } = params
   for (const item of items) {
     const pending = pendingItemUuids.has(item.uuid)
     const listed = pending ? null : toListedItem(item, lang, languages)
     const itemSize = listed ? JSON.stringify(listed).length + 1 : 0
     // a page is cut only when it has items, so an oversized item still makes progress
-    if (
-      listed &&
-      state.items.length > 0 &&
-      (state.items.length >= limit || state.size + itemSize > TOOL_RESULT_BUDGET_CHARS)
-    ) {
+    if (listed && state.items.length > 0 && (state.items.length >= limit || state.size + itemSize > maxChars)) {
       state.full = true
       return
     }
@@ -273,6 +270,7 @@ export const createCategoryItemsListMissingLabelsTool = ({
       languages,
       pendingItemUuids,
       limit,
+      maxChars: getResultBudget(ctx),
     }
     const state: PageState = { items: [], size: 400, lastConsumed: cursor ?? null, full: false }
     let serverCursor: string | null = cursor ?? null

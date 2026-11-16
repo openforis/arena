@@ -85,6 +85,8 @@ export default {
     nodesBatchInvalid: 'Invalid batch edit request ({{reason}}).',
     nodesBatchBusy: 'Another batch edit is still running; try again in a few seconds.',
     nodesBatchInvalidValue: 'The new value of "{{attributeName}}" is not valid for this attribute.',
+    nodesBatchWouldClearValues:
+      'This edit would clear other values that become non-applicable; edit this value in the form to confirm.',
     nodesBatchUnexpected: 'The edit could not be applied because of an unexpected error on the server.',
   },
   recordPrintableExport: {
@@ -172,6 +174,8 @@ Try to refresh the page.`,
   aiDataQueryNoEntities: 'This survey has no entities that can be queried.',
   aiDataQueryInvalid: 'The AI could not generate a valid query for this request: {{errors}}',
   aiDataQueryEmpty: 'Select an entity and some attributes (or dimensions and measures) first.',
+  aiAssistantStepLimit:
+    'The assistant reached its step limit without writing an answer. Try again, or ask a narrower question.',
   aiLocalServerUnreachable:
     'The AI server at {{baseUrl}} could not be reached. Is it running, with CORS enabled? Did the browser block access to local network devices?',
   aiLocalServerModelMissing:

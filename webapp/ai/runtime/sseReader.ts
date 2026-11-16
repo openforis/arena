@@ -9,7 +9,7 @@ import { deserializeStreamPart } from '@common/ai/wire'
  * (which aborts the request).
  * @param {Response} response - Gateway response (status 200, text/event-stream).
  * @returns {ReadableStream<LanguageModelV4StreamPart>} The parts.
- * @throws {SystemError} aiProviderUnavailable when the response has no body (nothing to read).
+ * @throws {SystemError} aiProviderUnavailable when the response has no body, or the stream ends without `[DONE]`.
  */
 export const readSseParts = (response: Response): ReadableStream<LanguageModelV4StreamPart> => {
   if (!response.body) throw new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
@@ -17,7 +17,13 @@ export const readSseParts = (response: Response): ReadableStream<LanguageModelV4
   const decoder = new TextDecoder()
   return new ReadableStream<LanguageModelV4StreamPart>({
     async start(controller) {
-      const parser = createSseParser({ onEvent: (event) => controller.enqueue(deserializeStreamPart(event)) })
+      const parser = createSseParser({
+        onEvent: (event) => controller.enqueue(deserializeStreamPart(event)),
+        // a stream cut before `[DONE]` must not look like a complete answer
+        onDone: (receivedDoneToken) => {
+          if (!receivedDoneToken) throw new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
+        },
+      })
       try {
         for (;;) {
           const { value, done } = await reader.read()

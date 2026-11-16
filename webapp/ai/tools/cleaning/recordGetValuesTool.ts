@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import * as Record from '@core/record/record'
+
 import type { AiTool } from '@webapp/ai/tools/types'
 import {
   attributeNamesSchema,
@@ -9,7 +11,7 @@ import {
 } from '@webapp/ai/tools/common/toolSchemas'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
 import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
-import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
@@ -29,6 +31,9 @@ const inputSchema = z.object({
     .nullish()
     .describe('Values of the record key attributes, e.g. {"cluster_id": "12"}, when the UUID is unknown.'),
   attributes: attributeNamesSchema(20).min(1).describe('Attribute names to read.'),
+  parentNodeUuid: uuidSchema
+    .nullish()
+    .describe('Node UUID of an entity of the record: read only the attributes below it (e.g. one tree).'),
 })
 
 type Input = z.infer<typeof inputSchema>
@@ -59,7 +64,8 @@ export const createRecordGetValuesTool = ({
   name: 'record_getValues',
   description:
     'Reads attributes of one record (by UUID or by its key values): for each node its UUID, the keys of its parent ' +
-    'entity, its formatted and raw value and its validation messages. At most 100 nodes.',
+    'entity, its formatted and raw value and its validation messages. At most 100 nodes: when ' +
+    'truncated, narrow with parentNodeUuid (the node UUID of one entity) or fewer attributes.',
   inputSchema,
   /**
    * Resolves the record, loads it once and reads the attributes.
@@ -67,7 +73,7 @@ export const createRecordGetValuesTool = ({
    * @param {object} ctx - Tool context.
    * @returns {Promise<object>} The values, or a tool error.
    */
-  execute: async ({ recordUuid, recordKeys, attributes }, ctx) => {
+  execute: async ({ recordUuid, recordKeys, attributes, parentNodeUuid }, ctx) => {
     const { survey, surveyId, cycle } = getCleaningContext(ctx)
     if (!recordUuid && !recordKeys) throw new AiToolFailure('recordRequired', 'Give recordUuid or recordKeys.')
     const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: [...new Set(attributes)] })
@@ -81,7 +87,16 @@ export const createRecordGetValuesTool = ({
         : await findRecordUuidByKeys({ api, survey, surveyId, cycle, keys: recordKeys ?? {}, signal })
       const record = await api.fetchRecordAndNodes({ surveyId, recordUuid: lookup.recordUuid, signal })
       if (!record) throw new AiToolFailure('recordNotAvailable', 'The record does not exist or you may not see it.')
-      return fitListToBudget(getRecordValues({ survey, cycle, record, nodeDefs, i18n: getI18n() }), 'nodes')
+      if (parentNodeUuid && !Record.getNodeByUuid(parentNodeUuid)(record)) {
+        throw new AiToolFailure('unknownParentNode', 'parentNodeUuid is not a node of this record.')
+      }
+      const values = getRecordValues({ survey, cycle, record, nodeDefs, i18n: getI18n(), parentNodeUuid })
+      const fitted = fitListToBudget(values, 'nodes', getResultBudget(ctx))
+      if (!fitted.truncated) return fitted
+      return {
+        ...fitted,
+        note: `Only the first ${fitted.nodes.length} of ${values.total} nodes are shown, in record order. Narrow with parentNodeUuid (the node UUID of one entity) or fewer attributes.`,
+      }
     } catch (error) {
       throw toRequestFailure(error, TIMEOUT_HINT)
     }

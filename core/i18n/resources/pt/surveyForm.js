@@ -44,6 +44,10 @@ Continuar?`,
     'Não foi possível gerar a descrição por IA para {{count}} campo; ela ficou vazia.',
   schemaSummaryAiDescriptionsFailed_other:
     'Não foi possível gerar descrições por IA para {{count}} campos; elas ficaram vazias.',
+  schemaSummaryAiDescriptionsNotDone_one:
+    'A descrição por IA não foi gerada para {{count}} campo porque a execução foi interrompida; ela ficou vazia.',
+  schemaSummaryAiDescriptionsNotDone_other:
+    'As descrições por IA não foram geradas para {{count}} campos porque a execução foi interrompida; elas ficaram vazias.',
   hidePages: 'Ocultar páginas',
   showPages: 'Mostrar páginas',
   move: `Mover '{{nodeDefLabel}}'`,
@@ -216,6 +220,8 @@ No Arena Mobile:
     defaultLabel: 'Rótulo padrão',
     failed_one: 'A IA não conseguiu gerar {{count}} tradução; ela não tem sugestão da IA.',
     failed_other: 'A IA não conseguiu gerar {{count}} traduções; elas não têm sugestão da IA.',
+    notDone_one: 'A execução foi interrompida antes de pedir {{count}} tradução; ela não tem sugestão da IA.',
+    notDone_other: 'A execução foi interrompida antes de pedir {{count}} traduções; elas não têm sugestão da IA.',
     path: 'Caminho',
     showDescriptions: 'Mostrar descrições',
     title: 'Traduzir rótulos de definições de nós',

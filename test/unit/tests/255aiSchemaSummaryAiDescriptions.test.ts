@@ -43,14 +43,14 @@ const uuidOf = (survey: any, name: string): string =>
 const known = ['u1', 'u2']
 
 describe('schema summary AI descriptions on the server (255)', () => {
-  test('the AI items are the node defs without a description, with their parent path', async () => {
+  test('the AI items are the node defs without a description, with their label and parent path', async () => {
     const survey = await buildSurvey()
     const { surveyName, nodeDefs } = getSchemaSummaryAiItems({ survey, cycle })
     expect(surveyName).toBe(Survey.getName(Survey.getSurveyInfo(survey)))
     expect([...nodeDefs].sort((a, b) => a.name.localeCompare(b.name))).toEqual([
-      { uuid: uuidOf(survey, 'cluster_id'), name: 'cluster_id', type: 'decimal', parentPath: '' },
-      { uuid: uuidOf(survey, 'plot'), name: 'plot', type: 'entity', parentPath: '' },
-      { uuid: uuidOf(survey, 'plot_dbh'), name: 'plot_dbh', type: 'decimal', parentPath: 'plot' },
+      { uuid: uuidOf(survey, 'cluster_id'), name: 'cluster_id', label: 'Id', type: 'decimal', parentPath: '' },
+      { uuid: uuidOf(survey, 'plot'), name: 'plot', label: 'Plot', type: 'entity', parentPath: '' },
+      { uuid: uuidOf(survey, 'plot_dbh'), name: 'plot_dbh', label: 'DBH', type: 'decimal', parentPath: 'plot' },
     ])
   })
 

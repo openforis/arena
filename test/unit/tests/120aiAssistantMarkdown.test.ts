@@ -37,7 +37,8 @@ describe('renderAssistantMarkdown', () => {
     '![x](https://evil/?q=schema)',
     rawPayload,
     '[a](https://example.org) [b](javascript:alert(1)) <script>alert(1)</script>',
-    '**bold** and `code`\n\n- one\n- two'
+    '**bold** and `code`\n\n- one\n- two',
+    '§7.2.1 About the designer\n§12 Examples'
   )
 
   test('a Markdown image loads nothing: it becomes a link', () => {
@@ -62,6 +63,10 @@ describe('renderAssistantMarkdown', () => {
     expect(outputs[3]).toContain('<strong>bold</strong>')
     expect(outputs[3]).toContain('<code>code</code>')
     expect(outputs[3]).toContain('<li>one</li>')
+  })
+
+  test('a single line break is kept (cited sections on their own lines)', () => {
+    expect(outputs[4]).toMatch(/§7\.2\.1 About the designer<br>\s*§12 Examples/)
   })
 
   test('the sanitizer hook does not leak to the shared sanitizer', () => {

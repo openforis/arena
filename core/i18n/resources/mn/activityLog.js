@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'судалгааг үүсгэсэн',
     [ActivityLog.type.surveyPropUpdate]: 'судалгааны {{key}}-г шинэчилсэн',
+    [ActivityLog.type.surveyAiPolicyUpdate]: 'судалгааны хиймэл оюуны бодлогыг өөрчилсөн',
     [ActivityLog.type.surveyPublish]: 'судалгааг нийтэлсэн',
     [ActivityLog.type.surveyCollectImport]: 'судалгааг Collect-оос импортолсон',
 

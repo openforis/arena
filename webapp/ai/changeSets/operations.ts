@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
+import { onUpdateKey, onUpdateMultiple } from '@core/survey/nodeDefPropUpdaters'
 import { isLockedByPublication } from '@core/survey/nodeDefEditGuards'
 
 import { getExpressionProp, setExpressionProp } from './expressionProps'
@@ -131,15 +132,24 @@ const assocText = (nodeDef: any, kind: LabelKind, lang: string, text: string): a
     ? NodeDef.assocLabels({ ...NodeDef.getLabels(nodeDef), [lang]: text })(nodeDef)
     : NodeDef.assocDescriptions({ ...NodeDef.getDescriptions(nodeDef), [lang]: text })(nodeDef)
 
+// the side effects the form designer applies when `multiple` or `key` changes
+const applyUpdate = (nodeDef: any, op: { prop: string; to: unknown }, survey: any): any => {
+  const updated = NodeDef.assocProp({ key: op.prop, value: op.to })(nodeDef)
+  const params = { survey, surveyCycleKey: NodeDef.getCycles(nodeDef)[0], nodeDef: updated, value: op.to }
+  if (op.prop === 'multiple') return onUpdateMultiple(params)
+  return op.prop === 'key' ? onUpdateKey(params) : updated
+}
+
 /**
  * Applies a non-create operation to a node definition.
  * @param {object} nodeDef - Node definition.
  * @param {ChangeOperation} op - Operation.
+ * @param {object} survey - Survey the node definition belongs to (the layout side effect of `multiple` reads it).
  * @returns {object} The updated node definition.
  */
-export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation): any => {
+export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation, survey: any): any => {
   if (isRecordEditOperation(op)) return nodeDef
-  if (op.type === 'nodeDef.update') return NodeDef.assocProp({ key: op.prop, value: op.to })(nodeDef)
+  if (op.type === 'nodeDef.update') return applyUpdate(nodeDef, op, survey)
   if (op.type === 'label.set') return assocText(nodeDef, op.kind, op.lang, op.to)
   if (op.type === 'expression.set') return setExpressionProp(nodeDef, op.prop, op.to)
   return nodeDef
@@ -155,5 +165,5 @@ export const applyOperationToSurvey = (survey: any, op: AnyOperation): any => {
   if (isRecordEditOperation(op)) return survey
   if (op.type === 'nodeDef.create') return Survey.assocNodeDef({ nodeDef: op.nodeDef })(survey)
   const nodeDef = Survey.getNodeDefByUuid(op.nodeDefUuid)(survey)
-  return Survey.assocNodeDef({ nodeDef: applyOperationToNodeDef(nodeDef, op) })(survey)
+  return Survey.assocNodeDef({ nodeDef: applyOperationToNodeDef(nodeDef, op, survey) })(survey)
 }

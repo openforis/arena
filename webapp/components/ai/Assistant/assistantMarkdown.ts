@@ -41,8 +41,10 @@ const ALLOWED_URI_REGEXP = /^(?:https?|mailto):/i
 const escapeHtml = (text: string): string =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
-// a Markdown image becomes a link (the user decides whether to open it), never a request
+// a Markdown image becomes a link (the user decides whether to open it), never a request; a single line break is kept
+// (models write one item per line, e.g. the cited manual sections)
 const marked = new Marked({
+  breaks: true,
   renderer: {
     image: ({ href, text }: { href: string; text: string }) =>
       `<a href="${escapeHtml(href)}">${escapeHtml(text || href)}</a>`,

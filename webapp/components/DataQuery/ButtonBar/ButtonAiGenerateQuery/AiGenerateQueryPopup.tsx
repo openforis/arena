@@ -31,8 +31,13 @@ export const AiGenerateQueryPopup = (props: Props) => {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const closedRef = useRef(false)
+
   useEffect(() => {
     textareaRef.current?.focus()
+    return () => {
+      closedRef.current = true
+    }
   }, [])
 
   const descriptionTrimmed = description.trim()
@@ -50,6 +55,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
         description: descriptionTrimmed,
         includeAnalysis,
       })
+      if (closedRef.current) return
       setBusy(false)
       onGenerated(result)
     } catch (err) {
@@ -67,6 +73,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
         <textarea
           ref={textareaRef}
           className="ai-textarea"
+          aria-label={i18n.t('dataView:dataQuery.ai.placeholder')}
           placeholder={i18n.t('dataView:dataQuery.ai.placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -79,7 +86,11 @@ export const AiGenerateQueryPopup = (props: Props) => {
           }}
         />
 
-        {error && <div className="ai-generate-query-popup__error">{error}</div>}
+        {error && (
+          <div className="ai-generate-query-popup__error" role="alert">
+            {error}
+          </div>
+        )}
       </ModalBody>
 
       <ModalFooter>

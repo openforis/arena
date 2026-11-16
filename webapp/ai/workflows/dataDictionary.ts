@@ -8,13 +8,22 @@ import type { AiGenerateText } from '@common/ai/llm'
 import { type AiDataDictionaryNodeDef, generateDataDictionaryDescriptions } from '@common/ai/tasks/dataDictionary'
 
 import { resolveBatchModel } from './batchModel'
-import { type AiBatchGuard, type AiBatchProgress, type AiBatchStop, chunkArray, runAiBatchCalls } from './batchRun'
+import {
+  type AiBatchCall,
+  type AiBatchGuard,
+  type AiBatchProgress,
+  type AiBatchStop,
+  chunkArray,
+  runAiBatchCalls,
+} from './batchRun'
 
 export type SchemaSummaryAiItems = { surveyName: string; nodeDefs: AiDataDictionaryNodeDef[] }
 
 export type DataDictionaryResult = {
   aiDescriptions: Record<string, string>
   failedCount: number
+  // node defs a stop kept the run from trying (not part of failedCount)
+  notDoneCount: number
   // present when the run stopped before its last call: the descriptions are those made until then
   stop?: AiBatchStop
 }
@@ -81,12 +90,21 @@ export const runDataDictionaryDescriptions = async ({
   const nodeDefs = items.nodeDefs.slice(0, AiLimits.dataDictionaryMaxDescriptions)
   const batches = chunkArray(nodeDefs, batchSize)
   const aiDescriptions: Record<string, string> = {}
-  const { stop } = await runAiBatchCalls({
-    calls: batches.map((batch) => ({
-      size: batch.length,
-      run: (callSignal?: AbortSignal) =>
-        describe({ generateText, surveyName: items.surveyName, nodeDefs: batch, signal: callSignal }),
-    })),
+  // an unusable answer splits the call in two halves, down to one node def
+  const buildCall = (batch: AiDataDictionaryNodeDef[]): AiBatchCall<Awaited<ReturnType<typeof describe>>> => ({
+    size: batch.length,
+    run: (callSignal?: AbortSignal) =>
+      describe({ generateText, surveyName: items.surveyName, nodeDefs: batch, signal: callSignal }),
+    split:
+      batch.length > 1
+        ? () => {
+            const middle = Math.ceil(batch.length / 2)
+            return [buildCall(batch.slice(0, middle)), buildCall(batch.slice(middle))]
+          }
+        : undefined,
+  })
+  const { stop, notRunCount } = await runAiBatchCalls({
+    calls: batches.map(buildCall),
     guard,
     signal,
     onProgress,
@@ -99,9 +117,10 @@ export const runDataDictionaryDescriptions = async ({
       }
     },
   })
-  // failed batches and node defs the model skipped are both left empty in the export
-  const failedCount = nodeDefs.length - Object.keys(aiDescriptions).length
-  return stop ? { aiDescriptions, failedCount, stop } : { aiDescriptions, failedCount }
+  // failed batches and node defs the model skipped are both left empty in the export; those a stop never tried are apart
+  const notDoneCount = Math.min(notRunCount, nodeDefs.length - Object.keys(aiDescriptions).length)
+  const failedCount = nodeDefs.length - Object.keys(aiDescriptions).length - notDoneCount
+  return stop ? { aiDescriptions, failedCount, notDoneCount, stop } : { aiDescriptions, failedCount, notDoneCount }
 }
 
 /**
@@ -129,7 +148,7 @@ export const generateDataDictionaryWorkflow = async ({
 }): Promise<DataDictionaryResult> => {
   const items = await fetchAiItems({ surveyId, cycle, signal })
   // every node def has a description: no model, no consent dialog
-  if (items.nodeDefs.length === 0) return { aiDescriptions: {}, failedCount: 0 }
+  if (items.nodeDefs.length === 0) return { aiDescriptions: {}, failedCount: 0, notDoneCount: 0 }
   const { generateText, guard } = await resolveBatchModel({ feature: 'dataDictionary', surveyId, signal })
   return runDataDictionaryDescriptions({ items, generateText, guard, signal, onProgress })
 }

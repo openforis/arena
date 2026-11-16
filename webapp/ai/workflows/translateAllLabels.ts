@@ -46,14 +46,16 @@ export type NodeDefsTranslationResult = {
   languages: string[]
   otherLangs: string[]
   items: NodeDefsTranslationItem[]
-  // label or description translations (text × language) the AI did not produce, those of a stopped run included
+  // label or description translations (text × language) the AI did not produce
   failedCount: number
+  // translations a stop kept the run from asking for (not failures)
+  notDoneCount?: number
   // present when the run stopped before its last call: the items hold what was translated until then
   stop?: AiBatchStop
 }
 
 // what applyTranslations needs to know about the call a translation list answers
-type TranslationOutcome = AiTranslationResult & { itemIds: string[]; targetLangs: string[] }
+export type TranslationOutcome = AiTranslationResult & { itemIds: string[]; targetLangs: string[] }
 
 type ProgressListener = (progress: AiBatchProgress) => void
 
@@ -132,7 +134,7 @@ export const buildTranslationItems = ({
  * @param {number} params.maxTargetLangs - Target languages per call.
  * @returns {AiBatchCall[]} The calls.
  */
-const buildTranslationCalls = ({
+export const buildTranslationCalls = ({
   items,
   sourceLang,
   otherLangs,
@@ -151,16 +153,23 @@ const buildTranslationCalls = ({
 }): AiBatchCall<TranslationOutcome>[] => {
   // the task accepts a limited number of target languages per call
   const langGroups = chunkArray(otherLangs, maxTargetLangs)
-  return chunkArray(items, batchSize).flatMap((batch) =>
-    langGroups.map((targetLangs) => ({
-      size: batch.length * targetLangs.length,
-      run: async (signal?: AbortSignal) => ({
-        ...(await translate({ generateText, sourceLang, targetLangs, items: batch, signal })),
-        itemIds: batch.map(({ id }) => id),
-        targetLangs,
-      }),
-    }))
-  )
+  // an unusable answer splits the call in two halves, down to one item
+  const buildCall = (batch: AiTranslationItem[], targetLangs: string[]): AiBatchCall<TranslationOutcome> => ({
+    size: batch.length * targetLangs.length,
+    run: async (signal?: AbortSignal) => ({
+      ...(await translate({ generateText, sourceLang, targetLangs, items: batch, signal })),
+      itemIds: batch.map(({ id }) => id),
+      targetLangs,
+    }),
+    split:
+      batch.length > 1
+        ? () => {
+            const middle = Math.ceil(batch.length / 2)
+            return [buildCall(batch.slice(0, middle), targetLangs), buildCall(batch.slice(middle), targetLangs)]
+          }
+        : undefined,
+  })
+  return chunkArray(items, batchSize).flatMap((batch) => langGroups.map((targetLangs) => buildCall(batch, targetLangs)))
 }
 
 /**
@@ -300,7 +309,7 @@ export const runTranslateAllLabels = async ({
   })
   // translations the model silently dropped in calls that succeeded
   let missingCount = 0
-  const { failedCount, stop } = await runAiBatchCalls({
+  const { failedCount, notRunCount, stop } = await runAiBatchCalls({
     calls,
     guard,
     signal,
@@ -313,9 +322,9 @@ export const runTranslateAllLabels = async ({
   // a text too long for the task is never sent: it counts as failed in every language
   const result = buildNodeDefsTranslationResult({
     ...resultParams,
-    failedCount: failedCount + missingCount + skippedCount * otherLangs.length,
+    failedCount: failedCount - notRunCount + missingCount + skippedCount * otherLangs.length,
   })
-  return stop ? { ...result, stop } : result
+  return stop ? { ...result, notDoneCount: notRunCount, stop } : result
 }
 
 /**

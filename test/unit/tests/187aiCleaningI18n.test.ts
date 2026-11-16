@@ -20,6 +20,7 @@ const cleaningKeys = [
   'result.failed',
   'result.skipped',
   'rowAction.askAssistant',
+  'rowAction.busy',
   'rowAction.question',
 ].sort((a, b) => a.localeCompare(b))
 

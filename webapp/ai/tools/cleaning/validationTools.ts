@@ -10,7 +10,7 @@ import type { AiTool } from '@webapp/ai/tools/types'
 import { attributeNamesSchema, uuidSchema } from '@webapp/ai/tools/common/toolSchemas'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
 import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
-import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
@@ -80,7 +80,7 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
       throw toRequestFailure(error, TIMEOUT_HINT)
     }
     const summary = summarizeValidationRows({ survey, rows, total, i18n: getI18n(), cycle })
-    return fitListToBudget(summary, 'groups')
+    return fitListToBudget(summary, 'groups', getResultBudget(ctx))
   },
 })
 
@@ -129,7 +129,7 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
     }
     const { rows: pageRows, hasMore } = pageValidationRows(fetched)
     const rows = toValidationListItems({ survey, rows: pageRows, user: ctx.user, i18n: getI18n(), lang })
-    const fitted = fitListToBudget({ rows, total, truncated: hasMore, offset }, 'rows')
+    const fitted = fitListToBudget({ rows, total, truncated: hasMore, offset }, 'rows', getResultBudget(ctx))
     // the budget may cut rows of the page: the next page starts after the last one returned
     const moreRows = hasMore || fitted.rows.length < rows.length
     return moreRows ? { ...fitted, truncated: true, nextOffset: offset + fitted.rows.length } : fitted

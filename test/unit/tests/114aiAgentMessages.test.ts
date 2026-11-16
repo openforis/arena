@@ -36,21 +36,25 @@ const tool = (
 
 describe('describeToolPart', () => {
   test('counts, change sets, failures', () => {
-    expect(describeToolPart(tool('nodeDef_search', { matches: [1, 2, 3] }))).toBe('[nodeDef_search returned 3 items]')
+    expect(describeToolPart(tool('nodeDef_search', { matches: [1, 2, 3] }))).toBe(
+      '(Earlier in this conversation, nodeDef_search returned 3 items.)'
+    )
     expect(
       describeToolPart(tool('labels_proposeSet', { changeSetId: 'cs-1', operations: 2, status: 'shownToUser' }))
-    ).toBe('[labels_proposeSet: change set cs-1 (2 operations) shown to the user]')
+    ).toBe('(Earlier in this conversation a change set with 2 operations was shown to the user.)')
     expect(describeToolPart(tool('nodeDef_get', { error: { code: 'nodeDefNotFound', message: 'x' } }, 'failed'))).toBe(
-      '[nodeDef_get failed: nodeDefNotFound]'
+      '(Earlier in this conversation, nodeDef_get failed: nodeDefNotFound.)'
     )
-    expect(describeToolPart(tool('view_getCurrent', { module: 'designer' }))).toBe('[view_getCurrent done]')
+    expect(describeToolPart(tool('view_getCurrent', { module: 'designer' }))).toBe(
+      '(Earlier in this conversation, view_getCurrent ran.)'
+    )
   })
 })
 
 describe('describeToolPart interrupted', () => {
   test('a call still running when the turn stopped', () => {
     expect(describeToolPart({ ...tool('nodeDef_get', undefined), state: 'running' })).toBe(
-      '[nodeDef_get was interrupted]'
+      '(Earlier in this conversation, nodeDef_get was interrupted.)'
     )
   })
 })
@@ -96,7 +100,7 @@ describe('buildTrimmedHistory', () => {
     })
     expect(history[1]).toEqual({
       role: 'assistant',
-      content: 'Looking.\n[nodeDef_search returned 2 items]\nFound two.',
+      content: 'Looking.\n(Earlier in this conversation, nodeDef_search returned 2 items.)\nFound two.',
     })
   })
 
@@ -132,7 +136,7 @@ describe('buildTrimmedHistory', () => {
     })
     expect(history).toEqual([
       { role: 'user', content: 'One' },
-      { role: 'assistant', content: 'Partial\n[stopped by the user]' },
+      { role: 'assistant', content: 'Partial\n(The user stopped this answer.)' },
       { role: 'user', content: 'Two\n\nThree\n\nFour' },
     ])
   })
@@ -162,9 +166,23 @@ describe('getHistoryBudget', () => {
       requires: () => true,
       execute: async () => null,
     }
-    const withoutTools = getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [] })
+    const withoutTools = getHistoryBudget({
+      maxPromptChars: 1000,
+      systemPrompt: 'x'.repeat(100),
+      tools: [],
+      maxSteps: 6,
+    })
     expect(withoutTools).toBe(700)
-    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo] })).toBeLessThan(700)
-    expect(getHistoryBudget({ maxPromptChars: 100, systemPrompt: 'x'.repeat(100), tools: [] })).toBe(0)
+    expect(
+      getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 0 })
+    ).toBeLessThan(700)
+    expect(getHistoryBudget({ maxPromptChars: 100, systemPrompt: 'x'.repeat(100), tools: [], maxSteps: 6 })).toBe(0)
+    // each step may add a result of an eighth of the limit (125 chars); the history never drops below a tenth
+    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 2 })).toBe(
+      getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 0 }) - 250
+    )
+    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 50 })).toBe(
+      100
+    )
   })
 })

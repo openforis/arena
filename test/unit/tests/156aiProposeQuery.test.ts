@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
-import { Query } from '@common/model/query'
+import { Query, SortCriteria } from '@common/model/query'
 
 import { proposeQueryInputSchema, proposeQueryTool, toDataQueryAiResult } from '@webapp/ai/tools/analysis/proposeQuery'
 
@@ -53,6 +53,33 @@ describe('query_propose', () => {
     expect(Query.getDimensions(entry.query)).toEqual([getUuid('cluster/plot/tree/tree_type')])
     expect(Query.getMeasures(entry.query)).toEqual({ [getUuid('cluster/plot/tree/dbh')]: ['avg'] })
     expect(Expression.toString(Query.getFilter(entry.query), Expression.modes.sql)).toBe('dbh > 10')
+  })
+
+  test('an aggregate query can be sorted by a measure, in the order given', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const sort = [
+      { attribute: 'dbh', order: 'desc' },
+      { attribute: 'tree_type', order: 'asc' },
+    ]
+    const result = await runTool(proposeQueryTool, { ...aggregateInput, sort }, ctx)
+    expect(result.queryId).toBe('q1')
+    const criteria = Query.getSort(ctx.analysisQueries.get('q1').query)
+    expect(criteria.map(SortCriteria.getVariable)).toEqual(['dbh_avg', 'tree_type'])
+    expect(criteria.map(SortCriteria.getOrder)).toEqual(['desc', 'asc'])
+  })
+
+  test('the entity count is a measure to sort by; an attribute that is neither is refused', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const countInput = {
+      ...aggregateInput,
+      measures: [{ attribute: 'tree', functions: ['cnt'] }],
+      sort: [{ attribute: 'tree', order: 'desc' }],
+    }
+    const result = await runTool(proposeQueryTool, countInput, ctx)
+    expect(result.queryId).toBe('q1')
+    expect(Query.getSort(ctx.analysisQueries.get('q1').query).map(SortCriteria.getVariable)).toEqual(['tree_uuid_cnt'])
+    const refused = await runTool(proposeQueryTool, { ...countInput, sort: [{ attribute: 'dbh' }] }, ctx)
+    expect(refused.error.issues[0].message).toContain('cannot sort by "dbh"')
   })
 
   test('a raw query with two numeric attributes can be a chart; ids keep counting', async () => {

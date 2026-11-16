@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
@@ -11,6 +11,7 @@ import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const aggregateRowsMax = 200
 export const rawRowsMax = 50
+const NOTE_RESERVE_CHARS = 300
 
 const inputSchema = z.object({
   queryId: z.string().max(20).describe('Id returned by query_propose (q1, q2, …)'),
@@ -62,6 +63,17 @@ const fetchCappedRows = async ({ api, requestParams, max }: { api: AnalysisApi; 
   const total = truncated ? await api.fetchQueryCount(requestParams) : rows.length
   return { rows: rows.slice(0, max), total, truncated }
 }
+
+/**
+ * Tells the model that the rows are only the first ones of the sort order.
+ * @param {object} params - Parameters.
+ * @param {number} params.shown - Rows in the result.
+ * @param {number} params.total - Rows of the query.
+ * @returns {string} The note.
+ */
+const getTruncationNote = ({ shown, total }: { shown: number; total: number }): string =>
+  `Only the first ${shown} of ${total} rows are shown, in the sort order of the query. For the top rows, propose ` +
+  'the query with a sort (a measure desc) and read its first rows; never conclude from rows that are not shown.'
 
 /**
  * Creates query_count and query_run.
@@ -130,7 +142,10 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
           total,
           truncated,
         }
-        return fitListToBudget(result, 'rows')
+        // the room of the truncation note is kept
+        const fitted = fitListToBudget(result, 'rows', getResultBudget(ctx) - NOTE_RESERVE_CHARS)
+        if (!fitted.truncated) return fitted
+        return { ...fitted, note: getTruncationNote({ shown: fitted.rows.length, total }) }
       } catch (error) {
         throw toQueryFailure(error)
       }

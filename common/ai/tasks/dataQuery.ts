@@ -118,6 +118,36 @@ const parseFilter = ({ filter, allowedColumnNames, errors }) => {
 }
 
 /**
+ * Finds a node def by name; a column name (e.g. species_scientific_name, listed in the schema) stands for its attribute.
+ * @param {object[]} candidates - The node defs that can be used.
+ * @param {string} name - Attribute or column name.
+ * @returns {object|undefined} The node def.
+ */
+const findDefByName = (candidates: any[], name: string) =>
+  candidates.find((candidate) => NodeDef.getName(candidate) === name) ??
+  candidates.find((candidate) => ColumnNodeDef.getColumnNames(candidate).includes(name))
+
+/**
+ * Returns the column a sort item refers to: a selected attribute or dimension (the named column, else its main one),
+ * or a measure of an aggregate query.
+ * @param {object} params - Parameters.
+ * @param {string} params.attribute - Sort attribute (or column) name.
+ * @param {object[]} params.sortableDefs - Selected attributes (raw) or dimensions (aggregate).
+ * @param {object} params.measureSortColumns - Measure columns by measure name (aggregate mode).
+ * @param {string} params.lang - Label language.
+ * @returns {{variable: string, label: string}|null} The column, null when the item cannot be sorted.
+ */
+const getSortColumn = ({ attribute, sortableDefs, measureSortColumns, lang }) => {
+  const sortDef = findDefByName(sortableDefs, attribute)
+  if (!sortDef) return measureSortColumns[attribute] ?? null
+  const columnNames: string[] = ColumnNodeDef.getColumnNames(sortDef)
+  return {
+    variable: columnNames.includes(attribute) ? attribute : ColumnNodeDef.getColumnName(sortDef),
+    label: NodeDef.getLabel(sortDef, lang),
+  }
+}
+
+/**
  * Converts the (already parsed) model answer into a Data Explorer query, validating every node def reference.
  * @param {object} params - The parameters.
  * @param {object} params.survey - The survey.
@@ -153,7 +183,7 @@ export const toQuery = ({
 
   const resolveNames = ({ names, candidates, kind }) =>
     names.reduce((acc, name) => {
-      const nodeDef = candidates.find((candidate) => NodeDef.getName(candidate) === name)
+      const nodeDef = findDefByName(candidates, name)
       if (nodeDef) {
         if (!acc.includes(nodeDef)) acc.push(nodeDef)
       } else {
@@ -168,6 +198,8 @@ export const toQuery = ({
   let query = Query.create({ entityDefUuid: NodeDef.getUuid(entityDef) })
   // columns (attributes or dimensions) that can be used for sorting
   let sortableDefs = []
+  // aggregate mode: measure name (attribute, or the entity for the count) → its column of the first function
+  const measureSortColumns: Record<string, { variable: string; label: string }> = {}
 
   if (modeAggregate) {
     query = Query.assocMode(Query.modes.aggregate)(query)
@@ -207,6 +239,13 @@ export const toQuery = ({
       if (validFunctions.length > 0) {
         const measureDefUuid = NodeDef.getUuid(measureDef)
         measures[measureDefUuid] = [...new Set([...(measures[measureDefUuid] ?? []), ...validFunctions])]
+        measureSortColumns[attribute] ??= {
+          variable: ColumnNodeDef.getColumnNameAggregateFunction({
+            nodeDef: measureDef,
+            aggregateFn: validFunctions[0],
+          }),
+          label: NodeDef.getLabel(measureDef, lang),
+        }
       }
     })
     if (aiResult.measures.length === 0) {
@@ -244,10 +283,10 @@ export const toQuery = ({
   // sort
   const sortOrders: string[] = Object.values(SortCriteria.orders)
   const sort = aiResult.sort.reduce((acc, { attribute, order }) => {
-    const sortDef = sortableDefs.find((nodeDef) => NodeDef.getName(nodeDef) === attribute)
-    if (!sortDef) {
+    const sortColumn = getSortColumn({ attribute, sortableDefs, measureSortColumns, lang })
+    if (!sortColumn) {
       errors.push(
-        `cannot sort by "${attribute}": sort attributes must be among the selected ${modeAggregate ? 'dimensions' : 'attributes'}`
+        `cannot sort by "${attribute}": sort attributes must be among the selected ${modeAggregate ? 'dimensions or measures' : 'attributes'}`
       )
       return acc
     }
@@ -258,10 +297,7 @@ export const toQuery = ({
       return acc
     }
     const sortCriteria = SortCriteria.assocOrder(orderNormalized)(
-      SortCriteria.assocVariable({
-        variable: ColumnNodeDef.getColumnName(sortDef),
-        label: NodeDef.getLabel(sortDef, lang),
-      })(SortCriteria.create())
+      SortCriteria.assocVariable(sortColumn)(SortCriteria.create())
     )
     acc.push(sortCriteria)
     return acc

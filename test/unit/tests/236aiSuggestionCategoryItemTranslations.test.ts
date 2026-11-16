@@ -1,4 +1,3 @@
-import { getLanguageLabel } from '@core/app/languages'
 import * as Survey from '@core/survey/survey'
 
 import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
@@ -9,7 +8,7 @@ import {
   categoryItemTranslationsResolver,
   detectCategoryItemTranslations,
 } from '@webapp/ai/suggestions/detectors/categoryItemTranslations'
-import { CONTINUE_TAIL } from '@webapp/ai/suggestions/prompts/designPrompts'
+import { buildSuggestionRequest } from '@webapp/ai/suggestions/suggestionActions'
 
 import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
 import { describeContext, TEST_NOW } from '@test/unit/utils/designSuggestionTestUtils'
@@ -89,22 +88,20 @@ describe('category item translations suggestion (236)', () => {
     expect(SUGGESTION_DEFINITIONS.categoryItemTranslations).toBe(categoryItemTranslationsDefinition)
   })
 
-  test('the prompt names the language and the visible categories, the two tools, and ends with the continue sentence', () => {
-    const [suggestion] = detectCategoryItemTranslations(
-      { [speciesUuid]: { fr: 3 }, [landUseUuid]: { fr: 2 } },
-      survey,
-      { surveyId: 7, now: TEST_NOW }
-    )
-    const prompt = categoryItemTranslationsDefinition.prompt(suggestion, describeContext(survey))
-    expect(prompt).toContain(`${getLanguageLabel('fr')} (fr)`)
-    expect(prompt).toContain('"land_use", "species"')
-    expect(prompt).toContain('categoryItems_listMissingLabels')
-    expect(prompt).toContain('categoryItemLabels_proposeSet')
-    expect(prompt.endsWith(CONTINUE_TAIL)).toBe(true)
-
-    // a category deleted after detection is left out of the prompt
-    const gone = categoryItemTranslationsDefinition.prompt(suggestion, describeContext(withoutCategory(landUseUuid)))
-    expect(gone).toContain('"species"')
-    expect(gone).not.toContain('land_use')
+  test('Do it starts no chat turn: the definition has no prompt, so no request is built', () => {
+    const [suggestion] = detectCategoryItemTranslations({ [speciesUuid]: { fr: 3 } }, survey, {
+      surveyId: 7,
+      now: TEST_NOW,
+    })
+    expect(categoryItemTranslationsDefinition.prompt).toBeUndefined()
+    expect(
+      buildSuggestionRequest({
+        suggestion,
+        userUuid: 'u1',
+        surveyId: 7,
+        cycle: '0',
+        describeContext: describeContext(survey),
+      })
+    ).toBeNull()
   })
 })

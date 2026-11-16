@@ -135,6 +135,7 @@ export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
  * @param {Record<string, string>} params.aiDescriptions - AI descriptions by node def uuid. The request checks their
  * shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid), not the request.
  * @param {number} [params.aiDescriptionsFailedCount] - Node defs left without a description.
+ * @param {number} [params.aiDescriptionsNotDoneCount] - Node defs a stop kept the run from describing.
  * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{job: object}>} The started job.
  */
@@ -144,13 +145,14 @@ export const startSchemaSummaryExportJob = async ({
   fileFormat,
   aiDescriptions,
   aiDescriptionsFailedCount = 0,
+  aiDescriptionsNotDoneCount = 0,
   signal,
 }) => {
   const {
     data: { job },
   } = await axios.post(
     `/api/survey/${surveyId}/schema-summary/export`,
-    { cycle, fileFormat, aiDescriptions, aiDescriptionsFailedCount },
+    { cycle, fileFormat, aiDescriptions, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount },
     // the progress dialog shows the error
     { errorHandledLocally: true, signal }
   )

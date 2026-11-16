@@ -80,14 +80,23 @@ describe('createAiSettingsCache (368)', () => {
     expect(cache.getSnapshot()).toBe(result)
   })
 
-  test('invalidate drops the cache and fetches again', async () => {
+  test('invalidate fetches again and keeps the old settings until the new ones arrive', async () => {
     const next = { ...SETTINGS, featureToggles: { chat: false } }
     const { cache, getCalls } = setup([SETTINGS, next])
     await cache.fetchOnce()
-    cache.invalidate()
-    expect(cache.getSnapshot()).toBeNull()
-    expect(await cache.fetchOnce()).toEqual(next)
+    const refreshed = cache.invalidate()
+    expect(cache.getSnapshot()).toEqual(SETTINGS)
+    expect(await refreshed).toEqual(next)
+    expect(cache.getSnapshot()).toEqual(next)
     expect(getCalls()).toBe(2)
+  })
+
+  test('a failed invalidate keeps the old settings', async () => {
+    const { cache } = setup([SETTINGS, new Error('network')])
+    await cache.fetchOnce()
+    expect(isAiSettingsFetchError(await cache.invalidate())).toBe(true)
+    expect(cache.getSnapshot()).toEqual(SETTINGS)
+    expect(await cache.fetchOnce()).toEqual(SETTINGS)
   })
 
   test('a fetch that started before a reset cannot write its result', async () => {

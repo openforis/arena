@@ -2,7 +2,7 @@ import { translateItems } from '@common/ai/tasks/translation'
 import { expectSystemErrorKey, scriptedTextGenerator } from '@test/unit/utils/aiTestUtils'
 
 const items = [{ id: 'label', text: 'Tree height', kind: 'nodeDefLabel' }]
-const validAnswer = JSON.stringify({ translations: [{ id: 'label', byLang: { es: 'Altura del árbol' } }] })
+const validAnswer = JSON.stringify({ translations: [{ id: '1', byLang: { es: 'Altura del árbol' } }] })
 const baseParams = { sourceLang: 'en', targetLangs: ['es'], items }
 
 describe('translateItems', () => {
@@ -13,18 +13,30 @@ describe('translateItems', () => {
     expect(calls).toHaveLength(1)
   })
 
-  test('retries once with the parse error, then succeeds', async () => {
-    const { generateText, calls } = scriptedTextGenerator('Sorry, here you go: nothing', validAnswer)
-    const result = await translateItems({ generateText, ...baseParams })
-    expect(result.translations[0].byLang.es).toBe('Altura del árbol')
-    expect(calls[1].prompt).toMatch(/could not be parsed/)
+  test('sends short ids and maps them back, dropping an id the model made up', async () => {
+    const two = [...items, { id: 'other', text: 'Plot', kind: 'nodeDefLabel' }]
+    const answer = JSON.stringify({
+      translations: [
+        { id: '2', byLang: { es: 'Parcela' } },
+        { id: '1', byLang: { es: 'Altura' } },
+        { id: '9', byLang: { es: 'Inventada' } },
+      ],
+    })
+    const { generateText, calls } = scriptedTextGenerator(answer)
+    const result = await translateItems({ generateText, ...baseParams, items: two })
+    expect(result.translations).toEqual([
+      { id: 'other', byLang: { es: 'Parcela' } },
+      { id: 'label', byLang: { es: 'Altura' } },
+    ])
+    expect(calls[0].prompt).toMatch(/id="1"/)
+    expect(calls[0].prompt).not.toMatch(/id="label"/)
   })
 
-  test('fails with aiTranslationInvalid (no raw parser text) after two bad answers', async () => {
-    const { generateText, calls } = scriptedTextGenerator('nope', '{"translations": "wrong"}')
+  test('an unusable answer is not repeated: aiTranslationInvalid, one call', async () => {
+    const { generateText, calls } = scriptedTextGenerator('nope')
     const error = await expectSystemErrorKey(translateItems({ generateText, ...baseParams }), 'aiTranslationInvalid')
     expect(error.statusCode).toBe(502)
-    expect(calls).toHaveLength(2)
+    expect(calls).toHaveLength(1)
   })
 
   test.each([

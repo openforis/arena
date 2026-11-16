@@ -18,7 +18,7 @@ import { TestId } from '@webapp/utils/testId'
  * @returns {React.ReactElement} The warning (if any) and the download button.
  */
 export const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
-  const { tempFileName, aiDescriptionsFailedCount = 0 } = job.result
+  const { tempFileName, aiDescriptionsFailedCount = 0, aiDescriptionsNotDoneCount = 0 } = job.result
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
@@ -35,6 +35,11 @@ export const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
       {aiDescriptionsFailedCount > 0 && (
         <div className="schema-summary-export__warning" role="status">
           {i18n.t('surveyForm:schemaSummaryAiDescriptionsFailed', { count: aiDescriptionsFailedCount })}
+        </div>
+      )}
+      {aiDescriptionsNotDoneCount > 0 && (
+        <div className="schema-summary-export__warning" role="status">
+          {i18n.t('surveyForm:schemaSummaryAiDescriptionsNotDone', { count: aiDescriptionsNotDoneCount })}
         </div>
       )}
       <ButtonDownload

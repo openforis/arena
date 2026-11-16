@@ -1,6 +1,6 @@
 import './modal.scss'
 
-import { useCallback } from 'react'
+import { useCallback, useId } from 'react'
 import PropTypes from 'prop-types'
 import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
@@ -10,7 +10,13 @@ import { useI18n } from '@webapp/store/system'
 import { Button } from './buttons'
 
 export const ModalClose = ({ onClose }) => (
-  <Button className="modal-close" iconClassName="icon-cross icon-20px" onClick={onClose} variant="text" />
+  <Button
+    className="modal-close"
+    iconClassName="icon-cross icon-20px"
+    onClick={onClose}
+    title="common.close"
+    variant="text"
+  />
 )
 
 ModalClose.propTypes = {
@@ -48,6 +54,7 @@ export const Modal = (props) => {
   } = props
 
   const i18n = useI18n()
+  const titleId = useId()
 
   const onClose = useCallback(
     (event) => {
@@ -74,10 +81,10 @@ export const Modal = (props) => {
       open
     >
       <Fade in timeout={500}>
-        <div className="modal-content">
+        <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined}>
           {(title || showCloseButton) && (
             <ModalHeader>
-              {title && <span>{i18n.t(title, titleParams)}</span>}
+              {title && <span id={titleId}>{i18n.t(title, titleParams)}</span>}
               {showCloseButton && <ModalClose onClose={onClose} />}
             </ModalHeader>
           )}

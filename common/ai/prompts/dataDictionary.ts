@@ -14,11 +14,11 @@ import { pq } from './promptSafety'
  * Builds the system + user prompt pair for a batch of node defs.
  * @param {object} args - Args.
  * @param {string} args.surveyName - Survey name for context.
- * @param {Array<{uuid:string, name:string, type:string, parentPath?:string, hint?:string}>} args.nodeDefs - Node defs to describe.
+ * @param {Array<{id:string, name:string, label?:string, type:string, parentPath?:string, hint?:string}>} args.nodeDefs - Node defs to describe.
  * @param {{message: string}} [args.previousError] - Parser/validator error from a prior attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The prompt pair.
  */
-export const buildDataDictionaryPrompt = ({ surveyName, nodeDefs, previousError }) => {
+export const buildDataDictionaryPrompt = ({ surveyName, nodeDefs, previousError = null }) => {
   const system = `You write concise field descriptions for an Open Foris Arena (FAO) survey
 data dictionary. The survey is used for forest, agricultural, or
 biodiversity data collection.
@@ -26,6 +26,7 @@ biodiversity data collection.
 Style:
 - One sentence per field. 12-25 words. No headings, no markdown.
 - Describe what the field captures, not how the user interacts with it.
+- The label, when given, tells what an abbreviated name means: follow it.
 - Use domain-appropriate vocabulary (DBH, basal area, plot, stratum...) only
   when the field name implies it.
 - If the field name is generic ("notes", "remarks", "comments"), give a
@@ -33,20 +34,18 @@ Style:
 - Do not invent units that aren't implied by the name.
 
 Output format (very important):
-Reply with EXACTLY one JSON object, nothing else, in this exact shape:
-{
-  "descriptions": [
-    { "uuid": "<original uuid>", "description": "<one-sentence description>" }
-  ]
-}
-- One entry per requested uuid. Do not invent uuids.
+Reply with EXACTLY one JSON object, nothing else, in this exact shape, compact (no indentation, no line breaks):
+{"descriptions":[{"id":"<field id>","description":"<one-sentence description>"}]}
+- One entry per requested id. Do not invent ids.
 - Do not wrap the JSON in code fences or backticks.
 - Do not add prose before or after the JSON.`
 
   const items = nodeDefs
     .map(
-      (nd, idx) =>
-        `[${idx + 1}] uuid=${pq(nd.uuid, 100)} name=${pq(nd.name, 200)} type=${pq(nd.type, 64)}` +
+      (nd) =>
+        `id=${pq(nd.id, 100)} name=${pq(nd.name, 200)}` +
+        (nd.label ? ` label=${pq(nd.label, 200)}` : '') +
+        ` type=${pq(nd.type, 64)}` +
         (nd.parentPath ? ` parent=${pq(nd.parentPath, 400)}` : '') +
         (nd.hint ? `\n    extra: ${pq(nd.hint, 400)}` : '')
     )

@@ -179,6 +179,13 @@ describe('Apply of category item labels (231)', () => {
     expect(categoryLabels.putCategoryItemLabels).not.toHaveBeenCalled()
   })
 
+  test('the store survey id as a string (bigint from the database) is the same survey', async () => {
+    const categoryLabels = createCategoryDeps(answerOf())
+    const changeSet = categoryLabelChangeSet([op('c1', '1')])
+    await apply(changeSet, ['c1'], categoryLabels, { ...survey, id: String(changeSet.surveyId) })
+    expect(categoryLabels.putCategoryItemLabels).toHaveBeenCalled()
+  })
+
   test('nothing written: no store refresh, no suggestion event', async () => {
     const categoryLabels = createCategoryDeps(
       answerOf({ conflicts: [{ itemUuid: 'item-1', lang: 'fr', reason: 'valueChanged', currentText: 'Acacia' }] })

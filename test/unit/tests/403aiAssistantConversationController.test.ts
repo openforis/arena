@@ -314,6 +314,32 @@ describe('assistant conversation controller (403)', () => {
       expect(controller.getState().conversation?.id).toBe(id)
     })
 
+    test('a copy stored by another tab after this one was loaded is the base of the next turn', async () => {
+      const loaded = withTurn(storedConversation('c1', { updatedAt: '2026-10-15T10:00:00.000Z' }), 'first', 'done')
+      const turn = createTurnControl()
+      const { controller, panel, store } = await setup({ conversations: [loaded], runTurn: turn.run })
+      panel.setConversationId('c1')
+      controller.select(scope, 'c1')
+      await flush()
+      const fromOtherTab = withTurn(loaded, 'from the other tab', 'done')
+      await store.save({ ...fromOtherTab, updatedAt: '2026-10-15T11:00:00.000Z' })
+      await controller.send(env, 'second')
+      await flush()
+      expect(turn.params[0].conversation.messages).toHaveLength(4)
+      expect(turn.params[0].conversation.messages[2]).toMatchObject({ text: 'from the other tab' })
+    })
+
+    test('a failed final save of a turn marks the store as not persistent', async () => {
+      const turn = createTurnControl()
+      const { controller, registry, store } = await setup({ runTurn: turn.run })
+      await controller.send(env, 'hello')
+      store.save.mockRejectedValueOnce(new Error('quota'))
+      turn.release()
+      await registry.settle()
+      expect(controller.getState().persistent).toBe(false)
+      expect(controller.getState().busy).toBe(false)
+    })
+
     test('nothing is sent while a turn runs or a card is applied', async () => {
       const turn = createTurnControl()
       const { controller, runTurn } = await setup({ runTurn: turn.run })

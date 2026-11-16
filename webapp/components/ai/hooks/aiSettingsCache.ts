@@ -18,7 +18,8 @@ export type AiSettingsCacheDeps = {
 export type AiSettingsCache = {
   fetchOnce: () => Promise<AiSettingsResponse>
   getSnapshot: () => AiSettingsResponse | null
-  invalidate: () => void
+  // reads again; the old settings stay until the new ones arrive (and stay when the read fails)
+  invalidate: () => Promise<AiSettingsResponse>
   reset: () => void
   subscribe: (listener: () => void) => () => void
 }
@@ -82,7 +83,14 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
    */
   const fetchOnce = (): Promise<AiSettingsResponse> => {
     if (cache) return Promise.resolve(cache)
-    if (inflight !== null) return inflight
+    return inflight ?? startFetch()
+  }
+
+  /**
+   * Starts a fetch and registers it as the one in flight.
+   * @returns {Promise<AiSettingsResponse>} The settings.
+   */
+  const startFetch = (): Promise<AiSettingsResponse> => {
     const startedAt = generation
     const current: Promise<AiSettingsResponse> = (async () => {
       const { result, keep } = await read()
@@ -105,9 +113,7 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
     getSnapshot: () => cache,
     invalidate: () => {
       generation += 1
-      cache = null
-      inflight = null
-      fetchOnce().catch(() => undefined)
+      return startFetch()
     },
     reset: () => {
       generation += 1

@@ -37,8 +37,8 @@ export default class SchemaSummaryExportJob extends Job {
 
   async beforeSuccess() {
     // counted in the browser, which generated the descriptions
-    const { tempFileName, aiDescriptionsFailedCount = 0 } = this.context
-    this.setResult({ tempFileName, aiDescriptionsFailedCount })
+    const { tempFileName, aiDescriptionsFailedCount = 0, aiDescriptionsNotDoneCount = 0 } = this.context
+    this.setResult({ tempFileName, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount })
   }
 }
 

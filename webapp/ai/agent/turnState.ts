@@ -28,7 +28,7 @@ export type TurnState = {
   setQueries: (queries: Record<string, AnalysisQueryEntry>) => void
   setUsage: (usage: AssistantMessageUsage) => void
   setTitle: (title: string) => void
-  finish: (status: AssistantMessageStatus, errorKey?: string) => void
+  finish: (status: AssistantMessageStatus, errorKey?: string, errorParams?: Record<string, unknown>) => void
 }
 
 /**
@@ -131,10 +131,12 @@ export const createTurnState = ({
     setQueries: (queries) => set({ ...current, queries }),
     setUsage: (usage) => updateAnswer((message) => ({ ...message, usage })),
     setTitle: (title) => set({ ...current, title }),
-    finish: (status, errorKey) => {
+    finish: (status, errorKey, errorParams) => {
       // the model gave no title (conversation_setTitle): the first message is the title
       if (!current.title) current = { ...current, title: toConversationTitle(displayText || userMessage) }
-      updateAnswer((message) => (errorKey ? { ...message, status, errorKey } : { ...message, status }))
+      updateAnswer((message) =>
+        errorKey ? { ...message, status, errorKey, ...(errorParams ? { errorParams } : {}) } : { ...message, status }
+      )
     },
   }
 }

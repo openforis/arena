@@ -10,7 +10,7 @@ import { isHostingAllowed, type AiPolicy } from '@common/ai/policy'
 import * as Survey from '@core/survey/survey'
 
 import { ALL_TOOLS } from './allTools'
-import { limitToolResult, toolError } from './common/toolResult'
+import { TOOL_RESULT_MAX_CHARS, limitToolResult, toolError } from './common/toolResult'
 import { AiToolFailure } from './toolFailure'
 import type { AiTool, AiToolArea, AiToolContext } from './types'
 
@@ -78,16 +78,22 @@ const toCallContext = (ctx: AiToolContext): AiToolContext => {
  * @param {AiTool} tool - The tool.
  * @param {unknown} input - Raw input from the model.
  * @param {AiToolContext} ctx - Tool context.
+ * @param {number} [maxResultChars] - Cap of the result JSON (default: the wrapper limit).
  * @returns {Promise<unknown>} The result or `{ error: { code, message, … } }`.
  */
-export const runTool = async (tool: AiTool, input: unknown, ctx: AiToolContext): Promise<unknown> => {
+export const runTool = async (
+  tool: AiTool,
+  input: unknown,
+  ctx: AiToolContext,
+  maxResultChars: number = TOOL_RESULT_MAX_CHARS
+): Promise<unknown> => {
   ctx.signal.throwIfAborted()
   const parsed = tool.inputSchema.safeParse(input)
   if (!parsed.success) return toolError('invalidInput', z.prettifyError(parsed.error))
   try {
-    const output = await tool.execute(parsed.data, toCallContext(ctx))
+    const output = await tool.execute(parsed.data, { ...toCallContext(ctx), resultCapChars: maxResultChars })
     ctx.signal.throwIfAborted()
-    return limitToolResult(output)
+    return limitToolResult(output, maxResultChars)
   } catch (error) {
     if (ctx.signal.aborted || isAbortError(error)) throw error
     if (error instanceof AiToolFailure) return toolError(error.code, error.message, error.details)
@@ -111,15 +117,20 @@ const toToolJsonSchema = (tool: AiTool): Record<string, unknown> => {
  * invalid input reaches the model as `invalidInput` with the zod message.
  * @param {AiTool[]} tools - The tools.
  * @param {AiToolContext} ctx - Tool context.
+ * @param {number} [maxResultChars] - Cap of each result JSON (default: the wrapper limit).
  * @returns {ToolSet} The AI SDK tool set.
  */
-export const toAiSdkTools = (tools: AiTool[], ctx: AiToolContext): ToolSet => {
+export const toAiSdkTools = (
+  tools: AiTool[],
+  ctx: AiToolContext,
+  maxResultChars: number = TOOL_RESULT_MAX_CHARS
+): ToolSet => {
   const result: Record<string, unknown> = {}
   for (const tool of tools) {
     result[tool.name] = {
       description: tool.description,
       inputSchema: jsonSchema(toToolJsonSchema(tool) as any),
-      execute: (input: unknown) => runTool(tool, input, ctx),
+      execute: (input: unknown) => runTool(tool, input, ctx, maxResultChars),
     }
   }
   return result as ToolSet

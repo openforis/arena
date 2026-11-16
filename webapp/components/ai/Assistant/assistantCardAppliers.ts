@@ -47,8 +47,8 @@ export const createCardAppliers = (reduxStore: ReduxStore): AssistantCardApplier
       // the card shows the edits as failed instead of an unhandled rejection
       results = operationIds.map((operationId) => toChunkErrorResult(operationId, error))
     }
-    if (results.some((result) => result.status === 'applied'))
-      window.dispatchEvent(new CustomEvent(RECORD_EDITS_APPLIED_EVENT))
+    // also after a timeout or a failure: the server may have written the edits, the report must be read again
+    window.dispatchEvent(new CustomEvent(RECORD_EDITS_APPLIED_EVENT))
     return { results, note: summarizeRecordEditResults({ changeSet, results }) }
   },
 })

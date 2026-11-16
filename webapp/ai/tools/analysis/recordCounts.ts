@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import * as RecordStep from '@core/record/recordStep'
 
-import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
@@ -135,7 +135,7 @@ export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<an
         const days = rows.map(({ date, count }) => ({ period: String(date).slice(0, 10), count: Number(count) }))
         const counts = groupBy === 'day' ? days : sumByMonth(days)
         const total = days.reduce((sum, { count }) => sum + count, 0)
-        return fitListToBudget({ from, to, groupBy, counts, total }, 'counts')
+        return fitListToBudget({ from, to, groupBy, counts, total }, 'counts', getResultBudget(ctx))
       } catch (error) {
         throw toCountFailure(error)
       }

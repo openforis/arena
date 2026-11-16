@@ -20,6 +20,7 @@ export const RECORD_VALUES_MAX = 100
  * @param {object} params.record - The record with its nodes.
  * @param {object[]} params.nodeDefs - Attribute definitions, in the order wanted.
  * @param {CleaningI18n} params.i18n - Translator.
+ * @param {string|null} [params.parentNodeUuid] - Entity node: only the nodes below it.
  * @param {number} [params.max] - Node cap.
  * @returns {object} The nodes, the total and the truncated flag.
  */
@@ -29,6 +30,7 @@ export const getRecordValues = ({
   record,
   nodeDefs,
   i18n,
+  parentNodeUuid = null,
   max = RECORD_VALUES_MAX,
 }: {
   survey: any
@@ -36,9 +38,13 @@ export const getRecordValues = ({
   record: any
   nodeDefs: any[]
   i18n: CleaningI18n
+  parentNodeUuid?: string | null
   max?: number
 }) => {
-  const allNodes = nodeDefs.flatMap((nodeDef) => Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record))
+  const parentNode = parentNodeUuid ? Record.getNodeByUuid(parentNodeUuid)(record) : null
+  const allNodes = nodeDefs
+    .flatMap((nodeDef) => Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record))
+    .filter((node: any) => !parentNode || Node.isDescendantOf(parentNode)(node))
   const nodes = allNodes.slice(0, max).map((node: any) => ({
     nodeUuid: Node.getUuid(node),
     attribute: NodeDef.getName(nodeDefs.find((nodeDef) => NodeDef.getUuid(nodeDef) === Node.getNodeDefUuid(node))),

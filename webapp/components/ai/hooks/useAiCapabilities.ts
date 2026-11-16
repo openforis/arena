@@ -6,6 +6,7 @@ import {
   getAiCapabilitiesSnapshot,
   loadAiCapabilities,
   resetAiCapabilities,
+  startAiLocalServerReprobe,
   subscribeAiCapabilities,
 } from '@webapp/ai/engines/capabilitiesStore'
 import type { AiCapabilities } from '@webapp/ai/engines/types'
@@ -26,6 +27,11 @@ export const useAiCapabilities = (): AiCapabilities => {
     if (aiEnabledInSystem && userUuid) loadAiCapabilities().catch(() => undefined)
     else if (!userUuid) resetAiCapabilities()
   }, [aiEnabledInSystem, userUuid])
+
+  useEffect(
+    () => (aiEnabledInSystem && userUuid ? startAiLocalServerReprobe() : undefined),
+    [aiEnabledInSystem, userUuid]
+  )
 
   return capabilities
 }

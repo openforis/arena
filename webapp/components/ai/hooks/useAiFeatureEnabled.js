@@ -37,10 +37,10 @@ export const fetchAiSettingsOnce = () => settingsCache.fetchOnce()
 export const getAiSettingsSnapshot = () => settingsCache.getSnapshot()
 
 /**
- * Drops the cached AI settings and triggers a re-fetch. Call this from the
+ * Triggers a re-fetch; the cached AI settings stay until the new ones arrive. Call this from the
  * AI Settings panel after `Save` / `Clear` so other components pick up the
  * new toggles immediately.
- * @returns {void}
+ * @returns {Promise<object>} The new settings (a stand-in marked `_fetchError` when the read failed).
  */
 export const invalidateAiSettingsCache = () => settingsCache.invalidate()
 

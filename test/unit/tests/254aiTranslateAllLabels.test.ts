@@ -174,14 +174,17 @@ describe('translate all labels in the browser (254)', () => {
 
   test('a failed call is counted (items × languages) and the others still apply', async () => {
     const survey = await buildWideSurvey(25, ['en', 'fr', 'es'])
-    let call = 0
+    // the items of the first call keep failing, also when the call is split down to single items
+    let failingIds: Set<string> | null = null
     const result = await runTranslateAllLabels({
       survey,
       generateText,
       guard: noGuard,
       translate: async (params: any) => {
-        call += 1
-        if (call === 1) throw new SystemError('aiTranslationInvalid', {}, 502)
+        failingIds ??= new Set(params.items.map((item: any) => item.id))
+        if (params.items.every((item: any) => failingIds!.has(item.id))) {
+          throw new SystemError('aiTranslationInvalid', {}, 502)
+        }
         return translateAll(params)
       },
     })

@@ -50,7 +50,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, onClose }) => {
         </div>
 
         {error ? (
-          <div className="ai-explain-panel__error">
+          <div className="ai-explain-panel__error" role="alert">
             {getAiErrorKey(error) === 'aiRequestTimeout'
               ? i18n.t('aiExpression.explain.timeout')
               : tUnescaped('aiExpression.explain.error', { message: getAiErrorMessage({ error, i18n }) })}

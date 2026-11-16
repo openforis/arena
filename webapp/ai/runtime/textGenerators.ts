@@ -6,6 +6,10 @@ import { generateText, streamText, type LanguageModel, type ModelMessage } from 
 
 import type { AiGenerateText } from '@common/ai/llm'
 
+// non-chat tasks need no reasoning: a thinking model on a local server would spend its time on it. Read only by the
+// local server provider (named 'localServer'); the gateway model never forwards provider options.
+const TASK_PROVIDER_OPTIONS = { localServer: { reasoningEffort: 'none' } }
+
 /**
  * Wraps the model as an AiGenerateText (used by the shared tasks).
  * @param {LanguageModel} model - The model.
@@ -14,7 +18,14 @@ import type { AiGenerateText } from '@common/ai/llm'
 export const createGatewayTextGenerator =
   (model: LanguageModel): AiGenerateText =>
   async ({ system, prompt, signal }) => {
-    const result = await generateText({ model, system, prompt, abortSignal: signal, maxRetries: 0 })
+    const result = await generateText({
+      model,
+      system,
+      prompt,
+      abortSignal: signal,
+      maxRetries: 0,
+      providerOptions: TASK_PROVIDER_OPTIONS,
+    })
     return result.text
   }
 
@@ -44,7 +55,14 @@ export const streamTextChunks = async ({
   onChunk: (chunk: string) => void
   signal?: AbortSignal
 }): Promise<void> => {
-  const options = { model, system, abortSignal: signal, maxRetries: 0, onError: () => {} }
+  const options = {
+    model,
+    system,
+    abortSignal: signal,
+    maxRetries: 0,
+    onError: () => {},
+    providerOptions: TASK_PROVIDER_OPTIONS,
+  }
   // errors are read from the stream; the noop onError keeps the SDK from logging them to the console
   const result = messages ? streamText({ ...options, messages }) : streamText({ ...options, prompt: prompt ?? '' })
   for await (const part of result.stream) {

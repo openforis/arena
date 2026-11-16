@@ -180,7 +180,9 @@ describe('handleModelRequest: generate', () => {
       })
     const unexpected = failing(new Error('db exploded'))
     const res1 = await run(body(), unexpected.deps)
-    expect(res1.statusCode).toBe(502)
+    expect(res1.statusCode).toBe(500)
+    expect(res1.body.key).toBe('appErrors:unexpectedServerError')
+    expect(JSON.stringify(res1.body)).not.toMatch(/db exploded/)
     expect(unexpected.logged.join('\n')).toMatch(/db exploded/)
 
     const expected = failing(new SystemError('aiNotConfigured', {}, 503))
@@ -336,6 +338,34 @@ describe('handleModelRequest: stream', () => {
     }
   })
 
+  test('a client that left before the stream started: the provider stream is aborted and cancelled', async () => {
+    let cancelled = false
+    let signal: AbortSignal | undefined
+    const model = new MockLanguageModelV4({
+      doStream: async ({ abortSignal }) => {
+        signal = abortSignal
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue({ type: 'stream-start', warnings: [] })
+          },
+          cancel() {
+            cancelled = true
+          },
+        })
+        return { stream } as any
+      },
+    })
+    const { deps, telemetry } = createDeps(model)
+    const req = createFakeRequest(body({ stream: true }))
+    const res = createFakeResponse()
+    // the socket closes while the policy and budget checks run, before the close listener exists
+    res.destroyed = true
+    await handleModelRequest({ req, res, user, deps })
+    expect(signal?.aborted).toBe(true)
+    expect(cancelled).toBe(true)
+    expect(telemetry).toHaveLength(1)
+  })
+
   test('an error before the stream starts is a plain JSON error', async () => {
     const model = new MockLanguageModelV4({
       doStream: async () => {
@@ -372,7 +402,6 @@ describe('mock provider canned answers', () => {
     const { system, prompt } = buildTranslationPrompt({
       sourceLang: 'en',
       glossary: undefined,
-      previousError: undefined,
       targetLangs: ['fr', 'es'],
       items: [
         { id: 'u1_label', text: 'Tree', kind: 'nodeDefLabel' },

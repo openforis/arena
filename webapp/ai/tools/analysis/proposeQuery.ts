@@ -30,7 +30,11 @@ export const proposeQueryInputSchema = z.object({
     .array(z.object({ attribute: name, order: z.string().max(10).nullish() }))
     .max(10)
     .nullish()
-    .describe('Optional sort: selected attributes (raw) or dimensions (aggregate), order asc or desc'),
+    .describe(
+      'Optional sort: selected attributes (raw) or dimensions and measures (aggregate; a measure is named by its ' +
+        'attribute, or the entity name for the count), order asc or desc. Sort a measure desc to get the top groups, ' +
+        'e.g. the species with most trees'
+    ),
   explanation: z.string().max(1000).describe("Short explanation of the query, in the user's language"),
 })
 
@@ -62,8 +66,9 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
   const store = ctx.analysisQueries
   if (!store) throw new Error('query_propose needs the conversation query store')
   const { survey, cycle, lang, includeAnalysis } = getAnalysisContext(ctx)
-  const { query, errors } = toQuery({ survey, cycle, lang, aiResult: toDataQueryAiResult(input), includeAnalysis })
-  if (!query) {
+  const aiResult = toDataQueryAiResult(input)
+  const { query, errors } = toQuery({ survey, cycle, lang, aiResult, includeAnalysis })
+  if (!query || errors.length > 0) {
     return {
       error: {
         code: 'invalidProposal',

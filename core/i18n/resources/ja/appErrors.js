@@ -87,6 +87,8 @@ export default {
     nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
     nodesBatchBusy: '別の一括編集が実行中です。数秒後にもう一度お試しください。',
     nodesBatchInvalidValue: '「{{attributeName}}」の新しい値はこの属性には無効です。',
+    nodesBatchWouldClearValues:
+      'この編集により、該当しなくなる他の値が消去されます。確認するにはフォームでこの値を編集してください。',
     nodesBatchUnexpected: 'サーバーで予期しないエラーが発生したため、編集を適用できませんでした。',
   },
   recordPrintableExport: {
@@ -175,6 +177,8 @@ export default {
   aiDataQueryNoEntities: 'この調査にはクエリ可能な項目がありません。',
   aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',
   aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
+  aiAssistantStepLimit:
+    'アシスタントは回答を書く前にステップ数の上限に達しました。もう一度試すか、より絞った質問をしてください。',
   aiLocalServerUnreachable:
     'AI サーバー ({{baseUrl}}) に接続できませんでした。CORS を有効にして起動していますか？ブラウザーがローカルネットワーク上のデバイスへのアクセスをブロックしていませんか？',
   aiLocalServerModelMissing:

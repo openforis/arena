@@ -177,6 +177,23 @@ describe('row context', () => {
     )
     expect(toRowContextDisplayText('no context here')).toBeNull()
   })
+
+  test('the parent entity node is in the draft and not in the chat text', () => {
+    const draft = buildRowContextDraft({
+      question: 'Why?',
+      context: {
+        recordUuid: 'rec-1',
+        recordKeys: '12',
+        nodeUuid: 'node-1',
+        parentNodeUuid: 'tree-9',
+        path: 'p',
+        messages: [],
+      },
+    })
+    expect(draft).toContain('(parentNodeUuid: tree-9)')
+    expect(parseRowContext(draft)).toEqual({ recordUuid: 'rec-1', nodeUuid: 'node-1' })
+    expect(toRowContextDisplayText(draft)).not.toContain('tree-9')
+  })
 })
 
 describe('cleaning prompt', () => {

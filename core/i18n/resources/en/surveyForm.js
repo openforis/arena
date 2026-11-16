@@ -43,6 +43,10 @@ Continue?`,
   schemaSummaryAiDescriptionsFailed_one: 'AI description could not be generated for {{count}} field; it is left empty.',
   schemaSummaryAiDescriptionsFailed_other:
     'AI descriptions could not be generated for {{count}} fields; they are left empty.',
+  schemaSummaryAiDescriptionsNotDone_one:
+    'AI description was not generated for {{count}} field because the run was stopped; it is left empty.',
+  schemaSummaryAiDescriptionsNotDone_other:
+    'AI descriptions were not generated for {{count}} fields because the run was stopped; they are left empty.',
   hidePages: 'Hide pages',
   showPages: 'Show pages',
   move: `Move '{{nodeDefLabel}}'`,
@@ -215,6 +219,8 @@ In Arena Mobile:
     defaultLabel: 'Default label',
     failed_one: 'The AI could not produce {{count}} translation; it has no AI suggestion.',
     failed_other: 'The AI could not produce {{count}} translations; they have no AI suggestion.',
+    notDone_one: 'The run was stopped before {{count}} translation was asked for; it has no AI suggestion.',
+    notDone_other: 'The run was stopped before {{count}} translations were asked for; they have no AI suggestion.',
     path: 'Path',
     showDescriptions: 'Show descriptions',
     title: 'Translate Node Definition Labels',

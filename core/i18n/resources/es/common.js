@@ -1364,6 +1364,15 @@ $t(common.appNameFull)
   aiBatch: {
     translateTitle: 'IA: Traducir etiquetas',
     dataDictionaryTitle: 'IA: Descripciones de campos',
+    categoryLabelsTitle: 'IA: Traducir etiquetas de categorías',
+    categoryLabelsNothing:
+      'No hay etiquetas de categorías para traducir: los elementos no tienen etiqueta en otro idioma.',
+    categoryLabelsSaved_one: '{{count}} etiqueta de categoría guardada.',
+    categoryLabelsSaved_other: '{{count}} etiquetas de categorías guardadas.',
+    categoryLabelsNotSaved_one:
+      '{{count}} etiqueta de categoría no se pudo guardar (cambió entretanto o no fue aceptada); {{saved}} guardadas.',
+    categoryLabelsNotSaved_other:
+      '{{count}} etiquetas de categorías no se pudieron guardar (cambiaron entretanto o no fueron aceptadas); {{saved}} guardadas.',
     preparing: 'Preparando…',
     progress: '{{done}} de {{total}} solicitudes a la IA completadas',
     stop: 'Detener',
@@ -1449,6 +1458,7 @@ $t(common.appNameFull)
     rowAction: {
       askAssistant: 'Preguntar al asistente',
       question: '¿Por qué este valor no es válido y cómo puedo corregirlo?',
+      busy: 'El asistente sigue respondiendo. Espera a que termine o deténlo primero.',
     },
     card: {
       empty: '(vacío)',

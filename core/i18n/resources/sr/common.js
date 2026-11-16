@@ -1522,6 +1522,17 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
   aiBatch: {
     translateTitle: 'AI: Prevedi oznake',
     dataDictionaryTitle: 'AI: Opisi polja',
+    categoryLabelsTitle: 'AI: Prevedi oznake kategorija',
+    categoryLabelsNothing: 'Nema oznaka kategorija za prevod: stavke nemaju oznaku ni na jednom drugom jeziku.',
+    categoryLabelsSaved_one: 'Sačuvana je {{count}} oznaka kategorije.',
+    categoryLabelsSaved_few: 'Sačuvane su {{count}} oznake kategorija.',
+    categoryLabelsSaved_other: 'Sačuvano je {{count}} oznaka kategorija.',
+    categoryLabelsNotSaved_one:
+      '{{count}} oznaka kategorije nije mogla biti sačuvana (u međuvremenu izmijenjena ili nije prihvaćena); sačuvano: {{saved}}.',
+    categoryLabelsNotSaved_few:
+      '{{count}} oznake kategorija nisu mogle biti sačuvane (u međuvremenu izmijenjene ili nisu prihvaćene); sačuvano: {{saved}}.',
+    categoryLabelsNotSaved_other:
+      '{{count}} oznaka kategorija nije moglo biti sačuvano (u međuvremenu izmijenjene ili nisu prihvaćene); sačuvano: {{saved}}.',
     preparing: 'Priprema…',
     progress: 'Završeno AI zahtjeva: {{done}} od {{total}}',
     stop: 'Zaustavi',
@@ -1608,6 +1619,7 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
     rowAction: {
       askAssistant: 'Pitaj asistenta',
       question: 'Zašto ova vrijednost nije važeća i kako da je ispravim?',
+      busy: 'Asistent još odgovara. Sačekaj da završi ili ga prvo zaustavi.',
     },
     card: {
       empty: '(prazno)',

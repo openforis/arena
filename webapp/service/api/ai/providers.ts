@@ -2,7 +2,10 @@
  * Frontend client for the AI provider endpoints (account providers and the default provider). The API key is never
  * returned by the server; a saved provider's key is only used by the server on the endpoint it was saved with.
  */
-import axios from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
+
+// read by appErrorsMiddleware: the dialog shows the error, and the request body (with the API key) stays out of Redux
+const localErrors: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
 
 export type AiProviderRequest = {
   id?: string
@@ -38,7 +41,7 @@ const providerUrl = (id: string): string => `/api/ai/providers/${encodeURICompon
  * @returns {Promise<AiProviderTestResponse>} The result (a failed test is `ok: false`, not an error).
  */
 export const testProvider = async (input: AiProviderRequest): Promise<AiProviderTestResponse> => {
-  const { data } = await axios.post('/api/ai/providers/test', input)
+  const { data } = await axios.post('/api/ai/providers/test', input, localErrors)
   return data
 }
 
@@ -48,7 +51,7 @@ export const testProvider = async (input: AiProviderRequest): Promise<AiProvider
  * @returns {Promise<AiProviderModelsResponse>} The models.
  */
 export const fetchProviderModels = async (input: AiProviderRequest): Promise<AiProviderModelsResponse> => {
-  const { data } = await axios.post('/api/ai/providers/models', input)
+  const { data } = await axios.post('/api/ai/providers/models', input, localErrors)
   return data
 }
 
@@ -60,7 +63,7 @@ export const fetchProviderModels = async (input: AiProviderRequest): Promise<AiP
 export const addProvider = async (
   input: AiProviderRequest
 ): Promise<{ provider: SettingsBody; settings: SettingsBody }> => {
-  const { data } = await axios.post('/api/ai/providers', input)
+  const { data } = await axios.post('/api/ai/providers', input, localErrors)
   return data
 }
 
@@ -74,7 +77,7 @@ export const updateProvider = async (
   id: string,
   input: AiProviderRequest
 ): Promise<{ provider: SettingsBody; settings: SettingsBody }> => {
-  const { data } = await axios.put(providerUrl(id), input)
+  const { data } = await axios.put(providerUrl(id), input, localErrors)
   return data
 }
 

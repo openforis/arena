@@ -105,7 +105,7 @@ const persistGroup = async (group: Group, deps: ApplierDeps): Promise<void> => {
   const before = isCreate ? null : Survey.getNodeDefByUuid(group.uuid)(deps.getSurvey())
   const base = first.type === 'nodeDef.create' ? NodeDef.dissocTemporary(first.nodeDef) : before
   const changes = isCreate ? rest : group.operations
-  const nodeDef = changes.reduce((acc, op) => applyOperationToNodeDef(acc, op), base)
+  const nodeDef = changes.reduce((acc, op) => applyOperationToNodeDef(acc, op, deps.getSurvey()), base)
   if (isCreate) {
     await deps.postNodeDef(nodeDef)
     deps.onNodeDefCreated(nodeDef)

@@ -18,10 +18,11 @@ import { OFF_POLICY } from '@webapp/ai/policy/effectivePolicy'
 
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from './featureSwitches'
 import { loadLocalServerConsent, saveLocalServerConsent } from './localServerConsent'
-import { selectEngine } from './selectEngine'
+import { getEffectiveProviderId, selectEngine } from './selectEngine'
 import type {
   AiCapabilities,
   AiEngine,
+  AiEngineErrorInfo,
   AiEngineModelOptions,
   AiEngineSelection,
   AiLocalServerCapability,
@@ -69,6 +70,8 @@ export type ModelResolverDeps = {
   // the AI settings of the loaded capabilities (null: not loaded or failed to load)
   getSettings: () => AiFeatureSwitches | null
   loadCapabilities: () => Promise<AiCapabilities>
+  // reads the settings again (the last check before a local request); loadCapabilities when absent
+  refreshCapabilities?: () => Promise<AiCapabilities>
   // getEffectivePolicyFor: survey policy within the ceilings (the ceilings alone for features without a survey);
   // null fails closed. fresh: read from the server now, not from the cache
   getEffectivePolicyFor: (params: {
@@ -124,10 +127,19 @@ const noEngine = (selection: { unavailable: string[] }, dataClass: AiDataClass) 
  * Returns the selected engine, or throws aiNoEngineAvailable with the reason.
  * @param {AiEngineSelection} selection - The selection.
  * @param {AiDataClass} dataClass - Data class of the request.
+ * @param {AiEngineErrorInfo|null} [probeError] - Why the last probe of the request's local provider failed.
  * @returns {AiSelectedEngine} The engine.
  */
-const assertSelected = (selection: AiEngineSelection, dataClass: AiDataClass): AiSelectedEngine => {
+const assertSelected = (
+  selection: AiEngineSelection,
+  dataClass: AiDataClass,
+  probeError?: AiEngineErrorInfo | null
+): AiSelectedEngine => {
   if ('engine' in selection) return selection.engine
+  // a local server that is down or has no model: its own message (with the URL), not the generic one
+  if (probeError && selection.unavailable.includes('notAvailable')) {
+    throw new SystemError(probeError.key, probeError.params, StatusCodes.SERVICE_UNAVAILABLE)
+  }
   throw noEngine(selection, dataClass)
 }
 
@@ -156,8 +168,9 @@ const selectForTurn = ({
   dataClass: AiDataClass
   declare?: ResolveModelParams['declareDataClass']
 }): SelectedForTurn => {
+  const probeError = capabilities.local[getEffectiveProviderId({ capabilities, providerId })]?.error
   const select = (candidate: AiDataClass) =>
-    assertSelected(selectEngine({ effective, dataClass: candidate, capabilities, providerId }), candidate)
+    assertSelected(selectEngine({ effective, dataClass: candidate, capabilities, providerId }), candidate, probeError)
   const first = select(dataClass)
   const declared = declare ? getMaxAiDataClass(dataClass, declare({ engine: first, policy: effective })) : dataClass
   return declared === dataClass ? { engine: first, dataClass } : { engine: select(declared), dataClass: declared }
@@ -273,7 +286,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    */
   const recheckLocal = async (context: Context, engine: AiSelectedEngine, capability: AiLocalServerCapability) => {
     const { options } = context
-    const capabilities = await deps.loadCapabilities()
+    const capabilities = await (deps.refreshCapabilities ?? deps.loadCapabilities)()
     assertFeatureEnabled(options.feature)
     const policy = await deps.getEffectivePolicyFor({
       feature: options.feature,

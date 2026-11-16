@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { QueryNodeDefs } from '@common/model/query'
 
-import { TOOL_RESULT_BUDGET_CHARS, fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
@@ -69,12 +69,12 @@ const execute = async (input: Input, ctx: any) => {
     const item = toItem(entityDef)
     // the wrapper of the single entity counts in the budget
     const wrapperLength = JSON.stringify({ entities: [], truncated: true }).length
-    const fitted = fitListToBudget(item, 'attributes', TOOL_RESULT_BUDGET_CHARS - wrapperLength)
+    const fitted = fitListToBudget(item, 'attributes', getResultBudget(ctx) - wrapperLength)
     return { entities: [fitted], truncated: fitted.truncated ?? false }
   }
 
   const result = { entities: entityDefs.map(toItem) }
-  if (JSON.stringify(result).length <= TOOL_RESULT_BUDGET_CHARS) return result
+  if (JSON.stringify(result).length <= getResultBudget(ctx)) return result
   return {
     entities: result.entities.map(({ name, label, parentEntity }) => ({ name, label, parentEntity })),
     attributesOmitted: true,

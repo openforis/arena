@@ -12,6 +12,7 @@ import {
   getAiCapabilitiesStore,
   getCurrentUserUuid,
   loadAiCapabilities,
+  refreshAiCapabilities,
   notifyAiCapabilities,
 } from './capabilitiesStore'
 import { requestLocalServerConsent } from './consentRequests'
@@ -22,6 +23,7 @@ export const appModelResolverDeps: ModelResolverDeps = {
   isInstanceEnabled: () => isConfigAiFeaturesEnabled(reduxStore.getState()),
   getSettings: () => getAiCapabilitiesStore().getSettings(),
   loadCapabilities: loadAiCapabilities,
+  refreshCapabilities: refreshAiCapabilities,
   getEffectivePolicyFor,
   storage: getBrowserLocalStorage(),
   requestConsent: requestLocalServerConsent,

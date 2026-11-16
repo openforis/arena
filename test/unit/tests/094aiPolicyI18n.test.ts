@@ -17,7 +17,7 @@ describe('AI policy i18n', () => {
     expect(resources[lang].common.aiPolicy.level.cloud).toMatch(CYRILLIC)
   })
 
-  test.each(['en', 'fr', 'ja'])('%s has the activity log message', (lang) => {
+  test.each(languages)('%s has the activity log message', (lang) => {
     expect(typeof resources[lang].activityLog.messages[ActivityLog.type.surveyAiPolicyUpdate]).toBe('string')
   })
 

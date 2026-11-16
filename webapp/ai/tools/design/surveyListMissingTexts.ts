@@ -10,7 +10,7 @@ import type { ChangeSet, LabelKind } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
 import { canViewCurrentSurvey } from '../common/toolPermissions'
-import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
+import { getResultBudget } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool } from '../types'
 import {
@@ -198,6 +198,7 @@ const toEmptyItem = (slot: Slot): MissingTextItem => ({
  * @param {MissingTextsInput} params.input - Tool input.
  * @param {SuggestionScope|null} params.scope - Scope of an accepted suggestion.
  * @param {ChangeSet[]} params.pendingChangeSets - Cards not applied yet.
+ * @param {number} [params.maxChars] - JSON budget of the page.
  * @returns {MissingTextsPage} The page.
  */
 export const listMissingTexts = ({
@@ -205,11 +206,13 @@ export const listMissingTexts = ({
   input,
   scope,
   pendingChangeSets,
+  maxChars = getResultBudget(),
 }: {
   survey: any
   input: MissingTextsInput
   scope: SuggestionScope | null
   pendingChangeSets: ChangeSet[]
+  maxChars?: number
 }): MissingTextsPage => {
   const languages = getSurveyLanguages(survey)
   const lang = checkLanguage(input, languages)
@@ -230,7 +233,7 @@ export const listMissingTexts = ({
     const item = lang === null ? toEmptyItem(slot) : toSourceItem(slot, lang, languages)
     size += JSON.stringify(item).length + 1
     // a page is cut only when it has items, so an oversized text still makes progress
-    if (page.items.length > 0 && (page.items.length >= limit || size > TOOL_RESULT_BUDGET_CHARS)) {
+    if (page.items.length > 0 && (page.items.length >= limit || size > maxChars)) {
       page.nextCursor = String(slot.index)
       break
     }
@@ -257,5 +260,6 @@ export const surveyListMissingTextsTool: AiTool<MissingTextsInput, MissingTextsP
       input,
       scope: ctx.suggestionScope ?? null,
       pendingChangeSets: ctx.getPendingChangeSets?.() ?? [],
+      maxChars: getResultBudget(ctx),
     }),
 }

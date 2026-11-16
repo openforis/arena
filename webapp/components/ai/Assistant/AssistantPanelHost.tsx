@@ -11,8 +11,10 @@ import { isCleaningRoute } from './cleaning/cleaningArea'
 import { useExplorerEditMode } from './cleaning/useCleaningArea'
 import { isAssistantShown, pickArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
+import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { useAssistantAreas } from './useAssistantAreas'
 import { useAssistantPanel } from './useAssistantPanel'
+import { CategoryLabelsBatchHost } from './suggestions/CategoryLabelsBatchHost'
 import { SuggestionsHost } from './suggestions/SuggestionsHost'
 
 // the panel, the agent and the AI SDK load on the first open
@@ -56,12 +58,14 @@ export const AssistantPanelHost = () => {
       analysisRoute: isAnalysisRoute(pathname),
       cleaningRoute: isCleaningRoute({ pathname, explorerEditMode }),
     })
-    if (next !== area) assistantPanelStore.setArea(next)
+    // a running answer keeps its area: another one would hide it and its Stop button would stop it unseen
+    if (next !== area && !assistantTurnRegistry.isRunning()) assistantPanelStore.setArea(next)
   }, [area, explorerEditMode, module, open, pathname, statuses, userSelectedArea])
 
   return (
     <>
       <SuggestionsHost module={module} statuses={statuses} />
+      <CategoryLabelsBatchHost />
       {mounted && shown && (
         <Suspense fallback={null}>
           <AssistantPanel statuses={statuses} />

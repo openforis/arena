@@ -12,8 +12,10 @@ const thrown = (call: () => unknown): any => {
 }
 
 /** Returns an SSE response with these JSON events. */
-const sseResponse = (events: string[]): Response =>
-  new Response(events.map((event) => `data: ${event}\n\n`).join(''), { status: 200 })
+const sseResponse = (events: string[], { done = true } = {}): Response =>
+  new Response(events.map((event) => `data: ${event}\n\n`).join('') + (done ? 'data: [DONE]\n\n' : ''), {
+    status: 200,
+  })
 
 describe('deserializeStreamPart: what comes off the wire is checked, not trusted (373)', () => {
   test.each([[null], [undefined], ['text'], [42], [[]], [{}], [{ type: 7 }]])('%j is not a stream part', (json) => {
@@ -82,5 +84,14 @@ describe('readSseParts: a malformed part ends the stream with an error (373)', (
     const reader = readSseParts(sseResponse(['{"type":"text-delta","id":"t","delta":"Hi"}'])).getReader()
     expect((await reader.read()).done).toBe(false)
     expect((await reader.read()).done).toBe(true)
+  })
+
+  test('a stream that ends without [DONE] errors instead of closing', async () => {
+    const reader = readSseParts(
+      sseResponse(['{"type":"text-delta","id":"t","delta":"Hi"}'], { done: false })
+    ).getReader()
+    expect((await reader.read()).done).toBe(false)
+    const error = await reader.read().catch((e) => e)
+    expect(error.key).toBe('aiProviderUnavailable')
   })
 })

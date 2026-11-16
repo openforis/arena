@@ -12,13 +12,16 @@ import type { AiContextWindow, AiEngineErrorInfo, AiEngineLimits } from './types
 
 export const DEFAULT_LOCAL_CONTEXT_TOKENS = 8192
 export const LOCAL_SERVER_MAX_STEPS = 6 // adjusted from the manual matrix
+// a big context leaves room for more tool steps
+export const LOCAL_SERVER_MAX_STEPS_LARGE_CONTEXT = 10
+export const LARGE_CONTEXT_TOKENS = 32000
 export const PROBE_TIMEOUT_MS = 3000
+// the first call loads the model into memory
+export const TEST_CHAT_TIMEOUT_MS = 60000
 
 // also the ratio of the assistant's context estimate when a provider reports no usage
 export const CHARS_PER_TOKEN = 3
-const PROMPT_SHARE = 0.75 // a quarter of the context is kept for the answer
-// the gateway's default output cap (AI_MAX_OUTPUT_TOKENS): a local model gets the same ceiling
-export const LOCAL_SERVER_MAX_OUTPUT_TOKENS = 4096
+const PROMPT_SHARE = 0.75 // a quarter of the context is kept for the answer (not capped: the server decides)
 
 export type LocalServerProbeResult = {
   reachable: boolean
@@ -34,20 +37,9 @@ export type LocalServerProbeResult = {
  */
 export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimits => ({
   maxPromptChars: Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * CHARS_PER_TOKEN * PROMPT_SHARE),
-  maxSteps: LOCAL_SERVER_MAX_STEPS,
+  maxSteps:
+    (contextTokens ?? 0) >= LARGE_CONTEXT_TOKENS ? LOCAL_SERVER_MAX_STEPS_LARGE_CONTEXT : LOCAL_SERVER_MAX_STEPS,
 })
-
-/**
- * Returns the most tokens a local model may write for an answer: the quarter of its context kept for it, at most the
- * gateway's cap. Without it a model that does not stop writes until its context is full.
- * @param {number|null} contextTokens - Context size, or null when unknown (8,192 is used).
- * @returns {number} The cap, in tokens.
- */
-export const getLocalServerMaxOutputTokens = (contextTokens: number | null): number =>
-  Math.min(
-    LOCAL_SERVER_MAX_OUTPUT_TOKENS,
-    Math.floor((contextTokens && contextTokens > 0 ? contextTokens : DEFAULT_LOCAL_CONTEXT_TOKENS) * (1 - PROMPT_SHARE))
-  )
 
 /**
  * Returns the context window of the local server's model.
@@ -177,5 +169,40 @@ export const probeLocalServer = async ({
     return { reachable: false, models: [], contextTokens: null, error: toEngineErrorInfo(error, baseUrl) }
   } finally {
     clearTimeout(timer)
+  }
+}
+
+/**
+ * Settings Test: the probe, then one real minimal chat completion with the chosen (else the first) model. A server
+ * that lists its models but cannot answer (no model loaded, wrong model, error) is reported as failed.
+ * @param {object} params - Parameters of probeLocalServer.
+ * @returns {Promise<LocalServerProbeResult>} The probe result; when the chat call failed: not reachable, with its error.
+ */
+export const testLocalServerChat = async (params: {
+  baseUrl: string
+  modelId: string | null
+  fetchImpl: LocalServerFetchImpl
+}): Promise<LocalServerProbeResult> => {
+  const probe = await probeLocalServer(params)
+  const modelId = params.modelId ?? probe.models[0] ?? null
+  if (!probe.reachable || !modelId) return probe
+  const { baseUrl, fetchImpl } = params
+  try {
+    const localFetch = createLocalServerFetch({ fetchImpl, baseUrl, modelId })
+    await localFetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // the only call with a token cap: a one-word answer; reasoning_effort none is ignored by servers not knowing it
+      body: JSON.stringify({
+        model: modelId,
+        messages: [{ role: 'user', content: 'Reply with one word: ok' }],
+        max_tokens: 8,
+        reasoning_effort: 'none',
+      }),
+      signal: AbortSignal.timeout(TEST_CHAT_TIMEOUT_MS),
+    })
+    return probe
+  } catch (error) {
+    return { ...probe, reachable: false, error: toEngineErrorInfo(error, baseUrl) }
   }
 }

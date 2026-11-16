@@ -114,6 +114,20 @@ describe('createCapabilitiesStore', () => {
     expect(notified).toBe(2)
   })
 
+  test('a refresh whose settings could not be read keeps those of the same user', async () => {
+    let fail = false
+    const { deps } = fakeDeps([])
+    const store = createCapabilitiesStore({
+      ...deps,
+      loadSettings: async () => (fail ? null : settingsSnapshot),
+    })
+    await store.load({ userUuid: 'u1' })
+    fail = true
+    const capabilities = await store.refresh({ userUuid: 'u1' })
+    expect(store.getSettings()).toEqual(settingsSnapshot)
+    expect(capabilities.providers.map((entry) => entry.id)).toEqual(['arena-default'])
+  })
+
   test('another user reloads', async () => {
     const { calls, deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)

@@ -1,6 +1,6 @@
 /**
  * Translation of survey labels. Plain text + tolerant JSON parsing + zod validation
- * (small local models reject the JSON response format), with one retry on an unusable answer.
+ * (small local models reject the JSON response format). An unusable answer is an error: the batch splits the call.
  */
 import { z } from 'zod'
 
@@ -8,8 +8,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 
 import type { AiGenerateText } from '../llm'
 import { AiLimits } from '../limits'
-import { safeParseJsonResponse, withOneRetry } from '../parsing'
-import type { RetryFeedback } from '../parsing'
+import { safeParseJsonResponse } from '../parsing'
 import { buildTranslationPrompt } from '../prompts/translation'
 
 export type AiTranslationItem = { id: string; text: string; kind?: string }
@@ -98,14 +97,15 @@ export const translateItems = async ({
   validateItems(items)
   validateGlossary(glossary)
 
-  const run = async (previousError: RetryFeedback | null) => {
-    const { system, prompt } = buildTranslationPrompt({ sourceLang, targetLangs, items, glossary, previousError })
-    return safeParseJsonResponse(await generateText({ system, prompt, signal }), ResultSchema)
-  }
-  const { value } = await withOneRetry({
-    run,
-    getRetryFeedback: ({ error }) => (error ? { message: error } : null),
-  })
+  // short ids keep the prompt and the answer small; the answer is mapped back to the original ids
+  const shortItems = items.map((item, index) => ({ ...item, id: String(index + 1) }))
+  const { system, prompt } = buildTranslationPrompt({ sourceLang, targetLangs, items: shortItems, glossary })
+  const { value } = safeParseJsonResponse(await generateText({ system, prompt, signal }), ResultSchema)
   if (!value) throw new SystemError('aiTranslationInvalid', {}, StatusCodes.BAD_GATEWAY)
-  return value
+  // an id the model made up is dropped
+  const translations = value.translations.flatMap(({ id, byLang }) => {
+    const item = shortItems.find((candidate) => candidate.id === id)
+    return item ? [{ id: items[Number(id) - 1].id, byLang }] : []
+  })
+  return { translations }
 }

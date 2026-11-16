@@ -91,7 +91,7 @@ export const buildSuggestionRequest = ({
   log?: AiLog
 }): SuggestionRequest | null => {
   const definition = definitions[suggestion.kind]
-  if (suggestion.targets.length === 0) return null
+  if (suggestion.targets.length === 0 || !definition.prompt) return null
   let prompt: string
   let displayText: string
   try {

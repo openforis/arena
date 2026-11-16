@@ -8,6 +8,8 @@ import {
   TOOL_RESULT_BUDGET_CHARS,
   TOOL_RESULT_MAX_CHARS,
   fitListToBudget,
+  getResultBudget,
+  getToolResultCap,
   limitToolResult,
   takeWithinBudget,
   toolError,
@@ -24,6 +26,32 @@ describe('one tool result budget (385)', () => {
   test('the budget is the limit minus room for the wrapper fields', () => {
     expect(TOOL_RESULT_MAX_CHARS).toBe(AiLimits.assistantToolResultMaxChars)
     expect(TOOL_RESULT_BUDGET_CHARS).toBe(AiLimits.assistantToolResultMaxChars - 500)
+  })
+
+  test('the cap grows with the context, up to 32,000 chars', () => {
+    expect(getToolResultCap(40000)).toBe(5000)
+    expect(getToolResultCap(200000)).toBe(25000)
+    expect(getToolResultCap(2_000_000)).toBe(32000)
+  })
+
+  test('a tool reads the budget of the turn from the context (the default without one)', () => {
+    expect(getResultBudget()).toBe(TOOL_RESULT_BUDGET_CHARS)
+    expect(getResultBudget({ resultCapChars: 25000 })).toBe(24500)
+  })
+
+  test('the registry gives each tool the cap of the turn', async () => {
+    let seen: number | undefined
+    const tool: any = {
+      name: 'test_cap',
+      description: 'd',
+      inputSchema: { safeParse: (value: unknown) => ({ success: true, data: value }) },
+      execute: async (_input: unknown, ctx: any) => {
+        seen = ctx.resultCapChars
+        return { ok: true }
+      },
+    }
+    await runTool(tool, {}, createToolContext(), 25000)
+    expect(seen).toBe(25000)
   })
 
   test('no tool computes its own budget or keeps its own toolError', () => {

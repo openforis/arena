@@ -42,6 +42,8 @@ export default {
   schemaSummaryAiDescriptions_xlsx: 'スキーマ概要＋AI説明（Excel）',
   schemaSummaryAiDescriptionsFailed_other:
     '{{count}}件のフィールドでAIによる説明を生成できませんでした。空のままになっています。',
+  schemaSummaryAiDescriptionsNotDone_other:
+    '実行が停止されたため、{{count}}件のフィールドでAIによる説明は生成されませんでした。空のままになっています。',
   hidePages: 'ページを隠す',
   showPages: 'ページを表示',
   move: `「{{nodeDefLabel}}」を移動`,
@@ -212,6 +214,7 @@ Arena Mobileでは：
     defaultDescription: 'デフォルトの説明',
     defaultLabel: 'デフォルトのラベル',
     failed_other: 'AIは{{count}}件の翻訳を生成できませんでした。これらにはAIの提案がありません。',
+    notDone_other: '実行が停止されたため、{{count}}件の翻訳は依頼されませんでした。これらにはAIの提案がありません。',
     path: 'パス',
     showDescriptions: '説明を表示',
     title: 'ノード定義ラベルを翻訳',

@@ -8,7 +8,7 @@ const serviceDir = path.resolve(__dirname, '../../../server/modules/ai/service')
 /** True when a statement of the source is an import/export from a path through mock/mockScripts. */
 const importsMockScripts = (source: string): boolean =>
   source
-    .split(';')
+    .split('\n')
     .some(
       (statement) =>
         /^\s*(?:import|export)\b/.test(statement) &&

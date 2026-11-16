@@ -266,7 +266,9 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    */
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence
-    const nextSettings = await safely(() => deps.loadSettings({ force, userUuid }), null)
+    const loaded = await safely(() => deps.loadSettings({ force, userUuid }), null)
+    // a refresh that failed keeps the settings of the same user: AI must not vanish for one failed request
+    const nextSettings = loaded ?? (force && loadedFor === userUuid ? settings : null)
     // loadLocalProviders catches its own storage errors; this fallback is reached only when localStorage is unreadable,
     // which counts as "not on this browser"
     const localProviders = await safely(() => deps.loadLocalProviders(userUuid), [] as LocalProvider[])
@@ -312,8 +314,9 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     getLoadedFor: () => loadedFor,
     load: ({ userUuid }) => {
       resetIfOtherUser(userUuid)
-      if (loadedFor === userUuid && complete) return Promise.resolve(capabilities)
+      // a run in flight first: a forced one is newer than the stored capabilities
       if (inflight && inflight.userUuid === userUuid) return inflight.promise
+      if (loadedFor === userUuid && complete) return Promise.resolve(capabilities)
       return run({ userUuid, force: false })
     },
     refresh: ({ userUuid }) => {

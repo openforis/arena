@@ -6,14 +6,13 @@ import { z } from 'zod'
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import type { AiGenerateText } from '../llm'
-import { safeParseJsonResponse, withOneRetry } from '../parsing'
-import type { RetryFeedback } from '../parsing'
+import { safeParseJsonResponse } from '../parsing'
 import { buildDataDictionaryPrompt } from '../prompts/dataDictionary'
 
-export type AiDataDictionaryNodeDef = { uuid: string; name: string; type: string; parentPath?: string }
+export type AiDataDictionaryNodeDef = { uuid: string; name: string; label?: string; type: string; parentPath?: string }
 
 const DescriptionsSchema = z.object({
-  descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
+  descriptions: z.array(z.object({ id: z.string(), description: z.string() })),
 })
 
 /**
@@ -36,14 +35,15 @@ export const generateDataDictionaryDescriptions = async ({
   nodeDefs: AiDataDictionaryNodeDef[]
   signal?: AbortSignal
 }): Promise<{ descriptions: { uuid: string; description: string }[] }> => {
-  const run = async (previousError: RetryFeedback | null) => {
-    const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs, previousError })
-    return safeParseJsonResponse(await generateText({ system, prompt, signal }), DescriptionsSchema)
-  }
-  const { value } = await withOneRetry({
-    run,
-    getRetryFeedback: ({ error }) => (error ? { message: error } : null),
-  })
+  // short ids keep the prompt and the answer small; the answer is mapped back to the uuids
+  const shortNodeDefs = nodeDefs.map((nodeDef, index) => ({ ...nodeDef, id: String(index + 1) }))
+  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: shortNodeDefs })
+  const { value } = safeParseJsonResponse(await generateText({ system, prompt, signal }), DescriptionsSchema)
   if (!value) throw new SystemError('aiDataDictionaryInvalid', {}, StatusCodes.BAD_GATEWAY)
-  return value
+  // an id the model made up is dropped
+  const descriptions = value.descriptions.flatMap(({ id, description }) => {
+    const nodeDef = shortNodeDefs.find((candidate) => candidate.id === id)
+    return nodeDef ? [{ uuid: nodeDefs[Number(id) - 1].uuid, description }] : []
+  })
+  return { descriptions }
 }

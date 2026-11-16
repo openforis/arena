@@ -212,6 +212,24 @@ export const createAssistantConversationController = (
   const getShown = (): Conversation | null => selectShownConversation(state, panel.getState().conversationId)
 
   /**
+   * Returns the stored copy of a conversation when it is newer than the one in memory: another tab added turns or
+   * applied a card meanwhile. A running turn of this tab is newer in memory (it saves while it streams).
+   * @param {Conversation} conversation - The conversation in memory.
+   * @returns {Promise<Conversation>} The newer of the two.
+   */
+  const newerThanStored = async (conversation: Conversation): Promise<Conversation> => {
+    try {
+      const stored = await conversationStore?.get(conversation.id, conversation.userUuid)
+      return stored && stored.updatedAt > conversation.updatedAt
+        ? normalizeLoadedConversation(stored, false)
+        : conversation
+    } catch (error) {
+      logAiWarning('The stored conversation could not be read', error)
+      return conversation
+    }
+  }
+
+  /**
    * Ends the running turn for the UI: it is no longer the live one, so it neither shows nor frees `busy` again.
    * @returns {RunningTurn|null} The turn that ended, if any.
    */
@@ -375,7 +393,13 @@ export const createAssistantConversationController = (
       })
       if (isCurrent() || holdsCopy()) set({ conversation: final })
       suggestions.reportSettle({ conversation: final, running: false })
-      await persist(final)
+      try {
+        await persist(final)
+      } catch (saveError) {
+        // the answer is shown but not stored (full quota): the panel says it is lost on reload
+        set({ persistent: false })
+        logAiWarning('The conversation could not be saved', saveError)
+      }
     } catch (error) {
       // an unexpected failure (not the model's: runAssistantTurn reports those in the answer): no spinner is left
       if ((isCurrent() || holdsCopy()) && state.conversation) {
@@ -403,16 +427,19 @@ export const createAssistantConversationController = (
    * @param {AssistantConversationEnv} env - What the turn reads from the app.
    * @param {string} text - User message.
    * @param {AssistantSendOptions} options - Suggestion and display text.
-   * @returns {string|null} The conversation id, or null when nothing was sent.
+   * @returns {Promise<string|null>} The conversation id, or null when nothing was sent.
    */
-  const startSend = (
+  const startSend = async (
     env: AssistantConversationEnv,
     text: string,
     { suggestion, displayText }: AssistantSendOptions
-  ): string | null => {
+  ): Promise<string | null> => {
     if (!conversationStore || state.busy || state.applying) return null
     const selectedId = panel.getState().conversationId
-    const selected = selectShownConversation(state, selectedId)
+    const shown = selectShownConversation(state, selectedId)
+    const selected = shown && (await newerThanStored(shown))
+    // checked again: a turn or a card action may have started while the stored copy was read
+    if (state.busy || state.applying || selectedId !== panel.getState().conversationId) return null
     // a remembered conversation that is not loaded: a new one must not silently take its place
     if (selectedId && !selected && !suggestion) return null
     const created = createNewConversation(env)
@@ -440,7 +467,7 @@ export const createAssistantConversationController = (
         return startSend(env, text, options)
       })
     }
-    return Promise.resolve(startSend(env, text, options))
+    return startSend(env, text, options)
   }
 
   const retry = (env: AssistantConversationEnv) => {
@@ -562,7 +589,7 @@ export const createAssistantConversationController = (
    * @returns {Promise<Conversation|null>} The conversation.
    */
   const readConversation = async (id: string): Promise<Conversation | null> => {
-    if (state.conversation?.id === id) return state.conversation
+    if (state.conversation?.id === id) return newerThanStored(state.conversation)
     const userUuid = selection?.scope.userUuid
     if (!conversationStore || !userUuid) return null
     return (await conversationStore.get(id, userUuid)) ?? null

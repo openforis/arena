@@ -31,14 +31,14 @@ export const LocalConsentRevoke = ({ baseUrl }: Props) => {
   })
 
   const onRevoke = useCallback(() => {
-    if (!baseUrl) return
+    if (!baseUrl || state === 'revoked') return
     const done = revokeLocalServerConsent({
       storage: getBrowserLocalStorage(),
       userUuid: getCurrentUserUuid(),
       baseUrl,
     })
     if (done) setRevokedBaseUrl(baseUrl)
-  }, [baseUrl])
+  }, [baseUrl, state])
 
   if (state === 'none') return null
   const revoked = state === 'revoked'
@@ -46,7 +46,8 @@ export const LocalConsentRevoke = ({ baseUrl }: Props) => {
     <div className="provider-dialog__row">
       <span className="provider-dialog__hint">{t('aiEngine.consent.revokeHint')}</span>
       <Button
-        disabled={revoked}
+        aria-disabled={revoked}
+        className={revoked ? 'Mui-disabled' : undefined}
         label="aiEngine.consent.revoke"
         onClick={onRevoke}
         size="small"

@@ -11,6 +11,8 @@ export type AssistantTurnRegistry = {
   abortAll: () => void
   settle: () => Promise<void>
   getGeneration: () => number
+  // a turn is running (registered, not ended)
+  isRunning: () => boolean
 }
 
 export const RESET_REASON = 'reset'
@@ -82,6 +84,7 @@ export const createAssistantTurnRegistry = ({
     },
     settle: () => settleWithin(pending, settleTimeoutMs, log),
     getGeneration: () => generation,
+    isRunning: () => controllers.size > 0,
   }
 }
 

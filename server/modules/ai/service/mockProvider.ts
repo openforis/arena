@@ -27,13 +27,13 @@ const promptText = (prompt: LanguageModelV4Prompt): string =>
 type CannedAnswer = string | ((text: string) => string)
 
 /**
- * Describes every field of the data dictionary prompt (its field list has `uuid=...`).
+ * Describes every field of the data dictionary prompt (its field list has `id=...`).
  * @param {string} text - Prompt text.
  * @returns {string} The JSON answer.
  */
 const describeEveryField = (text: string): string =>
   JSON.stringify({
-    descriptions: [...text.matchAll(/uuid="([^"]+)"/g)].map(([, uuid]) => ({ uuid, description: 'MOCK description.' })),
+    descriptions: [...text.matchAll(/\bid="([^"]+)"/g)].map(([, id]) => ({ id, description: 'MOCK description.' })),
   })
 
 /**

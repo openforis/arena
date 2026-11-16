@@ -9,8 +9,6 @@ import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import { toSurveyKey } from './conversationModel'
 import type { Conversation } from './types'
 
-export { toSurveyKey }
-
 export type ConversationStore = {
   // false: the memory store (the panel says conversations are lost on reload)
   persistent: boolean

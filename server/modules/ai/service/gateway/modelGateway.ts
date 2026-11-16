@@ -7,7 +7,7 @@ import type { LanguageModelV4, LanguageModelV4StreamPart } from '@ai-sdk/provide
 import type { User } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import { getAiFeature } from '@common/ai/features'
 import type { AiGatewayCall } from '@common/ai/wire'
 import { serializeGenerateResult, serializeStreamPart } from '@common/ai/wire'
@@ -92,6 +92,8 @@ const createCallControl = ({ res, timeoutMs }: { res: any; timeoutMs: number }) 
     controller.abort(new Error('client disconnected'))
   }
   res.on('close', onClose)
+  // the client may have left while the checks ran, before this listener existed
+  if (res.destroyed) onClose()
   return {
     signal: controller.signal,
     state,
@@ -235,6 +237,8 @@ const pumpStream = async ({
     // the provider must not keep producing for a call that failed here
     await reader.cancel(error).catch(() => {})
   } finally {
+    // a loop that ended without an abort (client gone before the stream) must still stop the provider
+    await reader.cancel().catch(() => {})
     reader.releaseLock()
   }
   // cancel() ends the read cleanly for piped streams and for providers that ignore the abort signal
@@ -319,8 +323,12 @@ export const handleModelRequest = async ({
     prepared = await prepareCall({ req, user, deps })
   } catch (error) {
     // unexpected failures (not our own SystemErrors) must leave a trace in the server log
-    if (!(error instanceof SystemError)) deps.logError(formatErrorForLog(req.body?.feature ?? 'unknown', error))
-    sendJsonError(res, toAiSystemError(error))
+    if (error instanceof SystemError) {
+      sendJsonError(res, error)
+    } else {
+      deps.logError(formatErrorForLog(req.body?.feature ?? 'unknown', error))
+      sendJsonError(res, new SystemError('appErrors:unexpectedServerError', {}, StatusCodes.INTERNAL_SERVER_ERROR))
+    }
     return
   }
   const { request, call, model, ctx, offeredTools } = prepared

@@ -10,7 +10,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { canViewCurrentSurvey } from '../common/toolPermissions'
-import { takeWithinBudget } from '../common/toolResult'
+import { getResultBudget, takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
 import { requireSurvey } from './surveyLookup'
 
@@ -41,15 +41,15 @@ const byName = (a: { name: string }, b: { name: string }): number => a.name.loca
  * @param {object} emptyResult - The result without entries.
  * @returns {object[]} The first entries that fit.
  */
-const fitEntries = <T>(entries: T[], emptyResult: object): T[] =>
-  takeWithinBudget(entries, { baseChars: JSON.stringify(emptyResult).length })
+const fitEntries = <T>(entries: T[], emptyResult: object, maxChars?: number): T[] =>
+  takeWithinBudget(entries, { baseChars: JSON.stringify(emptyResult).length, maxChars })
 
 /**
  * Lists the categories by name.
  * @param {object} survey - Survey.
  * @returns {CategoriesList} The list.
  */
-export const listCategories = (survey: any): CategoriesList => {
+export const listCategories = (survey: any, maxChars?: number): CategoriesList => {
   const entries: CategoryEntry[] = Survey.getCategoriesArray(survey)
     .map((category: any) => ({
       name: Category.getName(category),
@@ -57,7 +57,7 @@ export const listCategories = (survey: any): CategoriesList => {
       itemsCount: toCount(Category.getItemsCount(category)),
     }))
     .sort(byName)
-  const categories = fitEntries(entries, { total: entries.length, truncated: true, categories: [] })
+  const categories = fitEntries(entries, { total: entries.length, truncated: true, categories: [] }, maxChars)
   return { total: entries.length, truncated: categories.length < entries.length, categories }
 }
 
@@ -66,11 +66,11 @@ export const listCategories = (survey: any): CategoriesList => {
  * @param {object} survey - Survey.
  * @returns {TaxonomiesList} The list.
  */
-export const listTaxonomies = (survey: any): TaxonomiesList => {
+export const listTaxonomies = (survey: any, maxChars?: number): TaxonomiesList => {
   const entries: TaxonomyEntry[] = Survey.getTaxonomiesArray(survey)
     .map((taxonomy: any) => ({ name: Taxonomy.getName(taxonomy), taxaCount: toCount(Taxonomy.getTaxaCount(taxonomy)) }))
     .sort(byName)
-  const taxonomies = fitEntries(entries, { total: entries.length, truncated: true, taxonomies: [] })
+  const taxonomies = fitEntries(entries, { total: entries.length, truncated: true, taxonomies: [] }, maxChars)
   return { total: entries.length, truncated: taxonomies.length < entries.length, taxonomies }
 }
 
@@ -83,7 +83,7 @@ export const categoriesListTool: AiTool<Record<string, never>, CategoriesList> =
   area: ['design'],
   dataClass: 'schema',
   requires: canViewCurrentSurvey,
-  execute: async (_input, ctx) => listCategories(requireSurvey(ctx)),
+  execute: async (_input, ctx) => listCategories(requireSurvey(ctx), getResultBudget(ctx)),
 }
 
 export const taxonomiesListTool: AiTool<Record<string, never>, TaxonomiesList> = {
@@ -95,5 +95,5 @@ export const taxonomiesListTool: AiTool<Record<string, never>, TaxonomiesList> =
   area: ['design'],
   dataClass: 'schema',
   requires: canViewCurrentSurvey,
-  execute: async (_input, ctx) => listTaxonomies(requireSurvey(ctx)),
+  execute: async (_input, ctx) => listTaxonomies(requireSurvey(ctx), getResultBudget(ctx)),
 }

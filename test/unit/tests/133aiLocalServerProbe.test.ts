@@ -5,6 +5,7 @@ import {
   parseLmStudioContextTokens,
   parseLocalServerModelIds,
   probeLocalServer,
+  testLocalServerChat,
 } from '@webapp/ai/engines/localServerProbe'
 
 const BASE_URL = 'http://localhost:1234/v1'
@@ -36,6 +37,12 @@ describe('limits', () => {
     expect(getLocalServerLimits(4096)).toEqual({ maxPromptChars: 9216, maxSteps: 6 })
     expect(getLocalServerLimits(null)).toEqual({ maxPromptChars: 18432, maxSteps: LOCAL_SERVER_MAX_STEPS })
     expect(DEFAULT_LOCAL_CONTEXT_TOKENS).toBe(8192)
+  })
+
+  test('10 steps from a context of 32,000 tokens', () => {
+    expect(getLocalServerLimits(31999).maxSteps).toBe(6)
+    expect(getLocalServerLimits(32000).maxSteps).toBe(10)
+    expect(getLocalServerLimits(150000).maxSteps).toBe(10)
   })
 })
 
@@ -125,5 +132,38 @@ describe('probeLocalServer', () => {
     const { fetchImpl } = routes({ 'http://localhost:1234/v1/models': () => new Response('not json', { status: 200 }) })
     const result = await probeLocalServer({ baseUrl: BASE_URL, modelId: null, fetchImpl })
     expect(result).toEqual({ reachable: true, models: [], contextTokens: null, error: null })
+  })
+})
+
+describe('testLocalServerChat', () => {
+  const models = () => json(200, { data: [{ id: 'm' }] })
+
+  test('asks one tiny question with reasoning off after listing the models', async () => {
+    let body: any = null
+    const { fetchImpl } = routes({
+      [`${BASE_URL}/models`]: models,
+      [`${BASE_URL}/chat/completions`]: () => json(200, { choices: [] }),
+    })
+    const probe = await testLocalServerChat({
+      baseUrl: BASE_URL,
+      modelId: null,
+      fetchImpl: async (url, init) => {
+        if (url.endsWith('/chat/completions')) body = JSON.parse(String(init?.body))
+        return fetchImpl(url)
+      },
+    })
+    expect(probe.reachable).toBe(true)
+    expect(body).toMatchObject({ model: 'm', max_tokens: 8, reasoning_effort: 'none' })
+  })
+
+  test('a chat call that fails although the models are listed is an error', async () => {
+    const { fetchImpl } = routes({
+      [`${BASE_URL}/models`]: models,
+      [`${BASE_URL}/chat/completions`]: () => json(500, {}),
+    })
+    const probe = await testLocalServerChat({ baseUrl: BASE_URL, modelId: 'm', fetchImpl })
+    expect(probe.reachable).toBe(false)
+    expect(probe.models).toEqual(['m'])
+    expect(probe.error?.key).toBe('aiLocalServerError')
   })
 })

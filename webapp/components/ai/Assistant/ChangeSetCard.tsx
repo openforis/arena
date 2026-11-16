@@ -12,7 +12,7 @@ import { ChangeItemRow } from './ChangeItem'
 import { ChangeSetCompactCard } from './ChangeSetCompactCard'
 import { ChangeSetReviewDialog } from './ChangeSetReviewDialog'
 import { splitReviewItems } from './changeItemModel'
-import { buildReviewItems, isCompactCard, type ReviewItem } from './changeSetReviewModel'
+import { buildReviewItems, getStatusLineText, isCompactCard, type ReviewItem } from './changeSetReviewModel'
 import { useChangeSetSelection, type ChangeSetSelection } from './useChangeSetSelection'
 import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'
 
@@ -41,7 +41,7 @@ const ChangeSetFullCard = ({
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
   const nodeDefExists = useNodeDefExists()
-  const { pendingIds, conflicts, conflictIds, selectedIds, toggle } = selection
+  const { pendingIds, conflicts, conflictIds, selectedIds, toggle, discard, setStatusElement } = selection
   const { nodeDefItems, categoryGroups } = useMemo(() => splitReviewItems(items), [items])
 
   /**
@@ -94,7 +94,9 @@ const ChangeSetFullCard = ({
           <ul className="ai-assistant-card__rows">{group.items.map(renderRow)}</ul>
         </div>
       ))}
-      {cardState.discarded && <p className="ai-assistant-card__hint">{t('aiAssistant.card.discarded')}</p>}
+      <p className="ai-assistant-card__hint" ref={setStatusElement} role="status" tabIndex={-1}>
+        {getStatusLineText({ items, discarded: Boolean(cardState.discarded), t })}
+      </p>
       {pendingIds.length > 0 && (
         <div className="ai-assistant-card__footer">
           {dirty && <p className="ai-assistant-card__hint">{t('aiAssistant.card.saveCurrentEditFirst')}</p>}
@@ -108,7 +110,7 @@ const ChangeSetFullCard = ({
           <Button
             disabled={busy}
             label="aiAssistant.card.discard"
-            onClick={selection.discard}
+            onClick={discard}
             testId={TestId.aiAssistant.discardBtn}
             variant="text"
           />

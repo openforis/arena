@@ -88,6 +88,8 @@ export default {
     nodesBatchInvalid: 'Neispravan zahtjev za grupnu izmjenu ({{reason}}).',
     nodesBatchBusy: 'Druga grupna izmjena je još u toku; pokušajte ponovo za nekoliko sekundi.',
     nodesBatchInvalidValue: 'Nova vrijednost za "{{attributeName}}" nije važeća za ovaj atribut.',
+    nodesBatchWouldClearValues:
+      'Ova izmjena bi obrisala druge vrijednosti koje više nisu primjenjive; izmijenite ovu vrijednost u obrascu da potvrdite.',
     nodesBatchUnexpected: 'Izmjena nije mogla biti primijenjena zbog neočekivane greške na serveru.',
   },
   recordPrintableExport: {
@@ -177,6 +179,8 @@ Pokušajte da osvježite stranicu.`,
   aiDataQueryNoEntities: 'Ovo istraživanje nema entitete koji se mogu pretraživati.',
   aiDataQueryInvalid: 'AI nije mogao da generiše ispravan upit za ovaj zahtjev: {{errors}}',
   aiDataQueryEmpty: 'Prvo izaberite entitet i neke atribute (ili dimenzije i mjere).',
+  aiAssistantStepLimit:
+    'Asistent je dostigao ograničenje broja koraka a da nije napisao odgovor. Pokušajte ponovo ili postavite uže pitanje.',
   aiLocalServerUnreachable:
     'Nije moguće pristupiti AI serveru na adresi {{baseUrl}}. Da li je pokrenut i da li je CORS omogućen? Da li je pregledač blokirao pristup uređajima u lokalnoj mreži?',
   aiLocalServerModelMissing:
