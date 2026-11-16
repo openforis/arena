@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 /**
  * Service for the activity-log summarization feature (Tier 1 #5).
  *
@@ -24,10 +25,10 @@ const MAX_FETCH = 1000
 // userName lets a single user balloon memory by N×userName.length).
 const MAX_AGGREGATE_KEY_LEN = 64
 
-const truncateKey = (value) =>
+const truncateKey = (value: unknown) =>
   typeof value === 'string' && value.length > MAX_AGGREGATE_KEY_LEN ? value.slice(0, MAX_AGGREGATE_KEY_LEN) : value
 
-const aggregate = ({ entries, userUuidFilter }) => {
+const aggregate = ({ entries, userUuidFilter }: { entries: any; userUuidFilter: any }) => {
   const filtered = userUuidFilter ? entries.filter((e) => e.userUuid === userUuidFilter) : entries
   const map = new Map()
   for (const entry of filtered) {
@@ -59,7 +60,21 @@ const aggregate = ({ entries, userUuidFilter }) => {
  * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
  *   The streaming result.
  */
-export const summarize = async ({ user, surveyId, from, to, userUuid, signal }) => {
+export const summarize = async ({
+  user,
+  surveyId,
+  from,
+  to,
+  userUuid,
+  signal,
+}: {
+  user: ArenaUser
+  surveyId: number
+  from: any
+  to: any
+  userUuid: string
+  signal: any
+}) => {
   if (!surveyId) throw new SystemError('aiActivityLogSurveyMissing')
 
   const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })

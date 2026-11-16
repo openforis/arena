@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 /**
  * Reads and writes per-user AI configuration from `user.prefs.ai`.
  *
@@ -54,7 +55,7 @@ const defaultFeatureToggles = () => ({
   [featureCategories.dataQuery]: false,
 })
 
-const sanitiseFeatureToggles = (input) => {
+const sanitiseFeatureToggles = (input: any) => {
   const base = defaultFeatureToggles()
   if (!input || typeof input !== 'object') return base
   for (const key of Object.keys(base)) {
@@ -63,7 +64,7 @@ const sanitiseFeatureToggles = (input) => {
   return base
 }
 
-const sanitiseProvider = (provider) => {
+const sanitiseProvider = (provider: any) => {
   if (!ProviderRegistry.isSupported(provider)) {
     throw new SystemError('aiProviderInvalid', { provider })
   }
@@ -75,7 +76,7 @@ const sanitiseProvider = (provider) => {
  * @param {object} user - Arena user.
  * @returns {?object} The persisted AI prefs, or null.
  */
-const getRawPrefs = (user) => {
+const getRawPrefs = (user: ArenaUser) => {
   const prefs = User.getPrefs(user) || {}
   return prefs[PREFS_KEY] || null
 }
@@ -88,7 +89,7 @@ const getRawPrefs = (user) => {
  * @param {string} [args.apiKey] - Draft API key from the form.
  * @returns {string|null} Decrypted key, or null when unavailable.
  */
-const resolveApiKey = ({ user, apiKey }) => {
+const resolveApiKey = ({ user, apiKey }: { user: ArenaUser; apiKey: any }) => {
   if (typeof apiKey === 'string' && apiKey.length > 0) return apiKey
   const raw = getRawPrefs(user)
   if (!raw?.apiKeyEncrypted) return null
@@ -105,7 +106,7 @@ const resolveApiKey = ({ user, apiKey }) => {
  * @param {object} user - Arena user.
  * @returns {object} Settings descriptor with `hasApiKey` rather than the key itself.
  */
-export const getPublicSettings = (user) => {
+export const getPublicSettings = (user: ArenaUser) => {
   const raw = getRawPrefs(user)
   if (!raw) {
     return {
@@ -142,7 +143,7 @@ export const getPublicSettings = (user) => {
  * @param {object} user - Arena user.
  * @returns {boolean} The master-toggle state (default false).
  */
-export const areFeaturesEnabledForUser = (user) => !!getRawPrefs(user)?.featuresEnabled
+export const areFeaturesEnabledForUser = (user: ArenaUser) => !!getRawPrefs(user)?.featuresEnabled
 
 /**
  * Returns true when the user has both the master toggle on and the given
@@ -152,7 +153,7 @@ export const areFeaturesEnabledForUser = (user) => !!getRawPrefs(user)?.features
  * @param {string} category - One of {@link featureCategories}.
  * @returns {boolean} Whether the user wants this category active.
  */
-export const isCategoryEnabledForUser = (user, category) => {
+export const isCategoryEnabledForUser = (user: ArenaUser, category: any) => {
   const raw = getRawPrefs(user)
   if (!raw?.featuresEnabled) return false
   const toggles = sanitiseFeatureToggles(raw.featureToggles)
@@ -170,7 +171,7 @@ export const isCategoryEnabledForUser = (user, category) => {
  * @param {boolean} [options.decrypt] - Decrypt the API key (default true).
  * @returns {?object} Provider config or null.
  */
-export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
+export const getEffectiveUserConfig = (user: ArenaUser, { decrypt = true }: { decrypt?: any } = {}) => {
   const raw = getRawPrefs(user)
   if (!raw?.featuresEnabled || !raw.enabled || !raw.provider) return null
   const model = raw.model || getDefaultModel(raw.provider)
@@ -185,11 +186,21 @@ export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
 }
 
 // Location applies only to Vertex AI.
-const sanitiseLocation = ({ provider, location }) =>
+const sanitiseLocation = ({ provider, location }: { provider: any; location: any }) =>
   provider === ProviderRegistry.providers.googleVertex && location ? String(location).trim() || null : null
 
 // Throws when the provider config is incomplete.
-const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) => {
+const validateProviderConfig = ({
+  provider,
+  model,
+  baseUrl,
+  isFixedEndpoint,
+}: {
+  provider: any
+  model: any
+  baseUrl: any
+  isFixedEndpoint: boolean
+}) => {
   if (!model && !isFixedEndpoint && !getDefaultModel(provider)) throw new SystemError('aiModelMissing', { provider })
   const requiresBaseUrl =
     provider === ProviderRegistry.providers.openaiCompatible || provider === ProviderRegistry.providers.vercelAiSdk
@@ -205,7 +216,7 @@ const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) =
  * @param {boolean} args.overrideEnabled - Whether the user-provider override is active.
  * @returns {{provider: string, model: string|null, baseUrl: string|null, location: string|null}} - The sanitised provider config.
  */
-const extractProviderConfig = ({ update, overrideEnabled }) => {
+const extractProviderConfig = ({ update, overrideEnabled }: { update: any; overrideEnabled: any }) => {
   const provider = sanitiseProvider(update.provider)
   const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
   const model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
@@ -245,7 +256,7 @@ const extractProviderConfig = ({ update, overrideEnabled }) => {
  * @param {boolean} [args.update.enabled] - Whether the user-provider override is active.
  * @returns {Promise<object>} The new public settings descriptor.
  */
-export const saveSettings = async ({ user, update }) => {
+export const saveSettings = async ({ user, update }: { user: ArenaUser; update: any }) => {
   const existing = getRawPrefs(user) || {}
   const featuresEnabled = !!update.featuresEnabled
   const featureToggles = sanitiseFeatureToggles(update.featureToggles)
@@ -301,7 +312,7 @@ export const saveSettings = async ({ user, update }) => {
  * @param {object} args.user - The user.
  * @returns {Promise<object>} The new public settings descriptor (all empty).
  */
-export const clearSettings = async ({ user }) => {
+export const clearSettings = async ({ user }: { user: ArenaUser }) => {
   const prefs = User.getPrefs(user) || {}
   if (!prefs[PREFS_KEY]) return user
   const rest = { ...prefs }
@@ -329,7 +340,21 @@ export const clearSettings = async ({ user }) => {
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string, errorKey?: string, errorParams?: object, errorStatusCode?: number}>}
  *   Test result (errorKey/errorParams: translatable app error, for configuration errors; errorStatusCode: provider HTTP status).
  */
-export const testConnection = async ({ user, provider, model, baseUrl, location, apiKey }) => {
+export const testConnection = async ({
+  user,
+  provider,
+  model,
+  baseUrl,
+  location,
+  apiKey,
+}: {
+  user: ArenaUser
+  provider: any
+  model: any
+  baseUrl: any
+  location: any
+  apiKey: any
+}) => {
   let cfg
   if (provider) {
     const providerSanitised = sanitiseProvider(String(provider))
@@ -385,7 +410,17 @@ export const testConnection = async ({ user, provider, model, baseUrl, location,
  * @param {string} [args.apiKey] - API key from the form, if any.
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models.
  */
-export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
+export const listModels = async ({
+  user,
+  provider,
+  baseUrl,
+  apiKey,
+}: {
+  user: ArenaUser
+  provider: any
+  baseUrl: any
+  apiKey: any
+}) => {
   sanitiseProvider(provider)
   const effectiveApiKey = resolveApiKey({ user, apiKey })
   const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
@@ -397,7 +432,7 @@ export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
   return { models }
 }
 
-const stampTestResult = async ({ user, ok }) => {
+const stampTestResult = async ({ user, ok }: { user: ArenaUser; ok: any }) => {
   const prefs = User.getPrefs(user) || {}
   const existing = prefs[PREFS_KEY]
   if (!existing) return

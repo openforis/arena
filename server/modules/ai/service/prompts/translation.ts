@@ -31,7 +31,19 @@ const KIND_HINTS = {
  * @param {{message: string}} [args.previousError] - Parser/validator error from a prior attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The prompt pair.
  */
-export const buildTranslationPrompt = ({ sourceLang, targetLangs, items, glossary, previousError }) => {
+export const buildTranslationPrompt = ({
+  sourceLang,
+  targetLangs,
+  items,
+  glossary,
+  previousError,
+}: {
+  sourceLang: any
+  targetLangs: any
+  items: any[]
+  glossary: any
+  previousError: any
+}) => {
   const system = `You translate survey labels for the Open Foris Arena platform (FAO field-data
 collection). The labels are short, terminologically consistent, and often
 domain-specific (forestry, agriculture, biodiversity).

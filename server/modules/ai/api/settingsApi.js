@@ -19,7 +19,7 @@ import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const buildResponseBody = async (user) => {
   const settings = AiSettingsService.getPublicSettings(user)
-  const effective = await ProviderResolver.describeEffectiveSource(user)
+  const effective = ProviderResolver.describeEffectiveSource(user)
   return {
     ...settings,
     effectiveSource: effective.source,

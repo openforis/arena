@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 /**
  * Prompt builder for the natural-language → Data Explorer query feature.
  *
@@ -78,7 +79,21 @@ and dbh (decimal, [measure]), the request "number of trees by species" becomes:
 and "average dbh of trees with dbh greater than 10 by plot" becomes:
 {"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["plot_id"],"measures":[{"attribute":"dbh","functions":["avg"]}],"filter":"dbh > 10","sort":[{"attribute":"plot_id","order":"asc"}],"explanation":"Averages the DBH of the trees with DBH > 10 for each plot."}`
 
-const describeAttribute = ({ survey, nodeDef, entityDef, lang, cycle, includeAnalysis }) => {
+const describeAttribute = ({
+  survey,
+  nodeDef,
+  entityDef,
+  lang,
+  cycle,
+  includeAnalysis,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  entityDef: any
+  lang: string
+  cycle: string
+  includeAnalysis: boolean
+}) => {
   const name = NodeDef.getName(nodeDef)
   const type = NodeDef.getType(nodeDef)
   const label = NodeDef.getLabel(nodeDef, lang)
@@ -116,7 +131,17 @@ const describeAttribute = ({ survey, nodeDef, entityDef, lang, cycle, includeAna
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {string} - The schema description.
  */
-export const buildSchemaDescription = ({ survey, cycle, lang, includeAnalysis = false }) => {
+export const buildSchemaDescription = ({
+  survey,
+  cycle,
+  lang,
+  includeAnalysis = false,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  lang: string
+  includeAnalysis?: boolean
+}) => {
   const entityDefs = QueryNodeDefs.getQueryableEntityDefs({ survey, cycle })
   return entityDefs
     .map((entityDef) => {
@@ -163,6 +188,13 @@ export const buildDataQueryGeneratePrompt = ({
   description,
   includeAnalysis = false,
   previousError = null,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  lang: string
+  description: any
+  includeAnalysis?: boolean
+  previousError?: any
 }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)

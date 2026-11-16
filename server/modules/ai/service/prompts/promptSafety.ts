@@ -13,7 +13,7 @@
  */
 export const PROMPT_FIELD_MAX = 4000
 
-export const pq = (value, maxLen = PROMPT_FIELD_MAX) => {
+export const pq = (value: unknown, maxLen = PROMPT_FIELD_MAX) => {
   if (value == null) return '""'
   const s = String(value)
   const truncated = s.length > maxLen ? `${s.slice(0, maxLen)}…[truncated]` : s

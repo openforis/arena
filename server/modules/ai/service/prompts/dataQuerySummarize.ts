@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 /**
  * Prompt builder for the "suggest name, label and description" feature of the
  * Data Explorer query manager.
@@ -35,7 +36,7 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape:
 Example: an aggregate query on the entity "tree" with dimension "species" and measure "tree" (cnt) becomes:
 {"name":"trees_by_species","label":"Number of trees by species","description":"Number of trees grouped by species."}`
 
-const describeNodeDef = ({ nodeDef, lang }) => {
+const describeNodeDef = ({ nodeDef, lang }: { nodeDef: ArenaNodeDef<NodeDefType>; lang: string }) => {
   const name = NodeDef.getName(nodeDef)
   const label = NodeDef.getLabel(nodeDef, lang)
   return label && label !== name ? `${name} (label=${pq(label, 150)})` : name
@@ -50,7 +51,7 @@ const describeNodeDef = ({ nodeDef, lang }) => {
  * @param {string} params.lang - The language used for the labels.
  * @returns {string} - The query description.
  */
-export const describeQuery = ({ survey, query, lang }) => {
+export const describeQuery = ({ survey, query, lang }: { survey: ArenaSurvey; query: any; lang: string }) => {
   const findNodeDefs = (uuids: string[]) => uuids.map((uuid) => Survey.getNodeDefByUuid(uuid)(survey)).filter(Boolean)
   const describeNodeDefs = (uuids: string[]) =>
     findNodeDefs(uuids)
@@ -97,7 +98,17 @@ export const describeQuery = ({ survey, query, lang }) => {
  * @param {{message: string}} [params.previousError] - Error from a previous attempt, fed back to the model.
  * @returns {{ system: string, prompt: string }} - The prompt pair.
  */
-export const buildDataQuerySummarizePrompt = ({ survey, query, lang, previousError = null }) => {
+export const buildDataQuerySummarizePrompt = ({
+  survey,
+  query,
+  lang,
+  previousError = null,
+}: {
+  survey: ArenaSurvey
+  query: any
+  lang: string
+  previousError?: any
+}) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyName = Survey.getName(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)

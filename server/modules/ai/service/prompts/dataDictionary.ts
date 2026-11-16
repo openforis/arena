@@ -18,7 +18,15 @@ import { pq } from './promptSafety'
  * @param {{message: string}} [args.previousError] - Parser/validator error from a prior attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The prompt pair.
  */
-export const buildDataDictionaryPrompt = ({ surveyName, nodeDefs, previousError }) => {
+export const buildDataDictionaryPrompt = ({
+  surveyName,
+  nodeDefs,
+  previousError,
+}: {
+  surveyName: any
+  nodeDefs: any
+  previousError: any
+}) => {
   const system = `You write concise field descriptions for an Open Foris Arena (FAO) survey
 data dictionary. The survey is used for forest, agricultural, or
 biodiversity data collection.

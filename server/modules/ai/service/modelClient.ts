@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 /**
  * Single entry point that every Tier-1 AI feature calls. Hides the
  * provider plumbing behind three Vercel-AI-SDK-shaped methods: `generate`
@@ -35,11 +36,11 @@ const featureToCategory = {
   dataQuerySummarize: AiSettingsService.featureCategories.dataQuery,
 }
 
-const assertFeaturesEnabled = (feature, user) => {
+const assertFeaturesEnabled = (feature: any, user: ArenaUser) => {
   if (!ENV.aiFeaturesEnabled) {
     throw new SystemError('aiFeaturesDisabled', { feature })
   }
-  const flags = ENV.aiFeatureFlags
+  const flags = ENV.aiFeatureFlags as Record<string, boolean> | null
   if (flags && Object.hasOwn(flags, feature) && !flags[feature]) {
     throw new SystemError('aiFeatureDisabled', { feature })
   }
@@ -57,14 +58,14 @@ const assertFeaturesEnabled = (feature, user) => {
   }
 }
 
-const assertPromptSize = (prompt, system, feature) => {
+const assertPromptSize = (prompt: any, system: any, feature: any) => {
   const total = (prompt?.length || 0) + (system?.length || 0)
   if (total > ENV.aiMaxPromptChars) {
     throw new SystemError('aiPromptTooLarge', { feature, size: total, limit: ENV.aiMaxPromptChars })
   }
 }
 
-const buildContext = ({ user, feature, meta }) => ({
+const buildContext = ({ user, feature, meta }: { user: ArenaUser; feature: any; meta: any }) => ({
   feature,
   source: meta.source,
   provider: meta.provider,
@@ -82,11 +83,23 @@ const buildContext = ({ user, feature, meta }) => ({
  * @param {AbortSignal} [args.signal] - Optional cancellation signal.
  * @returns {Promise<{text: string, usage: object, finishReason: string}>} Vercel AI SDK result.
  */
-export const generate = async ({ user, feature, prompt, system, signal }) => {
+export const generate = async ({
+  user,
+  feature,
+  prompt,
+  system,
+  signal,
+}: {
+  user: ArenaUser
+  feature: any
+  prompt: any
+  system?: string
+  signal?: AbortSignal
+}) => {
   assertFeaturesEnabled(feature, user)
   assertPromptSize(prompt, system, feature)
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
-  return AiTelemetry.track(buildContext({ user, feature, meta }), () =>
+  return await AiTelemetry.track(buildContext({ user, feature, meta }), () =>
     generateText({
       model,
       prompt,
@@ -108,12 +121,26 @@ export const generate = async ({ user, feature, prompt, system, signal }) => {
  * @param {AbortSignal} [args.signal] - Optional cancellation signal.
  * @returns {Promise<{object: *, usage: object, finishReason: string}>} Vercel AI SDK result.
  */
-export const generateStructured = async ({ user, feature, prompt, system, schema, signal }) => {
+export const generateStructured = async ({
+  user,
+  feature,
+  prompt,
+  system,
+  schema,
+  signal,
+}: {
+  user: ArenaUser
+  feature: any
+  prompt: any
+  system?: string
+  schema: any
+  signal?: AbortSignal
+}) => {
   assertFeaturesEnabled(feature, user)
   assertPromptSize(prompt, system, feature)
   if (!schema) throw new SystemError('aiSchemaMissing', { feature })
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
-  return AiTelemetry.track(buildContext({ user, feature, meta }), () =>
+  return await AiTelemetry.track(buildContext({ user, feature, meta }), () =>
     generateObject({
       model,
       prompt,
@@ -134,9 +161,17 @@ const PROMPT_CACHE_PROVIDER_OPTIONS = { anthropic: { cacheControl: { type: 'ephe
  * @param {string} [args.cachedSystemPrefix] - Long and stable text to send before the system prompt.
  * @returns {string|Array<object>|undefined} The system instructions for the Vercel AI SDK.
  */
-export const buildSystemInstructions = ({ system, cachedSystemPrefix }) => {
+export const buildSystemInstructions = ({
+  system,
+  cachedSystemPrefix,
+}: {
+  system?: string
+  cachedSystemPrefix?: string
+}) => {
   if (!cachedSystemPrefix) return system
-  const instructions = [{ role: 'system', content: cachedSystemPrefix, providerOptions: PROMPT_CACHE_PROVIDER_OPTIONS }]
+  const instructions: { role: 'system'; content: string; providerOptions?: typeof PROMPT_CACHE_PROVIDER_OPTIONS }[] = [
+    { role: 'system', content: cachedSystemPrefix, providerOptions: PROMPT_CACHE_PROVIDER_OPTIONS },
+  ]
   if (system) instructions.push({ role: 'system', content: system })
   return instructions
 }
@@ -158,7 +193,21 @@ export const buildSystemInstructions = ({ system, cachedSystemPrefix }) => {
  * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
  *   The SDK stream result.
  */
-export const streamChat = async ({ user, feature, messages, system, cachedSystemPrefix, signal }) => {
+export const streamChat = async ({
+  user,
+  feature,
+  messages,
+  system,
+  cachedSystemPrefix,
+  signal,
+}: {
+  user: ArenaUser
+  feature: any
+  messages: any
+  system?: string
+  cachedSystemPrefix?: string
+  signal?: AbortSignal
+}) => {
   assertFeaturesEnabled(feature, user)
   const totalChars =
     (messages || []).reduce((acc, m) => acc + (typeof m.content === 'string' ? m.content.length : 0), 0) +
@@ -168,19 +217,17 @@ export const streamChat = async ({ user, feature, messages, system, cachedSystem
   }
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
   const ctx = buildContext({ user, feature, meta })
-  const start = Date.now()
   const result = streamText({
     model,
     messages,
     system: buildSystemInstructions({ system, cachedSystemPrefix }),
     abortSignal: signal,
   })
-  result.usage
+  Promise.resolve(result.usage)
     .then(async (usage) => {
-      await AiTelemetry.track({ ...ctx }, async () => ({ usage }))
+      await AiTelemetry.track({ ...ctx }, () => ({ usage }))
     })
     .catch(() => {})
-  result._aiStartedAt = start
   return result
 }
 
@@ -197,12 +244,23 @@ export const streamChat = async ({ user, feature, messages, system, cachedSystem
  * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
  *   The SDK stream result; callers iterate `textStream` and may await `.usage`.
  */
-export const stream = async ({ user, feature, prompt, system, signal }) => {
+export const stream = async ({
+  user,
+  feature,
+  prompt,
+  system,
+  signal,
+}: {
+  user: ArenaUser
+  feature: any
+  prompt: any
+  system?: string
+  signal?: AbortSignal
+}) => {
   assertFeaturesEnabled(feature, user)
   assertPromptSize(prompt, system, feature)
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
   const ctx = buildContext({ user, feature, meta })
-  const start = Date.now()
   const result = streamText({
     model,
     prompt,
@@ -210,15 +268,13 @@ export const stream = async ({ user, feature, prompt, system, signal }) => {
     abortSignal: signal,
   })
   // Fire-and-forget telemetry once the stream finishes.
-  result.usage
+  Promise.resolve(result.usage)
     .then(async (usage) => {
-      await AiTelemetry.track({ ...ctx }, async () => ({ usage }))
+      await AiTelemetry.track({ ...ctx }, () => ({ usage }))
     })
     .catch(() => {
       // The error path is handled by the route's stream consumer; suppress
       // here to avoid an unhandled-rejection warning on cancellation.
     })
-  // Annotate the returned object so route handlers can log start time if needed.
-  result._aiStartedAt = start
   return result
 }

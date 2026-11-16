@@ -20,7 +20,7 @@ const logger = Log.getLogger('AiGateway')
  * @param {Function} fn - The async work to time.
  * @returns {Promise<*>} Whatever fn resolves to.
  */
-export const track = async (ctx, fn) => {
+export const track = async (ctx: any, fn: any) => {
   const start = Date.now()
   try {
     const result = await fn()

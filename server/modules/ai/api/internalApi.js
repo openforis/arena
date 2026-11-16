@@ -27,7 +27,7 @@ export const init = (app) => {
       try {
         const user = Request.getUser(req)
         const start = Date.now()
-        const effective = await ProviderResolver.describeEffectiveSource(user)
+        const effective = ProviderResolver.describeEffectiveSource(user)
         const result = await ModelClient.generateStructured({
           user,
           feature: 'internalPing',
