@@ -66,8 +66,10 @@ export const createRequireNodeUuidBelongsToRecord =
     try {
       const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
       // a malformed uuid is refused before querying the database
-      const nodeRecordUuid = isUuid(String(nodeUuid)) ? await fetchNodeRecordUuid(surveyId, nodeUuid) : null
-      if (nodeRecordUuid !== recordUuid) {
+      const validUuid = isUuid(String(nodeUuid))
+      const nodeRecordUuid = validUuid ? await fetchNodeRecordUuid(surveyId, nodeUuid) : null
+      // a node not found is let through: its create may still be queued in the records thread
+      if (!validUuid || (nodeRecordUuid && nodeRecordUuid !== recordUuid)) {
         Response.sendErr(
           res,
           new SystemError(NodesBatchMessageKeys.nodeNotInRecord, { recordUuid }, StatusCodes.BAD_REQUEST)

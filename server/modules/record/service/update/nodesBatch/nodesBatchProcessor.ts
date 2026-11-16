@@ -56,6 +56,8 @@ export type NodesBatchProcessorDeps = {
   // uuid of the record owning the node, or null when the node does not exist (in any record)
   findNodeRecordUuid: (params: { msg: NodesBatchPersistMessage; nodeUuid: string; t: any }) => Promise<string | null>
   persistNode: (params: Record<string, unknown>, t: any) => Promise<any>
+  // uuids of the node defs whose values the edit would clear (they become non-applicable)
+  findNodeDefUuidsToClear: (params: Record<string, unknown>) => Promise<string[]>
   cacheRecord: (params: {
     msg: NodesBatchPersistMessage
     recordUuid: string
@@ -273,7 +275,7 @@ const applyEdit = async ({
   edit: NodesBatchRecordEdit
   t: any
 }): Promise<ArenaRecord> => {
-  const { msg, survey, refusedResults, appliedEdits } = state
+  const { msg, deps, survey, refusedResults, appliedEdits } = state
   const check = checkBatchEdit({ survey, record, recordUuid: msg.recordUuid, edit })
   if (check.ok === false) {
     refusedResults.push(await refineMissingNodeResult({ state, record, edit, result: check.result, t }))
@@ -283,6 +285,21 @@ const applyEdit = async ({
   if (!matchesQualifiers(state, record, Node.assocValue(edit.to)(check.node))) {
     refusedResults.push(failedResult(edit.index, NodesBatchMessageKeys.forbidden))
     return record
+  }
+  // the user never confirmed a clear (form edits ask first): an edit that would clear values is refused
+  if (!Survey.isKeepNonApplicableValues(Survey.getSurveyInfo(survey))) {
+    const nodeDefUuidsToClear = await deps.findNodeDefUuidsToClear({
+      user: msg.user,
+      survey,
+      record,
+      node: Node.assocValue(edit.to)(check.node),
+      timezoneOffset: msg.timezoneOffset,
+      lang: msg.lang,
+    })
+    if (nodeDefUuidsToClear.length > 0) {
+      refusedResults.push(failedResult(edit.index, NodesBatchMessageKeys.wouldClearValues))
+      return record
+    }
   }
   const recordUpdated = await persistEdit({ state, record, node: check.node, edit, t })
   appliedEdits.push(edit)
@@ -301,8 +318,10 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
   // the lock wait may have used up the time: the caller already reported these edits as timed out
   if (isPastDeadline(state)) return failedResults(edits, NodesBatchMessageKeys.applyTimeout)
   let record = await deps.getOrFetchRecord({ msg, recordUuid, t })
-  // a record of another cycle is not the one the proposal saw
-  if (!record || Record.getCycle(record) !== msg.cycle) return edits.map(({ index }) => conflictResult(index))
+  // a record of another cycle (or a preview one, made with the draft survey) is not the one the proposal saw
+  if (!record || Record.isPreview(record) || Record.getCycle(record) !== msg.cycle) {
+    return edits.map(({ index }) => conflictResult(index))
+  }
   state.qualifierFilters = await deps.fetchQualifierFilters({ msg, survey, t })
   const recordToCheck = await withFreshStepAndOwner(state, record, t)
   if (!recordToCheck) return edits.map(({ index }) => conflictResult(index))

@@ -33,6 +33,12 @@ describe('nodes batch request', () => {
     expect(request).toEqual({ cycle: '0', edits: [{ recordUuid: rec(1), nodeUuid: node(1), from: null, to: 'x' }] })
   })
 
+  test('a cycle that is not a survey cycle is refused', () => {
+    const body = { cycle: 'x1', edits: [edit(rec(1), node(1))] }
+    expect(() => parseNodesBatchRequest(body, ['0', '1'])).toThrow()
+    expect(parseNodesBatchRequest({ ...body, cycle: 1 }, ['0', '1']).cycle).toBe('1')
+  })
+
   test('invalid requests are refused with a reason', () => {
     expect.assertions(18)
     expectInvalid(null, 'cycle')

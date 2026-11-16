@@ -54,11 +54,13 @@ const checkEditsSet = (edits: NodesBatchEdit[]): void => {
 /**
  * Validates the body of POST /records/nodes/update.
  * @param {unknown} body - The request body: { cycle, edits: [{ recordUuid, nodeUuid, from, to }] }.
+ * @param {string[]} [cycleKeys] - The survey cycle keys; when given, the cycle must be one of them (it becomes a cache key).
  * @returns {NodesBatchRequest} The request.
  */
-export const parseNodesBatchRequest = (body: unknown): NodesBatchRequest => {
+export const parseNodesBatchRequest = (body: unknown, cycleKeys?: string[]): NodesBatchRequest => {
   const { cycle, edits } = (body ?? {}) as Record<string, unknown>
   if ((typeof cycle !== 'string' && typeof cycle !== 'number') || String(cycle) === '') throw invalidRequest('cycle')
+  if (cycleKeys && !cycleKeys.includes(String(cycle))) throw invalidRequest('cycle')
   if (!Array.isArray(edits) || edits.length === 0) throw invalidRequest('edits')
   if (edits.length > NodesBatchLimits.maxEdits) {
     throw invalidRequest('tooManyEdits', { max: NodesBatchLimits.maxEdits })

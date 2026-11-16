@@ -73,6 +73,7 @@ describe('processNodesBatch', () => {
     persistNow,
     matchesQualifiers = () => true,
     stepAndOwnerInDb = undefined,
+    nodeDefUuidsToClear = [],
   }: {
     failOnNodeUuid?: string | null
     validationFor?: (node: any) => any
@@ -84,6 +85,7 @@ describe('processNodesBatch', () => {
     matchesQualifiers?: (params: { pendingNode: any }) => boolean
     // step and owner as they are in the database, when they differ from the (cached) record
     stepAndOwnerInDb?: { step: string; ownerUuid: string } | null
+    nodeDefUuidsToClear?: string[]
   } = {}) => {
     const posted: any[] = []
     const errors: string[] = []
@@ -114,6 +116,7 @@ describe('processNodesBatch', () => {
       logError: (message) => {
         errors.push(message)
       },
+      findNodeDefUuidsToClear: async () => nodeDefUuidsToClear,
       persistNode: async (
         { record: recordParam, node, nodesUpdateListener, nodesValidationListener }: any,
         t: unknown
@@ -194,6 +197,20 @@ describe('processNodesBatch', () => {
     ])
     expect(posted[0].content.recordUuid).toBe(recordUuid)
     expect(posted[2].content).toEqual({ recordUuid })
+  })
+
+  test('an edit that would clear non-applicable values is refused without writing', async () => {
+    const { deps, calls } = createDeps({ nodeDefUuidsToClear: ['def-1'] })
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchWouldClearValues' }])
+    expect(calls.persistNode).toBe(0)
+  })
+
+  test('a preview record is a conflict: its edits are not written', async () => {
+    const { deps, calls } = createDeps({ recordInDb: { ...record, [Record.keys.preview]: true } })
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'conflict' }])
+    expect(calls.persistNode).toBe(0)
   })
 
   test('a persist error rolls back the record: applied and pending edits fail, conflicts stay, no events', async () => {

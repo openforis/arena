@@ -1,4 +1,5 @@
 import * as Request from '@server/utils/request'
+import { parseItemsLimit } from './categoryItemsLimit'
 import * as Response from '@server/utils/response'
 import { sendRouteError } from '@server/utils/sendRouteError'
 
@@ -389,7 +390,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
-        const limit = Request.getNumericParam(req, 'limit')
+        const limit = parseItemsLimit(Request.getNumericParam(req, 'limit'))
 
         const items = ObjectUtils.toUuidIndexedObj(
           await CategoryService.fetchItemsByParentUuid({

@@ -15,6 +15,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
@@ -161,7 +162,8 @@ export const init = (app) => {
         // the edits come from the assistant: the AI switches (server and user) apply, as for the gateway
         assertFeatureEnabled('assistantCleaning', user)
         const { surveyId, timezoneOffset = null, lang = null } = Request.getParams(req)
-        const { cycle, edits } = parseNodesBatchRequest(Request.getBody(req))
+        const surveyInfo = await SurveyService.fetchSurveyById({ surveyId: Number(surveyId) })
+        const { cycle, edits } = parseNodesBatchRequest(Request.getBody(req), Survey.getCycleKeys(surveyInfo))
 
         const results = await RecordService.updateNodesBatch({
           user,

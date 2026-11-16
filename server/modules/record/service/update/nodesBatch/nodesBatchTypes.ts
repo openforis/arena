@@ -18,6 +18,7 @@ export const NodesBatchMessageKeys = {
   nodeNotInRecord: 'appErrors:record.nodeNotInRecord',
   invalidRequest: 'appErrors:record.nodesBatchInvalid',
   invalidValue: 'appErrors:record.nodesBatchInvalidValue',
+  wouldClearValues: 'appErrors:record.nodesBatchWouldClearValues',
   applyTimeout: 'appErrors:aiApplyTimeout',
   busy: 'appErrors:record.nodesBatchBusy',
   // the text of an unexpected error is logged on the server, never sent to the client

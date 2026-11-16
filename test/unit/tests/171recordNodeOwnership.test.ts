@@ -75,10 +75,9 @@ describe('delete endpoint: the node uuid must belong to the record of the URL', 
     expect(res.body).toMatchObject({ key: 'appErrors:record.nodeNotInRecord' })
   })
 
-  test('a missing node is refused with 400', async () => {
-    const { res, next } = await runDelete(null)
-    expect(next).not.toHaveBeenCalled()
-    expect(res.statusCode).toBe(400)
+  test('a missing node passes: its create may still be queued', async () => {
+    const { next } = await runDelete(null)
+    expect(next).toHaveBeenCalledWith()
   })
 
   test('a malformed uuid is refused without any lookup', async () => {
