@@ -7,7 +7,9 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
 export default class EntitiesDeleteJob extends DataImportBaseJob {
-  constructor(params) {
+  entitiesDeleted: any
+
+  constructor(params?: any) {
     super('EntitiesDeleteJob', params)
     this.entitiesDeleted = 0
   }
@@ -69,8 +71,8 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
     await this.persistUpdatedNodes({ nodesUpdated })
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     const { entitiesDeleted } = this
     return { ...result, entitiesDeleted }
   }

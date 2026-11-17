@@ -1,8 +1,10 @@
 import { Dates } from '@openforis/arena-core'
+import type { Node as ArenaRecordNode } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import Job from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -15,7 +17,19 @@ import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesU
 import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
 
 export default class DataImportBaseJob extends Job {
-  constructor(type, params) {
+  currentRecord: any
+  insertedRecordsUuids: Set<string>
+  nodesDeleteBatchPersister: any
+  nodesInsertBatchPersister: any
+  nodesUpdateBatchPersister: any
+  rdbUpdatesBatchPersister: any
+  recordsDateModifiedBatchPersister: any
+  recordsValidationBatchPersister: any
+  skippedRecordsUuids: Set<string>
+  updatedRecordsUuids: Set<string>
+  updatedValues: number
+
+  constructor(type: string, params?: any) {
     super(type, params)
 
     this.insertedRecordsUuids = new Set()
@@ -45,7 +59,13 @@ export default class DataImportBaseJob extends Job {
     this.rdbUpdatesBatchPersister = new RdbUpdatesBatchPersister({ user, surveyId, tx })
   }
 
-  async persistUpdatedNodes({ nodesUpdated, dateModified = new Date() }) {
+  async persistUpdatedNodes({
+    nodesUpdated,
+    dateModified = new Date(),
+  }: {
+    nodesUpdated: Record<string, ArenaRecordNode> | ArenaRecordNode[]
+    dateModified?: Date | null
+  }) {
     const { context, currentRecord: record, tx } = this
     const { dryRun, survey } = context
 
@@ -72,7 +92,7 @@ export default class DataImportBaseJob extends Job {
       }
     }
     await RecordManager.assocRefDataToNodes({ survey, nodes: nodesArray }, tx)
-    const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray }, tx)
+    const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray })
     await this.rdbUpdatesBatchPersister.addItem(rdbUpdates)
 
     this.currentRecord = recordUpdated
@@ -92,10 +112,10 @@ export default class DataImportBaseJob extends Job {
     await super.beforeSuccess()
   }
 
-  generateResult() {
+  generateResult(): Promise<any> {
     const { errors, insertedRecordsUuids, processed, skippedRecordsUuids, updatedRecordsUuids, updatedValues } = this
 
-    return {
+    return Promise.resolve({
       errorsCount: Object.keys(errors).length,
       insertedRecords: insertedRecordsUuids.size,
       insertedRecordsUuids: Array.from(insertedRecordsUuids),
@@ -105,12 +125,12 @@ export default class DataImportBaseJob extends Job {
       updatedRecords: updatedRecordsUuids.size,
       updatedRecordsUuids: Array.from(updatedRecordsUuids),
       updatedValues,
-    }
+    })
   }
 
   _addError(key, params = {}) {
     this.addError({
-      error: Validation.newInstance(false, {}, [{ key, params }]),
+      error: Validation.newInstance(false, {}, [ValidationResult.newInstance(key, params)]),
     })
   }
 

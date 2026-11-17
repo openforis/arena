@@ -6,7 +6,13 @@ import FlatDataImportJob from './FlatDataImportJob'
 import DataFilesImportJob from './DataFilesImportJob'
 import EntitiesDeleteJob from './EntitiesDeleteJob'
 
-const createInternalJobs = ({ includeFiles, deleteExistingEntities }) => [
+const createInternalJobs = ({
+  includeFiles,
+  deleteExistingEntities,
+}: {
+  includeFiles: boolean
+  deleteExistingEntities: any
+}) => [
   new PrepareImportFileJob(),
   new FlatDataImportJob({ keepReaderOpenOnEnd: true }),
   ...(includeFiles ? [new DataFilesImportJob()] : []),
@@ -14,6 +20,8 @@ const createInternalJobs = ({ includeFiles, deleteExistingEntities }) => [
 ]
 
 export default class DataImportJob extends Job {
+  static readonly type: string = 'DataImportJob'
+
   constructor(params, type = DataImportJob.type) {
     super(type, params, createInternalJobs(params))
   }
@@ -21,11 +29,11 @@ export default class DataImportJob extends Job {
   generateResult() {
     const result = super.combineInnerJobsResults()
     const { includeFiles } = this.context
-    return {
+    return Promise.resolve({
       ...result,
       entitiesDeleted: result.entitiesDeleted || 0,
       includeFiles,
-    }
+    })
   }
 
   async onEnd() {
@@ -33,7 +41,7 @@ export default class DataImportJob extends Job {
 
     this.errors = this.combineInnerJobsErrors()
 
-    const flatDataImportJobInner = this.innerJobs[1]
+    const flatDataImportJobInner = this.innerJobs[1] as unknown as FlatDataImportJob | undefined
     flatDataImportJobInner?.dataImportFileReader?.close()
 
     const { filePath } = this.context
@@ -42,5 +50,3 @@ export default class DataImportJob extends Job {
     }
   }
 }
-
-DataImportJob.type = 'DataImportJob'

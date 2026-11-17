@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import { Objects, RecordUpdater, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -14,7 +16,13 @@ import { createRecordEvaluationContext } from '@server/modules/record/manager/re
 
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
-const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
+const checkRootKeysSpecified = ({
+  rootKeyDefs,
+  rootKeyValuesFormatted,
+}: {
+  rootKeyDefs: any
+  rootKeyValuesFormatted: any
+}) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
   if (emptyRootKeyValueIndex >= 0) {
     const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
@@ -30,7 +38,7 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
  * @param {!string} params.keyValues - The record key values (formatted), used in the error message.
  * @returns {void}
  */
-const checkCanUpdateRecord = ({ context, record, keyValues }) => {
+const checkCanUpdateRecord = ({ context, record, keyValues }: { context: any; record: any; keyValues: any }) => {
   const { survey, updateRecordsInAnalysis, user, userQualifierFilters } = context
   if (
     !DataImportRecordPermissions.canUpdateRecord({
@@ -45,7 +53,7 @@ const checkCanUpdateRecord = ({ context, record, keyValues }) => {
   }
 }
 
-const getRecordSummaryKey = ({ survey, rootKeyDefs, record }) =>
+const getRecordSummaryKey = ({ survey, rootKeyDefs, record }: { survey: ArenaSurvey; rootKeyDefs: any; record: any }) =>
   NodeValues.getFastEqualityCompositeKey({
     nodeDefs: rootKeyDefs,
     getKey: (rootKeyDef) =>
@@ -69,7 +77,15 @@ const getRecordSummaryKey = ({ survey, rootKeyDefs, record }) =>
  * @param {!Array<object>} params.recordsSummary - The records summary list to index.
  * @returns {Map<string, Array<object>>|null} - The index, or null if it cannot be built safely.
  */
-const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
+const buildRecordsSummaryIndex = ({
+  survey,
+  rootKeyDefs,
+  recordsSummary,
+}: {
+  survey: ArenaSurvey
+  rootKeyDefs: any
+  recordsSummary: any
+}) => {
   if (!rootKeyDefs.every((rootKeyDef) => NodeValues.isTypeFastIndexable(NodeDef.getType(rootKeyDef)))) {
     return null
   }
@@ -87,7 +103,17 @@ const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
   return index
 }
 
-const findRecordSummariesMatchingKeysByIndex = ({ survey, rootKeyDefs, valuesByDefUuid, index }) => {
+const findRecordSummariesMatchingKeysByIndex = ({
+  survey,
+  rootKeyDefs,
+  valuesByDefUuid,
+  index,
+}: {
+  survey: ArenaSurvey
+  rootKeyDefs: any
+  valuesByDefUuid: Record<string, any>
+  index: any
+}) => {
   const { key: bucketKey } = NodeValues.getFastEqualityCompositeKey({
     nodeDefs: rootKeyDefs,
     getKey: (rootKeyDef) =>
@@ -101,7 +127,17 @@ const findRecordSummariesMatchingKeysByIndex = ({ survey, rootKeyDefs, valuesByD
   return index.get(bucketKey) ?? []
 }
 
-const findRecordSummariesMatchingKeysByScan = ({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary }) =>
+const findRecordSummariesMatchingKeysByScan = ({
+  survey,
+  rootKeyDefs,
+  valuesByDefUuid,
+  recordsSummary,
+}: {
+  survey: ArenaSurvey
+  rootKeyDefs: any
+  valuesByDefUuid: Record<string, any>
+  recordsSummary: any
+}) =>
   recordsSummary.filter((record) =>
     rootKeyDefs.every((rootKeyDef) => {
       const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
@@ -116,7 +152,19 @@ const findRecordSummariesMatchingKeysByScan = ({ survey, rootKeyDefs, valuesByDe
     })
   )
 
-const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback, currentRecord = null }) => {
+const fetchOrCreateRecord = async ({
+  valuesByDefUuid,
+  context,
+  tx,
+  flushCallback,
+  currentRecord = null,
+}: {
+  valuesByDefUuid: Record<string, any>
+  context: any
+  tx: DbClient
+  flushCallback: any
+  currentRecord?: any
+}) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
 
   // fetch record by root entity key values

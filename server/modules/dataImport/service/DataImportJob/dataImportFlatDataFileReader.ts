@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { FlatDataExportModel, Objects } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
@@ -20,7 +21,7 @@ const VALUE_PROP_DEFAULT = 'value'
 const allowedBooleanValues = new Set(['true', 'false', 'yes', 'no', '1', '0'])
 const booleanTrueValues = new Set(['true', 'yes', '1'])
 
-const generateAllowedDateFormats = (sep) => [
+const generateAllowedDateFormats = (sep: any) => [
   `DD${sep}MM${sep}YYYY`,
   `D${sep}MM${sep}YYYY`,
   `D${sep}M${sep}YYYY`,
@@ -39,9 +40,9 @@ const allowedDateFormats = dateFormatsSeparators.reduce((acc, separator) => {
 }, [])
 const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm', DateUtils.formats.timeWithSeconds, 'H:mm:ss']
 
-const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
+const singlePropValueConverter = ({ value }: { value: unknown }) => value[VALUE_PROP_DEFAULT]
 
-const numericValueConverter = ({ value, headers }) => {
+const numericValueConverter = ({ value, headers }: { value: unknown; headers: any }) => {
   const val = singlePropValueConverter({ value })
   const numericVal = Number(val)
   if (Number.isNaN(numericVal)) {
@@ -50,7 +51,19 @@ const numericValueConverter = ({ value, headers }) => {
   return numericVal
 }
 
-const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey }) => {
+const extractDateOrTime = ({
+  value,
+  allowedFormats,
+  formatTo,
+  headers,
+  errorKey,
+}: {
+  value: unknown
+  allowedFormats: any
+  formatTo: any
+  headers: any
+  errorKey: any
+}) => {
   const val = singlePropValueConverter({ value })
   let dateObj = null
   const valueIsInValidFormat = allowedFormats.some((format) => {
@@ -65,7 +78,7 @@ const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey 
   return DateUtils.format(dateObj, formatTo)
 }
 
-const extractVernacularNameUuid = ({ taxon, vernacularName }) => {
+const extractVernacularNameUuid = ({ taxon, vernacularName }: { taxon: any; vernacularName: any }) => {
   if (Objects.isEmpty(vernacularName)) return null
 
   // match vernacular names with language specified (e.g. "Mahogany (eng)") or simple ones, like "Mahogany"
@@ -80,19 +93,39 @@ const extractVernacularNameUuid = ({ taxon, vernacularName }) => {
   return TaxonVernacularName.getUuid(vernacularNameObj)
 }
 
-const findCategoryItem = async ({ survey, categoryItemProvider, nodeDef, code }) => {
+const findCategoryItem = ({
+  survey,
+  categoryItemProvider,
+  nodeDef,
+  code,
+}: {
+  survey: ArenaSurvey
+  categoryItemProvider: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  code: string
+}) => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const codePaths = [code] // only first level items are supported at this stage
   const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
   if (itemUuid) {
     // Item is in the survey index (non-big category); no DB call needed
-    return Survey.getCategoryItemByUuid(itemUuid)(survey) ?? { uuid: itemUuid }
+    return Promise.resolve(Survey.getCategoryItemByUuid(itemUuid)(survey) ?? { uuid: itemUuid })
   }
   // Big category — not indexed in memory, must query the provider
   return categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
 }
 
-const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
+const findTaxon = async ({
+  survey,
+  taxonProvider,
+  nodeDef,
+  taxonCode,
+}: {
+  survey: ArenaSurvey
+  taxonProvider: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  taxonCode: any
+}) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return (
     Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey) ??
@@ -110,7 +143,15 @@ const timeWithSecondsValuePattern = /^\d{1,2}:\d{2}:\d{2}$/
  * @param {!object} params.nodeDef - The time node definition the value belongs to.
  * @returns {object} An object with the formatted time `value` and a null `refData`.
  */
-export const extractTimeValue = ({ value, headers, nodeDef }) => {
+export const extractTimeValue = ({
+  value,
+  headers,
+  nodeDef,
+}: {
+  value: unknown
+  headers: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   const val = value[VALUE_PROP_DEFAULT]
   // Only apply the node def's seconds-including format when the input value itself carries
   // seconds; otherwise fall back to the plain HH:mm storage format, so an HH:mm input into a
@@ -252,7 +293,7 @@ const requiredValuePropsByNodeDefType = {
   [NodeDef.nodeDefType.taxon]: [Node.valuePropsTaxon.code],
 }
 
-const isRequiredColumn = (column) => {
+const isRequiredColumn = (column: any) => {
   const { key, nodeDef, valueProp } = column
   if (!key) return false
   const requiredValueProps = requiredValuePropsByNodeDefType[NodeDef.getType(nodeDef)]
@@ -271,7 +312,7 @@ const checkRequiredHeadersNotMissing =
 
 const _validateHeaders =
   ({ csvDataExportModel }) =>
-  async (headers) => {
+  (headers) => {
     checkAllHeadersAreValid({ csvDataExportModel })(headers)
     checkRequiredHeadersNotMissing({ csvDataExportModel })(headers)
   }
@@ -306,6 +347,19 @@ const createReaderFromStream = ({
   includeAnalysis = false,
   validateHeaders = true,
   includeFiles = false,
+}: {
+  stream: any
+  fileFormat: string
+  survey: ArenaSurvey
+  categoryItemProvider: any
+  taxonProvider: any
+  cycle: string
+  nodeDefUuid: string
+  onRowItem: any
+  onTotalChange?: any
+  includeAnalysis?: boolean
+  validateHeaders?: any
+  includeFiles?: boolean
 }) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -323,14 +377,14 @@ const createReaderFromStream = ({
   return FlatDataReader.createReaderFromStream({
     stream,
     fileFormat,
-    onHeaders: async (headers) => {
+    onHeaders: (headers) => {
       if (validateHeaders) {
-        await _validateHeaders({ csvDataExportModel })(headers)
+        _validateHeaders({ csvDataExportModel })(headers)
       }
     },
     onRow: async (row) => {
       // combine several columns into single values for every attribute definition
-      const valuesByDefUuidTemp = {}
+      const valuesByDefUuidTemp: Record<string, Record<string, any>> = {}
       for (const column of csvDataExportModel.columns) {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
 
