@@ -7,6 +7,7 @@ import type { ArenaApi } from '../fixtures/arenaApi'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import {
   acceptConsentAndWait,
+  analysisAreaLabel,
   analysisMessages,
   askAnalysis,
   collectRequestBodies,
@@ -14,12 +15,18 @@ import {
   expectedAverages,
   isExplorerQueryRequest,
   isGatewayRequest,
+  mapLayerCard,
   queryCard,
   reopenLastConversation,
   reloadApp,
   setLocalProvider,
 } from '../helpers/aiAnalysis'
-import { assistantPanel, openAssistantPanel, waitForAssistantTurn } from '../helpers/assistantPanel'
+import {
+  assistantPanel,
+  openAssistantPanel,
+  selectAssistantArea,
+  waitForAssistantTurn,
+} from '../helpers/assistantPanel'
 import { Urls } from '../helpers/urls'
 import { startLocalModelServer } from '../stubs/localModelServer'
 
@@ -75,6 +82,38 @@ test.describe('AI analysis assistant (mock provider)', () => {
     await expect(page.locator('.data-query-chart-wrapper .recharts-bar-rectangle')).toHaveCount(3)
     // an aggregate chart loads all its rows, not the table page size
     expect(queryBodies.some((body) => body.limit == null)).toBe(true)
+  })
+
+  test('map card: opens the Map with the layer ticked, again after unticking', async ({ page, sampleSurvey: _ }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.map)
+    await waitForAssistantTurn(page)
+    await expect(mapLayerCard(page)).toBeVisible()
+
+    const showOnMap = page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]')
+    await showOnMap.click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.map}$`))
+
+    // the Layers panel may already be open: a click on the open tab would collapse it
+    const layersPanel = page.getByTestId(mapIds.railPanel('layers'))
+    if (!(await layersPanel.isVisible())) await page.getByTestId(mapIds.railTab('layers')).click()
+    const checkbox = layersPanel
+      .locator('label', { hasText: 'Cluster coordinate' })
+      .locator('input.leaflet-control-layers-selector')
+    await expect(checkbox).toBeChecked()
+
+    await checkbox.uncheck()
+    await expect(checkbox).not.toBeChecked()
+    await showOnMap.click()
+    await expect(checkbox).toBeChecked()
+
+    await reloadApp(page)
+    await openAssistantPanel(page)
+    // on the Map the assistant opens on the Help area
+    await selectAssistantArea(page, analysisAreaLabel)
+    await reopenLastConversation(page)
+    await expect(mapLayerCard(page)).toBeVisible()
   })
 
   test.describe('with the stub local server', () => {

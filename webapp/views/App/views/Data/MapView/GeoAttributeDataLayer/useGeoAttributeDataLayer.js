@@ -17,6 +17,7 @@ import * as API from '@webapp/service/api'
 
 import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
+import { fitLayerBounds } from './fitLayerBounds'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
 const onGeoJsonDataExportComplete =
@@ -33,6 +34,7 @@ const onGeoJsonDataExportComplete =
 
 export const useGeoAttributeDataLayer = (props) => {
   const {
+    activationKey = null,
     attributeDef,
     markersColor,
     editingRecordUuid,
@@ -198,6 +200,14 @@ export const useGeoAttributeDataLayer = (props) => {
   }, [attributeDefUuid, onPointsLoaded, points])
 
   const visiblePoints = useMemo(() => (pointsFilter ? points.filter(pointsFilter) : points), [points, pointsFilter])
+
+  // zoom to the layer once per activation (the assistant's "Show on map"), when its points are there
+  const zoomedKeyRef = useRef(null)
+  useEffect(() => {
+    if (activationKey && activationKey !== zoomedKeyRef.current && fitLayerBounds(map, visiblePoints)) {
+      zoomedKeyRef.current = activationKey
+    }
+  }, [activationKey, map, visiblePoints])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({
     points: visiblePoints,

@@ -1,6 +1,7 @@
 import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
+import { useLocation } from 'react-router'
 
 import { isHexColor } from '@core/colorUtils'
 import * as Survey from '@core/survey/survey'
@@ -104,6 +105,10 @@ const MapWrapper = () => {
   const lang = useSurveyPreferredLang()
   const survey = useSurvey() as any
 
+  // the assistant asks for a layer through the router state; the key changes on every navigation, so each ask counts
+  const { state: locationState, key: locationKey } = useLocation()
+  const requestedUuid: string | null = locationState?.aiMapLayer?.uuid ?? null
+
   const surveyInfo = useSurveyInfo() as any
   const surveyId = Survey.getId(survey)
 
@@ -194,6 +199,8 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
+          checked={requestedUuid === NodeDef.getUuid(attributeDef)}
+          activationKey={requestedUuid === NodeDef.getUuid(attributeDef) ? locationKey : null}
           markersColor={getGeoAttributeLayerMarkersColor({
             attributeDef,
             defaultColor: layerColors[preloadedLayerRefs.length + samplingPointDataLevels.length + index],
@@ -207,8 +214,10 @@ const MapWrapper = () => {
       createRecordFromSamplingPointDataItem,
       geoAttributeDefs,
       layerColors,
+      locationKey,
       onRecordEditClick,
       preloadedLayerRefs,
+      requestedUuid,
       samplingPointDataLevels,
     ]
   )

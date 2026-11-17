@@ -1,0 +1,37 @@
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import { isMapLayerDef, type ProposedMapLayer } from '@webapp/ai/tools/analysis/proposeMapLayer'
+
+export type MapLayerCardModel = {
+  status: 'ok' | 'missing' | 'noPermission'
+  label: string | null
+  explanation: string
+  uuid: string
+}
+
+/**
+ * Builds what the map layer card shows.
+ * @param {object} params - Parameters.
+ * @param {ProposedMapLayer} params.proposed - The proposed layer.
+ * @param {object} params.survey - The survey.
+ * @param {string} params.lang - Label language.
+ * @param {boolean} params.canUseMap - Whether the user can open the map.
+ * @returns {MapLayerCardModel} The card model.
+ */
+export const getMapLayerCardModel = ({
+  proposed,
+  survey,
+  lang,
+  canUseMap,
+}: {
+  proposed: ProposedMapLayer
+  survey: any
+  lang: string
+  canUseMap: boolean
+}): MapLayerCardModel => {
+  const { attributeUuid: uuid, explanation } = proposed
+  const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
+  if (!nodeDef || !isMapLayerDef(nodeDef)) return { status: 'missing', label: null, explanation, uuid }
+  return { status: canUseMap ? 'ok' : 'noPermission', label: NodeDef.getLabel(nodeDef, lang), explanation, uuid }
+}

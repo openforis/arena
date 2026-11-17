@@ -13,12 +13,14 @@ import { Button } from '@webapp/components/buttons'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
 import { useI18nT } from '@webapp/store/system'
+import { getProposedMapLayer } from '@webapp/ai/tools/analysis/proposeMapLayer'
 import { TestId } from '@webapp/utils/testId'
 
 import { AssistantMarkdown } from './AssistantMarkdown'
 import { canOpenProviderChooser } from './providerChip/providerChipModel'
 import { getProposedChangeSetId, getToolRowLabel, isHiddenToolPart } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
+import { MapLayerCard } from './analysis/MapLayerCard'
 import { QueryCard } from './analysis/QueryCard'
 import { RecordEditCard } from './cleaning/RecordEditCard'
 import { ChangeSetCard } from './ChangeSetCard'
@@ -101,6 +103,7 @@ const AnswerPart = ({
   const changeSetId = getProposedChangeSetId(part)
   const cardState = changeSetId ? changeSets[changeSetId] : undefined
   const queryId = getProposedQueryId({ toolName: part.toolName, output: part.output })
+  const mapLayer = getProposedMapLayer({ toolName: part.toolName, output: part.output })
   const queryEntry = queryId ? (queries[queryId] ?? null) : undefined
   return (
     <>
@@ -126,6 +129,7 @@ const AnswerPart = ({
             />
           ))}
         {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
+        {mapLayer && <MapLayerCard proposed={mapLayer} />}
       </div>
     </>
   )

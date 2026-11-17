@@ -7,6 +7,7 @@ import {
   formatMockQueryAnswer,
 } from '@server/modules/ai/service/mock/mockScriptsAnalysis'
 import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
+import { proposeMapLayerInputSchema } from '@webapp/ai/tools/analysis/proposeMapLayer'
 import { proposeQueryInputSchema, toDataQueryAiResult } from '@webapp/ai/tools/analysis/proposeQuery'
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 
@@ -36,6 +37,7 @@ const buildSurvey = async () =>
     SB.entity(
       'cluster',
       SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
+      SB.attribute('cluster_coordinate', NodeDef.nodeDefType.coordinate),
       SB.entity(
         'plot',
         SB.attribute('plot_id', NodeDef.nodeDefType.integer).key(),
@@ -70,6 +72,7 @@ describe('analysis mock scripts', () => {
     const survey = await buildSurvey()
     for (const script of assistantAnalysisMockScripts) {
       const [propose] = toolCalls(script)
+      if (propose.toolName === 'map_proposeLayer') continue // checked in its own test
       expect(propose.toolName).toBe('query_propose')
       const input = proposeQueryInputSchema.parse(propose.input)
       const { query, errors } = toQuery({
@@ -81,6 +84,15 @@ describe('analysis mock scripts', () => {
       expect(errors).toEqual([])
       expect(query).toBeTruthy()
     }
+  })
+
+  test('the map script proposes a layer of the e2e survey', async () => {
+    const survey = await buildSurvey()
+    const script = assistantAnalysisMockScripts.find((s) => s.pattern.test('show cluster_coordinate on the map'))!
+    const [propose] = toolCalls(script)
+    expect(propose.toolName).toBe('map_proposeLayer')
+    const { attribute } = proposeMapLayerInputSchema.parse(propose.input)
+    expect(Survey.getNodeDefByName(attribute)(survey)).toBeTruthy()
   })
 
   test('the run script runs the proposed query, then answers from its rows', () => {

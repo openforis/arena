@@ -18,6 +18,7 @@ export const analysisAreaLabel = 'Analysis'
 export const analysisMessages = {
   propose: 'average of tree_dec_1 by cluster_id',
   run: 'run the average of tree_dec_1 by cluster_id',
+  map: 'show cluster_coordinate on the map',
 }
 
 // averages of tree_dec_1 by cluster in the sample records (test/e2e/fixtures/seed/sampleSurveyModel.ts)
@@ -134,6 +135,14 @@ export const reopenLastConversation = async (page: Page): Promise<void> => {
  * @returns {import('@playwright/test').Locator} The card.
  */
 export const queryCard = (page: Page, queryId: string) => page.getByTestId(TestId.aiQueryCard.root(queryId))
+
+/**
+ * Returns the map layer card (the only one of the conversation).
+ * @param {Page} page - The page.
+ * @returns {import('@playwright/test').Locator} The card.
+ */
+export const mapLayerCard = (page: Page) =>
+  page.locator('[data-testid^="ai-map-layer-card-"]:not([data-testid$="-show-on-map"])')
 
 /**
  * Checks that the Explorer table shows the expected averages.

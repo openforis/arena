@@ -1,5 +1,5 @@
-import { useCallback, useMemo } from 'react'
-import { LayerGroup, LayersControl } from 'react-leaflet'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,6 +10,7 @@ import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPa
 
 export const GeoAttributeDataLayer = (props) => {
   const {
+    activationKey = null,
     attributeDef,
     checked = false,
     markersColor,
@@ -30,6 +31,7 @@ export const GeoAttributeDataLayer = (props) => {
     totalPoints,
     points,
   } = useGeoAttributeDataLayer({
+    activationKey,
     attributeDef,
     checked,
     markersColor,
@@ -38,6 +40,15 @@ export const GeoAttributeDataLayer = (props) => {
   })
 
   const layerKey = NodeDef.getUuid(attributeDef)
+
+  // a repeated activation finds the overlay already checked (LayersControl.Overlay acts on changes of `checked`
+  // only), or unticked by the user: adding the group fires overlayadd, which fetches the data
+  const map = useMap()
+  const layerGroupRef = useRef(null)
+  useEffect(() => {
+    const layerGroup = layerGroupRef.current
+    if (activationKey && layerGroup && !map.hasLayer(layerGroup)) map.addLayer(layerGroup)
+  }, [activationKey, map])
   const { selectPoint, layerSortOrders } = useMapLayersPanel()
   const sortOrder = layerSortOrders[layerKey] ?? 'none'
   const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
@@ -60,7 +71,7 @@ export const GeoAttributeDataLayer = (props) => {
 
   return (
     <LayersControl.Overlay name={layerName} checked={checked}>
-      <LayerGroup>
+      <LayerGroup ref={layerGroupRef}>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a node value point
           const { cluster: isCluster, key } = cluster.properties
@@ -125,6 +136,7 @@ export const GeoAttributeDataLayer = (props) => {
 }
 
 GeoAttributeDataLayer.propTypes = {
+  activationKey: PropTypes.string, // changes on each request to show the layer: it is then shown and zoomed to
   attributeDef: PropTypes.any,
   checked: PropTypes.bool, // when true, the layer is selected (and its data fetched) on mount
   markersColor: PropTypes.any,

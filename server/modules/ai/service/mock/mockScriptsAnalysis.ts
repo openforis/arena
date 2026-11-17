@@ -63,4 +63,17 @@ export const assistantAnalysisMockScripts: MockScript[] = [
       { text: 'MOCK: I proposed query q1. Use "Open in Explorer" on the card to see the result.' },
     ],
   },
+  {
+    promptMarker: assistantMarkers.analysis,
+    pattern: /^show cluster_coordinate on the map/i,
+    steps: [
+      {
+        toolCall: {
+          toolName: 'map_proposeLayer',
+          input: { attribute: 'cluster_coordinate', explanation: 'MOCK: the clusters on the map.' },
+        },
+      },
+      { text: 'MOCK: use "Show on map" on the card.' },
+    ],
+  },
 ]

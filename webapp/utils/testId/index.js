@@ -143,6 +143,10 @@ export const TestId = {
     openInExplorer: (queryId) => `ai-query-card-${queryId}-open-in-explorer`,
     showAsChart: (queryId) => `ai-query-card-${queryId}-show-as-chart`,
   },
+  aiMapLayerCard: {
+    root: (uuid) => `ai-map-layer-card-${uuid}`,
+    showOnMap: (uuid) => `ai-map-layer-card-${uuid}-show-on-map`,
+  },
   categoryDetails: {
     addLevelBtn: 'add-level-btn',
     categoryName: 'category-name',
