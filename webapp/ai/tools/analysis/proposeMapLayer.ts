@@ -8,7 +8,7 @@ import { isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
 import { findNodeDefByName, getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
-import { parseMapSearchQuery } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
+import { parseMapSearchQuery } from '@core/geo/coordinateQuery'
 
 export const MAP_PROPOSE_LAYER_TOOL_NAME = 'map_proposeLayer'
 

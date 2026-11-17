@@ -1,4 +1,4 @@
-import { normalizeLongitude } from './coordinateFormat'
+import { normalizeLongitude } from '@core/geo/coordinateFormat'
 
 export type ScaleBar = { meters: number; widthPx: number; label: string }
 

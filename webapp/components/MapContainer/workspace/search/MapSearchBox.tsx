@@ -7,7 +7,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import type { MapRecordCandidate, MapWorkspaceRecords } from '../mapWorkspaceTypes'
-import { formatCoordinates } from '../statusbar/coordinateFormat'
+import { formatCoordinates } from '@core/geo/coordinateFormat'
 import { buildMapSearchResults, parseMapSearchQuery } from './mapSearchQuery'
 import type { MapSearchResult } from './mapSearchQuery'
 
