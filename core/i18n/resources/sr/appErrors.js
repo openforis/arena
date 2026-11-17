@@ -181,6 +181,8 @@ Pokušajte da osvježite stranicu.`,
   aiDataQueryEmpty: 'Prvo izaberite entitet i neke atribute (ili dimenzije i mjere).',
   aiAssistantStepLimit:
     'Asistent je dostigao ograničenje broja koraka a da nije napisao odgovor. Pokušajte ponovo ili postavite uže pitanje.',
+  aiAssistantToolCallText:
+    'Model je napisao poziv alata kao tekst umjesto da pozove alat. Pokušajte ponovo ili koristite veći model.',
   aiLocalServerUnreachable:
     'Nije moguće pristupiti AI serveru na adresi {{baseUrl}}. Da li je pokrenut i da li je CORS omogućen? Da li je pregledač blokirao pristup uređajima u lokalnoj mreži?',
   aiLocalServerModelMissing:

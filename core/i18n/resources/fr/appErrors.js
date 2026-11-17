@@ -18,6 +18,8 @@ export default {
   aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
   aiAssistantStepLimit:
     "L'assistant a atteint sa limite d'étapes sans rédiger de réponse. Réessayez ou posez une question plus ciblée.",
+  aiAssistantToolCallText:
+    "Le modèle a écrit un appel d'outil sous forme de texte au lieu d'appeler l'outil. Réessayez ou utilisez un modèle plus grand.",
   aiLocalServerUnreachable:
     "Le serveur d'IA à l'adresse {{baseUrl}} est injoignable. Est-il démarré, avec CORS activé ? Le navigateur a-t-il bloqué l'accès aux appareils du réseau local ?",
   aiLocalServerModelMissing:

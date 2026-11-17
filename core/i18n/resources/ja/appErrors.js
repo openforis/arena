@@ -179,6 +179,8 @@ export default {
   aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
   aiAssistantStepLimit:
     'アシスタントは回答を書く前にステップ数の上限に達しました。もう一度試すか、より絞った質問をしてください。',
+  aiAssistantToolCallText:
+    'モデルがツールを呼び出さず、ツール呼び出しをテキストとして書き出しました。もう一度試すか、より大きなモデルを使用してください。',
   aiLocalServerUnreachable:
     'AI サーバー ({{baseUrl}}) に接続できませんでした。CORS を有効にして起動していますか？ブラウザーがローカルネットワーク上のデバイスへのアクセスをブロックしていませんか？',
   aiLocalServerModelMissing:

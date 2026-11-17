@@ -176,6 +176,8 @@ Try to refresh the page.`,
   aiDataQueryEmpty: 'Select an entity and some attributes (or dimensions and measures) first.',
   aiAssistantStepLimit:
     'The assistant reached its step limit without writing an answer. Try again, or ask a narrower question.',
+  aiAssistantToolCallText:
+    'The model wrote a tool call as text instead of calling the tool. Try again, or use a larger model.',
   aiLocalServerUnreachable:
     'The AI server at {{baseUrl}} could not be reached. Is it running, with CORS enabled? Did the browser block access to local network devices?',
   aiLocalServerModelMissing:

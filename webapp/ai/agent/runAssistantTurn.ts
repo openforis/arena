@@ -48,6 +48,11 @@ export const assistantAreaFeatures: Record<AssistantPromptArea, AiFeatureKey> = 
 
 const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
 export const STEP_LIMIT_ERROR_KEY = 'aiAssistantStepLimit'
+export const TOOL_CALL_TEXT_ERROR_KEY = 'aiAssistantToolCallText'
+
+// small local models sometimes write the tool call as text: <|tool_call>...<tool_call|>, <tool_call>...</tool_call>
+const TOOL_CALL_OPEN = /^<\|?tool_call\|?>/
+const TOOL_CALL_CLOSE = /<\|?\/?tool_call\|?>$/
 
 /**
  * Builds the prepareStep of a turn: the last allowed step gets no tools, so the model answers with what it has.
@@ -206,6 +211,21 @@ const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
 }
 
 /**
+ * Returns true when the text of the answer is only a tool call written as text.
+ * @param {Conversation} after - Conversation at the end of the turn.
+ * @returns {boolean} True for a markup-only answer.
+ */
+const isToolCallTextAnswer = (after: Conversation): boolean => {
+  const answer = after.messages.at(-1)
+  if (answer?.role !== 'assistant') return false
+  const text = answer.parts
+    .map((part) => (part.type === 'text' ? part.text : ''))
+    .join('')
+    .trim()
+  return TOOL_CALL_OPEN.test(text) && TOOL_CALL_CLOSE.test(text)
+}
+
+/**
  * Ends the turn from what the stream reported.
  * @param {TurnState} state - Turn state.
  * @param {StreamOutcome} outcome - Abort / error.
@@ -220,7 +240,8 @@ const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSigna
   if (outcome.aborted || signal.aborted || isAiAbortError(outcome.error)) state.finish('stopped')
   else if (outcome.error && !toolCallOnLastStep) {
     state.finish('error', getAiErrorKey(outcome.error) ?? PROVIDER_ERROR_KEY, getAiErrorParams(outcome.error))
-  } else if (isSilentTurn(state.get(), before)) state.finish('error', STEP_LIMIT_ERROR_KEY)
+  } else if (isToolCallTextAnswer(state.get())) state.finish('error', TOOL_CALL_TEXT_ERROR_KEY)
+  else if (isSilentTurn(state.get(), before)) state.finish('error', STEP_LIMIT_ERROR_KEY)
   else state.finish('done')
 }
 
