@@ -12,5 +12,6 @@ export default class RFileCommon extends RFileUser {
 
     const { chain } = this.rChain
     await this.appendContent(Chain.getScriptCommon(chain))
+    return this
   }
 }

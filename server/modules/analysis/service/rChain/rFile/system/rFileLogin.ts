@@ -16,5 +16,6 @@ if (!arenaLogin) {
   stop("Login to Arena server is necessary to proceed.")
 }
 `)
+    return this
   }
 }

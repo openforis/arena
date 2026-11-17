@@ -6,6 +6,11 @@ import * as ApiRoutes from '@common/apiRoutes'
 import { arenaGetCSV, dfVar, setVar } from '../../rFunctions'
 
 export default class ListCategories {
+  _categories: any
+  _name: any
+  _rChain: any
+  _scripts: any
+
   constructor(rChain) {
     this._rChain = rChain
     this._scripts = []

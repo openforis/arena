@@ -91,7 +91,7 @@ export default class RFileReadData extends RFileSystem {
       options: { includeAncestorAttributes: true, includeFiles: false },
     })
 
-    const columnNamesByConversionType = flatDataExportModel.columns.reduce((acc, column) => {
+    const columnNamesByConversionType = flatDataExportModel.columns.reduce((acc: Record<string, string[]>, column) => {
       const { header, nodeDef, dataType } = column
 
       const conversionType = conversionTypeByColumnDataType[dataType]

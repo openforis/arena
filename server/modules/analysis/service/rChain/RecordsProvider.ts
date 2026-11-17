@@ -1,8 +1,13 @@
+import type { DbClient } from '@server/db/db'
 import * as Record from '@core/record/record'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { ItemsCache } from './ItemsCache'
 
 export class RecordsProvider {
+  _recordsCache: any
+  surveyId: number
+  tx: DbClient
+
   constructor({ surveyId, tx, maxItems = 100, maxTotalItemsSize = 10000 }) {
     this.surveyId = surveyId
     this.tx = tx

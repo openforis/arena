@@ -14,6 +14,10 @@ const computedCategoryUuidCol = 'computed_category_uuid'
  * Class that models a data frame step results.
  */
 export default class DfResults {
+  _entity: any
+  _rChain: any
+  _scripts: any
+
   constructor(rChain, entity) {
     this._rChain = rChain
     this._entity = entity

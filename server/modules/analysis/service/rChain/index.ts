@@ -1,3 +1,4 @@
+import type { User as ArenaUser, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
@@ -23,8 +24,19 @@ import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
 import PersistOlapDataJob from '../olap/PersistOlapDataJob'
 
-export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
-  new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
+export const generateScript = ({
+  surveyId,
+  cycle,
+  chainUuid,
+  serverUrl,
+  token,
+}: {
+  surveyId: number
+  cycle: string
+  chainUuid: string
+  serverUrl: any
+  token: any
+}) => new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
 export const fetchNodeData = async ({
@@ -35,6 +47,14 @@ export const fetchNodeData = async ({
   nodeDefUuid,
   draft = true,
   fileFormat = FileFormats.csv,
+}: {
+  res: any
+  surveyId: number
+  cycle: string
+  chainUuid: string
+  nodeDefUuid: string
+  draft?: boolean
+  fileFormat?: string
 }) => {
   // prepare query
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
@@ -68,17 +88,43 @@ export const fetchNodeData = async ({
 
 // ==== UPDATE
 
-export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+export const startPersistResultsJob = ({
+  user,
+  surveyId,
+  cycle,
+  entityDefUuid,
+  chainUuid,
+  filePath,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  entityDefUuid: string
+  chainUuid: string
+  filePath: string
+}) => {
   const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
   return JobManager.enqueueJob(job)
 }
 
-export const startPersistOlapDataJob = ({ user, surveyId, cycle, chainUuid, filePath }) => {
+export const startPersistOlapDataJob = ({
+  user,
+  surveyId,
+  cycle,
+  chainUuid,
+  filePath,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  chainUuid: string
+  filePath: string
+}) => {
   const job = new PersistOlapDataJob({ user, surveyId, cycle, chainUuid, filePath })
   return JobManager.enqueueJob(job)
 }
 
-const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {
+const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }: { entity: any; nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const nodeDefName = NodeDef.getName(nodeDef)
 
   if (NodeDef.isBaseUnit(nodeDef)) {
@@ -90,7 +136,17 @@ const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {
   return `${NodeDef.getName(entity)}-${nodeDefName}`
 }
 
-export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }) => {
+export const persistUserScripts = async ({
+  user,
+  surveyId,
+  chainUuid,
+  filePath,
+}: {
+  user: ArenaUser
+  surveyId: number
+  chainUuid: string
+  filePath: string
+}) => {
   const fileZip = new FileZip(filePath)
   await fileZip.init()
 

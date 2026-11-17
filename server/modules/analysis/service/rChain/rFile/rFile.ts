@@ -12,6 +12,12 @@ const pathsWithErrorsIgnored = ['system/login', 'system/statistical-analysis']
 export const padStart = StringUtils.padStart(3, '0')
 
 export default class RFile {
+  _dir: any
+  _fileName: any
+  _path: any
+  _pathRelative: any
+  _rChain: any
+
   constructor(rChain, dir, fileName) {
     this._rChain = rChain
     this._dir = dir
@@ -50,7 +56,7 @@ export default class RFile {
     return this
   }
 
-  async logInfo(content) {
+  logInfo(content) {
     return this.appendContent(arenaInfo(this._fileName, content))
   }
 

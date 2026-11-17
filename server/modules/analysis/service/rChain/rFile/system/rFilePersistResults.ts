@@ -8,7 +8,7 @@ import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
 
 const persistScriptJobVar = 'persistScriptJob'
 
-const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
+const getSendResultsToServerScripts = ({ rChain, entity, dfResults }: { rChain: any; entity: any; dfResults: any }) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
   const { name: dfResultName, dfSourceName } = dfResults
   const scripts = []

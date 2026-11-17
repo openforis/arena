@@ -1,5 +1,10 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
-import { FlatDataExportModel, Objects } from '@openforis/arena-core'
+import {
+  FlatDataExportModel,
+  Objects,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+} from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
 import * as Srs from '@core/geo/srs'
@@ -352,7 +357,7 @@ const createReaderFromStream = ({
   fileFormat: string
   survey: ArenaSurvey
   categoryItemProvider: any
-  taxonProvider: any
+  taxonProvider?: any
   cycle: string
   nodeDefUuid: string
   onRowItem: any

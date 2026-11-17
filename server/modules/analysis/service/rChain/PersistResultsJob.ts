@@ -9,7 +9,12 @@ import { RecordsProvider } from './RecordsProvider'
 import { FileFormats } from '@core/fileFormats'
 
 export default class PersistResultsJob extends FlatDataImportJob {
-  constructor(params) {
+  static readonly type: string = 'PersistResultsJob'
+  fileZip: any
+  recordsProvider: any
+  stream: any
+
+  constructor(params?: any) {
     super(params, PersistResultsJob.type)
   }
 
@@ -29,7 +34,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
     return false
   }
 
-  async fetchSurvey() {
+  fetchSurvey() {
     const { surveyId, tx } = this
     const { cycle } = this.context
 
@@ -45,22 +50,23 @@ export default class PersistResultsJob extends FlatDataImportJob {
     )
   }
 
-  async createFlatDataReader() {
+  createFlatDataReader() {
     const { context, stream } = this
     const { cycle, nodeDefUuid, survey } = context
 
-    return DataImportFlatDataFileReader.createReaderFromStream({
+    const reader = DataImportFlatDataFileReader.createReaderFromStream({
       stream,
       fileFormat: FileFormats.csv,
       survey,
       categoryItemProvider: RecordProvidersDefault.categoryItemProvider,
       cycle,
       nodeDefUuid,
-      onRowItem: async (item) => this.onRowItem(item),
+      onRowItem: (item) => this.onRowItem(item),
       onTotalChange: (total) => (this.total = total),
       includeAnalysis: true,
       validateHeaders: false,
     })
+    return Promise.resolve(reader)
   }
 
   async onRowItem(item) {
@@ -104,5 +110,3 @@ export default class PersistResultsJob extends FlatDataImportJob {
     this.fileZip?.close()
   }
 }
-
-PersistResultsJob.type = 'PersistResultsJob'
