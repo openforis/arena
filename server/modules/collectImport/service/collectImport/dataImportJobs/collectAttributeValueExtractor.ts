@@ -21,7 +21,7 @@ import * as CollectSurvey from '../model/collectSurvey'
 
 const { nodeDefType } = NodeDef
 
-const extractTextValueAndMeta = (collectNode: any, collectNodeField = 'value') => {
+const extractTextValueAndMeta = (collectNode: CollectRecord.CollectNode, collectNodeField = 'value') => {
   const value = CollectRecord.getTextValue(collectNodeField)(collectNode)
   return value ? { value } : null
 }
@@ -70,7 +70,7 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
 
 const extractCodeValueAndMeta =
   ({ survey, categoryItemProvider, nodeDef, record, node, tx }) =>
-  async (collectNode) => {
+  async (collectNode: CollectRecord.CollectNode) => {
     const code = CollectRecord.getTextValue('code')(collectNode)
     if (Objects.isEmpty(code)) {
       return null
@@ -101,7 +101,7 @@ const extractCoordinateValueAndMeta = ({
   collectNode,
 }: {
   nodeDef: ArenaNodeDef<NodeDefType>
-  collectNode: any
+  collectNode: CollectRecord.CollectNode
 }) => {
   const { x, y, srs, accuracy, altitude } = CollectRecord.getTextValues(collectNode)
 
@@ -123,7 +123,7 @@ const extractCoordinateValueAndMeta = ({
   return null
 }
 
-const extractDateValueAndMeta = (collectNode: any) => {
+const extractDateValueAndMeta = (collectNode: CollectRecord.CollectNode) => {
   const { day, month, year } = CollectRecord.getTextValues(collectNode)
 
   if (!NumberUtils.isInteger(year) || !NumberUtils.isInteger(month) || !NumberUtils.isInteger(day)) {
@@ -134,8 +134,14 @@ const extractDateValueAndMeta = (collectNode: any) => {
 }
 
 const extractFileValueAndMeta =
-  (survey: ArenaSurvey, node: any, collectSurveyFileZip: any, collectNodeDef: any, tx: DbClient) =>
-  async (collectNode) => {
+  (
+    survey: ArenaSurvey,
+    node: any,
+    collectSurveyFileZip: any,
+    collectNodeDef: CollectSurvey.CollectNodeDef,
+    tx: DbClient
+  ) =>
+  async (collectNode: CollectRecord.CollectNode) => {
     const { file_name: fileName } = CollectRecord.getTextValues(collectNode)
 
     const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
@@ -185,7 +191,7 @@ const findTaxonUuid = async ({
 
 const extractTaxonValueAndMeta =
   ({ survey, taxonProvider, nodeDef }) =>
-  async (collectNode) => {
+  async (collectNode: CollectRecord.CollectNode) => {
     const {
       code: taxonCode,
       scientific_name: scientificName,
@@ -218,7 +224,7 @@ const extractTaxonValueAndMeta =
     }
   }
 
-const extractTimeValueAndMeta = (collectNode: any) => {
+const extractTimeValueAndMeta = (collectNode: CollectRecord.CollectNode) => {
   const { hour, minute } = CollectRecord.getTextValues(collectNode)
 
   const value =
@@ -227,7 +233,28 @@ const extractTimeValueAndMeta = (collectNode: any) => {
   return { value }
 }
 
-const valueAndMetaExtractorByType = {
+// params of the extraction of the value (and meta) of an Arena attribute from the matching Collect node
+type AttributeValueExtractParams = {
+  survey: ArenaSurvey
+  categoryItemProvider?: any
+  taxonProvider?: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  record?: any
+  node?: any
+  collectSurveyFileZip?: any
+  collectNodeDef?: CollectSurvey.CollectNodeDef
+  collectNode: CollectRecord.CollectNode
+  collectNodeField?: string
+  tx?: DbClient
+}
+
+type AttributeValueAndMeta = { value?: unknown; meta?: Record<string, unknown> } | null
+
+type AttributeValueExtractor = (
+  params: AttributeValueExtractParams
+) => AttributeValueAndMeta | Promise<AttributeValueAndMeta>
+
+const valueAndMetaExtractorByType: Record<string, AttributeValueExtractor> = {
   [nodeDefType.boolean]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.code]: ({ collectNode, survey, categoryItemProvider, nodeDef, record, node, tx = db }) =>
     extractCodeValueAndMeta({ survey, categoryItemProvider, nodeDef, record, node, tx })(collectNode),
@@ -255,7 +282,7 @@ export const extractAttributeValueAndMeta = async ({
   collectNode,
   collectNodeField, // Collect items
   tx,
-}) => {
+}: AttributeValueExtractParams): Promise<AttributeValueAndMeta> => {
   const nodeDefType = NodeDef.getType(nodeDef)
   const valueAndMetaExtractor = valueAndMetaExtractorByType[nodeDefType]
   // async: an unknown type must reject, not throw

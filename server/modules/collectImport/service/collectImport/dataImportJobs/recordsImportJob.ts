@@ -291,6 +291,17 @@ export default class RecordsImportJob extends Job {
     collectNode,
     field,
     queue,
+  }: {
+    survey: ArenaSurvey
+    record: any
+    nodeDefNamesByPath: any
+    nodeDef: any
+    nodeParent: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+    collectNodeDefPath: string
+    collectNode: CollectRecord.CollectNode
+    field: string | null
+    queue: any
   }) {
     const { collectSurveyFileZip } = this.context
 
@@ -345,7 +356,21 @@ export default class RecordsImportJob extends Job {
     return nodeDef ? [{ uuid: nodeDef.uuid }] : null
   }
 
-  _extractChildrenItemsToInsert({ survey, nodeDefNamesByPath, collectNodeDef, collectNodeDefPath, collectNode, node }) {
+  _extractChildrenItemsToInsert({
+    survey,
+    nodeDefNamesByPath,
+    collectNodeDef,
+    collectNodeDefPath,
+    collectNode,
+    node,
+  }: {
+    survey: ArenaSurvey
+    nodeDefNamesByPath: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+    collectNodeDefPath: string
+    collectNode: CollectRecord.CollectNode
+    node: any
+  }) {
     // Output
     const itemsToInsert = []
 

@@ -1,7 +1,12 @@
+import type { Element } from 'xml-js'
+
 import * as A from '@core/arena'
 
 import { nodeDefType } from '@core/survey/nodeDef'
 import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
+
+// node definition of a Collect survey (survey IDML parsed by xml-js in non compact mode)
+export type CollectNodeDef = Element
 
 const keys = {
   attributes: 'attributes',
@@ -29,7 +34,7 @@ const collectNodeDefTypes = {
 // type (and field, for range attributes split into 2 node defs) of the node defs created for a Collect node def
 type CollectNodeDefField = { type: string; field?: string }
 
-const nodeDefFieldsExtractorByCollectType: Record<string, (collectNodeDef: any) => CollectNodeDefField[]> = {
+const nodeDefFieldsExtractorByCollectType: Record<string, (collectNodeDef: CollectNodeDef) => CollectNodeDefField[]> = {
   [collectNodeDefTypes.boolean]: () => [{ type: nodeDefType.boolean }],
   [collectNodeDefTypes.code]: () => [{ type: nodeDefType.code }],
   [collectNodeDefTypes.coordinate]: () => [{ type: nodeDefType.coordinate }],
@@ -58,7 +63,7 @@ export const layoutTypes = {
 
 export const samplingPointDataCodeListNames = ['sampling_design', 'ofc_sampling_design']
 
-export const getNodeDefFieldsByCollectNodeDef = (collectNodeDef: any) => {
+export const getNodeDefFieldsByCollectNodeDef = (collectNodeDef: CollectNodeDef) => {
   const collectType = getElementName(collectNodeDef)
   const fieldsExtractor = nodeDefFieldsExtractorByCollectType[collectType]
   return fieldsExtractor?.(collectNodeDef)
@@ -152,7 +157,7 @@ export const getCollectAttribute =
 
 export const getNodeDefRoot = A.pipe(getElementsByPath(['schema', 'entity']), A.head)
 
-export const getNodeDefByPath = (collectNodeDefPath: any) => (collectSurvey) => {
+export const getNodeDefByPath = (collectNodeDefPath: string) => (collectSurvey) => {
   const collectAncestorNodeNames = A.pipe(A.split('/'), A.reject(A.isEmpty))(collectNodeDefPath)
 
   let currentCollectNode = getElementByName('schema')(collectSurvey)
@@ -173,7 +178,7 @@ export const getNodeDefByPath = (collectNodeDefPath: any) => (collectSurvey) => 
   return currentCollectNode
 }
 
-export const getNodeDefChildren = (collectNodeDef: any) =>
+export const getNodeDefChildren = (collectNodeDef: CollectNodeDef) =>
   A.pipe(getElements, A.filter(_isNodeDefElement))(collectNodeDef)
 
 const _isNodeDefElement = A.pipe(getElementName, (name) => A.includes(name, A.keys(collectNodeDefTypes)))
