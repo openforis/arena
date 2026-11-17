@@ -1,4 +1,5 @@
-import * as pgPromise from 'pg-promise'
+import type { DbClient } from '@server/db/db'
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -7,13 +8,19 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as SQL from '@common/model/db/sql'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 
-const canJoinWithMultipleAttributeTable = ({ nodeDef, viewNodeDef }) =>
+const canJoinWithMultipleAttributeTable = ({
+  nodeDef,
+  viewNodeDef,
+}: {
+  nodeDef: ArenaNodeDef<NodeDefType>
+  viewNodeDef: any
+}) =>
   NodeDef.isMultipleAttribute(nodeDef) &&
   NodeDef.canMultipleAttributeBeAggregated(nodeDef) &&
   !NodeDef.isEqual(nodeDef)(viewNodeDef) &&
   NodeDef.isDescendantOf(viewNodeDef)(nodeDef)
 
-const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
+const _getSelectFieldNodeDefs = (viewDataNodeDef: any) =>
   viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) => {
     const { nodeDef: viewNodeDef, tableData, survey } = viewDataNodeDef
     const { nodeDef, name: colName, names: colNames, namesFull } = columnNodeDef
@@ -34,7 +41,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
     return namesFull
   })
 
-const _getSelectFieldKeys = (viewDataNodeDef) => {
+const _getSelectFieldKeys = (viewDataNodeDef: any) => {
   const nodeDefKeys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
   const keys = nodeDefKeys.flatMap((nodeDef) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDef)
@@ -43,7 +50,13 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
   return `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}`
 }
 
-const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNodeDef }) => {
+const _getJoinWithMultipleAttributeTable = ({
+  viewDataNodeDef,
+  multAttrColumnNodeDef,
+}: {
+  viewDataNodeDef: any
+  multAttrColumnNodeDef: any
+}) => {
   const { survey, tableData } = viewDataNodeDef
   const { nodeDef: multAttrDef, names: columnNames } = multAttrColumnNodeDef
   const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
@@ -60,7 +73,7 @@ const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNod
   ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
 }
 
-const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
+const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef: any) => {
   const { columnNodeDefs, nodeDef: viewNodeDef } = viewDataNodeDef
 
   const multAttributeColumnNodeDefs = columnNodeDefs.filter((columnNodeDef) =>
@@ -80,7 +93,10 @@ const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
  * @param {pgPromise.IDatabase} client - The data base client.
  * @returns {Promise<null|*>} - The result promise.
  */
-export const createDataView = async ({ survey, nodeDef }, client) => {
+export const createDataView = (
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  client: DbClient
+) => {
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
   const { tableData, viewDataParent, virtualExpression } = viewDataNodeDef
 

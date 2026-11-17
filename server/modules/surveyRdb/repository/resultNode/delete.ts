@@ -1,8 +1,8 @@
-import * as pgPromise from 'pg-promise'
+import type { Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import { TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
@@ -15,7 +15,10 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
  * @param {!string} params.cycle - The survey cycle.
  * @param {!pgPromise.IDatabase} client - The database client.
  */
-export const deleteNodeResultsByChainUuid = async ({ survey, chain, entity, cycle }, client = db) => {
+export const deleteNodeResultsByChainUuid = (
+  { survey, chain, entity, cycle }: { survey: ArenaSurvey; chain: ArenaChain; entity: any; cycle: string },
+  client: DbClient = db
+) => {
   const tableData = new TableDataNodeDef(survey, entity)
   const viewData = new ViewDataNodeDef(survey, entity)
 

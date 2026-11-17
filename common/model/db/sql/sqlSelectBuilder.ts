@@ -6,8 +6,9 @@ class SqlSelectBuilder extends SqlBuilder {
   protected _from: string[]
   protected _where: string[]
   protected _groupBy: string[]
-  protected _offset: number | null
-  protected _limit: number | null
+  // number or query param placeholder (e.g. $/offset/)
+  protected _offset: number | string | null
+  protected _limit: number | string | null
   protected _orderBy: string[]
 
   constructor() {
@@ -45,12 +46,12 @@ class SqlSelectBuilder extends SqlBuilder {
     return this
   }
 
-  offset(offset: number | null): this {
+  offset(offset: number | string | null): this {
     this._offset = offset
     return this
   }
 
-  limit(limit: number | null): this {
+  limit(limit: number | string | null): this {
     this._limit = limit
     return this
   }

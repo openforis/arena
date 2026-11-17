@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -6,7 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { Schemata, TableDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 /**
  * Returns a list of items for each record containing duplicate entities.
@@ -25,7 +26,13 @@ import { db } from '@server/db/db'
  * @param {!object} client - The DB client.
  * @returns {Promise<Array>} The list of items.
  */
-export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
+export const fetchRecordsWithDuplicateEntities = async (
+  survey: ArenaSurvey,
+  cycle: string,
+  nodeDefEntity: any,
+  nodeDefKeys: any,
+  client: DbClient
+) => {
   const surveyId = Survey.getId(survey)
 
   const tableDef = new TableDataNodeDef(survey, nodeDefEntity)
@@ -77,11 +84,11 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
 }
 
 export const fetchEntityKeysByRecordAndNodeDefUuid = async (
-  survey,
-  entityDefUuid,
-  recordUuid,
-  nodeUuid = null,
-  client = db
+  survey: ArenaSurvey,
+  entityDefUuid: string,
+  recordUuid: string,
+  nodeUuid: string | null = null,
+  client: DbClient = db
 ) => {
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const tableDef = new TableDataNodeDef(survey, entityDef)

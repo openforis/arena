@@ -1,6 +1,12 @@
+import type { DbClient } from '@server/db/db'
+import type {
+  Record as ArenaRecord,
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 import camelize from 'camelize'
-import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -31,7 +37,7 @@ import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/co
 
 import { getUserGroupAccessCondition } from './userGroupAccessCondition'
 
-const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
+const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef: any, nodeDef: ArenaNodeDef<NodeDefType>) => {
   const { survey } = viewDataNodeDef
   const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
@@ -42,10 +48,21 @@ const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
  * @param {object} nodeDefCol - The time node definition column.
  * @returns {string} The TO_CHAR format, including seconds if the node definition includes them.
  */
-export const getTimeColumnToCharFormat = (nodeDefCol) =>
+export const getTimeColumnToCharFormat = (nodeDefCol: any) =>
   NodeDef.isSecondsIncluded(nodeDefCol) ? 'HH24:MI:SS' : 'HH24:MI'
 
-const columnTransformByNodeDefType = {
+// params of the transformation of the columns of a node def in the data view select
+type ColumnTransformParams = {
+  streamMode: boolean
+  viewAlias: string
+  nodeDefCol: ArenaNodeDef<NodeDefType>
+  nameFull: string
+  namesFull: string[]
+  names: string[]
+  alias: string
+}
+
+const columnTransformByNodeDefType: Record<string, (params: ColumnTransformParams) => string[]> = {
   [NodeDef.nodeDefType.boolean]: ({ streamMode, nameFull, namesFull, alias }) => {
     if (!streamMode) {
       // boolean value, not text
@@ -109,6 +126,15 @@ const _prepareSelectFields = ({
   streamMode,
   includeFileAttributeDefs = true,
   includeDateCreated = false,
+}: {
+  queryBuilder: any
+  viewDataNodeDef: any
+  columnNodeDefs: any
+  nodeDefCols: any
+  editMode: any
+  streamMode: any
+  includeFileAttributeDefs?: boolean
+  includeDateCreated?: boolean
 }) => {
   const alwaysIncludedFields = [
     viewDataNodeDef.columnRecordUuid,
@@ -148,7 +174,17 @@ const _prepareSelectFields = ({
   }
 }
 
-const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode }) => {
+const _prepareFromClause = ({
+  queryBuilder,
+  viewDataNodeDef,
+  nodeDefCols,
+  editMode,
+}: {
+  queryBuilder: any
+  viewDataNodeDef: any
+  nodeDefCols: any
+  editMode: any
+}) => {
   queryBuilder.from(viewDataNodeDef.nameAliased)
   if (editMode) {
     const { survey, surveyId } = viewDataNodeDef
@@ -229,6 +265,14 @@ const _prepareRecordsWhereConditions = ({
   recordSteps,
   recordOwnerUuid,
   userGroupAccessFilters,
+}: {
+  queryBuilder: any
+  viewDataNodeDef: any
+  cycle: string
+  query: any
+  recordSteps: any
+  recordOwnerUuid: string
+  userGroupAccessFilters: any
 }) => {
   if (!A.isNil(cycle)) {
     queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
@@ -266,9 +310,10 @@ const _prepareRecordsWhereConditions = ({
 // values farther than this many interquartile ranges from the quartiles are outliers (Tukey's fences)
 const outlierIqrFactor = 1.5
 
-const _isNumericNodeDef = (nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
+const _isNumericNodeDef = (nodeDef: ArenaNodeDef<NodeDefType>) =>
+  NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
 
-const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }) =>
+const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }: { viewDataNodeDef: any; nodeDefCols: any }) =>
   nodeDefCols
     .filter(_isNumericNodeDef)
     // same X and Y axes used by the scatter chart: first 2 numeric attributes
@@ -278,7 +323,7 @@ const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }) =>
       return `sample_base.${DbUtils.asName(name)}::double precision`
     })
 
-const _getSampleOutlierExpressions = ({ values }) => {
+const _getSampleOutlierExpressions = ({ values }: { values: any }) => {
   const conditions = []
   const scores = []
   for (const [idx, value] of values.entries()) {
@@ -309,7 +354,15 @@ const _getSampleOutlierExpressions = ({ values }) => {
  * @param {!Array} params.nodeDefCols - The selected attribute definitions.
  * @returns {string} - The sampling select query (it uses the "limit" parameter), flagging the outlier rows.
  */
-const _createSampleWithOutliersSelect = ({ baseSelect, viewDataNodeDef, nodeDefCols }) => {
+const _createSampleWithOutliersSelect = ({
+  baseSelect,
+  viewDataNodeDef,
+  nodeDefCols,
+}: {
+  baseSelect: any
+  viewDataNodeDef: any
+  nodeDefCols: any
+}) => {
   const columns = _getSampleNumericColumns({ viewDataNodeDef, nodeDefCols })
   if (columns.length === 0) {
     return `SELECT * FROM (${baseSelect}) AS sample_base ORDER BY random() LIMIT $/limit/`
@@ -340,7 +393,7 @@ const _createSampleWithOutliersSelect = ({ baseSelect, viewDataNodeDef, nodeDefC
     LIMIT $/limit/`
 }
 
-const _createViewDataQuery = (params) => {
+const _createViewDataQuery = (params: any) => {
   const {
     survey,
     cycle,
@@ -443,7 +496,7 @@ const _createViewDataQuery = (params) => {
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewData = async (params, client = db) => {
+export const fetchViewData = (params: any, client: DbClient = db) => {
   const { survey, query, stream = false } = params
 
   const editMode = Query.isModeRawEdit(query)
@@ -455,11 +508,11 @@ export const fetchViewData = async (params, client = db) => {
   const { select, queryParams } = _createViewDataQuery(params)
 
   return stream
-    ? new DbUtils.QueryStream(DbUtils.formatQuery(select, queryParams))
+    ? Promise.resolve(new DbUtils.QueryStream(DbUtils.formatQuery(select, queryParams)))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
 }
 
-export const countViewData = async (params, client = db) => {
+export const countViewData = async (params: any, client: DbClient = db) => {
   const { select, selectFields, queryParams } = _createViewDataQuery(params)
   const query = DbUtils.formatQuery(select, queryParams)
   const countQuery = `SELECT COUNT(*) AS count FROM (${query}) AS count_query`
@@ -481,8 +534,24 @@ export const countViewData = async (params, client = db) => {
  * @returns {Promise<number>} - The count of rows.
  */
 export const countDataTableRows = async (
-  { surveyId, cycle, tableName, filter = null, recordOwnerUuid = null, survey = null, userGroupAccessFilters = null },
-  client = db
+  {
+    surveyId,
+    cycle,
+    tableName,
+    filter = null,
+    recordOwnerUuid = null,
+    survey = null,
+    userGroupAccessFilters = null,
+  }: {
+    surveyId: number
+    cycle: string
+    tableName: any
+    filter?: any
+    recordOwnerUuid?: string
+    survey?: ArenaSurvey
+    userGroupAccessFilters?: any
+  },
+  client: DbClient = db
 ) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
@@ -517,7 +586,10 @@ export const countDataTableRows = async (
   return Number(countRS.count)
 }
 
-const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique }, client = db) => {
+const countDuplicateRecordsByNodeDefs = (
+  { survey, record, nodeDefsUnique }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefsUnique: any },
+  client: DbClient = db
+) => {
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const nodeRoot = Record.getRootNode(record)
@@ -558,21 +630,33 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
   return countDataTableRows({ surveyId, cycle: Record.getCycle(record), tableName, filter }, client)
 }
 
-export const isRecordUniqueByKeys = async ({ survey, record }, client = db) => {
+export const isRecordUniqueByKeys = async (
+  { survey, record }: { survey: ArenaSurvey; record: ArenaRecord },
+  client: DbClient = db
+) => {
   const nodeDefsUnique = Survey.getNodeDefRootKeys(survey)
   const duplicateCount = await countDuplicateRecordsByNodeDefs({ survey, record, nodeDefsUnique }, client)
   return duplicateCount === 0
 }
 
-export const isRecordUniqueByUniqueNodes = async ({ survey, record }, client = db) => {
+export const isRecordUniqueByUniqueNodes = async (
+  { survey, record }: { survey: ArenaSurvey; record: ArenaRecord },
+  client: DbClient = db
+) => {
   const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
   const duplicateCount = await countDuplicateRecordsByNodeDefs({ survey, record, nodeDefsUnique }, client)
   return duplicateCount === 0
 }
 
-export const fetchRecordsCountByRootNodesValue = async (
-  { survey, cycle, nodeDefs, nodes, recordUuidsExcluded = [] },
-  client = db
+export const fetchRecordsCountByRootNodesValue = (
+  {
+    survey,
+    cycle,
+    nodeDefs,
+    nodes,
+    recordUuidsExcluded = [],
+  }: { survey: ArenaSurvey; cycle: string; nodeDefs: any; nodes: any; recordUuidsExcluded?: any },
+  client: DbClient = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const surveyId = Survey.getId(survey)

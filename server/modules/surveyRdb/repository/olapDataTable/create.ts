@@ -1,8 +1,12 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
-export const createOlapDataTable = async ({ survey, cycle, baseUnitDef, entityDef }, client = db) => {
+export const createOlapDataTable = (
+  { survey, cycle, baseUnitDef, entityDef }: { survey: ArenaSurvey; cycle: string; baseUnitDef: any; entityDef: any },
+  client: DbClient = db
+) => {
   const table = new TableOlapData({ survey, cycle, baseUnitDef, entityDef })
 
   return client.query(

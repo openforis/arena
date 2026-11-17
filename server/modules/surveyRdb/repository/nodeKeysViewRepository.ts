@@ -1,4 +1,5 @@
-import { db } from '@server/db/db'
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,7 +10,7 @@ import * as NodeKeysView from '../schemaRdb/nodeKeysView'
 
 // ====== CREATE
 
-export const createNodeKeysView = async (survey, client = db) => {
+export const createNodeKeysView = async (survey: ArenaSurvey, client: DbClient = db) => {
   const surveyId = Survey.getId(survey)
 
   const selectViews = []

@@ -1,5 +1,6 @@
+import type { DbClient } from '@server/db/db'
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
-import pgPromise from 'pg-promise'
 
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
@@ -12,7 +13,19 @@ import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAgg
 
 import { getUserGroupAccessCondition } from './userGroupAccessCondition'
 
-const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilters, query }) => {
+const _getSelectQuery = ({
+  survey,
+  cycle,
+  recordOwnerUuid,
+  userGroupAccessFilters,
+  query,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  recordOwnerUuid: string
+  userGroupAccessFilters: any
+  query: any
+}) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -23,7 +36,7 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilter
 
   // SELECT measures
   Object.entries(Query.getMeasures(query)).forEach(([nodeDefUuid, aggFunctions], index) =>
-    queryBuilder.selectMeasure({ aggFunctions, nodeDefUuid, index, cycle, filter: Query.getFilter(query) })
+    queryBuilder.selectMeasure({ aggFunctions: aggFunctions as string[], nodeDefUuid, index })
   )
 
   // SELECT dimensions
@@ -82,7 +95,7 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilter
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
-export const countViewDataAgg = async (params, client = db) => {
+export const countViewDataAgg = (params: any, client: DbClient = db) => {
   const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null } = params
   const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
@@ -115,7 +128,7 @@ export const countViewDataAgg = async (params, client = db) => {
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = async (params, client = db) => {
+export const fetchViewDataAgg = (params: any, client: DbClient = db) => {
   const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null, limit, offset, stream } = params
   const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
@@ -130,6 +143,6 @@ export const fetchViewDataAgg = async (params, client = db) => {
   }
 
   return stream
-    ? new dbUtils.QueryStream(dbUtils.formatQuery(selectWithLimit, queryParamsWithLimit))
+    ? Promise.resolve(new dbUtils.QueryStream(dbUtils.formatQuery(selectWithLimit, queryParamsWithLimit)))
     : client.tx(dbUtils.txOptionsReadOnly, (t) => t.any(selectWithLimit, queryParamsWithLimit))
 }
