@@ -1600,6 +1600,8 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
       'Pitajte o podacima istraživanja: na primjer, "Prosječna visina stabala po parceli". Predlažem upite koje možete otvoriti u Istraživaču podataka.',
     mapLayerCard: {
       title: 'Sloj mape {{label}}',
+      titleLocation: 'Lokacija na mapi',
+      search: 'Pretraži: {{text}}',
       showOnMap: 'Prikaži na mapi',
       missing: 'Ovaj sloj više nije dostupan.',
       noPermission: 'Ne možete otvoriti mapu ovog istraživanja.',

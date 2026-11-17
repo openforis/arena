@@ -1560,6 +1560,8 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       'Pergunte sobre os dados do levantamento: por exemplo, "Altura média das árvores por parcela". Proponho consultas que pode abrir no Explorador.',
     mapLayerCard: {
       title: 'Camada do mapa {{label}}',
+      titleLocation: 'Localização no mapa',
+      search: 'Pesquisar: {{text}}',
       showOnMap: 'Mostrar no mapa',
       missing: 'Esta camada já não está disponível.',
       noPermission: 'Não pode abrir o mapa deste inquérito.',

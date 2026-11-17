@@ -1571,6 +1571,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       "Posez une question sur les données de l'enquête : par exemple, « Hauteur moyenne des arbres par placette ». Je propose des requêtes que vous pouvez ouvrir dans l'Explorateur.",
     mapLayerCard: {
       title: 'Couche de carte {{label}}',
+      titleLocation: 'Emplacement sur la carte',
+      search: 'Rechercher : {{text}}',
       showOnMap: 'Afficher sur la carte',
       missing: "Cette couche n'est plus disponible.",
       noPermission: 'Vous ne pouvez pas ouvrir la carte de cette enquête.',

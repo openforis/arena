@@ -1438,6 +1438,8 @@ $t(common.appNameFull)
       'Pregunte sobre los datos de la encuesta: por ejemplo, "Altura media de los árboles por parcela". Propongo consultas que puede abrir en el Explorador.',
     mapLayerCard: {
       title: 'Capa del mapa {{label}}',
+      titleLocation: 'Ubicación en el mapa',
+      search: 'Buscar: {{text}}',
       showOnMap: 'Mostrar en el mapa',
       missing: 'Esta capa ya no está disponible.',
       noPermission: 'No puede abrir el mapa de esta encuesta.',
