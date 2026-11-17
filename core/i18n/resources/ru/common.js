@@ -1655,7 +1655,7 @@ $t(common.cantUndoWarning)`,
       title: 'Слой карты {{label}}',
       showOnMap: 'Показать на карте',
       missing: 'Этот слой больше недоступен.',
-      noPermission: 'Вы не можете открыть карту этого обследования.',
+      noPermission: 'Вы не можете открыть карту этого опроса.',
     },
     queryCard: {
       title: 'Запрос {{queryId}}',

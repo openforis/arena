@@ -26,6 +26,7 @@ const cannedAnswerPatterns = [
 const e2eMessages = {
   propose: 'average of tree_dec_1 by cluster_id',
   run: 'run the average of tree_dec_1 by cluster_id',
+  map: 'show cluster_coordinate on the map',
 }
 
 const user = { uuid: 'test-ai-analysis-mock-scripts-user' }
@@ -88,7 +89,7 @@ describe('analysis mock scripts', () => {
 
   test('the map script proposes a layer of the e2e survey', async () => {
     const survey = await buildSurvey()
-    const script = assistantAnalysisMockScripts.find((s) => s.pattern.test('show cluster_coordinate on the map'))!
+    const script = assistantAnalysisMockScripts.find((s) => s.pattern.test(e2eMessages.map))!
     const [propose] = toolCalls(script)
     expect(propose.toolName).toBe('map_proposeLayer')
     const { attribute } = proposeMapLayerInputSchema.parse(propose.input)

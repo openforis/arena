@@ -75,6 +75,10 @@ describe('translations', () => {
       [
         'area',
         'empty',
+        'mapLayerCard.missing',
+        'mapLayerCard.noPermission',
+        'mapLayerCard.showOnMap',
+        'mapLayerCard.title',
         'queryCard.columns',
         'queryCard.filter',
         'queryCard.missing',

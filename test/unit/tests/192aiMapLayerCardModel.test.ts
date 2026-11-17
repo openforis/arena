@@ -63,6 +63,10 @@ describe('fitLayerBounds', () => {
     ]
     expect(fitLayerBounds(map, points)).toBe(true)
     expect(map.fitBounds).toHaveBeenCalledTimes(1)
+    expect(map.fitBounds.mock.calls[0][0]).toEqual([
+      [41, 12],
+      [42, 13],
+    ])
     expect(map.fitBounds.mock.calls[0][1]).toEqual({ padding: [32, 32], maxZoom: 16 })
   })
 })

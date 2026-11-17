@@ -1550,7 +1550,7 @@ $t(common.cantUndoWarning)`,
       '調査データについて質問してください。例:「区画ごとの平均樹高」。エクスプローラーで開けるクエリを提案します。',
     mapLayerCard: {
       title: '地図レイヤー {{label}}',
-      showOnMap: '地図で表示する',
+      showOnMap: '地図に表示',
       missing: 'このレイヤーは利用できなくなりました。',
       noPermission: 'この調査の地図を開けません。',
     },
