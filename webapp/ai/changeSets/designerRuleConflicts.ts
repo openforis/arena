@@ -6,7 +6,12 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { getOperationNodeDefUuid } from './operations'
-import { applyOperations, checkOtherExpressions, validateTouchedNodeDefs } from './previewChangeSet'
+import {
+  applyOperations,
+  checkOtherExpressions,
+  validateTouchedNodeDefs,
+  withDependencyGraphForRenames,
+} from './previewChangeSet'
 import { isRecordEditOperation } from './recordEdits/types'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import type { ChangeSet, ConflictReason, NodeDefOperation, OperationConflict } from './types'
@@ -118,7 +123,11 @@ export const findValidationConflicts = async ({
   // a create that is not selected will not be saved: what depends on it is invalid
   const operations = selectOperations(changeSet, survey, operationIds, true)
   const subset = { ...changeSet, operations }
-  const { draft, firstOperationByUuid } = applyOperations(subset, survey, keepKey)
+  const { draft, firstOperationByUuid } = applyOperations(
+    subset,
+    await withDependencyGraphForRenames(subset, survey),
+    keepKey
+  )
   const issues = [
     ...(await validateTouchedNodeDefs(draft, firstOperationByUuid, keepKey)),
     ...(await checkOtherExpressions(subset, draft, keepKey)),

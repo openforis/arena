@@ -6,7 +6,8 @@ import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
-import { buildAssistantSurvey, fakeT, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { buildAssistantSurvey, fakeT, getDefByName, testUser } from '@test/unit/utils/assistantTestUtils'
+import * as SB from '@test/utils/surveyBuilder'
 
 let survey: any
 let counter = 0
@@ -301,5 +302,30 @@ describe('previewChangeSet', () => {
 
   test('a root label can be translated', async () => {
     expect((await preview([labelDraft('cluster', 'en', 'Cluster plot')])).validation.valid).toBe(true)
+  })
+
+  test('renaming a node def that another node def expression references is an issue on the rename', async () => {
+    const dependentSurvey: any = await SB.survey(
+      testUser,
+      SB.entity(
+        'cluster',
+        SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
+        SB.attribute('cluster_code', NodeDef.nodeDefType.integer).defaultValues(
+          NodeDefExpression.createExpression({ expression: 'cluster_id' })
+        )
+      )
+    ).build()
+    const withId = { ...dependentSurvey, id: 7 }
+    const renamed = getDefByName(withId, 'cluster_id')
+    const changeSet = buildChangeSet({
+      drafts: [
+        { type: 'nodeDef.update', nodeDefUuid: NodeDef.getUuid(renamed), prop: 'name', from: 'cluster_id', to: 'cid' },
+      ],
+      survey: withId,
+      summary: 'test',
+    })
+    const result = await previewChangeSet(changeSet, withId, { t: fakeT })
+    expect(result.validation.valid).toBe(false)
+    expect(result.validation.issues[0]).toMatchObject({ operation: 0 })
   })
 })

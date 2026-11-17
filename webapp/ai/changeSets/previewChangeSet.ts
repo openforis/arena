@@ -176,6 +176,18 @@ const checkDuplicate = (op: NodeDefOperation, seenKeys: Set<string>, survey: any
   return issue(t, field, 'duplicateOperation', { name: nodeDef ? NodeDef.getName(nodeDef) : '' })
 }
 
+const isRename = (op: ChangeSet['operations'][number]): boolean => op.type === 'nodeDef.update' && op.prop === 'name'
+
+/**
+ * Returns the survey with its dependency graph when the change set renames a node def (the graph tells which node defs
+ * use the old name in an expression). The graph holds uuids: it stays valid after the rename.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey.
+ * @returns {Promise<object>} The survey to apply the operations to.
+ */
+export const withDependencyGraphForRenames = async (changeSet: ChangeSet, survey: any): Promise<any> =>
+  changeSet.operations.some(isRename) ? Survey.buildAndAssocDependencyGraph(survey) : survey
+
 /**
  * Applies the operations in order to a copy of the survey, skipping (and reporting) those with structural issues.
  * @param {ChangeSet} changeSet - Change set.
@@ -200,6 +212,12 @@ export const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate)
     draft = applyOperationToSurvey(draft, op)
     const uuid = getOperationNodeDefUuid(op)
     if (!firstOperationByUuid.has(uuid)) firstOperationByUuid.set(uuid, index)
+    // the expressions of the node defs depending on a renamed one use the old name: validate them too
+    if (isRename(op)) {
+      for (const dependentUuid of Survey.getNodeDefDependentsUuids(uuid)(draft)) {
+        if (!firstOperationByUuid.has(dependentUuid)) firstOperationByUuid.set(dependentUuid, index)
+      }
+    }
   }
   return { draft, issues, firstOperationByUuid }
 }
@@ -250,7 +268,11 @@ export const previewChangeSet = async (
   survey: any,
   { t }: { t: Translate }
 ): Promise<ChangeSetPreview> => {
-  const { draft, issues, firstOperationByUuid } = applyOperations(changeSet, survey, t)
+  const { draft, issues, firstOperationByUuid } = applyOperations(
+    changeSet,
+    await withDependencyGraphForRenames(changeSet, survey),
+    t
+  )
   issues.push(...checkCategoryItemLabels(changeSet, survey, t))
   if (issues.length === 0) {
     issues.push(...(await validateTouchedNodeDefs(draft, firstOperationByUuid, t)))
