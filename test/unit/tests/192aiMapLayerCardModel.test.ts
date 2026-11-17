@@ -15,9 +15,9 @@ beforeAll(async () => {
 })
 
 describe('map layer card model', () => {
-  const model = (attributeUuid: string, canUseMap = true) =>
+  const model = (attributeUuid: string | null, canUseMap = true, search: string | null = null) =>
     getMapLayerCardModel({
-      proposed: { attributeUuid, attribute: 'x', search: null, explanation: 'Why', shownToUser: true },
+      proposed: { attributeUuid, attribute: 'x', search, explanation: 'Why', shownToUser: true },
       survey,
       lang: 'en',
       canUseMap,
@@ -33,6 +33,24 @@ describe('map layer card model', () => {
     expect(result.label).toBeTruthy()
     expect(result.uuid).toBe(uuid)
     expect(result.explanation).toBe('Why')
+  })
+
+  test('layer plus search keeps the search', () => {
+    const result = model(getUuid('cluster/plot/plot_location'), true, 'EP')
+    expect(result.status).toBe('ok')
+    expect(result.search).toBe('EP')
+  })
+
+  test('coordinates only is ok without label or uuid', () => {
+    expect(model(null, true, '41,12')).toMatchObject({ status: 'ok', label: null, uuid: null, search: '41,12' })
+  })
+
+  test('coordinates only without permission', () => {
+    expect(model(null, false).status).toBe('noPermission')
+  })
+
+  test('a deleted attribute with a search is missing', () => {
+    expect(model('00000000-0000-0000-0000-000000000000', true, 'EP').status).toBe('missing')
   })
 
   test('an unknown uuid is missing', () => {

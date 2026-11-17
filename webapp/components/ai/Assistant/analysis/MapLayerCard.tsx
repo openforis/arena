@@ -33,12 +33,20 @@ export const MapLayerCard = ({ proposed }: { proposed: ProposedMapLayer }) => {
   if (model.status === 'missing') {
     return <div className="ai-query-card ai-query-card--missing">{i18n.t('aiAnalysis.mapLayerCard.missing')}</div>
   }
-  const { uuid } = model
+  const { uuid, search } = model
+  const key = uuid ?? 'location'
   return (
-    <div className="ai-query-card" data-testid={TestId.aiMapLayerCard.root(uuid)}>
+    <div className="ai-query-card" data-testid={TestId.aiMapLayerCard.root(key)}>
       <div className="ai-query-card__title">
-        {i18n.t('aiAnalysis.mapLayerCard.title', { label: model.label, interpolation: { escapeValue: false } })}
+        {model.label === null
+          ? i18n.t('aiAnalysis.mapLayerCard.titleLocation')
+          : i18n.t('aiAnalysis.mapLayerCard.title', { label: model.label, interpolation: { escapeValue: false } })}
       </div>
+      {search && (
+        <p className="ai-query-card__explanation">
+          {i18n.t('aiAnalysis.mapLayerCard.search', { text: search, interpolation: { escapeValue: false } })}
+        </p>
+      )}
       <p className="ai-query-card__explanation">{model.explanation}</p>
       {model.status === 'noPermission' ? (
         <div className="ai-query-card--missing">{i18n.t('aiAnalysis.mapLayerCard.noPermission')}</div>
@@ -48,8 +56,8 @@ export const MapLayerCard = ({ proposed }: { proposed: ProposedMapLayer }) => {
             className="btn-s"
             iconClassName="icon-map icon-12px"
             label="aiAnalysis.mapLayerCard.showOnMap"
-            onClick={() => void navigate(appModuleUri(dataModules.map), { state: { aiMapLayer: { uuid } } })}
-            testId={TestId.aiMapLayerCard.showOnMap(uuid)}
+            onClick={() => void navigate(appModuleUri(dataModules.map), { state: { aiMapLayer: { uuid, search } } })}
+            testId={TestId.aiMapLayerCard.showOnMap(key)}
             variant="outlined"
           />
         </div>

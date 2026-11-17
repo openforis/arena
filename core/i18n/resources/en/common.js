@@ -1547,6 +1547,8 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       'Ask about the survey data: for example, "Average tree height by plot". I propose queries that you can open in the Explorer.',
     mapLayerCard: {
       title: 'Map layer {{label}}',
+      titleLocation: 'Map location',
+      search: 'Search: {{text}}',
       showOnMap: 'Show on map',
       missing: 'This layer is no longer available.',
       noPermission: 'You cannot open the map of this survey.',

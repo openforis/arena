@@ -7,7 +7,8 @@ export type MapLayerCardModel = {
   status: 'ok' | 'missing' | 'noPermission'
   label: string | null
   explanation: string
-  uuid: string
+  uuid: string | null
+  search: string | null
 }
 
 /**
@@ -30,8 +31,10 @@ export const getMapLayerCardModel = ({
   lang: string
   canUseMap: boolean
 }): MapLayerCardModel => {
-  const { attributeUuid: uuid, explanation } = proposed
+  const { attributeUuid: uuid, explanation, search } = proposed
+  const status = canUseMap ? 'ok' : 'noPermission'
+  if (uuid === null) return { status, label: null, explanation, uuid, search }
   const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
-  if (!nodeDef || !isMapLayerDef(nodeDef)) return { status: 'missing', label: null, explanation, uuid }
-  return { status: canUseMap ? 'ok' : 'noPermission', label: NodeDef.getLabel(nodeDef, lang), explanation, uuid }
+  if (!nodeDef || !isMapLayerDef(nodeDef)) return { status: 'missing', label: null, explanation, uuid, search }
+  return { status, label: NodeDef.getLabel(nodeDef, lang), explanation, uuid, search }
 }
