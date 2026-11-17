@@ -7,7 +7,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import { FileImportBaseJob } from './filesImportBaseJob'
 
 export default class SurveyFilesImportJob extends FileImportBaseJob {
-  constructor(params) {
+  constructor(params?: any) {
     super('SurveyFilesImportJob', params)
   }
 

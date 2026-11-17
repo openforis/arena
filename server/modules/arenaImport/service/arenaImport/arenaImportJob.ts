@@ -17,7 +17,7 @@ import SurveyFilesImportJob from './jobs/surveyFilesImportJob'
 import CreateRdbJob from './jobs/createRdb'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
-const createInnerJobs = (params) => {
+const createInnerJobs = (params: any) => {
   const { backup = true, options = {} } = params
   const { includeData = true } = options
 
@@ -41,7 +41,7 @@ const createInnerJobs = (params) => {
   ]
 }
 
-const transformParams = (params) => {
+const transformParams = (params: any) => {
   const { backup: backupParam = true, options = { includeData: true }, ...paramsRest } = params
   const { includeData } = options
   const backup = backupParam && includeData
@@ -49,6 +49,8 @@ const transformParams = (params) => {
 }
 
 export default class ArenaImportJob extends Job {
+  static readonly type = 'ArenaImportJob'
+
   /**
    * Creates a new import job to import a survey in Arena format.
    * Records, files and activity log will be importin only when restoring a backup.
@@ -60,17 +62,18 @@ export default class ArenaImportJob extends Job {
    * @param {object} [params.surveyInfoTarget] - Target survey info (optional).
    * @returns {ArenaImportJob} - The import job.
    */
-  constructor(params) {
+  constructor(params?: any) {
     const paramsTransformed = transformParams(params)
     super(ArenaImportJob.type, paramsTransformed, createInnerJobs(paramsTransformed))
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { surveyId } = this.context
 
     this.setResult({
       surveyId,
     })
+    return Promise.resolve()
   }
 
   async onEnd() {
@@ -95,5 +98,3 @@ export default class ArenaImportJob extends Job {
     }
   }
 }
-
-ArenaImportJob.type = 'ArenaImportJob'

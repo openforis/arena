@@ -12,7 +12,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
  * Saves the list of inserted categories in the "categories" context property.
  */
 export default class CategoriesImportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('CategoriesImportJob', params)
   }
 

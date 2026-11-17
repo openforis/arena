@@ -9,7 +9,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import { FileImportBaseJob } from './filesImportBaseJob'
 
 export default class FilesImportJob extends FileImportBaseJob {
-  constructor(params) {
+  constructor(params?: any) {
     super('FilesImportJob', params)
   }
 
@@ -65,12 +65,12 @@ export default class FilesImportJob extends FileImportBaseJob {
     }
   }
 
-  async fetchFilesSummaries() {
+  fetchFilesSummaries() {
     const { arenaSurveyFileZip } = this.context
     return ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
   }
 
-  async fetchFileContent({ fileName: _fileName, fileUuid }) {
+  fetchFileContent({ fileName: _fileName, fileUuid }) {
     const { arenaSurveyFileZip } = this.context
     return ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
   }

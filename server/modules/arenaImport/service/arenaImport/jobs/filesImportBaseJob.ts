@@ -6,7 +6,12 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 import Job from '@server/job/job'
 
 export class FileImportBaseJob extends Job {
-  constructor(type, params) {
+  deletedFileUuids: string[]
+  insertedFileUuids: string[]
+  missingFileSummaries: any
+  updatedFileUuids: string[]
+
+  constructor(type: string, params?: any) {
     super(type, params)
     this.insertedFileUuids = []
     this.updatedFileUuids = []

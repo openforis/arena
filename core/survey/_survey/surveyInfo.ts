@@ -128,9 +128,9 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
 
 export const isPreloadedMapLayersEnabled = ObjectUtils.isPropTrue(keys.preloadedMapLayersEnabled)
 
-export const getPreloadedMapLayers = ObjectUtils.getProp(keys.preloadedMapLayers, [])
+export const getPreloadedMapLayers = ObjectUtils.getProp<Record<string, any>[]>(keys.preloadedMapLayers, [])
 
-export const getSurveyDocImages = ObjectUtils.getProp(keys.surveyDocImages, [])
+export const getSurveyDocImages = ObjectUtils.getProp<Record<string, any>[]>(keys.surveyDocImages, [])
 
 export const getSurveyDocOptions = ObjectUtils.getProp(keys.surveyDocOptions, {})
 

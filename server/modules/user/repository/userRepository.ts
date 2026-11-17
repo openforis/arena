@@ -51,7 +51,7 @@ export const importNewUser = (
     profilePicture,
   }: {
     surveyId: number
-    surveyCycleKey: any
+    surveyCycleKey?: string
     name: string
     uuid: any
     email: string
