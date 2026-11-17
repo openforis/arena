@@ -1,12 +1,13 @@
-import type {
-  User as ArenaUser,
-  Survey as ArenaSurvey,
-  Message,
-  Validation as ArenaValidation,
-} from '@openforis/arena-core'
 import * as fs from 'node:fs'
 
-import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
+import {
+  Authorizer,
+  ServiceRegistry,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type Message,
+  type Validation as ArenaValidation,
+} from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db, DbClient } from '@server/db/db'

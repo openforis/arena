@@ -1,14 +1,13 @@
-import type { ValidationResult as ArenaValidationResult } from '@openforis/arena-core'
-import { NodeDefExpressionValidator, ValidationResult } from '@openforis/arena-core'
-
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
 import {
+  NodeDefExpressionValidator,
   SurveyDocImages,
   surveyDocImagePropKeys as propKeys,
+  ValidationResult,
   type SurveyDocImage,
   type Survey as ArenaSurvey,
 } from '@openforis/arena-core'
@@ -32,7 +31,7 @@ const validateExpression =
       selfReferenceAllowed: true,
     })
     return validationResult && !validationResult.valid
-      ? (Validation.newInstance(false, {}, [validationResult as ArenaValidationResult]) as any)
+      ? (Validation.newInstance(false, {}, [validationResult as ValidationResult]) as any)
       : null
   }
 

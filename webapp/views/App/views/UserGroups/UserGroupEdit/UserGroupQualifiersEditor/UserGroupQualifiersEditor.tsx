@@ -1,7 +1,6 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { UserGroupQualifier as UserGroupQualifierType } from '@openforis/arena-core'
+import { UserGroupQualifier as UserGroupQualifierType, type Validation as ArenaValidation } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as StringUtils from '@core/stringUtils'

@@ -1,4 +1,3 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import '../form.scss'
 
 import React, { useCallback, useRef } from 'react'
@@ -6,7 +5,7 @@ import { NumericFormat, OnValueChange } from 'react-number-format'
 import classNames from 'classnames'
 import { TextField } from '@mui/material'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type Validation as ArenaValidation } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconCancel } from '@webapp/components/buttons'

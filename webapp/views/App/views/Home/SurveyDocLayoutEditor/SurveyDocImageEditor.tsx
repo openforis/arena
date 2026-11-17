@@ -1,4 +1,3 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import './SurveyDocImageEditor.scss'
 
 import { useCallback, useEffect, useState } from 'react'
@@ -9,6 +8,7 @@ import {
   SurveyDocPlace,
   surveyDocImagePropKeys,
   type SurveyDocImage,
+  type Validation as ArenaValidation,
 } from '@openforis/arena-core'
 
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'

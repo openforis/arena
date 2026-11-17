@@ -1,5 +1,4 @@
-import { Dates } from '@openforis/arena-core'
-import type { Chain as ArenaChain, Validation as ArenaValidation } from '@openforis/arena-core'
+import { Dates, type Chain as ArenaChain, type Validation as ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

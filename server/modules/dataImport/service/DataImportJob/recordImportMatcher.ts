@@ -1,5 +1,11 @@
-import type { Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
-import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
+import {
+  Dates,
+  Objects,
+  Records,
+  Surveys,
+  type Record as ArenaRecord,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
