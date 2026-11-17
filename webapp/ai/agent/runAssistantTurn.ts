@@ -12,6 +12,7 @@ import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConver
 
 import { getConversationDataClass, isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
+import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
@@ -206,8 +207,12 @@ const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined =
 const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
   const answer = after.messages.at(-1)
   const hasText = answer?.role === 'assistant' && answer.parts.some((part) => part.type === 'text' && part.text.trim())
-  // a new change set is shown for review; a query alone is not an answer
-  return !hasText && Object.keys(after.changeSets).length === Object.keys(before.changeSets).length
+  if (hasText || Object.keys(after.changeSets).length > Object.keys(before.changeSets).length) return false
+  // a new query card answers (the only answer without data access), unless it repeats an earlier query
+  const earlier = Object.values(before.queries ?? {})
+  return !Object.values(after.queries ?? {}).some(
+    (entry) => !before.queries?.[entry.id] && !earlier.some((old) => isDeepEqual(old.query, entry.query))
+  )
 }
 
 /**

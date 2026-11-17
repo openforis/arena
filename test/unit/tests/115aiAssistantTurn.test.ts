@@ -254,17 +254,32 @@ describe('runAssistantTurn', () => {
     expect(answerOf(result).status).toBe('done')
   })
 
-  test('a turn that only adds a query, without a written answer, is an error', async () => {
+  const queryOnlyTurn = (conversation?: Conversation) => {
     const addQuery = makeTool('test_query', async (_input, ctx) => {
-      ctx.analysisQueries?.add({ query: {}, explanation: 'E', entityName: 'tree', mode: 'raw' } as any)
+      ctx.analysisQueries?.add({ query: { a: 1 }, explanation: 'E', entityName: 'tree', mode: 'raw' } as any)
       return { ok: true }
     })
     const model = scriptedModel(
       () => toolCallStream('c1', 'test_query', { summary: 'x' }),
       () => convertArrayToReadableStream([{ type: 'stream-start', warnings: [] }, finish('stop')] as any[])
     )
-    const result = await run({ model, tools: [addQuery] })
+    return run({ model, tools: [addQuery], ...(conversation ? { conversation } : {}) })
+  }
+
+  test('a turn that only adds a new query, without a written answer, is done: the query card answers', async () => {
+    const result = await queryOnlyTurn()
     expect(Object.keys(result.queries ?? {})).toEqual(['q1'])
+    expect(answerOf(result).status).toBe('done')
+  })
+
+  test('a turn that only repeats an earlier query, without a written answer, is an error', async () => {
+    const entry = { query: { a: 1 }, explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
+    const conversation = {
+      ...createConversation({ userUuid: 'user-1', surveyId: 7, area: 'analysis' }),
+      queries: { q1: { ...entry, id: 'q1' } },
+    } as Conversation
+    const result = await queryOnlyTurn(conversation)
+    expect(Object.keys(result.queries ?? {})).toEqual(['q1', 'q2'])
     expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: STEP_LIMIT_ERROR_KEY })
   })
 
