@@ -1,10 +1,11 @@
+import type { DbClient } from '@server/db/db'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as DbUtils from '@server/db/dbUtils'
 import * as ImportReportRepository from '@server/modules/importReport/repository/importReportRepository'
 
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { Schemata } from '@common/model/db'
 
 // Table-level CRUD (fetchItems/countItems/insertItem/insertItems/updateItem) is shared with the ODK
 // importer via ImportReportRepository - see its header comment and
@@ -12,10 +13,17 @@ import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositor
 // per-language `messages` column projection is specific to Collect's report-item prop shape.
 const source = 'collect'
 
-export const fetchItems = async ({ surveyId, excludeResolved = false, offset = 0, limit = null }, client) =>
-  ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
+export const fetchItems = (
+  {
+    surveyId,
+    excludeResolved = false,
+    offset = 0,
+    limit = null,
+  }: { surveyId: number; excludeResolved?: any; offset?: number; limit?: number | null },
+  client?: DbClient
+) => ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
 
-export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
+export const fetchItemsStream = ({ surveyId, messageLangCode }: { surveyId: number; messageLangCode: any }) => {
   const select = `
       SELECT
         cr.id,
@@ -27,8 +35,8 @@ export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
         (cr.props)#>>$/messagePath/::text[] as message,
         cr.props as props,
         cr.resolved as resolved
-      FROM ${getSurveyDBSchema(surveyId)}.import_report cr
-      JOIN ${getSurveyDBSchema(surveyId)}.node_def nd on nd.uuid = cr.node_def_uuid
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.import_report cr
+      JOIN ${Schemata.getSchemaSurvey(surveyId)}.node_def nd on nd.uuid = cr.node_def_uuid
       WHERE cr.source = 'collect'
       ORDER BY id
    `
@@ -38,10 +46,12 @@ export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
   )
 }
 
-export const countItems = async ({ surveyId, excludeResolved }, client) =>
-  ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
+export const countItems = (
+  { surveyId, excludeResolved }: { surveyId: number; excludeResolved: any },
+  client?: DbClient
+) => ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
 
-export const insertItem = async (surveyId, item, client) =>
+export const insertItem = (surveyId: number, item: any, client: DbClient) =>
   ImportReportRepository.insertItem(
     surveyId,
     source,
@@ -53,7 +63,7 @@ export const insertItem = async (surveyId, item, client) =>
     client
   )
 
-export const insertItems = async ({ surveyId, items = [] }, client) =>
+export const insertItems = ({ surveyId, items = [] }: { surveyId: number; items?: any[] }, client: DbClient) =>
   ImportReportRepository.insertItems(
     {
       surveyId,
@@ -67,5 +77,10 @@ export const insertItems = async ({ surveyId, items = [] }, client) =>
     client
   )
 
-export const updateItem = async (surveyId, itemId, props, resolved, client) =>
-  ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)
+export const updateItem = (
+  surveyId: number,
+  itemId: number,
+  props: Record<string, any>,
+  resolved: any,
+  client: DbClient
+) => ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)

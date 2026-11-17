@@ -1,3 +1,4 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
@@ -34,7 +35,7 @@ const arenaFileTypeByCollectFileType = {
 }
 
 // coordinate specific props: allowOnlyDeviceCoordinate, accuracy and altitude
-const _extractCoordinateProps = (collectNodeDef) => {
+const _extractCoordinateProps = (collectNodeDef: CollectSurvey.CollectNodeDef) => {
   const props = {}
   for (const [uiAttributeName, propKey] of [
     ['allowOnlyDeviceCoordinate', NodeDef.propKeys.allowOnlyDeviceCoordinate],
@@ -49,12 +50,18 @@ const _extractCoordinateProps = (collectNodeDef) => {
 }
 
 // text input type (short/memo => singleLine/multiLine)
-const _extractTextProps = (collectNodeDef) =>
+const _extractTextProps = (collectNodeDef: CollectSurvey.CollectNodeDef) =>
   CollectSurvey.getAttribute('type', 'short')(collectNodeDef) === 'memo'
     ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
     : {}
 
-const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
+const _updateVisibilityLayoutProps = ({
+  collectNodeDef,
+  updateLayoutProp,
+}: {
+  collectNodeDef: CollectSurvey.CollectNodeDef
+  updateLayoutProp: any
+}) => {
   const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
   if (hiddenWhenNotRelevant) {
     updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
@@ -68,7 +75,17 @@ const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
   }
 }
 
-const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath, nodeDefUuid, field }) => {
+const _addNodeDefInfoToCache = ({
+  nodeDefsInfoByCollectPath,
+  collectNodeDefPath,
+  nodeDefUuid,
+  field,
+}: {
+  nodeDefsInfoByCollectPath: Record<string, any>
+  collectNodeDefPath: string
+  nodeDefUuid: string
+  field: any
+}) => {
   let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
   if (!nodeDefsInfo) {
     nodeDefsInfo = []
@@ -81,7 +98,13 @@ const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath,
 }
 
 export default class NodeDefsImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'NodeDefsImportJob'
+  importIssues: any
+  nodeDefUniqueNameGenerator: any
+  nodeDefs: any
+  nodeDefsInfoByCollectPath: Record<string, any>
+
+  constructor(params?: any) {
     super(NodeDefsImportJob.type, params)
 
     this.nodeDefs = {} // Node definitions by uuid
@@ -129,7 +152,21 @@ export default class NodeDefsImportJob extends Job {
     })
   }
 
-  _buildNodeDefProps({ parentNodeDef, collectNodeDef, type, field, multiple, tableLayout }) {
+  _buildNodeDefProps({
+    parentNodeDef,
+    collectNodeDef,
+    type,
+    field,
+    multiple,
+    tableLayout,
+  }: {
+    parentNodeDef: ArenaNodeDef<NodeDefType>
+    collectNodeDef: CollectSurvey.CollectNodeDef
+    type: any
+    field: string | null
+    multiple: any
+    tableLayout: any
+  }) {
     const { defaultLanguage } = this.context
     const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
     const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
@@ -179,7 +216,13 @@ export default class NodeDefsImportJob extends Job {
    * @param {string} field - Node sub-field.
    * @returns {Promise<object>} - Inserted node definitions.
    */
-  async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
+  async insertNodeDef(
+    parentNodeDef: ArenaNodeDef<NodeDefType> | null,
+    parentPath: string,
+    collectNodeDef: CollectSurvey.CollectNodeDef,
+    type: string,
+    field: string | null = null
+  ) {
     const nodeDefsUpdated = {}
     const nodeDefsInserted = {}
 
@@ -235,7 +278,7 @@ export default class NodeDefsImportJob extends Job {
       }
     } else if (type === NodeDef.nodeDefType.code) {
       // 3b. Add parent code def uuid
-      const parentCodeDefUuid = await this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
+      const parentCodeDefUuid = this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
       if (parentCodeDefUuid) {
         propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
       }
@@ -323,7 +366,7 @@ export default class NodeDefsImportJob extends Job {
     return childrenUuids
   }
 
-  extractLabels(collectNodeDef, type, field, defaultLang) {
+  extractLabels(collectNodeDef: CollectSurvey.CollectNodeDef, type: string, field: string | null, defaultLang: string) {
     let suffix = field ? ` (${field})` : ''
     if (type === NodeDef.nodeDefType.integer || type === NodeDef.nodeDefType.decimal) {
       // Add unit suffix to every label, if specified
@@ -338,7 +381,15 @@ export default class NodeDefsImportJob extends Job {
     return CollectSurvey.toLabels('label', defaultLang, ['instance', 'heading'], suffix)(collectNodeDef)
   }
 
-  async extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef }) {
+  async extractNodeDefAdvancedProps({
+    nodeDef,
+    type,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaNodeDef<NodeDefType>
+    type: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
 
@@ -414,7 +465,17 @@ export default class NodeDefsImportJob extends Job {
 
   // Collect "requiredIf" (attribute required when a condition is met) -> Arena "required if" (single non-key attributes
   // not always required only)
-  async parseRequiredIf({ nodeDef, type, multiple, collectNodeDef }) {
+  async parseRequiredIf({
+    nodeDef,
+    type,
+    multiple,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaNodeDef<NodeDefType>
+    type: any
+    multiple: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
     const requiredIfExpr = CollectSurvey.getAttribute('requiredIf')(collectNodeDef)
     if (
       StringUtils.isBlank(requiredIfExpr) ||
@@ -489,7 +550,13 @@ export default class NodeDefsImportJob extends Job {
     }
   }
 
-  async parseDefaultValues({ nodeDef, collectNodeDef }) {
+  async parseDefaultValues({
+    nodeDef,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaNodeDef<NodeDefType>
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
     const { defaultLanguage } = this.context
 
     const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
@@ -506,7 +573,13 @@ export default class NodeDefsImportJob extends Job {
     return defaultValues
   }
 
-  async parseValidationRules({ nodeDef, collectNodeDef }) {
+  async parseValidationRules({
+    nodeDef,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaNodeDef<NodeDefType>
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
     const { defaultLanguage } = this.context
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
@@ -621,7 +694,7 @@ export default class NodeDefsImportJob extends Job {
     this.total = count
   }
 
-  async _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
+  _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
     const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
     if (collectCodeParentExpr) {
       // starting from the node def parent path, find the path of the node referenced by collectCodeParentExpr
@@ -667,10 +740,14 @@ export default class NodeDefsImportJob extends Job {
   }
 }
 
-const _createNodeDef = (parentNodeDef, type, props, propsAdvanced = {}) =>
-  NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
+const _createNodeDef = (
+  parentNodeDef: ArenaNodeDef<NodeDefType>,
+  type: any,
+  props: Record<string, any>,
+  propsAdvanced = {}
+) => NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
 
-const determineNodeDefPageUuid = (type, collectNodeDef) => {
+const determineNodeDefPageUuid = (type: any, collectNodeDef: CollectSurvey.CollectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {
     const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
     if (multiple) {
@@ -692,5 +769,3 @@ const determineNodeDefPageUuid = (type, collectNodeDef) => {
   // Attribute => parent page
   return null
 }
-
-NodeDefsImportJob.type = 'NodeDefsImportJob'

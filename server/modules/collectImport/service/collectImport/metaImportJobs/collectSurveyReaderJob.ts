@@ -11,7 +11,7 @@ const idmlXmlFileName = 'idml.xml'
  * Reads the schema from a Collect backup file and saves it into the job context under idmlSource property
  */
 export default class CollectSurveyReaderJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('CollectSurveyReaderJob', params)
   }
 

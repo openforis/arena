@@ -1,6 +1,8 @@
 import * as Validator from '@core/validation/validator'
 
 export default class NodeDefUniqueNameGenerator {
+  names: any
+
   constructor() {
     this.names = []
   }

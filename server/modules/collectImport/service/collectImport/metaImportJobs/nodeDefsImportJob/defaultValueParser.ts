@@ -1,13 +1,24 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
+import * as Log from '@server/log/log'
+
 import * as CollectSurvey from '../../model/collectSurvey'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
-const parseConstantValue = async ({ survey, nodeDef, value }) => {
+const parseConstantValue = async ({
+  survey,
+  nodeDef,
+  value,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  value: unknown
+}) => {
   if (NodeDef.isBoolean(nodeDef)) {
     const valueConverted = await CollectExpressionConverter.convert({
       survey,
@@ -19,12 +30,24 @@ const parseConstantValue = async ({ survey, nodeDef, value }) => {
   return JSON.stringify(value)
 }
 
-const parseDefaultValue = async ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
+const logger = Log.getLogger('CollectDefaultValueParser')
+
+const parseDefaultValue = async ({
+  survey,
+  collectDefaultValue,
+  nodeDef,
+  defaultLanguage,
+}: {
+  survey: ArenaSurvey
+  collectDefaultValue: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  defaultLanguage: any
+}) => {
   const { value, expr: collectExpr, if: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
 
   if (StringUtils.isBlank(value) && StringUtils.isBlank(collectExpr)) {
     // empty default value, skip it
-    this.logDebug('empty value found in node def default value constant value and expression')
+    logger.debug('empty value found in node def default value constant value and expression')
     return null
   }
 
@@ -67,7 +90,17 @@ const parseDefaultValue = async ({ survey, collectDefaultValue, nodeDef, default
   }
 }
 
-export const parseDefaultValues = async ({ survey, nodeDef, collectDefaultValues, defaultLanguage }) => {
+export const parseDefaultValues = async ({
+  survey,
+  nodeDef,
+  collectDefaultValues,
+  defaultLanguage,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  collectDefaultValues: any
+  defaultLanguage: any
+}) => {
   const defaultValues = []
   const importIssues = []
 

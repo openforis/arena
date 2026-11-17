@@ -1,3 +1,10 @@
+import type {
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  ArenaRecordNode,
+  Record as ArenaRecord,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
@@ -12,7 +19,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
 import * as CollectRecord from '../model/collectRecord'
@@ -20,7 +27,7 @@ import * as CollectSurvey from '../model/collectSurvey'
 
 const { nodeDefType } = NodeDef
 
-const extractTextValueAndMeta = (collectNode, collectNodeField = 'value') => {
+const extractTextValueAndMeta = (collectNode: CollectRecord.CollectNode, collectNodeField = 'value') => {
   const value = CollectRecord.getTextValue(collectNodeField)(collectNode)
   return value ? { value } : null
 }
@@ -33,6 +40,14 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
   record,
   parentNode,
   client = db,
+}: {
+  survey: ArenaSurvey
+  categoryItemProvider: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  code: string
+  record: ArenaRecord
+  parentNode: ArenaRecordNode
+  client?: DbClient
 }) => {
   const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy({
     nodeDef,
@@ -61,7 +76,7 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
 
 const extractCodeValueAndMeta =
   ({ survey, categoryItemProvider, nodeDef, record, node, tx }) =>
-  async (collectNode) => {
+  async (collectNode: CollectRecord.CollectNode) => {
     const code = CollectRecord.getTextValue('code')(collectNode)
     if (Objects.isEmpty(code)) {
       return null
@@ -87,7 +102,13 @@ const extractCodeValueAndMeta =
     }
   }
 
-const extractCoordinateValueAndMeta = ({ nodeDef, collectNode }) => {
+const extractCoordinateValueAndMeta = ({
+  nodeDef,
+  collectNode,
+}: {
+  nodeDef: ArenaNodeDef<NodeDefType>
+  collectNode: CollectRecord.CollectNode
+}) => {
   const { x, y, srs, accuracy, altitude } = CollectRecord.getTextValues(collectNode)
 
   if (!Objects.isEmpty(x) && !Objects.isEmpty(y) && !Objects.isEmpty(srs)) {
@@ -108,7 +129,7 @@ const extractCoordinateValueAndMeta = ({ nodeDef, collectNode }) => {
   return null
 }
 
-const extractDateValueAndMeta = (collectNode) => {
+const extractDateValueAndMeta = (collectNode: CollectRecord.CollectNode) => {
   const { day, month, year } = CollectRecord.getTextValues(collectNode)
 
   if (!NumberUtils.isInteger(year) || !NumberUtils.isInteger(month) || !NumberUtils.isInteger(day)) {
@@ -118,37 +139,55 @@ const extractDateValueAndMeta = (collectNode) => {
   return { value: DateUtils.formatDateISO(date) }
 }
 
-const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNodeDef, tx) => async (collectNode) => {
-  const { file_name: fileName } = CollectRecord.getTextValues(collectNode)
+const extractFileValueAndMeta =
+  (
+    survey: ArenaSurvey,
+    node: ArenaRecordNode,
+    collectSurveyFileZip: any,
+    collectNodeDef: CollectSurvey.CollectNodeDef,
+    tx: DbClient
+  ) =>
+  async (collectNode: CollectRecord.CollectNode) => {
+    const { file_name: fileName } = CollectRecord.getTextValues(collectNode)
 
-  const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
-  const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${fileName}`)
+    const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
+    const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${fileName}`)
 
-  if (content) {
-    const fileSize = Buffer.byteLength(content)
-    const file = SurveyFile.createFile({
-      name: fileName,
-      size: fileSize,
-      content,
-      recordUuid: Node.getRecordUuid(node),
-      nodeUuid: Node.getUuid(node),
-      type: SurveyFile.SurveyFileType.recordAttachment,
-    })
-    await insertFile(Survey.getId(survey), file, tx)
+    if (content) {
+      const fileSize = Buffer.byteLength(content)
+      const file = SurveyFile.createFile({
+        name: fileName,
+        size: fileSize,
+        content,
+        recordUuid: Node.getRecordUuid(node),
+        nodeUuid: Node.getUuid(node),
+        type: SurveyFile.SurveyFileType.recordAttachment,
+      })
+      await insertFile(Survey.getId(survey), file, tx)
 
-    return {
-      value: {
-        [Node.valuePropsFile.fileUuid]: SurveyFile.getUuid(file),
-        [Node.valuePropsFile.fileName]: fileName,
-        [Node.valuePropsFile.fileSize]: fileSize,
-      },
+      return {
+        value: {
+          [Node.valuePropsFile.fileUuid]: SurveyFile.getUuid(file),
+          [Node.valuePropsFile.fileName]: fileName,
+          [Node.valuePropsFile.fileSize]: fileSize,
+        },
+      }
     }
+
+    return null
   }
 
-  return null
-}
-
-const findTaxonUuid = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
+const findTaxonUuid = async ({
+  survey,
+  taxonProvider,
+  nodeDef,
+  taxonCode,
+}: {
+  survey: ArenaSurvey
+  taxonProvider: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  taxonCode: any
+}) => {
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
   if (taxonUuid) return taxonUuid
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
@@ -158,7 +197,7 @@ const findTaxonUuid = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
 
 const extractTaxonValueAndMeta =
   ({ survey, taxonProvider, nodeDef }) =>
-  async (collectNode) => {
+  async (collectNode: CollectRecord.CollectNode) => {
     const {
       code: taxonCode,
       scientific_name: scientificName,
@@ -191,7 +230,7 @@ const extractTaxonValueAndMeta =
     }
   }
 
-const extractTimeValueAndMeta = (collectNode) => {
+const extractTimeValueAndMeta = (collectNode: CollectRecord.CollectNode) => {
   const { hour, minute } = CollectRecord.getTextValues(collectNode)
 
   const value =
@@ -200,7 +239,28 @@ const extractTimeValueAndMeta = (collectNode) => {
   return { value }
 }
 
-const valueAndMetaExtractorByType = {
+// params of the extraction of the value (and meta) of an Arena attribute from the matching Collect node
+type AttributeValueExtractParams = {
+  survey: ArenaSurvey
+  categoryItemProvider?: any
+  taxonProvider?: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  record?: ArenaRecord
+  node?: ArenaRecordNode
+  collectSurveyFileZip?: any
+  collectNodeDef?: CollectSurvey.CollectNodeDef
+  collectNode: CollectRecord.CollectNode
+  collectNodeField?: string
+  tx?: DbClient
+}
+
+type AttributeValueAndMeta = { value?: unknown; meta?: Record<string, unknown> } | null
+
+type AttributeValueExtractor = (
+  params: AttributeValueExtractParams
+) => AttributeValueAndMeta | Promise<AttributeValueAndMeta>
+
+const valueAndMetaExtractorByType: Record<string, AttributeValueExtractor> = {
   [nodeDefType.boolean]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.code]: ({ collectNode, survey, categoryItemProvider, nodeDef, record, node, tx = db }) =>
     extractCodeValueAndMeta({ survey, categoryItemProvider, nodeDef, record, node, tx })(collectNode),
@@ -210,7 +270,7 @@ const valueAndMetaExtractorByType = {
   [nodeDefType.file]: ({ collectNode, survey, node, collectSurveyFileZip, collectNodeDef, tx }) =>
     extractFileValueAndMeta(survey, node, collectSurveyFileZip, collectNodeDef, tx)(collectNode),
   [nodeDefType.integer]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
-  [nodeDefType.taxon]: async ({ collectNode, survey, taxonProvider, nodeDef }) =>
+  [nodeDefType.taxon]: ({ collectNode, survey, taxonProvider, nodeDef }) =>
     extractTaxonValueAndMeta({ survey, taxonProvider, nodeDef })(collectNode),
   [nodeDefType.text]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.time]: ({ collectNode }) => extractTimeValueAndMeta(collectNode),
@@ -228,12 +288,13 @@ export const extractAttributeValueAndMeta = async ({
   collectNode,
   collectNodeField, // Collect items
   tx,
-}) => {
+}: AttributeValueExtractParams): Promise<AttributeValueAndMeta> => {
   const nodeDefType = NodeDef.getType(nodeDef)
   const valueAndMetaExtractor = valueAndMetaExtractorByType[nodeDefType]
+  // async: an unknown type must reject, not throw
   if (!valueAndMetaExtractor) throw new Error(`Unknown NodeDef type: ${nodeDefType}`)
 
-  return valueAndMetaExtractor({
+  return await valueAndMetaExtractor({
     collectSurveyFileZip,
     collectNode,
     collectNodeDef,

@@ -204,7 +204,7 @@ export const getDatePublished = ObjectUtils.getDate(keys.datePublished)
 
 export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
-export const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
+export const getCollectReport = ObjectUtils.getProp<Record<string, any>>(keys.collectReport, {})
 
 export const hasCollectReportIssues = A.pipe(
   getCollectReport,

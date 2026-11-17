@@ -15,7 +15,7 @@ import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImport
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob/nodeDefsImportJob'
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
-const createInnerJob = (params) => {
+const createInnerJob = (params: any) => {
   const { options = {} } = params
   const { includeData = true } = options
 
@@ -34,16 +34,19 @@ const createInnerJob = (params) => {
 }
 
 export default class CollectImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'CollectImportJob'
+
+  constructor(params?: any) {
     super(CollectImportJob.type, params, createInnerJob(params))
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { surveyId } = this.context
 
     this.setResult({
       surveyId,
     })
+    return Promise.resolve()
   }
 
   async onEnd() {
@@ -64,5 +67,3 @@ export default class CollectImportJob extends Job {
     }
   }
 }
-
-CollectImportJob.type = 'CollectImportJob'
