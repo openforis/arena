@@ -10,13 +10,16 @@ const MAX_MESSAGE_CHARS = 8000
 
 const ALLOWED_ROLES = new Set(['user', 'assistant', 'system'])
 
-const badRequest = (message: any) => {
-  return Object.assign(new Error(message), { key: 'aiChatbotPayloadTooLarge', statusCode: 400 })
+const badRequest = (message) => {
+  const err = new Error(message)
+  err.key = 'aiChatbotPayloadTooLarge'
+  err.statusCode = 400
+  return err
 }
 
-const isTextPart = (p: any) => p && typeof p === 'object' && p.type === 'text' && typeof p.text === 'string'
+const isTextPart = (p) => p && typeof p === 'object' && p.type === 'text' && typeof p.text === 'string'
 
-const validateMessage = (m: any, i: any) => {
+const validateMessage = (m, i) => {
   if (!m || typeof m !== 'object') throw badRequest(`message ${i} is not an object`)
   if (!ALLOWED_ROLES.has(m.role)) throw badRequest(`message ${i} has invalid role`)
   if (!Array.isArray(m.parts) || m.parts.length === 0) throw badRequest(`message ${i} is missing parts`)
@@ -35,7 +38,7 @@ const validateMessage = (m: any, i: any) => {
  * @param {*} messages - Raw input from the request body.
  * @returns {Array} Validated messages.
  */
-export const validateMessages = (messages: any) => {
+export const validateMessages = (messages) => {
   if (!Array.isArray(messages) || messages.length === 0) {
     throw badRequest('messages must be a non-empty array')
   }

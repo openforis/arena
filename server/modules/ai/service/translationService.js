@@ -1,4 +1,3 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
 /**
  * Service for the survey-label translation feature (Tier 1 #1).
  *
@@ -51,9 +50,9 @@ const MAX_GLOSSARY_VALUE_LEN = 200
 // Lang codes are normally short and predictable; the cap is loose enough
 // to accept BCP-47-ish forms (`en`, `pt-BR`, `zh_Hans`) without trying to
 // be a full validator. The point is to bound length, not parse locales.
-const isValidLang = (lang: string) => typeof lang === 'string' && lang.length > 0 && lang.length <= MAX_LANG_CODE_LEN
+const isValidLang = (lang) => typeof lang === 'string' && lang.length > 0 && lang.length <= MAX_LANG_CODE_LEN
 
-const validateLangs = ({ sourceLang, targetLangs }: { sourceLang: any; targetLangs: any }) => {
+const validateLangs = ({ sourceLang, targetLangs }) => {
   if (!sourceLang) throw new SystemError('aiTranslationSourceLangMissing')
   if (!isValidLang(sourceLang)) {
     throw new SystemError('aiInputTooLong', { field: 'sourceLang', limit: MAX_LANG_CODE_LEN })
@@ -69,7 +68,7 @@ const validateLangs = ({ sourceLang, targetLangs }: { sourceLang: any; targetLan
   }
 }
 
-const validateItems = (items: any[]) => {
+const validateItems = (items) => {
   if (!Array.isArray(items) || items.length === 0) {
     throw new SystemError('aiTranslationItemsMissing')
   }
@@ -81,7 +80,7 @@ const validateItems = (items: any[]) => {
   }
 }
 
-const validateGlossaryEntryByLang = (byLang: any) => {
+const validateGlossaryEntryByLang = (byLang) => {
   for (const [lang, value] of Object.entries(byLang)) {
     if (!isValidLang(lang)) {
       throw new SystemError('aiInputTooLong', { field: 'glossary.byLang.key', limit: MAX_LANG_CODE_LEN })
@@ -92,7 +91,7 @@ const validateGlossaryEntryByLang = (byLang: any) => {
   }
 }
 
-const validateGlossary = (glossary: any) => {
+const validateGlossary = (glossary) => {
   if (!Array.isArray(glossary)) return
   if (glossary.length > MAX_GLOSSARY_ENTRIES) {
     throw new SystemError('aiTranslationTooManyItems', { count: glossary.length, limit: MAX_GLOSSARY_ENTRIES })
@@ -107,17 +106,7 @@ const validateGlossary = (glossary: any) => {
   }
 }
 
-const validateTranslateArgs = ({
-  sourceLang,
-  targetLangs,
-  items,
-  glossary,
-}: {
-  sourceLang: any
-  targetLangs: any
-  items: any[]
-  glossary: any
-}) => {
+const validateTranslateArgs = ({ sourceLang, targetLangs, items, glossary }) => {
   validateLangs({ sourceLang, targetLangs })
   validateItems(items)
   validateGlossary(glossary)
@@ -134,22 +123,10 @@ const validateTranslateArgs = ({
  * @returns {Promise<{translations: Array<{id:string, byLang: Record<string, string>}>}>}
  *   The translations grouped by item id.
  */
-export const translate = async ({
-  user,
-  sourceLang,
-  targetLangs,
-  items,
-  glossary = [],
-}: {
-  user: ArenaUser
-  sourceLang: any
-  targetLangs: any
-  items: any[]
-  glossary?: any
-}) => {
+export const translate = async ({ user, sourceLang, targetLangs, items, glossary = [] }) => {
   validateTranslateArgs({ sourceLang, targetLangs, items, glossary })
 
-  const runOnce = async (previousError?: { message: string }) => {
+  const runOnce = async (previousError) => {
     const { system, prompt } = buildTranslationPrompt({
       sourceLang,
       targetLangs,

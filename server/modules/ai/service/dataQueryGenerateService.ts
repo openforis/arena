@@ -16,7 +16,6 @@
 import { z } from 'zod'
 
 import { Authorizer } from '@openforis/arena-core'
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -70,7 +69,7 @@ const aggregateFunctions: string[] = Object.values(Query.DEFAULT_AGGREGATE_FUNCT
  * @param {object} [parent] - The parent node.
  * @returns {void}
  */
-const visitExpression = (node: any, visitor: any, parent = null) => {
+const visitExpression = (node, visitor, parent = null) => {
   if (!node || typeof node !== 'object') return
   if (Array.isArray(node)) {
     node.forEach((item) => visitExpression(item, visitor, parent))
@@ -96,7 +95,7 @@ const strictOperators: Record<string, string> = { '===': '==', '!==': '!=' }
  * @param {string[]} params.errors - Errors array to populate.
  * @returns {object|null} - The parsed expression, or null if not valid.
  */
-const parseFilter = ({ filter, allowedColumnNames, errors }: { filter: any; allowedColumnNames: any; errors: any }) => {
+const parseFilter = ({ filter, allowedColumnNames, errors }) => {
   let expr
   try {
     expr = Expression.fromString(filter)
@@ -148,7 +147,7 @@ export const toQuery = ({
   aiResult,
   includeAnalysis = false,
 }: {
-  survey: ArenaSurvey
+  survey: any
   cycle: string
   lang: string
   aiResult: AiResult

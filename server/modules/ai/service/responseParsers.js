@@ -18,7 +18,7 @@ const FENCE_LANGUAGE_RE = /^[a-zA-Z]*/
  * @param {string} value - Raw text.
  * @returns {string} Trimmed text without the wrapping fence.
  */
-export const stripFence = (value: string) => {
+export const stripFence = (value) => {
   const trimmed = value.trim()
   if (trimmed.length < FENCE.length * 2 || !trimmed.startsWith(FENCE) || !trimmed.endsWith(FENCE)) return trimmed
   const inner = trimmed.slice(FENCE.length, -FENCE.length)
@@ -33,7 +33,7 @@ export const stripFence = (value: string) => {
  * @returns {object} Parsed JSON value.
  * @throws {Error} When no parsable JSON object is found.
  */
-export const parseJsonResponse = (text: any) => {
+export const parseJsonResponse = (text) => {
   const candidate = stripFence(text || '')
   const start = candidate.indexOf('{')
   const end = candidate.lastIndexOf('}')

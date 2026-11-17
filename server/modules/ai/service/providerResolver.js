@@ -1,4 +1,3 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
 /**
  * Resolves which LLM provider/model to use for a given (user, feature) pair.
  *
@@ -44,41 +43,41 @@ const adminDefaultConfig = () =>
  *   The Vercel AI SDK model handle plus telemetry metadata.
  * @throws {SystemError} `aiNotConfigured` when no provider is available.
  */
-export const resolveModelForUser = ({ user, feature }: { user: ArenaUser; feature: any }) => {
+export const resolveModelForUser = async ({ user, feature }) => {
   const userCfg = AiSettingsService.getEffectiveUserConfig(user)
   if (userCfg) {
-    return Promise.resolve({
+    return {
       model: ProviderRegistry.buildModel(userCfg),
       meta: {
         source: sources.user,
         provider: userCfg.provider,
         model: userCfg.model,
       },
-    })
+    }
   }
 
   const adminCfg = adminDefaultConfig()
   if (adminCfg) {
-    return Promise.resolve({
+    return {
       model: ProviderRegistry.buildModel(adminCfg),
       meta: {
         source: sources.adminDefault,
         provider: adminCfg.provider,
         model: adminCfg.model,
       },
-    })
+    }
   }
 
-  return Promise.reject(new SystemError('aiNotConfigured', { feature }))
+  throw new SystemError('aiNotConfigured', { feature })
 }
 
 /**
  * Returns the provenance label that the AI Settings UI displays under
  * "Currently using:". Cheap, no external calls.
  * @param {object} user - The Arena user object.
- * @returns {{source: string, provider: ?string, model: ?string}} Provenance info.
+ * @returns {Promise<{source: string, provider: ?string, model: ?string}>} Provenance info.
  */
-export const describeEffectiveSource = (user: ArenaUser) => {
+export const describeEffectiveSource = async (user) => {
   const userCfg = AiSettingsService.getEffectiveUserConfig(user, { decrypt: false })
   if (userCfg) {
     return { source: sources.user, provider: userCfg.provider, model: userCfg.model }

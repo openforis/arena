@@ -1,4 +1,3 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 /**
  * Prompt builder for the natural-language → Arena validation expression
  * feature (Tier 1 #2). The prompt steers the model toward Arena's exact
@@ -56,19 +55,7 @@ const expressionTypeHints = {
  * @param {string} [args.previousError] - Error from an earlier parse attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The pair for `generateStructured`.
  */
-export const buildExpressionGeneratePrompt = ({
-  survey,
-  nodeDef,
-  expressionType,
-  description,
-  previousError,
-}: {
-  survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
-  expressionType: any
-  description: any
-  previousError: any
-}) => {
+export const buildExpressionGeneratePrompt = ({ survey, nodeDef, expressionType, description, previousError }) => {
   const nodeName = String(NodeDef.getName(nodeDef) || '')
   const nodeType = String(NodeDef.getType(nodeDef) || '')
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)

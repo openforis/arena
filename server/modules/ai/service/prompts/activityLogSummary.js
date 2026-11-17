@@ -17,19 +17,7 @@ import { pq } from './promptSafety'
  * @param {Array<{user:string, type:string, count:number, samples:string[]}>} args.aggregates - Per-user/type aggregates.
  * @returns {{ system: string, prompt: string }} The pair for `stream`.
  */
-export const buildActivityLogSummaryPrompt = ({
-  surveyName,
-  from,
-  to,
-  totalCount,
-  aggregates,
-}: {
-  surveyName: any
-  from: any
-  to: any
-  totalCount: any
-  aggregates: any
-}) => {
+export const buildActivityLogSummaryPrompt = ({ surveyName, from, to, totalCount, aggregates }) => {
   const system = `You summarize Open Foris Arena survey activity logs for a project manager.
 
 Style:

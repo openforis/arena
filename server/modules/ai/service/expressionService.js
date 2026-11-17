@@ -1,4 +1,3 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
 /**
  * Service for the natural-language → Arena expression feature (Tier 1 #2).
  *
@@ -52,7 +51,7 @@ const EXPLANATION_TAG_RE = /<explanation>([\s\S]*?)<\/explanation>/i
  * @param {string} text - Raw model output.
  * @returns {{ expression: string, explanation: string }} Parsed pieces.
  */
-const parseTaggedResponse = (text: any) => {
+const parseTaggedResponse = (text) => {
   const stripped = stripFence(text || '')
   const exprMatch = EXPRESSION_TAG_RE.exec(stripped)
   const explMatch = EXPLANATION_TAG_RE.exec(stripped)
@@ -66,7 +65,7 @@ const parseTaggedResponse = (text: any) => {
  * @param {string} expression - The candidate expression string.
  * @returns {{ valid: boolean, error?: string }} Parser result.
  */
-const tryParse = (expression: any) => {
+const tryParse = (expression) => {
   try {
     Expression.fromString(expression, Expression.modes.json)
     return { valid: true }
@@ -86,19 +85,7 @@ const tryParse = (expression: any) => {
  * @returns {Promise<{ expression: string, explanation: string, isValid: boolean, parseError?: string }>}
  *   The generated expression and validation status.
  */
-export const generate = async ({
-  user,
-  surveyId,
-  nodeDefUuid,
-  expressionType,
-  description,
-}: {
-  user: ArenaUser
-  surveyId: number
-  nodeDefUuid: string
-  expressionType: any
-  description: any
-}) => {
+export const generate = async ({ user, surveyId, nodeDefUuid, expressionType, description }) => {
   if (!description?.trim()) {
     throw new SystemError('aiExpressionDescriptionMissing')
   }
@@ -122,7 +109,7 @@ export const generate = async ({
     throw new SystemError('aiExpressionNodeDefNotFound', { nodeDefUuid })
   }
 
-  const runOnce = async (previousError?: { expression: string; message: string }) => {
+  const runOnce = async (previousError) => {
     const { system, prompt } = buildExpressionGeneratePrompt({
       survey,
       nodeDef,
@@ -172,21 +159,7 @@ export const generate = async ({
  * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
  *   The streaming result.
  */
-export const explain = async ({
-  user,
-  surveyId,
-  nodeDefUuid,
-  expression,
-  errorMessage,
-  signal,
-}: {
-  user: ArenaUser
-  surveyId: number
-  nodeDefUuid: string
-  expression: any
-  errorMessage: any
-  signal: any
-}) => {
+export const explain = async ({ user, surveyId, nodeDefUuid, expression, errorMessage, signal }) => {
   if (!expression?.trim()) {
     throw new SystemError('aiExpressionExpressionMissing')
   }

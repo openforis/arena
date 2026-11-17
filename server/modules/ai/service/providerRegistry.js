@@ -35,7 +35,7 @@ const validProviders = new Set(Object.values(providers))
  * @param {string} provider - Provider identifier from config or env.
  * @returns {boolean} True when supported.
  */
-export const isSupported = (provider: any) => validProviders.has(provider)
+export const isSupported = (provider) => validProviders.has(provider)
 
 /**
  * Builds a Vercel AI SDK `LanguageModel` instance for the given config.
@@ -55,7 +55,7 @@ export const isSupported = (provider: any) => validProviders.has(provider)
  * @returns {object} A Vercel AI SDK language model handle ready to pass to
  *   `generateText` / `generateObject` / `streamText`.
  */
-export const buildModel = (cfg: any) => {
+export const buildModel = (cfg) => {
   const { provider, model, apiKey, baseUrl, project, location, useApplicationDefaultCredentials } = cfg
   if (!isSupported(provider)) {
     throw new SystemError('aiProviderInvalid', { provider })

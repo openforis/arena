@@ -17,10 +17,7 @@ import { listVertexModels } from './vertexAi'
 
 const DEFAULT_TIMEOUT_MS = 10000
 
-const fetchWithTimeout = async (
-  url: any,
-  { headers, timeoutMs = DEFAULT_TIMEOUT_MS }: { headers?: any; timeoutMs?: any } = {}
-) => {
+const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) => {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -36,19 +33,19 @@ const fetchWithTimeout = async (
   }
 }
 
-const stripTrailingSlash = (s: any) => {
+const stripTrailingSlash = (s) => {
   if (!s) return s
   let end = s.length
   while (end > 0 && s[end - 1] === '/') end -= 1
   return s.slice(0, end)
 }
 
-const normaliseOpenAiBase = (baseUrl: any) => stripTrailingSlash(baseUrl || 'https://api.openai.com/v1')
+const normaliseOpenAiBase = (baseUrl) => stripTrailingSlash(baseUrl || 'https://api.openai.com/v1')
 
 // Heuristic filter that drops obvious non-chat models when an OpenAI-shaped
 // API returns the kitchen sink. Best-effort only — anything unfamiliar is
 // kept so users with niche backends are never blocked.
-const isLikelyChatModel = (id: any) => {
+const isLikelyChatModel = (id) => {
   if (typeof id !== 'string') return false
   const lower = id.toLowerCase()
   const blacklist = [
@@ -65,22 +62,22 @@ const isLikelyChatModel = (id: any) => {
   return !blacklist.some((needle) => lower.includes(needle))
 }
 
-const listOpenAiCompatible = async ({ baseUrl, apiKey }: { baseUrl: any; apiKey: any }) => {
+const listOpenAiCompatible = async ({ baseUrl, apiKey }) => {
   const base = normaliseOpenAiBase(baseUrl)
-  const headers: Record<string, string> = { Accept: 'application/json' }
+  const headers = { Accept: 'application/json' }
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`
   const json = await fetchWithTimeout(`${base}/models`, { headers })
   const data = Array.isArray(json?.data) ? json.data : []
   return data.map((entry) => (entry && typeof entry.id === 'string' ? { id: entry.id } : null)).filter(Boolean)
 }
 
-const listOpenAi = async ({ apiKey }: { apiKey: any }) => {
+const listOpenAi = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.openai })
   const all = await listOpenAiCompatible({ baseUrl: 'https://api.openai.com/v1', apiKey })
   return all.filter((m) => isLikelyChatModel(m.id))
 }
 
-const listAnthropic = async ({ apiKey }: { apiKey: any }) => {
+const listAnthropic = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.anthropic })
   const json = await fetchWithTimeout('https://api.anthropic.com/v1/models', {
     headers: {
@@ -99,7 +96,7 @@ const listAnthropic = async ({ apiKey }: { apiKey: any }) => {
     .filter(Boolean)
 }
 
-const listGoogle = async ({ apiKey }: { apiKey: any }) => {
+const listGoogle = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.google })
   // Key in a header, not in the URL, so that it doesn't end up in proxy/access logs.
   const json = await fetchWithTimeout('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', {
@@ -129,7 +126,7 @@ const listGoogle = async ({ apiKey }: { apiKey: any }) => {
  * @returns {Promise<Array<{id: string, description?: string}>>} The models.
  * @throws {SystemError} `aiModelListFailed` on any upstream failure.
  */
-export const listForProvider = async ({ provider, baseUrl, apiKey }: { provider: any; baseUrl: any; apiKey: any }) => {
+export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
   try {
     switch (provider) {
       case ProviderRegistry.providers.openai:

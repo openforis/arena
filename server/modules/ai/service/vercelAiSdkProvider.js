@@ -1,4 +1,3 @@
-import type { LanguageModel } from 'ai'
 /**
  * Vercel AI SDK v5 `LanguageModelV2` adapter for any backend that speaks
  * the Vercel AI SDK v5 chat protocol — i.e. accepts a POST body of
@@ -43,7 +42,7 @@ const unknownUsage = () => ({
  * @param {Function} [args.onDone] - Called once when the stream terminates.
  * @returns {{push: Function, end: Function}} Parser handle.
  */
-export const createV5StreamParser = ({ onEvent, onDone }: { onEvent: any; onDone?: () => void }) => {
+export const createV5StreamParser = ({ onEvent, onDone }) => {
   let buffer = ''
   let terminated = false
 
@@ -104,16 +103,16 @@ export const createV5StreamParser = ({ onEvent, onDone }: { onEvent: any; onDone
  * @param {*} content - The message content.
  * @returns {string} Flattened text.
  */
-const flattenContent = (content: any) => {
+const flattenContent = (content) => {
   if (typeof content === 'string') return content
   if (!Array.isArray(content)) return ''
   return content.map((part) => (part?.type === 'text' && typeof part.text === 'string' ? part.text : '')).join('')
 }
 
-const toV5Message = (role: any, text: any) => ({ role, parts: [{ type: 'text', text }] })
+const toV5Message = (role, text) => ({ role, parts: [{ type: 'text', text }] })
 
 // Tool messages are skipped — no tool-calling in this adapter.
-const partitionByRole = (prompt: any) => {
+const partitionByRole = (prompt) => {
   const systemTexts = []
   const rest = []
   for (const msg of prompt) {
@@ -126,7 +125,7 @@ const partitionByRole = (prompt: any) => {
   return { systemTexts, rest }
 }
 
-const prependPreamble = (rest: any, preamble: any) => {
+const prependPreamble = (rest, preamble) => {
   const messages = []
   let preambleApplied = !preamble
   for (const m of rest) {
@@ -146,7 +145,7 @@ const prependPreamble = (rest: any, preamble: any) => {
  * @param {Array} prompt - The v5 prompt array.
  * @returns {Array} v5-chat messages with `parts` arrays.
  */
-const vercelAiSdkMessagesFromPrompt = (prompt: any) => {
+const vercelAiSdkMessagesFromPrompt = (prompt) => {
   if (!Array.isArray(prompt)) return []
   const { systemTexts, rest } = partitionByRole(prompt)
   const preamble = systemTexts.join('\n\n').trim()
@@ -162,7 +161,7 @@ const vercelAiSdkMessagesFromPrompt = (prompt: any) => {
  * @param {AbortSignal} args.signal - Abort signal.
  * @returns {Promise<Response>} The fetch Response handle.
  */
-const postChatEndpoint = async ({ endpoint, messages, signal }: { endpoint: any; messages: any; signal: any }) => {
+const postChatEndpoint = async ({ endpoint, messages, signal }) => {
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
@@ -185,7 +184,7 @@ const postChatEndpoint = async ({ endpoint, messages, signal }: { endpoint: any;
  * @param {AbortSignal} signal - Abort signal for the read loop.
  * @returns {Promise<string>} The full response text.
  */
-const drainChatStreamToText = async (response: any, signal: any) => {
+const drainChatStreamToText = async (response, signal) => {
   let text = ''
   const parser = createV5StreamParser({
     onEvent: (event) => {
@@ -221,10 +220,7 @@ const drainChatStreamToText = async (response: any, signal: any) => {
  * @param {number} [cfg.timeoutMs] - Per-request timeout. Defaults to 60s.
  * @returns {object} A model handle compatible with `generateText` / `streamText`.
  */
-export const createVercelAiSdkModel = ({
-  baseUrl,
-  timeoutMs = DEFAULT_TIMEOUT_MS,
-}: { baseUrl?: any; timeoutMs?: any } = {}) => {
+export const createVercelAiSdkModel = ({ baseUrl, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) => {
   const endpoint = baseUrl
   const provider = AiProvider.vercelAiSdk
   const modelId = AiProvider.vercelAiSdk
@@ -324,7 +320,7 @@ export const createVercelAiSdkModel = ({
 
       return { stream }
     },
-  } as unknown as LanguageModel // implements the v2 language model spec of the AI SDK
+  }
 }
 
 export { vercelAiSdkMessagesFromPrompt }

@@ -1,4 +1,3 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 /**
  * Prompt builder for the "explain this expression" feature (Tier 1 #3).
  * Used by the streaming endpoint — output is plain prose suitable for
@@ -22,17 +21,7 @@ const allowedFunctions = Object.keys(ExpressionParser.functionNames || {})
  * @param {string} [args.errorMessage] - Optional parser/validation error to diagnose.
  * @returns {{ system: string, prompt: string }} The pair for `stream`.
  */
-export const buildExpressionExplainPrompt = ({
-  survey,
-  nodeDef,
-  expression,
-  errorMessage,
-}: {
-  survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
-  expression: any
-  errorMessage: any
-}) => {
+export const buildExpressionExplainPrompt = ({ survey, nodeDef, expression, errorMessage }) => {
   const nodeName = String(NodeDef.getName(nodeDef) || '')
   const nodeType = String(NodeDef.getType(nodeDef) || '')
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
