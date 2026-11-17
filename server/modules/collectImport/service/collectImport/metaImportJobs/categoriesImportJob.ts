@@ -19,7 +19,10 @@ import * as CollectSurvey from '../model/collectSurvey'
  * Saves the list of inserted categories in the "categories" context property.
  */
 export default class CategoriesImportJob extends Job {
-  constructor(params) {
+  itemBatchPersister: any
+  qualifiableItemCodesByCategoryAndLevel: Record<string, any>
+
+  constructor(params?: any) {
     super('CategoriesImportJob', params)
 
     this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))
@@ -72,7 +75,7 @@ export default class CategoriesImportJob extends Job {
     })
   }
 
-  async _insertCategory(collectCodeList) {
+  _insertCategory(collectCodeList) {
     const categoryName = collectCodeList.attributes.name
 
     // Create category

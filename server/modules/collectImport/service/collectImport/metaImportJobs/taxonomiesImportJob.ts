@@ -27,7 +27,16 @@ const fixedColumns = new Set(['id', 'parent_id', 'rank', 'no', 'code', 'scientif
  * Saves the list of inserted taxonomies in the "taxonomies" context property.
  */
 export default class TaxonomiesImportJob extends Job {
-  constructor(params) {
+  currentRow: any
+  extraPropsDefs: Record<string, { originalHeader: string } & Record<string, unknown>>
+  rowById: Record<string, any>
+  rowNumberByCode: Record<string, any>
+  rowNumberByScientificName: Record<string, any>
+  taxonomyCurrent: any
+  taxonomyImportManager: any
+  vernacularLangCodes: any
+
+  constructor(params?: any) {
     super('TaxonomiesImportJob', params)
 
     this.taxonomyCurrent = null // Current taxonomy being imported
