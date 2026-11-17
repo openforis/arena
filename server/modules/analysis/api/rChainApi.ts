@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
@@ -10,7 +11,7 @@ import * as CategoryService from '@server/modules/category/service/categoryServi
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisService from '../service'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ====== READ - Chain entity data
   app.get(
     ApiRoutes.rChain.entityData({
@@ -153,7 +154,7 @@ export const init = (app) => {
       entityUuid: ':entityDefUuid',
     }),
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const filePath = Request.getFilePath(req)
         const { surveyId, cycle, chainUuid, entityDefUuid, token } = Request.getParams(req)
@@ -224,7 +225,7 @@ export const init = (app) => {
   app.put(
     ApiRoutes.rChain.olapData({ surveyId: ':surveyId', cycle: ':cycle', chainUuid: ':chainUuid' }),
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const filePath = Request.getFilePath(req)
         const { surveyId, cycle, chainUuid, token } = Request.getParams(req)

@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -6,7 +7,7 @@ import * as Response from '@server/utils/response'
 
 import * as AnalysisService from '../service'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ====== CREATE - Chain
 
   app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {

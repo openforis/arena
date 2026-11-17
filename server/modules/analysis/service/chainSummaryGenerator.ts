@@ -9,24 +9,32 @@ import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ChainManager from '../manager'
-import { Objects } from '@openforis/arena-core'
+import { Objects, type Chain as ArenaChain, type Survey as ArenaSurvey } from '@openforis/arena-core'
 import { ArrayUtils } from '@core/arrayUtils'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
-const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
+const getCycleLabel = (cycleKey: any) => `${Number(cycleKey) + 1}`
 
-const generateSurveySummary = ({ survey, lang }) => ({
+const generateSurveySummary = ({ survey, lang }: { survey: ArenaSurvey; lang: string }) => ({
   surveyName: Survey.getName(survey),
   surveyLabel: Survey.getLabel(survey, lang),
   surveyDescription: Survey.getDescription(lang, '')(survey),
 })
 
-const getCategoryNameByUuid = ({ survey, categoryUuid }) => {
+const getCategoryNameByUuid = ({ survey, categoryUuid }: { survey: ArenaSurvey; categoryUuid: string }) => {
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
   return Category.getName(category)
 }
 
-const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
+const generateResultVariableSummary = ({
+  survey,
+  analysisNodeDef,
+  lang,
+}: {
+  survey: ArenaSurvey
+  analysisNodeDef: any
+  lang: string
+}) => {
   const categoryName = NodeDef.isCode(analysisNodeDef)
     ? getCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(analysisNodeDef) })
     : ''
@@ -51,7 +59,7 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
   return result
 }
 
-const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
+const generateCategoryAttributeAncestorsSummary = ({ survey }: { survey: ArenaSurvey }) => {
   const hierarchicalCategories = Survey.getCategoriesArray(survey).filter(Category.isHierarchical)
   if (hierarchicalCategories.length === 0) {
     return {}
@@ -82,7 +90,7 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   }
 }
 
-const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
+const generateStatisticalAnalysisSummary = ({ survey, chain }: { survey: ArenaSurvey; chain: ArenaChain }) => {
   const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
   if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
 
@@ -105,7 +113,17 @@ const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
   }
 }
 
-const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
+const generateChainSummary = async ({
+  surveyId,
+  chainUuid,
+  cycle,
+  lang: langParam = null,
+}: {
+  surveyId: number
+  chainUuid: string
+  cycle: string
+  lang?: string
+}) => {
   const chain = await ChainManager.fetchChain({ surveyId, chainUuid })
   if (!chain) {
     throw new SystemError('chainNotFound', { chainUuid })

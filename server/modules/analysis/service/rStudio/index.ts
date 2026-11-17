@@ -4,7 +4,7 @@ import { uuidv4 } from '@core/uuid'
 const tokenInfoByToken = {}
 const TOKEN_EXPIRATION = 48 * 60 * 60 * 1000 // 48h
 
-export const generateRStudioToken = ({ chainUuid }) => {
+export const generateRStudioToken = ({ chainUuid }: { chainUuid: string }) => {
   const token = uuidv4()
   tokenInfoByToken[token] = { chainUuid, createdAt: Date.now() }
 
@@ -15,7 +15,7 @@ export const generateRStudioToken = ({ chainUuid }) => {
   return token
 }
 
-const isRStudioTokenValid = ({ token, chainUuid }) => {
+const isRStudioTokenValid = ({ token, chainUuid }: { token: any; chainUuid: string }) => {
   const tokenInfo = tokenInfoByToken[token]
   if (!tokenInfo) return false
 
@@ -26,7 +26,7 @@ const isRStudioTokenValid = ({ token, chainUuid }) => {
   return createdAt + TOKEN_EXPIRATION >= Date.now()
 }
 
-export const checkRStudioToken = ({ token, chainUuid }) => {
+export const checkRStudioToken = ({ token, chainUuid }: { token: any; chainUuid: string }) => {
   if (!isRStudioTokenValid({ token, chainUuid })) {
     throw new SystemError('chain.error.invalidToken')
   }

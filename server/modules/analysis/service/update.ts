@@ -1,3 +1,5 @@
+import type { Chain as ArenaChain, User as ArenaUser } from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
 import { DB } from '@openforis/arena-server'
 
 import * as Survey from '@core/survey/survey'
@@ -11,9 +13,12 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ChainManager from '@server/modules/analysis/manager/chain'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
 
-export const validate = async ({ surveyId, chainUuid, chain: chainParam = null }, client = DB) => {
+export const validate = async (
+  { surveyId, chainUuid, chain: chainParam = null }: { surveyId: number; chainUuid: string; chain?: ArenaChain },
+  client: DbClient = DB
+) => {
   const chain = chainParam ?? (await ChainManager.fetchChain({ surveyId, chainUuid }, client))
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, client)
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
@@ -22,7 +27,7 @@ export const validate = async ({ surveyId, chainUuid, chain: chainParam = null }
   return Chain.assocValidation(validation)(chain)
 }
 
-export const update = async ({ user, surveyId, chain }) => {
+export const update = ({ user, surveyId, chain }: { user: ArenaUser; surveyId: number; chain: ArenaChain }) => {
   const chainUuid = Chain.getUuid(chain)
 
   return DB.tx(async (t) => {
