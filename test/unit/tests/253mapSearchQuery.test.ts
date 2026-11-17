@@ -2,6 +2,7 @@
 import {
   buildMapSearchResults,
   findRecordCandidates,
+  findSearchSelectId,
   findSingleRecordMatch,
   parseMapSearchQuery,
 } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
@@ -117,5 +118,11 @@ describe('Map search query (253)', () => {
     expect(find('3 - ep')).toBe('3 - EP')
     expect(find('0')).toBeNull()
     expect(find(' ')).toBeNull()
+  })
+
+  test('findSearchSelectId: coordinates win over a record with that label', () => {
+    const candidates = ['41.9, 12.5', '7'].map(candidate)
+    expect(findSearchSelectId(candidates, '7')).toBe('id-7')
+    expect(findSearchSelectId(candidates, '41.9, 12.5')).toBeNull()
   })
 })

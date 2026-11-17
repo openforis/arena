@@ -34,6 +34,21 @@ import { startLocalModelServer } from '../stubs/localModelServer'
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: the AI specs would be skipped')
 
+/**
+ * Opens the Map Layers panel (when closed) and gives the Cluster coordinate checkbox.
+ * @param {Page} page - The page.
+ * @returns {Promise<Locator>} The checkbox.
+ */
+const openLayersPanelCheckbox = async (page: Page) => {
+  const mapIds = TestId.mapWorkspace
+  // the Layers panel may already be open: a click on the open tab would collapse it
+  const layersPanel = page.getByTestId(mapIds.railPanel('layers'))
+  if (!(await layersPanel.isVisible())) await page.getByTestId(mapIds.railTab('layers')).click()
+  return layersPanel
+    .locator('label', { hasText: 'Cluster coordinate' })
+    .locator('input.leaflet-control-layers-selector')
+}
+
 test.describe('AI analysis assistant (mock provider)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
@@ -85,7 +100,6 @@ test.describe('AI analysis assistant (mock provider)', () => {
   })
 
   test('map card: opens the Map with the layer ticked, again after unticking', async ({ page, sampleSurvey: _ }) => {
-    const mapIds = TestId.mapWorkspace
     await page.goto(Urls.dataExplorer)
     await askAnalysis(page, analysisMessages.map)
     await waitForAssistantTurn(page)
@@ -95,12 +109,7 @@ test.describe('AI analysis assistant (mock provider)', () => {
     await showOnMap.click()
     await expect(page).toHaveURL(new RegExp(`${Urls.map}$`))
 
-    // the Layers panel may already be open: a click on the open tab would collapse it
-    const layersPanel = page.getByTestId(mapIds.railPanel('layers'))
-    if (!(await layersPanel.isVisible())) await page.getByTestId(mapIds.railTab('layers')).click()
-    const checkbox = layersPanel
-      .locator('label', { hasText: 'Cluster coordinate' })
-      .locator('input.leaflet-control-layers-selector')
+    const checkbox = await openLayersPanelCheckbox(page)
     await expect(checkbox).toBeChecked()
 
     await checkbox.uncheck()
@@ -132,10 +141,13 @@ test.describe('AI analysis assistant (mock provider)', () => {
     await expect(searchInput).toHaveValue('1')
     await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
     await expect(page.getByTestId(mapIds.statusZoom)).not.toHaveText('Zoom 3')
+    const checkbox = await openLayersPanelCheckbox(page)
+    await expect(checkbox).toBeChecked()
 
     await searchInput.clear()
     await showOnMap.click()
     await expect(searchInput).toHaveValue('1')
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
   })
 
   test('map card: a search without a match fills the search box', async ({ page, sampleSurvey: _ }) => {
@@ -160,6 +172,7 @@ test.describe('AI analysis assistant (mock provider)', () => {
     await expect(page.getByTestId(mapIds.searchInput)).toHaveValue('41.9, 12.5')
     await expect(page.getByTestId(mapIds.statusZoom)).toHaveText('Zoom 14')
     await expect(page.locator('.map-search-marker')).toHaveCount(1)
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
   })
 
   test.describe('with the stub local server', () => {

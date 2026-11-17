@@ -139,7 +139,8 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
   if (searchRequest && searchRequest.key !== appliedKey) {
     setAppliedKey(searchRequest.key)
     setInput(searchRequest.text)
-    setListOpen(true)
+    // coordinates are gone to at once (see the effect below): nothing to pick
+    setListOpen(parseMapSearchQuery(searchRequest.text).type !== 'coordinates')
   }
   if (searchRequest?.selectId && searchRequest.key !== selectedKey) {
     setSelectedKey(searchRequest.key)

@@ -226,6 +226,15 @@ export const findSingleRecordMatch = (candidates: MapRecordCandidate[], text: st
 }
 
 /**
+ * Finds the record to go to for a search asked from outside: none when the text is coordinates (they win).
+ * @param {MapRecordCandidate[]} candidates - Records shown on the map.
+ * @param {string} text - The searched text.
+ * @returns {string|null} The record id, or null.
+ */
+export const findSearchSelectId = (candidates: MapRecordCandidate[], text: string): string | null =>
+  parseMapSearchQuery(text).type === 'coordinates' ? null : (findSingleRecordMatch(candidates, text)?.id ?? null)
+
+/**
  * Builds the search results: the coordinates (or the invalid coordinates notice) first, then the matching records.
  * @param {object} params - Parameters.
  * @param {string} params.input - The search box text.

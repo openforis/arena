@@ -27,7 +27,7 @@ import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
 import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
-import { findSingleRecordMatch } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
+import { findSearchSelectId } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
 import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
 
 type LayerGroup = {
@@ -70,7 +70,7 @@ const MapViewContent = ({ layers, overlayGroups, aiSearch }: MapViewContentProps
         ? {
             text: aiSearch.text,
             key: aiSearch.key,
-            selectId: findSingleRecordMatch(layerCandidates, aiSearch.text)?.id ?? null,
+            selectId: findSearchSelectId(layerCandidates, aiSearch.text),
           }
         : undefined,
     }
