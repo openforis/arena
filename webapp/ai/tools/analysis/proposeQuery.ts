@@ -41,7 +41,10 @@ export const proposeQueryInputSchema = z.object({
     .min(1)
     .max(200)
     .nullish()
-    .describe('Optional: how many rows query_run returns. For a "top N" question set it to N, with a sort'),
+    .describe(
+      'Optional: the maximum number of rows of the result (the first N after the sort). For a "top N" question set ' +
+        'it to N, with a sort'
+    ),
   explanation: z.string().max(1000).describe("Short explanation of the query, in the user's language"),
 })
 
