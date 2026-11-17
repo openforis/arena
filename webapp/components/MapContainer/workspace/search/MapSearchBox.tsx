@@ -132,25 +132,36 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
     setListOpen(false)
   }
 
-  // each behaviour of a search request runs once per key: a records reload must not select again
+  // each behaviour of a search request runs once per key: a records reload must not select or open again
   const searchRequest = records?.searchRequest
   const [appliedKey, setAppliedKey] = useState<string | null>(null)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [openedKey, setOpenedKey] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   if (searchRequest && searchRequest.key !== appliedKey) {
     setAppliedKey(searchRequest.key)
     setInput(searchRequest.text)
-    // coordinates are gone to at once (see the effect below): nothing to pick
-    setListOpen(parseMapSearchQuery(searchRequest.text).type !== 'coordinates')
+    setListOpen(false)
   }
   if (searchRequest?.selectId && searchRequest.key !== selectedKey) {
     setSelectedKey(searchRequest.key)
-    setListOpen(false)
+  }
+  // the list shows only once the requested layer is known not to match (selectId null): not before its points load
+  if (
+    searchRequest &&
+    searchRequest.selectId === null &&
+    searchRequest.key !== openedKey &&
+    parseMapSearchQuery(searchRequest.text).type !== 'coordinates'
+  ) {
+    setOpenedKey(searchRequest.key)
+    setListOpen(true)
   }
   const requestText = searchRequest?.text
   useEffect(() => {
     if (!appliedKey || requestText === undefined) return
     const query = parseMapSearchQuery(requestText)
     if (query.type === 'coordinates') goToCoordinates(query.lat, query.lng)
+    else removeMarker()
     // only a new request goes to its coordinates
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedKey])
@@ -160,6 +171,10 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
     // only a new request selects; the records reloading changes onSelect
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey])
+  // focus the input so that leaving it (a click on the map) closes the list the request opened
+  useEffect(() => {
+    if (openedKey) inputRef.current?.focus()
+  }, [openedKey])
 
   /**
    * Handles the keyboard in the input: arrows move, Enter selects, Escape clears or leaves.
@@ -206,6 +221,7 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
     <div className="map-search">
       <span className="icon icon-search map-search__icon" aria-hidden="true" />
       <input
+        ref={inputRef}
         type="search"
         role="combobox"
         className="map-search__input"

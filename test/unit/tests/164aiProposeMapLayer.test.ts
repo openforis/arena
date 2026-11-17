@@ -101,6 +101,25 @@ describe('map_proposeLayer', () => {
     expect(result.error.message).toMatch(/coordinates/)
   })
 
+  test('a blank search is no search', async () => {
+    const result = await runTool(
+      proposeMapLayerTool,
+      { attribute: 'plot_location', search: '  ', explanation: 'Plots' },
+      newAnalysisToolContext({ survey })
+    )
+    expect(result).toEqual(valid())
+  })
+
+  test('a layer with invalid coordinates as search is refused', async () => {
+    const result: any = await runTool(
+      proposeMapLayerTool,
+      { attribute: 'plot_location', search: '95, 12', explanation: 'x' },
+      newAnalysisToolContext({ survey })
+    )
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.message).toMatch(/coordinates/)
+  })
+
   test('getProposedMapLayer fills old and coordinate-only outputs', () => {
     const toolName = 'map_proposeLayer'
     const old = { attributeUuid: 'u', attribute: 'a', explanation: 'e', shownToUser: true }
@@ -116,6 +135,7 @@ describe('map_proposeLayer', () => {
     expect(getProposedMapLayer({ toolName, output: { error: { code: 'invalidProposal' } } })).toBeNull()
     expect(getProposedMapLayer({ toolName: 'query_propose', output })).toBeNull()
     expect(getProposedMapLayer({ toolName, output: null })).toBeNull()
+    expect(getProposedMapLayer({ toolName, output: { ...output, attributeUuid: null, search: null } })).toBeNull()
   })
 
   test('requires: no survey access → not offered', () => {

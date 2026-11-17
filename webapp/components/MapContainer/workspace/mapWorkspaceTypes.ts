@@ -36,5 +36,6 @@ export type MapWorkspaceRecords = {
   candidates: MapRecordCandidate[]
   onSelect: (id: string) => void
   // a search asked from outside (the assistant): `key` is new on every ask, `selectId` the record to go to, once known
-  searchRequest?: { text: string; key: string; selectId: string | null }
+  // selectId: undefined = not known yet (the layer has no points yet), null = no single match
+  searchRequest?: { text: string; key: string; selectId?: string | null }
 }

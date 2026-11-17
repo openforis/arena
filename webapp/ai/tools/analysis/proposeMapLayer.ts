@@ -111,13 +111,15 @@ const validate = (input: ProposeMapLayerInput, survey: any): { error: object } |
  */
 const execute = async (input: ProposeMapLayerInput, ctx: AiToolContext) => {
   const survey = ctx.getSurvey?.() ?? ctx.survey
-  const validated = validate(input, survey)
+  // a blank search is no search
+  const search = input.search?.trim() || null
+  const validated = validate({ ...input, search }, survey)
   if ('error' in validated) return validated
   const { nodeDef } = validated
   return {
     attributeUuid: nodeDef ? NodeDef.getUuid(nodeDef) : null,
     attribute: nodeDef ? input.attribute : null,
-    search: input.search ?? null,
+    search,
     explanation: input.explanation,
     shownToUser: true,
   }

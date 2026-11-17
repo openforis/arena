@@ -159,6 +159,9 @@ test.describe('AI analysis assistant (mock provider)', () => {
 
     await expect(page.getByTestId(mapIds.searchInput)).toHaveValue('9')
     await expect(page.getByTestId(mapIds.searchResult(0))).toContainText('No record or coordinates match')
+    // the request focused the box: leaving it closes the list
+    await page.locator('.leaflet-container').click({ position: { x: 400, y: 300 } })
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
   })
 
   test('map card: coordinates fly the Map there', async ({ page, sampleSurvey: _ }) => {

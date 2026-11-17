@@ -19,6 +19,7 @@ import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
 import type { SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
 import type { MapRailTab, MapWorkspaceRecords } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
+import { findSearchSelectId } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
 import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
@@ -27,7 +28,7 @@ import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
 import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
-import { findSearchSelectId } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
+import type { ActiveLayer } from './MapLayersPanel/MapLayersPanelContext'
 import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
 
 type LayerGroup = {
@@ -59,10 +60,13 @@ const MapViewContent = ({ layers, overlayGroups, aiSearch }: MapViewContentProps
   const { activeLayers, selectPoint } = useMapLayersPanel()
   // the search finds the records the Records tab lists
   const records = useMemo<MapWorkspaceRecords>(() => {
-    // the record the assistant asked for: the only one matching, among the points of its layer once loaded
-    const layerCandidates = aiSearch?.layerKey
-      ? buildRecordCandidates(activeLayers.filter((layer: any) => layer.key === aiSearch.layerKey))
-      : []
+    // the record the assistant asked for: undefined until its layer has points, then the only matching record or null
+    const requestedLayer = aiSearch?.layerKey
+      ? activeLayers.find((layer: ActiveLayer) => layer.key === aiSearch.layerKey)
+      : undefined
+    const selectId = !aiSearch?.layerKey
+      ? null
+      : requestedLayer && findSearchSelectId(buildRecordCandidates([requestedLayer]), aiSearch.text)
     return {
       candidates: buildRecordCandidates(activeLayers),
       onSelect: (id: string) => selectRecordCandidate({ id, activeLayers, selectPoint }),
@@ -70,7 +74,7 @@ const MapViewContent = ({ layers, overlayGroups, aiSearch }: MapViewContentProps
         ? {
             text: aiSearch.text,
             key: aiSearch.key,
-            selectId: findSearchSelectId(layerCandidates, aiSearch.text),
+            selectId,
           }
         : undefined,
     }
