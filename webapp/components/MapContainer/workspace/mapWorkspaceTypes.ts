@@ -35,4 +35,6 @@ export type MapRecordCandidate = { id: string; label: string; lat: number; lng: 
 export type MapWorkspaceRecords = {
   candidates: MapRecordCandidate[]
   onSelect: (id: string) => void
+  // a search asked from outside (the assistant): `key` is new on every ask, `selectId` the record to go to, once known
+  searchRequest?: { text: string; key: string; selectId: string | null }
 }

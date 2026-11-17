@@ -39,6 +39,7 @@ export const useGeoAttributeDataLayer = (props) => {
     markersColor,
     editingRecordUuid,
     checked = false,
+    fitOnActivation = true,
     onPointsLoaded = null,
     pointsFilter = null,
   } = props
@@ -204,10 +205,15 @@ export const useGeoAttributeDataLayer = (props) => {
   // zoom to the layer once per activation (the assistant's "Show on map"), when its points are there
   const zoomedKeyRef = useRef(null)
   useEffect(() => {
-    if (activationKey && activationKey !== zoomedKeyRef.current && fitLayerBounds(map, visiblePoints)) {
+    if (
+      fitOnActivation &&
+      activationKey &&
+      activationKey !== zoomedKeyRef.current &&
+      fitLayerBounds(map, visiblePoints)
+    ) {
       zoomedKeyRef.current = activationKey
     }
-  }, [activationKey, map, visiblePoints])
+  }, [activationKey, fitOnActivation, map, visiblePoints])
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({
     points: visiblePoints,

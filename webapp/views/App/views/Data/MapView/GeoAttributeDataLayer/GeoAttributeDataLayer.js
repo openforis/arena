@@ -13,6 +13,7 @@ export const GeoAttributeDataLayer = (props) => {
     activationKey = null,
     attributeDef,
     checked = false,
+    fitOnActivation = true,
     markersColor,
     onPointsLoaded = null,
     onRecordEditClick,
@@ -34,6 +35,7 @@ export const GeoAttributeDataLayer = (props) => {
     activationKey,
     attributeDef,
     checked,
+    fitOnActivation,
     markersColor,
     onPointsLoaded,
     pointsFilter,
@@ -139,6 +141,7 @@ GeoAttributeDataLayer.propTypes = {
   activationKey: PropTypes.string, // changes on each request to show the layer: it is then shown and zoomed to
   attributeDef: PropTypes.any,
   checked: PropTypes.bool, // when true, the layer is selected (and its data fetched) on mount
+  fitOnActivation: PropTypes.bool, // when false, an activation shows the layer without zooming to it
   markersColor: PropTypes.any,
   onPointsLoaded: PropTypes.func, // called with ({ layerKey, points }) on every data fetch, before filtering
   onRecordEditClick: PropTypes.func,

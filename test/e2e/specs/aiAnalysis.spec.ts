@@ -116,6 +116,52 @@ test.describe('AI analysis assistant (mock provider)', () => {
     await expect(mapLayerCard(page)).toBeVisible()
   })
 
+  test('map card: a record search goes to the record, and applies again after clearing', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.mapRecord)
+    await waitForAssistantTurn(page)
+    const showOnMap = page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]')
+    await showOnMap.click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.map}$`))
+
+    const searchInput = page.getByTestId(mapIds.searchInput)
+    await expect(searchInput).toHaveValue('1')
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
+    await expect(page.getByTestId(mapIds.statusZoom)).not.toHaveText('Zoom 3')
+
+    await searchInput.clear()
+    await showOnMap.click()
+    await expect(searchInput).toHaveValue('1')
+  })
+
+  test('map card: a search without a match fills the search box', async ({ page, sampleSurvey: _ }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.mapNoMatch)
+    await waitForAssistantTurn(page)
+    await page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]').click()
+
+    await expect(page.getByTestId(mapIds.searchInput)).toHaveValue('9')
+    await expect(page.getByTestId(mapIds.searchResult(0))).toContainText('No record or coordinates match')
+  })
+
+  test('map card: coordinates fly the Map there', async ({ page, sampleSurvey: _ }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.mapCoordinates)
+    await waitForAssistantTurn(page)
+    await expect(mapLayerCard(page)).toContainText('Map location')
+    await page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]').click()
+
+    await expect(page.getByTestId(mapIds.searchInput)).toHaveValue('41.9, 12.5')
+    await expect(page.getByTestId(mapIds.statusZoom)).toHaveText('Zoom 14')
+    await expect(page.locator('.map-search-marker')).toHaveCount(1)
+  })
+
   test.describe('with the stub local server', () => {
     let stub: Awaited<ReturnType<typeof startLocalModelServer>>
 
