@@ -19,6 +19,7 @@ describe('map_proposeLayer', () => {
   const valid = () => ({
     attributeUuid: getUuid('cluster/plot/plot_location'),
     attribute: 'plot_location',
+    search: null,
     explanation: 'Plots',
     shownToUser: true,
   })
@@ -49,6 +50,63 @@ describe('map_proposeLayer', () => {
       newAnalysisToolContext({ survey })
     )
     expect(result.error.code).toBe('invalidProposal')
+  })
+
+  test('a record search is passed through', async () => {
+    const result = await runTool(
+      proposeMapLayerTool,
+      { attribute: 'plot_location', search: 'EP', explanation: 'Plots' },
+      newAnalysisToolContext({ survey })
+    )
+    expect(result).toEqual({ ...valid(), search: 'EP' })
+  })
+
+  test('coordinates alone are accepted', async () => {
+    const result = await runTool(
+      proposeMapLayerTool,
+      { search: '41.9, 12.5', explanation: 'x' },
+      newAnalysisToolContext({ survey })
+    )
+    expect(result).toEqual({
+      attributeUuid: null,
+      attribute: null,
+      search: '41.9, 12.5',
+      explanation: 'x',
+      shownToUser: true,
+    })
+  })
+
+  test('a text search without attribute is refused with the layers', async () => {
+    const result: any = await runTool(
+      proposeMapLayerTool,
+      { search: 'EP', explanation: 'x' },
+      newAnalysisToolContext({ survey })
+    )
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.layers).toEqual(expect.arrayContaining(['plot_location']))
+  })
+
+  test('nothing to show is refused', async () => {
+    const result: any = await runTool(proposeMapLayerTool, { explanation: 'x' }, newAnalysisToolContext({ survey }))
+    expect(result.error.code).toBe('invalidProposal')
+  })
+
+  test('invalid coordinates are refused', async () => {
+    const result: any = await runTool(
+      proposeMapLayerTool,
+      { search: '95, 12', explanation: 'x' },
+      newAnalysisToolContext({ survey })
+    )
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.message).toMatch(/coordinates/)
+  })
+
+  test('getProposedMapLayer fills old and coordinate-only outputs', () => {
+    const toolName = 'map_proposeLayer'
+    const old = { attributeUuid: 'u', attribute: 'a', explanation: 'e', shownToUser: true }
+    expect(getProposedMapLayer({ toolName, output: old })).toEqual({ ...old, search: null })
+    const coords = { attributeUuid: null, attribute: null, search: '41.9, 12.5', explanation: 'e', shownToUser: true }
+    expect(getProposedMapLayer({ toolName, output: coords })).toEqual(coords)
   })
 
   test('getProposedMapLayer', () => {

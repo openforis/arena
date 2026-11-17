@@ -210,6 +210,22 @@ export const findRecordCandidates = (
 }
 
 /**
+ * Finds the one record whose whole label, or last key (last ' - ' part), equals the text.
+ * @param {MapRecordCandidate[]} candidates - Records shown on the map.
+ * @param {string} text - Text to look for (case-insensitive).
+ * @returns {MapRecordCandidate|null} The record, or null when none or several match.
+ */
+export const findSingleRecordMatch = (candidates: MapRecordCandidate[], text: string): MapRecordCandidate | null => {
+  const query = text.trim().toLocaleLowerCase()
+  if (!query) return null
+  const matches = candidates.filter((candidate) => {
+    const label = candidate.label.trim().toLocaleLowerCase()
+    return label === query || label.split(' - ').at(-1) === query
+  })
+  return matches.length === 1 ? matches[0] : null
+}
+
+/**
  * Builds the search results: the coordinates (or the invalid coordinates notice) first, then the matching records.
  * @param {object} params - Parameters.
  * @param {string} params.input - The search box text.

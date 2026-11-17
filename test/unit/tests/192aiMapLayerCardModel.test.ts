@@ -17,7 +17,7 @@ beforeAll(async () => {
 describe('map layer card model', () => {
   const model = (attributeUuid: string, canUseMap = true) =>
     getMapLayerCardModel({
-      proposed: { attributeUuid, attribute: 'x', explanation: 'Why', shownToUser: true },
+      proposed: { attributeUuid, attribute: 'x', search: null, explanation: 'Why', shownToUser: true },
       survey,
       lang: 'en',
       canUseMap,
