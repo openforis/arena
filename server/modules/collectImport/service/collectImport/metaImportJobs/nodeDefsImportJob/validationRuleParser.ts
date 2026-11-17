@@ -50,7 +50,10 @@ const operandConverterByNodeDefType = {
   },
 }
 
-const checkExpressionParserByType: Record<string, (params: { collectCheck: any; nodeDef: any }) => string | null> = {
+const checkExpressionParserByType: Record<
+  string,
+  (params: { collectCheck: any; nodeDef: ArenaNodeDef<NodeDefType> }) => string | null
+> = {
   [collectCheckType.compare]: ({ collectCheck, nodeDef }) => {
     const attributes = CollectSurvey.getAttributes(collectCheck)
     const exprParts = Object.entries(attributes).reduce((accParts, [collectOperator, collectRightOperand]) => {
@@ -92,7 +95,7 @@ const isUniqueCheckConvertible = ({
 }: {
   survey: ArenaSurvey
   collectValidationRule: any
-  nodeDefCurrent: any
+  nodeDefCurrent: ArenaNodeDef<NodeDefType>
 }) => {
   const { expr } = CollectSurvey.getAttributes(collectValidationRule)
   const nodeDefName = NodeDef.getName(nodeDefCurrent)
@@ -142,7 +145,7 @@ const convertCheckExpression = async ({
   checkType: any
   collectValidationRule: any
   collectExpr: any
-  nodeDefCurrent: any
+  nodeDefCurrent: ArenaNodeDef<NodeDefType>
 }): Promise<{ exprConverted?: string | null; unique?: boolean }> => {
   const converter = checkExpressionConverterByType[checkType]
   if (converter) {

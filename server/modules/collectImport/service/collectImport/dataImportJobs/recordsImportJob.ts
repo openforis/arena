@@ -3,6 +3,8 @@ import type {
   Survey as ArenaSurvey,
   ArenaRecordNode,
   Record as ArenaRecord,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
 } from '@openforis/arena-core'
 import { Authorizer, Queue } from '@openforis/arena-core'
 
@@ -44,7 +46,7 @@ const evaluateApplicability = async ({
 }: {
   user: ArenaUser
   survey: ArenaSurvey
-  childDef: any
+  childDef: ArenaNodeDef<NodeDefType>
   record: ArenaRecord
   node: ArenaRecordNode
 }) => {
@@ -300,7 +302,7 @@ export default class RecordsImportJob extends Job {
     survey: ArenaSurvey
     record: ArenaRecord
     nodeDefNamesByPath: any
-    nodeDef: any
+    nodeDef: ArenaNodeDef<NodeDefType>
     nodeParent: ArenaRecordNode
     collectNodeDef: CollectSurvey.CollectNodeDef
     collectNodeDefPath: string
