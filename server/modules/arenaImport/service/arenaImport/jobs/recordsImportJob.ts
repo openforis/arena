@@ -1,3 +1,4 @@
+import type { Record as ArenaRecord } from '@openforis/arena-core'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
@@ -20,7 +21,7 @@ const NODES_INSERT_BATCH_SIZE = 10000
  * @param {!object} record - The record object.
  * @returns {object} - The modified record.
  */
-const prepareRecordSummaryToStore = (record: any) => {
+const prepareRecordSummaryToStore = (record: ArenaRecord) => {
   let maxDateModified = null
   for (const node of Record.getNodesArray(record)) {
     const nodeDateModified = Record.getDateModified(node)

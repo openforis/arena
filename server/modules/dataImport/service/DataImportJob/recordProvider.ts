@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { Survey as ArenaSurvey, Record as ArenaRecord } from '@openforis/arena-core'
 import { Objects, RecordUpdater, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -38,7 +38,15 @@ const checkRootKeysSpecified = ({
  * @param {!string} params.keyValues - The record key values (formatted), used in the error message.
  * @returns {void}
  */
-const checkCanUpdateRecord = ({ context, record, keyValues }: { context: any; record: any; keyValues: any }) => {
+const checkCanUpdateRecord = ({
+  context,
+  record,
+  keyValues,
+}: {
+  context: any
+  record: ArenaRecord
+  keyValues: any
+}) => {
   const { survey, updateRecordsInAnalysis, user, userQualifierFilters } = context
   if (
     !DataImportRecordPermissions.canUpdateRecord({
@@ -53,7 +61,15 @@ const checkCanUpdateRecord = ({ context, record, keyValues }: { context: any; re
   }
 }
 
-const getRecordSummaryKey = ({ survey, rootKeyDefs, record }: { survey: ArenaSurvey; rootKeyDefs: any; record: any }) =>
+const getRecordSummaryKey = ({
+  survey,
+  rootKeyDefs,
+  record,
+}: {
+  survey: ArenaSurvey
+  rootKeyDefs: any
+  record: ArenaRecord
+}) =>
   NodeValues.getFastEqualityCompositeKey({
     nodeDefs: rootKeyDefs,
     getKey: (rootKeyDef) =>

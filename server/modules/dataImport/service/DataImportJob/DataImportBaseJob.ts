@@ -1,5 +1,5 @@
 import { Dates } from '@openforis/arena-core'
-import type { Node as ArenaRecordNode } from '@openforis/arena-core'
+import type { ArenaRecordNode } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
