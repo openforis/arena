@@ -1569,6 +1569,12 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     area: 'Analyse',
     empty:
       "Posez une question sur les données de l'enquête : par exemple, « Hauteur moyenne des arbres par placette ». Je propose des requêtes que vous pouvez ouvrir dans l'Explorateur.",
+    mapLayerCard: {
+      title: 'Couche de carte {{label}}',
+      showOnMap: 'Afficher sur la carte',
+      missing: "Cette couche n'est plus disponible.",
+      noPermission: 'Vous ne pouvez pas ouvrir la carte de cette enquête.',
+    },
     queryCard: {
       title: 'Requête {{queryId}}',
       columns: 'Colonnes',
@@ -1731,6 +1737,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       query_listEntities: 'A listé les entités',
       category_findItems: 'A recherché des éléments de catégorie',
       query_propose: 'A préparé une requête',
+      map_proposeLayer: 'A préparé une couche de carte',
       query_count: "A compté les lignes d'une requête",
       query_run: 'A exécuté une requête',
       records_countByStep: 'A compté les enregistrements par étape',

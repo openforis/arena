@@ -1558,6 +1558,12 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     area: 'Análise',
     empty:
       'Pergunte sobre os dados do levantamento: por exemplo, "Altura média das árvores por parcela". Proponho consultas que pode abrir no Explorador.',
+    mapLayerCard: {
+      title: 'Camada do mapa {{label}}',
+      showOnMap: 'Mostrar no mapa',
+      missing: 'Esta camada já não está disponível.',
+      noPermission: 'Não pode abrir o mapa deste inquérito.',
+    },
     queryCard: {
       title: 'Consulta {{queryId}}',
       columns: 'Colunas',
@@ -1718,6 +1724,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       query_listEntities: 'Listou as entidades',
       category_findItems: 'Pesquisou itens de categoria',
       query_propose: 'Preparou uma consulta',
+      map_proposeLayer: 'Preparou uma camada do mapa',
       query_count: 'Contou as linhas de uma consulta',
       query_run: 'Executou uma consulta',
       records_countByStep: 'Contou os registros por etapa',

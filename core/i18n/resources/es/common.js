@@ -1436,6 +1436,12 @@ $t(common.appNameFull)
     area: 'Análisis',
     empty:
       'Pregunte sobre los datos de la encuesta: por ejemplo, "Altura media de los árboles por parcela". Propongo consultas que puede abrir en el Explorador.',
+    mapLayerCard: {
+      title: 'Capa del mapa {{label}}',
+      showOnMap: 'Mostrar en el mapa',
+      missing: 'Esta capa ya no está disponible.',
+      noPermission: 'No puede abrir el mapa de esta encuesta.',
+    },
     queryCard: {
       title: 'Consulta {{queryId}}',
       columns: 'Columnas',
@@ -1596,6 +1602,7 @@ $t(common.appNameFull)
       query_listEntities: 'Listó las entidades',
       category_findItems: 'Buscó elementos de categoría',
       query_propose: 'Preparó una consulta',
+      map_proposeLayer: 'Preparó una capa del mapa',
       query_count: 'Contó las filas de una consulta',
       query_run: 'Ejecutó una consulta',
       records_countByStep: 'Contó los registros por paso',
