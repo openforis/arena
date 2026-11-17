@@ -1,4 +1,10 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type {
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Node as ArenaNode,
+  Record as ArenaRecord,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
@@ -39,8 +45,8 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
   categoryItemProvider: any
   nodeDef: ArenaNodeDef<NodeDefType>
   code: string
-  record: any
-  parentNode: any
+  record: ArenaRecord
+  parentNode: ArenaNode
   client?: DbClient
 }) => {
   const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy({
@@ -136,7 +142,7 @@ const extractDateValueAndMeta = (collectNode: CollectRecord.CollectNode) => {
 const extractFileValueAndMeta =
   (
     survey: ArenaSurvey,
-    node: any,
+    node: ArenaNode,
     collectSurveyFileZip: any,
     collectNodeDef: CollectSurvey.CollectNodeDef,
     tx: DbClient
@@ -239,8 +245,8 @@ type AttributeValueExtractParams = {
   categoryItemProvider?: any
   taxonProvider?: any
   nodeDef: ArenaNodeDef<NodeDefType>
-  record?: any
-  node?: any
+  record?: ArenaRecord
+  node?: ArenaNode
   collectSurveyFileZip?: any
   collectNodeDef?: CollectSurvey.CollectNodeDef
   collectNode: CollectRecord.CollectNode
