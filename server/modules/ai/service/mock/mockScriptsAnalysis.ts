@@ -76,4 +76,43 @@ export const assistantAnalysisMockScripts: MockScript[] = [
       { text: 'MOCK: use "Show on map" on the card.' },
     ],
   },
+  {
+    promptMarker: assistantMarkers.analysis,
+    pattern: /^show cluster 1 on the map/i,
+    steps: [
+      {
+        toolCall: {
+          toolName: 'map_proposeLayer',
+          input: { attribute: 'cluster_coordinate', search: '1', explanation: 'MOCK: cluster 1 on the map.' },
+        },
+      },
+      { text: 'MOCK: use "Show on map" on the card.' },
+    ],
+  },
+  {
+    promptMarker: assistantMarkers.analysis,
+    pattern: /^show cluster 9 on the map/i,
+    steps: [
+      {
+        toolCall: {
+          toolName: 'map_proposeLayer',
+          input: { attribute: 'cluster_coordinate', search: '9', explanation: 'MOCK: cluster 9 on the map.' },
+        },
+      },
+      { text: 'MOCK: use "Show on map" on the card.' },
+    ],
+  },
+  {
+    promptMarker: assistantMarkers.analysis,
+    pattern: /^show 41\.9, 12\.5 on the map/i,
+    steps: [
+      {
+        toolCall: {
+          toolName: 'map_proposeLayer',
+          input: { search: '41.9, 12.5', explanation: 'MOCK: the place on the map.' },
+        },
+      },
+      { text: 'MOCK: use "Show on map" on the card.' },
+    ],
+  },
 ]

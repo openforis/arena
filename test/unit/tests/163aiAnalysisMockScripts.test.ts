@@ -27,6 +27,9 @@ const e2eMessages = {
   propose: 'average of tree_dec_1 by cluster_id',
   run: 'run the average of tree_dec_1 by cluster_id',
   map: 'show cluster_coordinate on the map',
+  mapRecord: 'show cluster 1 on the map',
+  mapNoMatch: 'show cluster 9 on the map',
+  mapCoordinates: 'show 41.9, 12.5 on the map',
 }
 
 const user = { uuid: 'test-ai-analysis-mock-scripts-user' }
@@ -87,13 +90,26 @@ describe('analysis mock scripts', () => {
     }
   })
 
-  test('the map script proposes a layer of the e2e survey', async () => {
+  test('the map scripts propose layers of the e2e survey', async () => {
     const survey = await buildSurvey()
-    const script = assistantAnalysisMockScripts.find((s) => s.pattern.test(e2eMessages.map))!
-    const [propose] = toolCalls(script)
-    expect(propose.toolName).toBe('map_proposeLayer')
-    const { attribute } = proposeMapLayerInputSchema.parse(propose.input)
-    expect(Survey.getNodeDefByName(attribute)(survey)).toBeTruthy()
+    for (const [message, attribute, search] of [
+      [e2eMessages.map, 'cluster_coordinate', null],
+      [e2eMessages.mapRecord, 'cluster_coordinate', '1'],
+      [e2eMessages.mapNoMatch, 'cluster_coordinate', '9'],
+      [e2eMessages.mapCoordinates, null, '41.9, 12.5'],
+    ]) {
+      const script = assistantAnalysisMockScripts.find((s) => s.pattern.test(message))!
+      const [propose] = toolCalls(script)
+      expect(propose.toolName).toBe('map_proposeLayer')
+      const input = proposeMapLayerInputSchema.parse(propose.input)
+      expect(input.attribute ?? null).toBe(attribute)
+      expect(input.search ?? null).toBe(search)
+    }
+    for (const message of [e2eMessages.map, e2eMessages.mapRecord, e2eMessages.mapNoMatch]) {
+      const script = assistantAnalysisMockScripts.find((s) => s.pattern.test(message))!
+      const input = proposeMapLayerInputSchema.parse(toolCalls(script)[0].input)
+      expect(Survey.getNodeDefByName(input.attribute)(survey)).toBeTruthy()
+    }
   })
 
   test('the run script runs the proposed query, then answers from its rows', () => {

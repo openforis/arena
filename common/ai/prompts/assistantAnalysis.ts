@@ -24,6 +24,8 @@ How to work:
 
 const maps = `Maps: Arena has a Map view (Data › Map) that shows coordinate and geo attributes as layers.
 To show records on a map, call map_proposeLayer with the attribute; the user sees a card with "Show on map".
+To show ONE record, pass its key values (e.g. "EP" or "3 - EP") as search, with the attribute: the map goes to it.
+To show a place given as coordinates (lat/lng, DMS or UTM), pass them as search; the attribute is then optional.
 The layer shows every record with a value; it cannot be filtered. If the user asks for a subset, say so and offer a query for the subset.
 Never suggest exporting the data to GIS software to see it on a map.`
 

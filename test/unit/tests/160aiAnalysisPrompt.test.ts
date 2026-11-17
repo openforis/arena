@@ -70,6 +70,8 @@ describe('analysis system prompt', () => {
     expect(prompt).toContain('map_proposeLayer')
     expect(prompt).toContain('Data › Map')
     expect(prompt).toContain('it cannot be filtered')
+    expect(prompt).toContain('pass its key values as search')
+    expect(prompt).toContain('coordinates')
     for (const other of [build(false), build(true)]) {
       expect(other).not.toContain('map_proposeLayer')
       expect(other).not.toContain('Data › Map')

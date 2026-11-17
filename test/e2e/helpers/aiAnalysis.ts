@@ -19,6 +19,9 @@ export const analysisMessages = {
   propose: 'average of tree_dec_1 by cluster_id',
   run: 'run the average of tree_dec_1 by cluster_id',
   map: 'show cluster_coordinate on the map',
+  mapRecord: 'show cluster 1 on the map',
+  mapNoMatch: 'show cluster 9 on the map',
+  mapCoordinates: 'show 41.9, 12.5 on the map',
 }
 
 // averages of tree_dec_1 by cluster in the sample records (test/e2e/fixtures/seed/sampleSurveyModel.ts)
