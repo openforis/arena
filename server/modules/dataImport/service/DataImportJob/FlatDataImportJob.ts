@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import { setImmediate as waitForEventLoop } from 'node:timers/promises'
 
 import { Objects, RecordUpdateResult } from '@openforis/arena-core'
@@ -8,6 +9,7 @@ import * as Record from '@core/record/record'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -27,7 +29,13 @@ const defaultErrorKey = 'error'
 // Maximum time (ms) spent processing rows without letting the event loop process timers and messages.
 const eventLoopYieldIntervalMillis = 200
 
-const determineAncestorMultipleEntityDefUuid = ({ survey, nodeDefUuid }) => {
+const determineAncestorMultipleEntityDefUuid = ({
+  survey,
+  nodeDefUuid,
+}: {
+  survey: ArenaSurvey
+  nodeDefUuid: string
+}) => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const ancestorMultipleEntityDef = NodeDef.isMultipleAttribute(nodeDef)
     ? Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
@@ -36,6 +44,20 @@ const determineAncestorMultipleEntityDefUuid = ({ survey, nodeDefUuid }) => {
 }
 
 export default class FlatDataImportJob extends DataImportBaseJob {
+  static readonly type = 'DataImportJob'
+  ancestorMultipleEntityDefUuid: string
+  dataImportFileReader: any
+  entitiesCreated: any
+  entitiesWithMultipleAttributesClearedByUuid: Record<string, any>
+  entityKeysIndexCache: any
+  entityUuidTouchedByRecordUuid: Record<string, any>
+  filesToDeleteByUuid: Record<string, any>
+  flatDataReader: any
+  lastEventLoopYieldTime: any
+  nodesPendingDependentsUpdateByUuid: Record<string, any>
+  updatedFilesByName: Record<string, any>
+  updatedFilesByUuid: Record<string, any>
+
   constructor(params, type = FlatDataImportJob.type) {
     super(type, params)
 
@@ -138,7 +160,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     }
   }
 
-  async fetchSurvey() {
+  fetchSurvey() {
     const { surveyId, tx } = this
     const { cycle } = this.context
 
@@ -189,7 +211,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       cycle,
       nodeDefUuid,
       includeFiles,
-      onRowItem: async (item) => this.onRowItem(item),
+      onRowItem: (item) => this.onRowItem(item),
     })
   }
 
@@ -218,7 +240,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     return createRecordEvaluationContext({ user, survey })
   }
 
-  async fetchOrCreateRecord({ valuesByDefUuid }) {
+  fetchOrCreateRecord({ valuesByDefUuid }) {
     const { currentRecord, context, tx } = this
     const flushCallback = async () => {
       // dependents must be updated (and persisted) before another record is fetched
@@ -481,8 +503,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     }
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     const { context, entitiesCreated } = this
     const { dryRun } = context
     return { ...result, dryRun, entitiesCreated }
@@ -501,7 +523,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   _addError(key, params = {}) {
     this.addError({
-      [defaultErrorKey]: Validation.newInstance(false, {}, [{ key, params }]),
+      [defaultErrorKey]: Validation.newInstance(false, {}, [ValidationResult.newInstance(key, params)]),
     })
   }
 
@@ -509,5 +531,3 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     return Object.values(this.errors)[0]?.[defaultErrorKey]
   }
 }
-
-FlatDataImportJob.type = 'DataImportJob'

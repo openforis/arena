@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import { Authorizer } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -20,7 +21,15 @@ import DataImportJob from './DataImportJob/DataImportJob'
  * @returns {Promise<void>} - Resolves if the options are allowed.
  * @throws {UnauthorizedError} If the user cannot use the options.
  */
-const checkCollectDataImportOptions = async ({ user, surveyId, deleteAllRecords = false }) => {
+const checkCollectDataImportOptions = async ({
+  user,
+  surveyId,
+  deleteAllRecords = false,
+}: {
+  user: ArenaUser
+  surveyId: number
+  deleteAllRecords?: any
+}) => {
   if (!deleteAllRecords) return
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
   if (!Authorizer.canEditSurvey(user, surveyInfo)) {
@@ -40,7 +49,21 @@ const checkCollectDataImportOptions = async ({ user, surveyId, deleteAllRecords 
  * @returns {Promise<object>} - The started job.
  * @throws {UnauthorizedError} If the user cannot use the specified options.
  */
-export const startCollectDataImportJob = async ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
+export const startCollectDataImportJob = async ({
+  user,
+  surveyId,
+  filePath,
+  deleteAllRecords,
+  cycle,
+  forceImport,
+}: {
+  user: ArenaUser
+  surveyId: number
+  filePath: string
+  deleteAllRecords: any
+  cycle: string
+  forceImport: any
+}) => {
   await checkCollectDataImportOptions({ user, surveyId, deleteAllRecords })
 
   const job = new CollectDataImportJob({
@@ -64,7 +87,15 @@ export const startCollectDataImportJob = async ({ user, surveyId, filePath, dele
  * @returns {void}
  * @throws {UnauthorizedError} If the user cannot use the options.
  */
-export const checkFlatDataImportOptions = ({ user, includeFiles = false, deleteExistingEntities = false }) => {
+export const checkFlatDataImportOptions = ({
+  user,
+  includeFiles = false,
+  deleteExistingEntities = false,
+}: {
+  user: ArenaUser
+  includeFiles?: boolean
+  deleteExistingEntities?: any
+}) => {
   if ((includeFiles || deleteExistingEntities) && !User.isSystemAdmin(user)) {
     throw new UnauthorizedError(User.getName(user))
   }
@@ -87,6 +118,23 @@ export const startFlatDataImportJob = ({
   includeFiles = false,
   deleteExistingEntities = false,
   abortOnErrors = true,
+}: {
+  user: ArenaUser
+  surveyId: number
+  filePath?: string
+  fileId?: string
+  totalChunks?: number
+  totalFileSize?: number
+  fileFormat: string
+  cycle: string
+  nodeDefUuid: string
+  dryRun?: any
+  insertNewRecords?: any
+  insertMissingNodes?: any
+  updateRecordsInAnalysis?: any
+  includeFiles?: boolean
+  deleteExistingEntities?: any
+  abortOnErrors?: any
 }) => {
   checkFlatDataImportOptions({ user, includeFiles, deleteExistingEntities })
 

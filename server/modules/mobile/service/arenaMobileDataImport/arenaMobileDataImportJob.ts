@@ -33,7 +33,7 @@ export default class ArenaMobileDataImportJob extends Job {
     super(ArenaMobileDataImportJob.type, params, [
       new PrepareImportFileJob(),
       new ArenaFileReadJob(),
-      new RecordsImportJob() as unknown as Job, // DataImportBaseJob (JS) generates the result synchronously
+      new RecordsImportJob(),
       new FilesImportJob(),
     ])
   }

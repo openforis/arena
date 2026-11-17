@@ -8,6 +8,10 @@ const directories = {
 const pathSeparator = '/'
 
 export class DataImportFileReader {
+  filePath: string
+  fileZip: any
+  includeFiles: boolean
+
   constructor({ filePath, includeFiles }) {
     this.filePath = filePath
     this.includeFiles = includeFiles
@@ -28,7 +32,7 @@ export class DataImportFileReader {
       if (!csvFileEntryName) {
         throw new Error('Cannot find CSV file inside ZIP')
       }
-      return this.fileZip.getEntryStream(csvFileEntryName)
+      return await this.fileZip.getEntryStream(csvFileEntryName)
     }
     return FileUtils.createReadStream(this.filePath)
   }
@@ -39,13 +43,10 @@ export class DataImportFileReader {
       const extension = FileUtils.getFileExtension(fileNameParam)
       possibleFileNames.push(`${fileUuid}.bin`, `${fileUuid}.${extension}`)
     }
-    for (const fileName of possibleFileNames) {
-      const entryName = [directories.files, fileName].join(pathSeparator)
-      if (this.fileZip.hasEntry(entryName)) {
-        return this.fileZip.getEntryData(entryName)
-      }
-    }
-    return null
+    const entryName = possibleFileNames
+      .map((fileName) => [directories.files, fileName].join(pathSeparator))
+      .find((name) => this.fileZip.hasEntry(name))
+    return entryName ? await this.fileZip.getEntryData(entryName) : null
   }
 
   close() {

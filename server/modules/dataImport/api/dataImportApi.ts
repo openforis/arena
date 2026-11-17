@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as Request from '@server/utils/request'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as JobUtils from '@server/job/jobUtils'
@@ -9,7 +10,7 @@ import { requireRecordCreatePermission } from '../../auth/authApiMiddleware'
 
 const uriPrefix = '/survey/:surveyId/data-import'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   app.post(`${uriPrefix}/collect`, requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)

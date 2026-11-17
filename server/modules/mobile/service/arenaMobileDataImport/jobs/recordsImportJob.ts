@@ -355,8 +355,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.setContext({ recordsFileUuids: recordsFileUuidsArray })
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     result[resultKeys.mergedRecordsMap] = this.mergedRecordsMap
     result[resultKeys.mergedSameRecordUuids] = Array.from(this.mergedSameRecordUuids)
     return result
