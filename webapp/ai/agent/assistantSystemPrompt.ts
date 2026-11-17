@@ -42,6 +42,7 @@ export const describeView = (view: AiCurrentView, survey: any): string | null =>
  * @param {AiToolContext} params.ctx - Tool context of the turn.
  * @param {string|null} params.outline - Handbook outline (Help only).
  * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
+ * @param {boolean} [params.mapToolAvailable] - Whether map_proposeLayer is offered in the turn (Analysis).
  * @returns {string} The system prompt.
  */
 const buildAreaPrompt = ({
@@ -49,11 +50,13 @@ const buildAreaPrompt = ({
   ctx,
   outline,
   dataToolsAvailable = false,
+  mapToolAvailable = false,
 }: {
   area: AssistantPromptArea
   ctx: AiToolContext
   outline: string | null
   dataToolsAvailable?: boolean
+  mapToolAvailable?: boolean
 }): string => {
   switch (area) {
     case 'design': {
@@ -83,6 +86,7 @@ const buildAreaPrompt = ({
         uiLang: ctx.uiLang,
         viewDescription: describeView(ctx.getCurrentView(), ctx.survey),
         dataToolsAvailable,
+        mapToolAvailable,
       })
     case 'cleaning':
       return buildAssistantCleaningPrompt({
@@ -104,6 +108,7 @@ const buildAreaPrompt = ({
  * @param {AiToolContext} params.ctx - Tool context of the turn.
  * @param {string|null} params.outline - Handbook outline (Help only).
  * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
+ * @param {boolean} [params.mapToolAvailable] - Whether map_proposeLayer is offered in the turn (Analysis).
  * @param {boolean} [params.titleToolAvailable] - Whether conversation_setTitle is offered (first message).
  * @returns {string} The system prompt.
  */
@@ -115,6 +120,7 @@ export const buildAssistantSystemPrompt = ({
   ctx: AiToolContext
   outline: string | null
   dataToolsAvailable?: boolean
+  mapToolAvailable?: boolean
   titleToolAvailable?: boolean
 }): string => {
   const prompt = `${buildAreaPrompt(params)}\n\n${HISTORY_NOTES_RULE}`

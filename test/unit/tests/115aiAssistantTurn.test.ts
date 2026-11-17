@@ -283,6 +283,25 @@ describe('runAssistantTurn', () => {
     expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: STEP_LIMIT_ERROR_KEY })
   })
 
+  test('an answer that is only a map card ends done', async () => {
+    const emptyStream = () =>
+      convertArrayToReadableStream([{ type: 'stream-start', warnings: [] }, finish('stop')] as any[])
+    const propose = makeTool('map_proposeLayer', async () => ({
+      attributeUuid: 'u1',
+      attribute: 'plot_location',
+      explanation: 'x',
+      shownToUser: true,
+    }))
+    const model = scriptedModel(() => toolCallStream('call-1', 'map_proposeLayer', { summary: 'x' }), emptyStream)
+    const result = await run({ model, tools: [propose] })
+    expect(answerOf(result).status).toBe('done')
+    // a failed proposal is not a card: the step-limit behaviour stays
+    const failing = makeTool('map_proposeLayer', async () => ({ error: { code: 'invalidProposal', message: 'x' } }))
+    const model2 = scriptedModel(() => toolCallStream('call-1', 'map_proposeLayer', { summary: 'x' }), emptyStream)
+    const failed = await run({ model: model2, tools: [failing] })
+    expect(answerOf(failed).errorKey).toBe(STEP_LIMIT_ERROR_KEY)
+  })
+
   test('the model answers on the last step: the turn is done', async () => {
     const echo = makeTool('test_echo', async () => ({ ok: true }))
     const model = scriptedModel(

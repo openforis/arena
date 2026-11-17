@@ -13,6 +13,7 @@ import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConver
 import { getConversationDataClass, isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
 import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
+import { MAP_PROPOSE_LAYER_TOOL_NAME, getProposedMapLayer } from '@webapp/ai/tools/analysis/proposeMapLayer'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
@@ -200,14 +201,22 @@ const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined =
 
 /**
  * Returns true when the answer of the turn has no text and no card (the model spent the steps on tool calls).
+ * A proposed map layer is a card: an answer that is only one ends done.
  * @param {Conversation} after - Conversation at the end of the turn.
  * @param {Conversation} before - Conversation before the turn.
  * @returns {boolean} True for a silent turn.
  */
 const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
   const answer = after.messages.at(-1)
-  const hasText = answer?.role === 'assistant' && answer.parts.some((part) => part.type === 'text' && part.text.trim())
-  if (hasText || Object.keys(after.changeSets).length > Object.keys(before.changeSets).length) return false
+  // a text or a map card answers
+  const hasContent =
+    answer?.role === 'assistant' &&
+    answer.parts.some(
+      (part) =>
+        (part.type === 'text' && part.text.trim()) ||
+        (part.type === 'tool' && getProposedMapLayer({ toolName: part.toolName, output: part.output }))
+    )
+  if (hasContent || Object.keys(after.changeSets).length > Object.keys(before.changeSets).length) return false
   // a new query card answers (the only answer without data access), unless it repeats an earlier query
   const earlier = Object.values(before.queries ?? {})
   return !Object.values(after.queries ?? {}).some(
@@ -341,6 +350,7 @@ export const runAssistantTurn = async ({
         ctx: turnCtx,
         outline,
         dataToolsAvailable: toolList.some((tool) => tool.dataClass === 'data'),
+        mapToolAvailable: toolList.some((tool) => tool.name === MAP_PROPOSE_LAYER_TOOL_NAME),
         titleToolAvailable: toolList.some((tool) => tool.name === CONVERSATION_TITLE_TOOL_NAME),
       })
     const budgetChars = getHistoryBudget({

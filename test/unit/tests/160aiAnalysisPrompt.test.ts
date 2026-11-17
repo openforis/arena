@@ -18,7 +18,7 @@ const cannedAnswerPatterns = [
 let survey: any = null
 const cycle = Survey.cycleOneKey
 
-const build = (dataToolsAvailable: boolean) =>
+const build = (dataToolsAvailable: boolean, mapToolAvailable = false) =>
   buildAssistantAnalysisPrompt({
     survey,
     cycle,
@@ -26,6 +26,7 @@ const build = (dataToolsAvailable: boolean) =>
     uiLang: 'es',
     viewDescription: 'Explorer',
     dataToolsAvailable,
+    mapToolAvailable,
   })
 
 beforeAll(async () => {
@@ -62,6 +63,16 @@ describe('analysis system prompt', () => {
     expect(prompt).toContain('never from raw samples')
     expect(prompt).toContain('"query q1"')
     expect(prompt).not.toContain('You cannot see any result')
+  })
+
+  test('with the map tool: the Map view and map_proposeLayer are named', () => {
+    const prompt = build(false, true)
+    expect(prompt).toContain('map_proposeLayer')
+    expect(prompt).toContain('Data › Map')
+    for (const other of [build(false), build(true)]) {
+      expect(other).not.toContain('map_proposeLayer')
+      expect(other).not.toContain('Data › Map')
+    }
   })
 
   test('never matches a canned mock answer', () => {

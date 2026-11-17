@@ -22,6 +22,10 @@ How to work:
 3. Call query_propose with the query. The user sees it as a card with "Open in Explorer" and, when possible,
    "Show as chart". If it returns invalidProposal, fix the issues and propose again.`
 
+const maps = `Maps: Arena has a Map view (Data › Map) that shows coordinate and geo attributes as layers.
+To show records on a map, call map_proposeLayer with the attribute; the user sees a card with "Show on map".
+Never suggest exporting the data to GIS software to see it on a map.`
+
 const readingWithData = `Reading results:
 - You only see results after calling query_run or query_count with a queryId returned by query_propose.
   You cannot run any other query. records_countByStep and records_countOverTime give record counts.
@@ -47,6 +51,7 @@ const readingWithoutData = `Reading results:
  * @param {string} params.uiLang - Language of the user's interface (answer language).
  * @param {string|null} [params.viewDescription] - Current view, as the assistant describes it.
  * @param {boolean} params.dataToolsAvailable - Whether query_run and the other data tools are offered.
+ * @param {boolean} [params.mapToolAvailable] - Whether map_proposeLayer is offered (default false).
  * @returns {string} The system prompt.
  */
 export const buildAssistantAnalysisPrompt = ({
@@ -56,6 +61,7 @@ export const buildAssistantAnalysisPrompt = ({
   uiLang,
   viewDescription = null,
   dataToolsAvailable,
+  mapToolAvailable = false,
 }: {
   survey: any
   cycle: string
@@ -63,6 +69,7 @@ export const buildAssistantAnalysisPrompt = ({
   uiLang: string
   viewDescription?: string | null
   dataToolsAvailable: boolean
+  mapToolAvailable?: boolean
 }): string => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
@@ -79,10 +86,13 @@ export const buildAssistantAnalysisPrompt = ({
   return [
     assistantMarkers.analysis,
     intro,
+    mapToolAvailable ? maps : null,
     `Query rules:\n${getDataQueryRules({ schemaSource: 'the schema is returned by query_listEntities' })}`,
     `Examples (each JSON object is a query_propose input):\n${dataQueryExamples}`,
     dataToolsAvailable ? readingWithData : readingWithoutData,
     `Context:\n${context}`,
     `Answer in ${getAnswerLanguageLabel(uiLang)}. Be brief.`,
-  ].join('\n\n')
+  ]
+    .filter(Boolean)
+    .join('\n\n')
 }
