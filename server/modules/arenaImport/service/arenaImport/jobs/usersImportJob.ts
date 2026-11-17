@@ -1,6 +1,5 @@
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { Survey as ArenaSurvey, User as ArenaUser } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
-import type { User as ArenaUser } from '@openforis/arena-core'
 import Job from '@server/job/job'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
