@@ -253,6 +253,20 @@ describe('runAssistantTurn', () => {
     expect(answerOf(result).status).toBe('done')
   })
 
+  test('a turn that only adds a query, without a written answer, is an error', async () => {
+    const addQuery = makeTool('test_query', async (_input, ctx) => {
+      ctx.analysisQueries?.add({ query: {}, explanation: 'E', entityName: 'tree', mode: 'raw' } as any)
+      return { ok: true }
+    })
+    const model = scriptedModel(
+      () => toolCallStream('c1', 'test_query', { summary: 'x' }),
+      () => convertArrayToReadableStream([{ type: 'stream-start', warnings: [] }, finish('stop')] as any[])
+    )
+    const result = await run({ model, tools: [addQuery] })
+    expect(Object.keys(result.queries ?? {})).toEqual(['q1'])
+    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: STEP_LIMIT_ERROR_KEY })
+  })
+
   test('the model answers on the last step: the turn is done', async () => {
     const echo = makeTool('test_echo', async () => ({ ok: true }))
     const model = scriptedModel(

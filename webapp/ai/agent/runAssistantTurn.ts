@@ -206,8 +206,8 @@ const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined =
 const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
   const answer = after.messages.at(-1)
   const hasText = answer?.role === 'assistant' && answer.parts.some((part) => part.type === 'text' && part.text.trim())
-  const count = (c: Conversation) => Object.keys(c.changeSets).length + Object.keys(c.queries ?? {}).length
-  return !hasText && count(after) === count(before)
+  // a new change set is shown for review; a query alone is not an answer
+  return !hasText && Object.keys(after.changeSets).length === Object.keys(before.changeSets).length
 }
 
 /**
