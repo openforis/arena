@@ -10,7 +10,7 @@ import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCre
  * Creates the view when survey Imported is published.
  */
 export default class CreateRdbJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('CreateRdbJob', params, [
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
@@ -18,10 +18,10 @@ export default class CreateRdbJob extends Job {
     ])
   }
 
-  async shouldExecute() {
+  shouldExecute() {
     const { survey } = this.context
 
     const surveyInfo = Survey.getSurveyInfo(survey)
-    return Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
+    return Promise.resolve(Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo))
   }
 }

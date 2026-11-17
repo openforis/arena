@@ -5,7 +5,9 @@ import Job from '@server/job/job'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
 export default class NodeDefsImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'NodeDefsImportJob'
+
+  constructor(params?: any) {
     super(NodeDefsImportJob.type, params)
   }
 
@@ -28,5 +30,3 @@ export default class NodeDefsImportJob extends Job {
     this.setContext({ survey: surveyUpdated })
   }
 }
-
-NodeDefsImportJob.type = 'NodeDefsImportJob'

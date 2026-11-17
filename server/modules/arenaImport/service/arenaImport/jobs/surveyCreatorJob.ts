@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -7,14 +8,22 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
-const isTemplate = ({ backup = true, surveyInfoArenaSurvey, surveyInfoTarget = null }) => {
+const isTemplate = ({
+  backup = true,
+  surveyInfoArenaSurvey,
+  surveyInfoTarget = null,
+}: {
+  backup?: boolean
+  surveyInfoArenaSurvey: any
+  surveyInfoTarget?: any
+}) => {
   if (backup) return Survey.isTemplate(surveyInfoArenaSurvey)
   if (surveyInfoTarget) return Survey.isTemplate(surveyInfoTarget)
   return false
 }
 
 export default class SurveyCreatorJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('SurveyCreatorJob', params)
   }
 
@@ -28,13 +37,9 @@ export default class SurveyCreatorJob extends Job {
     surveyInfoArenaSurvey.props = { ...surveyInfoArenaSurvey.props, ...surveyInfoArenaSurvey.propsDraft }
 
     // skip collect report
-    const {
-      collectUri,
-      collectNodeDefsInfoByPath,
-
-      collectReport, // always ignore Collect import report when survey is imported or cloned
-      ...propsToImport
-    } = surveyInfoArenaSurvey.props
+    const { collectUri, collectNodeDefsInfoByPath, ...propsOther } = surveyInfoArenaSurvey.props
+    // always ignore Collect import report when survey is imported or cloned
+    const propsToImport = A.omit(['collectReport'])(propsOther)
 
     const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
     const surveyTargetName = Survey.getName(surveyInfoTarget)

@@ -4,7 +4,7 @@ import * as ActivityLogManager from '@server/modules/activityLog/manager/activit
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
 export default class ActivityLogImportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('ActivityLogImportJob', params)
   }
 

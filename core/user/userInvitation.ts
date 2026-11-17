@@ -6,8 +6,8 @@ const keys = {
   removedDate: 'removedDate',
 } as const
 
-const getUserUuid = (userInvitation: Record<string, unknown>) => userInvitation[keys.userUuid]
-const getInvitedBy = (userInvitation: Record<string, unknown>) => userInvitation[keys.invitedBy]
+const getUserUuid = (userInvitation: Record<string, unknown>) => userInvitation[keys.userUuid] as string
+const getInvitedBy = (userInvitation: Record<string, unknown>) => userInvitation[keys.invitedBy] as string
 const getRemovedDate = (userInvitation: Record<string, unknown>) => userInvitation[keys.removedDate]
 
 const hasBeenRemoved = (userInvitation: Record<string, unknown>): boolean => {
