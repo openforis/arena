@@ -74,7 +74,9 @@ export const proposeMapLayerTool: AiTool<ProposeMapLayerInput, unknown> = {
   name: MAP_PROPOSE_LAYER_TOOL_NAME,
   description:
     'Proposes showing a coordinate or geo attribute as a layer on the Arena map (Data › Map). The user sees a card ' +
-    'with "Show on map". Returns the layer or the valid layer names.',
+    'with "Show on map". ' +
+    'The layer shows every record with a value; it cannot be filtered. If the user asks for a subset, say so and offer a query for the subset. ' +
+    'Returns the layer or the valid layer names.',
   inputSchema: proposeMapLayerInputSchema,
   area: ['analysis'],
   dataClass: 'schema',

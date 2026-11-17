@@ -108,6 +108,9 @@ const MapWrapper = () => {
   // the assistant asks for a layer through the router state; the key changes on every navigation, so each ask counts
   const { state: locationState, key: locationKey } = useLocation()
   const requestedUuid: string | null = locationState?.aiMapLayer?.uuid ?? null
+  // requested layers stay checked for the life of the view, so a later request does not remove them
+  const [requestedUuids, setRequestedUuids] = useState<ReadonlySet<string>>(new Set())
+  if (requestedUuid && !requestedUuids.has(requestedUuid)) setRequestedUuids(new Set(requestedUuids).add(requestedUuid))
 
   const surveyInfo = useSurveyInfo() as any
   const surveyId = Survey.getId(survey)
@@ -199,7 +202,7 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
-          checked={requestedUuid === NodeDef.getUuid(attributeDef)}
+          checked={requestedUuids.has(NodeDef.getUuid(attributeDef))}
           activationKey={requestedUuid === NodeDef.getUuid(attributeDef) ? locationKey : null}
           markersColor={getGeoAttributeLayerMarkersColor({
             attributeDef,
@@ -218,6 +221,7 @@ const MapWrapper = () => {
       onRecordEditClick,
       preloadedLayerRefs,
       requestedUuid,
+      requestedUuids,
       samplingPointDataLevels,
     ]
   )

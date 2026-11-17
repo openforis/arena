@@ -69,6 +69,7 @@ describe('analysis system prompt', () => {
     const prompt = build(false, true)
     expect(prompt).toContain('map_proposeLayer')
     expect(prompt).toContain('Data › Map')
+    expect(prompt).toContain('it cannot be filtered')
     for (const other of [build(false), build(true)]) {
       expect(other).not.toContain('map_proposeLayer')
       expect(other).not.toContain('Data › Map')
@@ -76,7 +77,7 @@ describe('analysis system prompt', () => {
   })
 
   test('never matches a canned mock answer', () => {
-    for (const prompt of [build(false), build(true)]) {
+    for (const prompt of [build(false), build(true), build(false, true)]) {
       for (const pattern of cannedAnswerPatterns) {
         expect(prompt).not.toMatch(pattern)
       }

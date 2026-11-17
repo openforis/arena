@@ -36,7 +36,9 @@ export const MapLayerCard = ({ proposed }: { proposed: ProposedMapLayer }) => {
   const { uuid } = model
   return (
     <div className="ai-query-card" data-testid={TestId.aiMapLayerCard.root(uuid)}>
-      <div className="ai-query-card__title">{i18n.t('aiAnalysis.mapLayerCard.title', { label: model.label })}</div>
+      <div className="ai-query-card__title">
+        {i18n.t('aiAnalysis.mapLayerCard.title', { label: model.label, interpolation: { escapeValue: false } })}
+      </div>
       <p className="ai-query-card__explanation">{model.explanation}</p>
       {model.status === 'noPermission' ? (
         <div className="ai-query-card--missing">{i18n.t('aiAnalysis.mapLayerCard.noPermission')}</div>
