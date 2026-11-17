@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
@@ -6,10 +7,13 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 const { SurveyFileType } = SurveyFile
 
 // cycle === undefined matches files associated to any cycle (e.g. when deleting a whole chain)
-const matchesChainAndCycle = ({ summary, chainUuid, cycle }) =>
+const matchesChainAndCycle = ({ summary, chainUuid, cycle }: { summary: any; chainUuid: string; cycle?: string }) =>
   SurveyFile.getChainUuid(summary) === chainUuid && (cycle === undefined || SurveyFile.getCycle(summary) === cycle)
 
-export const fetchChainMauFileSummary = async ({ surveyId, chainUuid, cycle }, client = undefined) => {
+export const fetchChainMauFileSummary = async (
+  { surveyId, chainUuid, cycle }: { surveyId: number; chainUuid: string; cycle?: string },
+  client?: DbClient
+) => {
   const summaries = await SurveyFileService.fetchFileSummariesByType(
     { surveyId, type: SurveyFileType.chainMau },
     client
@@ -17,7 +21,10 @@ export const fetchChainMauFileSummary = async ({ surveyId, chainUuid, cycle }, c
   return summaries.find((summary) => matchesChainAndCycle({ summary, chainUuid, cycle })) ?? null
 }
 
-export const deleteChainMauFile = async ({ surveyId, chainUuid, cycle }, client = undefined) => {
+export const deleteChainMauFile = async (
+  { surveyId, chainUuid, cycle }: { surveyId: number; chainUuid: string; cycle?: string },
+  client?: DbClient
+) => {
   const summaries = await SurveyFileService.fetchFileSummariesByType(
     { surveyId, type: SurveyFileType.chainMau },
     client
@@ -28,7 +35,21 @@ export const deleteChainMauFile = async ({ surveyId, chainUuid, cycle }, client 
   }
 }
 
-export const uploadChainMauFile = async ({ surveyId, chainUuid, cycle, filePath, fileName, fileSize }) => {
+export const uploadChainMauFile = async ({
+  surveyId,
+  chainUuid,
+  cycle,
+  filePath,
+  fileName,
+  fileSize,
+}: {
+  surveyId: number
+  chainUuid: string
+  cycle?: string
+  filePath: string
+  fileName: any
+  fileSize: any
+}) => {
   const existingSummary = await fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
 
   const content = await FileUtils.readBinaryFile(filePath)
@@ -48,7 +69,15 @@ export const uploadChainMauFile = async ({ surveyId, chainUuid, cycle, filePath,
   return file
 }
 
-export const fetchChainMauFileContent = async ({ surveyId, chainUuid, cycle }) => {
+export const fetchChainMauFileContent = async ({
+  surveyId,
+  chainUuid,
+  cycle,
+}: {
+  surveyId: number
+  chainUuid: string
+  cycle?: string
+}) => {
   const summary = await fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
   if (!summary) return null
 

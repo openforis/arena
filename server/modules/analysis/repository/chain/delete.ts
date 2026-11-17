@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import * as DB from '../../../../db'
 
 import { TableChain } from '../../../../../common/model/db'
@@ -12,7 +13,7 @@ import { TableChain } from '../../../../../common/model/db'
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const deleteChain = async (params, client = DB.client) => {
+export const deleteChain = (params: any, client: DbClient = DB.client) => {
   const { surveyId, chainUuid } = params
 
   const tableChain = new TableChain(surveyId)
