@@ -3,6 +3,7 @@ import type { AiTool } from '@webapp/ai/tools/types'
 import { AnalysisApi, axiosAnalysisHttp, createAnalysisApi } from './analysisApi'
 import { createFindCategoryItemsTool } from './findCategoryItems'
 import { listEntitiesTool } from './listEntities'
+import { proposeMapLayerTool } from './proposeMapLayer'
 import { proposeQueryTool } from './proposeQuery'
 import { createRecordCountTools } from './recordCounts'
 import { createRunQueryTools } from './runQuery'
@@ -17,6 +18,7 @@ export const createAnalysisTools = ({ api }: { api: AnalysisApi }): AiTool<any, 
   listEntitiesTool,
   createFindCategoryItemsTool({ api }),
   proposeQueryTool,
+  proposeMapLayerTool,
   ...createRunQueryTools({ api }),
   ...createRecordCountTools({ api }),
 ]

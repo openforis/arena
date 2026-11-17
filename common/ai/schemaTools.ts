@@ -13,6 +13,7 @@ export const SCHEMA_TOOL_NAMES: readonly string[] = [
   'expression_check',
   'expressions_proposeSet',
   'labels_proposeSet',
+  'map_proposeLayer',
   'nodeDef_get',
   'nodeDef_proposeCreate',
   'nodeDef_proposeUpdate',

@@ -13,6 +13,7 @@ let survey: any = null
 const schemaToolNames = [
   'category_findItems',
   'docs_search',
+  'map_proposeLayer',
   'nodeDef_search',
   'query_listEntities',
   'query_propose',
@@ -72,7 +73,7 @@ describe('analysis tools in the registry', () => {
   })
 
   test('names are valid function names and WebMCP descriptors can be built', () => {
-    expect(analysisTools).toHaveLength(7)
+    expect(analysisTools).toHaveLength(8)
     for (const tool of analysisTools) {
       expect(tool.name).toMatch(/^[a-zA-Z]\w{0,63}$/)
       const descriptor = toWebMcpDescriptor(tool)
