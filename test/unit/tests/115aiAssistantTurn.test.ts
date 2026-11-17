@@ -240,13 +240,14 @@ describe('runAssistantTurn', () => {
     expect(answerOf(result).parts).toHaveLength(2)
   })
 
-  test.each(['<|tool_call>call:query_propose{"a":1}<tool_call|>', ' <tool_call>{"name":"x"}</tool_call>\n', '<|tool_call|>x<|/tool_call|>'])(
-    'an answer that is only tool call markup is an error: %s',
-    async (text) => {
-      const result = await run({ model: scriptedModel(() => textStream(text)) })
-      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: TOOL_CALL_TEXT_ERROR_KEY })
-    }
-  )
+  test.each([
+    '<|tool_call>call:query_propose{"a":1}<tool_call|>',
+    ' <tool_call>{"name":"x"}</tool_call>\n',
+    '<|tool_call|>x<|/tool_call|>',
+  ])('an answer that is only tool call markup is an error: %s', async (text) => {
+    const result = await run({ model: scriptedModel(() => textStream(text)) })
+    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: TOOL_CALL_TEXT_ERROR_KEY })
+  })
 
   test('text that mentions a tool call among prose is an answer', async () => {
     const result = await run({ model: scriptedModel(() => textStream('Use <tool_call> markup carefully.')) })
