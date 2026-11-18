@@ -332,6 +332,34 @@ A password is **not** required: a user can sign in only with an external provide
   last-method rule, unless the admin explicitly confirms leaving the user with only the "forgot password" recovery).
 - User deletion: identities go with the `ON DELETE CASCADE`.
 
+## Implementation notes (arena-server, branch `external-login-providers`)
+
+Tasks 1–3 are implemented in `@openforis/arena-server`. Differences from the design above:
+
+- **Provider storage lives in arena-server**, next to the routes that use it (like the 2FA devices):
+  `AuthProviderService` (`ServerServiceType.authProvider`) stores the providers, encrypts the client secrets
+  (`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`, read by arena-server), reads `AUTH_PROVIDERS_CONFIG` and caches the list
+  for 60 s. Arena's `secretBox` is not used. Arena only adds the admin and user APIs (permissions, emails) on top of
+  the service.
+- **No foreign key** from `user_external_identity.provider_id` to `auth_provider` (environment providers have no
+  row); deleting a provider deletes its identity links in the same transaction.
+- Redirect URIs use `ARENA_PUBLIC_URL` (already used by Arena), or the request host when it is not set.
+- **Routes:** `GET /auth/providers`, `GET /auth/providers/:id/icon`, `GET /auth/oidc/:id` (start; query:
+  `invitation` + `name`, or `ticket` + `returnTo`), `GET /auth/oidc/:id/callback`, `POST /auth/oidc/_2fa`,
+  `POST /auth/oidc/:id/ticket` (logged-in user; `mode: link | test`, test for system admins only),
+  `GET /auth/oidc/_test-result` (system admin).
+- **Link and test modes** start from a short-lived ticket requested by the logged-in webapp (the start URL is a
+  browser navigation, without the access token). The test result is kept in a short-lived cookie and read by the
+  admin page from `_test-result`, so no claims go in URLs.
+- **Redirects back to the webapp:** success → `/app/home/`; 2FA → `/guest/login/?externalLoginStep=2fa&provider=<id>`;
+  errors → `?externalLoginError=<key>` on the login page, the invitation page or `returnTo`; link →
+  `<returnTo>?externalLoginLinked=<id>`; test → `<returnTo>?externalLoginTest=<id>`. `returnTo` must be an `/app/...`
+  path. Error keys: `ExternalLoginErrorKeys` (`externalLogin.*`).
+- Disabled providers can still be used in test mode.
+- `AuthProviderService.getUserIdentities` and `unlinkUserIdentity` (with the last-method rule) back the "Sign-in
+  methods" section.
+- Tests: end-to-end sign-ins against `oauth2-mock-server` (run in a child process, ESM only) plus unit tests.
+
 ## Tasks
 
 ### Task 1: arena-server — adapter interface, OIDC adapter, provider service interface
