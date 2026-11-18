@@ -1,3 +1,4 @@
+import type { User as ArenaUser, Survey as ArenaSurvey, UserGroup as ArenaUserGroup } from '@openforis/arena-core'
 import { Objects, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
@@ -9,15 +10,27 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
-const _fetchUserGroups = async ({ user, survey }, client) => {
-  const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+// UserGroupService is not exported by arena-server
+type UserGroupService = {
+  getManyByUser(params: { userUuid: string; surveyUuid?: string }, client?: DbClient): Promise<ArenaUserGroup[]>
+  getAll(params: { surveyUuid: string }, client?: DbClient): Promise<ArenaUserGroup[]>
+}
+
+const _getUserGroupService = (): UserGroupService =>
+  ServiceRegistry.getInstance().getService(ServerServiceType.userGroup) as unknown as UserGroupService
+
+const _fetchUserGroups = ({ user, survey }: { user: ArenaUser; survey: ArenaSurvey }, client: DbClient) => {
+  const userGroupService = _getUserGroupService()
   return userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid: Survey.getUuid(survey) }, client)
 }
 
-const _buildQualifierFilters = async ({ survey, userGroup }, client) => {
+const _buildQualifierFilters = async (
+  { survey, userGroup }: { survey: ArenaSurvey; userGroup: ArenaUserGroup },
+  client: DbClient
+) => {
   const qualifierNodeDefs = Survey.getQualifierNodeDefs(survey)
   const qualifiers = UserGroup.getQualifiers(userGroup)
   if (qualifierNodeDefs.length === 0 || qualifiers.length === 0) return []
@@ -61,12 +74,15 @@ const _buildQualifierFilters = async ({ survey, userGroup }, client) => {
  * @param {object} params - The function parameters.
  * @param {object} params.user - The current user.
  * @param {object} params.survey - The survey, with node defs loaded.
- * @param {pgPromise.IDatabase} [client] - The db client.
+ * @param {DbClient} [client] - The db client.
  * @returns {Promise<Array<{nodeDef: object, value: *}>>} - An empty array when the user is
  * unrestricted (no group, or group with no matching qualifiers), otherwise the list of qualifier
  * filters to apply.
  */
-export const fetchUserQualifierFilters = async ({ user, survey }, client = db) => {
+export const fetchUserQualifierFilters = async (
+  { user, survey }: { user: ArenaUser; survey: ArenaSurvey },
+  client: DbClient = db
+) => {
   if (Survey.getQualifierNodeDefs(survey).length === 0) return []
   const [userGroup] = await _fetchUserGroups({ user, survey }, client)
   return userGroup ? _buildQualifierFilters({ survey, userGroup }, client) : []
@@ -78,11 +94,14 @@ export const fetchUserQualifierFilters = async ({ user, survey }, client = db) =
  * @param {object} params - The function parameters.
  * @param {object} params.user - The current user.
  * @param {object} params.survey - The survey, with node defs loaded.
- * @param {pgPromise.IDatabase} [client] - The db client.
+ * @param {DbClient} [client] - The db client.
  * @returns {Promise<{own: Array<{nodeDef: *, value: *}>, readable: Array<Array<{nodeDef: *, value: *}>>}>} - `own` is empty when the user is unrestricted (then `readable` is empty too);
  * readable groups without qualifier filters are ignored (they would match every record).
  */
-export const fetchUserGroupAccessFilters = async ({ user, survey }, client = db) => {
+export const fetchUserGroupAccessFilters = async (
+  { user, survey }: { user: ArenaUser; survey: ArenaSurvey },
+  client: DbClient = db
+) => {
   const noFilters = { own: [], readable: [] }
   if (Survey.getQualifierNodeDefs(survey).length === 0) return noFilters
 
@@ -93,7 +112,7 @@ export const fetchUserGroupAccessFilters = async ({ user, survey }, client = db)
   const readableGroupUuids = UserGroup.getReadableGroupUuids(userGroup)
   if (own.length === 0 || readableGroupUuids.length === 0) return { own, readable: [] }
 
-  const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+  const userGroupService = _getUserGroupService()
   const surveyGroups = await userGroupService.getAll({ surveyUuid: Survey.getUuid(survey) }, client)
   const readableGroups = surveyGroups.filter(
     (group) => group.uuid !== userGroup.uuid && readableGroupUuids.includes(group.uuid)
