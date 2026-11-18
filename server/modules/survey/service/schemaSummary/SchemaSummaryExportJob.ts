@@ -7,7 +7,9 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import { generateSchemaSummaryItems } from './schemaSummary'
 
 export default class SchemaSummaryExportJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SchemaSummaryExportJob'
+
+  constructor(params?: any) {
     super(SchemaSummaryExportJob.type, params)
   }
 
@@ -35,10 +37,9 @@ export default class SchemaSummaryExportJob extends Job {
     this.setContext({ tempFileName })
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { tempFileName } = this.context
     this.setResult({ tempFileName })
+    return Promise.resolve()
   }
 }
-
-SchemaSummaryExportJob.type = 'SchemaSummaryExportJob'

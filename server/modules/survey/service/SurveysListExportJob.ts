@@ -1,3 +1,4 @@
+import type { DateFormats } from '@openforis/arena-core'
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
@@ -7,7 +8,9 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '../manager/surveyManager'
 
 export default class SurveysListExportJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveysListExportJob'
+
+  constructor(params?: any) {
     super(SurveysListExportJob.type, params)
   }
 
@@ -58,9 +61,10 @@ export default class SurveysListExportJob extends Job {
       for (const [key, value] of Object.entries(surveySummary)) {
         const valueTransformed = key.startsWith('date')
           ? DateUtils.convertDate({
-              dateStr: value,
+              dateStr: String(value),
               formatFrom: DateUtils.formats.datetimeISO,
-              formatTo: DateUtils.formats.datetimeExport,
+              // not one of the arena-core DateFormats, but a valid format
+              formatTo: DateUtils.formats.datetimeExport as DateFormats,
             })
           : value
         transformedSurveySummary[key] = valueTransformed
@@ -83,10 +87,9 @@ export default class SurveysListExportJob extends Job {
     this.setContext({ outputTempFileName })
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { outputTempFileName } = this.context
     this.setResult({ outputTempFileName })
+    return Promise.resolve()
   }
 }
-
-SurveysListExportJob.type = 'SurveysListExportJob'

@@ -58,6 +58,22 @@ export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity
   return nodesInserted
 }
 
+/**
+ * Inserts a node and updates its dependents.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing the insert.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.record - The record.
+ * @param {!object} params.node - The node to insert.
+ * @param {boolean} [params.system] - Whether the insert is a system activity.
+ * @param {number} [params.timezoneOffset] - The client timezone offset.
+ * @param {string} [params.lang] - The language used to evaluate the expressions.
+ * @param {boolean} [params.persistNodes] - Whether to persist the nodes (true by default).
+ * @param {boolean} [params.createMultipleEntities] - Whether to create the multiple entities (true by default).
+ * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
+ * @param {object} [t] - The database transaction.
+ * @returns {Promise<object>} - The update result (updated record and nodes).
+ */
 export const insertNode = async (
   {
     user,

@@ -8,9 +8,17 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
-const exportLabels = async ({ surveyId, outputStream, fileFormat }) => {
+const exportLabels = async ({
+  surveyId,
+  outputStream,
+  fileFormat,
+}: {
+  surveyId: number
+  outputStream: any
+  fileFormat: string
+}) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, includeAnalysis: false })
-  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as string[]
   const items = []
   Survey.visitDescendantsAndSelf({
     nodeDef: Survey.getNodeDefRoot(survey),

@@ -1,7 +1,7 @@
 const labelColumnPrefix = 'label_'
 const descriptionColumnPrefix = 'description_'
-const getLabelColumn = (langCode) => `${labelColumnPrefix}${langCode}`
-const getDescriptionColumn = (langCode) => `${descriptionColumnPrefix}${langCode}`
+const getLabelColumn = (langCode: any) => `${labelColumnPrefix}${langCode}`
+const getDescriptionColumn = (langCode: any) => `${descriptionColumnPrefix}${langCode}`
 
 export const SurveyLabelsExportModel = {
   labelColumnPrefix,

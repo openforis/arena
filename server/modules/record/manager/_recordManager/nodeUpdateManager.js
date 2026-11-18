@@ -219,6 +219,21 @@ export const updateRequiredFlags = async ({ user, survey, record, nodeDefUuids, 
     sideEffect,
   })
 
+/**
+ * Updates the dependents (default values, applicability, validation...) of the specified nodes.
+ * @param {!object} params - The parameters.
+ * @param {object} [params.user] - The user performing the update.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.record - The record.
+ * @param {!object} params.nodes - The updated nodes, indexed by UUID.
+ * @param {number} [params.timezoneOffset] - The client timezone offset.
+ * @param {string} [params.lang] - The language used to evaluate the expressions (survey default language if not specified).
+ * @param {boolean} [params.persistNodes] - Whether to persist the updated nodes (true by default).
+ * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
+ * @param {boolean} [params.clearNonApplicableValues] - Whether to clear the values of the non applicable nodes.
+ * @param {object} [tx] - The database transaction.
+ * @returns {Promise<object>} - The update result (updated record and nodes).
+ */
 export const updateNodesDependents = async (
   {
     user,

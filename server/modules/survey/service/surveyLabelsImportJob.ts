@@ -11,7 +11,7 @@ import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
 const errorPrefix = `validationErrors:surveyLabelsImport.`
 
-const extractLabels = ({ row, langCodes, columnPrefix }) =>
+const extractLabels = ({ row, langCodes, columnPrefix }: { row: any; langCodes: any; columnPrefix: any }) =>
   langCodes.reduce((acc, langCode) => {
     const value = row[`${columnPrefix}${langCode}`]
     if (StringUtils.isNotBlank(value)) {
@@ -21,7 +21,11 @@ const extractLabels = ({ row, langCodes, columnPrefix }) =>
   }, {})
 
 export default class SurveyLabelsImportJob extends Job {
-  constructor(params) {
+  flatDataReader: any
+
+  static readonly type: string = 'SurveyLabelsImportJob'
+
+  constructor(params?: any) {
     super(SurveyLabelsImportJob.type, params)
     this.validateHeaders = this.validateHeaders.bind(this)
   }
@@ -40,7 +44,7 @@ export default class SurveyLabelsImportJob extends Job {
       fileFormat,
       onHeaders: this.validateHeaders,
       onRow: async (row) => {
-        const nodeDef = await this.getNodeDef({ survey, row })
+        const nodeDef = await this.getNodeDef({ row })
         if (!nodeDef) return
 
         const labels = extractLabels({ langCodes, row, columnPrefix: SurveyLabelsExportModel.labelColumnPrefix })
@@ -77,16 +81,16 @@ export default class SurveyLabelsImportJob extends Job {
   async validateHeaders(headers) {
     const { context } = this
     const { survey } = context
-    const langCodes = Survey.getLanguages(Survey.getSurveyInfo(survey))
+    const langCodes = Survey.getLanguages(Survey.getSurveyInfo(survey)) as string[]
 
     const fixedHeaders = ['name']
     const dynamicHeaders = []
-    langCodes.forEach((langCode) => {
+    for (const langCode of langCodes) {
       dynamicHeaders.push(
         SurveyLabelsExportModel.getLabelColumn(langCode),
         SurveyLabelsExportModel.getDescriptionColumn(langCode)
       )
-    })
+    }
     const validHeaders = new Set([...fixedHeaders, ...dynamicHeaders])
     const invalidHeaders = headers.filter((header) => !validHeaders.has(header)).join(', ')
     if (invalidHeaders) {
@@ -119,5 +123,3 @@ export default class SurveyLabelsImportJob extends Job {
     await this.setStatusFailed()
   }
 }
-
-SurveyLabelsImportJob.type = 'SurveyLabelsImportJob'
