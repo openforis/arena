@@ -2,7 +2,6 @@ export default {
   title: 'Fournisseurs de connexion',
   subtitle:
     'Options de connexion externes affichées sur la page de connexion, dans cet ordre. Les utilisateurs peuvent aussi se connecter avec leur e-mail et leur mot de passe.',
-  previewLoginPage: 'Aperçu de la page de connexion',
   addProvider: 'Ajouter un fournisseur',
   continue: 'Continuer',
   encryptionKeyMissing:
@@ -68,7 +67,8 @@ export default {
     enabledInfo:
       'Désactivé, le bouton est masqué et les connexions avec ce fournisseur sont refusées. Les comptes liés sont conservés.',
     showOnLoginPage: 'Afficher sur la page de connexion',
-    showOnLoginPageInfo: "Désactivé, le fournisseur n'est accessible qu'avec le lien direct {{path}}",
+    showOnLoginPageInfo:
+      "Désactivé, le fournisseur n'a pas de bouton sur la page de connexion : les utilisateurs l'utilisent avec le lien direct {{path}}",
     connection: 'Connexion',
     issuer: "URL de l'émetteur",
     issuerInfo: 'Arena lit les autres points de terminaison depuis <émetteur>/.well-known/openid-configuration.',

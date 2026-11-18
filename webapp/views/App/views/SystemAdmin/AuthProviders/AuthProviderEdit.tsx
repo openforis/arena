@@ -58,6 +58,13 @@ const setupGuideFileByType: Record<AuthProviderType, string> = {
 const getSetupGuideUrl = (type: AuthProviderType = 'oidc'): string =>
   `https://github.com/openforis/arena/blob/master/docs/login-providers/${setupGuideFileByType[type]}.md`
 
+// redirect URI of the provider (also when not saved yet)
+const getRedirectUri = (draft: Draft): string =>
+  draft.redirectUri ?? draft.redirectUriTemplate?.replace('{id}', draft.id || '<id>') ?? ''
+
+// direct link that starts the sign-in with the provider (the only way to use a provider not shown on the login page)
+const getSignInStartUrl = (draft: Draft): string => getRedirectUri(draft).replace(/\/callback$/, '')
+
 const emailDomainRegExp = /^[a-z0-9-]{1,63}(\.[a-z0-9-]{1,63})+$/
 const isEmailDomainValid = (value: string): boolean => emailDomainRegExp.test(value)
 // "@example.org" or " Example.org " => "example.org"
@@ -143,7 +150,7 @@ const GeneralSection = ({ draft, isNew = false, readOnly, onChange }: SectionWit
         checked={Boolean(draft.showOnLoginPage)}
         disabled={readOnly}
         info="authProvidersView:form.showOnLoginPageInfo"
-        infoParams={{ path: `/guest/login?provider=${draft.id ?? ''}` }}
+        infoParams={{ path: getSignInStartUrl(draft) }}
         label="authProvidersView:form.showOnLoginPage"
         onChange={(showOnLoginPage) => onChange({ showOnLoginPage })}
       />
@@ -316,7 +323,7 @@ const SidePanel = ({ draft }: { draft: Draft }) => {
   const setupSteps = i18n.t(`authProvidersView:form.setupSteps.${draft.type ?? 'oidc'}`, {
     returnObjects: true,
   }) as unknown as string[]
-  const redirectUri = draft.redirectUri ?? draft.redirectUriTemplate?.replace('{id}', draft.id || '<id>') ?? ''
+  const redirectUri = getRedirectUri(draft)
   const onCopy = async () => {
     await navigator.clipboard.writeText(redirectUri)
     notifyInfo({ key: 'authProvidersView:form.redirectUriCopied' })

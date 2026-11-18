@@ -2,7 +2,6 @@ export default {
   title: 'Proveedores de inicio de sesión',
   subtitle:
     'Opciones externas de inicio de sesión que se muestran en la página de inicio de sesión, en este orden. Los usuarios también pueden iniciar sesión con correo electrónico y contraseña.',
-  previewLoginPage: 'Vista previa de la página de inicio de sesión',
   addProvider: 'Añadir proveedor',
   continue: 'Continuar',
   encryptionKeyMissing:
@@ -68,7 +67,8 @@ export default {
     enabledInfo:
       'Si está desactivado, el botón se oculta y se rechazan los inicios de sesión con este proveedor. Las cuentas vinculadas se conservan.',
     showOnLoginPage: 'Mostrar en la página de inicio de sesión',
-    showOnLoginPageInfo: 'Si está desactivado, solo se puede acceder al proveedor con el enlace directo {{path}}',
+    showOnLoginPageInfo:
+      'Si está desactivado, el proveedor no tiene botón en la página de inicio de sesión: los usuarios lo usan con el enlace directo {{path}}',
     connection: 'Conexión',
     issuer: 'URL del emisor',
     issuerInfo: 'Arena lee los demás endpoints de <emisor>/.well-known/openid-configuration.',

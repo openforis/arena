@@ -2,7 +2,6 @@ export default {
   title: 'Login providers',
   subtitle:
     'External sign-in options shown on the login page, in this order. Users can also sign in with email and password.',
-  previewLoginPage: 'Preview login page',
   addProvider: 'Add provider',
   continue: 'Continue',
   encryptionKeyMissing:
@@ -68,7 +67,8 @@ export default {
     enabledInfo:
       'When disabled, the button is hidden and sign-ins with this provider are refused. Linked accounts are kept.',
     showOnLoginPage: 'Show on the login page',
-    showOnLoginPageInfo: 'When off, the provider is reachable only with the direct link {{path}}',
+    showOnLoginPageInfo:
+      'When off, the provider has no button on the login page: users sign in with it using the direct link {{path}}',
     connection: 'Connection',
     issuer: 'Issuer URL',
     issuerInfo: 'Arena reads the other endpoints from <issuer>/.well-known/openid-configuration.',

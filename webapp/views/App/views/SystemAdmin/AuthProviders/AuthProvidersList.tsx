@@ -201,12 +201,6 @@ const AuthProvidersList = (): React.ReactElement => {
         </div>
         <div className="auth-providers__header-actions">
           <Button
-            iconClassName="icon-new-tab"
-            label="authProvidersView:previewLoginPage"
-            onClick={() => globalThis.open('/guest/login/', '_blank', 'noopener')}
-            variant="outlined"
-          />
-          <Button
             disabled={!secretEncryptionAvailable}
             iconClassName="icon-plus"
             label="authProvidersView:addProvider"
