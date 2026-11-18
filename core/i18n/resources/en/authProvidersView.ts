@@ -84,7 +84,10 @@ export default {
     access: 'Access',
     accessDescription: 'Only users who already have an Arena account or invitation can sign in.',
     allowedEmailDomains: 'Allowed email domains',
-    allowedEmailDomainsInfo: 'Separated by commas; any domain if empty.',
+    allowedEmailDomainsInfo: "Users can sign in only with an email of these domains (e.g. your organization's).",
+    emailDomainsMode: { all: 'Allow all email domains', specific: 'Allow only specific domains' },
+    emailDomainsPlaceholder: 'Type a domain, e.g. example.org',
+    emailDomainsRequired: 'Add at least one email domain, or allow all email domains',
     requireArena2FA: 'Require Arena two-factor authentication',
     requireArena2FAInfo:
       'Users who enabled Arena 2FA must still enter their code. Turn off only if this provider enforces its own multi-factor authentication.',
@@ -94,6 +97,11 @@ export default {
     redirectUri: 'Redirect URI',
     redirectUriCopied: 'Redirect URI copied',
     setupStepsTitle: 'How to set up the provider',
+    setupGuide: {
+      google: 'Detailed guide: Google',
+      microsoft: 'Detailed guide: Microsoft',
+      oidc: 'Detailed guide: Keycloak and other providers',
+    },
     setupSteps: {
       google: [
         'In the Google Cloud console, open Google Auth Platform (or APIs & Services) > Clients and create an OAuth client of type "Web application".',

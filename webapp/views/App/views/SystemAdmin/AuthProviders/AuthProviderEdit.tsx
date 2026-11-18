@@ -4,10 +4,15 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 
 import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+
 import { Button } from '@webapp/components/buttons'
+import { RadioButtonGroup } from '@webapp/components/RadioButtonGroup'
 import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 import LoadingBar from '@webapp/components/LoadingBar'
 import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import {
@@ -33,12 +38,36 @@ import {
 import { TestSignInResultDialog } from './TestSignInResultDialog'
 
 // redirectUriTemplate: redirect URI of a new provider, with "{id}" in place of its identifier
-type Draft = Partial<AdminAuthProvider> & { clientSecret?: string; redirectUriTemplate?: string }
+// restrictEmailDomains: "allow specific domains" selected (the list can still be empty while editing)
+type Draft = Partial<AdminAuthProvider> & {
+  clientSecret?: string
+  redirectUriTemplate?: string
+  restrictEmailDomains?: boolean
+}
 type OnChange = (changes: Partial<Draft>) => void
 type SectionProps = { draft: Draft; readOnly: boolean; onChange: OnChange }
 type SectionWithNewProps = SectionProps & { isNew?: boolean }
 
 const listUri = () => appModuleUri(systemAdminModules.authProviders)
+
+const setupGuideFileByType: Record<AuthProviderType, string> = {
+  google: 'google',
+  microsoft: 'microsoft',
+  oidc: 'keycloak',
+}
+const getSetupGuideUrl = (type: AuthProviderType = 'oidc'): string =>
+  `https://github.com/openforis/arena/blob/master/docs/login-providers/${setupGuideFileByType[type]}.md`
+
+const emailDomainRegExp = /^[a-z0-9-]{1,63}(\.[a-z0-9-]{1,63})+$/
+const isEmailDomainValid = (value: string): boolean => emailDomainRegExp.test(value)
+// "@example.org" or " Example.org " => "example.org"
+const toEmailDomain = (value: string): string => value.trim().toLowerCase().replace(/^@/, '')
+
+const isRestrictingEmailDomains = (draft: Draft): boolean =>
+  draft.restrictEmailDomains ?? (draft.allowedEmailDomains ?? []).length > 0
+
+const emailDomainsMissing = (draft: Draft): boolean =>
+  isRestrictingEmailDomains(draft) && (draft.allowedEmailDomains ?? []).length === 0
 
 const splitList = (value: string, separator: RegExp): string[] =>
   value
@@ -58,7 +87,7 @@ const toProps = (draft: Draft) => {
     tenant,
     clientId,
     scopes,
-    allowedEmailDomains,
+    allowedEmailDomains: isRestrictingEmailDomains(draft) ? allowedEmailDomains : [],
     trustEmail,
     requireArena2FA,
     iconKind,
@@ -218,17 +247,7 @@ const AccessSection = ({ draft, readOnly, onChange }: SectionProps) => {
     <section className="auth-provider-edit__section">
       <h3>{i18n.t('authProvidersView:form.access')}</h3>
       <p className="auth-providers__muted">{i18n.t('authProvidersView:form.accessDescription')}</p>
-      <FormItem
-        info="authProvidersView:form.allowedEmailDomainsInfo"
-        label="authProvidersView:form.allowedEmailDomains"
-      >
-        <Input
-          disabled={readOnly}
-          name="allowedEmailDomains"
-          onChange={(value) => onChange({ allowedEmailDomains: splitList(value, /[\s,;]+/) })}
-          value={(draft.allowedEmailDomains ?? []).join(', ')}
-        />
-      </FormItem>
+      <EmailDomainsField draft={draft} onChange={onChange} readOnly={readOnly} />
       <Checkbox
         checked={Boolean(draft.requireArena2FA)}
         disabled={readOnly}
@@ -246,6 +265,47 @@ const AccessSection = ({ draft, readOnly, onChange }: SectionProps) => {
         />
       )}
     </section>
+  )
+}
+
+const emailDomainsModes = { all: 'all', specific: 'specific' }
+
+const EmailDomainsField = ({ draft, readOnly, onChange }: SectionProps) => {
+  const restrict = isRestrictingEmailDomains(draft)
+  const items = Object.values(emailDomainsModes).map((key) => ({
+    key,
+    label: `authProvidersView:form.emailDomainsMode.${key}`,
+    disabled: readOnly,
+  }))
+  return (
+    <FormItem info="authProvidersView:form.allowedEmailDomainsInfo" label="authProvidersView:form.allowedEmailDomains">
+      <div className="auth-provider-edit__email-domains">
+        <RadioButtonGroup
+          items={items}
+          onChange={(mode: string) => onChange({ restrictEmailDomains: mode === emailDomainsModes.specific })}
+          row
+          value={restrict ? emailDomainsModes.specific : emailDomainsModes.all}
+        />
+        {restrict && (
+          <InputChipsText
+            idInput="auth-provider-email-domains"
+            isInputFieldValueValid={isEmailDomainValid}
+            onChange={(allowedEmailDomains: string[]) => onChange({ allowedEmailDomains })}
+            placeholder="authProvidersView:form.emailDomainsPlaceholder"
+            readOnly={readOnly}
+            selection={draft.allowedEmailDomains ?? []}
+            textTransformFunction={toEmailDomain}
+            validation={
+              emailDomainsMissing(draft)
+                ? Validation.newInstance(false, {}, [
+                    ValidationResult.newInstance('authProvidersView:form.emailDomainsRequired'),
+                  ])
+                : {}
+            }
+          />
+        )}
+      </div>
+    </FormItem>
   )
 }
 
@@ -274,6 +334,15 @@ const SidePanel = ({ draft }: { draft: Draft }) => {
           <li key={step}>{step}</li>
         ))}
       </ol>
+      <a
+        className="auth-provider-edit__guide-link"
+        href={getSetupGuideUrl(draft.type)}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        {i18n.t(`authProvidersView:form.setupGuide.${draft.type ?? 'oidc'}`)}
+        <span className="icon icon-new-tab icon-12px" />
+      </a>
       <h4>{i18n.t('authProvidersView:form.loginPagePreview')}</h4>
       <div className="auth-provider-edit__preview">
         <span className="guest-external-login__button">
@@ -338,6 +407,10 @@ const AuthProviderEdit = (): React.ReactElement => {
 
   const onSave = useCallback(async () => {
     if (!draft) return
+    if (emailDomainsMissing(draft)) {
+      notifyError({ key: 'authProvidersView:form.emailDomainsRequired' })
+      return
+    }
     try {
       if (isNew) {
         await createProvider({

@@ -56,7 +56,8 @@ object storage (S3) is usually the cheapest and most scalable option, and keeps 
   single sign-on, set `ARENA_PUBLIC_URL` (public URL of Arena, used for the redirect URIs) and
   `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY` (64 hexadecimal characters, e.g. `openssl rand -hex 32`), then add the
   providers in *System administration > Login providers*, registering there the shown redirect URI
-  (`<ARENA_PUBLIC_URL>/auth/oidc/<provider id>/callback`) at the provider. Providers can also be defined in a JSON
+  (`<ARENA_PUBLIC_URL>/auth/oidc/<provider id>/callback`) at the provider (see the
+  [setup guides](login-providers/README.md)). Providers can also be defined in a JSON
   file referenced by `AUTH_PROVIDERS_CONFIG`, with each client secret in `AUTH_PROVIDER_<ID>_CLIENT_SECRET`.
 - **Network:** stable internet connection, with a public IP address when self-hosted. Bandwidth needs are
   modest, except during bulk uploads of photos.

@@ -275,3 +275,22 @@
     background-color: $colorSurface;
   }
 }
+
+.auth-provider-edit__guide-link {
+  display: block;
+  margin: 0.5rem 0 0.75rem;
+  color: $colorPrimary;
+  font-size: 0.85rem;
+  line-height: 1.4;
+
+  .icon {
+    margin-left: 0.3rem;
+  }
+}
+
+.auth-provider-edit__email-domains {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}

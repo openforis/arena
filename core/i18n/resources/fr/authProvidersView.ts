@@ -84,7 +84,11 @@ export default {
     access: 'Accès',
     accessDescription: 'Seuls les utilisateurs qui ont déjà un compte ou une invitation Arena peuvent se connecter.',
     allowedEmailDomains: 'Domaines e-mail autorisés',
-    allowedEmailDomainsInfo: 'Séparés par des virgules ; tout domaine si vide.',
+    allowedEmailDomainsInfo:
+      "Les utilisateurs ne peuvent se connecter qu'avec un e-mail de ces domaines (par ex. celui de votre organisation).",
+    emailDomainsMode: { all: 'Autoriser tous les domaines', specific: 'Autoriser uniquement certains domaines' },
+    emailDomainsPlaceholder: 'Saisissez un domaine, par ex. example.org',
+    emailDomainsRequired: 'Ajoutez au moins un domaine e-mail, ou autorisez tous les domaines',
     requireArena2FA: "Exiger l'authentification à deux facteurs d'Arena",
     requireArena2FAInfo:
       "Les utilisateurs qui ont activé l'authentification à deux facteurs d'Arena doivent toujours saisir leur code. Désactivez-la seulement si ce fournisseur impose sa propre authentification multifacteur.",
@@ -94,6 +98,11 @@ export default {
     redirectUri: 'URI de redirection',
     redirectUriCopied: 'URI de redirection copiée',
     setupStepsTitle: 'Comment configurer le fournisseur',
+    setupGuide: {
+      google: 'Guide détaillé : Google',
+      microsoft: 'Guide détaillé : Microsoft',
+      oidc: 'Guide détaillé : Keycloak et autres fournisseurs',
+    },
     setupSteps: {
       google: [
         'Dans Google Cloud console, ouvrez Google Auth Platform (ou API et services) > Clients et créez un client OAuth de type « Application Web ».',
