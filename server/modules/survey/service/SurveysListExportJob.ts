@@ -59,14 +59,15 @@ export default class SurveysListExportJob extends Job {
     const objectTransformer = (surveySummary) => {
       const transformedSurveySummary = {}
       for (const [key, value] of Object.entries(surveySummary)) {
-        const valueTransformed = key.startsWith('date')
-          ? DateUtils.convertDate({
-              dateStr: String(value),
-              formatFrom: DateUtils.formats.datetimeISO,
-              // not one of the arena-core DateFormats, but a valid format
-              formatTo: DateUtils.formats.datetimeExport as DateFormats,
-            })
-          : value
+        const valueTransformed =
+          key.startsWith('date') && typeof value === 'string'
+            ? DateUtils.convertDate({
+                dateStr: value,
+                formatFrom: DateUtils.formats.datetimeISO,
+                // not one of the arena-core DateFormats, but a valid format
+                formatTo: DateUtils.formats.datetimeExport as DateFormats,
+              })
+            : value
         transformedSurveySummary[key] = valueTransformed
       }
       return transformedSurveySummary
