@@ -642,7 +642,7 @@ export const fetchUserSurveysInfo = async ({
       includeOwnerEmailAddress,
       onlyOwn,
     })
-  ).map(assocSurveyInfo)
+  ).map((survey) => assocSurveyInfo(survey))
 
   if (withChains) {
     return _filterSurveysWithChains(surveys)
