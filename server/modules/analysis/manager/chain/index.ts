@@ -314,7 +314,9 @@ const _getNodeDefsToClone = ({ sourceSurvey, sourceChainUuid }: { sourceSurvey: 
   const analysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(NodeDef.isAnalysis)
   const chainNodeDefs = analysisNodeDefs.filter((nd) => NodeDef.getChainUuid(nd) === sourceChainUuid)
   const areaBasedEntityUuids = new Set(
-    chainNodeDefs.filter((nd) => NodeDef.isAreaBasedEstimatedOf(nd) && NodeDef.isActive(nd)).map(NodeDef.getParentUuid)
+    chainNodeDefs
+      .filter((nd) => NodeDef.isAreaBasedEstimatedOf(nd) && NodeDef.isActive(nd))
+      .map((nd) => NodeDef.getParentUuid(nd))
   )
   const plotAreaNodeDefsOfOtherChains = analysisNodeDefs.filter(
     (nd) =>
