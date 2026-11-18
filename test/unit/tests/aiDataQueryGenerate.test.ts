@@ -216,6 +216,10 @@ describe('AI data query generation', () => {
       expect(convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'dbh >' }).errors[0]).toMatch(
         /cannot be parsed/
       )
+      // a filter in SQL style gets the syntax to use
+      expect(
+        convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'dbh > 10 AND tree_id = 1' }).errors[0]
+      ).toMatch(/cannot be parsed.*JavaScript syntax.*==.*&&/)
     })
   })
 

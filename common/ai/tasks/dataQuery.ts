@@ -87,7 +87,11 @@ const parseFilter = ({ filter, allowedColumnNames, errors }) => {
   try {
     expr = Expression.fromString(filter)
   } catch (error) {
-    errors.push(`filter "${filter}" cannot be parsed: ${error?.message ?? error}`)
+    // models often write the filter as SQL
+    errors.push(
+      `filter "${filter}" cannot be parsed: ${error?.message ?? error}. ` +
+        'Write it in JavaScript syntax: == and != (not =), && and || (not AND, OR), strings in double quotes'
+    )
     return null
   }
   let valid = true

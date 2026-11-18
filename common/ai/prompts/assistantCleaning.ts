@@ -5,6 +5,7 @@
 import * as Survey from '@core/survey/survey'
 
 import { assistantMarkers } from './assistantMarkers'
+import { getDataQueryRules } from './dataQueryGenerate'
 import { pq } from './promptSafety'
 
 const intro = `You are the data cleaning assistant of Open Foris Arena, a platform for field inventories and surveys.
@@ -67,6 +68,8 @@ export const buildAssistantCleaningPrompt = ({
     assistantMarkers.cleaning,
     intro,
     workflow,
+    // query_propose is offered here too
+    `Query rules:\n${getDataQueryRules({ schemaSource: 'the schema is returned by query_listEntities' })}`,
     rules,
     `Context:\n${context}`,
     `Answer in the language with code ${pq(uiLang, 16)}. Be brief.`,

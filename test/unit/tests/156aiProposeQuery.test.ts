@@ -55,6 +55,22 @@ describe('query_propose', () => {
     expect(Expression.toString(Query.getFilter(entry.query), Expression.modes.sql)).toBe('dbh > 10')
   })
 
+  test('the filter example is written in the syntax the filter is parsed with', async () => {
+    const description = (z.toJSONSchema(proposeQueryInputSchema) as any).properties.filter.description
+    expect(description).toContain('JavaScript syntax')
+    const [, example] = description.match(/e\.g\. (.+)$/)
+    const ctx = newAnalysisToolContext({ survey })
+    const result = await runTool(proposeQueryTool, { ...aggregateInput, filter: example }, ctx)
+    expect(JSON.stringify(result)).not.toContain('cannot be parsed')
+  })
+
+  test('an aggregate query without a dimension is refused with the way to get a total', async () => {
+    const input = { ...aggregateInput, dimensions: [], sort: [], measures: [{ attribute: 'tree', functions: ['cnt'] }] }
+    const result = await runTool(proposeQueryTool, input, newAnalysisToolContext({ survey }))
+    expect(result.error.code).toBe('invalidProposal')
+    expect(JSON.stringify(result.error.issues)).toContain('query_count')
+  })
+
   test('an aggregate query can be sorted by a measure, in the order given', async () => {
     const ctx = newAnalysisToolContext({ survey })
     const sort = [

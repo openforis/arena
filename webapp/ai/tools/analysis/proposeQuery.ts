@@ -25,7 +25,11 @@ export const proposeQueryInputSchema = z.object({
     .max(50)
     .nullish()
     .describe('Aggregate mode: the aggregated attributes and their functions (avg, cnt, max, med, min, sum)'),
-  filter: z.string().max(1000).nullish().describe('Optional filter, e.g. dbh > 10 AND tree_status = "L"'),
+  filter: z
+    .string()
+    .max(1000)
+    .nullish()
+    .describe('Optional filter in JavaScript syntax, e.g. dbh > 10 && tree_status == "L"'),
   sort: z
     .array(z.object({ attribute: name, order: z.string().max(10).nullish() }))
     .max(10)
@@ -81,6 +85,12 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
   // without a sort the first N rows are arbitrary ones
   if (input.limit && (input.sort ?? []).length === 0)
     errors.push('a limit needs a sort: add the sort that defines the first rows')
+  // the Explorer has no aggregate without a group: the row count of a raw query is the total
+  if (input.mode === 'aggregate' && (input.dimensions ?? []).length === 0)
+    errors.push(
+      'for a total with no grouping (e.g. "how many trees"), propose a raw query with the same filter: ' +
+        'query_count returns its number of rows'
+    )
   if (!query || errors.length > 0) {
     return {
       error: {
