@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { insertAllQueryBatch } from '@server/db/dbUtils'
 
 import { Schemata, TableDataNodeDef } from '@common/model/db'
@@ -8,7 +10,19 @@ import * as Node from '@core/record/node'
 
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
-const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity, nodeDefColumnsUuids }) => {
+const getSelectQuery = ({
+  surveyId,
+  nodeDef,
+  nodeDefContext,
+  nodeDefAncestorMultipleEntity,
+  nodeDefColumnsUuids,
+}: {
+  surveyId: number
+  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDefContext: any
+  nodeDefAncestorMultipleEntity: any
+  nodeDefColumnsUuids: string[]
+}) => {
   const getNodeSelectQuery = (ancestorDef) =>
     NodeRepository.getNodeSelectQuery({
       surveyId,
@@ -59,7 +73,15 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
         c.ancestor_uuid = n.uuid`
 }
 
-export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, onProgress = null }, client) => {
+export const populateTable = async (
+  {
+    survey,
+    nodeDef,
+    stopIfFunction = null,
+    onProgress = null,
+  }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType>; stopIfFunction?: any; onProgress?: any },
+  client: DbClient
+) => {
   const surveyId = Survey.getId(survey)
   const schema = Schemata.getSchemaSurveyRdb(surveyId)
   const includeAnalysis = true

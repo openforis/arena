@@ -1,4 +1,5 @@
-import * as Survey from '../../../../../core/survey/survey'
+import type { DbClient } from '@server/db/db'
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 
 import { TableDataNodeDef } from '../../../../../common/model/db'
@@ -13,9 +14,12 @@ import { TableDataNodeDef } from '../../../../../common/model/db'
  *
  * @returns {Promise<null|*>} - The result promise.
  */
-export const createDataTable = async ({ survey, nodeDef }, client) => {
+export const createDataTable = (
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  client: DbClient
+) => {
   if (NodeDef.isVirtual(nodeDef)) {
-    return null
+    return Promise.resolve(null)
   }
 
   const tableDataNodeDef = new TableDataNodeDef(survey, nodeDef)
@@ -42,7 +46,7 @@ export const createDataTable = async ({ survey, nodeDef }, client) => {
  * @param {NodeDef} nodeDef - The nodeDef of the data table.
  * @returns {string[]} - The names of the columns to index.
  */
-const _getIndexedColumnNames = (nodeDef) => {
+const _getIndexedColumnNames = (nodeDef: ArenaNodeDef<NodeDefType>) => {
   const { columnSet } = TableDataNodeDef
   return NodeDef.isRoot(nodeDef) ? [columnSet.recordUuid, columnSet.recordOwnerUuid] : [columnSet.parentUuid]
 }
@@ -56,7 +60,10 @@ const _getIndexedColumnNames = (nodeDef) => {
  * @param {pgPromise.IDatabase} client - The data base client.
  * @returns {Promise<void>} - The result promise.
  */
-export const createDataTableIndexes = async ({ survey, nodeDef }, client) => {
+export const createDataTableIndexes = async (
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  client: DbClient
+) => {
   if (NodeDef.isVirtual(nodeDef)) {
     return
   }

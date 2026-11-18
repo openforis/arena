@@ -1,13 +1,16 @@
 import * as A from '@core/arena'
 import SqlBuilder from '@common/model/db/sql/sqlBuilder'
 
+// number or query param placeholder (e.g. $/offset/)
+type SqlLimitValue = number | string | null
+
 class SqlSelectBuilder extends SqlBuilder {
   protected _select: string[]
   protected _from: string[]
   protected _where: string[]
   protected _groupBy: string[]
-  protected _offset: number | null
-  protected _limit: number | null
+  protected _offset: SqlLimitValue
+  protected _limit: SqlLimitValue
   protected _orderBy: string[]
 
   constructor() {
@@ -45,12 +48,12 @@ class SqlSelectBuilder extends SqlBuilder {
     return this
   }
 
-  offset(offset: number | null): this {
+  offset(offset: number | string | null): this {
     this._offset = offset
     return this
   }
 
-  limit(limit: number | null): this {
+  limit(limit: number | string | null): this {
     this._limit = limit
     return this
   }

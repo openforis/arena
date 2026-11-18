@@ -11,6 +11,9 @@ const pgp = pgPromise()
 const { Column } = pgp.helpers
 
 export default class MassiveUpdateData extends MassiveUpdate {
+  columnNames: any
+  nodeDefsByColumnName: Record<string, any>
+
   constructor({ survey, entityDef, analysisNodeDefs }, tx) {
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefs,
@@ -47,12 +50,12 @@ export default class MassiveUpdateData extends MassiveUpdate {
     this.columnNames = columnNames
   }
 
-  async push(rowResult) {
+  push(rowResult) {
     const insertValues = (this.columnNames || []).reduce(
       (values, columnName) => {
         const nodeDef = this.nodeDefsByColumnName[columnName]
 
-        let value =
+        let value: string | number | null =
           NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isCode(nodeDef) ? null : 'DEFAULT'
 
         if (rowResult[columnName] && rowResult[columnName] !== NA) {

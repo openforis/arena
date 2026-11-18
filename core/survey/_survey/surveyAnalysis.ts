@@ -3,6 +3,7 @@ import type {
   NodeDef as ArenaNodeDef,
   NodeDefType,
   Survey as ArenaSurvey,
+  NodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -97,7 +98,7 @@ export const getAnalysisNodeDefs =
 
 export const getAnalysisEntities =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): NodeDefEntity[] => {
     const { root } = SurveyNodeDefs.getHierarchy()(survey)
 
     const clusteringNodeDefUuid = ChainSamplingDesign.getClusteringNodeDefUuid(Chain.getSamplingDesign(chain))
@@ -107,10 +108,10 @@ export const getAnalysisEntities =
       ((clusteringNodeDefUuid && NodeDef.getUuid(nodeDef) === clusteringNodeDefUuid) ||
         getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0)
 
-    const entities: AnyNodeDef[] = []
+    const entities: NodeDefEntity[] = []
     SurveyNodeDefs.traverseHierarchyItemSync(root, (nodeDef) => {
       if (isAnalysisEntity(nodeDef)) {
-        entities.push(nodeDef)
+        entities.push(nodeDef as NodeDefEntity)
       }
     })
     return entities
@@ -118,14 +119,15 @@ export const getAnalysisEntities =
 
 export const getBaseUnitNodeDef =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): AnyNodeDef | null => {
+  (survey: ArenaSurvey): NodeDefEntity | null => {
     const samplingDesign = Chain.getSamplingDesign(chain)
     const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
-    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey)
+    // the base unit is an entity
+    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) as NodeDefEntity | null
   }
 
 export const getSamplingNodeDefChild =
-  ({ nodeDefParent, chainUuid }: { nodeDefParent: AnyNodeDef; chainUuid: string }) =>
+  ({ nodeDefParent, chainUuid }: { nodeDefParent: NodeDefEntity; chainUuid: string }) =>
   (survey: ArenaSurvey): AnyNodeDef | undefined =>
     SurveyNodeDefs.getNodeDefChildren({ nodeDef: nodeDefParent })(survey).find(
       (nodeDefChild) =>

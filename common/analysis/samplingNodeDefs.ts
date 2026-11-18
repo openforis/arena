@@ -3,6 +3,7 @@ import type {
   NodeDef as ArenaNodeDef,
   NodeDefType,
   Survey as ArenaSurvey,
+  NodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -17,7 +18,7 @@ const PLOT_AREA_SUFFIX = '_plot_area_'
 const WEIGHT_NODE_DEF_NAME = 'weight'
 const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(String.raw`^\w+${PLOT_AREA_SUFFIX}$`)
 
-const getEntityAreaNodeDefName = ({ nodeDefParent }: { nodeDefParent: AnyNodeDef }): string =>
+const getEntityAreaNodeDefName = ({ nodeDefParent }: { nodeDefParent: NodeDefEntity }): string =>
   `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
 
 const isWeightNodeDef = (nodeDef: AnyNodeDef): boolean => WEIGHT_NODE_DEF_NAME === NodeDef.getName(nodeDef)
@@ -28,7 +29,7 @@ const isEntityAreaNodeDef = ({
   includeOnlyValid = true,
 }: {
   nodeDef: AnyNodeDef
-  nodeDefParent: AnyNodeDef
+  nodeDefParent: NodeDefEntity
   includeOnlyValid?: boolean
 }): boolean => {
   if (!NodeDef.isSampling(nodeDef)) return false
@@ -66,7 +67,7 @@ const getAreaNodeDefDefaultScript = ({
   nodeDefParent,
   isWeight,
 }: {
-  nodeDefParent: AnyNodeDef
+  nodeDefParent: NodeDefEntity
   isWeight: boolean
 }): string => {
   const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
@@ -82,7 +83,7 @@ const newEntityAreaNodeDef = ({
   cycleKeys,
   isWeight = false,
 }: {
-  nodeDefParent: AnyNodeDef
+  nodeDefParent: NodeDefEntity
   baseUnitNodeDef: AnyNodeDef | null
   chainUuid: string
   cycleKeys: string[]
@@ -133,7 +134,7 @@ const determinePlotAreaNodeDefs = ({
     isWeight,
   }: {
     existingNodeDef: AnyNodeDef | undefined
-    nodeDefParent: AnyNodeDef
+    nodeDefParent: NodeDefEntity
     isWeight: boolean
   }) => {
     if (existingNodeDef) {

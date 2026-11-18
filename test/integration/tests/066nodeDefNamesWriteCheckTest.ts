@@ -1,3 +1,4 @@
+import type { NodeDefEntity } from '@openforis/arena-core'
 import AdmZip from 'adm-zip'
 
 import { ArenaServer } from '@openforis/arena-server'
@@ -74,7 +75,7 @@ describe('Node def names check on write', () => {
   test('names with characters not allowed are not saved', async () => {
     const user = getContextUser()
     const surveyId = Survey.getId(survey)
-    const clusterDef = Survey.getNodeDefByName('cluster')(survey)
+    const clusterDef = Survey.getNodeDefByName('cluster')(survey) as NodeDefEntity
     const clusterNoDef = Survey.getNodeDefByName('cluster_no')(survey)
 
     const nodeDefNew = NodeDef.newNodeDef(clusterDef, NodeDef.nodeDefType.text, [Survey.cycleOneKey], {

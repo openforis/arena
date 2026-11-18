@@ -1,4 +1,4 @@
-import type { NodeDefType } from '@openforis/arena-core'
+import type { NodeDefType, NodeDefEntity } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -7,7 +7,10 @@ import {
   toImageAttributeOptions,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotImageAttributes'
 
-const plotDef = { ...NodeDef.newNodeDef(null, NodeDef.nodeDefType.entity, ['0'], { name: 'plot' }), uuid: 'plot-def' }
+const plotDef = {
+  ...NodeDef.newNodeDef(null, NodeDef.nodeDefType.entity, ['0'], { name: 'plot' }),
+  uuid: 'plot-def',
+} as NodeDefEntity
 
 const newAttributeDef = ({
   name,

@@ -1,14 +1,16 @@
-import type {
-  NodeDefPropsWithLayout,
-  User as ArenaUser,
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-} from '@openforis/arena-core'
 import * as A from '@core/arena'
 import { db, DbClient } from '@server/db/db'
 
-import { NodeDefsFixer, Objects } from '@openforis/arena-core'
+import {
+  NodeDefsFixer,
+  Objects,
+  type NodeDefPropsWithLayout,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+  type NodeDefEntity,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -397,7 +399,7 @@ const checkCanMoveNodeDef = ({
   targetParentNodeDef,
 }: {
   nodeDef: ArenaNodeDef<NodeDefType>
-  targetParentNodeDef: any
+  targetParentNodeDef: NodeDefEntity
 }) => {
   if (NodeDef.isEntity(nodeDef)) {
     // Validation: prevent moving an entity into itself or into one of its descendants
@@ -532,6 +534,9 @@ export const moveNodeDef = (
 
     const nodeDefSource = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
+    if (!NodeDef.isEntity(targetParentNodeDef)) {
+      throw new Error('The target parent node definition must be an entity')
+    }
 
     checkCanMoveNodeDef({ nodeDef: nodeDefSource, targetParentNodeDef })
 
