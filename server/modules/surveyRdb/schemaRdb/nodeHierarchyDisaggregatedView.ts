@@ -12,4 +12,4 @@ export const columns = {
 
 const viewName = '_node_hierarchy_disaggregated'
 
-export const getNameWithSchema = (surveyId) => `${SchemaRdb.getName(surveyId)}.${viewName}`
+export const getNameWithSchema = (surveyId: number): string => `${SchemaRdb.getName(surveyId)}.${viewName}`

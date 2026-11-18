@@ -1,4 +1,4 @@
-import type { Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { Chain as ArenaChain, Survey as ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
 import { Schemata } from '@common/model/db'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
@@ -14,7 +14,7 @@ export const insertOlapData = async (
     chain,
     entityDef,
     values,
-  }: { survey: ArenaSurvey; cycle: string; chain: ArenaChain; entityDef: any; values: any },
+  }: { survey: ArenaSurvey; cycle: string; chain: ArenaChain; entityDef: NodeDefEntity; values: any },
   client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)

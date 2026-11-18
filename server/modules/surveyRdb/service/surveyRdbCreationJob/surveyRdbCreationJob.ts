@@ -6,7 +6,9 @@ import SurveyRdbOlapDataTablesCreationJob from './surveyRdbOlapDataTablesCreatio
 import RecordsUniquenessValidationJob from './recordsUniquenessValidationJob'
 
 export default class SurveyRdbCreationJob extends Job {
-  constructor(params) {
+  static readonly type = 'SurveyRdbCreationJob'
+
+  constructor(params?: any) {
     super(SurveyRdbCreationJob.type, params, [
       new SurveyRdbSchemaCreationJob(),
       new SurveyRdbDataTablesAndViewsCreationJob(),
@@ -15,5 +17,3 @@ export default class SurveyRdbCreationJob extends Job {
     ])
   }
 }
-
-SurveyRdbCreationJob.type = 'SurveyRdbCreationJob'

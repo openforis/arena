@@ -11,4 +11,4 @@ export const columns = {
 
 const viewName = '_node_keys_hierarchy'
 
-export const getNameWithSchema = (surveyId) => `${SchemaRdb.getName(surveyId)}.${viewName}`
+export const getNameWithSchema = (surveyId: number): string => `${SchemaRdb.getName(surveyId)}.${viewName}`

@@ -1,3 +1,5 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -14,7 +16,11 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 
 const recordValidationUpdateBatchSize = 1000
 
-const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
+const _updateNodeValidation = (
+  validationRecord: ArenaValidation,
+  nodeUuid: string,
+  validationNode: ArenaValidation
+): ArenaValidation => {
   const validationNodeOld = Validation.getFieldValidation(nodeUuid)(validationRecord)
 
   // Merge new validation with node validation
@@ -25,10 +31,14 @@ const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
 }
 
 export default class RecordsUniquenessValidationJob extends Job {
-  constructor(params) {
+  static readonly type = 'RecordsUniquenessValidationJob'
+
+  // Cache of record validations
+  validationByRecordUuid: Record<string, ArenaValidation>
+
+  constructor(params?: any) {
     super(RecordsUniquenessValidationJob.type, params)
 
-    // Cache of record validations
     this.validationByRecordUuid = {}
   }
 
@@ -44,7 +54,7 @@ export default class RecordsUniquenessValidationJob extends Job {
     }
   }
 
-  async validateRecordsUniquenessByCycle(cycle) {
+  async validateRecordsUniquenessByCycle(cycle: string): Promise<void> {
     // 1. fetch survey and node defs
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId: this.surveyId, cycle, draft: true, advanced: true },
@@ -105,7 +115,7 @@ export default class RecordsUniquenessValidationJob extends Job {
     this.incrementProcessedItems()
   }
 
-  async addRecordValidationToBatchUpdate(recordUuid, validation) {
+  async addRecordValidationToBatchUpdate(recordUuid: string, validation: ArenaValidation): Promise<void> {
     this.validationByRecordUuid[recordUuid] = validation
 
     if (Object.keys(this.validationByRecordUuid).length === recordValidationUpdateBatchSize) {
@@ -127,5 +137,3 @@ export default class RecordsUniquenessValidationJob extends Job {
     await this.flushRecordValidationBatchUpdate()
   }
 }
-
-RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'

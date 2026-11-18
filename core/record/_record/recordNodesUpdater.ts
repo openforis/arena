@@ -4,15 +4,14 @@ import {
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordUpdateResult,
   NodeValues,
-} from '@openforis/arena-core'
-import type {
-  ArenaRecord,
-  ArenaRecordNode,
-  CategoryItemProvider,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  NodeRefData as ArenaNodeRefData,
-  Survey as ArenaSurvey,
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type CategoryItemProvider,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+  type NodeRefData as ArenaNodeRefData,
+  type Survey as ArenaSurvey,
+  type NodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -45,7 +44,7 @@ const getKeyValuePairs = ({
   valuesByDefUuid,
 }: {
   survey: ArenaSurvey
-  entityDef: AnyNodeDef
+  entityDef: NodeDefEntity
   valuesByDefUuid: ValuesByDefUuid
 }): string => {
   const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
@@ -240,7 +239,7 @@ const _addEntityAndKeyValues =
     sideEffect = false,
   }: {
     context: RecordEvaluationContext
-    entityDef: AnyNodeDef
+    entityDef: NodeDefEntity
     parentNode: ArenaRecordNode
     keyValuesByDefUuid: ValuesByDefUuid
     sideEffect?: boolean
@@ -319,7 +318,7 @@ const _getOrCreateEntityByKeys =
       return { entity, updateResult: null }
     }
     // entity doesn't exist
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey) as NodeDefEntity
 
     if (!insertMissingNodes) {
       const keyValuePairs = getKeyValuePairs({ survey, entityDef, valuesByDefUuid })
@@ -417,7 +416,7 @@ const getOrCreateEntityByKeys =
     return { entity, updateResult }
   }
 
-const _canAttributeBeUpdated = ({ entityDef, attributeDef }: { entityDef: AnyNodeDef; attributeDef: AnyNodeDef }) =>
+const _canAttributeBeUpdated = ({ entityDef, attributeDef }: { entityDef: NodeDefEntity; attributeDef: AnyNodeDef }) =>
   // consider only attributes descendants of the specified entity
   NodeDef.isDescendantOf(entityDef)(attributeDef) &&
   (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
@@ -471,7 +470,7 @@ const updateAttributesInEntityWithValues =
       updateResult.merge(dependentsUpdateResult)
     }
 
-    const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
+    const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey) as NodeDefEntity
 
     for (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
