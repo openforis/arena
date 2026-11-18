@@ -75,7 +75,7 @@ const run = ({
   model?: MockLanguageModelV4
   conversation?: Conversation
   tools?: AiTool[]
-  limits?: { maxPromptChars: number; maxSteps: number }
+  limits?: { maxPromptChars: number }
   extra?: Partial<Parameters<typeof runAssistantTurn>[0]>
 }) =>
   runAssistantTurn({
@@ -187,7 +187,7 @@ describe('turn usage (204)', () => {
       messages: [userMsg('x'.repeat(100)), answerMsg('y'.repeat(100))],
     }
     const model = scriptedModel(textStream('ok'))
-    const result = await run({ model, conversation, limits: { maxPromptChars: 100, maxSteps: 2 } })
+    const result = await run({ model, conversation, limits: { maxPromptChars: 100 } })
     expect(answerOf(result).usage?.historyTrimmed).toBe(true)
     // only the system prompt and the new message were sent
     expect(model.doStreamCalls[0].prompt).toHaveLength(2)
@@ -203,7 +203,7 @@ describe('turn usage (204)', () => {
       hostingClass: 'onDevice',
       label: 'LM Studio',
       model: 'local-model',
-      limits: { maxPromptChars: 5000, maxSteps: 2 },
+      limits: { maxPromptChars: 5000 },
       contextWindow: { tokens: 8192, assumed: true },
     }
     const result = await run({

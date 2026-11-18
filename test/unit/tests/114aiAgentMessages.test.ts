@@ -166,23 +166,12 @@ describe('getHistoryBudget', () => {
       requires: () => true,
       execute: async () => null,
     }
-    const withoutTools = getHistoryBudget({
-      maxPromptChars: 1000,
-      systemPrompt: 'x'.repeat(100),
-      tools: [],
-      maxSteps: 6,
-    })
+    const withoutTools = getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [] })
     expect(withoutTools).toBe(700)
-    expect(
-      getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 0 })
-    ).toBeLessThan(700)
-    expect(getHistoryBudget({ maxPromptChars: 100, systemPrompt: 'x'.repeat(100), tools: [], maxSteps: 6 })).toBe(0)
-    // each step may add a result of an eighth of the limit (125 chars); the history never drops below a tenth
-    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 2 })).toBe(
-      getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 0 }) - 250
-    )
-    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo], maxSteps: 50 })).toBe(
-      100
-    )
+    expect(getHistoryBudget({ maxPromptChars: 100, systemPrompt: 'x'.repeat(100), tools: [] })).toBe(0)
+    // with tools the rest of the context is for the tool loop: the history keeps a tenth of the limit
+    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(100), tools: [echo] })).toBe(100)
+    // never more than what the system prompt and the tool definitions leave
+    expect(getHistoryBudget({ maxPromptChars: 1000, systemPrompt: 'x'.repeat(790), tools: [] })).toBe(10)
   })
 })

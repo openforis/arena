@@ -1,7 +1,6 @@
 import {
   DEFAULT_LOCAL_CONTEXT_TOKENS,
   getLocalServerLimits,
-  LOCAL_SERVER_MAX_STEPS,
   parseLmStudioContextTokens,
   parseLocalServerModelIds,
   probeLocalServer,
@@ -33,16 +32,11 @@ const routes = (table: Record<string, () => Response | Promise<Response>>) => {
 }
 
 describe('limits', () => {
-  test('context × 3 chars × 0.75, 6 steps', () => {
-    expect(getLocalServerLimits(4096)).toEqual({ maxPromptChars: 9216, maxSteps: 6 })
-    expect(getLocalServerLimits(null)).toEqual({ maxPromptChars: 18432, maxSteps: LOCAL_SERVER_MAX_STEPS })
+  test('context × 3 chars × 0.75', () => {
+    expect(getLocalServerLimits(4096)).toEqual({ maxPromptChars: 9216 })
+    expect(getLocalServerLimits(null)).toEqual({ maxPromptChars: 18432 })
+    expect(getLocalServerLimits(60000)).toEqual({ maxPromptChars: 135000 })
     expect(DEFAULT_LOCAL_CONTEXT_TOKENS).toBe(8192)
-  })
-
-  test('10 steps from a context of 32,000 tokens', () => {
-    expect(getLocalServerLimits(31999).maxSteps).toBe(6)
-    expect(getLocalServerLimits(32000).maxSteps).toBe(10)
-    expect(getLocalServerLimits(150000).maxSteps).toBe(10)
   })
 })
 

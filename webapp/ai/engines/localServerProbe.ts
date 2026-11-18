@@ -11,10 +11,6 @@ import {
 import type { AiContextWindow, AiEngineErrorInfo, AiEngineLimits } from './types'
 
 export const DEFAULT_LOCAL_CONTEXT_TOKENS = 8192
-export const LOCAL_SERVER_MAX_STEPS = 6 // adjusted from the manual matrix
-// a big context leaves room for more tool steps
-export const LOCAL_SERVER_MAX_STEPS_LARGE_CONTEXT = 10
-export const LARGE_CONTEXT_TOKENS = 32000
 export const PROBE_TIMEOUT_MS = 3000
 // the first call loads the model into memory
 export const TEST_CHAT_TIMEOUT_MS = 60000
@@ -37,8 +33,6 @@ export type LocalServerProbeResult = {
  */
 export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimits => ({
   maxPromptChars: Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * CHARS_PER_TOKEN * PROMPT_SHARE),
-  maxSteps:
-    (contextTokens ?? 0) >= LARGE_CONTEXT_TOKENS ? LOCAL_SERVER_MAX_STEPS_LARGE_CONTEXT : LOCAL_SERVER_MAX_STEPS,
 })
 
 /**

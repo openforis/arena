@@ -11,7 +11,6 @@ import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from 
 
 // the browser doesn't know the server's AI_MAX_PROMPT_CHARS (its default is the assistant's budget): limits.ts is the
 // one copy of these values
-const GATEWAY_MAX_STEPS = AiLimits.assistantMaxSteps
 const DEFAULT_GATEWAY_MAX_PROMPT_CHARS = AiLimits.assistantDefaultMaxPromptChars
 
 /**
@@ -64,7 +63,7 @@ export const getGatewayEngineInfo = ({
     label: entry.kind === 'arenaDefault' ? entry.type : entry.name,
     labelKey: entry.kind === 'arenaDefault' ? null : getDefaultNameKey({ name: entry.name, providerType: entry.type }),
     model: entry.model,
-    limits: { maxPromptChars: maxPromptChars ?? DEFAULT_GATEWAY_MAX_PROMPT_CHARS, maxSteps: GATEWAY_MAX_STEPS },
+    limits: { maxPromptChars: maxPromptChars ?? DEFAULT_GATEWAY_MAX_PROMPT_CHARS },
     providerId: entry.id,
   }
 }

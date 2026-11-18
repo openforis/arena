@@ -91,9 +91,9 @@ describe('resolveAssistantEngine: the turn uses the policy the engine was select
     hostingClass: 'cloud',
     label: 'openai',
     model: 'm',
-    limits: { maxPromptChars: 1000, maxSteps: 5 },
+    limits: { maxPromptChars: 1000 },
   }
-  const limits = { maxPromptChars: 1000, maxSteps: 5 }
+  const limits = { maxPromptChars: 1000 }
 
   test("the access carries the resolver's policy, not the one loaded before the turn", async () => {
     const checked: AiPolicy = { schema: 'orgHosted', data: 'off' }

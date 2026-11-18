@@ -88,7 +88,7 @@ describe('engine info', () => {
       // the default name of the type: shown translated
       labelKey: 'userAiSettings:defaultName.local',
       model: 'local-model',
-      limits: { maxPromptChars: 9216, maxSteps: 6 },
+      limits: { maxPromptChars: 9216 },
       contextWindow: { tokens: 4096, assumed: false },
       providerId: 'local:l1',
     })
@@ -100,7 +100,7 @@ describe('engine info', () => {
       localEntry({ name: 'Desk server' })
     )
     expect(info?.label).toBe('Desk server')
-    expect(info?.limits).toEqual({ maxPromptChars: 18432, maxSteps: 6 })
+    expect(info?.limits).toEqual({ maxPromptChars: 18432 })
   })
 
   test('no URL or class: no engine', () => {
@@ -115,7 +115,7 @@ describe('engine info', () => {
       label: 'My OpenAI',
       labelKey: null,
       model: 'gateway-model',
-      limits: { maxPromptChars: 100000, maxSteps: 10 },
+      limits: { maxPromptChars: 100000 },
       providerId: 'acct:a1',
     })
     expect(gatewayInfo(gatewayEntry(), null)?.limits.maxPromptChars).toBe(200000)

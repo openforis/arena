@@ -10,7 +10,7 @@ import type { AiProviderKind } from '@common/ai/providerIds'
 
 export type AiEngineId = 'gateway' | 'localServer' // 'builtIn' | 'webLlm' later (overview to-do list)
 
-export type AiEngineLimits = { maxPromptChars: number; maxSteps: number }
+export type AiEngineLimits = { maxPromptChars: number }
 
 // context size of the engine's model, in tokens; assumed: the default size, the server didn't report it
 export type AiContextWindow = { tokens: number; assumed: boolean }

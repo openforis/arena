@@ -1,7 +1,7 @@
 /**
  * One assistant turn: system prompt, history, tools, then the AI SDK tool loop streamed into the conversation.
  */
-import { stepCountIs, streamText, type LanguageModel, type TextStreamPart, type ToolSet } from 'ai'
+import { ToolChoiceViolationError, streamText, type LanguageModel, type TextStreamPart, type ToolSet } from 'ai'
 
 import * as Survey from '@core/survey/survey'
 
@@ -26,18 +26,17 @@ import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
-import { buildTrimmedHistory, getHistoryBudget } from './agentMessages'
+import { buildTrimmedHistory, getHistoryBudget, getToolDefinitionChars } from './agentMessages'
 import { buildAssistantSystemPrompt, type AssistantPromptArea } from './assistantSystemPrompt'
 import { resolveAssistantTurnModel } from './turnModel'
 import { createTurnState, type TurnState } from './turnState'
 import { buildTurnUsage, estimateContextTokens, toContextTokens, type TurnUsageInputs } from './turnUsage'
 
-export type AssistantLimits = { maxPromptChars: number; maxSteps: number }
+export type AssistantLimits = { maxPromptChars: number }
 
 // the browser doesn't know the server's AI_MAX_PROMPT_CHARS: its default is the budget (C: per-engine limits)
 export const DEFAULT_ASSISTANT_LIMITS: AssistantLimits = {
   maxPromptChars: AiLimits.assistantDefaultMaxPromptChars,
-  maxSteps: AiLimits.assistantMaxSteps,
 }
 
 // gateway feature of each area (design, help, analysis, cleaning)
@@ -49,7 +48,9 @@ export const assistantAreaFeatures: Record<AssistantPromptArea, AiFeatureKey> = 
 }
 
 const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
-export const STEP_LIMIT_ERROR_KEY = 'aiAssistantStepLimit'
+// the turn ended without an answer: with room left in the context, or because the context filled up
+export const NO_ANSWER_ERROR_KEY = 'aiAssistantNoAnswer'
+export const CONTEXT_FULL_ERROR_KEY = 'aiAssistantContextFull'
 export const TOOL_CALL_TEXT_ERROR_KEY = 'aiAssistantToolCallText'
 
 // small local models sometimes write the tool call as text: <|tool_call>...<tool_call|>, <tool_call>...</tool_call>
@@ -57,15 +58,20 @@ const TOOL_CALL_OPEN = /^<\|?tool_call\|?>/
 const TOOL_CALL_CLOSE = /<\|?\/?tool_call\|?>$/
 
 /**
- * Builds the prepareStep of a turn: the last allowed step gets no tools, so the model answers with what it has.
- * @param {number} maxSteps - Step limit of the turn.
+ * Builds the prepareStep of a turn. The context is the only limit of the tool loop: a step that has no room left for
+ * one more tool result gets no tools, so the model answers with what it has.
+ * @param {object} params - Parameters.
+ * @param {number} params.maxPromptChars - Prompt limit of the engine.
+ * @param {number} params.fixedChars - Characters of the system prompt and the tool definitions.
  * @returns {Function} The prepareStep function.
  */
 export const getPrepareStep =
-  (maxSteps: number) =>
-  ({ stepNumber }: { stepNumber: number }) =>
-    // a single-step limit keeps its tools: the model could never act otherwise
-    maxSteps > 1 && stepNumber >= maxSteps - 1 ? { toolChoice: 'none' as const } : undefined
+  ({ maxPromptChars, fixedChars }: { maxPromptChars: number; fixedChars: number }) =>
+  ({ stepNumber, messages }: { stepNumber: number; messages: unknown[] }) =>
+    // the first step keeps its tools: the model could never act otherwise
+    stepNumber > 0 && fixedChars + JSON.stringify(messages).length + getToolResultCap(maxPromptChars) > maxPromptChars
+      ? { toolChoice: 'none' as const }
+      : undefined
 
 export type RunAssistantTurnParams = {
   conversation: Conversation
@@ -113,9 +119,8 @@ type StreamOutcome = {
   error: unknown
   // tokens reported by the last finish-step (null: not reported)
   stepTokens: number | null
-  // steps started so far, and the limit of the turn (set once the engine is resolved)
-  steps: number
-  maxSteps: number
+  // a step ran without tools because the context had no room for one more tool result
+  contextFull: boolean
   // set once the request is built: from then on the answer gets a usage
   sent: TurnUsageInputs | null
 }
@@ -146,9 +151,6 @@ const handleStreamPart = (part: TurnStreamPart, state: TurnState, outcome: Strea
       break
     case 'tool-error':
       state.endTool({ toolCallId: part.toolCallId, output: toolFailedOutput(part.error) })
-      break
-    case 'start-step':
-      outcome.steps += 1
       break
     case 'finish-step':
       // the last step is what the model held at the end of the turn
@@ -200,7 +202,7 @@ const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined =
 }
 
 /**
- * Returns true when the answer of the turn has no text and no card (the model spent the steps on tool calls).
+ * Returns true when the answer of the turn has no text and no card (the model only called tools).
  * A proposed map layer is a card: an answer that is only one ends done.
  * @param {Conversation} after - Conversation at the end of the turn.
  * @param {Conversation} before - Conversation before the turn.
@@ -225,18 +227,26 @@ const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
 }
 
 /**
- * Returns true when the text of the answer is only a tool call written as text.
- * @param {Conversation} after - Conversation at the end of the turn.
- * @returns {boolean} True for a markup-only answer.
+ * Returns true when the text is only a tool call written as text.
+ * @param {string} text - Text written by the model.
+ * @returns {boolean} True for markup only.
  */
-const isToolCallTextAnswer = (after: Conversation): boolean => {
+const isToolCallText = (text: string): boolean => TOOL_CALL_OPEN.test(text.trim()) && TOOL_CALL_CLOSE.test(text.trim())
+
+/**
+ * Returns the text of the answer: of the whole turn, or only what follows the last tool call (the last step).
+ * @param {Conversation} after - Conversation at the end of the turn.
+ * @param {boolean} [lastStepOnly] - True for the text of the last step.
+ * @returns {string} The text.
+ */
+const getAnswerText = (after: Conversation, lastStepOnly = false): string => {
   const answer = after.messages.at(-1)
-  if (answer?.role !== 'assistant') return false
-  const text = answer.parts
-    .map((part) => (part.type === 'text' ? part.text : ''))
-    .join('')
-    .trim()
-  return TOOL_CALL_OPEN.test(text) && TOOL_CALL_CLOSE.test(text)
+  if (answer?.role !== 'assistant') return ''
+  if (lastStepOnly) {
+    const last = answer.parts.at(-1)
+    return last?.type === 'text' ? last.text : ''
+  }
+  return answer.parts.map((part) => (part.type === 'text' ? part.text : '')).join('')
 }
 
 /**
@@ -248,14 +258,18 @@ const isToolCallTextAnswer = (after: Conversation): boolean => {
  * @returns {void}
  */
 const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSignal, before: Conversation): void => {
-  const { maxSteps } = outcome
-  // a model that calls a tool on the last step, where none is allowed, makes the SDK fail: that is the step limit
-  const toolCallOnLastStep = outcome.steps >= maxSteps && maxSteps > 1 && !getAiErrorKey(outcome.error)
+  const after = state.get()
+  // a model that calls a tool on the step that has none makes the SDK fail: that is the full context, not an error
+  const toolCallOnLastStep = outcome.contextFull && ToolChoiceViolationError.isInstance(outcome.error)
   if (outcome.aborted || signal.aborted || isAiAbortError(outcome.error)) state.finish('stopped')
   else if (outcome.error && !toolCallOnLastStep) {
     state.finish('error', getAiErrorKey(outcome.error) ?? PROVIDER_ERROR_KEY, getAiErrorParams(outcome.error))
-  } else if (isToolCallTextAnswer(state.get())) state.finish('error', TOOL_CALL_TEXT_ERROR_KEY)
-  else if (isSilentTurn(state.get(), before)) state.finish('error', STEP_LIMIT_ERROR_KEY)
+  }
+  // a local server returns the tool call of that step as text: the full context too
+  else if (outcome.contextFull && (isToolCallText(getAnswerText(after, true)) || isSilentTurn(after, before))) {
+    state.finish('error', CONTEXT_FULL_ERROR_KEY)
+  } else if (isToolCallText(getAnswerText(after))) state.finish('error', TOOL_CALL_TEXT_ERROR_KEY)
+  else if (isSilentTurn(after, before)) state.finish('error', NO_ANSWER_ERROR_KEY)
   else state.finish('done')
 }
 
@@ -305,8 +319,7 @@ export const runAssistantTurn = async ({
     aborted: false,
     error: null,
     stepTokens: null,
-    steps: 0,
-    maxSteps: Infinity,
+    contextFull: false,
     sent: null,
   }
   try {
@@ -357,7 +370,6 @@ export const runAssistantTurn = async ({
       maxPromptChars: turn.limits.maxPromptChars,
       systemPrompt: system,
       tools: toolList,
-      maxSteps: turn.limits.maxSteps,
     })
     const history = buildTrimmedHistory({ messages: conversation.messages, userMessage, budgetChars })
     outcome.sent = {
@@ -365,20 +377,28 @@ export const runAssistantTurn = async ({
       droppedCount: history.droppedCount,
       contextWindow: turn.engine?.contextWindow ?? null,
     }
+    const prepareStep = getPrepareStep({
+      maxPromptChars: turn.limits.maxPromptChars,
+      fixedChars: system.length + getToolDefinitionChars(toolList),
+    })
     const result = streamText({
       model: turn.model,
       system,
       messages: history.messages,
       tools:
         toolList.length > 0 ? toAiSdkTools(toolList, turnCtx, getToolResultCap(turn.limits.maxPromptChars)) : undefined,
-      stopWhen: stepCountIs(turn.limits.maxSteps),
-      prepareStep: getPrepareStep(turn.limits.maxSteps),
+      // the step without tools is the last one
+      stopWhen: () => outcome.contextFull,
+      prepareStep: (step) => {
+        const prepared = prepareStep(step)
+        outcome.contextFull = prepared !== undefined
+        return prepared
+      },
       abortSignal: signal,
       maxRetries: 0,
       // errors arrive as 'error' parts of the full stream
       onError: () => undefined,
     })
-    outcome.maxSteps = turn.limits.maxSteps
     for await (const part of result.stream) {
       handleStreamPart(part, state, outcome)
       escalateOnDataResult({ part, toolList, state })

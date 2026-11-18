@@ -16,8 +16,9 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
   aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
-  aiAssistantStepLimit:
-    "L'assistant a atteint sa limite d'étapes sans rédiger de réponse. Réessayez ou posez une question plus ciblée.",
+  aiAssistantNoAnswer: "L'assistant s'est arrêté sans rédiger de réponse. Réessayez ou posez une question plus ciblée.",
+  aiAssistantContextFull:
+    "Le contexte du modèle s'est rempli avant que l'assistant puisse répondre. Démarrez une nouvelle conversation, posez une question plus ciblée ou utilisez un modèle avec un contexte plus grand.",
   aiAssistantToolCallText:
     "Le modèle a écrit un appel d'outil sous forme de texte au lieu d'appeler l'outil. Réessayez ou utilisez un modèle plus grand.",
   aiLocalServerUnreachable:

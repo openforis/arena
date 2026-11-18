@@ -160,7 +160,7 @@ describe('createModelResolver', () => {
       label: 'My OpenAI',
       labelKey: null,
       model: 'gateway-model',
-      limits: { maxPromptChars: 1000, maxSteps: 10 },
+      limits: { maxPromptChars: 1000 },
       providerId: 'acct:a1',
     })
     expect(state.gatewayCalls).toEqual([

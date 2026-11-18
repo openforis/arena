@@ -5,7 +5,8 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
 import {
   DEFAULT_ASSISTANT_LIMITS,
-  STEP_LIMIT_ERROR_KEY,
+  CONTEXT_FULL_ERROR_KEY,
+  NO_ANSWER_ERROR_KEY,
   TOOL_CALL_TEXT_ERROR_KEY,
   assistantAreaFeatures,
   getPrepareStep,
@@ -74,7 +75,7 @@ const run = ({
   access?: typeof cloudAccess
   signal?: AbortSignal
   onUpdate?: (conversation: Conversation) => void
-  limits?: { maxPromptChars: number; maxSteps: number }
+  limits?: { maxPromptChars: number }
   ctx?: ReturnType<typeof createToolContext>
   extra?: Partial<Parameters<typeof runAssistantTurn>[0]>
 }) =>
@@ -95,7 +96,7 @@ const run = ({
 
 describe('runAssistantTurn', () => {
   test('constants', () => {
-    expect(DEFAULT_ASSISTANT_LIMITS).toEqual({ maxPromptChars: 200000, maxSteps: 10 })
+    expect(DEFAULT_ASSISTANT_LIMITS).toEqual({ maxPromptChars: 200000 })
     expect(assistantAreaFeatures).toEqual({
       design: 'assistantDesign',
       help: 'chatbot',
@@ -226,18 +227,78 @@ describe('runAssistantTurn', () => {
     })
   })
 
-  test('stops at the step cap: the last step has no tools, and a turn without text gets the step-limit notice', async () => {
-    const echo = makeTool('test_echo', async () => ({ ok: true }))
+  test('stops when the context has no room for one more tool result: that step has no tools, and a turn without text gets the context-full notice', async () => {
+    const echo = makeTool('test_echo', async () => ({ text: 'x'.repeat(400) }))
     let call = 0
     const model = scriptedModel(() => toolCallStream(`call-${call++}`, 'test_echo', { summary: 'x' }))
-    const result = await run({ model, tools: [echo], limits: { maxPromptChars: 200000, maxSteps: 3 } })
-    expect(model.doStreamCalls).toHaveLength(3)
-    expect(model.doStreamCalls.map((streamCall) => streamCall.toolChoice?.type)).toEqual(['auto', 'auto', 'none'])
-    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: STEP_LIMIT_ERROR_KEY })
+    const result = await run({ model, tools: [echo], limits: { maxPromptChars: 4000 } })
+    const toolChoices = model.doStreamCalls.map((streamCall) => streamCall.toolChoice?.type)
+    expect(toolChoices.length).toBeGreaterThan(2)
+    expect(toolChoices.slice(0, -1).every((type) => type === 'auto')).toBe(true)
+    expect(toolChoices.at(-1)).toBe('none')
+    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: CONTEXT_FULL_ERROR_KEY })
     // an error without params stores none (as the messages saved before them)
     expect(answerOf(result).errorParams).toBeUndefined()
     // the tool call of the last step, where none is allowed, is not run
-    expect(answerOf(result).parts).toHaveLength(2)
+    expect(answerOf(result).parts).toHaveLength(toolChoices.length - 1)
+  })
+
+  describe('the last step, sent without tools because the context is full', () => {
+    const markup = '<|tool_call>call:test_echo{"summary":"x"}<tool_call|>'
+    const echo = makeTool('test_echo', async () => ({ text: 'x'.repeat(400) }))
+    // calls the tool until the step without tools, which gets the given stream
+    const modelEndingWith = (lastStep: () => any, firstStep?: () => any) => {
+      let call = 0
+      return new MockLanguageModelV4({
+        doStream: async (options: any) => {
+          if (options.toolChoice?.type === 'none') return { stream: lastStep() } as any
+          const stream =
+            call === 0 && firstStep ? firstStep() : toolCallStream(`call-${call}`, 'test_echo', { summary: 'x' })
+          call++
+          return { stream } as any
+        },
+      })
+    }
+    const limits = { maxPromptChars: 4000 }
+
+    test('a tool call written as text there is the full context, not a tool call text error', async () => {
+      const result = await run({ model: modelEndingWith(() => textStream(markup)), tools: [echo], limits })
+      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: CONTEXT_FULL_ERROR_KEY })
+    })
+
+    test('a tool call written as text there is not an answer, even after text of an earlier step', async () => {
+      const textThenToolCall = () =>
+        convertArrayToReadableStream([
+          { type: 'stream-start', warnings: [] },
+          { type: 'text-start', id: 't' },
+          { type: 'text-delta', id: 't', delta: 'Looking.' },
+          { type: 'text-end', id: 't' },
+          { type: 'tool-call', toolCallId: 'first', toolName: 'test_echo', input: JSON.stringify({ summary: 'x' }) },
+          finish('tool-calls'),
+        ] as any[])
+      const model = modelEndingWith(() => textStream(markup), textThenToolCall)
+      const result = await run({ model, tools: [echo], limits })
+      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: CONTEXT_FULL_ERROR_KEY })
+    })
+
+    test('another error there is reported as it is', async () => {
+      const failing = () => {
+        throw new Error('boom')
+      }
+      const result = await run({ model: modelEndingWith(failing), tools: [echo], limits })
+      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: 'aiProviderUnavailable' })
+    })
+  })
+
+  test('no step count stops a model that keeps calling tools while the context has room', async () => {
+    const echo = makeTool('test_echo', async () => ({ ok: true }))
+    let call = 0
+    const model = scriptedModel(() =>
+      call++ < 15 ? toolCallStream(`call-${call}`, 'test_echo', { summary: 'x' }) : textStream('Done.')
+    )
+    const result = await run({ model, tools: [echo] })
+    expect(model.doStreamCalls).toHaveLength(16)
+    expect(answerOf(result).status).toBe('done')
   })
 
   test.each([
@@ -280,7 +341,7 @@ describe('runAssistantTurn', () => {
     } as Conversation
     const result = await queryOnlyTurn(conversation)
     expect(Object.keys(result.queries ?? {})).toEqual(['q1', 'q2'])
-    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: STEP_LIMIT_ERROR_KEY })
+    expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: NO_ANSWER_ERROR_KEY })
   })
 
   test('an answer that is only a map card ends done', async () => {
@@ -295,28 +356,30 @@ describe('runAssistantTurn', () => {
     const model = scriptedModel(() => toolCallStream('call-1', 'map_proposeLayer', { summary: 'x' }), emptyStream)
     const result = await run({ model, tools: [propose] })
     expect(answerOf(result).status).toBe('done')
-    // a failed proposal is not a card: the step-limit behaviour stays
+    // a failed proposal is not a card: the turn has no answer
     const failing = makeTool('map_proposeLayer', async () => ({ error: { code: 'invalidProposal', message: 'x' } }))
     const model2 = scriptedModel(() => toolCallStream('call-1', 'map_proposeLayer', { summary: 'x' }), emptyStream)
     const failed = await run({ model: model2, tools: [failing] })
-    expect(answerOf(failed).errorKey).toBe(STEP_LIMIT_ERROR_KEY)
+    expect(answerOf(failed).errorKey).toBe(NO_ANSWER_ERROR_KEY)
   })
 
-  test('the model answers on the last step: the turn is done', async () => {
+  test('the model answers after a tool call: the turn is done', async () => {
     const echo = makeTool('test_echo', async () => ({ ok: true }))
     const model = scriptedModel(
       () => toolCallStream('c1', 'test_echo', { summary: 'x' }),
       () => textStream('Here is what I found.')
     )
-    const result = await run({ model, tools: [echo], limits: { maxPromptChars: 200000, maxSteps: 2 } })
+    const result = await run({ model, tools: [echo], limits: { maxPromptChars: 200000 } })
     expect(answerOf(result).status).toBe('done')
   })
 
-  test('getPrepareStep removes the tools on the last step only (and not with a single step)', () => {
-    const prepare = getPrepareStep(3)
-    expect(prepare({ stepNumber: 1 })).toBeUndefined()
-    expect(prepare({ stepNumber: 2 })).toEqual({ toolChoice: 'none' })
-    expect(getPrepareStep(1)({ stepNumber: 0 })).toBeUndefined()
+  test('getPrepareStep removes the tools when one more tool result would not fit (never on the first step)', () => {
+    // a result may take an eighth of the limit: 100 of 800 chars
+    const prepare = getPrepareStep({ maxPromptChars: 800, fixedChars: 200 })
+    const messages = (chars: number) => [{ role: 'user', content: 'x'.repeat(chars) }]
+    expect(prepare({ stepNumber: 1, messages: messages(300) })).toBeUndefined()
+    expect(prepare({ stepNumber: 1, messages: messages(500) })).toEqual({ toolChoice: 'none' })
+    expect(prepare({ stepNumber: 0, messages: messages(500) })).toBeUndefined()
   })
 
   test('an error stores its params with the answer', async () => {
@@ -402,7 +465,7 @@ describe('runAssistantTurn', () => {
       hostingClass: 'onDevice',
       label: 'LM Studio',
       model: 'local-model',
-      limits: { maxPromptChars: 5000, maxSteps: 1 },
+      limits: { maxPromptChars: 5000 },
     }
 
     test('a consent cancel ends as stopped, without an error key', async () => {
@@ -418,11 +481,9 @@ describe('runAssistantTurn', () => {
     })
 
     test('the turn resolves its engine once and uses the engine limits', async () => {
-      const echo = makeTool('test_echo', async () => ({ ok: true }))
-      const model = scriptedModel(
-        () => toolCallStream('c1', 'test_echo', { summary: 'a' }),
-        () => textStream('never')
-      )
+      const echo = makeTool('test_echo', async () => ({ text: 'x'.repeat(400) }))
+      let call = 0
+      const model = scriptedModel(() => toolCallStream(`c${call++}`, 'test_echo', { summary: 'a' }))
       const calls: unknown[] = []
       /** Resolves the local engine and records the call. */
       const resolve = async (params: unknown) => {
@@ -431,10 +492,10 @@ describe('runAssistantTurn', () => {
       }
       const result = await run({ tools: [echo], extra: { resolve } })
       expect(calls).toHaveLength(1)
-      // maxSteps 1: the loop stops after the first model call, which had its tools
-      expect(model.doStreamCalls).toHaveLength(1)
-      expect(model.doStreamCalls[0].toolChoice?.type).not.toBe('none')
-      expect(answerOf(result).status).toBe('error')
+      // the 5,000 chars of the engine, not the default 200,000, end the loop
+      expect(model.doStreamCalls.length).toBeLessThan(15)
+      expect(model.doStreamCalls.at(-1)?.toolChoice?.type).toBe('none')
+      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: CONTEXT_FULL_ERROR_KEY })
     })
 
     test('a data tool makes the turn declare data in the one resolution, and the model receives the tool', async () => {

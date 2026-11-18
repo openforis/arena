@@ -13,7 +13,6 @@ export const AiLimits = {
   translationMaxGlossaryEntries: 50,
   translationGlossaryValueMaxChars: 200,
   assistantMessageMaxChars: 8000,
-  assistantMaxSteps: 10,
   assistantToolResultMaxChars: 8000,
   assistantConversationsKept: 30,
   // the browser doesn't know the server's AI_MAX_PROMPT_CHARS: its default is the client budget (C: per engine)

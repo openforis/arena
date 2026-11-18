@@ -9,7 +9,7 @@ const engine: AiSelectedEngine = {
   hostingClass: 'cloud',
   label: 'My OpenAI',
   model: 'gpt-x',
-  limits: { maxPromptChars: 200000, maxSteps: 10 },
+  limits: { maxPromptChars: 200000 },
   providerId: 'acct:a1',
 }
 
@@ -36,7 +36,7 @@ describe('conversation provider (272)', () => {
   test("the turn resolves the conversation's provider", async () => {
     const { calls, resolve } = createResolve()
     await resolveAssistantEngine({
-      defaultLimits: { maxPromptChars: 1000, maxSteps: 2 },
+      defaultLimits: { maxPromptChars: 1000 },
       access: { hostingClass: null },
       feature: 'assistantAnalysis',
       surveyId: 1,

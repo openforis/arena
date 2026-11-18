@@ -199,7 +199,7 @@ describe('helpers', () => {
 
   test('toDataLocation: the gateway names its provider', () => {
     const engine = { id: 'gateway', hostingClass: 'orgHosted', label: 'openai-compatible', model: 'm' } as const
-    expect(toDataLocation({ ...engine, limits: { maxPromptChars: 1, maxSteps: 1 } })).toEqual({
+    expect(toDataLocation({ ...engine, limits: { maxPromptChars: 1 } })).toEqual({
       hostingClass: 'orgHosted',
       provider: 'openai-compatible',
       model: 'm',

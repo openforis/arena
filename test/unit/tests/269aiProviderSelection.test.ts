@@ -209,7 +209,7 @@ describe('single-provider selection (269)', () => {
       label: 'My OpenAI',
       labelKey: null,
       model: 'gpt-x',
-      limits: { maxPromptChars: 150000, maxSteps: 10 },
+      limits: { maxPromptChars: 150000 },
       providerId: 'acct:a1',
     })
     expect(state.gatewayCalls).toEqual([
@@ -240,7 +240,7 @@ describe('single-provider selection (269)', () => {
       label: 'Desk server',
       labelKey: null,
       model: 'local-model',
-      limits: { maxPromptChars: 18432, maxSteps: 6 },
+      limits: { maxPromptChars: 18432 },
       contextWindow: { tokens: 8192, assumed: false },
       providerId: 'local:l1',
     })

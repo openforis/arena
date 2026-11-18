@@ -34,7 +34,6 @@ describe('assistantDesign feature', () => {
   })
 
   test('assistant limits', () => {
-    expect(AiLimits.assistantMaxSteps).toBe(10)
     expect(AiLimits.assistantToolResultMaxChars).toBe(8000)
     expect(AiLimits.assistantConversationsKept).toBe(30)
     expect(AiLimits.handbookResultMaxChars).toBe(2000)

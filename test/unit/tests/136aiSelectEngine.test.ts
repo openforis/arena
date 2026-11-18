@@ -203,7 +203,7 @@ describe('selectEngine: examples', () => {
       label: 'Desk server',
       labelKey: null,
       model: 'local-model',
-      limits: { maxPromptChars: 18432, maxSteps: 6 },
+      limits: { maxPromptChars: 18432 },
       contextWindow: { tokens: 8192, assumed: false },
       providerId: 'local:a',
     })
@@ -219,7 +219,7 @@ describe('selectEngine: examples', () => {
       label: 'Mine',
       labelKey: null,
       model: 'model',
-      limits: { maxPromptChars: 200000, maxSteps: 10 },
+      limits: { maxPromptChars: 200000 },
       providerId: 'acct:a',
     })
   })

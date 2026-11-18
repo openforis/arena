@@ -177,8 +177,9 @@ export default {
   aiDataQueryNoEntities: 'この調査にはクエリ可能な項目がありません。',
   aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',
   aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
-  aiAssistantStepLimit:
-    'アシスタントは回答を書く前にステップ数の上限に達しました。もう一度試すか、より絞った質問をしてください。',
+  aiAssistantNoAnswer: 'アシスタントは回答を書かずに終了しました。もう一度試すか、より絞った質問をしてください。',
+  aiAssistantContextFull:
+    'アシスタントが回答する前にモデルのコンテキストがいっぱいになりました。新しい会話を始めるか、より絞った質問をするか、コンテキストの大きいモデルを使用してください。',
   aiAssistantToolCallText:
     'モデルがツールを呼び出さず、ツール呼び出しをテキストとして書き出しました。もう一度試すか、より大きなモデルを使用してください。',
   aiLocalServerUnreachable:

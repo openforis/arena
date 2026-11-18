@@ -6,7 +6,6 @@ import type { ModelMessage } from 'ai'
 
 import type { AssistantMessage, ConversationMessage, ConversationToolPart } from '@webapp/ai/conversations/types'
 import { toWebMcpDescriptor } from '@webapp/ai/tools/registry'
-import { getToolResultCap } from '@webapp/ai/tools/common/toolResult'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 export const APPLY_NOTE_PREFIX = 'Note from Arena (not the user): '
@@ -146,21 +145,19 @@ export const getToolDefinitionChars = (tools: AiTool[]): number =>
  * @param {number} params.maxPromptChars - Prompt limit of the engine.
  * @param {string} params.systemPrompt - System prompt.
  * @param {AiTool[]} params.tools - Tools offered (their schemas count toward the limit).
- * @param {number} params.maxSteps - Steps of the turn: each may add a tool result of the capped size.
  * @returns {number} The budget, at least 0.
  */
 export const getHistoryBudget = ({
   maxPromptChars,
   systemPrompt,
   tools,
-  maxSteps,
 }: {
   maxPromptChars: number
   systemPrompt: string
   tools: AiTool[]
-  maxSteps: number
 }): number => {
   const available = Math.floor(maxPromptChars * HISTORY_SHARE) - systemPrompt.length - getToolDefinitionChars(tools)
-  const reserved = tools.length > 0 ? maxSteps * getToolResultCap(maxPromptChars) : 0
-  return Math.max(0, available - reserved, Math.min(available, Math.floor(maxPromptChars * MIN_HISTORY_SHARE)))
+  // with tools the rest of the context is for the tool loop, which ends only when the context is full
+  const budget = tools.length > 0 ? Math.min(available, Math.floor(maxPromptChars * MIN_HISTORY_SHARE)) : available
+  return Math.max(0, budget)
 }

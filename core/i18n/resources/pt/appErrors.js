@@ -16,8 +16,10 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
   aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
-  aiAssistantStepLimit:
-    'O assistente atingiu o limite de passos sem escrever uma resposta. Tente novamente ou faça uma pergunta mais específica.',
+  aiAssistantNoAnswer:
+    'O assistente terminou sem escrever uma resposta. Tente novamente ou faça uma pergunta mais específica.',
+  aiAssistantContextFull:
+    'O contexto do modelo ficou cheio antes de o assistente conseguir responder. Inicie uma nova conversa, faça uma pergunta mais específica ou use um modelo com um contexto maior.',
   aiAssistantToolCallText:
     'O modelo escreveu uma chamada de ferramenta como texto em vez de chamar a ferramenta. Tente novamente ou use um modelo maior.',
   aiLocalServerUnreachable:

@@ -179,8 +179,9 @@ Pokušajte da osvježite stranicu.`,
   aiDataQueryNoEntities: 'Ovo istraživanje nema entitete koji se mogu pretraživati.',
   aiDataQueryInvalid: 'AI nije mogao da generiše ispravan upit za ovaj zahtjev: {{errors}}',
   aiDataQueryEmpty: 'Prvo izaberite entitet i neke atribute (ili dimenzije i mjere).',
-  aiAssistantStepLimit:
-    'Asistent je dostigao ograničenje broja koraka a da nije napisao odgovor. Pokušajte ponovo ili postavite uže pitanje.',
+  aiAssistantNoAnswer: 'Asistent je završio a da nije napisao odgovor. Pokušajte ponovo ili postavite uže pitanje.',
+  aiAssistantContextFull:
+    'Kontekst modela se popunio pre nego što je asistent mogao da odgovori. Započnite novi razgovor, postavite uže pitanje ili koristite model sa većim kontekstom.',
   aiAssistantToolCallText:
     'Model je napisao poziv alata kao tekst umjesto da pozove alat. Pokušajte ponovo ili koristite veći model.',
   aiLocalServerUnreachable:

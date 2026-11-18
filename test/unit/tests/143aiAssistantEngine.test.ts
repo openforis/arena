@@ -2,14 +2,14 @@ import type { AiPolicy } from '@common/ai/policy'
 import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 
-const DEFAULT_LIMITS = { maxPromptChars: 200000, maxSteps: 10 }
+const DEFAULT_LIMITS = { maxPromptChars: 200000 }
 
 const localEngine: AiSelectedEngine = {
   id: 'localServer',
   hostingClass: 'onDevice',
   label: 'LM Studio',
   model: 'local-model',
-  limits: { maxPromptChars: 18432, maxSteps: 6 },
+  limits: { maxPromptChars: 18432 },
 }
 
 const gatewayEngine: AiSelectedEngine = {
@@ -46,7 +46,7 @@ describe('resolveAssistantEngine', () => {
     })
     expect(calls).toEqual([{ feature: 'assistantDesign', surveyId: 7, dataClass: 'schema' }])
     expect(result.model).toBe('model of localServer')
-    expect(result.limits).toEqual({ maxPromptChars: 18432, maxSteps: 6 })
+    expect(result.limits).toEqual({ maxPromptChars: 18432 })
     expect(result.access).toEqual({ effective: access.effective, hostingClass: 'onDevice' })
     expect(result.engine).toBe(localEngine)
   })
@@ -79,7 +79,7 @@ describe('resolveAssistantEngine', () => {
 
   test("a caller's limits win over the engine's", async () => {
     const { resolve } = createResolve(localEngine)
-    const limits = { maxPromptChars: 500, maxSteps: 2 }
+    const limits = { maxPromptChars: 500 }
     const result = await resolveAssistantEngine({
       limits,
       defaultLimits: DEFAULT_LIMITS,

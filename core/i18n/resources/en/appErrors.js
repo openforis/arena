@@ -174,8 +174,9 @@ Try to refresh the page.`,
   aiDataQueryNoEntities: 'This survey has no entities that can be queried.',
   aiDataQueryInvalid: 'The AI could not generate a valid query for this request: {{errors}}',
   aiDataQueryEmpty: 'Select an entity and some attributes (or dimensions and measures) first.',
-  aiAssistantStepLimit:
-    'The assistant reached its step limit without writing an answer. Try again, or ask a narrower question.',
+  aiAssistantNoAnswer: 'The assistant ended without writing an answer. Try again, or ask a narrower question.',
+  aiAssistantContextFull:
+    "The model's context filled up before the assistant could answer. Start a new conversation, ask a narrower question, or use a model with a larger context.",
   aiAssistantToolCallText:
     'The model wrote a tool call as text instead of calling the tool. Try again, or use a larger model.',
   aiLocalServerUnreachable:
