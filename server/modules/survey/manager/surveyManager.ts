@@ -1,6 +1,12 @@
 import * as A from '@core/arena'
 
-import { Numbers, Objects, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import {
+  Numbers,
+  Objects,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type SurveyProps,
+} from '@openforis/arena-core'
 import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -101,7 +107,7 @@ const _addUserToSurveyAdmins = async (
 
 // language codes and cycle keys are used as JSON keys and export column names, SRS codes in queries:
 // imported surveys must have valid ones
-const _checkSurveyProps = (props: Record<string, any>) => {
+const _checkSurveyProps = (props: Partial<SurveyProps>) => {
   const langsInvalid = SurveyValidator.getInvalidLanguageCodes(props?.[Survey.infoKeys.languages] ?? [])
   if (langsInvalid.length > 0) {
     throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
@@ -676,7 +682,7 @@ export const updateSurveyProp = (
   })
 
 const updateSurveyCyclesProp = async (
-  { surveyId, value, valuePrev }: { surveyId: number; value: Record<string, any>; valuePrev: Record<string, any> },
+  { surveyId, value, valuePrev }: { surveyId: number; value: SurveyProps['cycles']; valuePrev: SurveyProps['cycles'] },
   client: DbClient = db
 ) => {
   const cycles = Object.keys(value)
@@ -697,7 +703,7 @@ const updateSurveyCyclesProp = async (
 export const updateSurveyProps = (
   user: ArenaUser,
   surveyId: number,
-  props: Record<string, any>,
+  props: Partial<SurveyProps>,
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -722,7 +728,9 @@ export const updateSurveyProps = (
         ])
 
         if (key === Survey.infoKeys.cycles) {
-          await updateSurveyCyclesProp({ surveyId, value, valuePrev }, t) // NOSONAR
+          const cycles = value as SurveyProps['cycles']
+          const cyclesPrev = valuePrev as SurveyProps['cycles']
+          await updateSurveyCyclesProp({ surveyId, value: cycles, valuePrev: cyclesPrev }, t) // NOSONAR
         }
       }
     }

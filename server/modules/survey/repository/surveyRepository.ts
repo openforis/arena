@@ -1,4 +1,9 @@
-import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type {
+  User as ArenaUser,
+  Survey as ArenaSurvey,
+  SurveyDependencyGraph,
+  SurveyProps,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 import camelize from 'camelize'
 
@@ -51,7 +56,12 @@ export const insertSurvey = (
     props = {},
     propsDraft = {},
     appVersion = null,
-  }: { survey: ArenaSurvey; props?: Record<string, any>; propsDraft?: Record<string, any>; appVersion?: string | null },
+  }: {
+    survey: ArenaSurvey
+    props?: Partial<SurveyProps>
+    propsDraft?: Partial<SurveyProps>
+    appVersion?: string | null
+  },
   client: DbClient = db
 ) =>
   client.one(
@@ -466,7 +476,7 @@ export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
 
 export const updateSurveyDependencyGraphs = (
   surveyId: number,
-  dependencyGraphs: Record<string, any>,
+  dependencyGraphs: SurveyDependencyGraph,
   client: DbClient = db
 ) => {
   const meta = {
