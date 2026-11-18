@@ -7,7 +7,7 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 import { ExportFile } from '../exportFile'
 
 export default class RecordFilesExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('RecordFilesExportJob', params)
   }
 

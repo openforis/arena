@@ -5,7 +5,9 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyManager from '../manager/surveyManager'
 
 export default class SurveyCreatorJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyCreatorJob'
+
+  constructor(params?: any) {
     super(SurveyCreatorJob.type, params)
   }
 
@@ -27,10 +29,9 @@ export default class SurveyCreatorJob extends Job {
     this.setContext({ survey, surveyId })
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { surveyId } = this.context
     this.setResult({ surveyId })
+    return Promise.resolve()
   }
 }
-
-SurveyCreatorJob.type = 'SurveyCreatorJob'

@@ -10,7 +10,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { ExportFile } from '../exportFile'
 
 export default class InfoExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('InfoExportJob', params)
   }
 
@@ -29,7 +29,6 @@ export default class InfoExportJob extends Job {
 
     const info = ArenaExportInfoFactory.createInstance({
       appInfo: AppInfo.currentAppInfo,
-      dateExported: new Date().toISOString(),
       exportedByUserUuid: User.getUuid(user),
       exportType,
       options: {

@@ -8,7 +8,7 @@ const taxaBatchSize = 10000
 const draft = true // always include draft taxonomies
 
 export default class TaxonomiesExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('TaxonomiesExportJob', params)
   }
 

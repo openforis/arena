@@ -6,7 +6,7 @@ import { ExportFile } from '../exportFile'
 const BATCH_SIZE = 5000
 
 export default class ActivityLogExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('ActivityLogExportJob', params)
   }
 

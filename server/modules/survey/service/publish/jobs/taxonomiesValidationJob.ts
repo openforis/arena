@@ -8,7 +8,9 @@ import * as Validation from '@core/validation/validation'
 import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 
 export default class TaxonomiesValidationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'TaxonomiesValidationJob'
+
+  constructor(params?: any) {
     super(TaxonomiesValidationJob.type, params)
   }
 
@@ -31,5 +33,3 @@ export default class TaxonomiesValidationJob extends Job {
     }
   }
 }
-
-TaxonomiesValidationJob.type = 'TaxonomiesValidationJob'

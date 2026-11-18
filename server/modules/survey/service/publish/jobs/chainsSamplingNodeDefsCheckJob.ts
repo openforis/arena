@@ -8,7 +8,9 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
 export default class ChainsSamplingNodeDefsCheckJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'ChainsSamplingNodeDefsCheckJob'
+
+  constructor(params?: any) {
     super(ChainsSamplingNodeDefsCheckJob.type, params)
   }
 
@@ -31,5 +33,3 @@ export default class ChainsSamplingNodeDefsCheckJob extends Job {
     }
   }
 }
-
-ChainsSamplingNodeDefsCheckJob.type = 'ChainsSamplingNodeDefsCheckJob'

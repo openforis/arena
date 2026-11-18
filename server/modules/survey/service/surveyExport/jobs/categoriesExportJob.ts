@@ -9,7 +9,7 @@ import { ExportFile } from '../exportFile'
 const itemsBatchSize = 10000
 
 export default class CategoriesExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('CategoriesExportJob', params)
   }
 
@@ -29,7 +29,7 @@ export default class CategoriesExportJob extends Job {
 
     const itemsCountByCategoryUuid = await CategoryService.fetchItemsCountIndexedByCategoryUuid(
       { surveyId, draft },
-      this.ts
+      this.tx
     )
 
     for (const categoryUuid of categoriesUuids) {
