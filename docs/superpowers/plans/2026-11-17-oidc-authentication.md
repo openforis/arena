@@ -264,10 +264,24 @@ Users accepted through an external provider may have no password:
 
 ### Account management
 
-- Profile page: "Linked accounts" section (provider icon and label, email, last used) with "Link" (starts the flow in
-  link mode; the flow cookie records the current user uuid) and "Unlink".
-- Unlink is refused if it would leave the user with no password and no other identity.
-- System admins see and can remove the linked identities in the user edit view.
+A password is **not** required: a user can sign in only with an external provider (e.g. only Google).
+
+- Profile page: "Sign-in methods" section listing the password (set / not set) and each linked provider (icon, label,
+  email, last used), with "Link" (starts the flow in link mode; the flow cookie records the current user uuid) and
+  "Unlink" per provider.
+- **Unlink** asks for confirmation, removes the identity link and sends the user a notification email ("Google was
+  unlinked from your Arena account"). Signing in with that provider afterwards is treated as a first sign-in: it
+  links again by verified email (access rules above), so unlinking is not a way to block a provider; disabling the
+  provider (admin) or the allowed email domains are.
+- **Last sign-in method:** unlink is refused (server-side check, button disabled with an explanation) if it would
+  leave the user with no password and no other linked provider; the dialog offers "Set a password" or "Link another
+  provider" first. "Set a password" does not ask for an old password when the user has none, but requires a recent
+  login (within the last 10 minutes, otherwise the user is asked to sign in again with the provider).
+- **Lost access to the provider** (Google account deleted, provider disabled or removed by the admin): the user can
+  still use "Forgot password" with their email to set a password and get back in, as the email is the account
+  recovery channel for every user.
+- System admins see the user's sign-in methods in the user edit view and can remove linked identities (same
+  last-method rule, unless the admin explicitly confirms leaving the user with only the "forgot password" recovery).
 - User deletion: identities go with the `ON DELETE CASCADE`.
 
 ## Tasks
@@ -314,7 +328,8 @@ Users accepted through an external provider may have no password:
 ### Task 5: Arena — user side
 
 - User service method(s) needed by the callback (invited user acceptance without a password).
-- `GET /api/user/:userUuid/external-identities`, `DELETE .../:identityId` (self or system admin; unlink rule).
+- `GET /api/user/:userUuid/external-identities`, `DELETE .../:identityId` (self or system admin; last-method rule,
+  notification email on unlink).
 - Users backup export/import: include identity links.
 - Allow setting a password without the old one when the user has none.
 - Integration tests.
@@ -326,7 +341,8 @@ Users accepted through an external provider may have no password:
   step, `oidcError` messages.
 - System admin "Login providers" page: list, add (preset choice), edit form, secret field, icon picker/upload,
   redirect URI with copy button, test connection, test sign-in, reorder, disable, delete with affected users list.
-- Profile / user edit view: "Linked accounts" section.
+- Profile / user edit view: "Sign-in methods" section (password status, linked providers, link / unlink, set
+  password).
 - i18n keys (all supported languages).
 
 ### Task 7: Tests and documentation
@@ -336,8 +352,8 @@ Users accepted through an external provider may have no password:
 - `docs/architecture.md`: authentication section (password, external providers, tokens, adapters).
 - `docs/server-requirements.md`: `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`, `AUTH_PROVIDERS_CONFIG`, how to register the
   redirect URI at Google, Microsoft and Keycloak.
-- User manual (`docs/user-manual/`, EN/FR/ES): signing in with an external provider, linked accounts, the "Login
-  providers" admin page, 2FA and Arena Mobile notes, with screenshots.
+- User manual (`docs/user-manual/`, EN/FR/ES): signing in with an external provider, sign-in methods
+  (link / unlink), the "Login providers" admin page, 2FA and Arena Mobile notes, with screenshots.
 
 ## Security checklist
 
