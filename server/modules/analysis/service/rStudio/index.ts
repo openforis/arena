@@ -1,7 +1,7 @@
 import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 
-const tokenInfoByToken = {}
+const tokenInfoByToken: Record<string, { chainUuid: string; createdAt: number }> = {}
 const TOKEN_EXPIRATION = 48 * 60 * 60 * 1000 // 48h
 
 export const generateRStudioToken = ({ chainUuid }: { chainUuid: string }) => {
@@ -15,7 +15,7 @@ export const generateRStudioToken = ({ chainUuid }: { chainUuid: string }) => {
   return token
 }
 
-const isRStudioTokenValid = ({ token, chainUuid }: { token: any; chainUuid: string }) => {
+const isRStudioTokenValid = ({ token, chainUuid }: { token: string; chainUuid: string }) => {
   const tokenInfo = tokenInfoByToken[token]
   if (!tokenInfo) return false
 
@@ -26,7 +26,7 @@ const isRStudioTokenValid = ({ token, chainUuid }: { token: any; chainUuid: stri
   return createdAt + TOKEN_EXPIRATION >= Date.now()
 }
 
-export const checkRStudioToken = ({ token, chainUuid }: { token: any; chainUuid: string }) => {
+export const checkRStudioToken = ({ token, chainUuid }: { token: string; chainUuid: string }) => {
   if (!isRStudioTokenValid({ token, chainUuid })) {
     throw new SystemError('chain.error.invalidToken')
   }
