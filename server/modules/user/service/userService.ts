@@ -1,7 +1,13 @@
-import type { User as ArenaUser, Survey as ArenaSurvey, Message } from '@openforis/arena-core'
 import * as fs from 'node:fs'
 
-import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
+import {
+  Authorizer,
+  ServiceRegistry,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type Message,
+  type Validation as ArenaValidation,
+} from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db, DbClient } from '@server/db/db'
@@ -128,7 +134,7 @@ const _checkUserAccessRequest = async ({ userAccessRequest }: { userAccessReques
 type UserAccessRequestInsertResult = {
   error?: string
   errorParams?: Record<string, unknown>
-  validation?: Validation.ValidationInstance
+  validation?: ArenaValidation
   requestInserted?: any
 }
 
@@ -215,7 +221,7 @@ const _insertOrCloneSurvey = async ({
 }
 
 type UserAccessRequestAcceptResult = {
-  validation?: Validation.ValidationInstance
+  validation?: ArenaValidation
   survey?: any
   userInvited?: ArenaUser
 }

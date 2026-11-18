@@ -1,4 +1,8 @@
-import type { Taxon as ArenaTaxon, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import type {
+  Taxon as ArenaTaxon,
+  Taxonomy as ArenaTaxonomy,
+  Validation as ArenaValidation,
+} from '@openforis/arena-core'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
@@ -26,7 +30,7 @@ export const validateTaxonomy = (
   taxonomies: ArenaTaxonomy[],
   taxonomy: ArenaTaxonomy,
   taxaCount: number
-): Promise<Validation.ValidationInstance> => Validator.validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
+): Promise<ArenaValidation> => Validator.validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
 
 // ====== TAXON
 
@@ -76,5 +80,5 @@ const taxonValidators = (taxa: ArenaTaxon[]) => ({
   [Taxon.keys.vernacularNames]: [_validateVernacularNames],
 })
 
-export const validateTaxon = (taxa: ArenaTaxon[], taxon: ArenaTaxon): Promise<Validation.ValidationInstance> =>
+export const validateTaxon = (taxa: ArenaTaxon[], taxon: ArenaTaxon): Promise<ArenaValidation> =>
   Validator.validate(taxon, taxonValidators(taxa))

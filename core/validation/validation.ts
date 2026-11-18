@@ -19,8 +19,6 @@ import { Validation, ValidationFactory, ValidationFields, ValidationResult, Vali
 //   },
 // }
 
-export type ValidationInstance = Validation
-
 export const keys = Validations.keys
 
 export { ValidatorErrorKeys as messageKeys } from './_validator/validatorErrorKeys'

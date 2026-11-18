@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { UserGroupQualifier as UserGroupQualifierType } from '@openforis/arena-core'
+import { UserGroupQualifier as UserGroupQualifierType, type Validation as ArenaValidation } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -8,7 +8,6 @@ import { uuidv4 } from '@core/uuid'
 import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
 import { validateUserGroupQualifier } from '@core/user/userGroup/userGroupValidator'
 import * as Validation from '@core/validation/validation'
-import type { ValidationInstance } from '@core/validation/validation'
 
 import { Button, ButtonAdd, Fieldset } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -42,14 +41,14 @@ const toQualifier = (qualifierUi: QualifierUi): UserGroupQualifierType => ({
 export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   const { qualifiers, onChange, readOnly = false } = props
 
-  const [validations, setValidations] = useState<ValidationInstance[]>([])
+  const [validations, setValidations] = useState<ArenaValidation[]>([])
   const [addedIndex, setAddedIndex] = useState<number | null>(null)
   const [qualifiersUi, setQualifiersUi] = useState<QualifierUi[]>(() =>
     qualifiers.map((qualifier) => ({ ...qualifier, uuid: uuidv4() }))
   )
 
   const validateAll = useCallback(
-    (qualifiersToValidate: UserGroupQualifierType[]): Promise<ValidationInstance[]> =>
+    (qualifiersToValidate: UserGroupQualifierType[]): Promise<ArenaValidation[]> =>
       Promise.all(
         qualifiersToValidate.map((qualifier) =>
           validateUserGroupQualifier({ qualifier, qualifiers: qualifiersToValidate })

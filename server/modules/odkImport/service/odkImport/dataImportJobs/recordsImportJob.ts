@@ -1,3 +1,4 @@
+import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import { isUuid } from '@core/uuid'
@@ -181,12 +182,12 @@ export default class RecordsImportJob extends Job {
     submissionFileZip,
     submissionDir,
   }: {
-    survey: any
+    survey: ArenaSurvey
     nodeDefsInfoByPath: { [path: string]: string }
-    parentNode: any
+    parentNode: ArenaRecordNode
     parentPath: string
     submissionElement: XmlElement
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -238,14 +239,14 @@ export default class RecordsImportJob extends Job {
     submissionFileZip,
     submissionDir,
   }: {
-    survey: any
+    survey: ArenaSurvey
     nodeDefsInfoByPath: { [path: string]: string }
     nodeDef: any
     nodeDefUuid: string
-    parentNode: any
+    parentNode: ArenaRecordNode
     childPath: string
     childElement: XmlElement
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -289,12 +290,12 @@ export default class RecordsImportJob extends Job {
     submissionFileZip,
     submissionDir,
   }: {
-    survey: any
+    survey: ArenaSurvey
     nodeDef: any
     nodeDefUuid: string
-    parentNode: any
+    parentNode: ArenaRecordNode
     rawText: string | null
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -330,9 +331,9 @@ export default class RecordsImportJob extends Job {
     submissionDir,
   }: {
     nodeDefUuid: string
-    parentNode: any
+    parentNode: ArenaRecordNode
     fileName: string | null
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -365,7 +366,7 @@ export default class RecordsImportJob extends Job {
     return Record.assocNode(nodeWithValue, { sideEffect: true })(record)
   }
 
-  async _insertRecordNodes(record: any) {
+  async _insertRecordNodes(record: ArenaRecord) {
     for (const node of Record.getNodesArray(record)) {
       await this.batchPersister.addItem(node, this.tx) // NOSONAR
     }

@@ -1,4 +1,11 @@
-import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
+import {
+  Dates,
+  Objects,
+  Records,
+  Surveys,
+  type Record as ArenaRecord,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
@@ -22,7 +29,7 @@ const formatKeyValue = async ({
   keyDef,
   value,
 }: {
-  survey: any
+  survey: ArenaSurvey
   cycle: any
   keyDef: any
   value: any
@@ -49,8 +56,8 @@ export const getRecordFormattedKeyValuesByDefUuid = async ({
   survey,
   record,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
 }): Promise<{ [nodeDefUuid: string]: any }> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
@@ -69,16 +76,21 @@ export const getRecordFormattedKeyValuesByDefUuid = async ({
 /**
  * Same as getRecordFormattedKeyValuesByDefUuid, but returns the values as an array, in node def key order.
  */
-export const getRecordFormattedKeyValues = async ({ survey, record }: { survey: any; record: any }): Promise<any[]> =>
-  Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
+export const getRecordFormattedKeyValues = async ({
+  survey,
+  record,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+}): Promise<any[]> => Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
 
 const findExistingRecordSummaryWithSameKeys = async ({
   survey,
   record,
   existingRecordsSummary,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   existingRecordsSummary: any[]
 }): Promise<any> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
@@ -101,8 +113,8 @@ export const findExistingRecordSummary = async ({
   existingRecordsSummary,
   conflictResolutionStrategy,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   existingRecordsSummary: any[]
   conflictResolutionStrategy: string
 }): Promise<any> => {
@@ -132,8 +144,8 @@ export const determineRecordAction = async ({
   existingRecordSummary,
   conflictResolutionStrategy,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   existingRecordSummary: any
   conflictResolutionStrategy: string
 }): Promise<{ action: RecordImportActionType; existingRecordUuid: string | null }> => {

@@ -5,6 +5,7 @@ import type {
   NodeDefType,
   Survey as ArenaSurvey,
   User as ArenaUser,
+  Validation as ArenaValidation,
 } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
@@ -62,7 +63,7 @@ const _validateNodeDefs = async ({
   const nodeDefsValidationArray = await Promise.all(
     nodeDefsToValidate.map((nodeDefToValidate) => SurveyValidator.validateNodeDef(survey, nodeDefToValidate))
   )
-  const nodeDefsValidationsByUuid: Record<string, Validation.ValidationInstance> = {}
+  const nodeDefsValidationsByUuid: Record<string, ArenaValidation> = {}
   for (const [index, nodeDefToValidate] of nodeDefsToValidate.entries()) {
     nodeDefsValidationsByUuid[NodeDef.getUuid(nodeDefToValidate)] = nodeDefsValidationArray[index]
   }

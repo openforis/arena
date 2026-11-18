@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import './SurveyInfoBrandingForm.scss'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject } from 'react'
@@ -16,7 +17,6 @@ import type {
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import type { ValidationResultInstance } from '@core/validation/validationResult'
 
 import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
@@ -75,8 +75,8 @@ type FileValidationError = {
   params?: Record<string, unknown>
 }
 
-const fieldErrorValidation = (errorKey: string): ValidationResultInstance =>
-  Validation.newInstance(false, {}, [ValidationResult.newInstance(errorKey)]) as ValidationResultInstance
+const fieldErrorValidation = (errorKey: string): ArenaValidation =>
+  Validation.newInstance(false, {}, [ValidationResult.newInstance(errorKey)])
 
 const resolvePreviewColor = (primaryColor: string): string | null =>
   SurveyBranding.isValidPrimaryColor(primaryColor) ? primaryColor : null

@@ -1,3 +1,4 @@
+import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
@@ -8,8 +9,8 @@ import { createRecordEvaluationContext } from '@server/modules/record/manager/re
 
 type PreviewParams = {
   user: any
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   timezoneOffset?: number | null
   lang?: string | null
 }
@@ -32,7 +33,7 @@ const _findNodeDefUuidsToClear = async ({
   return Array.from(clearedDefUuids ?? [])
 }
 
-const _prepareNodeToPersist = ({ record, node }: { record: any; node: any }): any => {
+const _prepareNodeToPersist = ({ record, node }: { record: ArenaRecord; node: ArenaRecordNode }): any => {
   const nodeExisting = Record.getNodeByUuid(Node.getUuid(node))(record)
   if (!nodeExisting) {
     return Node.assocCreated(true)(node)
@@ -59,7 +60,7 @@ const _prepareNodeToPersist = ({ record, node }: { record: any; node: any }): an
  * @returns {Promise<string[]>} - The uuids of the node definitions whose values would be cleared.
  */
 export const findNodeDefUuidsToClearOnNodePersist = async (
-  params: PreviewParams & { node: any }
+  params: PreviewParams & { node: ArenaRecordNode }
 ): Promise<string[]> => {
   const { record, node } = params
   const nodeToPersist = _prepareNodeToPersist({ record, node })
