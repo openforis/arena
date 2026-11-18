@@ -68,7 +68,7 @@ Implemented in arena-server (Passport, `src/api/auth/`, `src/service/authProvide
 
 - **Password login** (`POST /auth/login`), with optional 2FA (TOTP devices).
 - **External login providers** (OpenID Connect: Google, Microsoft, any OIDC provider), configured by system
-  admins in *System administration > Login providers* (`auth_provider` table, client secrets encrypted with
+  admins in _System administration > Login providers_ (`auth_provider` table, client secrets encrypted with
   `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`) or read-only from `AUTH_PROVIDERS_CONFIG`. A sign-in starts at
   `GET /auth/oidc/:id`; the callback matches the provider account (`user_external_identity`, by issuer and
   subject) or links it to an existing or invited user by verified email; there is no self sign-up. Users can
