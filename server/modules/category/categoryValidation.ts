@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
@@ -26,7 +27,7 @@ const deleteEmptyLevelError =
         Validation.isValid(validation)
       )
     ) {
-      levelsValidationUpdated = Validation.setErrors([])(levelsValidationUpdated) as Validation.ValidationInstance
+      levelsValidationUpdated = Validation.setErrors([])(levelsValidationUpdated) as ArenaValidation
     }
     const validationUpdated = Validation.cleanup(
       Validation.assocFieldValidation(keys.levels, levelsValidationUpdated)(validation)

@@ -1,4 +1,4 @@
-import type { Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { Chain as ArenaChain, Survey as ArenaSurvey, Validation as ArenaValidation } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
@@ -36,7 +36,7 @@ export const validateChain = async ({
   chain: ArenaChain
   defaultLang: string
   survey: ArenaSurvey
-}): Promise<Validation.ValidationInstance> =>
+}): Promise<ArenaValidation> =>
   Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
     analysisNodeDefs: [_validateAnalysisNodeDefs({ chain, survey })],

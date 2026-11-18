@@ -1,4 +1,9 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Survey as ArenaSurvey,
+  Validation as ArenaValidation,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -41,10 +46,7 @@ const canHaveRequiredIf = (nodeDef: AnyNodeDef): boolean =>
   !NodeDef.isKey(nodeDef) &&
   !NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
 
-const validateRequiredIf = async (
-  survey: ArenaSurvey,
-  nodeDef: AnyNodeDef
-): Promise<Validation.ValidationInstance | null> => {
+const validateRequiredIf = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ArenaValidation | null> => {
   if (!NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(nodeDef))) return null
   if (!canHaveRequiredIf(nodeDef)) {
     return Validation.newInstance(false, {}, [
@@ -54,7 +56,7 @@ const validateRequiredIf = async (
   return NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.required)
 }
 
-export const validate = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<Validation.ValidationInstance> => {
+export const validate = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ArenaValidation> => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {

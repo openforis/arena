@@ -2,14 +2,13 @@ import './AreaOfInterestDialog.scss'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-core'
+import type { AreaOfInterest, AreaOfInterestDescriptor, Validation as ArenaValidation } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import { SurveyAreaOfInterestValidator } from '@core/survey/surveyAreaOfInterestValidator'
 import * as StringUtils from '@core/stringUtils'
 import * as SurveyFile from '@core/survey/surveyFile'
-import type { ValidationInstance } from '@core/validation/validation'
 import * as Validation from '@core/validation/validation'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
@@ -84,7 +83,7 @@ export const AreaOfInterestDialog = (props: Props) => {
   const [name, setName] = useState(editedAreaOfInterest?.name ?? '')
   const [labels, setLabels] = useState<Record<string, string>>(editedAreaOfInterest?.labels ?? {})
   const [upload, setUpload] = useState<Upload | null>(null)
-  const [validation, setValidation] = useState<ValidationInstance | null>(null)
+  const [validation, setValidation] = useState<ArenaValidation | null>(null)
   const [uploading, setUploading] = useState(false)
 
   const draft = buildDraft({ editedAreaOfInterest, name, labels, upload })

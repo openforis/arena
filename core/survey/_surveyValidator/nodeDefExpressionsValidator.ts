@@ -3,6 +3,7 @@ import type {
   NodeDefExpression as ArenaNodeDefExpression,
   NodeDefType,
   Survey as ArenaSurvey,
+  Validation as ArenaValidation,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -83,7 +84,7 @@ const _validateOnlyLastApplyIfEmpty =
 const _validateExpressionUniqueness = (
   nodeDefExpressions: ArenaNodeDefExpression[],
   nodeDefExpression: ArenaNodeDefExpression
-): Validation.ValidationInstance | null =>
+): ArenaValidation | null =>
   A.any(
     (nodeDefExpr) =>
       !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
@@ -109,7 +110,7 @@ const _validateExpression = async ({
   nodeDefExpressions: ArenaNodeDefExpression[]
   nodeDefExpression: ArenaNodeDefExpression
   index: number
-}): Promise<Validation.ValidationInstance | null> => {
+}): Promise<ArenaValidation | null> => {
   const validateApplyIfUniqueness = applyIfUniquenessByDependencyType[dependencyType]
 
   const validation = await Validator.validate(nodeDefExpression, {
@@ -139,7 +140,7 @@ export const validate = async (
   survey: ArenaSurvey,
   nodeDef: AnyNodeDef,
   dependencyType: string
-): Promise<Validation.ValidationInstance | null> => {
+): Promise<ArenaValidation | null> => {
   const result = Validation.newInstance()
 
   const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](nodeDef)

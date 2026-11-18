@@ -5,8 +5,7 @@ import { NumericFormat, OnValueChange } from 'react-number-format'
 import classNames from 'classnames'
 import { TextField } from '@mui/material'
 
-import { Objects } from '@openforis/arena-core'
-import type { ValidationInstance } from '@core/validation/validation'
+import { Objects, type Validation as ArenaValidation } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconCancel } from '@webapp/components/buttons'
@@ -45,7 +44,7 @@ type Props = {
   textTransformFunction?: (value: string) => string
   title?: string | number
   type?: 'text' | 'number' | 'password'
-  validation?: ValidationInstance | null
+  validation?: ArenaValidation | null
   value?: string | number
 }
 

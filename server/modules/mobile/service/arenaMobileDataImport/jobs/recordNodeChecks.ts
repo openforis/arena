@@ -1,4 +1,9 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type {
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  ArenaRecordNode,
+} from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
@@ -8,7 +13,15 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const _checkParentValid = ({ nodes, node, nodeDef }: { nodes: any; node: any; nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const _checkParentValid = ({
+  nodes,
+  node,
+  nodeDef,
+}: {
+  nodes: any
+  node: ArenaRecordNode
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   const parentUuid = Node.getParentUuid(node)
   if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
     return { warn: 'has missing or invalid parent_uuid' }
@@ -16,7 +29,7 @@ const _checkParentValid = ({ nodes, node, nodeDef }: { nodes: any; node: any; no
   return null
 }
 
-const _checkNotEmptyMultiple = ({ node, nodeDef }: { node: any; nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const _checkNotEmptyMultiple = ({ node, nodeDef }: { node: ArenaRecordNode; nodeDef: ArenaNodeDef<NodeDefType> }) => {
   if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
     return { warn: 'is multiple and has an empty value' }
   }
@@ -29,7 +42,7 @@ const _checkHierarchyValid = ({
   nodeDef,
 }: {
   nodes: any
-  node: any
+  node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }) => {
   const nodeHierarchy = Node.getHierarchy(node)
@@ -48,7 +61,7 @@ const _checkCategoryItemExists = async ({
   nodeDef,
 }: {
   survey: ArenaSurvey
-  node: any
+  node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }) => {
   if (!NodeDef.isCode(nodeDef)) return null
@@ -65,7 +78,7 @@ const _checkTaxonExists = async ({
   nodeDef,
 }: {
   survey: ArenaSurvey
-  node: any
+  node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }) => {
   if (!NodeDef.isTaxon(nodeDef)) return null
@@ -86,7 +99,7 @@ export const checkNodeIsValid = async ({
 }: {
   survey: ArenaSurvey
   nodes: any
-  node: any
+  node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }): Promise<NodeCheckResult> => {
   if (!nodeDef) {

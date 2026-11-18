@@ -1,5 +1,4 @@
-import { Dates } from '@openforis/arena-core'
-import type { Chain as ArenaChain } from '@openforis/arena-core'
+import { Dates, type Chain as ArenaChain, type Validation as ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -171,7 +170,7 @@ export const { getValidation, hasValidation, assocValidation, dissocValidation }
 
 export const getItemValidationByUuid = (uuid: string) => A.pipe(getValidation, Validation.getFieldValidation(uuid))
 export const assocItemValidation =
-  (uuid: string, validation: Validation.ValidationInstance): ChainUpdater =>
+  (uuid: string, validation: ArenaValidation): ChainUpdater =>
   (chain) => {
     const validationUpdated = Validation.assocFieldValidation(uuid, validation)(getValidation(chain))
     return { ...chain, validation: validationUpdated }
