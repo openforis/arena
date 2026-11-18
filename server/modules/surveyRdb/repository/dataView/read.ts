@@ -1,14 +1,14 @@
 import type { DbClient } from '@server/db/db'
-import type {
-  Record as ArenaRecord,
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-} from '@openforis/arena-core'
 import * as A from '@core/arena'
 import camelize from 'camelize'
 
-import { Objects } from '@openforis/arena-core'
+import {
+  Objects,
+  type Record as ArenaRecord,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+} from '@openforis/arena-core'
 
 import { quote } from '@core/stringUtils'
 
