@@ -70,14 +70,14 @@ const TOOL_CALL_CLOSE = /<\|?\/?tool_call\|?>$/
 export const REPEATED_FAILURE_LIMIT = 3
 
 // why a step is sent without tools, and is the last one
-export type LastStepReason = 'contextFull' | 'repeatedFailure' | 'answerRequest'
+export type LastStepReason = 'contextFull' | 'repeatedFailure'
 
 const REPEATED_FAILURE_NOTE =
   `${APPLY_NOTE_PREFIX}the same tool call failed ${REPEATED_FAILURE_LIMIT} times, so the tools are now off. ` +
   'Answer the user now with what you have, and say briefly what could not be done.'
 const ANSWER_REQUEST_NOTE =
-  `${APPLY_NOTE_PREFIX}you ended without writing an answer. Write the answer to the user now, ` +
-  'from the results you already have. Do not call tools.'
+  `${APPLY_NOTE_PREFIX}you ended without writing an answer. Call the tool you still need, if any, ` +
+  'then write the answer to the user from the results you have.'
 
 // what the check reads of a step the SDK ran (StepResult)
 type RanStep = {
@@ -402,7 +402,7 @@ const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSigna
 }
 
 /**
- * Returns true when the model ended the turn by itself without an answer (often after thinking only).
+ * Returns true when the model ended the turn by itself without a written answer (often after thinking only).
  * @param {object} params - Parameters.
  * @param {TurnState} params.state - Turn state.
  * @param {StreamOutcome} params.outcome - Abort / error.
@@ -421,7 +421,12 @@ const endedWithoutAnswer = ({
   signal: AbortSignal
   before: Conversation
 }): boolean =>
-  !outcome.lastStep && !outcome.error && !outcome.aborted && !signal.aborted && isSilentTurn(state.get(), before)
+  !outcome.lastStep &&
+  !outcome.error &&
+  !outcome.aborted &&
+  !signal.aborted &&
+  // a card alone is asked for its words too
+  (isSilentTurn(state.get(), before) || !getAnswerText(state.get(), true).trim())
 
 /**
  * Runs one assistant turn. The conversation is reported through onUpdate on every change; the final one is returned.
@@ -542,22 +547,23 @@ export const runAssistantTurn = async ({
       onError: () => undefined,
     }
     const sink = { state, outcome, toolList }
-    const result = streamText({
-      ...request,
-      messages: history.messages,
-      // the step without tools is the last one
-      stopWhen: () => outcome.lastStep !== null,
-      prepareStep: (step) => {
-        outcome.lastStep = getLastStep(step)
-        return toStepSettings(outcome.lastStep, step.messages)
-      },
-    })
+    const runLoop = (messages: ModelMessage[]) =>
+      streamText({
+        ...request,
+        messages,
+        // the step without tools is the last one
+        stopWhen: () => outcome.lastStep !== null,
+        prepareStep: (step) => {
+          outcome.lastStep = getLastStep(step)
+          return toStepSettings(outcome.lastStep, step.messages)
+        },
+      })
+    const result = runLoop(history.messages)
     await streamInto({ result, ...sink })
     if (endedWithoutAnswer({ state, outcome, signal, before: conversation })) {
-      // asked once, without tools
-      outcome.lastStep = 'answerRequest'
+      // asked once; the tools stay on: the model may have stopped one call short of the answer
       const messages = toAnswerRequest(history.messages, await result.responseMessages)
-      await streamInto({ result: streamText({ ...request, messages, toolChoice: 'none' }), ...sink })
+      await streamInto({ result: runLoop(messages), ...sink })
     }
   } catch (error) {
     outcome.error = error

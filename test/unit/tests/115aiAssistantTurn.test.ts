@@ -465,7 +465,7 @@ describe('runAssistantTurn', () => {
         finish('stop'),
       ] as any[])
 
-    test('the model is asked once for the answer, without tools, after the tool results it already has', async () => {
+    test('the model is asked once for the answer, after the tool results it already has', async () => {
       const model = scriptedModel(
         () => toolCallStream('c1', 'test_echo', { summary: 'x' }),
         thinkingOnly,
@@ -473,13 +473,39 @@ describe('runAssistantTurn', () => {
       )
       const result = await run({ model, tools: [echo] })
       expect(model.doStreamCalls).toHaveLength(3)
-      const { prompt, toolChoice }: any = model.doStreamCalls[2]
-      expect(toolChoice?.type).toBe('none')
+      const { prompt }: any = model.doStreamCalls[2]
       // the request follows the tool result: the answer without text is not sent back
       expect(prompt.map((message: any) => message.role)).toEqual(['system', 'user', 'assistant', 'tool', 'user'])
       expect(JSON.stringify(prompt.at(-1).content)).toContain('without writing an answer')
       expect(answerOf(result).status).toBe('done')
       expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: 'There are 12 plots.' })
+    })
+
+    test('it may still call the tool it stopped short of, then answer', async () => {
+      const model = scriptedModel(
+        thinkingOnly,
+        () => toolCallStream('c1', 'test_echo', { summary: 'x' }),
+        () => textStream('There are 12 plots.')
+      )
+      const result = await run({ model, tools: [echo] })
+      expect(model.doStreamCalls.map((call) => call.toolChoice?.type)).toEqual(['auto', 'auto', 'auto'])
+      expect(answerOf(result).parts.map((part) => part.type)).toEqual(['reasoning', 'tool', 'text'])
+      expect(answerOf(result).status).toBe('done')
+    })
+
+    test('a card without a word is asked for too: the words of the answer follow the card', async () => {
+      const addQuery = makeTool('test_query', async (_input, ctx) => {
+        ctx.analysisQueries?.add({ query: { a: 1 }, explanation: 'E', entityName: 'tree', mode: 'raw' } as any)
+        return { ok: true }
+      })
+      const model = scriptedModel(
+        () => toolCallStream('c1', 'test_query', { summary: 'x' }),
+        thinkingOnly,
+        () => textStream('12 trees have no status.')
+      )
+      const result = await run({ model, tools: [addQuery] })
+      expect(model.doStreamCalls).toHaveLength(3)
+      expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: '12 trees have no status.' })
     })
 
     test('a model that stays silent is not asked twice: the no-answer error', async () => {
