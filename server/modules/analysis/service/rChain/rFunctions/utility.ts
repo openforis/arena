@@ -1,3 +1,6 @@
+// an R expression (code, variable name or literal)
+type RExpression = string | number
+
 export const NA = 'NA'
 
 export const comment = (text: any) => `# ${text}`
@@ -22,7 +25,7 @@ export const source = (path: any) => `source("${path}")`
 export const sourceWithTryCatch = (path: any, ignoreErrors: boolean = false) =>
   tryCatch({ code: source(path), ignoreErrors })
 
-export const setVar = (name: string, value: unknown) => `${name} <- ${value}`
+export const setVar = (name: string, value: RExpression) => `${name} <- ${value}`
 
 export const dfVar = (dataFrame: any, varName: any) => `${dataFrame}$${varName}`
 
@@ -31,7 +34,7 @@ export const merge = (x: any, y: any, by: any, allX = false) =>
 
 export const vector = (values = []) => `c(${values.join(', ')})`
 
-export const list = (object: any) => {
+export const list = (object: Record<string, RExpression>) => {
   const listValues = Object.entries(object)
     .map(([key, value]) => `${key} = ${value}`)
     .join(', ')
@@ -64,11 +67,11 @@ export const writeCsv = (x: any, file: any, rowNames = 'F') =>
 
 // == converters
 
-export const asCharacter = (value: unknown) => `as.character(${value})`
+export const asCharacter = (value: RExpression) => `as.character(${value})`
 
-export const asLogical = (value: unknown) => `as.logical(${value})`
+export const asLogical = (value: RExpression) => `as.logical(${value})`
 
-export const asNumeric = (value: unknown, units = null) => {
+export const asNumeric = (value: RExpression, units = null) => {
   const unitsArg = units ? `, units='${units}'` : ''
   return `as.numeric(${value}${unitsArg})`
 }
@@ -85,4 +88,4 @@ export const sysTime = () => `Sys.time()`
 
 export const q = () => `q()`
 
-export const print = (value: unknown) => `print( ${value} )`
+export const print = (value: RExpression) => `print( ${value} )`
