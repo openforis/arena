@@ -6,7 +6,9 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 
 export default class SurveyPropsUnpublishJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyPropsUnpublishJob'
+
+  constructor(params?: any) {
     super(SurveyPropsUnpublishJob.type, params)
   }
 
@@ -28,5 +30,3 @@ export default class SurveyPropsUnpublishJob extends Job {
     this.incrementProcessedItems()
   }
 }
-
-SurveyPropsUnpublishJob.type = 'SurveyPropsUnpublishJob'

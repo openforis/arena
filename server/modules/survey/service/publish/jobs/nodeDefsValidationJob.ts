@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import Job from '@server/job/job'
@@ -9,7 +10,7 @@ import * as Validation from '@core/validation/validation'
 import * as SurveyManager from '../../../manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
-const getNodeDefPath = ({ survey, nodeDef }) => {
+const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> }) => {
   if (NodeDef.isRoot(nodeDef)) {
     return NodeDef.getName(nodeDef)
   }
@@ -23,7 +24,9 @@ const getNodeDefPath = ({ survey, nodeDef }) => {
 }
 
 export default class NodeDefsValidationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'NodeDefsValidationJob'
+
+  constructor(params?: any) {
     super(NodeDefsValidationJob.type, params)
   }
 
@@ -63,5 +66,3 @@ export default class NodeDefsValidationJob extends Job {
     }
   }
 }
-
-NodeDefsValidationJob.type = 'NodeDefsValidationJob'
