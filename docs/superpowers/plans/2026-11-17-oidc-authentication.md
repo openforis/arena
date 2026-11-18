@@ -141,27 +141,53 @@ CREATE TABLE auth_provider (
 
 ### Admin UI: "Login providers"
 
-New system admin page (`systemAdminModules.authProviders`, `webapp/views/App/views/SystemAdmin/AuthProviders/`):
+Clickable mockup: `docs/superpowers/mockups/2026-11-18-login-providers/index.html` (screens: list, empty state, add,
+edit form, new Google provider, test results, delete, environment provider).
 
-- **List:** icon, label, type, enabled, shown on login page, number of linked users, source (DB / environment);
-  drag to reorder.
-- **Add:** choose a preset (Google, Microsoft, Generic OpenID Connect); the form then shows only the relevant fields.
-- **Form fields:** id (editable only on creation; suggested from the label), label, issuer (generic) or tenant
-  (Microsoft), client id, client secret (write-only: "set" / "change"), scopes, allowed email domains, trust provider
-  emails, require Arena 2FA, show on login page, enabled, icon (built-in / upload / generic).
-- **Redirect URI:** shown read-only with a copy button
-  (`<public base URL>/auth/oidc/<id>/callback`), with short instructions for registering it at the provider.
-- **Test:** runs the adapter's `testConnection` (discovery + JWKS fetch) and shows the result. An optional
-  "Test sign-in" opens the real flow in a new tab in a test mode that reports the claims received without logging in
-  or linking anything.
-- **Disable / delete:** disabling hides the button and refuses callbacks but keeps identity links. Deleting asks for
-  confirmation and lists the users linked *only* to this provider and without a password (they will not be able to log
-  in until they set a password via "forgot password"); identity links are deleted with the provider.
-- Environment providers are shown read-only with a "Managed by environment variables" note.
+New system admin page, visible and reachable only by system admins (sidebar "System admin" group, next to Job
+monitor, System logs and Messages): `systemAdminModules.authProviders`,
+`webapp/views/App/views/SystemAdmin/AuthProviders/`. The webapp route checks `User.isSystemAdmin`, and every API
+endpoint uses `AuthMiddleware.requireAdminPermission`.
+
+- **List:** one row per provider in login page order (drag handle to reorder): icon, label and identifier, type,
+  status chip (Enabled / Disabled / Discovery failed), login page visibility (Shown / Direct link only / Hidden until
+  fixed), linked users count (link to the Users list filtered by sign-in method), last used. Row actions: edit and a
+  menu with Test connection, Test sign-in, Copy redirect URI, Hide from / show on login page, Disable / enable,
+  Delete. Environment providers carry an "environment" lock chip. Header buttons: "Preview login page" (opens the
+  login page in a new tab) and "Add provider". A note reminds that email and password sign-in is always available.
+- **Empty state:** short explanation and "Add provider". If `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY` is missing, an
+  alert explains how to set it and adding DB providers is disabled.
+- **Add:** dialog to choose the type (Google, Microsoft, OpenID Connect), then the form with only the relevant fields.
+- **Form**, in three sections, with inline validation and a "N fields need attention" summary next to Save:
+  - *General:* button label, identifier (suggested from the label, lowercase letters, digits and hyphens, read-only
+    after creation), icon (Google and Microsoft: fixed official logo; others: Generic / Uploaded, PNG or SVG up to
+    100 KB), Enabled, Show on the login page (with the direct link shown when off).
+  - *Connection:* issuer URL with a "discovered" / "discovery failed" indicator (OIDC), tenant (Microsoft: a tenant ID,
+    "Any organization" or "Any Microsoft account"), client ID, client secret (write-only: "set on <date>" + Change),
+    scopes as chips.
+  - *Access:* allowed email domains as chips, Require Arena two-factor authentication, Trust emails from this provider
+    (hidden for Google, which always verifies emails).
+  - Footer: Test connection, Test sign-in, Cancel, Save.
+  - Side panel: redirect URI (`<public base URL>/auth/oidc/<id>/callback`) with a copy button, setup steps for the
+    chosen type with links to the setup guides, and a live login page preview with the provider's button highlighted.
+  - Header: created / last modified date and by whom.
+- **Test connection** loads the discovery document and signing keys and reports the outcome and timing. **Test
+  sign-in** opens the real flow in a new tab in test mode; the result dialog shows the validated claims (issuer,
+  subject, email and whether it is verified, name), the allowed domain check and the Arena user that would match,
+  without logging in or linking anything.
+- **Disable:** hides the button and refuses sign-ins, keeping identity links. **Delete:** confirmation dialog with the
+  number of linked users, the list of users left without any sign-in method (no password, no other provider), an
+  option (on by default) to email them how to set a password, a suggestion to disable instead, and type-the-identifier
+  to confirm. Identity links are deleted with the provider.
+- **Environment providers:** read-only view of the settings with a "Managed by the server configuration" note naming
+  the config variable and whether the secret variable is set; tests and the linked users list stay available; no
+  edit, disable or delete.
+- **Users list:** new "Sign-in method" filter (password, each provider, none) and column, used by the linked users
+  links.
 - API (system admin only), in a new `server/modules/authProvider/` module (`api/`, `service/`, `repository/`):
   `GET/POST /api/admin/auth-providers`, `GET/PUT/DELETE /api/admin/auth-providers/:id`,
   `POST /api/admin/auth-providers/:id/test`, `PUT /api/admin/auth-providers/order`,
-  `PUT /api/admin/auth-providers/:id/icon`.
+  `PUT /api/admin/auth-providers/:id/icon`, `GET /api/admin/auth-providers/:id/users-without-other-method`.
 - Every change is written to the server log with the admin user and the changed fields (never the secret).
 
 ### Login page and icons
@@ -363,8 +389,10 @@ A password is **not** required: a user can sign in only with an external provide
 - Invitation accept page (`ResetPassword.js`): "or accept with" provider buttons (invitation mode).
 - Login page: provider buttons with icons, `?provider=<id>` direct start, `?step=2fa` for the external login 2FA
   step, `oidcError` messages.
-- System admin "Login providers" page: list, add (preset choice), edit form, secret field, icon picker/upload,
-  redirect URI with copy button, test connection, test sign-in, reorder, disable, delete with affected users list.
+- System admin "Login providers" page, following the mockup: list, empty state, add (type choice), edit form with
+  side panel (redirect URI, setup steps, login page preview), test connection, test sign-in result, reorder, disable,
+  delete dialog, read-only environment providers.
+- Users list: "Sign-in method" filter and column.
 - Profile / user edit view: "Sign-in methods" section (password status, linked providers, link / unlink, set
   password).
 - i18n keys (all supported languages).
