@@ -1,8 +1,7 @@
 import {
   Objects,
   type Chain as ArenaChain,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
+  type NodeDefEntity,
   type Survey as ArenaSurvey,
 } from '@openforis/arena-core'
 
@@ -22,7 +21,7 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
 
   survey: ArenaSurvey | null
   chain: ArenaChain | null | undefined
-  baseUnitDef: ArenaNodeDef<NodeDefType> | null
+  baseUnitDef: NodeDefEntity | null
 
   constructor(params?: any) {
     super(SurveyRdbOlapDataTablesCreationJob.type, params)

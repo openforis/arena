@@ -1,5 +1,7 @@
 import './DataMatrixExportForm.scss'
 
+import type { NodeDefEntity } from '@openforis/arena-core'
+
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -149,7 +151,8 @@ export const DataMatrixExportForm = (props: Props) => {
     return queryKeyDefUuids.length > 0 ? queryKeyDefUuids : rootKeyDefUuids
   })
 
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  // the data matrix entity is a multiple entity (data query entity)
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey) as NodeDefEntity
   const entityLabel = NodeDef.getLabel(entityDef, lang)
   const keysLabel = rootKeyDefs
     .filter((keyDef: any) => recordKeyDefUuids.includes(NodeDef.getUuid(keyDef)))

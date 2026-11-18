@@ -87,7 +87,7 @@ describe('Screenshot image attributes (287)', () => {
       name: 'plot_photos',
       labels: { en: 'Plot photos' },
       multiple: true,
-    })
+    }) as NodeDefEntity
     const [option] = toImageAttributeOptions([photo], 'en', rowEntityDef)
     expect(option).toMatchObject({ label: 'Plot photos › photo label', rowParentDefUuid: 'plot-def' })
   })
