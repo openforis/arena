@@ -306,6 +306,12 @@ export const acceptUserAccessRequest = async ({
       const surveyOwnerUuid = User.getUuid(userInvited)
 
       await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
+
+      // only an explicit acceptance (by a system admin) marks the request as accepted, not any invitation
+      await UserManager.updateUserAccessRequestStatus(
+        { email, status: UserAccessRequest.status.ACCEPTED, userUuid: User.getUuid(user) },
+        t
+      )
       survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
 
       return { survey, userInvited }

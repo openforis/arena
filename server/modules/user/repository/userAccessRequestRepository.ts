@@ -17,11 +17,6 @@ export const countUserAccessRequests = (client: any = db): Promise<number> =>
 const userAccessRequestsSelect = `
     SELECT 
       ar.*,
-      CASE 
-        WHEN u.uuid IS NULL THEN '${UserAccessRequest.status.CREATED}' 
-        ELSE '${UserAccessRequest.status.ACCEPTED}' 
-        END 
-        AS status,
       acc.name AS accepted_by_name,
       acc.email AS accepted_by_email,
       t.props ->> 'name' AS template_name,
