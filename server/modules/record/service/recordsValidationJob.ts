@@ -5,7 +5,9 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export default class RecordsValidationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'RecordsValidationJob'
+
+  constructor(params?: any) {
     super(RecordsValidationJob.type, params)
   }
 
@@ -64,5 +66,3 @@ export default class RecordsValidationJob extends Job {
     this.incrementProcessedItems()
   }
 }
-
-RecordsValidationJob.type = 'RecordsValidationJob'

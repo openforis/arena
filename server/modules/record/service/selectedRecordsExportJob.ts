@@ -9,7 +9,9 @@ import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
 export default class SelectedRecordsExportJob extends ZipFileCreatorBaseJob {
-  constructor(params) {
+  static readonly type: string = 'SelectedRecordsExportJob'
+
+  constructor(params?: any) {
     super(SelectedRecordsExportJob.type, { ...params, exportType: ArenaExportType.records }, [
       new RecordsExportJob(),
       new RecordFilesExportJob(),
@@ -28,5 +30,3 @@ export default class SelectedRecordsExportJob extends ZipFileCreatorBaseJob {
     return { ...result, downloadToken }
   }
 }
-
-SelectedRecordsExportJob.type = 'SelectedRecordsExportJob'

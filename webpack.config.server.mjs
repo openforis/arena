@@ -37,7 +37,7 @@ export default {
   entry: {
     server: entry('server/server.js'),
     jobThread: entry('server/job/jobThread.ts'),
-    recordsUpdateThread: entry('server/modules/record/service/update/thread/recordsUpdateThread.js'),
+    recordsUpdateThread: entry('server/modules/record/service/update/thread/recordsUpdateThread.ts'),
   },
   output: {
     publicPath: 'dist/',

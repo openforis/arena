@@ -5,20 +5,20 @@ const threadZombies = new Set() // Set of threads marked to be killed
 
 // thread cache
 const getKey = () => `survey_records_thread`
-const get = (threadKey) => threads.getThread(threadKey)
-const put = (threadKey, thread) => threads.putThread(threadKey, thread)
+const get = (threadKey: any) => threads.getThread(threadKey)
+const put = (threadKey: any, thread: any) => threads.putThread(threadKey, thread)
 
-const remove = (threadKey) => {
+const remove = (threadKey: any) => {
   threads.removeThread(threadKey)
   threadZombies.delete(threadKey)
 }
 
 // Thread zombies (inactive threads, to be deleted at timeout)
-const markZombie = (threadKey) => threadZombies.add(threadKey)
+const markZombie = (threadKey: any) => threadZombies.add(threadKey)
 
-const reviveZombie = (threadKey) => threadZombies.delete(threadKey)
+const reviveZombie = (threadKey: any) => threadZombies.delete(threadKey)
 
-const isZombie = (threadKey) => threadZombies.has(threadKey)
+const isZombie = (threadKey: any) => threadZombies.has(threadKey)
 
 export const SurveyRecordsThreadMap = {
   getKey,

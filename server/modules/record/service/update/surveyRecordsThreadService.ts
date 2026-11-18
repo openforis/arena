@@ -24,7 +24,7 @@ const threadTimeouts = {}
 const clusterEventTargetType = 'recordsUpdateThread'
 const clusterEventTypes = { surveyClear: 'surveyClear', recordClear: 'recordClear' }
 
-const handleClusterEvent = (event) => {
+const handleClusterEvent = (event: any) => {
   const { targetType, eventType, message } = event
   if (targetType !== clusterEventTargetType) return
 
@@ -80,7 +80,7 @@ const _createThread = () => {
 }
 
 // ====== DELETE
-const _killThreadByKey = (threadKey) => {
+const _killThreadByKey = (threadKey: any) => {
   clearTimeout(threadTimeouts[threadKey])
   const thread = getThreadByKey(threadKey)
 
@@ -95,7 +95,15 @@ const killThread = () => {
   _killThreadByKey(threadKey)
 }
 
-const clearSurveyDataFromThread = ({ surveyId, cycle = null, draft = false }) => {
+const clearSurveyDataFromThread = ({
+  surveyId,
+  cycle = null,
+  draft = false,
+}: {
+  surveyId: number
+  cycle?: string
+  draft?: boolean
+}) => {
   ClusterBus.publish({
     targetType: clusterEventTargetType,
     targetId: `survey-${surveyId}`,
@@ -104,7 +112,17 @@ const clearSurveyDataFromThread = ({ surveyId, cycle = null, draft = false }) =>
   }).catch((error) => Logger.error(`error publishing surveyClear cluster event: ${error}`))
 }
 
-const clearRecordDataFromThread = ({ surveyId, cycle, draft, recordUuid }) => {
+const clearRecordDataFromThread = ({
+  surveyId,
+  cycle,
+  draft,
+  recordUuid,
+}: {
+  surveyId: number
+  cycle: string
+  draft: boolean
+  recordUuid: string
+}) => {
   ClusterBus.publish({
     targetType: clusterEventTargetType,
     targetId: recordUuid,
@@ -115,7 +133,7 @@ const clearRecordDataFromThread = ({ surveyId, cycle, draft, recordUuid }) => {
 
 // ====== READ
 
-const _resetThreadInactivityTimeout = (threadKey) => {
+const _resetThreadInactivityTimeout = (threadKey: any) => {
   clearTimeout(threadTimeouts[threadKey])
 
   // After one hour of inactivity, thread gets killed and user is notified
@@ -148,7 +166,7 @@ const getOrCreatedThread = () => {
 
 const { assocSocket, dissocSocket, dissocSocketBySocketId } = RecordSocketsMap
 
-const notifyRecordUpdateToSockets = async ({ eventType, content }) => {
+const notifyRecordUpdateToSockets = async ({ eventType, content }: { eventType: any; content: any }) => {
   const { recordUuid } = content
   const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   for (const socketId of socketIds) {
@@ -161,14 +179,22 @@ const notifyRecordUpdateToSockets = async ({ eventType, content }) => {
   }
 }
 
-const notifyRecordUpdateToSocket = async ({ socketId, eventType, content }) => {
+const notifyRecordUpdateToSocket = async ({
+  socketId,
+  eventType,
+  content,
+}: {
+  socketId: string
+  eventType: string
+  content: unknown
+}) => {
   if (socketId && (await WebSocketServer.isSocketConnected(socketId))) {
     WebSocketServer.notifySocket(socketId, eventType, content)
   }
 }
 
 // forwards a message coming from the records update thread to the sockets interested in it
-const notifyThreadMessageToSockets = async ({ eventType, content }) => {
+const notifyThreadMessageToSockets = async ({ eventType, content }: { eventType: any; content: any }) => {
   if (eventType === WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm) {
     // only the user who requested the update has to confirm it
     await notifyRecordUpdateToSocket({ socketId: content.socketId, eventType, content })
@@ -190,7 +216,15 @@ export const createSequentialThreadMessagesNotifier = () => {
   }
 }
 
-const notifyRecordDeleteToSockets = async ({ socketIdUser, recordUuid, notifySameUser = true }) => {
+const notifyRecordDeleteToSockets = async ({
+  socketIdUser,
+  recordUuid,
+  notifySameUser = true,
+}: {
+  socketIdUser: any
+  recordUuid: string
+  notifySameUser?: any
+}) => {
   // Notify other users viewing or editing the record it has been deleted
   const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   socketIds.forEach((socketId) => {

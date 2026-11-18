@@ -1,4 +1,10 @@
-import { Objects, Queue, SystemError } from '@openforis/arena-core'
+import {
+  Objects,
+  Queue,
+  SystemError,
+  type Record as ArenaRecord,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
@@ -20,13 +26,14 @@ import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
-const isClearNonApplicableValuesEnabled = (survey) => !Survey.isKeepNonApplicableValues(Survey.getSurveyInfo(survey))
+const isClearNonApplicableValuesEnabled = (survey: ArenaSurvey) =>
+  !Survey.isKeepNonApplicableValues(Survey.getSurveyInfo(survey))
 
 // the user must confirm the update first (if it clears values) only when the request comes from a socket
-const isClearNonApplicableValuesConfirmationNeeded = ({ msg, survey }) =>
+const isClearNonApplicableValuesConfirmationNeeded = ({ msg, survey }: { msg: any; survey: ArenaSurvey }) =>
   isClearNonApplicableValuesEnabled(survey) && !msg.clearNonApplicableValuesConfirmed && Boolean(msg.socketId)
 
-const getNodeAndDescendants = ({ record, nodeUuid }) => {
+const getNodeAndDescendants = ({ record, nodeUuid }: { record: ArenaRecord; nodeUuid: string }) => {
   const node = Record.getNodeByUuid(nodeUuid)(record)
   if (!node) return []
   return Record.getNodesArray(record).filter((n) => Node.getUuid(n) === nodeUuid || Node.isDescendantOf(node)(n))
@@ -43,7 +50,7 @@ const pgErrorCodeLockNotAvailable = '55P03'
 // Serializes record mutations across dynos: acquires a transaction-scoped Postgres advisory
 // lock keyed by recordUuid, runs fn with that transaction's client, and lets the lock be
 // auto-released on commit/rollback.
-const acquireRecordLockAndRun = ({ recordUuid, fn }) =>
+const acquireRecordLockAndRun = ({ recordUuid, fn }: { recordUuid: string; fn: any }) =>
   db.tx(async (t) => {
     await t.none('SET LOCAL lock_timeout = $1', [`${recordLockTimeoutMs}ms`])
     try {
@@ -65,7 +72,12 @@ const acquireRecordLockAndRun = ({ recordUuid, fn }) =>
 // Exported only so that tests can instantiate the thread class directly (in the main thread,
 // overriding postMessage): the module still creates and initializes the real worker instance below.
 export class RecordsUpdateThread extends Thread {
-  constructor(paramsObj) {
+  messageProcessorByType: Record<string, any>
+  processing: any
+  queue: any
+  surveysDataCache: any
+
+  constructor(paramsObj?: Record<string, any>) {
     super(paramsObj)
 
     this.queue = new Queue()
@@ -87,7 +99,7 @@ export class RecordsUpdateThread extends Thread {
     // do nothing
   }
 
-  async handleNodesUpdated({ record, updatedNodes }) {
+  handleNodesUpdated({ record, updatedNodes }) {
     if (!Objects.isEmpty(updatedNodes)) {
       const recordUuid = Record.getUuid(record)
       this.postMessage({
@@ -134,7 +146,7 @@ export class RecordsUpdateThread extends Thread {
     })
   }
 
-  async handleNodesValidationUpdated({ record, validations }) {
+  handleNodesValidationUpdated({ record, validations }) {
     const recordUpdated = Record.mergeNodeValidations(validations)(record)
 
     this.postMessage({
@@ -396,11 +408,11 @@ export class RecordsUpdateThread extends Thread {
     recordsCache.delete(recordUuid)
 
     if (recordsCache.isEmpty()) {
-      await this.processSurveyClearMsg(msg)
+      this.processSurveyClearMsg(msg)
     }
   }
 
-  async processSurveyClearMsg(msg) {
+  processSurveyClearMsg(msg) {
     const { surveyId, cycle } = msg
 
     const keysToDelete = []

@@ -14,7 +14,12 @@ import * as RecordManager from '../manager/recordManager'
 import { resolveValidationReportParams } from './validationReportParams'
 
 export default class VaidationReportGenerationJob extends Job {
-  constructor(params) {
+  categoriesTempFolderName: any
+  dbStream: any
+
+  static readonly type: string = 'VaidationReportGenerationJob'
+
+  constructor(params?: any) {
     super(VaidationReportGenerationJob.type, params)
   }
 
@@ -133,7 +138,7 @@ export default class VaidationReportGenerationJob extends Job {
 
   generateResult() {
     const { tempFileName } = this.context
-    return { tempFileName }
+    return Promise.resolve({ tempFileName })
   }
 
   async cancel() {
@@ -141,5 +146,3 @@ export default class VaidationReportGenerationJob extends Job {
     this.dbStream?.destroy()
   }
 }
-
-VaidationReportGenerationJob.type = 'VaidationReportGenerationJob'
