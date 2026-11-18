@@ -411,7 +411,7 @@ const updateClonedEntityDefLayout = ({
   clonedEntityDef,
   newUuidByOldUuid,
 }: {
-  clonedEntityDef: AnyNodeDef
+  clonedEntityDef: NodeDefEntity
   newUuidByOldUuid: Record<string, string>
 }): AnyNodeDef => {
   const layout = NodeDef.getLayout(clonedEntityDef)
@@ -744,8 +744,8 @@ export const getNodeDefDescendants =
 const multipleEntityFilterFunction = (nodeDef: AnyNodeDef): boolean =>
   NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)
 
-export const getOlapDataTableEntityDefs = (survey: ArenaSurvey): AnyNodeDef[] =>
-  ArrayUtils.sortById(findDescendants({ filterFn: multipleEntityFilterFunction })(survey)) as AnyNodeDef[]
+export const getOlapDataTableEntityDefs = (survey: ArenaSurvey): NodeDefEntity[] =>
+  ArrayUtils.sortById(findDescendants({ filterFn: multipleEntityFilterFunction })(survey)) as NodeDefEntity[]
 
 // ====== NODE DEFS CODE UTILS
 export const getNodeDefParentCode = (nodeDef: AnyNodeDef) => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))

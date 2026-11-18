@@ -1,4 +1,4 @@
-import { FileNames, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { FileNames, type NodeDefEntity, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
@@ -73,7 +73,8 @@ export default class PersistOlapDataJob extends Job {
     const { context, survey, chain, tx } = this
     const { cycle } = context
     const entityDefName = FileNames.getName(StringUtils.removePrefix(zipEntryNamePrefix)(zipEntryName))
-    const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
+    // the zip entries are named after the (multiple) entity defs
+    const entityDef = Survey.getNodeDefByName(entityDefName)(survey) as NodeDefEntity
 
     await SurveyRdbManager.clearOlapData({ survey, cycle, chain, entityDef }, tx)
 

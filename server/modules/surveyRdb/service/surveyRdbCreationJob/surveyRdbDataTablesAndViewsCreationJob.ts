@@ -6,7 +6,9 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
-  constructor(params) {
+  static readonly type = 'SurveyRdbDataTablesAndViewsCreationJob'
+
+  constructor(params?: any) {
     super(SurveyRdbDataTablesAndViewsCreationJob.type, params)
   }
 
@@ -104,5 +106,3 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     )
   }
 }
-
-SurveyRdbDataTablesAndViewsCreationJob.type = 'SurveyRdbDataTablesAndViewsCreationJob'

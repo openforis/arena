@@ -1,4 +1,9 @@
-import { Objects } from '@openforis/arena-core'
+import {
+  Objects,
+  type Chain as ArenaChain,
+  type NodeDefEntity,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,7 +17,13 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export default class SurveyRdbOlapDataTablesCreationJob extends Job {
-  constructor(params) {
+  static readonly type = 'SurveyRdbOlapDataTablesCreationJob'
+
+  survey: ArenaSurvey | null
+  chain: ArenaChain | null | undefined
+  baseUnitDef: NodeDefEntity | null
+
+  constructor(params?: any) {
     super(SurveyRdbOlapDataTablesCreationJob.type, params)
     // internal variables
     this.survey = null
@@ -156,5 +167,3 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
     )
   }
 }
-
-SurveyRdbOlapDataTablesCreationJob.type = 'SurveyRdbOlapDataTablesCreationJob'

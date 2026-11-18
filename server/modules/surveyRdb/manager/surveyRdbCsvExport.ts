@@ -1,4 +1,11 @@
-import { FlatDataExportModel, Objects } from '@openforis/arena-core'
+import {
+  FlatDataExportModel,
+  Objects,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+  type CategoryItem as ArenaCategoryItem,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -11,16 +18,29 @@ import { Query } from '@common/model/query'
 
 import { toSafeFileName } from '@server/utils/file/fileNames'
 
+// a column name, or a column name and its type
+type ExportField = string | { name: string; type: string }
+
 const maxExpandedCategoryItems = 20
 
-const visitCategoryItems = ({ survey, nodeDef, itemVisitor }) => {
+const visitCategoryItems = ({
+  survey,
+  nodeDef,
+  itemVisitor,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  itemVisitor: (item: ArenaCategoryItem) => void
+}) => {
   const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
   if (items.length <= maxExpandedCategoryItems) {
-    items.forEach(itemVisitor)
+    for (const item of items) {
+      itemVisitor(item)
+    }
   }
 }
 
-const fieldsExtractorByNodeDefType = {
+const fieldsExtractorByNodeDefType: Record<string, (params: Record<string, any>) => string[]> = {
   [NodeDef.nodeDefType.code]: ({ survey, columnNodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
     const { name: mainColumnName, names: columnNames, nodeDef } = columnNodeDef
 
@@ -67,13 +87,21 @@ const getCsvExportFields = ({
   expandCategoryItems = false,
   includeInternalUuids = false,
   includeDateCreated = false,
+}: {
+  survey: ArenaSurvey
+  query: any
+  addCycle?: boolean
+  includeCategoryItemsLabels?: boolean
+  expandCategoryItems?: boolean
+  includeInternalUuids?: boolean
+  includeDateCreated?: boolean
 }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
 
-  const fields = []
+  const fields: ExportField[] = []
   if (includeInternalUuids) {
-    ArrayUtils.addIfNotEmpty(viewDataNodeDef.columnParentUuidName)(fields)
+    ArrayUtils.addIfNotEmpty<ExportField>(viewDataNodeDef.columnParentUuidName)(fields)
     fields.push(viewDataNodeDef.columnUuidName)
   }
   if (addCycle) {
@@ -87,7 +115,7 @@ const getCsvExportFields = ({
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   fields.push(
-    ...nodeDefCols.flatMap((nodeDefCol) => {
+    ...nodeDefCols.flatMap((nodeDefCol): ExportField[] => {
       const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
       const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
       if (fieldsExtractor) {
@@ -104,7 +132,7 @@ const getCsvExportFields = ({
   return fields
 }
 
-const getCsvExportFieldsAgg = ({ survey, query, options = {} }) => {
+const getCsvExportFieldsAgg = ({ survey, query, options = {} }: { survey: ArenaSurvey; query: any; options?: any }) => {
   const { includeCategoryItemsLabels = false } = options
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
@@ -130,7 +158,7 @@ const getCsvExportFieldsAgg = ({ survey, query, options = {} }) => {
   return fields
 }
 
-const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
+const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }: { survey: ArenaSurvey; query: any }) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const nodeDefCodeCols = nodeDefCols.filter(NodeDef.isCode)
@@ -151,7 +179,15 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNamesGenerator }) => {
+const getCsvObjectTransformerUniqueFileNames = ({
+  survey,
+  query,
+  uniqueFileNamesGenerator,
+}: {
+  survey: ArenaSurvey
+  query: any
+  uniqueFileNamesGenerator: any
+}) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)

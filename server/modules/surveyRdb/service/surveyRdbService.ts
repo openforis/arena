@@ -1,7 +1,8 @@
+import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 import { Query } from '../../../../common/model/query'
 
-import { Authorizer } from '@openforis/arena-core'
+import { Authorizer, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
@@ -26,7 +27,17 @@ const Logger = Log.getLogger('SurveyRdbService')
 // share the same fetch instead of loading the same survey from the DB multiple times
 const surveyFetchPromisesByKey = new Map()
 
-const _doFetchSurvey = async ({ surveyId, cycle, includeRefData, draft }) => {
+const _doFetchSurvey = ({
+  surveyId,
+  cycle,
+  includeRefData,
+  draft,
+}: {
+  surveyId: number
+  cycle: string
+  includeRefData: boolean
+  draft: boolean
+}) => {
   const params = { surveyId, cycle, draft, advanced: true }
   return includeRefData
     ? SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -47,7 +58,17 @@ const _doFetchSurvey = async ({ surveyId, cycle, includeRefData, draft }) => {
  * @param {boolean} [params.draft] - Whether to load draft node defs (needed for custom aggregate functions).
  * @returns {Promise<object>} - The fetched survey.
  */
-const _fetchSurvey = async ({ surveyId, cycle, includeRefData = false, draft = true }) => {
+const _fetchSurvey = ({
+  surveyId,
+  cycle,
+  includeRefData = false,
+  draft = true,
+}: {
+  surveyId: number
+  cycle: string
+  includeRefData?: boolean
+  draft?: boolean
+}) => {
   const key = `${surveyId}_${cycle}_${includeRefData}_${draft}`
   let fetchPromise = surveyFetchPromisesByKey.get(key)
   if (!fetchPromise) {
@@ -59,7 +80,13 @@ const _fetchSurvey = async ({ surveyId, cycle, includeRefData = false, draft = t
   return fetchPromise
 }
 
-const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
+const _getRecordOwnerUuidForQuery = ({
+  user,
+  survey,
+}: {
+  user?: ArenaUser | null
+  survey: ArenaSurvey
+}): string | null => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   return Authorizer.canViewNotOwnedRecords(user, surveyInfo)
     ? null // fetch all records' data
@@ -74,7 +101,15 @@ const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
  * @param {string} [params.cycle] - The survey cycle.
  * @returns {Promise<{own: Array, readable: Array}>} - The access filters (`own` is empty when the user is not restricted).
  */
-const _fetchUserGroupAccessFilters = async ({ user, survey, cycle }) => {
+const _fetchUserGroupAccessFilters = async ({
+  user,
+  survey,
+  cycle,
+}: {
+  user?: ArenaUser | null
+  survey: ArenaSurvey
+  cycle: string
+}) => {
   if (!user) return { own: [], readable: [] }
   const surveyInfo = Survey.getSurveyInfo(survey)
   // same node defs used to generate the data views and to filter the records list (draft only if not published yet)
@@ -84,6 +119,20 @@ const _fetchUserGroupAccessFilters = async ({ user, survey, cycle }) => {
 }
 
 // export options that can be specified by the client: the other query parameters are determined server-side
+type FetchViewDataParams = {
+  user?: ArenaUser | null
+  surveyId: number
+  cycle: string
+  query: any
+  offset?: number
+  limit?: number | null
+  randomize?: boolean
+  columnNodeDefs?: boolean
+  outputStream?: any
+  addCycle?: boolean
+  options?: Record<string, any>
+}
+
 const exportOptionKeys = [
   'fileFormat',
   'includeCategoryItemsLabels',
@@ -94,7 +143,7 @@ const exportOptionKeys = [
   'nullsToEmpty',
 ]
 
-const _pickExportOptions = (options) =>
+const _pickExportOptions = (options: unknown): Record<string, any> =>
   options && typeof options === 'object' ? A.pick(exportOptionKeys, options) : {}
 
 /**
@@ -111,7 +160,7 @@ const _pickExportOptions = (options) =>
  * @param {object} [params.options] - The export options (only the ones in exportOptionKeys are considered).
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewData = async (params) => {
+export const fetchViewData = async (params: FetchViewDataParams) => {
   const {
     user,
     surveyId,
@@ -177,7 +226,7 @@ export const fetchViewData = async (params) => {
  * @param {!Query} [params.query] - The Query used to filter the records.
  * @returns {Promise<number>} - The count of rows.
  */
-export const countTable = async (params) => {
+export const countTable = async (params: { user?: ArenaUser | null; surveyId: number; cycle: string; query: any }) => {
   const { user, surveyId, cycle, query } = params
 
   const survey = await _fetchSurvey({ surveyId, cycle })
@@ -198,7 +247,17 @@ export const countTable = async (params) => {
  * @param {string[]} [params.entityDefUuids] - The entity definition UUIDs (all multiple entities if empty).
  * @returns {Promise<object>} - The count of rows indexed by entity definition UUID.
  */
-export const fetchTableRowsCountByEntityDefUuid = async ({ user, surveyId, cycle, entityDefUuids = [] }) => {
+export const fetchTableRowsCountByEntityDefUuid = async ({
+  user,
+  surveyId,
+  cycle,
+  entityDefUuids = [],
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  entityDefUuids?: string[]
+}) => {
   const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
   const userGroupAccessFilters = await _fetchUserGroupAccessFilters({ user, survey, cycle })
@@ -232,6 +291,14 @@ export const exportViewDataToTempFile = async ({
   columnNodeDefs = false,
   addCycle = false,
   options = {},
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  query: any
+  columnNodeDefs?: boolean
+  addCycle?: boolean
+  options?: any
 }) => {
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
@@ -242,7 +309,10 @@ export const exportViewDataToTempFile = async ({
   return tempFileName
 }
 
-export const exportDataMatrixToTempFile = async ({ user, survey, cycle, options }, client) => {
+export const exportDataMatrixToTempFile = async (
+  { user, survey, cycle, options }: { user: ArenaUser; survey: ArenaSurvey; cycle: string; options: any },
+  client?: DbClient
+) => {
   const { fileFormat } = options
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
@@ -267,6 +337,15 @@ export const fetchEntitiesDataToCsvFiles = async ({
   options,
   outputDir,
   callback,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  cycle: string
+  recordUuids?: string[] | null
+  search?: string | null
+  options: any
+  outputDir: string
+  callback?: (progress: Record<string, any>) => void
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
@@ -298,13 +377,18 @@ export const fetchEntitiesDataToCsvFiles = async ({
   })
 }
 
-export const fetchEntitiesFileUuidsByCycle = async ({
+export const fetchEntitiesFileUuidsByCycle = ({
   user,
   survey,
   cycle: cycleParam,
   includeDataFromAllCycles,
   filterRecordUuids,
-  callback = null,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  cycle: string
+  includeDataFromAllCycles?: boolean
+  filterRecordUuids?: string[] | null
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
@@ -315,11 +399,22 @@ export const fetchEntitiesFileUuidsByCycle = async ({
     cycle,
     recordOwnerUuid,
     filterRecordUuids,
-    callback,
   })
 }
 
-export const fetchEntitiesDataSummaryToFlatData = async ({ exportUuid, survey, cycle, lang, options }) => {
+export const fetchEntitiesDataSummaryToFlatData = async ({
+  exportUuid,
+  survey,
+  cycle,
+  lang,
+  options,
+}: {
+  exportUuid: string
+  survey: ArenaSurvey
+  cycle: string
+  lang: string
+  options: any
+}) => {
   const { fileFormat = FileFormats.xlsx } = options
   const items = []
   const entityDefs = SurveyRdbManager.getEntityDefsToExport({ survey, cycle, options })

@@ -1,11 +1,16 @@
-import type { Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { Chain as ArenaChain, Survey as ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 import * as Survey from '@core/survey/survey'
 
 import { db, DbClient } from '@server/db/db'
 
 export const clearOlapData = (
-  { survey, cycle, chain, entityDef }: { survey: ArenaSurvey; cycle: string; chain: ArenaChain; entityDef: any },
+  {
+    survey,
+    cycle,
+    chain,
+    entityDef,
+  }: { survey: ArenaSurvey; cycle: string; chain: ArenaChain; entityDef: NodeDefEntity },
   client: DbClient = db
 ) => {
   const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)

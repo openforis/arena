@@ -1,6 +1,16 @@
-import pgPromise from 'pg-promise'
+import type QueryStream from 'pg-query-stream'
 
-import { Dates, Objects, SystemError, UniqueFileNamesGenerator } from '@openforis/arena-core'
+import {
+  Dates,
+  Objects,
+  SystemError,
+  UniqueFileNamesGenerator,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+  type NodeDefEntity,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
@@ -14,7 +24,7 @@ import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/
 import { Query } from '@common/model/query'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -56,6 +66,29 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 
 export { clearOlapData, createOlapDataTable, insertOlapData } from '../repository/olapDataTable'
 
+type FetchViewDataParams = {
+  survey: ArenaSurvey
+  cycle: string
+  query: any
+  columnNodeDefs?: boolean
+  includeFileAttributeDefs?: boolean
+  recordSteps?: string[] | null
+  recordOwnerUuid?: string | null
+  userGroupAccessFilters?: any
+  offset?: number
+  limit?: number | null
+  randomize?: boolean
+  outputStream?: any
+  fileFormat?: string | null
+  addCycle?: boolean
+  includeCategoryItemsLabels?: boolean
+  expandCategoryItems?: boolean
+  includeInternalUuids?: boolean
+  includeDateCreated?: boolean
+  nullsToEmpty?: boolean
+  uniqueFileNamesGenerator?: UniqueFileNamesGenerator | null
+}
+
 const maxExcelCellsLimit = 1000000
 const maxExcelColumnsLimit = 16384
 
@@ -77,10 +110,11 @@ const maxExcelColumnsLimit = 16384
  * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including the outliers of the first 2 numeric attributes, so large datasets can be visualized without fetching them entirely.
  * @param {boolean|object} [params.outputStream] - The output to be used to stream the data (if specified).
  * @param {string} [params.fileFormat] - The format of the output file (csv or xlsx).
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewData = async (params, client = db) => {
+// returns the rows, or the query stream when outputStream is specified
+export const fetchViewData = async (params: FetchViewDataParams, client: DbClient = db): Promise<any> => {
   const {
     survey,
     cycle,
@@ -145,9 +179,9 @@ export const fetchViewData = async (params, client = db) => {
       uniqueFileNamesGenerator,
     })
     await DbUtils.stream({
-      queryStream: result,
+      queryStream: result as QueryStream,
       client,
-      processor: async (dbStream) =>
+      processor: (dbStream) =>
         FlatDataWriter.writeItemsStreamToStream({
           stream: dbStream,
           fields,
@@ -176,7 +210,7 @@ export const fetchViewData = async (params, client = db) => {
  * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = async (params, client = db) => {
+export const fetchViewDataAgg = async (params: Record<string, any>, client: DbClient = db): Promise<any> => {
   const {
     survey,
     cycle,
@@ -202,7 +236,7 @@ export const fetchViewDataAgg = async (params, client = db) => {
       DbUtils.stream({
         queryStream: result,
         client: t,
-        processor: async (dbStream) =>
+        processor: (dbStream) =>
           FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
       })
     )
@@ -218,6 +252,14 @@ const _determineRecordUuidsFilter = async ({
   recordUuids,
   search,
   user,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  recordsModifiedAfter?: string | null
+  recordsModifiedBefore?: string | null
+  recordUuids?: string[] | null
+  search?: string | null
+  user?: ArenaUser | null
 }) => {
   // recordUuids explicitly selected by the user are already checked against qualifiers by
   // requireRecordsReadableByUserGroup, at the API layer
@@ -260,7 +302,15 @@ const _determineRecordUuidsFilter = async ({
   return recordsSummaries.map(Record.getUuid)
 }
 
-export const getEntityDefsToExport = ({ survey, cycle, options }) => {
+export const getEntityDefsToExport = ({
+  survey,
+  cycle,
+  options,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  options: any
+}) => {
   const { exportSingleEntitiesIntoSeparateFiles } = options
   return Survey.findDescendants({
     cycle,
@@ -281,6 +331,16 @@ const createEntityFetchParams = ({
   options,
   nodeDefContext,
   idx,
+}: {
+  survey: ArenaSurvey
+  outputDir: string
+  filterRecordUuids: string[] | null
+  cycle: string
+  recordOwnerUuid: string | null
+  uniqueFileNamesGenerator: any
+  options: any
+  nodeDefContext: ArenaNodeDef<NodeDefType>
+  idx: number
 }) => {
   const {
     includeCategoryItemsLabels,
@@ -370,7 +430,17 @@ const createEntityFetchParams = ({
   }
 }
 
-const checkCanExportEntitiesData = async ({ fileFormat, nodeDefs, fetchParamsByNodeDefUuid, client }) => {
+const checkCanExportEntitiesData = async ({
+  fileFormat,
+  nodeDefs,
+  fetchParamsByNodeDefUuid,
+  client,
+}: {
+  fileFormat: string
+  nodeDefs: ArenaNodeDef<NodeDefType>[]
+  fetchParamsByNodeDefUuid: Record<string, any>
+  client: DbClient
+}) => {
   if (fileFormat === FileFormats.xlsx) {
     for (const nodeDefContext of nodeDefs) {
       const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
@@ -397,8 +467,18 @@ export const fetchEntitiesDataToCsvFiles = async (
     options,
     outputDir,
     callback,
+  }: {
+    user?: ArenaUser | null
+    survey: ArenaSurvey
+    cycle: string
+    search?: string | null
+    recordOwnerUuid?: string | null
+    recordUuids?: string[] | null
+    options: any
+    outputDir: string
+    callback?: (progress: Record<string, any>) => void
   },
-  client = db
+  client: DbClient = db
 ) => {
   const { recordsModifiedAfter, recordsModifiedBefore, fileFormat } = options
 
@@ -450,14 +530,26 @@ export const fetchEntitiesDataToCsvFiles = async (
   return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
 }
 
-const getDataMatrixColumnName = ({ viewDataNodeDef, nodeDef }) => {
+const getDataMatrixColumnName = ({
+  viewDataNodeDef,
+  nodeDef,
+}: {
+  viewDataNodeDef: ViewDataNodeDef
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   const { name } = new ColumnNodeDef(viewDataNodeDef, nodeDef)
   // taxon codes cannot be used: unlisted taxa have different scientific names but the same code (e.g. UNL)
   return NodeDef.isTaxon(nodeDef) ? `${name}${ColumnNodeDef.columnSuffixTaxonScientificName}` : name
 }
 
 // all the record keys when not specified, always in the survey order
-const getDataMatrixRecordKeyDefs = ({ survey, recordKeyAttributeDefUuids }) => {
+const getDataMatrixRecordKeyDefs = ({
+  survey,
+  recordKeyAttributeDefUuids,
+}: {
+  survey: ArenaSurvey
+  recordKeyAttributeDefUuids?: string[] | null
+}) => {
   const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
   if (A.isNil(recordKeyAttributeDefUuids)) return rootKeyDefs
   const rootKeyDefUuids = new Set(rootKeyDefs.map(NodeDef.getUuid))
@@ -466,7 +558,7 @@ const getDataMatrixRecordKeyDefs = ({ survey, recordKeyAttributeDefUuids }) => {
   return rootKeyDefs.filter((keyDef) => recordKeyAttributeDefUuids.includes(NodeDef.getUuid(keyDef)))
 }
 
-const getDataMatrixDefs = ({ survey, cycle, options }) => {
+const getDataMatrixDefs = ({ survey, cycle, options }: { survey: ArenaSurvey; cycle: string; options: any }) => {
   const { entityDefUuid, rowAttributeDefUuids, valueAttributeDefUuid } = options
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   if (!entityDef || !NodeDef.isMultipleEntity(entityDef) || Objects.isEmpty(rowAttributeDefUuids)) {
@@ -486,7 +578,15 @@ const getDataMatrixDefs = ({ survey, cycle, options }) => {
   }
 }
 
-const checkCanExportDataMatrix = ({ fileFormat, fields, items }) => {
+const checkCanExportDataMatrix = ({
+  fileFormat,
+  fields,
+  items,
+}: {
+  fileFormat: string
+  fields: string[]
+  items: any[]
+}) => {
   const cellsCount = fields.length * (items.length + 1)
   if (
     fileFormat === FileFormats.xlsx &&
@@ -504,12 +604,18 @@ const checkCanExportDataMatrix = ({ fileFormat, fields, items }) => {
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are included.
  * @param {!object} [params.options] - The entity, row, record key (all when not specified) and value definition UUIDs, the filter expression (as in Data Explorer) and the file format.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<{fields: string[], items: object[]}>} - The output fields and items.
  */
 export const fetchEntityDataMatrix = async (
-  { user = null, survey, cycle, recordOwnerUuid = null, options },
-  client = db
+  {
+    user = null,
+    survey,
+    cycle,
+    recordOwnerUuid = null,
+    options,
+  }: { user?: ArenaUser | null; survey: ArenaSurvey; cycle: string; recordOwnerUuid?: string | null; options: any },
+  client: DbClient = db
 ) => {
   // one column per record: records of different cycles could have the same keys
   if (A.isNil(cycle)) throw new Error('Cycle not specified')
@@ -548,8 +654,13 @@ export const fetchEntityDataMatrix = async (
 }
 
 export const fetchEntitiesFileUuidsByCycle = async (
-  { survey, cycle, recordOwnerUuid = null, filterRecordUuids = null },
-  client = db
+  {
+    survey,
+    cycle,
+    recordOwnerUuid = null,
+    filterRecordUuids = null,
+  }: { survey: ArenaSurvey; cycle: string; recordOwnerUuid?: string | null; filterRecordUuids?: string[] | null },
+  client: DbClient = db
 ) => {
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
@@ -605,12 +716,18 @@ export const fetchEntitiesFileUuidsByCycle = async (
  * @param {!Query} [params.query] - The Query used to filter the rows.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
- * @param {pgPromise.IDatabase} client - The database client.
+ * @param {DbClient} client - The database client.
  * @returns {Promise<number>} - The number of rows.
  */
-export const countTable = async (
-  { survey, cycle, recordOwnerUuid, userGroupAccessFilters = null, query },
-  client = db
+export const countTable = (
+  {
+    survey,
+    cycle,
+    recordOwnerUuid,
+    userGroupAccessFilters = null,
+    query,
+  }: { survey: ArenaSurvey; cycle: string; recordOwnerUuid?: string | null; userGroupAccessFilters?: any; query: any },
+  client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)
   const nodeDefTable = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
@@ -631,12 +748,24 @@ export const countTable = async (
  * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
- * @param {pgPromise.IDatabase} client - The database client.
+ * @param {DbClient} client - The database client.
  * @returns {Promise<object>} - Count of view data table rows indexed by related view data entity def UUID.
  */
 export const fetchTableRowsCountByEntityDefUuid = async (
-  { survey, cycle, entityDefUuids: entityDefUuidsParam = [], recordOwnerUuid = null, userGroupAccessFilters = null },
-  client = db
+  {
+    survey,
+    cycle,
+    entityDefUuids: entityDefUuidsParam = [],
+    recordOwnerUuid = null,
+    userGroupAccessFilters = null,
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    entityDefUuids?: string[]
+    recordOwnerUuid?: string | null
+    userGroupAccessFilters?: any
+  },
+  client: DbClient = db
 ) => {
   const entityDefUuids =
     entityDefUuidsParam?.length > 0
@@ -645,7 +774,7 @@ export const fetchTableRowsCountByEntityDefUuid = async (
           .filter((nodeDef) => NodeDef.isMultipleEntity(nodeDef) && NodeDef.isInCycle(cycle)(nodeDef))
           .map(NodeDef.getUuid)
 
-  const countsArray = await client.tx(async (tx) =>
+  const countsArray = await client.tx((tx) =>
     DbUtils.runQueries(
       tx,
       entityDefUuids.map(
@@ -660,7 +789,15 @@ export const fetchTableRowsCountByEntityDefUuid = async (
   return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})
 }
 
-export const filterEntitiesWithData = async ({ survey, cycle, entityDefs }) => {
+export const filterEntitiesWithData = async ({
+  survey,
+  cycle,
+  entityDefs,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  entityDefs: NodeDefEntity[]
+}) => {
   const entityDefUuids = entityDefs.map(NodeDef.getUuid)
   const dataViewCountsByEntityDefUuid = await fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
   return entityDefs.filter((entityDef) => {
