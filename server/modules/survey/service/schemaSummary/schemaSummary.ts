@@ -1,6 +1,13 @@
 import { z } from 'zod'
 
-import { Objects, Surveys } from '@openforis/arena-core'
+import {
+  Objects,
+  Surveys,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+} from '@openforis/arena-core'
 
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
@@ -31,7 +38,7 @@ const AiDescriptionsSchema = z.object({
   descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
 })
 
-const getParentPath = (nodeDef, survey) => {
+const getParentPath = (nodeDef: ArenaNodeDef<NodeDefType>, survey: ArenaSurvey) => {
   const parts = []
   let cur = Survey.getNodeDefParent(nodeDef)(survey)
   while (cur && !NodeDef.isRoot(cur)) {
@@ -41,7 +48,17 @@ const getParentPath = (nodeDef, survey) => {
   return parts.join('/')
 }
 
-const runAiDescriptionBatch = async ({ user, surveyName, batch, previousError }) => {
+const runAiDescriptionBatch = async ({
+  user,
+  surveyName,
+  batch,
+  previousError,
+}: {
+  user: ArenaUser
+  surveyName: string
+  batch: any
+  previousError?: { message: string }
+}) => {
   const batchNodeDefs = batch.map((e) => ({ uuid: e.uuid, name: e.name, type: e.type, parentPath: e.parentPath }))
   const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: batchNodeDefs, previousError })
   const { text } = await ModelClient.generate({ user, feature: 'schemaSummary', prompt, system })
@@ -49,7 +66,17 @@ const runAiDescriptionBatch = async ({ user, surveyName, batch, previousError })
   return AiDescriptionsSchema.parse(json)
 }
 
-const runAiDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIndex }) => {
+const runAiDescriptionBatchWithRetry = async ({
+  user,
+  surveyName,
+  batch,
+  batchIndex,
+}: {
+  user: ArenaUser
+  surveyName: string
+  batch: any
+  batchIndex: number
+}) => {
   try {
     return await runAiDescriptionBatch({ user, surveyName, batch })
   } catch (firstError) {
@@ -63,27 +90,33 @@ const runAiDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIn
   }
 }
 
-const getNodeDefPath = ({ survey, nodeDef }) => {
+const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const pathParts = []
   Survey.visitAncestorsAndSelf(nodeDef, (ancestorDef) => pathParts.unshift(NodeDef.getName(ancestorDef)))(survey)
   return pathParts.join('.')
 }
 
-const getDefaultValuesSummary = ({ nodeDef }) => {
+const getDefaultValuesSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const defaultValues = NodeDef.getDefaultValues(nodeDef)
   return defaultValues.length > 0
     ? defaultValues.map((defaultValue) => NodeDefExpression.getExpression(defaultValue)).join('; ')
     : ''
 }
 
-const getDefaultValueApplyIf = ({ nodeDef }) => {
+const getDefaultValueApplyIf = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const defaultValues = NodeDef.getDefaultValues(nodeDef)
   return defaultValues.length > 0
     ? defaultValues.map((defaultValue) => NodeDefExpression.getApplyIf(defaultValue)).join('; ')
     : ''
 }
 
-const getExpressionsSummary = ({ expressions, includeSeverity = false }) =>
+const getExpressionsSummary = ({
+  expressions,
+  includeSeverity = false,
+}: {
+  expressions: any
+  includeSeverity?: boolean
+}) =>
   expressions
     .reduce((acc, expression) => {
       const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
@@ -100,25 +133,25 @@ const getExpressionsSummary = ({ expressions, includeSeverity = false }) =>
     }, [])
     .join('\n')
 
-const getValidationsSummary = ({ nodeDef }) => {
+const getValidationsSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
   return getExpressionsSummary({ expressions, includeSeverity: true })
 }
 
 // mirrors the 3 "Required" options in the node def editor: not required, always required, required if
-const getRequiredSummary = ({ nodeDef }) => {
+const getRequiredSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const validations = NodeDef.getValidations(nodeDef)
   if (NodeDefValidations.isRequiredIfDefined(validations)) return 'conditional'
   return String(NodeDefValidations.isRequired(validations))
 }
 
-const getRequiredIfSummary = ({ nodeDef }) => {
+const getRequiredIfSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const validations = NodeDef.getValidations(nodeDef)
   return getExpressionsSummary({ expressions: NodeDefValidations.getRequiredIf(validations) })
 }
 
-const getValidationCountSummary = ({ nodeDef, countType }) => {
+const getValidationCountSummary = ({ nodeDef, countType }: { nodeDef: ArenaNodeDef<NodeDefType>; countType: any }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const count = NodeDefValidations.getCountProp(countType)(validations)
   if (Objects.isEmpty(count)) {
@@ -130,12 +163,12 @@ const getValidationCountSummary = ({ nodeDef, countType }) => {
   return String(count)
 }
 
-const getRelevantIf = (nodeDef) => {
+const getRelevantIf = (nodeDef: ArenaNodeDef<NodeDefType>) => {
   const relevantExpressions = NodeDef.getApplicable(nodeDef)
   return relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
 }
 
-const getValidationMessages = ({ nodeDef, lang }) => {
+const getValidationMessages = ({ nodeDef, lang }: { nodeDef: ArenaNodeDef<NodeDefType>; lang: string }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
   return expressions
@@ -149,7 +182,7 @@ const getValidationMessages = ({ nodeDef, lang }) => {
     .join('\n')
 }
 
-const getCategoryName = (survey, nodeDef) => {
+const getCategoryName = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
   if (!NodeDef.isCode(nodeDef)) return ''
 
   const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
@@ -165,26 +198,26 @@ const getCategoryName = (survey, nodeDef) => {
   return `${categoryName}${levelNameSuffix}`
 }
 
-const getTaxonomyName = (survey, nodeDef) => {
+const getTaxonomyName = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
   if (!NodeDef.isTaxon(nodeDef)) return ''
 
   const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
   return Taxonomy.getName(taxonomy) || ''
 }
 
-const getParentCodeAttribute = (survey, nodeDef) => {
+const getParentCodeAttribute = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
   if (!NodeDef.isCode(nodeDef)) return ''
   const parentCodeAttribute = Survey.getNodeDefParentCode(nodeDef)(survey)
   return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
 }
 
-const getCodeAttributeCategoryLevel = (survey, nodeDef) => {
+const getCodeAttributeCategoryLevel = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
   if (!NodeDef.isCode(nodeDef)) return ''
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   return String(categoryLevelIndex + 1)
 }
 
-const extractSchemaSummaryNodeDefs = (survey, cycle) => {
+const extractSchemaSummaryNodeDefs = (survey: ArenaSurvey, cycle: string) => {
   const nodeDefs = []
   Survey.visitDescendantsAndSelf({
     cycle,
@@ -200,7 +233,21 @@ const extractSchemaSummaryNodeDefs = (survey, cycle) => {
   return nodeDefs
 }
 
-const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, includeAiDescriptions }) => {
+const buildNodeDefItem = ({
+  survey,
+  nodeDef,
+  languages,
+  defaultLang,
+  cycle,
+  includeAiDescriptions,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  languages: string[]
+  defaultLang: string
+  cycle: string
+  includeAiDescriptions: boolean
+}) => {
   const { uuid, type } = nodeDef
   const name = NodeDef.getName(nodeDef)
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
@@ -269,7 +316,23 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
   }
 }
 
-const addAiDescriptions = async ({ user, surveyName, items, processed, total, onProgress, stopIfFunction }) => {
+const addAiDescriptions = async ({
+  user,
+  surveyName,
+  items,
+  processed,
+  total,
+  onProgress,
+  stopIfFunction,
+}: {
+  user: ArenaUser
+  surveyName: string
+  items: any[]
+  processed: number
+  total: number
+  onProgress: any
+  stopIfFunction: any
+}) => {
   const entriesNeedingDesc = items
     .filter((item) => !item._isRoot && !item._descriptionForAi?.trim())
     .map(({ uuid, name, type, _parentPath }) => ({ uuid, name, type, parentPath: _parentPath }))
@@ -307,12 +370,19 @@ export const generateSchemaSummaryItems = async ({
   includeAiDescriptions = false,
   onProgress = null,
   stopIfFunction = null,
+}: {
+  surveyId: number
+  cycle: string
+  user?: ArenaUser
+  includeAiDescriptions?: boolean
+  onProgress?: any
+  stopIfFunction?: any
 }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = extractSchemaSummaryNodeDefs(survey, cycle)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const languages = Survey.getLanguages(surveyInfo)
+  const languages = Survey.getLanguages(surveyInfo) as string[]
   const defaultLang = Survey.getDefaultLanguage(surveyInfo) || languages[0] || 'en'
   const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
 
@@ -347,6 +417,13 @@ export const exportSchemaSummary = async ({
   fileFormat,
   user = null,
   includeAiDescriptions = false,
+}: {
+  surveyId: number
+  cycle: string
+  outputStream: any
+  fileFormat: string
+  user?: ArenaUser
+  includeAiDescriptions?: boolean
 }) => {
   const items = await generateSchemaSummaryItems({ surveyId, cycle, user, includeAiDescriptions })
   await FlatDataWriter.writeItemsToStream({ items, options: { removeNewLines: false }, outputStream, fileFormat })
