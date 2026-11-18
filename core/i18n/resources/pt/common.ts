@@ -399,6 +399,8 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     systemAdmin: 'Administração do sistema',
     jobMonitor: 'Monitor de tarefas',
     systemLogs: 'Registos do sistema',
+    authProviders: 'Fornecedores de início de sessão',
+    authProvider: 'Fornecedor de início de sessão',
 
     help: 'Ajuda',
     about: 'Sobre',

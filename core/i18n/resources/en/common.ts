@@ -396,6 +396,8 @@ Try again?`,
     systemAdmin: 'System Administration',
     jobMonitor: 'Job Monitor',
     systemLogs: 'System Logs',
+    authProviders: 'Login Providers',
+    authProvider: 'Login Provider',
 
     help: 'Help',
     about: 'About',

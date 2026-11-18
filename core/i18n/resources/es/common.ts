@@ -375,6 +375,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     systemAdmin: 'Administración del sistema',
     jobMonitor: 'Monitor de trabajos',
     systemLogs: 'Registros del sistema',
+    authProviders: 'Proveedores de inicio de sesión',
+    authProvider: 'Proveedor de inicio de sesión',
 
     help: 'Ayuda',
     about: 'Acerca de',

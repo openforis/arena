@@ -398,6 +398,8 @@ export default {
     systemAdmin: 'Системийн удирдлага',
     jobMonitor: 'Ажлын хяналт',
     systemLogs: 'Системийн бүртгэл',
+    authProviders: 'Нэвтрэх үйлчилгээ үзүүлэгчид',
+    authProvider: 'Нэвтрэх үйлчилгээ үзүүлэгч',
 
     help: 'Тусламж',
     about: 'Тухай',

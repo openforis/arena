@@ -456,6 +456,8 @@ export default {
     systemAdmin: 'Администрирование системы',
     jobMonitor: 'Монитор заданий',
     systemLogs: 'Системные журналы',
+    authProviders: 'Провайдеры входа',
+    authProvider: 'Провайдер входа',
 
     help: 'Помощь',
     about: 'О программе',

@@ -23,6 +23,22 @@ export default {
   notAcceptedYet: '招待はまだ承認されていません',
   passwordResetLinkCopiedToClipboard: 'パスワード再設定リンクをクリップボードにコピーしました',
   passwordResetLink: 'パスワード再設定リンク',
+  signInMethods: {
+    title: 'サインイン方法',
+    password: 'パスワード',
+    passwordSet: '設定済み',
+    passwordNotSet: '未設定：外部プロバイダーでサインイン',
+    setPassword: 'パスワードを設定',
+    linkWith: '{{provider}}を連携',
+    unlink: '連携解除',
+    lastUsed: '最終使用 {{date}}',
+    lastMethodHint: '最後のサインイン方法を解除する前に、パスワードを設定するか別のプロバイダーを連携してください。',
+    unlinkConfirm: '{{provider}}の連携を解除しますか？このアカウントへのサインインに使用できなくなります。',
+    unlinkLastMethodConfirm:
+      '{{provider}}の連携を解除しますか？これはこのユーザーの最後のサインイン方法です。「パスワードをお忘れですか？」でのみ再びアクセスできます。',
+    linked: 'プロバイダーをアカウントに連携しました。',
+    unlinked: 'プロバイダーの連携を解除しました。',
+  },
   prefs: {
     title: '通知設定',
     notifyOnUserAccessRequest: '新規ユーザーのアクセス申請',

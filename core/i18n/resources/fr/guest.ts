@@ -26,6 +26,29 @@ export default {
 
 Entrez le code généré par votre application d'authentification.`,
   },
+  externalLogin: {
+    signInWith: 'Se connecter avec {{provider}}',
+    continueWith: 'Continuer avec {{provider}}',
+    errors: {
+      providerNotAvailable:
+        "Cette option de connexion n'est pas disponible. Réessayez plus tard ou connectez-vous avec votre e-mail et votre mot de passe.",
+      flowInvalid: 'La connexion a expiré ou a été commencée dans un autre navigateur. Veuillez réessayer.',
+      providerError: 'La connexion avec le fournisseur externe a échoué. Veuillez réessayer.',
+      emailNotVerified:
+        "Le fournisseur n'a pas confirmé votre adresse e-mail : elle ne peut donc pas être associée à un compte. Connectez-vous avec votre mot de passe et liez le fournisseur depuis votre profil.",
+      emailDomainNotAllowed: 'Les comptes avec ce domaine e-mail ne peuvent pas utiliser cette option de connexion.',
+      userNotFound:
+        "Aucun compte n'existe avec cette adresse e-mail. Demandez une invitation à un administrateur de l'enquête ou demandez un accès.",
+      ambiguousEmail:
+        'Plusieurs comptes correspondent à cette adresse e-mail. Connectez-vous avec votre mot de passe et liez le fournisseur depuis votre profil.',
+      identityAlreadyLinked: 'Ce compte du fournisseur est déjà lié à un autre utilisateur.',
+      providerAlreadyLinked:
+        "Un autre compte de ce fournisseur est déjà lié à votre utilisateur : déliez-le d'abord depuis votre profil.",
+      invitationInvalid:
+        "L'invitation n'est pas valide ou a expiré. Demandez-en une nouvelle à l'administrateur de l'enquête.",
+      invalidTwoFactorCode: 'Code de vérification non valide.',
+    },
+  },
   accessRequestView: {
     whatHappensNext: 'Et ensuite ?',
     alreadyHaveAnAccount: 'Vous avez déjà un compte ?',

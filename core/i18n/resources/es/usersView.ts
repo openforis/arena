@@ -20,6 +20,23 @@ export default {
   notAcceptedYet: 'Invitación aún no aceptada',
   passwordResetLinkCopiedToClipboard: 'Enlace de restablecimiento de contraseña copiado en el portapapeles',
   passwordResetLink: 'Enlace de restablecimiento de contraseña',
+  signInMethods: {
+    title: 'Métodos de inicio de sesión',
+    password: 'Contraseña',
+    passwordSet: 'Establecida',
+    passwordNotSet: 'No establecida: inicia sesión con un proveedor externo',
+    setPassword: 'Establecer una contraseña',
+    linkWith: 'Vincular {{provider}}',
+    unlink: 'Desvincular',
+    lastUsed: 'último uso {{date}}',
+    lastMethodHint:
+      'Establezca una contraseña o vincule otro proveedor antes de desvincular el último método de inicio de sesión.',
+    unlinkConfirm: '¿Desvincular {{provider}}? Ya no se podrá usar para iniciar sesión en esta cuenta.',
+    unlinkLastMethodConfirm:
+      '¿Desvincular {{provider}}? Es el último método de inicio de sesión de este usuario: solo podrá volver a entrar con "¿Olvidó su contraseña?".',
+    linked: 'Proveedor vinculado a su cuenta.',
+    unlinked: 'Proveedor desvinculado.',
+  },
   prefs: {
     title: 'Preferencias de notificación',
     notifyOnUserAccessRequest: 'Nuevas solicitudes de acceso de usuarios',

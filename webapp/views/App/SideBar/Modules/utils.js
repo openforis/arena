@@ -102,6 +102,7 @@ const getSystemAdminModules = (user) => {
         systemAdminModules.jobMonitor,
         systemAdminModules.systemLogs,
         systemAdminModules.messages,
+        systemAdminModules.authProviders,
       ],
     }),
   ]

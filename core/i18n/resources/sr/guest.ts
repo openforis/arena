@@ -26,6 +26,27 @@ export default {
 
 Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
   },
+  externalLogin: {
+    signInWith: 'Prijavite se putem {{provider}}',
+    continueWith: 'Nastavite putem {{provider}}',
+    errors: {
+      providerNotAvailable: 'Ova opcija prijave nije dostupna. Pokušajte kasnije ili se prijavite e-poštom i lozinkom.',
+      flowInvalid: 'Prijava je istekla ili je započeta u drugom pregledaču. Pokušajte ponovo.',
+      providerError: 'Prijava putem spoljnog provajdera nije uspela. Pokušajte ponovo.',
+      emailNotVerified:
+        'Provajder nije potvrdio vašu adresu e-pošte, pa se ne može povezati sa nalogom. Prijavite se lozinkom i povežite provajdera iz svog profila.',
+      emailDomainNotAllowed: 'Nalozi sa ovim domenom e-pošte ne mogu da koriste ovu opciju prijave.',
+      userNotFound:
+        'Ne postoji nalog sa ovom adresom e-pošte. Zatražite pozivnicu od administratora istraživanja ili zatražite pristup.',
+      ambiguousEmail:
+        'Ovoj adresi e-pošte odgovara više naloga. Prijavite se lozinkom i povežite provajdera iz svog profila.',
+      identityAlreadyLinked: 'Ovaj nalog provajdera je već povezan sa drugim korisnikom.',
+      providerAlreadyLinked:
+        'Drugi nalog ovog provajdera je već povezan sa vašim korisnikom: prvo ga uklonite iz svog profila.',
+      invitationInvalid: 'Pozivnica nije važeća ili je istekla. Zatražite novu od administratora istraživanja.',
+      invalidTwoFactorCode: 'Neispravan verifikacioni kod.',
+    },
+  },
   accessRequestView: {
     whatHappensNext: 'Šta se dešava dalje?',
     alreadyHaveAnAccount: 'Već imate nalog?',
