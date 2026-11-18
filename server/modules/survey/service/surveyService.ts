@@ -1,5 +1,14 @@
+import type { Response as ExpressResponse } from 'express'
 import { Schemata, SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
-import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
+import {
+  NodeDefExpressionEvaluator,
+  SurveyDocImages,
+  SurveyDocPlace,
+  type SurveyDocImage,
+  type User as ArenaUser,
+  type Survey as ArenaSurvey,
+  type SurveyFile as ArenaSurveyFile,
+} from '@openforis/arena-core'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
@@ -39,7 +48,7 @@ import { findSurveyDocImageApplicable } from './surveyDocImageUtils'
 
 const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
-export const fetchAndAssocStorageInfo = async ({ survey }) => {
+export const fetchAndAssocStorageInfo = async ({ survey }: { survey: ArenaSurvey }) => {
   const surveyId = Survey.getId(survey)
   const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
   const schema = Schemata.getSchemaSurvey(surveyId)
@@ -61,6 +70,12 @@ export const startPublishJob = async ({
   cleanupRecords,
   updateRecordValues,
   skipDataUpdate = false,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cleanupRecords: boolean
+  updateRecordValues: boolean
+  skipDataUpdate?: boolean
 }) => {
   if (!updateRecordValues && !skipDataUpdate) {
     const recordValuesUpdateWarning = await checkPublishRecordValuesUpdateWarning({ surveyId })
@@ -78,7 +93,7 @@ export const startPublishJob = async ({
   return { job }
 }
 
-export const startUnpublishJob = (user, surveyId) => {
+export const startUnpublishJob = (user: ArenaUser, surveyId: number) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyUnpublishJob({ user, surveyId })
@@ -88,7 +103,7 @@ export const startUnpublishJob = (user, surveyId) => {
   return job
 }
 
-export const startDeleteActivityLogJob = (user, surveyId) => {
+export const startDeleteActivityLogJob = (user: ArenaUser, surveyId: number) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyActivityLogClearJob({ user, surveyId })
@@ -117,6 +132,13 @@ export const createSurveyExportJob = async ({
   includeData = false,
   includeResultAttributes = true,
   includeActivityLog = true,
+}: {
+  surveyId: number
+  user: ArenaUser
+  outputFileName?: string
+  includeData?: boolean
+  includeResultAttributes?: boolean
+  includeActivityLog?: boolean
 }) => {
   const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
   const canExportData = canExportSurveyData(user, surveyInfo)
@@ -135,7 +157,13 @@ export const createSurveyExportJob = async ({
  * @param {object} params - The export parameters (see createSurveyExportJob).
  * @returns {Promise<{job: object}>} - The started job, serialized.
  */
-export const exportSurvey = async (params) => {
+export const exportSurvey = async (params: {
+  surveyId: number
+  user: ArenaUser
+  includeData?: boolean
+  includeResultAttributes?: boolean
+  includeActivityLog?: boolean
+}) => {
   const { surveyId } = params
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
   const job = await createSurveyExportJob({ ...params, outputFileName })
@@ -145,7 +173,15 @@ export const exportSurvey = async (params) => {
   return { job: JobUtils.jobToJSON(job) }
 }
 
-export const startSurveysListExport = ({ user, draft, template }) => {
+export const startSurveysListExport = ({
+  user,
+  draft,
+  template,
+}: {
+  user: ArenaUser
+  draft: boolean
+  template: boolean
+}) => {
   const job = new SurveysListExportJob({ user, draft, template })
 
   JobManager.enqueueJob(job)
@@ -153,13 +189,23 @@ export const startSurveysListExport = ({ user, draft, template }) => {
   return job
 }
 
-export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
+export const cloneSurvey = ({
+  user,
+  surveyId,
+  surveyInfoTarget,
+  cycle = null,
+}: {
+  user: ArenaUser
+  surveyId: number
+  surveyInfoTarget: ArenaSurvey
+  cycle?: string
+}) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget, cycle })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }
 
-export const startCreateSurveyJob = ({ user, surveyInfo }) => {
+export const startCreateSurveyJob = ({ user, surveyInfo }: { user: ArenaUser; surveyInfo: ArenaSurvey }) => {
   const job = new SurveyCreatorJob({ user, surveyInfo })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
@@ -172,22 +218,49 @@ export const startCreateSurveyJob = ({ user, surveyInfo }) => {
  * @param {number} params.surveyId - Survey id.
  * @returns {object} The enqueued job.
  */
-export const startNodeDefsTranslationJob = ({ user, surveyId }) => {
+export const startNodeDefsTranslationJob = ({ user, surveyId }: { user: ArenaUser; surveyId: number }) => {
   const job = new NodeDefsTranslationJob({ user, surveyId })
   JobManager.enqueueJob(job)
   return job
 }
 
-export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
+export const startSchemaSummaryExportJob = ({
+  user,
+  surveyId,
+  cycle,
+  fileFormat,
+  includeAiDescriptions = false,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  fileFormat: string
+  includeAiDescriptions?: boolean
+}) => {
   const job = new SchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, includeAiDescriptions })
   JobManager.enqueueJob(job)
   return job
 }
 
-export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
-  SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
+export const exportLabels = ({
+  surveyId,
+  outputStream,
+  fileFormat,
+}: {
+  surveyId: number
+  outputStream: ExpressResponse
+  fileFormat: string
+}) => SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
-const isSurveyDocImageApplicable = async ({ user, survey, imageFile }) => {
+const isSurveyDocImageApplicable = async ({
+  user,
+  survey,
+  imageFile,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  imageFile: SurveyDocImage
+}) => {
   const applyIf = SurveyDocImages.getApplyIf(imageFile)
   if (!applyIf) return true
   try {
@@ -209,6 +282,16 @@ const exportSurveyDocument = async ({
   generator,
   extension,
   contentType,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  outputStream: ExpressResponse
+  lang: string
+  draft: boolean
+  generator: typeof SurveyPdfGenerator.generateSurveyPdf | typeof SurveyDocxGenerator.generateSurveyDocx
+  extension: string
+  contentType: string
 }) => {
   const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
@@ -218,7 +301,7 @@ const exportSurveyDocument = async ({
     includeDeleted: false,
     includeAnalysis: false,
   })
-  const surveyDocImages = Survey.getSurveyDocImages(survey)
+  const surveyDocImages = Survey.getSurveyDocImages(survey) as SurveyDocImage[]
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   const headerImageFileSummary = await findSurveyDocImageApplicable({
@@ -240,7 +323,10 @@ const exportSurveyDocument = async ({
     cycle,
     lang: langToUse,
     i18n,
-    fileProvider: async (fileUuid) => SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }),
+    fileProvider: async (fileUuid: string) => {
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+      return SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary })
+    },
     headerImageFileUuid: headerImageFileSummary?.uuid,
     footerImageFileUuid: footerImageFileSummary?.uuid,
     headerOnFirstPageOnly,
@@ -256,7 +342,21 @@ const exportSurveyDocument = async ({
   })
 }
 
-export const exportSurveyDocx = ({ user, surveyId, cycle, outputStream, lang = null, draft = true }) =>
+export const exportSurveyDocx = ({
+  user,
+  surveyId,
+  cycle,
+  outputStream,
+  lang = null,
+  draft = true,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  outputStream: ExpressResponse
+  lang?: string
+  draft?: boolean
+}) =>
   exportSurveyDocument({
     user,
     surveyId,
@@ -269,7 +369,21 @@ export const exportSurveyDocx = ({ user, surveyId, cycle, outputStream, lang = n
     contentType: Response.contentTypes.docx,
   })
 
-export const exportSurveyPdf = ({ user, surveyId, cycle, outputStream, lang = null, draft = true }) =>
+export const exportSurveyPdf = ({
+  user,
+  surveyId,
+  cycle,
+  outputStream,
+  lang = null,
+  draft = true,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  outputStream: ExpressResponse
+  lang?: string
+  draft?: boolean
+}) =>
   exportSurveyDocument({
     user,
     surveyId,
@@ -282,24 +396,42 @@ export const exportSurveyPdf = ({ user, surveyId, cycle, outputStream, lang = nu
     contentType: Response.contentTypes.pdf,
   })
 
-export const deleteSurvey = async (surveyId) => {
+export const deleteSurvey = async (surveyId: number) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   await SurveyManager.deleteSurvey(surveyId)
 }
 
-export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) => {
+export const startLabelsImportJob = ({
+  user,
+  surveyId,
+  filePath,
+  fileFormat,
+}: {
+  user: ArenaUser
+  surveyId: number
+  filePath: string
+  fileFormat: string
+}) => {
   const job = new SurveyLabelsImportJob({ user, surveyId, filePath, fileFormat })
   return JobManager.enqueueJob(job)
 }
 
-const checkAreaOfInterestFileContent = (content) => {
+const checkAreaOfInterestFileContent = (content: Buffer) => {
   if (!parseAreaOfInterestJson(content.toString('utf8'))) {
     throw new SystemError(Validation.messageKeys.surveyInfoEdit.areaOfInterestInvalid, {}, StatusCodes.BAD_REQUEST)
   }
 }
 
-export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
+export const insertSurveyFile = async ({
+  surveyId,
+  filePath,
+  surveyFile,
+}: {
+  surveyId: number
+  filePath: string
+  surveyFile: ArenaSurveyFile
+}) => {
   const content = await FileUtils.readBinaryFile(filePath)
   if (SurveyFile.getType(surveyFile) === SurveyFile.SurveyFileType.areaOfInterest) {
     checkAreaOfInterestFileContent(content)
@@ -308,7 +440,7 @@ export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
   await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }
 
-export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+export const fetchSurveyFile = async ({ surveyId, fileUuid }: { surveyId: number; fileUuid: string }) => {
   const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
   const contentStream = summary
     ? await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })

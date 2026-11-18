@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as A from '@core/arena'
 
 import { Authorizer } from '@openforis/arena-core'
@@ -24,7 +25,7 @@ import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
 import * as SurveyService from '../service/surveyService'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ==== CREATE
   app.post(
     '/survey',
@@ -55,7 +56,6 @@ export const init = (app) => {
               cycle: cloneFromCycle,
               surveyInfoTarget,
               user,
-              res,
             })
             res.json({ job })
             return
@@ -124,7 +124,7 @@ export const init = (app) => {
   })
 
   // surveys list export
-  app.post('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+  app.post('/surveys/export', AuthMiddleware.requireCanExportSurveysList, (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { draft = true, template = false } = Request.getParams(req)
@@ -136,7 +136,7 @@ export const init = (app) => {
   })
 
   // surveys list export (download generated zip file)
-  app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+  app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, (req, res, next) => {
     try {
       const { tempFileName, fileFormat } = Request.getParams(req)
       FileUtils.checkIsValidTempFileName(tempFileName)
@@ -239,21 +239,21 @@ export const init = (app) => {
 
       const user = Request.getUser(req)
 
-      const { job, outputFileName } = await SurveyService.exportSurvey({
+      const { job } = await SurveyService.exportSurvey({
         surveyId,
         user,
         includeData,
         includeResultAttributes,
         includeActivityLog,
       })
-      res.json({ job, outputFileName })
+      res.json({ job })
     } catch (error) {
       next(error)
     }
   })
 
   // download generated survey export file
-  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
+  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, (req, res, next) => {
     try {
       const downloadFileName = Request.getDownloadFileName(req)
       const {
@@ -322,26 +322,22 @@ export const init = (app) => {
   })
 
   // schema summary export (start job)
-  app.post(
-    '/survey/:surveyId/schema-summary/export',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
-        const user = Request.getUser(req)
-        const job = SurveyService.startSchemaSummaryExportJob({
-          user,
-          surveyId,
-          cycle,
-          fileFormat,
-          includeAiDescriptions,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
+  app.post('/survey/:surveyId/schema-summary/export', AuthMiddleware.requireSurveyViewPermission, (req, res, next) => {
+    try {
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const job = SurveyService.startSchemaSummaryExportJob({
+        user,
+        surveyId,
+        cycle,
+        fileFormat,
+        includeAiDescriptions,
+      })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // schema summary export (download generated file)
   app.get(
@@ -446,7 +442,7 @@ export const init = (app) => {
     res.json({ job: JobUtils.jobToJSON(job) })
   })
 
-  app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+  app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const filePath = Request.getFilePath(req)
@@ -465,7 +461,7 @@ export const init = (app) => {
     '/survey/:surveyId/nodeDefs/translation/start',
     AuthMiddleware.requireSurveyEditPermission,
     requireAiFeaturesEnabled,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
