@@ -241,8 +241,30 @@ On callback, with the normalized identity:
      `ALLOW_USER_ACCESS_REQUEST` is on. No automatic sign-up.
 4. A logged-in user linking from the profile page skips the email match: the identity is linked to the current user
    (still refused if already linked to another user).
+5. Invitation acceptance with a provider skips the email match too (see below).
 
 The login rate limiters also apply to the callback route.
+
+### Accepting an invitation with a provider
+
+The invitation email link opens the accept page (`webapp/views/Guest/views/ResetPassword/ResetPassword.js`, reached
+with the reset-password uuid), which today asks for name, password and password confirmation. It gets an alternative:
+
+- Below the name/password form: "or accept with" + the same provider buttons as the login page. The password fields
+  become optional only for this path; the existing "set a password" path is unchanged.
+- Clicking a provider starts the flow in *invitation mode*: `GET /auth/oidc/:providerId?invitation=<uuid>`; the server
+  checks that the uuid is a valid, unexpired invitation (or reset-password request) for an `INVITED` user and stores
+  it in the signed flow cookie (never trusted from the callback URL).
+- On callback, the identity is linked to the invited user identified by the uuid, **even if the provider email differs
+  from the invited email** (e.g. invited at a work address, signs in with a personal Google account): the invitation
+  link already proves ownership of the invited address, as it does for the password path. The provider's
+  `allowedEmailDomains` still applies to the provider email; `emailVerified` is not required in this mode. The Arena
+  account keeps the invited email (used for notifications and "forgot password").
+- The user status becomes `ACCEPTED`; the name is the one typed on the page, or else the provider's `name` claim; the
+  reset-password uuid is consumed (same as when a password is set) and the user is logged in.
+- Refused if the identity is already linked to another Arena user (`oidcIdentityAlreadyLinked`), with a message
+  suggesting to sign in with that account or use another provider account.
+- Users who accepted this way have no password (see "Users without a password").
 
 ### 2FA
 
@@ -306,13 +328,14 @@ A password is **not** required: a user can sign in only with an external provide
 
 - Refactor `authenticationSuccessful` in `src/api/auth/login.ts`: extract `createSessionTokens({ req, res, user })`.
 - New `src/api/auth/oidc.ts`: `GET /auth/providers`, `GET /auth/providers/:id/icon`, `GET /auth/oidc/:providerId`,
-  `GET /auth/oidc/:providerId/callback`, `POST /auth/oidc/2fa`, link mode, test mode, access rules (incl. Gmail
-  normalization), per-provider flags.
+  `GET /auth/oidc/:providerId/callback`, `POST /auth/oidc/2fa`, link mode, invitation mode, test mode, access rules
+  (incl. Gmail normalization), per-provider flags.
 - Add the public paths to `pathsAllowedWithoutAuthentication`; endpoints in `ApiEndpoint.auth`; login rate limiters on
   the callback and the 2FA endpoint.
 - Tests against the mock provider: happy path, invalid state, nonce mismatch, unverified email with and without
   `trustEmail`, disallowed domain, unknown user, invited user acceptance, Gmail variants, ambiguous email, linked user
-  with changed email, 2FA required / not required, disabled provider, link mode.
+  with changed email, 2FA required / not required, disabled provider, link mode, invitation mode (different email,
+  expired invitation, identity already linked).
 - Release a new arena-server version (and arena-core if the user service interface changes).
 
 ### Task 4: Arena — provider configuration module
@@ -337,6 +360,7 @@ A password is **not** required: a user can sign in only with an external provide
 ### Task 6: Arena — webapp
 
 - Built-in icons in `web-resources/img/auth-providers/` (official Google and Microsoft SVG logos).
+- Invitation accept page (`ResetPassword.js`): "or accept with" provider buttons (invitation mode).
 - Login page: provider buttons with icons, `?provider=<id>` direct start, `?step=2fa` for the external login 2FA
   step, `oidcError` messages.
 - System admin "Login providers" page: list, add (preset choice), edit form, secret field, icon picker/upload,
@@ -348,7 +372,7 @@ A password is **not** required: a user can sign in only with an external provide
 ### Task 7: Tests and documentation
 
 - E2E (Playwright) with a mock OIDC provider in the e2e setup: admin creates a generic provider in the UI, existing
-  user logs in with it, invitation acceptance, unknown-user error, 2FA step.
+  user logs in with it, invitation acceptance with a provider, unknown-user error, 2FA step.
 - `docs/architecture.md`: authentication section (password, external providers, tokens, adapters).
 - `docs/server-requirements.md`: `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`, `AUTH_PROVIDERS_CONFIG`, how to register the
   redirect URI at Google, Microsoft and Keycloak.
