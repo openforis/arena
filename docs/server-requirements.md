@@ -52,6 +52,12 @@ object storage (S3) is usually the cheapest and most scalable option, and keeps 
 - **Domain name and HTTPS certificate** (e.g. free [Let's Encrypt](https://letsencrypt.org/) certificates).
 - **Email service** (SendGrid, Office 365 or Amazon SES), used for user invitations and password resets:
   Arena does not start without it.
+- **External login providers** (optional): to let users sign in with Google, Microsoft or an institutional
+  single sign-on, set `ARENA_PUBLIC_URL` (public URL of Arena, used for the redirect URIs) and
+  `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY` (64 hexadecimal characters, e.g. `openssl rand -hex 32`), then add the
+  providers in *System administration > Login providers*, registering there the shown redirect URI
+  (`<ARENA_PUBLIC_URL>/auth/oidc/<provider id>/callback`) at the provider. Providers can also be defined in a JSON
+  file referenced by `AUTH_PROVIDERS_CONFIG`, with each client secret in `AUTH_PROVIDER_<ID>_CLIENT_SECRET`.
 - **Network:** stable internet connection, with a public IP address when self-hosted. Bandwidth needs are
   modest, except during bulk uploads of photos.
 - **System administration:** a person (part-time) to apply OS updates, update Arena and monitor disk space

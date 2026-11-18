@@ -360,6 +360,23 @@ Tasks 1–3 are implemented in `@openforis/arena-server`. Differences from the d
   methods" section.
 - Tests: end-to-end sign-ins against `oauth2-mock-server` (run in a child process, ESM only) plus unit tests.
 
+### Arena side
+
+Implemented (arena-server 2.8.17):
+
+- `server/modules/authProvider/`: admin API (`/api/admin/auth-providers`, system admins) and sign-in methods API
+  (`/api/user/:userUuid/sign-in-methods`, the user or a system admin) over `AuthProviderService`; errors of the
+  arena-server services (`ServerError`) are sent as `{ key, params }` with their status. Emails: provider unlinked,
+  provider deleted (users left without any sign-in method).
+- Webapp: provider buttons on the login and invitation pages, 2FA step and errors after an external sign-in,
+  *System administration > Login providers* (list, add, edit, test connection, test sign-in, delete), *Sign-in
+  methods* in the profile and user edit view. Password change without the old password when the user has none.
+- e2e: `test/e2e/specs/externalLogin.spec.ts` with `oauth2-mock-server`.
+
+Not done (follow-ups): the "recent login" check before setting a first password, the *Sign-in method* filter and
+column of the users list, the identity links in the users backup export/import, the admin page translations other
+than English, French and Spanish (they fall back to English).
+
 ## Tasks
 
 ### Task 1: arena-server — adapter interface, OIDC adapter, provider service interface

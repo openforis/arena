@@ -62,6 +62,23 @@ through Postgres `LISTEN/NOTIFY` (`ClusterBus` in arena-server) and serialize bo
 work with advisory locks (`runWithClusterLock`). This needs S3 file storage and sticky sessions for
 socket.io; see [infra/k8s/README.md](../infra/k8s/README.md).
 
+## Authentication
+
+Implemented in arena-server (Passport, `src/api/auth/`, `src/service/authProvider/`, `src/service/externalLogin/`):
+
+- **Password login** (`POST /auth/login`), with optional 2FA (TOTP devices).
+- **External login providers** (OpenID Connect: Google, Microsoft, any OIDC provider), configured by system
+  admins in *System administration > Login providers* (`auth_provider` table, client secrets encrypted with
+  `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`) or read-only from `AUTH_PROVIDERS_CONFIG`. A sign-in starts at
+  `GET /auth/oidc/:id`; the callback matches the provider account (`user_external_identity`, by issuer and
+  subject) or links it to an existing or invited user by verified email; there is no self sign-up. Users can
+  link, unlink and see their sign-in methods in their profile (arena API in `server/modules/authProvider/`).
+- **Tokens:** both logins end with the same short-lived access token (Bearer) and a refresh token in an
+  `httpOnly` cookie (`POST /auth/token/refresh`); after an external sign-in the webapp gets its access token
+  through the refresh, as after a page reload.
+
+Design and decisions: [superpowers/plans/2026-11-17-oidc-authentication.md](superpowers/plans/2026-11-17-oidc-authentication.md).
+
 ## Database
 
 PostgreSQL with PostGIS, accessed with pg-promise. Schemas:
