@@ -1,3 +1,4 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,7 +15,7 @@ const BATCH_SIZE = 20
  * @param {number} size - Maximum chunk size.
  * @returns {Array[]} Array of chunks.
  */
-const chunkArray = (array, size) => {
+const chunkArray = <T>(array: T[], size: number): T[][] => {
   const chunks = []
   for (let i = 0; i < array.length; i += size) {
     chunks.push(array.slice(i, i + size))
@@ -28,7 +29,7 @@ const chunkArray = (array, size) => {
  * @param {string} defaultLang - Survey default language code.
  * @returns {{ items: Array, itemInfoById: object }} Items to translate and their metadata.
  */
-const buildTranslationItems = (nodeDefs, defaultLang) => {
+const buildTranslationItems = (nodeDefs: ArenaNodeDef<NodeDefType>[], defaultLang: string) => {
   const items = []
   const itemInfoById = {}
 
@@ -59,7 +60,7 @@ const buildTranslationItems = (nodeDefs, defaultLang) => {
  * @param {object} aiByNodeDef - Accumulator object (mutated in place).
  * @returns {void}
  */
-const applyBatchResult = (translations, itemInfoById, aiByNodeDef) => {
+const applyBatchResult = (translations: any, itemInfoById: Record<string, any>, aiByNodeDef: Record<string, any>) => {
   for (const { id, byLang } of translations) {
     const info = itemInfoById[id]
     if (!info) continue
@@ -82,13 +83,15 @@ const applyBatchResult = (translations, itemInfoById, aiByNodeDef) => {
  * so the user can review and confirm them in the frontend modal.
  */
 export default class NodeDefsTranslationJob extends Job {
+  static readonly type: string = 'NodeDefsTranslationJob'
+
   /**
    * Creates the job.
    * @param {object} params - Job params.
    * @param {object} params.user - Acting user.
    * @param {number} params.surveyId - Survey id.
    */
-  constructor(params) {
+  constructor(params?: any) {
     super(NodeDefsTranslationJob.type, params)
   }
 
@@ -98,7 +101,7 @@ export default class NodeDefsTranslationJob extends Job {
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true }, this.tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const defaultLang = Survey.getDefaultLanguage(surveyInfo)
-    const languages = Survey.getLanguages(surveyInfo)
+    const languages = Survey.getLanguages(surveyInfo) as string[]
     const otherLangs = languages.filter((l) => l !== defaultLang)
 
     if (otherLangs.length === 0) {
@@ -130,7 +133,7 @@ export default class NodeDefsTranslationJob extends Job {
     this.setContext({ survey, defaultLang, languages, otherLangs, aiByNodeDef })
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { survey, defaultLang, languages, otherLangs, aiByNodeDef } = this.context
 
     const nodeDefs = Survey.getNodeDefDescendantsAndSelf()(survey)
@@ -160,7 +163,6 @@ export default class NodeDefsTranslationJob extends Job {
     })
 
     this.setResult({ defaultLang, languages, otherLangs, items: resultItems })
+    return Promise.resolve()
   }
 }
-
-NodeDefsTranslationJob.type = 'NodeDefsTranslationJob'

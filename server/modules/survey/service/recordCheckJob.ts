@@ -1,6 +1,15 @@
+import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
-import { Objects } from '@openforis/arena-core'
+import {
+  Objects,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type ArenaRecordNode,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -22,7 +31,13 @@ import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './
 const VERBOSE_LOGGING = false
 
 export default class RecordCheckJob extends Job {
-  constructor(params) {
+  nodesBatchInserter: any
+  nodesBatchUpdater: any
+  surveyAndNodeDefsByCycle: Record<string, any>
+
+  static readonly type: string = 'RecordCheckJob'
+
+  constructor(params?: any) {
     super(RecordCheckJob.type, params)
 
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
@@ -202,7 +217,7 @@ export default class RecordCheckJob extends Job {
     const nodeDefValidationUpdatedUuids = []
     const nodeDefDeletedUuids = []
     // published node defs whose "required if" condition changed: their "required if" flags must be recomputed
-    const nodeDefRequiredIfUpdatedUuids = []
+    const nodeDefRequiredIfUpdatedUuids: string[] = []
 
     for (const def of nodeDefs) {
       const nodeDefUuid = NodeDef.getUuid(def)
@@ -335,7 +350,7 @@ export default class RecordCheckJob extends Job {
     this.logDebugOptional(`record fetched (${Object.keys(Record.getNodes(record) ?? {}).length} nodes)`)
 
     const nodesInsertedByUuid = {}
-    const allUpdatedNodesByUuid = {}
+    const allUpdatedNodesByUuid: { [nodeUuid: string]: ArenaRecordNode } = {}
 
     // 3. insert missing nodes
     const nodeDefToCheckForMissingNodesUuids = forceFullCheck ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
@@ -354,7 +369,7 @@ export default class RecordCheckJob extends Job {
     }
 
     // 4. apply default values and recalculate applicability
-    const nodeDefAddedOrUpdatedUuidsUnique = new Set(A.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
+    const nodeDefAddedOrUpdatedUuidsUnique = new Set<string>(A.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
     for (const nodeInserted of Object.values(nodesInsertedByUuid)) {
       nodeDefAddedOrUpdatedUuidsUnique.add(Node.getNodeDefUuid(nodeInserted))
     }
@@ -379,7 +394,7 @@ export default class RecordCheckJob extends Job {
       : nodeDefRequiredIfUpdatedUuids
     if (nodeDefRequiredIfToUpdateUuids.length > 0) {
       this.logDebugOptional('updating "required if" flags')
-      const { record: recordUpdateRequired, nodes: nodesUpdatedRequired = {} } =
+      const { record: recordUpdateRequired, nodes: nodesUpdatedRequired = {} }: RecordUpdateResult =
         await RecordManager.updateRequiredFlags({
           user,
           survey,
@@ -482,15 +497,34 @@ export default class RecordCheckJob extends Job {
 
 // Inserts a missing single node in a specified parent node.
 // Returns an indexed object with all the inserted nodes.
-const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, user, tx, sideEffect = false }) => {
+// result of a record update: the updated record and nodes
+type RecordUpdateResult = { record?: ArenaRecord; nodes?: { [nodeUuid: string]: ArenaRecordNode } }
+
+const _insertMissingSingleNode = ({
+  survey,
+  childDef,
+  record,
+  parentNode,
+  user,
+  tx,
+  sideEffect = false,
+}: {
+  survey: ArenaSurvey
+  childDef: ArenaNodeDef<NodeDefType>
+  record: ArenaRecord
+  parentNode: ArenaRecordNode
+  user: ArenaUser
+  tx: DbClient
+  sideEffect?: boolean
+}): Promise<RecordUpdateResult> => {
   if (!NodeDef.isSingle(childDef)) {
     // multiple node: don't insert it
-    return {}
+    return Promise.resolve({})
   }
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
   if (!A.isEmpty(children)) {
     // single node already inserted
-    return {}
+    return Promise.resolve({})
   }
   // insert missing single node
   const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
@@ -500,7 +534,13 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
   )
 }
 
-const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {
+const _applyDefaultValuesAndApplicability = (
+  survey: ArenaSurvey,
+  nodeDefUpdatedUuids: string[],
+  record: ArenaRecord,
+  newNodes: { [nodeUuid: string]: ArenaRecordNode },
+  tx: DbClient
+): Promise<RecordUpdateResult> => {
   const nodesToUpdate = { ...newNodes }
 
   // Include nodes associated to updated node defs
@@ -517,7 +557,7 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   )
 }
 
-const _clearRecordKeysValidation = (record) => {
+const _clearRecordKeysValidation = (record: ArenaRecord) => {
   const validationRecord = Record.getValidation(record)
 
   const validationNodes = Object.values(Validation.getFieldValidations(validationRecord))
@@ -531,12 +571,27 @@ const _clearRecordKeysValidation = (record) => {
   return record
 }
 
-const _getRequiredIfNodeDefUuids = ({ survey, nodeDefUuids }) =>
+const _getRequiredIfNodeDefUuids = ({ survey, nodeDefUuids }: { survey: ArenaSurvey; nodeDefUuids: string[] }) =>
   nodeDefUuids.filter((nodeDefUuid) =>
     NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(Survey.getNodeDefByUuid(nodeDefUuid)(survey)))
   )
 
-const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx) => {
+const _validateNodes = async (
+  {
+    user,
+    survey,
+    nodeDefUuids,
+    record,
+    nodes,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    nodeDefUuids: string[]
+    record: ArenaRecord
+    nodes: { [nodeUuid: string]: ArenaRecordNode }
+  },
+  tx: DbClient
+) => {
   const nodesToValidate = { ...nodes }
 
   for (const nodeDefUuid of nodeDefUuids) {
@@ -554,5 +609,3 @@ const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx)
   // Record keys uniqueness must be validated after RDB generation
   await RecordManager.validateNodesAndPersistValidation({ user, survey, record, nodes: nodesToValidate }, tx)
 }
-
-RecordCheckJob.type = 'RecordCheckJob'

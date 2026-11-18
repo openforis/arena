@@ -4,7 +4,9 @@ import * as SurveyManager from '../manager/surveyManager'
 import { Schemata } from '@openforis/arena-server'
 
 export default class SurveyActivityLogClearJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyActivityLogClearJob'
+
+  constructor(params?: any) {
     super(SurveyActivityLogClearJob.type, params)
   }
 
@@ -30,5 +32,3 @@ export default class SurveyActivityLogClearJob extends Job {
     }
   }
 }
-
-SurveyActivityLogClearJob.type = 'SurveyActivityLogClearJob'

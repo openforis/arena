@@ -9,7 +9,9 @@ import * as SurveyManager from '../manager/surveyManager'
  * (It requires the survey to be set in the context or it loads it with "published" props).
  */
 export default class SurveyDependencyGraphsGenerationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyDependencyGraphsGenerationJob'
+
+  constructor(params?: any) {
     super(SurveyDependencyGraphsGenerationJob.type, params)
   }
 
@@ -23,5 +25,3 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
     await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, this.tx)
   }
 }
-
-SurveyDependencyGraphsGenerationJob.type = 'SurveyDependencyGraphsGenerationJob'
