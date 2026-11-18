@@ -1,7 +1,13 @@
+import type {
+  User as ArenaUser,
+  Survey as ArenaSurvey,
+  SurveyDependencyGraph,
+  SurveyProps,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 import camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as DB from '@server/db'
 
 import { now as dbNow, newQueryParams, normalizeLimit, normalizeOffset, selectDate } from '@server/db/dbUtils'
@@ -10,9 +16,9 @@ import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { getSurveyDBSchema } from './surveySchemaRepositoryUtils'
+import { Schemata } from '@common/model/db'
 
-const _getLabelColumn = (tableAlias) => {
+const _getLabelColumn = (tableAlias?: string) => {
   const prefix = tableAlias ? `${tableAlias}.` : ''
   return `COALESCE(${prefix}preferred_label, ${prefix}default_label)`
 }
@@ -41,10 +47,23 @@ const _getSurveySelectFields = (alias = '') => {
  *   legacy file paths to migrate, so callers should pass the "current fully-migrated" stamp value (see
  *   `getCurrentAppVersionStamp` in `surveyDataMigrationSteps.js`) rather than leaving this unset, otherwise the
  *   survey would be treated as pending a data migration and become unavailable (503) until the next migration run.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<object>} - The newly inserted survey row.
  */
-export const insertSurvey = async ({ survey, props = {}, propsDraft = {}, appVersion = null }, client = db) =>
+export const insertSurvey = (
+  {
+    survey,
+    props = {},
+    propsDraft = {},
+    appVersion = null,
+  }: {
+    survey: ArenaSurvey
+    props?: Partial<SurveyProps>
+    propsDraft?: Partial<SurveyProps>
+    appVersion?: string | null
+  },
+  client: DbClient = db
+) =>
   client.one(
     `
       INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template, app_version)
@@ -66,9 +85,9 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {}, appVer
 
 // ============== READ
 
-export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], A.prop('id'))
+export const fetchAllSurveyIds = (client: DbClient = db) => client.map('SELECT id FROM survey', [], A.prop('id'))
 
-const _getSelectWhereCondition = ({ draft, search }) => {
+const _getSelectWhereCondition = ({ draft, search }: { draft: boolean; search: string | null }) => {
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
   const labelCol = _getLabelColumn('s')
 
@@ -86,18 +105,25 @@ const _getSelectWhereCondition = ({ draft, search }) => {
       }`
 }
 
+// lang, offset and limit are query params
 const _getSurveysSelectQuery = ({
   user,
-  lang,
   draft = false,
   template = false,
   search = null,
-  offset = 0,
-  limit = null,
   sortBy = Survey.sortableKeys.dateModified,
   sortOrder = 'DESC',
   includeOwnerEmailAddress = false,
   onlyOwn = false,
+}: {
+  user: ArenaUser
+  draft?: boolean
+  template?: boolean
+  search?: string | null
+  sortBy?: string | null
+  sortOrder?: string | null
+  includeOwnerEmailAddress?: boolean
+  onlyOwn?: boolean
 }) => {
   const checkAccess = (!template || draft) && !User.isSystemAdmin(user)
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -175,7 +201,7 @@ const _getSurveysSelectQuery = ({
     `
 }
 
-export const fetchUserSurveys = async (
+export const fetchUserSurveys = (
   {
     user,
     draft = false,
@@ -188,8 +214,20 @@ export const fetchUserSurveys = async (
     sortOrder = 'DESC',
     includeOwnerEmailAddress = false,
     onlyOwn = false,
+  }: {
+    user: ArenaUser
+    draft?: boolean
+    template?: boolean
+    offset?: number
+    limit?: number | null
+    lang?: string
+    search?: string | null
+    sortBy?: string | null
+    sortOrder?: string | null
+    includeOwnerEmailAddress?: boolean
+    onlyOwn?: boolean
   },
-  client = db
+  client: DbClient = db
 ) => {
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
@@ -198,9 +236,6 @@ export const fetchUserSurveys = async (
       user,
       draft,
       template,
-      offset,
-      limit,
-      lang,
       search,
       sortBy,
       sortOrder,
@@ -219,22 +254,29 @@ export const fetchUserSurveys = async (
   )
 }
 
-export const countUserSurveys = async (
-  { user, draft = false, template = false, search: searchParam = null, lang = null, onlyOwn = false },
-  client = db
+export const countUserSurveys = (
+  {
+    user,
+    draft = false,
+    template = false,
+    search: searchParam = null,
+    lang = null,
+    onlyOwn = false,
+  }: { user: ArenaUser; draft?: boolean; template?: boolean; search?: string | null; lang?: string; onlyOwn?: boolean },
+  client: DbClient = db
 ) => {
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
   return client.one(
     `
     SELECT COUNT(*)
-    FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search, onlyOwn })}) AS s`,
+    FROM (${_getSurveysSelectQuery({ user, draft, template, search, onlyOwn })}) AS s`,
     { search, template, lang, limit: null, offset: 0, userUuid: User.getUuid(user) },
     (row) => Number(row.count)
   )
 }
 
-export const countOwnedSurveys = async ({ user }, client = db) =>
+export const countOwnedSurveys = ({ user }: { user: ArenaUser }, client: DbClient = db) =>
   client.one(
     `
     SELECT COUNT(*)
@@ -245,14 +287,14 @@ export const countOwnedSurveys = async ({ user }, client = db) =>
     (row) => Number(row.count)
   )
 
-export const fetchSurveysByName = async (surveyName, client = db) =>
+export const fetchSurveysByName = (surveyName: string, client: DbClient = db) =>
   client.map(
     `SELECT ${_getSurveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     (def) => DB.transformCallback(def)
   )
 
-export const fetchSurveyIdsAndNames = async (client = db) =>
+export const fetchSurveyIdsAndNames = (client: DbClient = db) =>
   client.map(
     `SELECT 
       id, 
@@ -280,19 +322,19 @@ export const fetchSurveyIdsAndNames = async (client = db) =>
  * Used to prioritize the startup data migration: surveys ordered this way have their more
  * recently active (and therefore more likely to be opened again soon) surveys migrated first,
  * reducing the window in which any given survey is temporarily unavailable while migrating.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
  */
-export const fetchSurveyIdsAndAppVersions = async (client = db) =>
+export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
   client.map('SELECT id, app_version FROM survey ORDER BY date_modified DESC', [], camelize)
 
 /**
  * Fetches the app version a survey was last migrated to.
  * @param {!number} surveyId - The survey ID.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<{ appVersion: string|null }|null>} - The app version, or null if the survey doesn't exist.
  */
-export const fetchSurveyAppVersionById = async (surveyId, client = db) =>
+export const fetchSurveyAppVersionById = (surveyId: number, client: DbClient = db) =>
   client.oneOrNone('SELECT app_version FROM survey WHERE id = $1', [surveyId], camelize)
 
 /**
@@ -304,19 +346,22 @@ export const fetchSurveyAppVersionById = async (surveyId, client = db) =>
  * @param {import('@server/db/db').DbClient} [client] - The database client.
  * @returns {Promise<import('@openforis/arena-core').Survey>} - The survey.
  */
-export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
+export const fetchSurveyById = (
+  { surveyId, draft = false, backup = false }: { surveyId: number; draft?: boolean; backup?: boolean },
+  client: DbClient = db
+) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
     DB.transformCallback(def, draft, false, backup)
   )
 
-export const fetchDependencies = async (surveyId, client = db) =>
+export const fetchDependencies = (surveyId: number, client: DbClient = db) =>
   client.oneOrNone(
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
     A.prop('dependencies')
   )
 
-export const fetchFilesTotalSpace = async (surveyId, client = db) =>
+export const fetchFilesTotalSpace = (surveyId: number, client: DbClient = db) =>
   client.oneOrNone(
     `SELECT config#>'{${Survey.configKeys.filesTotalSpace}}' AS value
      FROM survey 
@@ -325,7 +370,10 @@ export const fetchFilesTotalSpace = async (surveyId, client = db) =>
     A.prop('value')
   )
 
-export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
+export const fetchTemporarySurveyIds = (
+  { olderThan24Hours = false }: { olderThan24Hours?: boolean } = {},
+  client: DbClient = db
+) =>
   client.map(
     `SELECT id 
      FROM survey 
@@ -343,10 +391,10 @@ export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {},
  * @param {import('@server/db/db').DbClient} [client] - The database client.
  * @returns {Promise<null>} - The result promise.
  */
-export const markSurveyDraft = async (surveyId, client = db) =>
+export const markSurveyDraft = (surveyId: number, client: DbClient = db) =>
   client.none(`UPDATE survey SET draft = true, date_modified = ${dbNow} WHERE id = $1`, [surveyId])
 
-export const updateSurveyProp = async (surveyId, key, value, client = db) => {
+export const updateSurveyProp = (surveyId: number, key: string, value: unknown, client: DbClient = db) => {
   const prop = { [key]: value }
 
   return client.one(
@@ -362,7 +410,10 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
   )
 }
 
-export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
+export const updateSurveyOwner = (
+  { surveyId, ownerUuid }: { surveyId: number; ownerUuid: string },
+  client: DbClient = db
+) =>
   client.none(
     `UPDATE survey 
     SET owner_uuid = $/ownerUuid/
@@ -375,10 +426,13 @@ export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
  * @param {object} params - The update parameters.
  * @param {number} params.surveyId - The survey id.
  * @param {string} params.version - The app version to associate to the survey.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<null>} - The result promise.
  */
-export const updateSurveyAppVersion = async ({ surveyId, version }, client = db) =>
+export const updateSurveyAppVersion = (
+  { surveyId, version }: { surveyId: number; version: string },
+  client: DbClient = db
+) =>
   client.none(
     `UPDATE survey
     SET app_version = $/version/
@@ -386,7 +440,7 @@ export const updateSurveyAppVersion = async ({ surveyId, version }, client = db)
     { surveyId, version }
   )
 
-export const publishSurveyProps = async (surveyId, client = db) =>
+export const publishSurveyProps = (surveyId: number, client: DbClient = db) =>
   client.none(
     `
     UPDATE
@@ -403,7 +457,7 @@ export const publishSurveyProps = async (surveyId, client = db) =>
     [surveyId]
   )
 
-export const unpublishSurveyProps = async (surveyId, client = db) =>
+export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
   client.none(
     `
   UPDATE
@@ -420,7 +474,11 @@ export const unpublishSurveyProps = async (surveyId, client = db) =>
     [surveyId]
   )
 
-export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
+export const updateSurveyDependencyGraphs = (
+  surveyId: number,
+  dependencyGraphs: SurveyDependencyGraph,
+  client: DbClient = db
+) => {
   const meta = {
     dependencyGraphs,
   }
@@ -435,7 +493,7 @@ export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, c
   )
 }
 
-export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
+export const removeSurveyTemporaryFlag = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.none(
     `
     UPDATE survey 
@@ -447,7 +505,10 @@ export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
     [surveyId]
   )
 
-export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) =>
+export const updateSurveyConfigurationProp = (
+  { surveyId, key, value }: { surveyId: number; key: string; value: unknown },
+  client: DbClient = db
+) =>
   client.none(
     `UPDATE survey
     SET config = jsonb_set(coalesce(config, '{}'), $/path/::text[], $/value/)
@@ -456,16 +517,18 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
   )
 
 // removes only one key: the other keys (e.g. mapCustomLayers) must survive
-export const deleteSurveyConfigurationProp = async ({ surveyId, key }, client = db) =>
-  client.none(`UPDATE survey SET config = config - $/key/::text WHERE id = $/surveyId/`, { surveyId, key })
+export const deleteSurveyConfigurationProp = (
+  { surveyId, key }: { surveyId: number; key: string },
+  client: DbClient = db
+) => client.none(`UPDATE survey SET config = config - $/key/::text WHERE id = $/surveyId/`, { surveyId, key })
 
 // ============== DELETE
 // the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,
 // otherwise the whole delete transaction (dropping the survey schemas) would be rolled back
-export const deleteSurvey = async (id, client = db) =>
+export const deleteSurvey = (id: number, client: DbClient = db) =>
   client.oneOrNone('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
-export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
+export const deleteSurveyLabelsAndDescriptions = async (id: number, langCodes: string[], client: DbClient = db) => {
   // one "#-" operator per path, with the path passed as a parameter
   const params = newQueryParams([id])
   const propsUpdateCond = langCodes
@@ -485,5 +548,5 @@ export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = 
   )
 }
 
-export const dropSurveySchema = async (id, client = db) =>
-  client.query(`DROP SCHEMA IF EXISTS ${getSurveyDBSchema(id)} CASCADE`)
+export const dropSurveySchema = (id: number, client: DbClient = db) =>
+  client.query(`DROP SCHEMA IF EXISTS ${Schemata.getSchemaSurvey(id)} CASCADE`)
