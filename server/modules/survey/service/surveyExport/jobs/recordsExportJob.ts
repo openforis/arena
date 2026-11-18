@@ -8,7 +8,7 @@ import * as RecordService from '@server/modules/record/service/recordService'
 import { ExportFile } from '../exportFile'
 
 export default class RecordsExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('RecordsExportJob', params)
   }
 

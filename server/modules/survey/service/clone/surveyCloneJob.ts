@@ -5,7 +5,9 @@ import ArenaImportJob from '../../../arenaImport/service/arenaImport/arenaImport
 import { SurveyCreatorJobHelper } from '../surveyCreatorJobHelper'
 
 export default class SurveyCloneJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyCloneJob'
+
+  constructor(params?: any) {
     const backup = false
     const cloning = true
     const { cycle } = params
@@ -16,10 +18,11 @@ export default class SurveyCloneJob extends Job {
     ])
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { surveyId } = this.context
 
     this.setResult({ surveyId })
+    return Promise.resolve()
   }
 
   async onEnd() {
@@ -33,5 +36,3 @@ export default class SurveyCloneJob extends Job {
     }
   }
 }
-
-SurveyCloneJob.type = 'SurveyCloneJob'
