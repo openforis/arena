@@ -33,9 +33,10 @@ const routes = (table: Record<string, () => Response | Promise<Response>>) => {
 
 describe('limits', () => {
   test('context × 3 chars × 0.75', () => {
-    expect(getLocalServerLimits(4096)).toEqual({ maxPromptChars: 9216 })
-    expect(getLocalServerLimits(null)).toEqual({ maxPromptChars: 18432 })
-    expect(getLocalServerLimits(60000)).toEqual({ maxPromptChars: 135000 })
+    // the tokens are the real limit; the characters (3 per token) stand in until the server counts a request
+    expect(getLocalServerLimits(4096)).toEqual({ maxPromptChars: 9216, maxPromptTokens: 3072 })
+    expect(getLocalServerLimits(null)).toEqual({ maxPromptChars: 18432, maxPromptTokens: 6144 })
+    expect(getLocalServerLimits(60000)).toEqual({ maxPromptChars: 135000, maxPromptTokens: 45000 })
     expect(DEFAULT_LOCAL_CONTEXT_TOKENS).toBe(8192)
   })
 })

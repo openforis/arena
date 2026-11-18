@@ -31,9 +31,10 @@ export type LocalServerProbeResult = {
  * @param {number|null} contextTokens - Context size, or null when unknown (8,192 is used).
  * @returns {AiEngineLimits} The limits.
  */
-export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimits => ({
-  maxPromptChars: Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * CHARS_PER_TOKEN * PROMPT_SHARE),
-})
+export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimits => {
+  const maxPromptTokens = Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * PROMPT_SHARE)
+  return { maxPromptChars: maxPromptTokens * CHARS_PER_TOKEN, maxPromptTokens }
+}
 
 /**
  * Returns the context window of the local server's model.

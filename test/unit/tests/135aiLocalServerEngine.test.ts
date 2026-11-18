@@ -88,7 +88,7 @@ describe('engine info', () => {
       // the default name of the type: shown translated
       labelKey: 'userAiSettings:defaultName.local',
       model: 'local-model',
-      limits: { maxPromptChars: 9216 },
+      limits: { maxPromptChars: 9216, maxPromptTokens: 3072 },
       contextWindow: { tokens: 4096, assumed: false },
       providerId: 'local:l1',
     })
@@ -100,7 +100,7 @@ describe('engine info', () => {
       localEntry({ name: 'Desk server' })
     )
     expect(info?.label).toBe('Desk server')
-    expect(info?.limits).toEqual({ maxPromptChars: 18432 })
+    expect(info?.limits).toEqual({ maxPromptChars: 18432, maxPromptTokens: 6144 })
   })
 
   test('no URL or class: no engine', () => {

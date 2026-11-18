@@ -1,7 +1,14 @@
 /**
  * One assistant turn: system prompt, history, tools, then the AI SDK tool loop streamed into the conversation.
  */
-import { ToolChoiceViolationError, streamText, type LanguageModel, type TextStreamPart, type ToolSet } from 'ai'
+import {
+  ToolChoiceViolationError,
+  streamText,
+  type LanguageModel,
+  type ModelMessage,
+  type TextStreamPart,
+  type ToolSet,
+} from 'ai'
 
 import * as Survey from '@core/survey/survey'
 
@@ -19,6 +26,8 @@ import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
+import { CHARS_PER_TOKEN } from '@webapp/ai/engines/localServerProbe'
+import type { AiEngineLimits } from '@webapp/ai/engines/types'
 import { resolveModel, type ResolveModelParams, type ResolvedModel } from '@webapp/ai/engines/resolveModel'
 import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getToolResultCap } from '@webapp/ai/tools/common/toolResult'
@@ -26,13 +35,13 @@ import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
-import { buildTrimmedHistory, getHistoryBudget, getToolDefinitionChars } from './agentMessages'
+import { APPLY_NOTE_PREFIX, buildTrimmedHistory, getHistoryBudget, getToolDefinitionChars } from './agentMessages'
 import { buildAssistantSystemPrompt, type AssistantPromptArea } from './assistantSystemPrompt'
 import { resolveAssistantTurnModel } from './turnModel'
 import { createTurnState, type TurnState } from './turnState'
 import { buildTurnUsage, estimateContextTokens, toContextTokens, type TurnUsageInputs } from './turnUsage'
 
-export type AssistantLimits = { maxPromptChars: number }
+export type AssistantLimits = AiEngineLimits
 
 // the browser doesn't know the server's AI_MAX_PROMPT_CHARS: its default is the budget (C: per-engine limits)
 export const DEFAULT_ASSISTANT_LIMITS: AssistantLimits = {
@@ -57,21 +66,114 @@ export const TOOL_CALL_TEXT_ERROR_KEY = 'aiAssistantToolCallText'
 const TOOL_CALL_OPEN = /^<\|?tool_call\|?>/
 const TOOL_CALL_CLOSE = /<\|?\/?tool_call\|?>$/
 
+// the same call (tool and input) failing this many times in a turn ends the tool loop
+export const REPEATED_FAILURE_LIMIT = 3
+
+// why a step is sent without tools, and is the last one
+export type LastStepReason = 'contextFull' | 'repeatedFailure' | 'answerRequest'
+
+const REPEATED_FAILURE_NOTE =
+  `${APPLY_NOTE_PREFIX}the same tool call failed ${REPEATED_FAILURE_LIMIT} times, so the tools are now off. ` +
+  'Answer the user now with what you have, and say briefly what could not be done.'
+const ANSWER_REQUEST_NOTE =
+  `${APPLY_NOTE_PREFIX}you ended without writing an answer. Write the answer to the user now, ` +
+  'from the results you already have. Do not call tools.'
+
+// what the check reads of a step the SDK ran (StepResult)
+type RanStep = {
+  usage?: { inputTokens?: number }
+  content: { type: string; toolName?: string; input?: unknown; output?: unknown }[]
+}
+
 /**
- * Builds the prepareStep of a turn. The context is the only limit of the tool loop: a step that has no room left for
- * one more tool result gets no tools, so the model answers with what it has.
- * @param {object} params - Parameters.
- * @param {number} params.maxPromptChars - Prompt limit of the engine.
- * @param {number} params.fixedChars - Characters of the system prompt and the tool definitions.
- * @returns {Function} The prepareStep function.
+ * Returns true when one call (same tool, same input) failed REPEATED_FAILURE_LIMIT times in the turn.
+ * @param {RanStep[]} steps - Steps of the turn so far.
+ * @returns {boolean} True for a repeated failure.
  */
-export const getPrepareStep =
-  ({ maxPromptChars, fixedChars }: { maxPromptChars: number; fixedChars: number }) =>
-  ({ stepNumber, messages }: { stepNumber: number; messages: unknown[] }) =>
+const hasRepeatedFailure = (steps: RanStep[]): boolean => {
+  const counts = new Map<string, number>()
+  for (const part of steps.flatMap((step) => step.content)) {
+    // a tool that threw, or the structured error result of the tool wrapper
+    if (part.type !== 'tool-error' && !(part.type === 'tool-result' && (part.output as any)?.error)) continue
+    const key = `${part.toolName}:${JSON.stringify(part.input)}`
+    const count = (counts.get(key) ?? 0) + 1
+    if (count >= REPEATED_FAILURE_LIMIT) return true
+    counts.set(key, count)
+  }
+  return false
+}
+
+/**
+ * Builds the check that ends the tool loop of a turn: the step it names is sent without tools, so the model answers
+ * with what it has. The context is the limit (no room left for one more tool result), and a call that keeps failing.
+ * @param {object} params - Parameters.
+ * @param {AssistantLimits} params.limits - Prompt limits of the engine.
+ * @param {number} params.fixedChars - Characters of the system prompt and the tool definitions.
+ * @returns {Function} The check of a step: the reason it is the last one, or null.
+ */
+export const getLastStepCheck = ({ limits, fixedChars }: { limits: AssistantLimits; fixedChars: number }) => {
+  const resultCap = getToolResultCap(limits.maxPromptChars)
+  // characters of the request before this one: the provider counted it in tokens
+  let countedChars = 0
+  return ({
+    stepNumber,
+    messages,
+    steps,
+  }: {
+    stepNumber: number
+    messages: unknown[]
+    steps: RanStep[]
+  }): LastStepReason | null => {
+    const chars = fixedChars + JSON.stringify(messages).length
+    const addedChars = chars - countedChars
+    countedChars = chars
     // the first step keeps its tools: the model could never act otherwise
-    stepNumber > 0 && fixedChars + JSON.stringify(messages).length + getToolResultCap(maxPromptChars) > maxPromptChars
-      ? { toolChoice: 'none' as const }
-      : undefined
+    if (stepNumber === 0) return null
+    if (hasRepeatedFailure(steps)) return 'repeatedFailure'
+    const inputTokens = steps.at(-1)?.usage?.inputTokens
+    // only what was added since the counted request is estimated (a context of unknown size: the characters decide)
+    const full =
+      limits.maxPromptTokens && inputTokens
+        ? inputTokens + Math.ceil((addedChars + resultCap) / CHARS_PER_TOKEN) > limits.maxPromptTokens
+        : chars + resultCap > limits.maxPromptChars
+    return full ? 'contextFull' : null
+  }
+}
+
+/**
+ * Adds a note of Arena as a user message (joined to a last user message: some providers refuse two in a row).
+ * @param {ModelMessage[]} messages - Messages of the request.
+ * @param {string} note - The note.
+ * @returns {ModelMessage[]} The messages with the note.
+ */
+const withNote = (messages: ModelMessage[], note: string): ModelMessage[] => {
+  const last = messages.at(-1)
+  return last?.role === 'user' && typeof last.content === 'string'
+    ? [...messages.slice(0, -1), { ...last, content: `${last.content}\n\n${note}` }]
+    : [...messages, { role: 'user', content: note }]
+}
+
+/**
+ * Returns the settings of a step: none, or no tools on the last one (with the note after a repeated failure).
+ * @param {LastStepReason|null} reason - Why the step is the last one, or null.
+ * @param {ModelMessage[]} messages - Messages of the step.
+ * @returns {object|undefined} The prepareStep result.
+ */
+const toStepSettings = (reason: LastStepReason | null, messages: ModelMessage[]) => {
+  if (!reason) return undefined
+  return reason === 'repeatedFailure'
+    ? { toolChoice: 'none' as const, messages: withNote(messages, REPEATED_FAILURE_NOTE) }
+    : { toolChoice: 'none' as const }
+}
+
+/**
+ * Returns the messages that ask a silent model for its answer: what it did, without the empty answer of its last step.
+ * @param {ModelMessage[]} history - Messages the turn started with.
+ * @param {ModelMessage[]} said - Messages of the model and its tools in the turn.
+ * @returns {ModelMessage[]} The messages of the request.
+ */
+const toAnswerRequest = (history: ModelMessage[], said: ModelMessage[]): ModelMessage[] =>
+  withNote([...history, ...(said.at(-1)?.role === 'assistant' ? said.slice(0, -1) : said)], ANSWER_REQUEST_NOTE)
 
 export type RunAssistantTurnParams = {
   conversation: Conversation
@@ -119,8 +221,8 @@ type StreamOutcome = {
   error: unknown
   // tokens reported by the last finish-step (null: not reported)
   stepTokens: number | null
-  // a step ran without tools because the context had no room for one more tool result
-  contextFull: boolean
+  // why the last step ran without tools (null: the model ended the turn by itself)
+  lastStep: LastStepReason | null
   // set once the request is built: from then on the answer gets a usage
   sent: TurnUsageInputs | null
 }
@@ -164,6 +266,32 @@ const handleStreamPart = (part: TurnStreamPart, state: TurnState, outcome: Strea
       break
     default:
       break
+  }
+}
+
+/**
+ * Streams a request into the answer of the turn.
+ * @param {object} params - Parameters.
+ * @param {object} params.result - The streamText result.
+ * @param {TurnState} params.state - Turn state.
+ * @param {StreamOutcome} params.outcome - Abort / error seen so far (updated).
+ * @param {AiTool[]} params.toolList - Tools offered in the turn.
+ * @returns {Promise<void>}
+ */
+const streamInto = async ({
+  result,
+  state,
+  outcome,
+  toolList,
+}: {
+  result: { stream: AsyncIterable<TurnStreamPart> }
+  state: TurnState
+  outcome: StreamOutcome
+  toolList: AiTool[]
+}): Promise<void> => {
+  for await (const part of result.stream) {
+    handleStreamPart(part, state, outcome)
+    escalateOnDataResult({ part, toolList, state })
   }
 }
 
@@ -259,19 +387,41 @@ const getAnswerText = (after: Conversation, lastStepOnly = false): string => {
  */
 const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSignal, before: Conversation): void => {
   const after = state.get()
-  // a model that calls a tool on the step that has none makes the SDK fail: that is the full context, not an error
-  const toolCallOnLastStep = outcome.contextFull && ToolChoiceViolationError.isInstance(outcome.error)
+  const forced = outcome.lastStep !== null
+  // a model that calls a tool on the step that has none makes the SDK fail: that is no answer, not an error
+  const toolCallOnLastStep = forced && ToolChoiceViolationError.isInstance(outcome.error)
+  // a local server returns the tool call of that step as text: no answer either
+  const noAnswer = isSilentTurn(after, before) || (forced && isToolCallText(getAnswerText(after, true)))
   if (outcome.aborted || signal.aborted || isAiAbortError(outcome.error)) state.finish('stopped')
   else if (outcome.error && !toolCallOnLastStep) {
     state.finish('error', getAiErrorKey(outcome.error) ?? PROVIDER_ERROR_KEY, getAiErrorParams(outcome.error))
-  }
-  // a local server returns the tool call of that step as text: the full context too
-  else if (outcome.contextFull && (isToolCallText(getAnswerText(after, true)) || isSilentTurn(after, before))) {
-    state.finish('error', CONTEXT_FULL_ERROR_KEY)
+  } else if (noAnswer) {
+    state.finish('error', outcome.lastStep === 'contextFull' ? CONTEXT_FULL_ERROR_KEY : NO_ANSWER_ERROR_KEY)
   } else if (isToolCallText(getAnswerText(after))) state.finish('error', TOOL_CALL_TEXT_ERROR_KEY)
-  else if (isSilentTurn(after, before)) state.finish('error', NO_ANSWER_ERROR_KEY)
   else state.finish('done')
 }
+
+/**
+ * Returns true when the model ended the turn by itself without an answer (often after thinking only).
+ * @param {object} params - Parameters.
+ * @param {TurnState} params.state - Turn state.
+ * @param {StreamOutcome} params.outcome - Abort / error.
+ * @param {AbortSignal} params.signal - Turn signal.
+ * @param {Conversation} params.before - Conversation before the turn.
+ * @returns {boolean} True when the answer is worth asking for.
+ */
+const endedWithoutAnswer = ({
+  state,
+  outcome,
+  signal,
+  before,
+}: {
+  state: TurnState
+  outcome: StreamOutcome
+  signal: AbortSignal
+  before: Conversation
+}): boolean =>
+  !outcome.lastStep && !outcome.error && !outcome.aborted && !signal.aborted && isSilentTurn(state.get(), before)
 
 /**
  * Runs one assistant turn. The conversation is reported through onUpdate on every change; the final one is returned.
@@ -319,7 +469,7 @@ export const runAssistantTurn = async ({
     aborted: false,
     error: null,
     stepTokens: null,
-    contextFull: false,
+    lastStep: null,
     sent: null,
   }
   try {
@@ -377,31 +527,37 @@ export const runAssistantTurn = async ({
       droppedCount: history.droppedCount,
       contextWindow: turn.engine?.contextWindow ?? null,
     }
-    const prepareStep = getPrepareStep({
-      maxPromptChars: turn.limits.maxPromptChars,
+    const getLastStep = getLastStepCheck({
+      limits: turn.limits,
       fixedChars: system.length + getToolDefinitionChars(toolList),
     })
-    const result = streamText({
+    const request = {
       model: turn.model,
       system,
-      messages: history.messages,
       tools:
         toolList.length > 0 ? toAiSdkTools(toolList, turnCtx, getToolResultCap(turn.limits.maxPromptChars)) : undefined,
-      // the step without tools is the last one
-      stopWhen: () => outcome.contextFull,
-      prepareStep: (step) => {
-        const prepared = prepareStep(step)
-        outcome.contextFull = prepared !== undefined
-        return prepared
-      },
       abortSignal: signal,
       maxRetries: 0,
       // errors arrive as 'error' parts of the full stream
       onError: () => undefined,
+    }
+    const sink = { state, outcome, toolList }
+    const result = streamText({
+      ...request,
+      messages: history.messages,
+      // the step without tools is the last one
+      stopWhen: () => outcome.lastStep !== null,
+      prepareStep: (step) => {
+        outcome.lastStep = getLastStep(step)
+        return toStepSettings(outcome.lastStep, step.messages)
+      },
     })
-    for await (const part of result.stream) {
-      handleStreamPart(part, state, outcome)
-      escalateOnDataResult({ part, toolList, state })
+    await streamInto({ result, ...sink })
+    if (endedWithoutAnswer({ state, outcome, signal, before: conversation })) {
+      // asked once, without tools
+      outcome.lastStep = 'answerRequest'
+      const messages = toAnswerRequest(history.messages, await result.responseMessages)
+      await streamInto({ result: streamText({ ...request, messages, toolChoice: 'none' }), ...sink })
     }
   } catch (error) {
     outcome.error = error

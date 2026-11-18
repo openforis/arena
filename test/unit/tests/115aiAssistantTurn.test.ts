@@ -9,7 +9,7 @@ import {
   NO_ANSWER_ERROR_KEY,
   TOOL_CALL_TEXT_ERROR_KEY,
   assistantAreaFeatures,
-  getPrepareStep,
+  getLastStepCheck,
   runAssistantTurn,
 } from '@webapp/ai/agent/runAssistantTurn'
 import type { AiTool } from '@webapp/ai/tools/types'
@@ -75,7 +75,7 @@ const run = ({
   access?: typeof cloudAccess
   signal?: AbortSignal
   onUpdate?: (conversation: Conversation) => void
-  limits?: { maxPromptChars: number }
+  limits?: { maxPromptChars: number; maxPromptTokens?: number }
   ctx?: ReturnType<typeof createToolContext>
   extra?: Partial<Parameters<typeof runAssistantTurn>[0]>
 }) =>
@@ -373,13 +373,139 @@ describe('runAssistantTurn', () => {
     expect(answerOf(result).status).toBe('done')
   })
 
-  test('getPrepareStep removes the tools when one more tool result would not fit (never on the first step)', () => {
-    // a result may take an eighth of the limit: 100 of 800 chars
-    const prepare = getPrepareStep({ maxPromptChars: 800, fixedChars: 200 })
+  describe('getLastStepCheck', () => {
     const messages = (chars: number) => [{ role: 'user', content: 'x'.repeat(chars) }]
-    expect(prepare({ stepNumber: 1, messages: messages(300) })).toBeUndefined()
-    expect(prepare({ stepNumber: 1, messages: messages(500) })).toEqual({ toolChoice: 'none' })
-    expect(prepare({ stepNumber: 0, messages: messages(500) })).toBeUndefined()
+    const step = (inputTokens?: number, ...content: any[]) => ({ usage: { inputTokens }, content })
+
+    test('the context is full when one more tool result would not fit (never on the first step)', () => {
+      // a result may take an eighth of the limit: 100 of 800 chars
+      const check = getLastStepCheck({ limits: { maxPromptChars: 800 }, fixedChars: 200 })
+      expect(check({ stepNumber: 1, messages: messages(300), steps: [] })).toBeNull()
+      expect(check({ stepNumber: 1, messages: messages(500), steps: [] })).toBe('contextFull')
+      expect(check({ stepNumber: 0, messages: messages(500), steps: [] })).toBeNull()
+    })
+
+    test('tokens the provider counted decide: the last request as counted, what was added since at 3 chars per token', () => {
+      const limits = { maxPromptChars: 800, maxPromptTokens: 2000 }
+      const check = getLastStepCheck({ limits, fixedChars: 200 })
+      check({ stepNumber: 0, messages: messages(300), steps: [] })
+      // far over the characters, but few tokens: 100 counted + (3,000 added + 100 for a result) / 3 < 2,000
+      expect(check({ stepNumber: 1, messages: messages(3300), steps: [step(100)] })).toBeNull()
+      // 1,900 counted + (300 added + 100 for a result) / 3 > 2,000
+      expect(check({ stepNumber: 2, messages: messages(3600), steps: [step(100), step(1900)] })).toBe('contextFull')
+      // a provider that reports no usage: the characters decide
+      const uncounted = getLastStepCheck({ limits, fixedChars: 200 })
+      uncounted({ stepNumber: 0, messages: messages(300), steps: [] })
+      expect(uncounted({ stepNumber: 1, messages: messages(3300), steps: [step()] })).toBe('contextFull')
+    })
+
+    test('the same failing call three times ends the tool loop; other failures and successes do not', () => {
+      const result = (input: unknown, output: unknown) => ({ type: 'tool-result', toolName: 't', input, output })
+      const failed = (input: unknown) => step(undefined, result(input, { error: { code: 'invalidProposal' } }))
+      const ok = (input: unknown) => step(undefined, result(input, { ok: true }))
+      const thrown = step(undefined, { type: 'tool-error', toolName: 't', input: { a: 1 }, error: new Error('x') })
+      const at = (steps: unknown[]) =>
+        getLastStepCheck({ limits: { maxPromptChars: 200000 }, fixedChars: 0 })({
+          stepNumber: steps.length,
+          messages: [],
+          steps: steps as any[],
+        })
+      expect(at([failed({ a: 1 }), failed({ a: 1 })])).toBeNull()
+      expect(at([failed({ a: 1 }), failed({ a: 2 }), failed({ a: 3 })])).toBeNull()
+      expect(at([ok({ a: 1 }), ok({ a: 1 }), ok({ a: 1 })])).toBeNull()
+      // not in a row: the count is of the turn
+      expect(at([failed({ a: 1 }), failed({ a: 2 }), failed({ a: 1 }), failed({ a: 1 })])).toBe('repeatedFailure')
+      expect(at([thrown, failed({ a: 1 }), thrown])).toBe('repeatedFailure')
+    })
+  })
+
+  describe('the same failing tool call, three times', () => {
+    const failing = makeTool('test_fail', async () => ({ error: { code: 'invalidProposal', message: 'no' } }))
+    // repeats the failing call; the step without tools gets the given stream
+    const repeatingModel = (lastStep: () => any) => {
+      let call = 0
+      return new MockLanguageModelV4({
+        doStream: async (options: any) =>
+          ({
+            stream:
+              options.toolChoice?.type === 'none'
+                ? lastStep()
+                : toolCallStream(`call-${call++}`, 'test_fail', { summary: 'x' }),
+          }) as any,
+      })
+    }
+
+    test('the next step has no tools and asks for the answer', async () => {
+      const model = repeatingModel(() => textStream('I could not do it.'))
+      const result = await run({ model, tools: [failing] })
+      expect(model.doStreamCalls.map((call) => call.toolChoice?.type)).toEqual(['auto', 'auto', 'auto', 'none'])
+      const request: any = model.doStreamCalls[3].prompt.at(-1)
+      expect(request.role).toBe('user')
+      expect(JSON.stringify(request.content)).toContain('failed 3 times')
+      expect(answerOf(result).status).toBe('done')
+      expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: 'I could not do it.' })
+    })
+
+    test('a model that gives no answer there ends with the no-answer error, and is not asked again', async () => {
+      const model = repeatingModel(() => textStream('<|tool_call>call:test_fail{"summary":"x"}<tool_call|>'))
+      const result = await run({ model, tools: [failing] })
+      expect(model.doStreamCalls).toHaveLength(4)
+      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: NO_ANSWER_ERROR_KEY })
+    })
+  })
+
+  describe('a turn that ends without a word', () => {
+    const echo = makeTool('test_echo', async () => ({ ok: true }))
+    const thinkingOnly = () =>
+      convertArrayToReadableStream([
+        { type: 'stream-start', warnings: [] },
+        { type: 'reasoning-start', id: 'r' },
+        { type: 'reasoning-delta', id: 'r', delta: 'The result is 12.' },
+        { type: 'reasoning-end', id: 'r' },
+        finish('stop'),
+      ] as any[])
+
+    test('the model is asked once for the answer, without tools, after the tool results it already has', async () => {
+      const model = scriptedModel(
+        () => toolCallStream('c1', 'test_echo', { summary: 'x' }),
+        thinkingOnly,
+        () => textStream('There are 12 plots.')
+      )
+      const result = await run({ model, tools: [echo] })
+      expect(model.doStreamCalls).toHaveLength(3)
+      const { prompt, toolChoice }: any = model.doStreamCalls[2]
+      expect(toolChoice?.type).toBe('none')
+      // the request follows the tool result: the answer without text is not sent back
+      expect(prompt.map((message: any) => message.role)).toEqual(['system', 'user', 'assistant', 'tool', 'user'])
+      expect(JSON.stringify(prompt.at(-1).content)).toContain('without writing an answer')
+      expect(answerOf(result).status).toBe('done')
+      expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: 'There are 12 plots.' })
+    })
+
+    test('a model that stays silent is not asked twice: the no-answer error', async () => {
+      const model = scriptedModel(() => toolCallStream('c1', 'test_echo', { summary: 'x' }), thinkingOnly)
+      const result = await run({ model, tools: [echo] })
+      expect(model.doStreamCalls).toHaveLength(3)
+      expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: NO_ANSWER_ERROR_KEY })
+    })
+
+    test('silent on the first step: the request joins the user message (never two user messages in a row)', async () => {
+      const model = scriptedModel(thinkingOnly, () => textStream('Hello.'))
+      const result = await run({ model })
+      const prompt: any[] = model.doStreamCalls[1].prompt
+      expect(prompt.map((message) => message.role)).toEqual(['system', 'user'])
+      expect(JSON.stringify(prompt[1].content)).toMatch(/Add a remarks field.*without writing an answer/)
+      expect(answerOf(result).status).toBe('done')
+    })
+
+    test('a stopped or failed turn is not asked', async () => {
+      const failing = scriptedModel(() => {
+        throw new Error('boom')
+      })
+      const failed = await run({ model: failing })
+      expect(failing.doStreamCalls).toHaveLength(1)
+      expect(answerOf(failed).status).toBe('error')
+    })
   })
 
   test('an error stores its params with the answer', async () => {

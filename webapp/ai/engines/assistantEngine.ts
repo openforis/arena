@@ -1,5 +1,5 @@
 /**
- * Engine of an assistant turn: the model, the step cap and prompt budget, and the hosting class the tools are
+ * Engine of an assistant turn: the model, the prompt budget, and the hosting class the tools are
  * offered for. Pure (resolveModel is injected); runAssistantTurn and the panel use it.
  */
 import type { AiDataClass, AiFeatureKey } from '@common/ai/features'
