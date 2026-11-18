@@ -1,7 +1,6 @@
-import pgPromise from 'pg-promise'
 import * as A from '@core/arena'
 
-import { Numbers, Objects } from '@openforis/arena-core'
+import { Numbers, Objects, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
 import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -21,7 +20,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as Log from '@server/log/log'
 
@@ -44,13 +43,12 @@ import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonom
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepository from '../repository/surveyRepository'
-import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 
 const Logger = Log.getLogger('SurveyManager')
 
-const assocSurveyInfo = (survey) => survey
+const assocSurveyInfo = <T>(survey: T): T => survey
 
-const _fetchAndAssocSrss = async ({ surveyInfo }, client) => {
+const _fetchAndAssocSrss = async ({ surveyInfo }: { surveyInfo: ArenaSurvey }, client: DbClient) => {
   const srsCodes = Survey.getSRSCodes(surveyInfo)
   if (srsCodes.length === 0) return surveyInfo
 
@@ -58,40 +56,43 @@ const _fetchAndAssocSrss = async ({ surveyInfo }, client) => {
   return Survey.assocSrs(srss)(surveyInfo)
 }
 
-const _fetchAndAssocRdbInitialized = async ({ surveyInfo }, client) => {
+const _fetchAndAssocRdbInitialized = async ({ surveyInfo }: { surveyInfo: ArenaSurvey }, client: DbClient) => {
   const surveyId = Survey.getId(surveyInfo)
   const rdbInitialized = await SchemaRdbRepository.selectSchemaExists(surveyId, client)
   return Survey.assocRDBInitilized(rdbInitialized)(surveyInfo)
 }
 
-const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }, client) => {
+const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }: { surveyInfo: ArenaSurvey }, client: DbClient) => {
   const surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
   return _fetchAndAssocRdbInitialized({ surveyInfo: surveyInfoUpdated }, client)
 }
 
 // ====== VALIDATION
 
-export const validateNewSurvey = async ({ newSurvey }) => {
+export const validateNewSurvey = async ({ newSurvey }: { newSurvey: Record<string, any> }) => {
   const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
   return SurveyValidator.validateNewSurvey({ newSurvey, surveyInfos })
 }
 
-export const validateSurveyClone = async ({ newSurvey }) => {
+export const validateSurveyClone = async ({ newSurvey }: { newSurvey: Record<string, any> }) => {
   const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
   return SurveyValidator.validateSurveyClone({ newSurvey, surveyInfos })
 }
 
-export const validateSurveyImportFromCollect = async ({ newSurvey }) => {
+export const validateSurveyImportFromCollect = async ({ newSurvey }: { newSurvey: Record<string, any> }) => {
   const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
   return SurveyValidator.validateSurveyImportFromCollect({ newSurvey, surveyInfos })
 }
 
-const validateSurveyInfo = async (surveyInfo) =>
+const validateSurveyInfo = async (surveyInfo: ArenaSurvey) =>
   SurveyValidator.validateSurveyInfo(surveyInfo, await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo)))
 
 // ====== CREATE
 
-const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
+const _addUserToSurveyAdmins = async (
+  { user, surveyInfo }: { user: ArenaUser; surveyInfo: ArenaSurvey },
+  client: DbClient = db
+) => {
   if (!User.isSystemAdmin(user)) {
     const surveyAdminsGroup = Survey.getAuthGroupAdmin(surveyInfo)
     await UserManager.addUserToGroup({ user, surveyInfo, group: surveyAdminsGroup, userToAdd: user }, client)
@@ -100,7 +101,7 @@ const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
 
 // language codes and cycle keys are used as JSON keys and export column names, SRS codes in queries:
 // imported surveys must have valid ones
-const _checkSurveyProps = (props) => {
+const _checkSurveyProps = (props: Record<string, any>) => {
   const langsInvalid = SurveyValidator.getInvalidLanguageCodes(props?.[Survey.infoKeys.languages] ?? [])
   if (langsInvalid.length > 0) {
     throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
@@ -122,10 +123,20 @@ const _checkSurveyProps = (props) => {
  * @param {boolean} [params.createRootEntityDef] - Whether to create the root entity definition.
  * @param {boolean} [params.system] - Whether the creation comes from a real user or it's a system activity (survey import).
  * @param {boolean} [params.updateUserPrefs] - Whether to update the user preferred survey after the creation.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<Survey>} - The newly created survey object.
  */
-export const insertSurvey = async (params, client = db) => {
+export const insertSurvey = async (
+  params: {
+    user: ArenaUser
+    surveyInfo: ArenaSurvey
+    createRootEntityDef?: boolean
+    system?: boolean
+    updateUserPrefs?: boolean
+    temporary?: boolean
+  },
+  client: DbClient = db
+) => {
   const {
     user,
     surveyInfo: surveyInfoParam,
@@ -204,7 +215,10 @@ export const insertSurvey = async (params, client = db) => {
   }
 }
 
-export const importSurvey = async (params, client = db) => {
+export const importSurvey = async (
+  params: { user: ArenaUser; surveyInfo: ArenaSurvey; backup?: boolean },
+  client: DbClient = db
+) => {
   const { user, surveyInfo: surveyInfoParam, backup } = params
   _checkSurveyProps(Survey.getProps(surveyInfoParam))
   _checkSurveyProps(Survey.getPropsDraft(surveyInfoParam))
@@ -267,18 +281,19 @@ export const {
 
 /**
  * Fetches the id and app version of every survey.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
  */
-export const fetchSurveyIdsAndAppVersions = async (client = db) => SurveyRepository.fetchSurveyIdsAndAppVersions(client)
+export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
+  SurveyRepository.fetchSurveyIdsAndAppVersions(client)
 
 /**
  * Returns true if the per-survey data migration of the given survey hasn't completed yet.
  * @param {!number} surveyId - The survey ID.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<boolean>} - False if the survey doesn't exist.
  */
-export const isSurveyDataMigrationPendingById = async (surveyId, client = db) => {
+export const isSurveyDataMigrationPendingById = async (surveyId: number, client: DbClient = db) => {
   const surveyAppVersion = await SurveyRepository.fetchSurveyAppVersionById(surveyId, client)
   return surveyAppVersion ? isSurveyDataMigrationPending({ appVersion: surveyAppVersion.appVersion }) : false
 }
@@ -289,7 +304,7 @@ export const isSurveyDataMigrationPendingById = async (surveyId, client = db) =>
  * @param {object} surveyInfo - The survey info object.
  * @returns {void}
  */
-const assertSurveyDataMigrated = (surveyInfo) => {
+const assertSurveyDataMigrated = (surveyInfo: ArenaSurvey) => {
   const surveyId = Survey.getId(surveyInfo)
   const appVersion = Survey.getAppVersion(surveyInfo)
   if (isSurveyDataMigrationPending({ appVersion })) {
@@ -301,8 +316,14 @@ const assertSurveyDataMigrated = (surveyInfo) => {
 // migration (i.e. the migration steps themselves) -- everyone else should leave this false, since it
 // bypasses the assertSurveyDataMigrated guard below.
 export const fetchSurveyById = async (
-  { surveyId, draft = false, validate = false, backup = false, skipMigrationCheck = false },
-  client = db
+  {
+    surveyId,
+    draft = false,
+    validate = false,
+    backup = false,
+    skipMigrationCheck = false,
+  }: { surveyId: number; draft?: boolean; validate?: boolean; backup?: boolean; skipMigrationCheck?: boolean },
+  client: DbClient = db
 ) => {
   const [surveyInfo, authGroups] = await DbUtils.runQueries(client, [
     () => SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
@@ -334,8 +355,18 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     backup = false,
     includeAnalysis = true,
     skipMigrationCheck = false,
+  }: {
+    surveyId: number
+    cycle?: string
+    draft?: boolean
+    advanced?: boolean
+    validate?: boolean
+    includeDeleted?: boolean
+    backup?: boolean
+    includeAnalysis?: boolean
+    skipMigrationCheck?: boolean
   },
-  client = db
+  client: DbClient = db
 ) => {
   const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup, skipMigrationCheck }, client)
   const surveyCycles = Survey.getCycleKeys(
@@ -382,8 +413,19 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     backup = false,
     includeBigCategories = false,
     includeBigTaxonomies = false,
+  }: {
+    surveyId: number
+    cycle?: string
+    draft?: boolean
+    advanced?: boolean
+    validate?: boolean
+    includeDeleted?: boolean
+    includeAnalysis?: boolean
+    backup?: boolean
+    includeBigCategories?: boolean
+    includeBigTaxonomies?: boolean
   },
-  client = db
+  client: DbClient = db
 ) => {
   const survey = await fetchSurveyAndNodeDefsBySurveyId(
     { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup },
@@ -398,7 +440,7 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-const calculateFilesMissing = async ({ surveyId }) => {
+const calculateFilesMissing = async ({ surveyId }: { surveyId: number }) => {
   const nodeDefFileUuids = await NodeDefRepository.fetchFileNodeDefUuidsBySurveyId({ surveyId })
   if (Objects.isEmpty(nodeDefFileUuids)) {
     return 0
@@ -406,20 +448,26 @@ const calculateFilesMissing = async ({ surveyId }) => {
   return NodeRepository.countNodesWithMissingFile({ surveyId, nodeDefFileUuids })
 }
 
-const _validateFetchUserSurveysInfoSortParams = ({ sortBy, sortOrder }) => {
+const _validateFetchUserSurveysInfoSortParams = ({
+  sortBy,
+  sortOrder,
+}: {
+  sortBy: string | null
+  sortOrder: string | null
+}) => {
   // check sortBy is valid
-  if (sortBy && !Object.values(Survey.sortableKeys).includes(sortBy)) {
+  if (sortBy && !(Object.values(Survey.sortableKeys) as string[]).includes(sortBy)) {
     throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
   }
   // check sortOrder is valid
   if (sortOrder) {
     const sortOrderStr = typeof sortOrder === 'string' ? sortOrder.toLowerCase() : null
-    if (!sortOrderStr || !Object.values(SortOrder).includes(sortOrderStr))
+    if (!sortOrderStr || !(Object.values(SortOrder) as string[]).includes(sortOrderStr))
       throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
 }
 
-const _filterSurveysWithChains = async (surveys) => {
+const _filterSurveysWithChains = async (surveys: ArenaSurvey[]) => {
   const surveysWithChains = []
   for (const survey of surveys) {
     const surveyId = Survey.getId(survey)
@@ -433,12 +481,20 @@ const _filterSurveysWithChains = async (surveys) => {
   return surveysWithChains
 }
 
-const _fetchSurveyWithCounts = async ({ survey, draft, includeDbSize = false }) => {
+const _fetchSurveyWithCounts = async ({
+  survey,
+  draft,
+  includeDbSize = false,
+}: {
+  survey: ArenaSurvey
+  draft: boolean
+  includeDbSize?: boolean
+}) => {
   const surveyId = Survey.getId(survey)
   const surveyWithCounts = {
     ...survey,
     cycles: Survey.getCycleKeys(survey).length,
-    languages: Survey.getLanguages(survey).join('|'),
+    languages: (Survey.getLanguages(survey) as string[]).join('|'),
   }
   try {
     const canHaveData = Survey.canHaveData(survey)
@@ -486,7 +542,19 @@ const _fetchSurveyWithCounts = async ({ survey, draft, includeDbSize = false }) 
 // (each survey can issue up to ~6 concurrent queries via _fetchSurveyWithCounts).
 const _fetchSurveysWithCountsConcurrency = 3
 
-const _fetchSurveysWithCounts = async ({ surveys, draft, includeDbSize, onProgress, stopIfFunction }) => {
+const _fetchSurveysWithCounts = async ({
+  surveys,
+  draft,
+  includeDbSize,
+  onProgress,
+  stopIfFunction,
+}: {
+  surveys: ArenaSurvey[]
+  draft: boolean
+  includeDbSize: boolean
+  onProgress?: ((progress: Record<string, any>) => void) | null
+  stopIfFunction?: (() => boolean) | null
+}) => {
   const surveysWithCounts = []
   for (let i = 0; i < surveys.length; i += _fetchSurveysWithCountsConcurrency) {
     if (stopIfFunction?.()) {
@@ -540,6 +608,23 @@ export const fetchUserSurveysInfo = async ({
   withChains = false,
   onProgress = null,
   stopIfFunction = null,
+}: {
+  user: ArenaUser
+  draft?: boolean
+  template?: boolean
+  offset?: number
+  limit?: number | null
+  lang?: string
+  search?: string | null
+  sortBy?: string | null
+  sortOrder?: string | null
+  includeCounts?: boolean
+  includeDbSize?: boolean
+  includeOwnerEmailAddress?: boolean
+  onlyOwn?: boolean
+  withChains?: boolean
+  onProgress?: ((progress: Record<string, any>) => void) | null
+  stopIfFunction?: (() => boolean) | null
 }) => {
   _validateFetchUserSurveysInfoSortParams({ sortBy, sortOrder })
 
@@ -572,18 +657,28 @@ export const fetchUserSurveysInfo = async ({
 }
 
 // ====== UPDATE
-export const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
+export const updateSurveyProp = (
+  user: ArenaUser,
+  surveyId: number,
+  key: string,
+  value: unknown,
+  system = false,
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     await DbUtils.runQueries(t, [
       () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-      () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+      () => SurveyRepository.markSurveyDraft(surveyId, t),
       () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
     return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
-const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = db) => {
+const updateSurveyCyclesProp = async (
+  { surveyId, value, valuePrev }: { surveyId: number; value: Record<string, any>; valuePrev: Record<string, any> },
+  client: DbClient = db
+) => {
   const cycles = Object.keys(value)
   const cyclesPrev = Object.keys(valuePrev)
   // Add new cycles to nodeDefs
@@ -599,9 +694,15 @@ const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = d
   }
 }
 
-export const updateSurveyProps = async (user, surveyId, props, client = db) =>
+export const updateSurveyProps = (
+  user: ArenaUser,
+  surveyId: number,
+  props: Record<string, any>,
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
-    const validation = await validateSurveyInfo({ id: surveyId, props })
+    // only the props are validated
+    const validation = await validateSurveyInfo({ id: surveyId, props } as ArenaSurvey)
     if (!Validation.isValid(validation)) {
       return assocSurveyInfo({ validation })
     }
@@ -615,7 +716,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       if (!A.equals(value, valuePrev)) {
         /* NOSONAR */ await DbUtils.runQueries(t, [
           () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-          () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+          () => SurveyRepository.markSurveyDraft(surveyId, t),
           () =>
             ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
         ])
@@ -649,7 +750,10 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     return surveyUpdated
   })
 
-const deleteUnusedSurveyFilesByType = async ({ surveyId, type, usedFileUuids }, client) => {
+const deleteUnusedSurveyFilesByType = async (
+  { surveyId, type, usedFileUuids }: { surveyId: number; type: string; usedFileUuids: Set<string> },
+  client: DbClient
+) => {
   const fileSummaries = await SurveyFileManager.fetchFileSummariesByType({ surveyId, type }, client)
   const fileSummariesToDelete = fileSummaries.filter(
     (fileSummary) => !usedFileUuids.has(SurveyFile.getUuid(fileSummary))
@@ -660,7 +764,7 @@ const deleteUnusedSurveyFilesByType = async ({ surveyId, type, usedFileUuids }, 
   }
 }
 
-export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
+export const deleteUnusedSurveyFiles = async (surveyId: number, client: DbClient = db) => {
   const survey = await fetchSurveyById({ surveyId, draft: true }, client)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const preloadedMapLayers = Survey.getPreloadedMapLayers(surveyInfo)
@@ -683,7 +787,7 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   )
 }
 
-export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
+export const publishSurveyProps = (surveyId: number, langsDeleted: string[], client: DbClient = db) =>
   client.tx(async (t) => {
     await SurveyRepository.publishSurveyProps(surveyId, t)
     if (!A.isEmpty(langsDeleted)) {
@@ -691,7 +795,7 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
     }
   })
 
-export const unpublishSurveyProps = async (surveyId, client = db) =>
+export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
   SurveyRepository.unpublishSurveyProps(surveyId, client)
 
 /**
@@ -699,13 +803,18 @@ export const unpublishSurveyProps = async (surveyId, client = db) =>
  * @param {object} params - The update parameters.
  * @param {number} params.surveyId - The survey id.
  * @param {string} params.version - The app version to associate to the survey.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<null>} - The result promise.
  */
-export const updateSurveyAppVersion = async ({ surveyId, version }, client = db) =>
-  SurveyRepository.updateSurveyAppVersion({ surveyId, version }, client)
+export const updateSurveyAppVersion = (
+  { surveyId, version }: { surveyId: number; version: string },
+  client: DbClient = db
+) => SurveyRepository.updateSurveyAppVersion({ surveyId, version }, client)
 
-export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) => {
+export const updateSurveyConfigurationProp = async (
+  { surveyId, key, value }: { surveyId: number; key: string; value: number },
+  client: DbClient = db
+) => {
   if (key !== Survey.configKeys.filesTotalSpace) {
     throw new Error(`Configuration key update not supported: ${key}`)
   }
@@ -721,7 +830,15 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
   return fetchSurveyById({ surveyId, draft: true, validate: true }, client)
 }
 
-export const updateSurveyOwner = async ({ user, surveyId, ownerUuid, system = false }, client = db) =>
+export const updateSurveyOwner = (
+  {
+    user,
+    surveyId,
+    ownerUuid,
+    system = false,
+  }: { user: ArenaUser; surveyId: number; ownerUuid: string; system?: boolean },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     await SurveyRepository.updateSurveyOwner({ surveyId, ownerUuid }, t)
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyOwnerUpdate, { ownerUuid }, system, t)
@@ -730,7 +847,11 @@ export const updateSurveyOwner = async ({ user, surveyId, ownerUuid, system = fa
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
 // ====== DELETE
-export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) => {
+export const deleteSurvey = async (
+  surveyId: number,
+  { deleteUserPrefs = true }: { deleteUserPrefs?: boolean } = {},
+  client: DbClient = db
+) => {
   // fetch file summaries to delete before survey schema is dropped
   const filesToDelete = SurveyFileManager.isFileContentStoredInDB()
     ? []
@@ -752,7 +873,7 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
   }
 }
 
-export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
+export const deleteTemporarySurveys = ({ olderThan24Hours }: { olderThan24Hours?: boolean }, client: DbClient = db) =>
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
     for (const surveyId of surveyIds) {
@@ -761,7 +882,7 @@ export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) 
     return surveyIds.length
   })
 
-export const deleteAllActivityLog = async ({ surveyId }, client = db) =>
+export const deleteAllActivityLog = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   ActivityLogRepository.deleteAll({ surveyId }, client)
 
 export const { dropSurveySchema } = SurveyRepository
