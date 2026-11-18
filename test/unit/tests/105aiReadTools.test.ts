@@ -43,11 +43,23 @@ describe('survey_getOverview', () => {
     expect(result.nodeDefs.find((def: any) => def.name === 'tree')).toMatchObject({ multiple: true, parent: 'plot' })
   })
 
-  test('is capped, with truncated', () => {
-    const overview = buildSurveyOverview({ survey, cycle: '0', lang: 'en', maxNodeDefs: 3 })
-    expect(overview.nodeDefs).toHaveLength(3)
-    expect(overview.truncated).toBe(true)
-    expect(overview.total).toBe(7)
+  test('a survey that does not fit lists the entities first, each with its number of attributes', () => {
+    const overview: any = buildSurveyOverview({ survey, cycle: '0', lang: 'en', maxNodeDefs: 3 })
+    expect(overview.nodeDefs.map((def: any) => [def.name, def.attributes])).toEqual([
+      ['cluster', 2],
+      ['plot', 1],
+      ['tree', 1],
+    ])
+    expect(overview).toMatchObject({ attributesOmitted: true, truncated: false, total: 7 })
+  })
+
+  test('with an entity it lists the children of that entity', async () => {
+    const result: any = await runTool(surveyGetOverviewTool, { entity: 'plot' }, ctxWithSurvey())
+    expect(result.nodeDefs.map((def: any) => def.name)).toEqual(['plot_id', 'tree'])
+    expect(result).toMatchObject({ entity: 'plot', truncated: false })
+    expect(result.attributesOmitted).toBeUndefined()
+    const unknown: any = await runTool(surveyGetOverviewTool, { entity: 'plott' }, ctxWithSurvey())
+    expect(unknown.error).toMatchObject({ code: 'nodeDefNotFound', closestNames: expect.arrayContaining(['plot']) })
   })
 
   test('requires an open survey the user can view', () => {
@@ -184,9 +196,17 @@ describe('result budget', () => {
     const result: any = await runTool(surveyGetOverviewTool, {}, createToolContext({ survey: big }))
     expect(result.json).toBeUndefined()
     expect(JSON.stringify(result).length).toBeLessThan(AiLimits.assistantToolResultMaxChars)
-    expect(result.truncated).toBe(true)
     expect(result.total).toBe(603)
-    expect(result.nodeDefs.length).toBeLessThan(603)
+    // too large for one result: the entities, and the attributes of one entity on demand
+    expect(result.nodeDefs.map((def: any) => [def.name, def.attributes])).toEqual([
+      ['root', 401],
+      ['wide', 200],
+    ])
+    expect(result).toMatchObject({ attributesOmitted: true, truncated: false })
+    const wide: any = await runTool(surveyGetOverviewTool, { entity: 'wide' }, createToolContext({ survey: big }))
+    expect(JSON.stringify(wide).length).toBeLessThan(AiLimits.assistantToolResultMaxChars)
+    expect(wide.nodeDefs[0].name).toBe('w_0')
+    expect(wide).toMatchObject({ truncated: true, total: 200 })
   })
 
   test('nodeDef_get caps the children', async () => {
