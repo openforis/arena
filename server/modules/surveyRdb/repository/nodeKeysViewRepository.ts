@@ -1,11 +1,10 @@
 import type { Survey as ArenaSurvey } from '@openforis/arena-core'
-import { db, DbClient } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { ViewDataNodeDef } from '@common/model/db'
 
-import * as RDBDataView from '../schemaRdb/dataView'
 import * as NodeKeysView from '../schemaRdb/nodeKeysView'
 
 // ====== CREATE
@@ -25,9 +24,9 @@ export const createNodeKeysView = async (survey: ArenaSurvey, client: DbClient =
             ${viewDataNodeDef.columnNodeDefUuid.name} AS ${NodeKeysView.columns.nodeUuid},
             '${NodeDef.getUuid(nodeDef)}' AS ${NodeKeysView.columns.nodeDefUuid},
             ${ViewDataNodeDef.columnSet.recordUuid} AS ${NodeKeysView.columns.recordUuid},
-            ${RDBDataView.columns.keys} AS ${NodeKeysView.columns.keys}
+            ${ViewDataNodeDef.columnSet.keys} AS ${NodeKeysView.columns.keys}
         FROM
-            ${RDBDataView.getNameWithSchema(surveyId)(nodeDef)}  
+            ${viewDataNodeDef.nameQualified}  
       `)
   })
 

@@ -586,6 +586,12 @@ export const countDataTableRows = async (
   return Number(countRS.count)
 }
 
+// column values are primitives (objects, if any, are compared as JSON)
+const _valueToLiteralString = (value: unknown): string | null => {
+  if (Objects.isNil(value)) return null
+  return typeof value === 'object' ? JSON.stringify(value) : String(value)
+}
+
 const countDuplicateRecordsByNodeDefs = (
   { survey, record, nodeDefsUnique }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefsUnique: any },
   client: DbClient = db
@@ -608,7 +614,7 @@ const countDuplicateRecordsByNodeDefs = (
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const colValue = TableDataNodeDefColUtils.getValue(survey, nodeDefUnique, nodeUnique)
-      const colValueString = A.isNil(colValue) ? null : String(colValue)
+      const colValueString = _valueToLiteralString(colValue)
       const value = Expression.newLiteral(colValueString)
 
       const condition = Expression.newBinary({
@@ -667,7 +673,7 @@ export const fetchRecordsCountByRootNodesValue = (
 
   const nodeValues = nodeDefs.map((nodeDef, idx) => {
     const value = TableDataNodeDefColUtils.getValue(survey, nodeDef, nodes[idx])
-    return Objects.isNil(value) ? null : String(value)
+    return _valueToLiteralString(value)
   })
 
   const filterColumns = nodeDefs.map((nodeDef) => NodeDefTable.getColumnName(nodeDef))
