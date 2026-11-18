@@ -26,7 +26,7 @@ export const formats = {
   dateDefault: DateFormats.dateDisplay,
   dateISO: DateFormats.dateStorage,
   datetimeDefault: DateFormats.datetimeDefault,
-  datetimeExport: 'YYYY-MM-DD HH:mm:ss',
+  datetimeExport: DateFormats.datetimeExport,
   datetimeDisplay: DateFormats.datetimeDisplay,
   datetimeISO: DateFormats.datetimeStorage,
   timeStorage: DateFormats.timeStorage,

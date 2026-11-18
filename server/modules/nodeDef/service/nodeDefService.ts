@@ -28,9 +28,6 @@ import * as NodeDefManager from '../manager/nodeDefManager'
 import type { NodeDefPropsUpdate } from '../repository/nodeDefRepository'
 import * as DbUtils from '@server/db/dbUtils'
 
-// NodeDefEntityChildPosition (arena-core) lacks the minimum size props set by the form layout
-type LayoutPosition = NodeDefEntityChildPosition & { minH?: number; minW?: number }
-
 const fetchSurvey = ({ surveyId, cycle }: { surveyId: number; cycle?: string }, client: DbClient = db) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     { surveyId, cycle, draft: true, advanced: true, validate: false },
@@ -438,7 +435,7 @@ const _insertClonedNodeDefsAndUpdateLayout = async ({
 
   const preferredLayoutByCycle = layoutRefPosition
     ? cycleKeys.reduce((acc, cycle) => {
-        const { minH, minW, h, w } = layoutRefPosition as LayoutPosition
+        const { minH, minW, h, w } = layoutRefPosition
         acc[cycle] = { minH, minW, h, w }
         return acc
       }, {})

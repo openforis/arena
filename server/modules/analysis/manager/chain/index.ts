@@ -1,11 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import {
-  Authorizer,
-  ChainFactory,
-  type Chain as ArenaChain,
-  type ChainProps,
-  type User as ArenaUser,
-} from '@openforis/arena-core'
+import { Authorizer, ChainFactory, type Chain as ArenaChain, type User as ArenaUser } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
@@ -55,8 +49,7 @@ export const create = async ({ user, surveyId }: { user: ArenaUser; surveyId: nu
   const cycles = Survey.getCycleKeys(surveyInfo)
   const defaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-  // cycles: stored in the chain props but not declared by the arena-core ChainProps
-  let chain = ChainFactory.createInstance({ cycles } as ChainProps)
+  let chain = ChainFactory.createInstance({ cycles })
 
   const validation = await ChainValidator.validateChain({ chain, defaultLang, survey })
 

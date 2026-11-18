@@ -1,4 +1,3 @@
-import type { DateFormats } from '@openforis/arena-core'
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
@@ -64,8 +63,7 @@ export default class SurveysListExportJob extends Job {
             ? DateUtils.convertDate({
                 dateStr: value,
                 formatFrom: DateUtils.formats.datetimeISO,
-                // not one of the arena-core DateFormats, but a valid format
-                formatTo: DateUtils.formats.datetimeExport as DateFormats,
+                formatTo: DateUtils.formats.datetimeExport,
               })
             : value
         transformedSurveySummary[key] = valueTransformed
