@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import * as DB from '../../../../db'
 
 import { TableChain } from '../../../../../common/model/db'
@@ -15,7 +16,7 @@ import { TableChain } from '../../../../../common/model/db'
  *
  * @returns {Promise<null>} - The result promise.
  */
-export const updateChain = async (params, client = DB.client) => {
+export const updateChain = async (params: any, client: DbClient = DB.client) => {
   const { surveyId, chainUuid, fields = {}, dateExecuted = false, dateModified = false } = params
 
   if (!surveyId || !chainUuid)
@@ -33,7 +34,8 @@ export const updateChain = async (params, client = DB.client) => {
 
   if (setFields.length === 0) throw new Error(`At least one among fields, dateExecuted or dateModified is required`)
 
-  return client.none(
+  // async: the params validation errors must reject, not throw
+  return await client.none(
     `UPDATE ${table.nameQualified}
     SET ${setFields.join(', ')}
     WHERE ${TableChain.columnSet.uuid} = $1`,

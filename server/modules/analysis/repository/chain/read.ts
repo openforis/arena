@@ -1,14 +1,13 @@
-import { BaseProtocol } from '@openforis/arena-server'
+import type { DbClient } from '@server/db/db'
 
 import { TableChain } from '@common/model/db'
-import * as Chain from '@common/analysis/chain'
 
 import * as A from '@core/arena'
 
 import * as DB from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-export const transformCallback = (row) => {
+export const transformCallback = (row: any) => {
   if (!row) return {}
   return A.pipe(DB.mergeProps(), A.camelizePartial({ limitToLevel: 1 }))(row)
 }
@@ -22,10 +21,10 @@ export const transformCallback = (row) => {
  *
  * @returns {Promise<number>} - The result promise.
  */
-export const countChains = async (params, client = DB.client) => {
+export const countChains = (params: any, client: DbClient = DB.client) => {
   const { surveyId } = params
   const tableChain = new TableChain(surveyId)
-  return client.one(`${tableChain.getSelect({ surveyId, count: true })}`, [], (row) => Number(row.count))
+  return client.one(`${tableChain.getSelect({ count: true })}`, [], (row) => Number(row.count))
 }
 
 /**
@@ -40,13 +39,13 @@ export const countChains = async (params, client = DB.client) => {
  *
  * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchChains = async (params, client = DB.client) => {
+export const fetchChains = (params: any, client: DbClient = DB.client) => {
   const { surveyId, offset = 0, limit = null, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)
 
   return client.map(
-    `${tableChain.getSelect({ surveyId, includeScript })}
+    `${tableChain.getSelect({ includeScript })}
     ORDER BY ${tableChain.columnDateCreated} DESC
     LIMIT $1
     OFFSET $2`,
@@ -66,7 +65,7 @@ export const fetchChains = async (params, client = DB.client) => {
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
-export const fetchChain = async (params, client = DB.client) => {
+export const fetchChain = (params: any, client: DbClient = DB.client) => {
   const { surveyId, chainUuid, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)

@@ -1,4 +1,5 @@
-import { DB, BaseProtocol } from '@openforis/arena-server'
+import type { DbClient } from '@server/db/db'
+import { DB } from '@openforis/arena-server'
 
 import * as Chain from '@common/analysis/chain'
 import { TableChain } from '../../../../../common/model/db'
@@ -12,7 +13,7 @@ import { transformCallback } from './read'
  * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChain = async (params, client = DB) => {
+export const insertChain = (params: any, client: DbClient = DB) => {
   const { surveyId, chain } = params
   const tableChain = new TableChain(surveyId)
 
@@ -37,7 +38,7 @@ export const insertChain = async (params, client = DB) => {
  * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChainFull = async (params, client = DB) => {
+export const insertChainFull = (params: any, client: DbClient = DB) => {
   const { surveyId, chain, scriptCommon = null, scriptEnd = null } = params
   const tableChain = new TableChain(surveyId)
 

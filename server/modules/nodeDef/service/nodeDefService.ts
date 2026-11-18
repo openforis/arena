@@ -211,7 +211,7 @@ export const updateNodeDefProps = (
   }: {
     user: ArenaUser
     surveyId: number
-    cycle: string
+    cycle?: string
     nodeDefUuid: string
     parentUuid: string
     props?: Record<string, any>
@@ -573,7 +573,12 @@ export const markNodeDefDeleted = (
   })
 
 export const markNodeDefsDeleted = async (
-  { user, surveyId, cycle, nodeDefUuids }: { user: ArenaUser; surveyId: number; cycle: string; nodeDefUuids: string[] },
+  {
+    user,
+    surveyId,
+    cycle,
+    nodeDefUuids,
+  }: { user: ArenaUser; surveyId: number; cycle?: string; nodeDefUuids: string[] },
   client: DbClient = db
 ) => {
   let response = { nodeDefsUpdated: {}, nodeDefsValidation: {} }
