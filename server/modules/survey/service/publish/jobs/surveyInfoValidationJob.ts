@@ -6,7 +6,9 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyManager from '../../../manager/surveyManager'
 
 export default class SurveyInfoValidationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyInfoValidationJob'
+
+  constructor(params?: any) {
     super(SurveyInfoValidationJob.type, params)
   }
 
@@ -24,5 +26,3 @@ export default class SurveyInfoValidationJob extends Job {
     }
   }
 }
-
-SurveyInfoValidationJob.type = 'SurveyInfoValidationJob'

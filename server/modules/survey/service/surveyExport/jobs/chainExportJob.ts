@@ -3,7 +3,7 @@ import * as AnalysisService from '@server/modules/analysis/service'
 import { ExportFile } from '../exportFile'
 
 export default class ChainExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('ChainExportJob', params)
   }
 

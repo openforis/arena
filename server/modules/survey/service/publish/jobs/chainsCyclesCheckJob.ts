@@ -8,7 +8,9 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
 export default class ChainsCyclesCheckJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'ChainsCyclesCheckJob'
+
+  constructor(params?: any) {
     super(ChainsCyclesCheckJob.type, params)
   }
 
@@ -33,5 +35,3 @@ export default class ChainsCyclesCheckJob extends Job {
     return { cycleKeys }
   }
 }
-
-ChainsCyclesCheckJob.type = 'ChainsCyclesCheckJob'

@@ -7,7 +7,7 @@ import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schem
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 export default class DataDeleteJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('DataDeleteJob', params)
   }
 

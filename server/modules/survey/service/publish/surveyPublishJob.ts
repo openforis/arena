@@ -20,7 +20,9 @@ import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
 import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
 
 export default class SurveyPublishJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyPublishJob'
+
+  constructor(params?: any) {
     super(SurveyPublishJob.type, params, [
       new NodeDefsValidationJob(),
       new CategoriesValidationJob(),
@@ -57,5 +59,3 @@ export default class SurveyPublishJob extends Job {
     }
   }
 }
-
-SurveyPublishJob.type = 'SurveyPublishJob'

@@ -14,7 +14,15 @@ import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
 import InfoExportJob from './jobs/infoExportJob'
 
-const createInnerJobs = ({ backup, includeResultAttributes, includeActivityLog }) => {
+const createInnerJobs = ({
+  backup,
+  includeResultAttributes,
+  includeActivityLog,
+}: {
+  backup: boolean
+  includeResultAttributes: boolean
+  includeActivityLog: boolean
+}) => {
   // records, files, activity log are included only if exporting survey as backup (not cloning)
   return [
     new SurveyInfoExportJob(),
@@ -29,6 +37,8 @@ const createInnerJobs = ({ backup, includeResultAttributes, includeActivityLog }
 }
 
 export default class SurveyExportJob extends ZipFileCreatorBaseJob {
+  static readonly type: string = 'SurveyExportJob'
+
   /**
    * It creates a survey export job that exports a survey including node definitions, categories, taxonomies, chains and users.
    * If the export is for a backup, it includes also records, files and activity log.
@@ -41,7 +51,7 @@ export default class SurveyExportJob extends ZipFileCreatorBaseJob {
    * @param {boolean} [params.includeActivityLog] - If true, includes the activity log in the export.
    * @returns {SurveyExportJob} - The export job.
    */
-  constructor(params) {
+  constructor(params?: any) {
     const { backup = true, includeResultAttributes = true, includeActivityLog = true } = params
     super(
       SurveyExportJob.type,
@@ -73,5 +83,3 @@ export default class SurveyExportJob extends ZipFileCreatorBaseJob {
     return DownloadAuthTokenUtils.generateToken({ userUuid, fileName: outputFileName })
   }
 }
-
-SurveyExportJob.type = 'SurveyExportJob'

@@ -17,7 +17,7 @@ const SURVEY_FILE_TYPES_TO_EXPORT = [
 ]
 
 export default class SurveyFilesExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('SurveyFilesExportJob', params)
   }
 

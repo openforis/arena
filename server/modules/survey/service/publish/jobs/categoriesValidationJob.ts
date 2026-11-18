@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import Job from '@server/job/job'
@@ -7,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
 
-const _removeWarnings = (validation) => {
+const _removeWarnings = (validation: ArenaValidation): ArenaValidation => {
   const fieldValidations = Validation.getFieldValidations(validation)
 
   // remove warnings from fields validations
@@ -38,7 +39,9 @@ const _removeWarnings = (validation) => {
 }
 
 export default class CategoriesValidationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'CategoriesValidationJob'
+
+  constructor(params?: any) {
     super(CategoriesValidationJob.type, params)
   }
 
@@ -69,5 +72,3 @@ export default class CategoriesValidationJob extends Job {
     }
   }
 }
-
-CategoriesValidationJob.type = 'CategoriesValidationJob'

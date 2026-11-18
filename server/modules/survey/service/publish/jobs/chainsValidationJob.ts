@@ -9,7 +9,9 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as DbUtils from '@server/db/dbUtils'
 
 export default class ChainsValidationJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'ChainsValidationJob'
+
+  constructor(params?: any) {
     super(ChainsValidationJob.type, params)
   }
 
@@ -24,19 +26,17 @@ export default class ChainsValidationJob extends Job {
     const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
     const validations = await Promise.all(
-      chains.map(async (chain) => ChainValidator.validateChain({ chain, defaultLang, survey }))
+      chains.map((chain) => ChainValidator.validateChain({ chain, defaultLang, survey }))
     )
-    validations.forEach((validation, index) => {
+    for (const [index, validation] of validations.entries()) {
       if (!Validation.isValid(validation)) {
         const chain = chains[index]
         this.addError(Validation.getFieldValidations(validation), Chain.getLabel(defaultLang)(chain))
       }
-    })
+    }
 
     if (this.hasErrors()) {
       await this.setStatusFailed()
     }
   }
 }
-
-ChainsValidationJob.type = 'ChainsValidationJob'

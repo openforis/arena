@@ -1,4 +1,4 @@
-import { Objects } from '@openforis/arena-core'
+import { Objects, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
@@ -8,7 +8,7 @@ import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { ExportFile } from '../exportFile'
 
-const keepOnlyOneCycle = ({ survey, cycle }) => {
+const keepOnlyOneCycle = ({ survey, cycle }: { survey: ArenaSurvey; cycle: string }) => {
   // create new cycle and set it in survey cycles
   Object.assign(survey[Survey.infoKeys.props], {
     [Survey.infoKeys.cycles]: {
@@ -24,7 +24,7 @@ const keepOnlyOneCycle = ({ survey, cycle }) => {
 }
 
 export default class SurveyInfoExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('SurveyInfoExportJob', params)
   }
 

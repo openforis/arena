@@ -6,7 +6,7 @@ import * as UserService from '@server/modules/user/service/userService'
 import { ExportFile } from '../exportFile'
 
 export default class UsersExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('UsersExportJob', params)
   }
 

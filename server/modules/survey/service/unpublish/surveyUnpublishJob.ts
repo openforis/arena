@@ -7,7 +7,9 @@ import SurveyPropsUnpublishPublishJob from './jobs/surveyPropsUnpublishJob'
 import DataDeleteJob from './jobs/dataDeleteJob'
 
 export default class SurveyUnpublishJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'SurveyUnpublishJob'
+
+  constructor(params?: any) {
     super(SurveyUnpublishJob.type, params, [new SurveyPropsUnpublishPublishJob(), new DataDeleteJob()])
   }
 
@@ -17,5 +19,3 @@ export default class SurveyUnpublishJob extends Job {
     await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyUnpublish, null, false, this.tx)
   }
 }
-
-SurveyUnpublishJob.type = 'SurveyUnpublishJob'

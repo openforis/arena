@@ -10,7 +10,9 @@ import * as RecordManager from '../../../../record/manager/recordManager'
 import * as UserManager from '../../../../user/manager/userManager'
 
 export default class CyclesDeletedCheckJob extends Job {
-  constructor(params) {
+  static readonly type: string = 'CyclesDeletedCheckJob'
+
+  constructor(params?: any) {
     super(CyclesDeletedCheckJob.type, params)
   }
 
@@ -57,5 +59,3 @@ export default class CyclesDeletedCheckJob extends Job {
     return []
   }
 }
-
-CyclesDeletedCheckJob.type = 'CyclesDeletedCheckJob'
