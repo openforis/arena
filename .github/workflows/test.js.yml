@@ -15,6 +15,8 @@ env:
   # required by arena-server unless NODE_ENV is development or test: throwaway values for the CI server
   USER_AUTH_TOKEN_SECRET: ci-user-auth-token-secret
   USER_2FA_SECRET: ci-user-2fa-secret
+  # throwaway key for the CI server: encrypts the client secrets of the login providers created by the e2e tests
+  AUTH_PROVIDER_SECRET_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 
 jobs:
   build:

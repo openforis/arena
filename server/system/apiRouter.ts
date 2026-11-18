@@ -27,6 +27,7 @@ import * as messageApi from '@server/modules/message/api'
 import * as fileDownloadApi from '@server/modules/fileDownload/api/fileDownloadApi'
 import * as aiApi from '@server/modules/ai/api/aiApi'
 import * as surveyCompareApi from '@server/modules/surveyCompare/api/surveyCompareApi'
+import * as authProviderApi from '@server/modules/authProvider/api/authProviderApi'
 
 export const router = expressRouter()
 
@@ -58,6 +59,7 @@ analysisApi.init(router)
 
 jobApi.init(router)
 systemLogApi.init(router)
+authProviderApi.init(router)
 
 expressionApi.init(router)
 

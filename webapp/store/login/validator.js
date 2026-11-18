@@ -15,12 +15,15 @@ const _validatePasswordConfirm = (propName, item) => {
   return password !== passwordConfirm ? { key: Validation.messageKeys.user.passwordsDoNotMatch } : null
 }
 
+// external login: only the 2FA code is entered (the user has signed in at the provider)
 export const validateLoginObj =
-  ({ requireTwoFactorToken = false } = {}) =>
+  ({ requireTwoFactorToken = false, externalLogin = false } = {}) =>
   async (obj) =>
     Validator.validate(obj, {
-      email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
-      password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired)],
+      email: externalLogin
+        ? []
+        : [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
+      password: externalLogin ? [] : [Validator.validateRequired(Validation.messageKeys.user.passwordRequired)],
       twoFactorToken: requireTwoFactorToken
         ? [Validator.validateRequired(Validation.messageKeys.user.twoFactorTokenRequired)]
         : [],

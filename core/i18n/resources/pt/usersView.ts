@@ -23,6 +23,23 @@ Copiar o link de redefinição de senha para a área de transferência?`,
   notAcceptedYet: 'Convite ainda não aceito',
   passwordResetLinkCopiedToClipboard: 'Link de redefinição de senha copiado para a área de transferência',
   passwordResetLink: 'Link de redefinição de senha',
+  signInMethods: {
+    title: 'Métodos de início de sessão',
+    password: 'Palavra-passe',
+    passwordSet: 'Definida',
+    passwordNotSet: 'Não definida: entra com um fornecedor externo',
+    setPassword: 'Definir uma palavra-passe',
+    linkWith: 'Associar {{provider}}',
+    unlink: 'Desassociar',
+    lastUsed: 'última utilização {{date}}',
+    lastMethodHint:
+      'Defina uma palavra-passe ou associe outro fornecedor antes de desassociar o último método de início de sessão.',
+    unlinkConfirm: 'Desassociar {{provider}}? Deixará de poder ser usado para entrar nesta conta.',
+    unlinkLastMethodConfirm:
+      'Desassociar {{provider}}? É o último método de início de sessão deste utilizador: só poderá voltar a entrar com "Esqueceu a palavra-passe?".',
+    linked: 'Fornecedor associado à sua conta.',
+    unlinked: 'Fornecedor desassociado.',
+  },
   prefs: {
     title: 'Preferências de notificação',
     notifyOnUserAccessRequest: 'Novas solicitações de acesso de usuários',

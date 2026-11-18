@@ -26,6 +26,29 @@ export default {
 
   Ingrese el código generado por su aplicación de autenticación.`,
   },
+  externalLogin: {
+    signInWith: 'Iniciar sesión con {{provider}}',
+    continueWith: 'Continuar con {{provider}}',
+    errors: {
+      providerNotAvailable:
+        'Esta opción de inicio de sesión no está disponible. Inténtelo más tarde o inicie sesión con su correo electrónico y contraseña.',
+      flowInvalid: 'El inicio de sesión ha caducado o se inició en otro navegador. Inténtelo de nuevo.',
+      providerError: 'El inicio de sesión con el proveedor externo ha fallado. Inténtelo de nuevo.',
+      emailNotVerified:
+        'El proveedor no confirmó su dirección de correo electrónico, por lo que no se puede asociar a una cuenta. Inicie sesión con su contraseña y vincule el proveedor desde su perfil.',
+      emailDomainNotAllowed:
+        'Las cuentas con este dominio de correo electrónico no pueden usar esta opción de inicio de sesión.',
+      userNotFound:
+        'No existe ninguna cuenta con esta dirección de correo electrónico. Pida una invitación a un administrador de la encuesta o solicite acceso.',
+      ambiguousEmail:
+        'Más de una cuenta corresponde a esta dirección de correo electrónico. Inicie sesión con su contraseña y vincule el proveedor desde su perfil.',
+      identityAlreadyLinked: 'Esta cuenta del proveedor ya está vinculada a otro usuario.',
+      providerAlreadyLinked:
+        'Otra cuenta de este proveedor ya está vinculada a su usuario: desvincúlela primero desde su perfil.',
+      invitationInvalid: 'La invitación no es válida o ha caducado. Pida una nueva al administrador de la encuesta.',
+      invalidTwoFactorCode: 'Código de verificación no válido.',
+    },
+  },
   accessRequestView: {
     whatHappensNext: '¿Qué sucede después?',
     alreadyHaveAnAccount: '¿Ya tiene una cuenta?',

@@ -301,6 +301,14 @@ export const systemAdminModules = {
     key: 'message',
     path: 'message',
   },
+  authProviders: {
+    key: 'authProviders',
+    path: 'authProviders',
+  },
+  authProvider: {
+    key: 'authProvider',
+    path: 'authProvider',
+  },
 }
 
 export const helpModules = {

@@ -400,6 +400,8 @@ Réessayer ?`,
     systemAdmin: 'Administration du système',
     jobMonitor: 'Moniteur des tâches',
     systemLogs: 'Journaux système',
+    authProviders: 'Fournisseurs de connexion',
+    authProvider: 'Fournisseur de connexion',
 
     help: 'Aide',
     about: 'À propos',

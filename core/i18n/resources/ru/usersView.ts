@@ -24,6 +24,22 @@ export default {
   notAcceptedYet: 'Приглашение еще не принято',
   passwordResetLinkCopiedToClipboard: 'Ссылка для сброса пароля скопирована в буфер обмена',
   passwordResetLink: 'Ссылка для сброса пароля',
+  signInMethods: {
+    title: 'Способы входа',
+    password: 'Пароль',
+    passwordSet: 'Задан',
+    passwordNotSet: 'Не задан: вход через внешнего провайдера',
+    setPassword: 'Задать пароль',
+    linkWith: 'Привязать {{provider}}',
+    unlink: 'Отвязать',
+    lastUsed: 'последнее использование {{date}}',
+    lastMethodHint: 'Задайте пароль или привяжите другого провайдера, прежде чем отвязывать последний способ входа.',
+    unlinkConfirm: 'Отвязать {{provider}}? Его больше нельзя будет использовать для входа в эту учётную запись.',
+    unlinkLastMethodConfirm:
+      'Отвязать {{provider}}? Это последний способ входа этого пользователя: вернуться он сможет только через «Забыли пароль?».',
+    linked: 'Провайдер привязан к вашей учётной записи.',
+    unlinked: 'Провайдер отвязан.',
+  },
   prefs: {
     title: 'Настройки уведомлений',
     notifyOnUserAccessRequest: 'Новые запросы на доступ',

@@ -7,18 +7,35 @@ import { appModules, appModuleUri } from '@webapp/app/appModules'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import { AppInfo } from '@core/app/appInfo'
 
+import * as LoginState from './state'
 import { ViewState } from './state'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
 export const loginViewStateUpdate = 'login/viewState/update'
 export const reset = 'login/reset'
+export const loginExternalLoginUpdate = 'login/externalLogin/update'
 
 export const setEmail = (email) => (dispatch) => dispatch({ type: loginEmailUpdate, email })
 export const setLoginError = (message) => (dispatch) => dispatch({ type: loginErrorUpdate, message })
 export const setViewState = (viewState) => (dispatch) => dispatch({ type: loginViewStateUpdate, viewState })
+export const setExternalLogin = (externalLogin) => (dispatch) =>
+  dispatch({ type: loginExternalLoginUpdate, externalLogin })
 
 const resetState = (dispatch) => dispatch({ type: reset })
+
+const externalLoginErrorKeyPrefix = 'externalLogin.'
+
+/**
+ * Converts the error keys of the external login ("externalLogin.userNotFound") to i18n keys.
+ * @param {string} errorKey - The error key returned by the server.
+ * @returns {string} - The i18n key.
+ */
+export const toExternalLoginErrorMessageKey = (errorKey) =>
+  `guest:externalLogin.errors.${String(errorKey).replace(externalLoginErrorKeyPrefix, '')}`
+
+const toErrorMessageKey = (messageKey) =>
+  messageKey?.startsWith(externalLoginErrorKeyPrefix) ? toExternalLoginErrorMessageKey(messageKey) : messageKey
 
 const _createAction = (handlerFn) => async (dispatch, getState) => {
   try {
@@ -28,18 +45,25 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
     await handlerFn(dispatch, getState)
   } catch (error) {
     // no message from the server (e.g. server unreachable): don't show technical details like "AxiosError: ..."
-    const messageKey = error?.response?.data?.message || 'appErrors:networkError'
+    const messageKey = toErrorMessageKey(error?.response?.data?.message) || 'appErrors:networkError'
     dispatch(setLoginError(messageKey))
   } finally {
     dispatch(LoaderActions.hideLoader())
   }
 }
 
+const postLogin = ({ email, password, twoFactorToken, externalLogin }) =>
+  externalLogin
+    ? // 2FA step of a sign-in with an external provider: the pending login is in a cookie set by the server
+      axios.post('/auth/oidc/_2fa', { twoFactorToken, appInfo: AppInfo.currentAppInfo })
+    : axios.post('/auth/login', { email, password, twoFactorToken, appInfo: AppInfo.currentAppInfo })
+
 export const login = (email, password, twoFactorToken) =>
-  _createAction(async (dispatch) => {
+  _createAction(async (dispatch, getState) => {
+    const externalLogin = LoginState.isExternalLogin(getState())
     const {
       data: { message, user, twoFactorRequired, authToken },
-    } = await axios.post('/auth/login', { email, password, twoFactorToken, appInfo: AppInfo.currentAppInfo })
+    } = await postLogin({ email, password, twoFactorToken, externalLogin })
     if (user) {
       ApiConstants.setAuthToken(authToken)
       dispatch(resetState)

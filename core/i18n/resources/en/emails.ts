@@ -93,6 +93,20 @@ export default {
              <p>If you did not request a password reset, please ignore this email or let us know.</p>
              $t(emails:signature)`,
   },
+  authProviderUnlinked: {
+    subject: '$t(common.appNameFull): {{providerLabel}} unlinked from your account',
+    body: `<p>Hello {{name}},</p>
+      <p>Your <strong>{{providerLabel}}</strong> account has been unlinked from your $t(common.appNameFull) account: you can no longer use it to sign in.</p>
+      <p>If you did not make this change, please contact the $t(common.appNameFull) administrators.</p>
+      $t(emails:signature)`,
+  },
+  authProviderDeleted: {
+    subject: '$t(common.appNameFull): sign-in with {{providerLabel}} is no longer available',
+    body: `<p>Hello {{name}},</p>
+      <p>Signing in to $t(common.appNameFull) with <strong>{{providerLabel}}</strong> is no longer available, and it was your only way to sign in.</p>
+      <p>To get back into your account, set a password with "Forgot password?" on the login page: <a href="{{serverUrl}}/guest/forgotPassword">{{serverUrl}}/guest/forgotPassword</a></p>
+      $t(emails:signature)`,
+  },
   userDeleted: {
     subject: `You have been removed from the survey {{surveyLabel}} in $t(common.appNameFull)`,
     body: `<p>Hello {{name}},</p>

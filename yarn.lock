@@ -4059,9 +4059,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.8.15":
-  version: 2.8.15
-  resolution: "@openforis/arena-server@npm:2.8.15"
+"@openforis/arena-server@npm:^2.8.17":
+  version: 2.8.17
+  resolution: "@openforis/arena-server@npm:2.8.17"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1159.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -4079,6 +4079,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.3"
     jszip: "npm:^3.10.2"
     log4js: "npm:^6.9.1"
+    openid-client: "npm:^6"
     otplib: "npm:^13.5.0"
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"
@@ -4086,7 +4087,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/1950d5546d60e0fa7fb16371da40bf06a97b2f9e9419cfaa6802ba30cf1e540c79ef13787a8cee2e90d82dd66bbb6282d28d1a72da7e7c2d964843a22c4a4f0d
+  checksum: 10c0/10e72bf6705034d202663512f577ef734540f0de1808574f7d2f8b7b8330645c42dcbe447b8dd908bc341fdf50c6e4b9dbaad5effcabc6556c7c5e6f3bbc6a0c
   languageName: node
   linkType: hard
 
@@ -7406,6 +7407,13 @@ __metadata:
   bin:
     baseline-browser-mapping: dist/cli.cjs
   checksum: 10c0/48322036bee156d700d1511045abcce3be6cd596d4fadd2e383960ba4206ef4f5eb8c1485481443f931e9b972ab5d9a6f91ec19e7e7778c197fcda88bcf27349
+  languageName: node
+  linkType: hard
+
+"basic-auth@npm:^3.0.0":
+  version: 3.1.0
+  resolution: "basic-auth@npm:3.1.0"
+  checksum: 10c0/b81095162f858ce06e9cba6ccef5571ae04f9d8210943b813f956ae280add2e1941cd28577106f0e591624e1e86911fe18824383a9be89e1c3b3627c3fcb037c
   languageName: node
   linkType: hard
 
@@ -13521,6 +13529,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jose@npm:^6.2.12, jose@npm:^6.2.15":
+  version: 6.2.17
+  resolution: "jose@npm:6.2.17"
+  checksum: 10c0/1a00d44656e38664c54a8b2d903b6c947b3fc4275f7ede2462f74e50ce320359ea324deba15652dcc158c14ed99135a2382a4c5718be350923a9e583bea727db
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^10.0.0":
   version: 10.0.0
   resolution: "js-tokens@npm:10.0.0"
@@ -15252,6 +15267,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"oauth2-mock-server@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "oauth2-mock-server@npm:9.3.0"
+  dependencies:
+    basic-auth: "npm:^3.0.0"
+    jose: "npm:^6.2.12"
+  bin:
+    oauth2-mock-server: dist/oauth2-mock-server.mjs
+  checksum: 10c0/f392f5e6419581a9fbecf2ebee78ed0c4ea275419be0dee100341b466d300b26a9b3c7f120e151db27ba5a10d863733f5391213dbc934a8a44a8bb371c9a8bfb
+  languageName: node
+  linkType: hard
+
+"oauth4webapi@npm:^3.8.8":
+  version: 3.8.8
+  resolution: "oauth4webapi@npm:3.8.8"
+  checksum: 10c0/1f7d35ba8d7d5aa9ce9ec5959a4611ed2b5dd7830172b1546749b91dda8c53f7934e669c6f81e912c64e3ae4fc681d4d6ce149b42cc9d17db97162bf8765e028
+  languageName: node
+  linkType: hard
+
 "object-assign@npm:^4, object-assign@npm:^4.1.1":
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
@@ -15427,7 +15461,7 @@ __metadata:
     "@mui/x-tree-view": "npm:^9.18.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
     "@openforis/arena-core": "npm:^2.23.0"
-    "@openforis/arena-server": "npm:^2.8.15"
+    "@openforis/arena-server": "npm:^2.8.17"
     "@playwright/test": "npm:1.65.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@react-leaflet/core": "npm:3.0.0"
@@ -15532,6 +15566,7 @@ __metadata:
     nodemailer: "npm:^10.5.0"
     nodemon: "npm:^3.1.14"
     npm-run-all: "npm:^4.1.5"
+    oauth2-mock-server: "npm:^9.3.0"
     optimize-css-assets-webpack-plugin: "npm:^6.0.1"
     path: "npm:^0.12.7"
     pg: "npm:^8.23.1"
@@ -15608,6 +15643,16 @@ __metadata:
   bin:
     opener: bin/opener-bin.js
   checksum: 10c0/dd56256ab0cf796585617bc28e06e058adf09211781e70b264c76a1dbe16e90f868c974e5bf5309c93469157c7d14b89c35dc53fe7293b0e40b4d2f92073bc79
+  languageName: node
+  linkType: hard
+
+"openid-client@npm:^6":
+  version: 6.9.0
+  resolution: "openid-client@npm:6.9.0"
+  dependencies:
+    jose: "npm:^6.2.15"
+    oauth4webapi: "npm:^3.8.8"
+  checksum: 10c0/546f9404f869f8168ed6760ab764f4c7105d8a712879caa801c7a65da0d5c57166536700578df56638bbd701b73696439bdbff91c150ea3550d25e32c8ef5e9d
   languageName: node
   linkType: hard
 

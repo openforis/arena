@@ -15,6 +15,9 @@ const actionHandlers = {
   [LoginActions.loginErrorUpdate]: (state, { message }) => LoginState.assocError(message)(state),
 
   [LoginActions.loginViewStateUpdate]: (state, { viewState }) => LoginState.assocViewState(viewState)(state),
+
+  [LoginActions.loginExternalLoginUpdate]: (state, { externalLogin }) =>
+    LoginState.assocExternalLogin(externalLogin)(state),
 }
 
 export default exportReducer(actionHandlers)

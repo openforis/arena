@@ -1,4 +1,24 @@
 export default {
+  authProvider: {
+    notFound: 'Login provider not found',
+    readOnly: 'This provider is defined in the server configuration and cannot be changed here',
+    idAlreadyUsed: 'The identifier "{{id}}" is already used by another provider',
+    encryptionKeyMissing:
+      'The encryption key of the client secrets (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY) is not configured',
+    validation: 'Some fields are not valid',
+    iconInvalid: 'Invalid icon: use a PNG or SVG file up to 100 KB',
+    identityNotFound: 'Linked account not found',
+    lastSignInMethod: 'This is the last sign-in method: set a password or link another provider first',
+    idInvalid: 'Invalid identifier: use lowercase letters, digits and hyphens (up to 64 characters)',
+    typeInvalid: 'Invalid provider type',
+    labelInvalid: 'The button label is required (up to 64 characters)',
+    issuerInvalid: 'Invalid issuer URL (https is required)',
+    tenantInvalid: 'Invalid tenant',
+    clientIdRequired: 'The client ID is required',
+    scopesMissingOpenid: 'The scopes must include "openid"',
+    emailDomainInvalid: 'Invalid email domain',
+    clientSecretRequired: 'The client secret is required',
+  },
   mapCustomLayers: {
     urlInvalid: 'The service URL is not valid',
     urlNotAllowed: 'Only public http and https addresses can be used',

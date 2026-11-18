@@ -1,6 +1,7 @@
 import activityLog from './activityLog'
 import appErrors from './appErrors'
 import auth from './auth'
+import authProvidersView from './authProvidersView'
 import common from './common'
 import dataExportView from './dataExportView'
 import dataImportView from './dataImportView'
@@ -26,6 +27,7 @@ export default {
   activityLog,
   appErrors,
   auth,
+  authProvidersView,
   common,
   dataExportView,
   dataImportView,

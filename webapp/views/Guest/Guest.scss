@@ -346,6 +346,36 @@ $guestMobileBreakpoint: 900px;
   }
 }
 
+// external login providers (official logos keep their colors; the buttons use the theme)
+.guest-external-login {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.guest-external-login__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid $colorOutline;
+  border-radius: 0.5rem;
+  background-color: $colorSurface;
+  color: $colorOnSurface;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    background-color: with-alpha($colorPrimary, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $colorPrimary;
+    outline-offset: 2px;
+  }
+}
+
 @media screen and (max-width: $guestMobileBreakpoint) {
   .guest__header {
     padding: 0.75rem 1rem;

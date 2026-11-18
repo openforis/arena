@@ -1,4 +1,25 @@
 export default {
+  authProvider: {
+    notFound: 'Proveedor de inicio de sesión no encontrado',
+    readOnly: 'Este proveedor está definido en la configuración del servidor y no se puede modificar aquí',
+    idAlreadyUsed: 'El identificador "{{id}}" ya lo usa otro proveedor',
+    encryptionKeyMissing:
+      'La clave de cifrado de los secretos de cliente (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY) no está configurada',
+    validation: 'Algunos campos no son válidos',
+    iconInvalid: 'Icono no válido: use un archivo PNG o SVG de hasta 100 KB',
+    identityNotFound: 'Cuenta vinculada no encontrada',
+    lastSignInMethod:
+      'Es el último método de inicio de sesión: establezca una contraseña o vincule otro proveedor primero',
+    idInvalid: 'Identificador no válido: use letras minúsculas, dígitos y guiones (hasta 64 caracteres)',
+    typeInvalid: 'Tipo de proveedor no válido',
+    labelInvalid: 'La etiqueta del botón es obligatoria (hasta 64 caracteres)',
+    issuerInvalid: 'URL del emisor no válida (se requiere https)',
+    tenantInvalid: 'Inquilino no válido',
+    clientIdRequired: 'El ID de cliente es obligatorio',
+    scopesMissingOpenid: 'Los ámbitos deben incluir "openid"',
+    emailDomainInvalid: 'Dominio de correo no válido',
+    clientSecretRequired: 'El secreto de cliente es obligatorio',
+  },
   mapCustomLayers: {
     urlInvalid: 'La URL del servicio no es válida',
     urlNotAllowed: 'Solo se pueden usar direcciones http y https públicas',

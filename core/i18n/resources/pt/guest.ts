@@ -26,6 +26,28 @@ export default {
 
 Insira o código gerado pelo seu aplicativo autenticador.`,
   },
+  externalLogin: {
+    signInWith: 'Entrar com {{provider}}',
+    continueWith: 'Continuar com {{provider}}',
+    errors: {
+      providerNotAvailable:
+        'Esta opção de início de sessão não está disponível. Tente mais tarde ou entre com o seu e-mail e palavra-passe.',
+      flowInvalid: 'O início de sessão expirou ou foi iniciado noutro navegador. Tente novamente.',
+      providerError: 'O início de sessão com o fornecedor externo falhou. Tente novamente.',
+      emailNotVerified:
+        'O fornecedor não confirmou o seu endereço de e-mail, por isso não pode ser associado a uma conta. Entre com a sua palavra-passe e associe o fornecedor a partir do seu perfil.',
+      emailDomainNotAllowed: 'As contas com este domínio de e-mail não podem usar esta opção de início de sessão.',
+      userNotFound:
+        'Não existe nenhuma conta com este endereço de e-mail. Peça um convite a um administrador do inquérito ou solicite acesso.',
+      ambiguousEmail:
+        'Mais de uma conta corresponde a este endereço de e-mail. Entre com a sua palavra-passe e associe o fornecedor a partir do seu perfil.',
+      identityAlreadyLinked: 'Esta conta do fornecedor já está associada a outro utilizador.',
+      providerAlreadyLinked:
+        'Outra conta deste fornecedor já está associada ao seu utilizador: desassocie-a primeiro a partir do seu perfil.',
+      invitationInvalid: 'O convite não é válido ou expirou. Peça um novo ao administrador do inquérito.',
+      invalidTwoFactorCode: 'Código de verificação inválido.',
+    },
+  },
   accessRequestView: {
     whatHappensNext: 'O que acontece depois?',
     alreadyHaveAnAccount: 'Já tem uma conta?',

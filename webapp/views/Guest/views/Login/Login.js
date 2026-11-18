@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, Navigate } from 'react-router'
+import { Link, Navigate, useSearchParams } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
@@ -13,6 +13,7 @@ import { EmailInput, PasswordInput, VerificationCodeInput } from '@webapp/compon
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 import Error from '@webapp/views/Guest/Error'
+import { ExternalLoginButtons } from '@webapp/views/Guest/components/ExternalLoginButtons'
 import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import { useI18n } from '@webapp/store/system'
@@ -27,6 +28,27 @@ const FormFields = {
   twoFactorToken: 'twoFactorToken',
 }
 
+// handles the redirect back from an external login provider: error or 2FA step
+const useExternalLoginRedirect = () => {
+  const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    const errorKey = searchParams.get('externalLoginError')
+    const step = searchParams.get('externalLoginStep')
+    if (!errorKey && !step) return
+    if (errorKey) {
+      dispatch(LoginActions.setLoginError(LoginActions.toExternalLoginErrorMessageKey(errorKey)))
+    }
+    if (step === '2fa') {
+      dispatch(LoginActions.setExternalLogin(true))
+      dispatch(LoginActions.setViewState(ViewState.ask2FAToken))
+    }
+    // the params are consumed: a page reload does not show them again
+    setSearchParams({}, { replace: true })
+  }, [dispatch, searchParams, setSearchParams])
+}
+
 const Login = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -35,11 +57,14 @@ const Login = () => {
   const viewState = useSelector(LoginState.getViewState)
   const is2FAViewState = useSelector(LoginState.is2FAViewState)
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
+  const externalLogin = useSelector(LoginState.isExternalLogin)
   const user = useUser()
 
+  useExternalLoginRedirect()
+
   const validatorFn = useCallback(
-    (obj) => LoginValidator.validateLoginObj({ requireTwoFactorToken: is2FAViewState })(obj),
-    [is2FAViewState]
+    (obj) => LoginValidator.validateLoginObj({ requireTwoFactorToken: is2FAViewState, externalLogin })(obj),
+    [is2FAViewState, externalLogin]
   )
 
   const {
@@ -64,6 +89,7 @@ const Login = () => {
   const onClickBack = useCallback(() => {
     setObjectField(FormFields.twoFactorToken, '')
     dispatch(LoginActions.setLoginError(null))
+    dispatch(LoginActions.setExternalLogin(false))
     dispatch(LoginActions.setViewState(ViewState.askUsernameAndPassword))
   }, [dispatch, setObjectField])
 
@@ -163,6 +189,7 @@ const Login = () => {
         {i18n.t('guest:loginView.forgotPassword')}
       </Link>
       <Button className="guest__submit" label="guest:loginView.login" onClick={onClickLogin} type="submit" />
+      <ExternalLoginButtons />
       {allowAccessRequest && (
         <>
           <div className="guest__divider">{i18n.t('guest:loginView.or')}</div>
