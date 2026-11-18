@@ -4,6 +4,7 @@ import {
   type Survey as ArenaSurvey,
   type NodeDef as ArenaNodeDef,
   type NodeDefType,
+  type CategoryItem as ArenaCategoryItem,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -29,11 +30,13 @@ const visitCategoryItems = ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaNodeDef<NodeDefType>
-  itemVisitor: any
+  itemVisitor: (item: ArenaCategoryItem) => void
 }) => {
   const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
   if (items.length <= maxExpandedCategoryItems) {
-    items.forEach(itemVisitor)
+    for (const item of items) {
+      itemVisitor(item)
+    }
   }
 }
 
