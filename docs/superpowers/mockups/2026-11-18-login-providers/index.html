@@ -129,7 +129,7 @@ tr.disabled td:not(:last-child) { opacity: .55; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem 1rem; }
 .field { display: flex; flex-direction: column; gap: .3rem; }
 .field.full { grid-column: 1 / -1; }
-.field label { font-size: .8rem; font-weight: 600; }
+.field .lbl { font-size: .8rem; font-weight: 600; }
 .field .help { font-size: .76rem; color: var(--color-on-surface-variant); line-height: 1.4; }
 .input { font: inherit; display: flex; align-items: center; gap: .4rem; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-on-surface); border-radius: 8px; padding: .5rem .7rem; min-height: 38px; }
 .input.ro { background: var(--color-surface-variant); color: var(--color-on-surface-variant); }
@@ -203,7 +203,7 @@ tr.disabled td:not(:last-child) { opacity: .55; }
 <p class="poc-note" id="note"></p>
 
 <!-- reusable logos (official brand marks keep their colors: they are brand assets, not UI colors) -->
-<svg width="0" height="0" style="position:absolute">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="g" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></symbol>
   <symbol id="ms" viewBox="0 0 22 22"><rect x="0" y="0" width="10" height="10" fill="#F25022"/><rect x="12" y="0" width="10" height="10" fill="#7FBA00"/><rect x="0" y="12" width="10" height="10" fill="#00A4EF"/><rect x="12" y="12" width="10" height="10" fill="#FFB900"/></symbol>
   <symbol id="key" viewBox="0 0 24 24"><path fill="currentColor" d="M11 7 9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></symbol>
@@ -233,10 +233,10 @@ tr.disabled td:not(:last-child) { opacity: .55; }
   <div class="body">
     <nav class="sidebar">
       <div class="grp">System admin</div>
-      <a><svg class="i"><use href="#play"/></svg>Job monitor</a>
-      <a><svg class="i"><use href="#info"/></svg>System logs</a>
-      <a><svg class="i"><use href="#users"/></svg>Messages</a>
-      <a class="on"><svg class="i"><use href="#key"/></svg>Login providers<span class="new">new</span></a>
+      <a><svg aria-hidden="true" class="i"><use href="#play"/></svg>Job monitor</a>
+      <a><svg aria-hidden="true" class="i"><use href="#info"/></svg>System logs</a>
+      <a><svg aria-hidden="true" class="i"><use href="#users"/></svg>Messages</a>
+      <a class="on"><svg aria-hidden="true" class="i"><use href="#key"/></svg>Login providers<span class="new">new</span></a>
     </nav>
     <main class="main">
 
@@ -248,8 +248,8 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <p class="sub">External sign-in options shown on the login page, in this order. Users can also sign in with email and password.</p>
     </div>
     <div class="actions">
-      <button class="btn outlined"><svg class="i"><use href="#ext"/></svg>Preview login page</button>
-      <button class="btn primary"><svg class="i"><use href="#plus"/></svg>Add provider</button>
+      <button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Preview login page</button>
+      <button class="btn primary"><svg aria-hidden="true" class="i"><use href="#plus"/></svg>Add provider</button>
     </div>
   </div>
   <div class="card">
@@ -257,64 +257,64 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <thead><tr><th style="width:32px"></th><th>Provider</th><th>Type</th><th>Status</th><th>Login page</th><th>Linked users</th><th>Last used</th><th style="width:96px"></th></tr></thead>
       <tbody>
         <tr>
-          <td class="drag"><svg class="i"><use href="#drag"/></svg></td>
-          <td><div class="pname"><svg class="logo"><use href="#g"/></svg><div><b>Google</b><div class="muted">google</div></div></div></td>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo"><use href="#g"/></svg><div><b>Google</b><div class="muted">google</div></div></div></td>
           <td>Google</td>
-          <td><span class="chip ok"><svg class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
+          <td><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
           <td>Shown</td>
           <td><a class="lnk" href="#">128</a></td>
           <td class="muted">2 min ago</td>
-          <td><div class="rowact"><button class="btn icon"><svg class="i"><use href="#edit"/></svg></button><button class="btn icon"><svg class="i"><use href="#more"/></svg></button></div></td>
+          <td><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
         </tr>
         <tr>
-          <td class="drag"><svg class="i"><use href="#drag"/></svg></td>
-          <td><div class="pname"><svg class="logo"><use href="#ms"/></svg><div><b>Microsoft</b><div class="muted">microsoft · any organization</div></div></div></td>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo"><use href="#ms"/></svg><div><b>Microsoft</b><div class="muted">microsoft · any organization</div></div></div></td>
           <td>Microsoft</td>
-          <td><span class="chip ok"><svg class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
+          <td><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
           <td>Shown</td>
           <td><a class="lnk" href="#">41</a></td>
           <td class="muted">yesterday</td>
-          <td style="position:relative"><div class="rowact"><button class="btn icon"><svg class="i"><use href="#edit"/></svg></button><button class="btn icon" style="background:var(--color-surface-variant)"><svg class="i"><use href="#more"/></svg></button></div>
+          <td style="position:relative"><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions" style="background:var(--color-surface-variant)"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div>
             <div class="menu" style="right:.5rem;top:2.6rem">
-              <div><svg class="i"><use href="#play"/></svg>Test connection</div>
-              <div><svg class="i"><use href="#ext"/></svg>Test sign-in</div>
-              <div><svg class="i"><use href="#copy"/></svg>Copy redirect URI</div>
-              <div><svg class="i"><use href="#key"/></svg>Hide from login page</div>
+              <div><svg aria-hidden="true" class="i"><use href="#play"/></svg>Test connection</div>
+              <div><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Test sign-in</div>
+              <div><svg aria-hidden="true" class="i"><use href="#copy"/></svg>Copy redirect URI</div>
+              <div><svg aria-hidden="true" class="i"><use href="#key"/></svg>Hide from login page</div>
               <div class="sep"></div>
-              <div><svg class="i"><use href="#lock"/></svg>Disable</div>
-              <div class="del"><svg class="i"><use href="#warn"/></svg>Delete…</div>
+              <div><svg aria-hidden="true" class="i"><use href="#lock"/></svg>Disable</div>
+              <div class="del"><svg aria-hidden="true" class="i"><use href="#warn"/></svg>Delete…</div>
             </div>
           </td>
         </tr>
         <tr>
-          <td class="drag"><svg class="i"><use href="#drag"/></svg></td>
-          <td><div class="pname"><svg class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg><div><b>FAO SSO</b><div class="muted">fao-sso · <span class="chip" style="padding:0 .4rem"><svg class="i" style="width:12px;height:12px"><use href="#lock"/></svg>environment</span></div></div></div></td>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg><div><b>FAO SSO</b><div class="muted">fao-sso · <span class="chip" style="padding:0 .4rem"><svg aria-hidden="true" class="i" style="width:12px;height:12px"><use href="#lock"/></svg>environment</span></div></div></div></td>
           <td>OpenID Connect</td>
-          <td><span class="chip ok"><svg class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
+          <td><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
           <td>Direct link only</td>
           <td><a class="lnk" href="#">12</a></td>
           <td class="muted">3 days ago</td>
-          <td><div class="rowact"><button class="btn icon" title="View"><svg class="i"><use href="#ext"/></svg></button><button class="btn icon"><svg class="i"><use href="#more"/></svg></button></div></td>
+          <td><div class="rowact"><button class="btn icon" aria-label="View" title="View"><svg aria-hidden="true" class="i"><use href="#ext"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
         </tr>
         <tr class="disabled">
-          <td class="drag"><svg class="i"><use href="#drag"/></svg></td>
-          <td><div class="pname"><svg class="logo" style="color:var(--color-on-surface-variant)"><use href="#key"/></svg><div><b>Partner Keycloak</b><div class="muted">partner-kc</div></div></div></td>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo" style="color:var(--color-on-surface-variant)"><use href="#key"/></svg><div><b>Partner Keycloak</b><div class="muted">partner-kc</div></div></div></td>
           <td>OpenID Connect</td>
           <td><span class="chip off">Disabled</span></td>
           <td>—</td>
           <td><a class="lnk" href="#">3</a></td>
           <td class="muted">2 months ago</td>
-          <td><div class="rowact"><button class="btn icon"><svg class="i"><use href="#edit"/></svg></button><button class="btn icon"><svg class="i"><use href="#more"/></svg></button></div></td>
+          <td><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
         </tr>
         <tr>
-          <td class="drag"><svg class="i"><use href="#drag"/></svg></td>
-          <td><div class="pname"><svg class="logo" style="color:var(--color-on-surface-variant)"><use href="#key"/></svg><div><b>Okta (test)</b><div class="muted">okta-test</div></div></div></td>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo" style="color:var(--color-on-surface-variant)"><use href="#key"/></svg><div><b>Okta (test)</b><div class="muted">okta-test</div></div></div></td>
           <td>OpenID Connect</td>
-          <td><span class="chip err"><svg class="i" style="width:14px;height:14px"><use href="#warn"/></svg>Discovery failed</span></td>
+          <td><span class="chip err"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#warn"/></svg>Discovery failed</span></td>
           <td>Hidden until fixed</td>
           <td class="muted">0</td>
           <td class="muted">never</td>
-          <td><div class="rowact"><button class="btn icon"><svg class="i"><use href="#edit"/></svg></button><button class="btn icon"><svg class="i"><use href="#more"/></svg></button></div></td>
+          <td><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
         </tr>
       </tbody>
     </table>
@@ -329,14 +329,14 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <h2>Login providers</h2>
       <p class="sub">External sign-in options shown on the login page, in this order. Users can also sign in with email and password.</p>
     </div>
-    <div class="actions"><button class="btn primary" disabled><svg class="i"><use href="#plus"/></svg>Add provider</button></div>
+    <div class="actions"><button class="btn primary" disabled><svg aria-hidden="true" class="i"><use href="#plus"/></svg>Add provider</button></div>
   </div>
-  <div class="alert warn"><svg class="i"><use href="#warn"/></svg><div><b>Encryption key not configured.</b> Set <code>AUTH_PROVIDER_SECRET_ENCRYPTION_KEY</code> (64 hexadecimal characters) on the server to store provider client secrets, then restart Arena. See the server requirements documentation.</div></div>
+  <div class="alert warn"><svg aria-hidden="true" class="i"><use href="#warn"/></svg><div><b>Encryption key not configured.</b> Set <code>AUTH_PROVIDER_SECRET_ENCRYPTION_KEY</code> (64 hexadecimal characters) on the server to store provider client secrets, then restart Arena. See the server requirements documentation.</div></div>
   <div class="card" style="padding:3rem 2rem;text-align:center">
-    <div style="display:flex;justify-content:center;gap:.75rem;margin-bottom:1rem"><svg class="logo" style="width:32px;height:32px"><use href="#g"/></svg><svg class="logo" style="width:32px;height:32px"><use href="#ms"/></svg><svg class="logo" style="width:32px;height:32px;color:var(--color-primary)"><use href="#uni"/></svg></div>
+    <div style="display:flex;justify-content:center;gap:.75rem;margin-bottom:1rem"><svg aria-hidden="true" class="logo" style="width:32px;height:32px"><use href="#g"/></svg><svg aria-hidden="true" class="logo" style="width:32px;height:32px"><use href="#ms"/></svg><svg aria-hidden="true" class="logo" style="width:32px;height:32px;color:var(--color-primary)"><use href="#uni"/></svg></div>
     <h3 style="margin:0 0 .4rem">No login providers yet</h3>
     <p class="muted" style="max-width:460px;margin:0 auto 1.2rem;line-height:1.5">Let users sign in with Google, Microsoft or your organization's single sign-on, in addition to email and password.</p>
-    <button class="btn primary" disabled><svg class="i"><use href="#plus"/></svg>Add provider</button>
+    <button class="btn primary" disabled><svg aria-hidden="true" class="i"><use href="#plus"/></svg>Add provider</button>
   </div>
 </section>
 
@@ -349,9 +349,9 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <div class="dh"><h3>Add login provider</h3><p class="sub" style="margin-top:.3rem">Choose the kind of provider. You can change the label and icon afterwards.</p></div>
       <div class="db">
         <div class="presets">
-          <div class="preset on"><svg class="logo"><use href="#g"/></svg><b>Google</b><span>Google accounts, including Gmail and Google Workspace.</span></div>
-          <div class="preset"><svg class="logo"><use href="#ms"/></svg><b>Microsoft</b><span>Work, school or personal Microsoft accounts (Entra ID).</span></div>
-          <div class="preset"><svg class="logo" style="color:var(--color-primary)"><use href="#key"/></svg><b>OpenID Connect</b><span>Any other provider: Keycloak, Okta, Auth0, your organization's SSO…</span></div>
+          <div class="preset on"><svg aria-hidden="true" class="logo"><use href="#g"/></svg><b>Google</b><span>Google accounts, including Gmail and Google Workspace.</span></div>
+          <div class="preset"><svg aria-hidden="true" class="logo"><use href="#ms"/></svg><b>Microsoft</b><span>Work, school or personal Microsoft accounts (Entra ID).</span></div>
+          <div class="preset"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#key"/></svg><b>OpenID Connect</b><span>Any other provider: Keycloak, Okta, Auth0, your organization's SSO…</span></div>
         </div>
         <p class="muted small" style="margin:.9rem 0 0">Facebook, GitHub and Apple are not supported yet.</p>
       </div>
@@ -363,19 +363,19 @@ tr.disabled td:not(:last-child) { opacity: .55; }
 <!-- ===================== EDIT FORM ===================== -->
 <section class="screen" data-screen="form" data-label="Edit form" data-note="Generic OpenID Connect provider. Right column: live preview of the login button and the redirect URI to register at the provider. The client secret is write-only.">
   <div class="head">
-    <div><h2 style="display:flex;align-items:center;gap:.6rem"><svg class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip info">OpenID Connect</span></h2><p class="sub">Created 12 Nov 2026 by Admin User · last modified today</p></div>
+    <div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip info">OpenID Connect</span></h2><p class="sub">Created 12 Nov 2026 by Admin User · last modified today</p></div>
   </div>
   <div class="formgrid">
     <div class="card">
       <div class="section">
         <h3>General</h3><p class="sub">How the provider appears to users.</p>
         <div class="fields">
-          <div class="field"><label>Button label</label><div class="input"><span class="grow">FAO SSO</span></div><span class="help">Shown as "Sign in with FAO SSO".</span></div>
-          <div class="field"><label>Identifier</label><div class="input ro"><svg class="i" style="width:14px;height:14px"><use href="#lock"/></svg><span class="grow">fao-sso</span></div><span class="help">Used in URLs and to link user accounts. Cannot be changed after creation.</span></div>
-          <div class="field full"><label>Icon</label>
+          <div class="field"><span class="lbl">Button label</span><div class="input"><span class="grow">FAO SSO</span></div><span class="help">Shown as "Sign in with FAO SSO".</span></div>
+          <div class="field"><span class="lbl">Identifier</span><div class="input ro"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#lock"/></svg><span class="grow">fao-sso</span></div><span class="help">Used in URLs and to link user accounts. Cannot be changed after creation.</span></div>
+          <div class="field full"><span class="lbl">Icon</span>
             <div style="display:flex;gap:.75rem;align-items:center">
-              <div class="seg"><div>Generic</div><div class="on"><svg class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg>Uploaded</div></div>
-              <button class="btn outlined"><svg class="i"><use href="#upload"/></svg>Replace…</button>
+              <div class="seg"><div>Generic</div><div class="on"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg>Uploaded</div></div>
+              <button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#upload"/></svg>Replace…</button>
               <span class="help">PNG or SVG, up to 100 KB, shown at 20×20 px.</span>
             </div>
           </div>
@@ -388,16 +388,16 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <div class="section">
         <h3>Connection</h3><p class="sub">Values from the application registered at the provider.</p>
         <div class="fields">
-          <div class="field full"><label>Issuer URL</label><div class="input"><span class="grow">https://sso.fao.org/realms/main</span><span class="chip ok"><svg class="i" style="width:14px;height:14px"><use href="#check"/></svg>discovered</span></div><span class="help">Arena reads the other endpoints from <code>/.well-known/openid-configuration</code>.</span></div>
-          <div class="field"><label>Client ID</label><div class="input"><span class="grow">arena-prod</span></div></div>
-          <div class="field"><label>Client secret</label><div class="secret"><div class="input ro" style="flex:1"><span class="grow">•••••••••••• set on 12 Nov 2026</span></div><button class="btn outlined">Change</button></div><span class="help">Stored encrypted, never shown again.</span></div>
-          <div class="field full"><label>Scopes</label><div class="input"><span class="tag">openid</span><span class="tag">email</span><span class="tag">profile</span><span class="grow muted small">add scope…</span></div></div>
+          <div class="field full"><span class="lbl">Issuer URL</span><div class="input"><span class="grow">https://sso.fao.org/realms/main</span><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>discovered</span></div><span class="help">Arena reads the other endpoints from <code>/.well-known/openid-configuration</code>.</span></div>
+          <div class="field"><span class="lbl">Client ID</span><div class="input"><span class="grow">arena-prod</span></div></div>
+          <div class="field"><span class="lbl">Client secret</span><div class="secret"><div class="input ro" style="flex:1"><span class="grow">•••••••••••• set on 12 Nov 2026</span></div><button class="btn outlined">Change</button></div><span class="help">Stored encrypted, never shown again.</span></div>
+          <div class="field full"><span class="lbl">Scopes</span><div class="input"><span class="tag">openid</span><span class="tag">email</span><span class="tag">profile</span><span class="grow muted small">add scope…</span></div></div>
         </div>
       </div>
       <div class="section">
         <h3>Access</h3><p class="sub">Who can sign in with this provider. Only users who already have an Arena account or invitation can sign in.</p>
         <div class="fields">
-          <div class="field full"><label>Allowed email domains</label><div class="input"><span class="tag">fao.org</span><span class="grow muted small">any domain if empty</span></div></div>
+          <div class="field full"><span class="lbl">Allowed email domains</span><div class="input"><span class="tag">fao.org</span><span class="grow muted small">any domain if empty</span></div></div>
         </div>
         <div style="margin-top:.6rem">
           <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Require Arena two-factor authentication</b><span>Users who enabled Arena 2FA must still enter their code. Turn off only if this provider enforces its own multi-factor authentication.</span></div></div>
@@ -405,15 +405,15 @@ tr.disabled td:not(:last-child) { opacity: .55; }
         </div>
       </div>
       <div class="footer">
-        <button class="btn outlined"><svg class="i"><use href="#play"/></svg>Test connection</button>
-        <button class="btn text"><svg class="i"><use href="#ext"/></svg>Test sign-in</button>
+        <button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#play"/></svg>Test connection</button>
+        <button class="btn text"><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Test sign-in</button>
         <div class="r"><button class="btn text">Cancel</button><button class="btn primary">Save</button></div>
       </div>
     </div>
     <div class="side">
       <div class="card">
         <h4>Redirect URI</h4>
-        <div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/fao-sso/callback</span><button class="btn icon" title="Copy"><svg class="i"><use href="#copy"/></svg></button></div>
+        <div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/fao-sso/callback</span><button class="btn icon" aria-label="Copy" title="Copy"><svg aria-hidden="true" class="i"><use href="#copy"/></svg></button></div>
         <ol class="steps" style="margin-top:.75rem">
           <li>Register Arena as a confidential web application at the provider.</li>
           <li>Add the redirect URI above.</li>
@@ -427,9 +427,9 @@ tr.disabled td:not(:last-child) { opacity: .55; }
         <div class="preview">
           <div class="fakeinput"></div><div class="fakeinput"></div><div class="fakebtn"></div>
           <div class="or">or</div>
-          <div class="pbtn"><svg class="logo"><use href="#g"/></svg>Sign in with Google</div>
-          <div class="pbtn"><svg class="logo"><use href="#ms"/></svg>Sign in with Microsoft</div>
-          <div class="pbtn hl" style="opacity:.6"><svg class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg>Sign in with FAO SSO</div>
+          <div class="pbtn"><svg aria-hidden="true" class="logo"><use href="#g"/></svg>Sign in with Google</div>
+          <div class="pbtn"><svg aria-hidden="true" class="logo"><use href="#ms"/></svg>Sign in with Microsoft</div>
+          <div class="pbtn hl" style="opacity:.6"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg>Sign in with FAO SSO</div>
         </div>
         <p class="muted small" style="margin:.5rem 0 0">Not shown on the login page (direct link only).</p>
       </div>
@@ -439,15 +439,15 @@ tr.disabled td:not(:last-child) { opacity: .55; }
 
 <!-- ===================== GOOGLE FORM ===================== -->
 <section class="screen" data-screen="google" data-label="New Google" data-note="Google preset: no issuer field, official logo fixed (brand guidelines), label prefilled. Validation errors appear inline and in the footer.">
-  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg class="logo" style="width:26px;height:26px"><use href="#g"/></svg>New Google provider</h2><p class="sub">Create an OAuth client ID of type "Web application" in the Google Cloud console.</p></div></div>
+  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px"><use href="#g"/></svg>New Google provider</h2><p class="sub">Create an OAuth client ID of type "Web application" in the Google Cloud console.</p></div></div>
   <div class="formgrid">
     <div class="card">
       <div class="section">
         <h3>General</h3><p class="sub">How the provider appears to users.</p>
         <div class="fields">
-          <div class="field"><label>Button label</label><div class="input"><span class="grow">Google</span></div><span class="help">Shown as "Sign in with Google".</span></div>
-          <div class="field"><label>Identifier</label><div class="input"><span class="grow">google</span></div><span class="help">Lowercase letters, digits and hyphens. Cannot be changed later.</span></div>
-          <div class="field full"><label>Icon</label><div style="display:flex;gap:.6rem;align-items:center"><svg class="logo" style="width:24px;height:24px"><use href="#g"/></svg><span class="help">Official Google logo (required by Google's sign-in branding guidelines).</span></div></div>
+          <div class="field"><span class="lbl">Button label</span><div class="input"><span class="grow">Google</span></div><span class="help">Shown as "Sign in with Google".</span></div>
+          <div class="field"><span class="lbl">Identifier</span><div class="input"><span class="grow">google</span></div><span class="help">Lowercase letters, digits and hyphens. Cannot be changed later.</span></div>
+          <div class="field full"><span class="lbl">Icon</span><div style="display:flex;gap:.6rem;align-items:center"><svg aria-hidden="true" class="logo" style="width:24px;height:24px"><use href="#g"/></svg><span class="help">Official Google logo (required by Google's sign-in branding guidelines).</span></div></div>
         </div>
         <div style="margin-top:.6rem">
           <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Enabled</b><span>When disabled, the button is hidden and sign-ins with this provider are refused.</span></div></div>
@@ -457,13 +457,13 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <div class="section">
         <h3>Connection</h3><p class="sub">From Google Cloud console › APIs &amp; Services › Credentials.</p>
         <div class="fields">
-          <div class="field"><label>Client ID</label><div class="input"><span class="grow">1234567890-abc.apps.googleusercontent.com</span></div></div>
-          <div class="field"><label>Client secret</label><div class="input err"><span class="grow muted">Required</span></div><span class="help" style="color:var(--color-error)">Enter the client secret.</span></div>
+          <div class="field"><span class="lbl">Client ID</span><div class="input"><span class="grow">1234567890-abc.apps.googleusercontent.com</span></div></div>
+          <div class="field"><span class="lbl">Client secret</span><div class="input err"><span class="grow muted">Required</span></div><span class="help" style="color:var(--color-error)">Enter the client secret.</span></div>
         </div>
       </div>
       <div class="section">
         <h3>Access</h3><p class="sub">Only users who already have an Arena account or invitation can sign in.</p>
-        <div class="fields"><div class="field full"><label>Allowed email domains</label><div class="input"><span class="grow muted small">any domain if empty (e.g. gmail.com, fao.org)</span></div></div></div>
+        <div class="fields"><div class="field full"><span class="lbl">Allowed email domains</span><div class="input"><span class="grow muted small">any domain if empty (e.g. gmail.com, fao.org)</span></div></div></div>
         <div style="margin-top:.6rem">
           <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Require Arena two-factor authentication</b><span>Users who enabled Arena 2FA must still enter their code.</span></div></div>
         </div>
@@ -477,23 +477,23 @@ tr.disabled td:not(:last-child) { opacity: .55; }
     <div class="side">
       <div class="card">
         <h4>Authorized redirect URI</h4>
-        <div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/google/callback</span><button class="btn icon"><svg class="i"><use href="#copy"/></svg></button></div>
+        <div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/google/callback</span><button class="btn icon" aria-label="Copy"><svg aria-hidden="true" class="i"><use href="#copy"/></svg></button></div>
         <p class="muted small" style="margin:.6rem 0 0">Paste it under "Authorized redirect URIs" of the OAuth client.</p>
       </div>
-      <div class="card"><h4>Login page preview</h4><div class="preview"><div class="fakeinput"></div><div class="fakeinput"></div><div class="fakebtn"></div><div class="or">or</div><div class="pbtn hl"><svg class="logo"><use href="#g"/></svg>Sign in with Google</div></div></div>
+      <div class="card"><h4>Login page preview</h4><div class="preview"><div class="fakeinput"></div><div class="fakeinput"></div><div class="fakebtn"></div><div class="or">or</div><div class="pbtn hl"><svg aria-hidden="true" class="logo"><use href="#g"/></svg>Sign in with Google</div></div></div>
     </div>
   </div>
 </section>
 
 <!-- ===================== TEST RESULT ===================== -->
 <section class="screen" data-screen="test" data-label="Test results" data-note="Test connection checks discovery and signing keys. Test sign-in runs the real flow in a new tab and shows the claims received, without logging in or linking anything; it also tells which Arena user would match.">
-  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip info">OpenID Connect</span></h2></div></div>
+  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip info">OpenID Connect</span></h2></div></div>
   <div class="card" style="height:320px;opacity:.5"></div>
   <div class="scrim">
     <div class="dialog" style="width:680px">
       <div class="dh"><h3>Test sign-in result</h3></div>
       <div class="db">
-        <div class="alert ok"><svg class="i"><use href="#check"/></svg><div><b>Sign-in succeeded.</b> The ID token was validated (signature, issuer, audience, expiry, nonce). Nobody was logged in.</div></div>
+        <div class="alert ok"><svg aria-hidden="true" class="i"><use href="#check"/></svg><div><b>Sign-in succeeded.</b> The ID token was validated (signature, issuer, audience, expiry, nonce). Nobody was logged in.</div></div>
         <dl class="kv">
           <dt>Issuer</dt><dd>https://sso.fao.org/realms/main</dd>
           <dt>Subject (sub)</dt><dd>f3c1a9e2-7b44-4c0b-9d1e-2a0c5b8e6f11</dd>
@@ -502,7 +502,7 @@ tr.disabled td:not(:last-child) { opacity: .55; }
           <dt>Allowed domain</dt><dd><span class="chip ok">fao.org</span></dd>
           <dt>Matching Arena user</dt><dd>Maria Rossi (accepted) · would be linked on first sign-in</dd>
         </dl>
-        <div class="alert info" style="margin:1rem 0 0"><svg class="i"><use href="#info"/></svg><div class="small">Connection test: discovery document and signing keys (3 keys) loaded in 240 ms.</div></div>
+        <div class="alert info" style="margin:1rem 0 0"><svg aria-hidden="true" class="i"><use href="#info"/></svg><div class="small">Connection test: discovery document and signing keys (3 keys) loaded in 240 ms.</div></div>
       </div>
       <div class="df"><button class="btn primary">Close</button></div>
     </div>
@@ -518,13 +518,13 @@ tr.disabled td:not(:last-child) { opacity: .55; }
       <div class="dh"><h3>Delete "Partner Keycloak"?</h3></div>
       <div class="db">
         <p style="margin:0 0 .8rem;line-height:1.5">3 users have linked this provider. Their links will be removed. To stop sign-ins while keeping the links, <a class="lnk" href="#">disable the provider</a> instead.</p>
-        <div class="alert warn"><svg class="i"><use href="#warn"/></svg><div><b>2 users have no other way to sign in.</b> They have no Arena password and no other linked provider. They will be able to get back in only with "Forgot password".</div></div>
+        <div class="alert warn"><svg aria-hidden="true" class="i"><use href="#warn"/></svg><div><b>2 users have no other way to sign in.</b> They have no Arena password and no other linked provider. They will be able to get back in only with "Forgot password".</div></div>
         <div class="ulist">
           <div><span class="avatar">AM</span><span>Ana Martínez</span><span class="muted" style="margin-left:auto">ana.martinez@partner.org</span></div>
           <div><span class="avatar">JK</span><span>Jonas Keller</span><span class="muted" style="margin-left:auto">j.keller@partner.org</span></div>
         </div>
         <div class="confirm"><span class="cb on"></span>Send these users an email explaining how to set a password</div>
-        <div class="field" style="margin-top:1rem"><label>Type <code>partner-kc</code> to confirm</label><div class="input"><span class="grow">partner-kc</span></div></div>
+        <div class="field" style="margin-top:1rem"><span class="lbl">Type <code>partner-kc</code> to confirm</span><div class="input"><span class="grow">partner-kc</span></div></div>
       </div>
       <div class="df"><button class="btn text">Cancel</button><button class="btn danger">Delete provider</button></div>
     </div>
@@ -533,8 +533,8 @@ tr.disabled td:not(:last-child) { opacity: .55; }
 
 <!-- ===================== ENV (READ-ONLY) ===================== -->
 <section class="screen" data-screen="env" data-label="Env provider" data-note="Providers defined in AUTH_PROVIDERS_CONFIG are shown read-only: settings come from the server configuration. Tests and the linked users list are still available.">
-  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip"><svg class="i" style="width:14px;height:14px"><use href="#lock"/></svg>environment</span></h2></div></div>
-  <div class="alert info"><svg class="i"><use href="#lock"/></svg><div><b>Managed by the server configuration.</b> This provider is defined in <code>AUTH_PROVIDERS_CONFIG</code>; change it there and restart Arena. Client secret: <code>AUTH_PROVIDER_FAO_SSO_CLIENT_SECRET</code> <span class="chip ok">set</span></div></div>
+  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#lock"/></svg>environment</span></h2></div></div>
+  <div class="alert info"><svg aria-hidden="true" class="i"><use href="#lock"/></svg><div><b>Managed by the server configuration.</b> This provider is defined in <code>AUTH_PROVIDERS_CONFIG</code>; change it there and restart Arena. Client secret: <code>AUTH_PROVIDER_FAO_SSO_CLIENT_SECRET</code> <span class="chip ok">set</span></div></div>
   <div class="formgrid">
     <div class="card">
       <div class="section">
@@ -551,9 +551,9 @@ tr.disabled td:not(:last-child) { opacity: .55; }
           <dt>Show on login page</dt><dd>No (direct link only)</dd>
         </dl>
       </div>
-      <div class="footer"><button class="btn outlined"><svg class="i"><use href="#play"/></svg>Test connection</button><button class="btn text"><svg class="i"><use href="#ext"/></svg>Test sign-in</button><div class="r"><button class="btn outlined"><svg class="i"><use href="#users"/></svg>12 linked users</button></div></div>
+      <div class="footer"><button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#play"/></svg>Test connection</button><button class="btn text"><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Test sign-in</button><div class="r"><button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#users"/></svg>12 linked users</button></div></div>
     </div>
-    <div class="side"><div class="card"><h4>Redirect URI</h4><div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/fao-sso/callback</span><button class="btn icon"><svg class="i"><use href="#copy"/></svg></button></div></div></div>
+    <div class="side"><div class="card"><h4>Redirect URI</h4><div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/fao-sso/callback</span><button class="btn icon" aria-label="Copy"><svg aria-hidden="true" class="i"><use href="#copy"/></svg></button></div></div></div>
   </div>
 </section>
 
