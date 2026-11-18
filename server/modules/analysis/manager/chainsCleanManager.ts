@@ -1,3 +1,10 @@
+import type {
+  User as ArenaUser,
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+} from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
 import * as Chain from '@common/analysis/chain'
 import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
 
@@ -13,7 +20,7 @@ import * as DB from '@server/db'
 
 const Logger = Log.getLogger('ChainsCleanManager')
 
-const _cleanChainsOrphans = async ({ user, surveyId }, tx) => {
+const _cleanChainsOrphans = async ({ user, surveyId }: { user: ArenaUser; surveyId: number }, tx: DbClient) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx)
   const chains = await ChainRepository.fetchChains({ surveyId }, tx)
   const chainsUuids = new Set(chains.map(Chain.getUuid))
@@ -27,13 +34,17 @@ const _cleanChainsOrphans = async ({ user, surveyId }, tx) => {
   return NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: orphanNodeDefsUuids }, tx)
 }
 
-const _fixUpdatedAreaBasedEstimatedOfNodeDef = async (
-  { user, survey, chain, nodeDef, areaBasedEstimatedOfNodeDef },
-  tx
+const _fixUpdatedAreaBasedEstimatedOfNodeDef = (
+  {
+    user,
+    survey,
+    nodeDef,
+    areaBasedEstimatedOfNodeDef,
+  }: { user: ArenaUser; survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType>; areaBasedEstimatedOfNodeDef: any },
+  tx: DbClient
 ) => {
   const nodeDefUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({
     survey,
-    chain,
     nodeDefAreaBasedEstimate: nodeDef,
     areaBasedEstimatedOfNodeDef,
   })
@@ -56,7 +67,10 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDef = async (
   )
 }
 
-const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) => {
+const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async (
+  { user, surveyId }: { user: ArenaUser; surveyId: number },
+  tx: DbClient
+) => {
   const nodeDefsUpdated = {}
   const nodeDefsValidation = {}
 
@@ -64,7 +78,6 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) =
     { surveyId, draft: true, advanced: true, includeAnalysis: true },
     tx
   )
-  const chains = await ChainRepository.fetchChains({ surveyId }, tx)
 
   for (const nodeDef of Survey.getNodeDefsArray(survey)) {
     const chainUuid = NodeDef.getChainUuid(nodeDef)
@@ -74,10 +87,9 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) =
         const expectedName = AreaBasedEstimatedOfNodeDef.getName({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
         if (NodeDef.getName(nodeDef) !== expectedName) {
           // ancestors node defs have been updated, so the name of this node def must be updated too
-          const chain = chains.find((_chain) => Chain.getUuid(_chain) === chainUuid)
           const { nodeDefsUpdated: nodeDefsUpdatedTemp, nodeDefsValidation: nodeDefsValidationTemp } =
             /* NOSONAR */ await _fixUpdatedAreaBasedEstimatedOfNodeDef(
-              { user, survey, chain, nodeDef, areaBasedEstimatedOfNodeDef },
+              { user, survey, nodeDef, areaBasedEstimatedOfNodeDef },
               tx
             )
           Object.assign(nodeDefsUpdated, nodeDefsUpdatedTemp)
@@ -89,7 +101,7 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) =
   return { nodeDefsUpdated, nodeDefsValidation }
 }
 
-export const cleanChains = async ({ user, surveyId }, client = DB.client) =>
+export const cleanChains = ({ user, surveyId }: { user: ArenaUser; surveyId: number }, client: DbClient = DB.client) =>
   client.tx(async (tx) => {
     const nodeDefsUpdated = {}
     const nodeDefsValidation = {}
