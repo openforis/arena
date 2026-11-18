@@ -678,7 +678,10 @@ export const updateUserPassword = async ({
   if (!editingSameUser && !isSystemAdmin) {
     throw new UnauthorizedError(User.getName(user))
   }
-  const oldPasswordCheck = !isSystemAdmin
+  const oldUser = await UserManager.fetchUserByUuidWithPassword(userToUpdateUuid)
+  const oldPasswordEncrypted = User.getPassword(oldUser)
+  // users signing in only with an external provider have no password to confirm
+  const oldPasswordCheck = !isSystemAdmin && Boolean(oldPasswordEncrypted)
   const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm, {
     includeOldPassword: oldPasswordCheck,
   })
@@ -686,8 +689,6 @@ export const updateUserPassword = async ({
     return validation
   }
   if (oldPasswordCheck) {
-    const oldUser = await UserManager.fetchUserByUuidWithPassword(userToUpdateUuid)
-    const oldPasswordEncrypted = User.getPassword(oldUser)
     const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
     if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
       // password not matching the existing one

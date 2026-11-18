@@ -26,6 +26,28 @@ export default {
 
 認証アプリで生成されたコードを入力してください。`,
   },
+  externalLogin: {
+    signInWith: '{{provider}}でサインイン',
+    continueWith: '{{provider}}で続行',
+    errors: {
+      providerNotAvailable:
+        'このサインイン方法は現在利用できません。後でもう一度お試しいただくか、メールアドレスとパスワードでサインインしてください。',
+      flowInvalid: 'サインインの有効期限が切れたか、別のブラウザで開始されました。もう一度お試しください。',
+      providerError: '外部プロバイダーでのサインインに失敗しました。もう一度お試しください。',
+      emailNotVerified:
+        'プロバイダーがメールアドレスを確認していないため、アカウントと照合できません。パスワードでサインインし、プロフィールからプロバイダーを連携してください。',
+      emailDomainNotAllowed: 'このメールドメインのアカウントはこのサインイン方法を使用できません。',
+      userNotFound:
+        'このメールアドレスのアカウントはありません。調査の管理者に招待を依頼するか、アクセスをリクエストしてください。',
+      ambiguousEmail:
+        'このメールアドレスに一致するアカウントが複数あります。パスワードでサインインし、プロフィールからプロバイダーを連携してください。',
+      identityAlreadyLinked: 'このプロバイダーのアカウントは既に別のユーザーに連携されています。',
+      providerAlreadyLinked:
+        'このプロバイダーの別のアカウントが既にあなたのユーザーに連携されています。先にプロフィールから連携を解除してください。',
+      invitationInvalid: '招待が無効か、有効期限が切れています。調査の管理者に新しい招待を依頼してください。',
+      invalidTwoFactorCode: '確認コードが無効です。',
+    },
+  },
   accessRequestView: {
     whatHappensNext: 'この後の流れ',
     alreadyHaveAnAccount: 'すでにアカウントをお持ちですか？',

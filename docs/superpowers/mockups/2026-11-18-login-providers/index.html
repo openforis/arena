@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arena login providers – admin UI mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ---------- Arena theme tokens (copied from webapp/style/themes.scss) ---------- */
+:root, [data-theme='light'] {
+  color-scheme: light;
+  --color-primary: #3885ca; --color-on-primary: #fff;
+  --color-primary-container: color-mix(in srgb, var(--color-primary) 30%, #fff);
+  --color-primary-container-low: color-mix(in srgb, var(--color-primary) 9%, #fff);
+  --color-on-primary-container: color-mix(in srgb, var(--color-primary) 60%, #000);
+  --color-secondary: #5b6b7d;
+  --color-background: #f6f7f9; --color-on-background: #2f3138;
+  --color-surface: #fff; --color-on-surface: #2f3138;
+  --color-surface-variant: #e7e9ee; --color-on-surface-variant: #62666f;
+  --color-outline: #d1d1dd;
+  --color-error: #ed5b46; --color-error-container: #f7dfe3;
+  --color-success: #84ac67; --color-success-container: #f0f2e7;
+  --color-warning-container: #fbf0d9; --color-on-warning-container: #7a5a12;
+  --color-shadow: #2f3138;
+}
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-primary: #4a94d6; --color-on-primary: #fff;
+  --color-primary-container: color-mix(in srgb, var(--color-primary) 30%, #1f2228);
+  --color-primary-container-low: color-mix(in srgb, var(--color-primary) 9%, #1f2228);
+  --color-on-primary-container: color-mix(in srgb, var(--color-primary) 60%, #fff);
+  --color-secondary: #9aa8b8;
+  --color-background: #16181d; --color-on-background: #e3e5ea;
+  --color-surface: #1f2228; --color-on-surface: #e3e5ea;
+  --color-surface-variant: #2d3139; --color-on-surface-variant: #a9aeb9;
+  --color-outline: #3e434d;
+  --color-error: #f07462; --color-error-container: #4d2a2a;
+  --color-success: #93bb76; --color-success-container: #2b3526;
+  --color-warning-container: #4a3d1f; --color-on-warning-container: #f1d699;
+  --color-shadow: #000;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Noto Sans', system-ui, sans-serif; font-size: 14px; background: #2a2d33; color: #e3e5ea; }
+
+/* ---------- POC chrome (not part of the design) ---------- */
+.poc-bar { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; align-items: center; padding: .6rem 1rem; background: #1b1d22; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 10; }
+.poc-bar h1 { font-size: .95rem; margin: 0 .5rem 0 0; font-weight: 600; }
+.poc-group { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; }
+.poc-group span { opacity: .6; font-size: .75rem; margin-right: .25rem; text-transform: uppercase; letter-spacing: .05em; }
+.poc-group button { font: inherit; font-size: .8rem; background: #2d3139; color: #e3e5ea; border: 1px solid #3e434d; border-radius: 6px; padding: .3rem .6rem; cursor: pointer; }
+.poc-group button.on { background: #2a6aa5; border-color: #2a6aa5; color: #fff; }
+.poc-note { max-width: 1280px; margin: .75rem auto 0; padding: 0 1rem; font-size: .85rem; color: #a9aeb9; line-height: 1.5; }
+.poc-stage { display: flex; justify-content: center; padding: 1rem; }
+.frame { width: 1280px; height: 800px; max-width: 100%; border-radius: 10px; overflow: hidden; position: relative; box-shadow: 0 10px 40px #0008; background: var(--color-background); color: var(--color-on-background); display: grid; grid-template-rows: 48px 1fr; }
+
+/* ---------- app shell ---------- */
+.topbar { display: flex; align-items: center; gap: .75rem; padding: 0 1rem; background: var(--color-surface); border-bottom: 1px solid var(--color-outline); }
+.topbar img { height: 26px; }
+.topbar .crumb { color: var(--color-on-surface-variant); }
+.topbar .crumb b { color: var(--color-on-surface); font-weight: 600; }
+.topbar .user { margin-left: auto; display: flex; align-items: center; gap: .5rem; color: var(--color-on-surface-variant); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary-container); color: var(--color-on-primary-container); display: grid; place-items: center; font-weight: 600; font-size: .8rem; }
+.body { display: grid; grid-template-columns: 220px 1fr; min-height: 0; }
+.sidebar { background: var(--color-surface); border-right: 1px solid var(--color-outline); padding: .75rem .5rem; }
+.sidebar .grp { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--color-on-surface-variant); margin: .5rem .75rem .35rem; }
+.sidebar a { display: flex; align-items: center; gap: .6rem; padding: .5rem .75rem; border-radius: 8px; color: var(--color-on-surface); text-decoration: none; }
+.sidebar a.on { background: var(--color-primary-container-low); color: var(--color-primary); font-weight: 600; }
+.sidebar a .new { margin-left: auto; font-size: .65rem; padding: .05rem .4rem; border-radius: 99px; background: var(--color-primary); color: var(--color-on-primary); }
+.main { overflow: auto; padding: 1.5rem 2rem; position: relative; }
+
+/* ---------- primitives ---------- */
+h2 { margin: 0; font-size: 1.4rem; font-weight: 700; }
+.sub { margin: .3rem 0 0; color: var(--color-on-surface-variant); line-height: 1.5; }
+.head { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; }
+.head .actions { margin-left: auto; display: flex; gap: .5rem; }
+.btn { font: inherit; display: inline-flex; align-items: center; gap: .4rem; border-radius: 8px; padding: .5rem .9rem; cursor: pointer; border: 1px solid transparent; font-weight: 500; white-space: nowrap; }
+.btn.primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn.outlined { background: var(--color-surface); color: var(--color-on-surface); border-color: var(--color-outline); }
+.btn.text { background: none; color: var(--color-primary); padding: .5rem .5rem; }
+.btn.danger { background: var(--color-error); color: #fff; }
+.btn.icon { padding: .35rem; background: none; color: var(--color-on-surface-variant); border-radius: 6px; }
+.btn.icon:hover { background: var(--color-surface-variant); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.card { background: var(--color-surface); border: 1px solid var(--color-outline); border-radius: 12px; }
+.chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .75rem; padding: .15rem .55rem; border-radius: 99px; background: var(--color-surface-variant); color: var(--color-on-surface-variant); white-space: nowrap; }
+.chip.ok { background: var(--color-success-container); color: var(--color-success); }
+.chip.off { background: var(--color-surface-variant); }
+.chip.err { background: var(--color-error-container); color: var(--color-error); }
+.chip.info { background: var(--color-primary-container-low); color: var(--color-primary); }
+.alert { display: flex; gap: .6rem; padding: .75rem 1rem; border-radius: 10px; line-height: 1.45; margin-bottom: 1rem; }
+.alert.warn { background: var(--color-warning-container); color: var(--color-on-warning-container); }
+.alert.err { background: var(--color-error-container); color: var(--color-error); }
+.alert.ok { background: var(--color-success-container); color: var(--color-success); }
+.alert.info { background: var(--color-primary-container-low); color: var(--color-on-primary-container); }
+.muted { color: var(--color-on-surface-variant); }
+.small { font-size: .8rem; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82rem; background: var(--color-surface-variant); padding: .1rem .35rem; border-radius: 4px; }
+svg.i { width: 18px; height: 18px; flex: none; }
+.logo { width: 20px; height: 20px; flex: none; }
+
+/* ---------- list ---------- */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-weight: 600; font-size: .78rem; color: var(--color-on-surface-variant); padding: .65rem .75rem; border-bottom: 1px solid var(--color-outline); }
+td { padding: .7rem .75rem; border-bottom: 1px solid var(--color-outline); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr.disabled td:not(:last-child) { opacity: .55; }
+.drag { cursor: grab; color: var(--color-on-surface-variant); }
+.pname { display: flex; align-items: center; gap: .65rem; }
+.pname b { font-weight: 600; }
+.pname .muted { font-size: .78rem; }
+.lnk { color: var(--color-primary); text-decoration: none; }
+.lnk:hover { text-decoration: underline; }
+.rowact { display: flex; justify-content: flex-end; gap: .1rem; }
+.menu { position: absolute; background: var(--color-surface); border: 1px solid var(--color-outline); border-radius: 10px; box-shadow: 0 8px 24px color-mix(in srgb, var(--color-shadow) 25%, transparent); padding: .3rem; min-width: 200px; z-index: 5; }
+.menu div { padding: .5rem .75rem; border-radius: 6px; display: flex; gap: .5rem; align-items: center; }
+.menu div:hover { background: var(--color-surface-variant); }
+.menu .sep { height: 1px; padding: 0; margin: .3rem 0; background: var(--color-outline); }
+.menu .del { color: var(--color-error); }
+
+/* ---------- form ---------- */
+.formgrid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+.section { padding: 1.1rem 1.25rem; }
+.section + .section { border-top: 1px solid var(--color-outline); }
+.section h3 { margin: 0 0 .2rem; font-size: 1rem; }
+.section .sub { margin: 0 0 1rem; font-size: .85rem; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem 1rem; }
+.field { display: flex; flex-direction: column; gap: .3rem; }
+.field.full { grid-column: 1 / -1; }
+.field .lbl { font-size: .8rem; font-weight: 600; }
+.field .help { font-size: .76rem; color: var(--color-on-surface-variant); line-height: 1.4; }
+.input { font: inherit; display: flex; align-items: center; gap: .4rem; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-on-surface); border-radius: 8px; padding: .5rem .7rem; min-height: 38px; }
+.input.ro { background: var(--color-surface-variant); color: var(--color-on-surface-variant); }
+.input .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side .input .grow { white-space: normal; overflow-wrap: anywhere; }
+.input .tag { font-size: .75rem; padding: .1rem .45rem; border-radius: 6px; background: var(--color-surface-variant); }
+.input.err { border-color: var(--color-error); }
+.secret { display: flex; gap: .5rem; align-items: center; }
+.switchrow { display: flex; align-items: flex-start; gap: .75rem; padding: .55rem 0; }
+.switchrow + .switchrow { border-top: 1px dashed var(--color-outline); }
+.switchrow .txt { flex: 1; }
+.switchrow .txt b { font-weight: 600; display: block; }
+.switchrow .txt span { font-size: .8rem; color: var(--color-on-surface-variant); line-height: 1.4; }
+.sw { width: 36px; height: 20px; border-radius: 99px; background: var(--color-outline); position: relative; flex: none; margin-top: .15rem; }
+.sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; }
+.sw.on { background: var(--color-primary); }
+.sw.on::after { left: 18px; }
+.seg { display: inline-flex; border: 1px solid var(--color-outline); border-radius: 8px; overflow: hidden; }
+.seg div { padding: .4rem .8rem; display: flex; align-items: center; gap: .4rem; }
+.seg div + div { border-left: 1px solid var(--color-outline); }
+.seg .on { background: var(--color-primary-container-low); color: var(--color-primary); font-weight: 600; }
+.footer { display: flex; gap: .5rem; align-items: center; padding: .9rem 1.25rem; border-top: 1px solid var(--color-outline); }
+.footer .r { margin-left: auto; display: flex; gap: .5rem; }
+.side { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 0; }
+.side .card { padding: 1rem; }
+.side h4 { margin: 0 0 .6rem; font-size: .85rem; }
+.preview { background: var(--color-background); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: .5rem; }
+.preview .or { display: flex; align-items: center; gap: .5rem; color: var(--color-on-surface-variant); font-size: .78rem; margin: .25rem 0; }
+.preview .or::before, .preview .or::after { content: ''; flex: 1; height: 1px; background: var(--color-outline); }
+.pbtn { display: flex; align-items: center; justify-content: center; gap: .6rem; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-on-surface); border-radius: 8px; padding: .55rem .9rem; font-weight: 500; }
+.pbtn.hl { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.fakeinput { height: 34px; border: 1px solid var(--color-outline); border-radius: 8px; background: var(--color-surface); }
+.fakebtn { height: 36px; border-radius: 8px; background: var(--color-primary); }
+.steps { margin: 0; padding-left: 1.1rem; line-height: 1.6; font-size: .82rem; color: var(--color-on-surface-variant); }
+.kv { display: grid; grid-template-columns: 150px 1fr; gap: .35rem .75rem; font-size: .82rem; }
+.kv dt { color: var(--color-on-surface-variant); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+
+/* ---------- dialogs ---------- */
+.scrim { position: absolute; inset: 0; background: color-mix(in srgb, var(--color-shadow) 45%, transparent); display: grid; place-items: center; z-index: 20; }
+.dialog { background: var(--color-surface); border-radius: 14px; width: 620px; max-width: 92%; box-shadow: 0 20px 50px #0006; }
+.dialog .dh { padding: 1.2rem 1.4rem .4rem; }
+.dialog .dh h3 { margin: 0; font-size: 1.15rem; }
+.dialog .db { padding: .6rem 1.4rem 1rem; }
+.dialog .df { display: flex; justify-content: flex-end; gap: .5rem; padding: .9rem 1.4rem; border-top: 1px solid var(--color-outline); }
+.presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+.preset { border: 1px solid var(--color-outline); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; gap: .5rem; cursor: pointer; }
+.preset.on { border-color: var(--color-primary); background: var(--color-primary-container-low); }
+.preset .logo { width: 28px; height: 28px; }
+.preset b { font-weight: 600; }
+.preset span { font-size: .8rem; color: var(--color-on-surface-variant); line-height: 1.4; }
+.ulist { border: 1px solid var(--color-outline); border-radius: 10px; max-height: 170px; overflow: auto; }
+.ulist div { display: flex; gap: .6rem; align-items: center; padding: .5rem .75rem; font-size: .85rem; }
+.ulist div + div { border-top: 1px solid var(--color-outline); }
+.ulist .avatar { width: 24px; height: 24px; font-size: .7rem; }
+.confirm { display: flex; gap: .5rem; align-items: center; margin-top: .9rem; font-size: .85rem; }
+.cb { width: 16px; height: 16px; border: 2px solid var(--color-outline); border-radius: 4px; }
+.cb.on { background: var(--color-primary); border-color: var(--color-primary); }
+
+.screen { display: none; }
+.screen.on { display: block; }
+</style>
+</head>
+<body>
+
+<div class="poc-bar">
+  <h1>Login providers – admin UI</h1>
+  <div class="poc-group" id="screens"><span>Screen</span></div>
+  <div class="poc-group" id="themes"><span>Theme</span><button data-theme="light">Light</button><button data-theme="dark">Dark</button></div>
+</div>
+<p class="poc-note" id="note"></p>
+
+<!-- reusable logos (official brand marks keep their colors: they are brand assets, not UI colors) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="g" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></symbol>
+  <symbol id="ms" viewBox="0 0 22 22"><rect x="0" y="0" width="10" height="10" fill="#F25022"/><rect x="12" y="0" width="10" height="10" fill="#7FBA00"/><rect x="0" y="12" width="10" height="10" fill="#00A4EF"/><rect x="12" y="12" width="10" height="10" fill="#FFB900"/></symbol>
+  <symbol id="key" viewBox="0 0 24 24"><path fill="currentColor" d="M11 7 9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></symbol>
+  <symbol id="uni" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zM5 13.2v4L12 21l7-3.8v-4L12 17l-7-3.8z"/></symbol>
+  <symbol id="drag" viewBox="0 0 24 24"><path fill="currentColor" d="M9 4h2v2H9zm4 0h2v2h-2zM9 9h2v2H9zm4 0h2v2h-2zm-4 5h2v2H9zm4 0h2v2h-2zm-4 5h2v2H9zm4 0h2v2h-2z"/></symbol>
+  <symbol id="edit" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><path fill="currentColor" d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zM9 6a3 3 0 1 1 6 0v2H9V6z"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+  <symbol id="warn" viewBox="0 0 24 24"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><path fill="currentColor" d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></symbol>
+  <symbol id="ext" viewBox="0 0 24 24"><path fill="currentColor" d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7z"/></symbol>
+  <symbol id="upload" viewBox="0 0 24 24"><path fill="currentColor" d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><path fill="currentColor" d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0c-.3 0-.6 0-1 .1 1.2.8 2 2 2 3.4V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></symbol>
+</svg>
+
+<div class="poc-stage">
+<div class="frame">
+  <div class="topbar">
+    <img src="../2026-11-09-guest-pages/of_arena_icon.png" alt="Arena" />
+    <div class="crumb">System admin / <b>Login providers</b></div>
+    <div class="user"><span class="small">System admin</span><div class="avatar">AU</div></div>
+  </div>
+  <div class="body">
+    <nav class="sidebar">
+      <div class="grp">System admin</div>
+      <a><svg aria-hidden="true" class="i"><use href="#play"/></svg>Job monitor</a>
+      <a><svg aria-hidden="true" class="i"><use href="#info"/></svg>System logs</a>
+      <a><svg aria-hidden="true" class="i"><use href="#users"/></svg>Messages</a>
+      <a class="on"><svg aria-hidden="true" class="i"><use href="#key"/></svg>Login providers<span class="new">new</span></a>
+    </nav>
+    <main class="main">
+
+<!-- ===================== LIST ===================== -->
+<section class="screen" data-screen="list" data-label="List" data-note="Providers in the order of the login page buttons (drag to reorder). Disabled providers are greyed out. The environment-defined provider is read-only (lock). Linked users opens the Users list filtered by sign-in method.">
+  <div class="head">
+    <div>
+      <h2>Login providers</h2>
+      <p class="sub">External sign-in options shown on the login page, in this order. Users can also sign in with email and password.</p>
+    </div>
+    <div class="actions">
+      <button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Preview login page</button>
+      <button class="btn primary"><svg aria-hidden="true" class="i"><use href="#plus"/></svg>Add provider</button>
+    </div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:32px"></th><th>Provider</th><th>Type</th><th>Status</th><th>Login page</th><th>Linked users</th><th>Last used</th><th style="width:96px"></th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo"><use href="#g"/></svg><div><b>Google</b><div class="muted">google</div></div></div></td>
+          <td>Google</td>
+          <td><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
+          <td>Shown</td>
+          <td><a class="lnk" href="#">128</a></td>
+          <td class="muted">2 min ago</td>
+          <td><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
+        </tr>
+        <tr>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo"><use href="#ms"/></svg><div><b>Microsoft</b><div class="muted">microsoft · any organization</div></div></div></td>
+          <td>Microsoft</td>
+          <td><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
+          <td>Shown</td>
+          <td><a class="lnk" href="#">41</a></td>
+          <td class="muted">yesterday</td>
+          <td style="position:relative"><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions" style="background:var(--color-surface-variant)"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div>
+            <div class="menu" style="right:.5rem;top:2.6rem">
+              <div><svg aria-hidden="true" class="i"><use href="#play"/></svg>Test connection</div>
+              <div><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Test sign-in</div>
+              <div><svg aria-hidden="true" class="i"><use href="#copy"/></svg>Copy redirect URI</div>
+              <div><svg aria-hidden="true" class="i"><use href="#key"/></svg>Hide from login page</div>
+              <div class="sep"></div>
+              <div><svg aria-hidden="true" class="i"><use href="#lock"/></svg>Disable</div>
+              <div class="del"><svg aria-hidden="true" class="i"><use href="#warn"/></svg>Delete…</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg><div><b>FAO SSO</b><div class="muted">fao-sso · <span class="chip" style="padding:0 .4rem"><svg aria-hidden="true" class="i" style="width:12px;height:12px"><use href="#lock"/></svg>environment</span></div></div></div></td>
+          <td>OpenID Connect</td>
+          <td><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>Enabled</span></td>
+          <td>Direct link only</td>
+          <td><a class="lnk" href="#">12</a></td>
+          <td class="muted">3 days ago</td>
+          <td><div class="rowact"><button class="btn icon" aria-label="View" title="View"><svg aria-hidden="true" class="i"><use href="#ext"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
+        </tr>
+        <tr class="disabled">
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo" style="color:var(--color-on-surface-variant)"><use href="#key"/></svg><div><b>Partner Keycloak</b><div class="muted">partner-kc</div></div></div></td>
+          <td>OpenID Connect</td>
+          <td><span class="chip off">Disabled</span></td>
+          <td>—</td>
+          <td><a class="lnk" href="#">3</a></td>
+          <td class="muted">2 months ago</td>
+          <td><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
+        </tr>
+        <tr>
+          <td class="drag"><svg aria-hidden="true" class="i"><use href="#drag"/></svg></td>
+          <td><div class="pname"><svg aria-hidden="true" class="logo" style="color:var(--color-on-surface-variant)"><use href="#key"/></svg><div><b>Okta (test)</b><div class="muted">okta-test</div></div></div></td>
+          <td>OpenID Connect</td>
+          <td><span class="chip err"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#warn"/></svg>Discovery failed</span></td>
+          <td>Hidden until fixed</td>
+          <td class="muted">0</td>
+          <td class="muted">never</td>
+          <td><div class="rowact"><button class="btn icon" aria-label="Edit"><svg aria-hidden="true" class="i"><use href="#edit"/></svg></button><button class="btn icon" aria-label="More actions"><svg aria-hidden="true" class="i"><use href="#more"/></svg></button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted small" style="margin-top:.75rem">Email and password sign-in is always available. Changes reach every server instance within a minute.</p>
+</section>
+
+<!-- ===================== EMPTY / NO KEY ===================== -->
+<section class="screen" data-screen="empty" data-label="Empty / no key" data-note="First visit. If AUTH_PROVIDER_SECRET_ENCRYPTION_KEY is not set, adding DB providers is disabled with an explanation (environment providers would still be listed).">
+  <div class="head">
+    <div>
+      <h2>Login providers</h2>
+      <p class="sub">External sign-in options shown on the login page, in this order. Users can also sign in with email and password.</p>
+    </div>
+    <div class="actions"><button class="btn primary" disabled><svg aria-hidden="true" class="i"><use href="#plus"/></svg>Add provider</button></div>
+  </div>
+  <div class="alert warn"><svg aria-hidden="true" class="i"><use href="#warn"/></svg><div><b>Encryption key not configured.</b> Set <code>AUTH_PROVIDER_SECRET_ENCRYPTION_KEY</code> (64 hexadecimal characters) on the server to store provider client secrets, then restart Arena. See the server requirements documentation.</div></div>
+  <div class="card" style="padding:3rem 2rem;text-align:center">
+    <div style="display:flex;justify-content:center;gap:.75rem;margin-bottom:1rem"><svg aria-hidden="true" class="logo" style="width:32px;height:32px"><use href="#g"/></svg><svg aria-hidden="true" class="logo" style="width:32px;height:32px"><use href="#ms"/></svg><svg aria-hidden="true" class="logo" style="width:32px;height:32px;color:var(--color-primary)"><use href="#uni"/></svg></div>
+    <h3 style="margin:0 0 .4rem">No login providers yet</h3>
+    <p class="muted" style="max-width:460px;margin:0 auto 1.2rem;line-height:1.5">Let users sign in with Google, Microsoft or your organization's single sign-on, in addition to email and password.</p>
+    <button class="btn primary" disabled><svg aria-hidden="true" class="i"><use href="#plus"/></svg>Add provider</button>
+  </div>
+</section>
+
+<!-- ===================== ADD: PRESET ===================== -->
+<section class="screen" data-screen="add" data-label="Add: choose type" data-note="Step 1 of adding a provider: the preset decides which fields the form shows. Presets fill the issuer, label and icon.">
+  <div class="head"><div><h2>Login providers</h2><p class="sub">External sign-in options shown on the login page, in this order.</p></div></div>
+  <div class="card" style="height:300px"></div>
+  <div class="scrim">
+    <div class="dialog">
+      <div class="dh"><h3>Add login provider</h3><p class="sub" style="margin-top:.3rem">Choose the kind of provider. You can change the label and icon afterwards.</p></div>
+      <div class="db">
+        <div class="presets">
+          <div class="preset on"><svg aria-hidden="true" class="logo"><use href="#g"/></svg><b>Google</b><span>Google accounts, including Gmail and Google Workspace.</span></div>
+          <div class="preset"><svg aria-hidden="true" class="logo"><use href="#ms"/></svg><b>Microsoft</b><span>Work, school or personal Microsoft accounts (Entra ID).</span></div>
+          <div class="preset"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#key"/></svg><b>OpenID Connect</b><span>Any other provider: Keycloak, Okta, Auth0, your organization's SSO…</span></div>
+        </div>
+        <p class="muted small" style="margin:.9rem 0 0">Facebook, GitHub and Apple are not supported yet.</p>
+      </div>
+      <div class="df"><button class="btn text">Cancel</button><button class="btn primary">Continue</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== EDIT FORM ===================== -->
+<section class="screen" data-screen="form" data-label="Edit form" data-note="Generic OpenID Connect provider. Right column: live preview of the login button and the redirect URI to register at the provider. The client secret is write-only.">
+  <div class="head">
+    <div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip info">OpenID Connect</span></h2><p class="sub">Created 12 Nov 2026 by Admin User · last modified today</p></div>
+  </div>
+  <div class="formgrid">
+    <div class="card">
+      <div class="section">
+        <h3>General</h3><p class="sub">How the provider appears to users.</p>
+        <div class="fields">
+          <div class="field"><span class="lbl">Button label</span><div class="input"><span class="grow">FAO SSO</span></div><span class="help">Shown as "Sign in with FAO SSO".</span></div>
+          <div class="field"><span class="lbl">Identifier</span><div class="input ro"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#lock"/></svg><span class="grow">fao-sso</span></div><span class="help">Used in URLs and to link user accounts. Cannot be changed after creation.</span></div>
+          <div class="field full"><span class="lbl">Icon</span>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <div class="seg"><div>Generic</div><div class="on"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg>Uploaded</div></div>
+              <button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#upload"/></svg>Replace…</button>
+              <span class="help">PNG or SVG, up to 100 KB, shown at 20×20 px.</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:.6rem">
+          <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Enabled</b><span>When disabled, the button is hidden and sign-ins with this provider are refused. Linked accounts are kept.</span></div></div>
+          <div class="switchrow"><div class="sw"></div><div class="txt"><b>Show on the login page</b><span>When off, the provider is reachable only with the direct link <code>/guest/login?provider=fao-sso</code>.</span></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <h3>Connection</h3><p class="sub">Values from the application registered at the provider.</p>
+        <div class="fields">
+          <div class="field full"><span class="lbl">Issuer URL</span><div class="input"><span class="grow">https://sso.fao.org/realms/main</span><span class="chip ok"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#check"/></svg>discovered</span></div><span class="help">Arena reads the other endpoints from <code>/.well-known/openid-configuration</code>.</span></div>
+          <div class="field"><span class="lbl">Client ID</span><div class="input"><span class="grow">arena-prod</span></div></div>
+          <div class="field"><span class="lbl">Client secret</span><div class="secret"><div class="input ro" style="flex:1"><span class="grow">•••••••••••• set on 12 Nov 2026</span></div><button class="btn outlined">Change</button></div><span class="help">Stored encrypted, never shown again.</span></div>
+          <div class="field full"><span class="lbl">Scopes</span><div class="input"><span class="tag">openid</span><span class="tag">email</span><span class="tag">profile</span><span class="grow muted small">add scope…</span></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <h3>Access</h3><p class="sub">Who can sign in with this provider. Only users who already have an Arena account or invitation can sign in.</p>
+        <div class="fields">
+          <div class="field full"><span class="lbl">Allowed email domains</span><div class="input"><span class="tag">fao.org</span><span class="grow muted small">any domain if empty</span></div></div>
+        </div>
+        <div style="margin-top:.6rem">
+          <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Require Arena two-factor authentication</b><span>Users who enabled Arena 2FA must still enter their code. Turn off only if this provider enforces its own multi-factor authentication.</span></div></div>
+          <div class="switchrow"><div class="sw"></div><div class="txt"><b>Trust emails from this provider</b><span>Link accounts by email even when the provider does not confirm the email is verified. Turn on only for providers that verify emails themselves.</span></div></div>
+        </div>
+      </div>
+      <div class="footer">
+        <button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#play"/></svg>Test connection</button>
+        <button class="btn text"><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Test sign-in</button>
+        <div class="r"><button class="btn text">Cancel</button><button class="btn primary">Save</button></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h4>Redirect URI</h4>
+        <div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/fao-sso/callback</span><button class="btn icon" aria-label="Copy" title="Copy"><svg aria-hidden="true" class="i"><use href="#copy"/></svg></button></div>
+        <ol class="steps" style="margin-top:.75rem">
+          <li>Register Arena as a confidential web application at the provider.</li>
+          <li>Add the redirect URI above.</li>
+          <li>Allow the <code>openid email profile</code> scopes.</li>
+          <li>Paste the client ID and secret here.</li>
+        </ol>
+        <a class="lnk small" href="#">Setup guides: Google · Microsoft · Keycloak</a>
+      </div>
+      <div class="card">
+        <h4>Login page preview</h4>
+        <div class="preview">
+          <div class="fakeinput"></div><div class="fakeinput"></div><div class="fakebtn"></div>
+          <div class="or">or</div>
+          <div class="pbtn"><svg aria-hidden="true" class="logo"><use href="#g"/></svg>Sign in with Google</div>
+          <div class="pbtn"><svg aria-hidden="true" class="logo"><use href="#ms"/></svg>Sign in with Microsoft</div>
+          <div class="pbtn hl" style="opacity:.6"><svg aria-hidden="true" class="logo" style="color:var(--color-primary)"><use href="#uni"/></svg>Sign in with FAO SSO</div>
+        </div>
+        <p class="muted small" style="margin:.5rem 0 0">Not shown on the login page (direct link only).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GOOGLE FORM ===================== -->
+<section class="screen" data-screen="google" data-label="New Google" data-note="Google preset: no issuer field, official logo fixed (brand guidelines), label prefilled. Validation errors appear inline and in the footer.">
+  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px"><use href="#g"/></svg>New Google provider</h2><p class="sub">Create an OAuth client ID of type "Web application" in the Google Cloud console.</p></div></div>
+  <div class="formgrid">
+    <div class="card">
+      <div class="section">
+        <h3>General</h3><p class="sub">How the provider appears to users.</p>
+        <div class="fields">
+          <div class="field"><span class="lbl">Button label</span><div class="input"><span class="grow">Google</span></div><span class="help">Shown as "Sign in with Google".</span></div>
+          <div class="field"><span class="lbl">Identifier</span><div class="input"><span class="grow">google</span></div><span class="help">Lowercase letters, digits and hyphens. Cannot be changed later.</span></div>
+          <div class="field full"><span class="lbl">Icon</span><div style="display:flex;gap:.6rem;align-items:center"><svg aria-hidden="true" class="logo" style="width:24px;height:24px"><use href="#g"/></svg><span class="help">Official Google logo (required by Google's sign-in branding guidelines).</span></div></div>
+        </div>
+        <div style="margin-top:.6rem">
+          <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Enabled</b><span>When disabled, the button is hidden and sign-ins with this provider are refused.</span></div></div>
+          <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Show on the login page</b><span>When off, reachable only with a direct link.</span></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <h3>Connection</h3><p class="sub">From Google Cloud console › APIs &amp; Services › Credentials.</p>
+        <div class="fields">
+          <div class="field"><span class="lbl">Client ID</span><div class="input"><span class="grow">1234567890-abc.apps.googleusercontent.com</span></div></div>
+          <div class="field"><span class="lbl">Client secret</span><div class="input err"><span class="grow muted">Required</span></div><span class="help" style="color:var(--color-error)">Enter the client secret.</span></div>
+        </div>
+      </div>
+      <div class="section">
+        <h3>Access</h3><p class="sub">Only users who already have an Arena account or invitation can sign in.</p>
+        <div class="fields"><div class="field full"><span class="lbl">Allowed email domains</span><div class="input"><span class="grow muted small">any domain if empty (e.g. gmail.com, fao.org)</span></div></div></div>
+        <div style="margin-top:.6rem">
+          <div class="switchrow"><div class="sw on"></div><div class="txt"><b>Require Arena two-factor authentication</b><span>Users who enabled Arena 2FA must still enter their code.</span></div></div>
+        </div>
+        <p class="muted small" style="margin:.4rem 0 0">Google always verifies emails, so "Trust emails from this provider" is not needed.</p>
+      </div>
+      <div class="footer">
+        <span class="small" style="color:var(--color-error)">1 field needs attention</span>
+        <div class="r"><button class="btn text">Cancel</button><button class="btn primary">Create provider</button></div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h4>Authorized redirect URI</h4>
+        <div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/google/callback</span><button class="btn icon" aria-label="Copy"><svg aria-hidden="true" class="i"><use href="#copy"/></svg></button></div>
+        <p class="muted small" style="margin:.6rem 0 0">Paste it under "Authorized redirect URIs" of the OAuth client.</p>
+      </div>
+      <div class="card"><h4>Login page preview</h4><div class="preview"><div class="fakeinput"></div><div class="fakeinput"></div><div class="fakebtn"></div><div class="or">or</div><div class="pbtn hl"><svg aria-hidden="true" class="logo"><use href="#g"/></svg>Sign in with Google</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TEST RESULT ===================== -->
+<section class="screen" data-screen="test" data-label="Test results" data-note="Test connection checks discovery and signing keys. Test sign-in runs the real flow in a new tab and shows the claims received, without logging in or linking anything; it also tells which Arena user would match.">
+  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip info">OpenID Connect</span></h2></div></div>
+  <div class="card" style="height:320px;opacity:.5"></div>
+  <div class="scrim">
+    <div class="dialog" style="width:680px">
+      <div class="dh"><h3>Test sign-in result</h3></div>
+      <div class="db">
+        <div class="alert ok"><svg aria-hidden="true" class="i"><use href="#check"/></svg><div><b>Sign-in succeeded.</b> The ID token was validated (signature, issuer, audience, expiry, nonce). Nobody was logged in.</div></div>
+        <dl class="kv">
+          <dt>Issuer</dt><dd>https://sso.fao.org/realms/main</dd>
+          <dt>Subject (sub)</dt><dd>f3c1a9e2-7b44-4c0b-9d1e-2a0c5b8e6f11</dd>
+          <dt>Email</dt><dd>maria.rossi@fao.org <span class="chip ok">verified</span></dd>
+          <dt>Name</dt><dd>Maria Rossi</dd>
+          <dt>Allowed domain</dt><dd><span class="chip ok">fao.org</span></dd>
+          <dt>Matching Arena user</dt><dd>Maria Rossi (accepted) · would be linked on first sign-in</dd>
+        </dl>
+        <div class="alert info" style="margin:1rem 0 0"><svg aria-hidden="true" class="i"><use href="#info"/></svg><div class="small">Connection test: discovery document and signing keys (3 keys) loaded in 240 ms.</div></div>
+      </div>
+      <div class="df"><button class="btn primary">Close</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DELETE ===================== -->
+<section class="screen" data-screen="delete" data-label="Delete" data-note="Delete asks for confirmation and lists the users who would be left without any sign-in method (no password, no other provider). Disable is suggested as the safer alternative.">
+  <div class="head"><div><h2>Login providers</h2><p class="sub">External sign-in options shown on the login page, in this order.</p></div></div>
+  <div class="card" style="height:300px;opacity:.5"></div>
+  <div class="scrim">
+    <div class="dialog">
+      <div class="dh"><h3>Delete "Partner Keycloak"?</h3></div>
+      <div class="db">
+        <p style="margin:0 0 .8rem;line-height:1.5">3 users have linked this provider. Their links will be removed. To stop sign-ins while keeping the links, <a class="lnk" href="#">disable the provider</a> instead.</p>
+        <div class="alert warn"><svg aria-hidden="true" class="i"><use href="#warn"/></svg><div><b>2 users have no other way to sign in.</b> They have no Arena password and no other linked provider. They will be able to get back in only with "Forgot password".</div></div>
+        <div class="ulist">
+          <div><span class="avatar">AM</span><span>Ana Martínez</span><span class="muted" style="margin-left:auto">ana.martinez@partner.org</span></div>
+          <div><span class="avatar">JK</span><span>Jonas Keller</span><span class="muted" style="margin-left:auto">j.keller@partner.org</span></div>
+        </div>
+        <div class="confirm"><span class="cb on"></span>Send these users an email explaining how to set a password</div>
+        <div class="field" style="margin-top:1rem"><span class="lbl">Type <code>partner-kc</code> to confirm</span><div class="input"><span class="grow">partner-kc</span></div></div>
+      </div>
+      <div class="df"><button class="btn text">Cancel</button><button class="btn danger">Delete provider</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ENV (READ-ONLY) ===================== -->
+<section class="screen" data-screen="env" data-label="Env provider" data-note="Providers defined in AUTH_PROVIDERS_CONFIG are shown read-only: settings come from the server configuration. Tests and the linked users list are still available.">
+  <div class="head"><div><h2 style="display:flex;align-items:center;gap:.6rem"><svg aria-hidden="true" class="logo" style="width:26px;height:26px;color:var(--color-primary)"><use href="#uni"/></svg>FAO SSO <span class="chip"><svg aria-hidden="true" class="i" style="width:14px;height:14px"><use href="#lock"/></svg>environment</span></h2></div></div>
+  <div class="alert info"><svg aria-hidden="true" class="i"><use href="#lock"/></svg><div><b>Managed by the server configuration.</b> This provider is defined in <code>AUTH_PROVIDERS_CONFIG</code>; change it there and restart Arena. Client secret: <code>AUTH_PROVIDER_FAO_SSO_CLIENT_SECRET</code> <span class="chip ok">set</span></div></div>
+  <div class="formgrid">
+    <div class="card">
+      <div class="section">
+        <h3>Settings</h3>
+        <dl class="kv" style="grid-template-columns:200px 1fr">
+          <dt>Identifier</dt><dd>fao-sso</dd>
+          <dt>Button label</dt><dd>FAO SSO</dd>
+          <dt>Issuer URL</dt><dd>https://sso.fao.org/realms/main</dd>
+          <dt>Client ID</dt><dd>arena-prod</dd>
+          <dt>Scopes</dt><dd>openid email profile</dd>
+          <dt>Allowed email domains</dt><dd>fao.org</dd>
+          <dt>Require Arena 2FA</dt><dd>Yes</dd>
+          <dt>Trust emails</dt><dd>No</dd>
+          <dt>Show on login page</dt><dd>No (direct link only)</dd>
+        </dl>
+      </div>
+      <div class="footer"><button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#play"/></svg>Test connection</button><button class="btn text"><svg aria-hidden="true" class="i"><use href="#ext"/></svg>Test sign-in</button><div class="r"><button class="btn outlined"><svg aria-hidden="true" class="i"><use href="#users"/></svg>12 linked users</button></div></div>
+    </div>
+    <div class="side"><div class="card"><h4>Redirect URI</h4><div class="input ro small"><span class="grow">https://arena.openforis.org/auth/oidc/fao-sso/callback</span><button class="btn icon" aria-label="Copy"><svg aria-hidden="true" class="i"><use href="#copy"/></svg></button></div></div></div>
+  </div>
+</section>
+
+    </main>
+  </div>
+</div>
+</div>
+
+<script>
+const screens = [...document.querySelectorAll('.screen')]
+const params = new URLSearchParams(location.search)
+const bar = document.getElementById('screens')
+const note = document.getElementById('note')
+const show = (key) => {
+  for (const s of screens) s.classList.toggle('on', s.dataset.screen === key)
+  for (const b of bar.querySelectorAll('button')) b.classList.toggle('on', b.dataset.screen === key)
+  note.textContent = screens.find((s) => s.dataset.screen === key)?.dataset.note ?? ''
+  params.set('screen', key)
+  history.replaceState(null, '', `?${params}`)
+}
+const setTheme = (theme) => {
+  document.documentElement.dataset.theme = theme
+  for (const b of document.querySelectorAll('#themes button')) b.classList.toggle('on', b.dataset.theme === theme)
+  params.set('theme', theme)
+  history.replaceState(null, '', `?${params}`)
+}
+for (const s of screens) {
+  const b = document.createElement('button')
+  b.textContent = s.dataset.label
+  b.dataset.screen = s.dataset.screen
+  b.onclick = () => show(s.dataset.screen)
+  bar.appendChild(b)
+}
+for (const b of document.querySelectorAll('#themes button')) b.onclick = () => setTheme(b.dataset.theme)
+show(params.get('screen') ?? 'list')
+setTheme(params.get('theme') ?? 'light')
+</script>
+</body>
+</html>

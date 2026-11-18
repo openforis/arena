@@ -1,4 +1,26 @@
 export default {
+  authProvider: {
+    notFound: 'Fournisseur de connexion introuvable',
+    readOnly: 'Ce fournisseur est défini dans la configuration du serveur et ne peut pas être modifié ici',
+    idAlreadyUsed: "L'identifiant « {{id}} » est déjà utilisé par un autre fournisseur",
+    encryptionKeyMissing:
+      "La clé de chiffrement des secrets client (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY) n'est pas configurée",
+    validation: 'Certains champs ne sont pas valides',
+    iconInvalid: 'Icône non valide : utilisez un fichier PNG ou SVG de 100 Ko au maximum',
+    identityNotFound: 'Compte lié introuvable',
+    lastSignInMethod:
+      "C'est la dernière méthode de connexion : définissez d'abord un mot de passe ou liez un autre fournisseur",
+    idInvalid:
+      'Identifiant non valide : utilisez des lettres minuscules, des chiffres et des tirets (64 caractères au maximum)',
+    typeInvalid: 'Type de fournisseur non valide',
+    labelInvalid: 'Le libellé du bouton est obligatoire (64 caractères au maximum)',
+    issuerInvalid: "URL de l'émetteur non valide (https est requis)",
+    tenantInvalid: 'Locataire non valide',
+    clientIdRequired: "L'ID client est obligatoire",
+    scopesMissingOpenid: 'Les portées doivent inclure « openid »',
+    emailDomainInvalid: 'Domaine e-mail non valide',
+    clientSecretRequired: 'Le secret client est obligatoire',
+  },
   mapCustomLayers: {
     urlInvalid: 'L’URL du service n’est pas valide',
     urlNotAllowed: 'Seules les adresses http et https publiques peuvent être utilisées',

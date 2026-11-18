@@ -24,6 +24,23 @@ Copier le lien de réinitialisation du mot de passe dans le presse-papiers ?`,
   notAcceptedYet: 'Invitation non encore acceptée',
   passwordResetLinkCopiedToClipboard: 'Lien de réinitialisation du mot de passe copié dans votre presse-papiers',
   passwordResetLink: 'Lien de réinitialisation du mot de passe',
+  signInMethods: {
+    title: 'Méthodes de connexion',
+    password: 'Mot de passe',
+    passwordSet: 'Défini',
+    passwordNotSet: 'Non défini : se connecte avec un fournisseur externe',
+    setPassword: 'Définir un mot de passe',
+    linkWith: 'Lier {{provider}}',
+    unlink: 'Délier',
+    lastUsed: 'dernière utilisation le {{date}}',
+    lastMethodHint:
+      'Définissez un mot de passe ou liez un autre fournisseur avant de délier la dernière méthode de connexion.',
+    unlinkConfirm: 'Délier {{provider}} ? Il ne pourra plus être utilisé pour se connecter à ce compte.',
+    unlinkLastMethodConfirm:
+      "Délier {{provider}} ? C'est la dernière méthode de connexion de cet utilisateur : il ne pourra revenir qu'avec « Mot de passe oublié ? ».",
+    linked: 'Fournisseur lié à votre compte.',
+    unlinked: 'Fournisseur délié.',
+  },
   prefs: {
     title: 'Préférences de notification',
     notifyOnUserAccessRequest: "Nouvelles demandes d'accès des utilisateurs",

@@ -394,6 +394,8 @@ export default {
     systemAdmin: 'システム管理',
     jobMonitor: 'ジョブモニター',
     systemLogs: 'システムログ',
+    authProviders: 'ログインプロバイダー',
+    authProvider: 'ログインプロバイダー',
 
     help: 'ヘルプ',
     about: 'このアプリについて',

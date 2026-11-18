@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    loginProviders: {
+      title: "Sign in with Google, Microsoft or your organization's account",
+      description: `In **System Administration > Login providers**, let the users sign in with **Google**, **Microsoft** or any **OpenID Connect** provider (e.g. Keycloak, Okta or the single sign-on of your organization): each provider gets a button on the login page. The provider form shows the redirect URI to register at the provider, the setup steps and a link to a detailed guide; **Test connection** and **Test sign-in** check the configuration without logging anybody in.
+
+Only users who already have an Arena account or an invitation can sign in: the first time, the account is matched by its verified email address. Invited users can accept the invitation with a provider instead of choosing a password, and every user can link or unlink providers in **My profile > Sign-in methods**. Email and password login is always available.
+
+The server needs the \`ARENA_PUBLIC_URL\` and \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` environment variables (see \`.env.template\`).`,
+    },
     mobileUploadEmailNotification: {
       title: 'Email notification of the records uploaded from Arena Mobile',
       description: `In **Survey info → Security**, check **Notify survey administrators by email when records are uploaded from Arena Mobile**: after each upload, every survey administrator receives an email listing the uploaded records, with their key values, whether they are new or updated, the user who created them, the dates and the number of validation errors and warnings.

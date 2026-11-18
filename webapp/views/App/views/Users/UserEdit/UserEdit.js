@@ -27,6 +27,7 @@ import DropdownUserRole from '../DropdownUserRole'
 import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
+import { SignInMethodsPanel } from './SignInMethodsPanel'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 
 const UserEdit = ({ ownProfile = false }) => {
@@ -111,6 +112,7 @@ const UserEdit = ({ ownProfile = false }) => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingLoggedInUser = User.isEqual(user)(userToUpdate)
+  const loggedInUserSystemAdmin = User.isSystemAdmin(loggedInUser)
   const newUser = !userUuidParam && !ownProfile
   const surveyGroupsVisible = !newUser && showSurveyGroup
 
@@ -247,6 +249,15 @@ const UserEdit = ({ ownProfile = false }) => {
             </Fieldset>
           )}
         </>
+      )}
+
+      {userUuid && User.hasAccepted(userToUpdate) && (editingLoggedInUser || loggedInUserSystemAdmin) && (
+        <SignInMethodsPanel
+          editingLoggedInUser={editingLoggedInUser}
+          onSetPasswordClick={onChangePasswordClick}
+          systemAdmin={loggedInUserSystemAdmin}
+          userUuid={userUuid}
+        />
       )}
 
       {(canEdit || canRemove || invitationExpired) && (

@@ -427,6 +427,8 @@ Pokušati ponovo?`,
     systemAdmin: 'Administracija sistema',
     jobMonitor: 'Nadzor zadataka',
     systemLogs: 'Sistemski dnevnici',
+    authProviders: 'Provajderi za prijavu',
+    authProvider: 'Provajder za prijavu',
 
     help: 'Pomoć',
     about: 'O aplikaciji',
