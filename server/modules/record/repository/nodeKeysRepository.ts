@@ -2,9 +2,12 @@ import * as A from '@core/arena'
 
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
-export const fetchNodesHierarchyKeys = async ({ surveyId, nodeUuids }, client = db) =>
+export const fetchNodesHierarchyKeys = (
+  { surveyId, nodeUuids }: { surveyId: number; nodeUuids: string[] },
+  client: DbClient = db
+) =>
   client.map(
     `
     SELECT *

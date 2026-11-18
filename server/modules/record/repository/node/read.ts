@@ -1,4 +1,4 @@
-import * as pgPromise from 'pg-promise'
+import type { DbClient } from '@server/db/db'
 import { TableNode } from '../../../../../common/model/db'
 
 import { db } from '../../../../db/db'
@@ -13,11 +13,11 @@ import { db } from '../../../../db/db'
  * @param {string} [params.parentUuid=null] - The parent node uuid to filter by.
  * @param {string} [params.nodeDefUuid=null] - The node definition uuid to filter by.
  * @param {boolean} [params.draft=false] - Whether to fetch draft props or only published ones.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {DbClient} [client=db] - The database client.
  *
  * @returns {Promise<Node[]>} - The result promise.
  */
-export const fetchNodes = async (params, client = db) => {
+export const fetchNodes = (params: any, client: DbClient = db) => {
   const { survey, uuid, recordUuid, parentUuid, nodeDefUuid, draft } = params
   const table = new TableNode(survey)
   return client.map(
