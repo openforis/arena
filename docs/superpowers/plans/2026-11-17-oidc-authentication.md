@@ -1,32 +1,45 @@
-# Generic OpenID Connect (OIDC) Login Implementation Plan
+# External Login Providers (OpenID Connect) Implementation Plan
 
-**Goal:** Let users sign in to Arena through any OpenID Connect provider configured by the instance administrator
-(Google, Microsoft Entra ID, Keycloak, Okta, institutional SSO, ...), alongside the existing email/password login.
+**Goal:** Let users sign in to Arena through external identity providers (Google, Microsoft, Keycloak, Okta,
+institutional SSO, ...) alongside the existing email/password login, with the providers managed by system admins in
+the Arena UI.
 
-**Architecture:** OIDC is a new way to prove who the user is; everything after that is reused. The arena-server
-callback route resolves the Arena user from the provider's ID token, then goes through the same code path as the
-password login (`createUserAuthTokens` + refresh token cookie). The browser lands on `/app/home` with only the refresh
-cookie set: the webapp's existing "401 → `POST /auth/token/refresh` → retry" interceptor
+**Architecture:** An external provider is a new way to prove who the user is; everything after that is reused. A
+provider *adapter* turns the provider's callback into a normalized identity (`issuer`, `subject`, `email`,
+`emailVerified`, `name`); the callback route resolves the Arena user from it and then goes through the same code path
+as the password login (`createUserAuthTokens` + refresh token cookie). The browser lands on `/app/home` with only the
+refresh cookie set: the webapp's existing "401 → `POST /auth/token/refresh` → retry" interceptor
 (`webapp/app/appErrorsMiddleware.js`) gets the access token, exactly as after a page reload.
 
+Providers are stored in the database and edited by system admins in a new "Login providers" page; providers can also
+be defined with environment variables (read-only in the UI), for deployments managed as code.
+
 **Tech stack:** [`openid-client`](https://github.com/panva/openid-client) v6 (certified OIDC relying party: discovery,
-PKCE, state, nonce and ID token validation), Express, pg-promise, React.
+PKCE, state, nonce and ID token validation), Express, pg-promise, React, MUI.
 
 ## Scope
 
 In scope:
 
-- One or more OIDC providers, configured with environment variables (no admin UI).
+- Any number of OpenID Connect providers, with presets for Google and Microsoft (incl. multi-tenant) and a generic
+  OIDC type for any other provider.
+- Provider adapter interface, so that non-OIDC providers can be added later without touching the login flow.
+- Provider configuration: system admin UI (stored in the DB, client secrets encrypted) plus optional environment
+  variable configuration.
+- Provider icons on the login buttons (built-in brand icons for presets, uploaded icon or generic icon otherwise).
 - Authorization code flow with PKCE, `response_mode=query`.
 - Login allowed only for users that already exist in Arena or have a pending invitation (see "Access rules").
-- Linking / unlinking an external identity from the user's profile page.
+- Per-provider settings: allowed email domains, trust provider emails, require Arena 2FA, show on login page.
+- Linking / unlinking external identities from the user's profile page.
 
-Out of scope (possible follow-ups):
+Out of scope (follow-ups):
 
-- Facebook and other OAuth2-only providers (no standard ID token; would need a provider-specific strategy).
-- Arena Mobile login (native flow with PKCE and an app redirect URI; separate project).
-- Single logout at the provider (RP-initiated logout): Arena logout keeps only revoking Arena's own tokens.
-- Self sign-up through OIDC, SCIM provisioning, mapping provider groups/claims to Arena roles.
+- Adapters for OAuth2-only providers (Facebook, GitHub) and Apple (OIDC, but needs a signed JWT client secret and a
+  form POST callback).
+- Domain-based routing (user types the email first, Arena picks the provider configured for that domain).
+- Arena Mobile login (native flow with PKCE and an app redirect URI).
+- Single logout at the provider (RP-initiated logout).
+- Self sign-up through external providers, SCIM provisioning, mapping provider groups/claims to Arena roles.
 - SAML.
 
 ## Current state (for reference)
@@ -39,53 +52,149 @@ Out of scope (possible follow-ups):
   `{ user, survey, authToken }`).
 - `@openforis/arena-server` (`src/api/auth/authTokenRefresh.ts`): `POST /auth/token/refresh` rotates the refresh
   token cookie and returns a new access token.
+- arena-server calls Arena-specific logic through services registered by Arena in the `ServiceRegistry`
+  (`server/system/arenaServerServices.ts`).
 - Arena: user statuses `INVITED`, `FORCE_CHANGE_PASSWORD`, `ACCEPTED` (`core/user/user.ts`); invited users accept by
   setting name and password on the reset-password page (`server/modules/user/service/userService.ts` `resetPassword`).
-- Arena webapp: login form `webapp/views/Guest/views/Login/Login.js`, login actions `webapp/store/login/actions.js`.
+- Arena: AES-256-GCM encryption of small secrets at rest in `server/utils/crypto/secretBox.ts` (currently tied to
+  `AI_USER_KEY_ENCRYPTION_SECRET`).
+- Arena webapp: login form `webapp/views/Guest/views/Login/Login.js`; system admin pages under
+  `webapp/views/App/views/SystemAdmin/` (`systemAdminModules` in `webapp/app/appModules.js`).
 
 ## Design decisions
 
-### Configuration
+### Provider model
 
-Providers are configured with environment variables, read by arena-server (`ProcessEnv`):
+```ts
+type AuthProviderType = 'oidc' | 'google' | 'microsoft' // presets of the OIDC adapter; more adapter types later
 
+interface AuthProvider {
+  id: string // stable slug, e.g. "google", "fao": immutable once created (used in URLs and identity links)
+  type: AuthProviderType
+  label: string // button text: "Sign in with <label>"
+  enabled: boolean
+  showOnLoginPage: boolean // false: reachable only with /guest/login?provider=<id>
+  order: number
+  issuer?: string // oidc only; preset types know their issuer
+  tenant?: string // microsoft only: tenant id, or "common" / "organizations" for multi-tenant
+  clientId: string
+  clientSecret: string // write-only in the API and UI; encrypted at rest
+  scopes: string[] // default ["openid", "email", "profile"]
+  allowedEmailDomains: string[] // empty = any domain
+  trustEmail: boolean // treat the email as verified even if the provider omits email_verified (default false)
+  requireArena2FA: boolean // default true: users with Arena 2FA enabled must still enter their code
+  icon: { kind: 'builtin' | 'uploaded' | 'generic'; ref?: string }
+  source: 'db' | 'env' // env providers are read-only in the UI
+}
 ```
-OIDC_PROVIDERS=google,institution                 # provider ids, comma-separated; empty = feature off
-OIDC_GOOGLE_ISSUER=https://accounts.google.com
-OIDC_GOOGLE_CLIENT_ID=...
-OIDC_GOOGLE_CLIENT_SECRET=...
-OIDC_GOOGLE_LABEL=Google                          # button label
-OIDC_GOOGLE_SCOPES=openid email profile           # optional, this is the default
-OIDC_GOOGLE_ALLOWED_EMAIL_DOMAINS=fao.org         # optional, restricts who can use this provider
-OIDC_INSTITUTION_ISSUER=https://sso.example.org/realms/main
-...
-OIDC_REDIRECT_BASE_URL=https://arena.example.org  # callback = <base>/auth/oidc/<id>/callback
+
+### Provider adapters
+
+```ts
+interface ExternalIdentity {
+  issuer: string
+  subject: string
+  email?: string
+  emailVerified: boolean
+  name?: string
+}
+
+interface AuthProviderAdapter {
+  buildAuthorizationUrl(params: { provider: AuthProvider; redirectUri: string; flow: FlowParams }): Promise<URL>
+  handleCallback(params: { provider: AuthProvider; redirectUri: string; flow: FlowParams; currentUrl: URL }): Promise<ExternalIdentity>
+  testConnection(provider: AuthProvider): Promise<void> // used by the admin UI "Test" button
+}
 ```
 
-Issuer metadata is fetched with OIDC discovery (`<issuer>/.well-known/openid-configuration`) lazily on first use and
-cached; a discovery failure disables only that provider and is logged, it must not prevent the server from starting.
+Only the OIDC adapter is implemented now; `google` and `microsoft` are presets of it (fixed issuer, default icon and
+label). Microsoft multi-tenant (`tenant` = `common` / `organizations`): the ID token issuer is
+`https://login.microsoftonline.com/<user tenant id>/v2.0`, so the adapter validates it against that template instead
+of the discovery document's issuer, and stores the actual `iss` in the identity link.
 
-The public list of configured providers (id + label only) is exposed by a new unauthenticated
-`GET /auth/oidc/providers` endpoint, so the webapp does not need build-time variables.
+### Configuration storage
+
+New table in the `public` schema (arena-server migration):
+
+```sql
+CREATE TABLE auth_provider (
+  id            varchar(64) PRIMARY KEY,    -- slug, immutable
+  type          varchar(32) NOT NULL,
+  props         jsonb       NOT NULL,       -- label, issuer, tenant, clientId, scopes, flags, icon, order, ...
+  client_secret text,                       -- secretBox envelope ("v1:..."), never returned by the API
+  icon_file     bytea,                      -- uploaded icon (PNG or sanitized SVG, max 100 KB)
+  date_created  timestamptz NOT NULL DEFAULT now(),
+  date_modified timestamptz NOT NULL DEFAULT now()
+);
+```
+
+- Client secrets are encrypted with `secretBox`, generalized to take the key variable name, using a new
+  `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY` (64 hex chars). The UI shows an explanatory error and disables the page if
+  the key is not set.
+- Environment providers: `AUTH_PROVIDERS_CONFIG` = path to a JSON file (or inline JSON) with an array of providers
+  (same shape as above, without secrets); each secret in `AUTH_PROVIDER_<ID>_CLIENT_SECRET`. A DB provider with the
+  same id as an env provider is refused.
+- arena-server reads providers through a new `ServerServiceType.authProvider` service implemented by Arena (Arena
+  owns the encryption key and the env parsing), with an in-process cache. The cache is invalidated on every change
+  made in this process and expires after 60 s, so all cluster instances pick up admin changes within a minute.
+- OIDC discovery metadata is fetched lazily on first use and cached per provider (until its config changes); a
+  discovery failure disables only that provider and is logged.
+
+### Admin UI: "Login providers"
+
+New system admin page (`systemAdminModules.authProviders`, `webapp/views/App/views/SystemAdmin/AuthProviders/`):
+
+- **List:** icon, label, type, enabled, shown on login page, number of linked users, source (DB / environment);
+  drag to reorder.
+- **Add:** choose a preset (Google, Microsoft, Generic OpenID Connect); the form then shows only the relevant fields.
+- **Form fields:** id (editable only on creation; suggested from the label), label, issuer (generic) or tenant
+  (Microsoft), client id, client secret (write-only: "set" / "change"), scopes, allowed email domains, trust provider
+  emails, require Arena 2FA, show on login page, enabled, icon (built-in / upload / generic).
+- **Redirect URI:** shown read-only with a copy button
+  (`<public base URL>/auth/oidc/<id>/callback`), with short instructions for registering it at the provider.
+- **Test:** runs the adapter's `testConnection` (discovery + JWKS fetch) and shows the result. An optional
+  "Test sign-in" opens the real flow in a new tab in a test mode that reports the claims received without logging in
+  or linking anything.
+- **Disable / delete:** disabling hides the button and refuses callbacks but keeps identity links. Deleting asks for
+  confirmation and lists the users linked *only* to this provider and without a password (they will not be able to log
+  in until they set a password via "forgot password"); identity links are deleted with the provider.
+- Environment providers are shown read-only with a "Managed by environment variables" note.
+- API (system admin only), in a new `server/modules/authProvider/` module (`api/`, `service/`, `repository/`):
+  `GET/POST /api/admin/auth-providers`, `GET/PUT/DELETE /api/admin/auth-providers/:id`,
+  `POST /api/admin/auth-providers/:id/test`, `PUT /api/admin/auth-providers/order`,
+  `PUT /api/admin/auth-providers/:id/icon`.
+- Every change is written to the server log with the admin user and the changed fields (never the secret).
+
+### Login page and icons
+
+- `GET /auth/providers` (public): `[{ id, label, iconUrl }]` for enabled providers with `showOnLoginPage`, in the
+  configured order. `GET /auth/providers/:id/icon` serves uploaded icons.
+- One button per provider below the email/password form ("or" divider), full width, outlined, theme colors
+  (no hard-coded colors), with the provider icon on the left and "Sign in with <label>" (i18n) as text.
+- **Built-in icons:** SVG brand logos for the presets (Google "G", Microsoft four squares) in
+  `web-resources/img/auth-providers/`. Logos keep their official brand colors (they are brand assets, not UI colors),
+  while the button itself uses the theme: this matches Google's and Microsoft's sign-in branding guidelines (neutral
+  button + official logo + "Sign in with Google" / "Sign in with Microsoft"). The logo must not be recolored or
+  altered.
+- **Custom providers:** uploaded icon (PNG, or SVG sanitized server-side with DOMPurify, max 100 KB, shown at
+  20×20 px), or a generic "login" icon from the MUI icon set when none is uploaded.
+- `/guest/login?provider=<id>` starts the flow directly for providers not shown on the login page.
+- `oidcError` query param → translated error message.
 
 ### Flow
 
-1. The login page shows a "Sign in with <label>" button per provider; clicking it navigates (full page) to
-   `GET /auth/oidc/:providerId`.
+1. Clicking a provider button navigates (full page) to `GET /auth/oidc/:providerId`.
 2. arena-server generates `state`, `nonce` and a PKCE `code_verifier`, stores them in a short-lived (10 min), signed,
    `httpOnly`, `SameSite=Lax` cookie scoped to `/auth/oidc/` (Lax is required: the callback is a cross-site top-level
-   GET navigation), and redirects to the provider's authorization endpoint.
+   GET navigation), and redirects to the provider's authorization endpoint (built by the adapter).
 3. The provider redirects back to `GET /auth/oidc/:providerId/callback?code=...&state=...`.
-4. arena-server validates `state`, exchanges the code (with the PKCE verifier), validates the ID token (signature,
-   issuer, audience, expiry, nonce) with `openid-client`, then clears the flow cookie.
-5. The user is resolved (see "Access rules"). On success the same token creation as the password login runs
-   (refactor `authenticationSuccessful` so that the "send JSON" part is separate from the "create tokens + set refresh
-   cookie" part), and the response redirects to `/app/home/`.
-6. On failure the response redirects to `/guest/login?oidcError=<errorKey>`; the login page shows the translated
-   message. Error details are logged server-side, never put in the URL.
+4. The adapter validates `state`, exchanges the code (with the PKCE verifier), validates the ID token (signature,
+   issuer, audience, expiry, nonce) and returns the `ExternalIdentity`; the flow cookie is cleared.
+5. The user is resolved (see "Access rules") and, if required, Arena 2FA is checked (see "2FA").
+6. Same token creation as the password login (refactor `authenticationSuccessful` so that "create tokens + set refresh
+   cookie" is separate from "send JSON"), then redirect to `/app/home/`.
+7. On failure: redirect to `/guest/login?oidcError=<errorKey>`; details are logged server-side, never put in the URL.
 
-The access token is never put in a URL. The webapp needs no special post-login handling: `/auth/user` returns 401,
-the interceptor calls `/auth/token/refresh` with the cookie and retries.
+The access token is never put in a URL.
 
 To check during implementation: the refresh cookie is `SameSite=Strict` in production. It is set on the callback
 response (setting is allowed) and is only sent later by same-site `fetch` calls from the loaded app, so it should
@@ -99,8 +208,8 @@ New table in the `public` schema (arena-server migration):
 CREATE TABLE user_external_identity (
   id             bigserial PRIMARY KEY,
   user_uuid      uuid        NOT NULL REFERENCES "user" (uuid) ON DELETE CASCADE,
-  provider_id    varchar(64) NOT NULL,  -- id from OIDC_PROVIDERS
-  issuer         text        NOT NULL,  -- iss claim, so a provider id reused for another issuer does not match
+  provider_id    varchar(64) NOT NULL REFERENCES auth_provider (id) ON DELETE CASCADE, -- see note on env providers
+  issuer         text        NOT NULL,  -- actual iss claim (per tenant for Microsoft multi-tenant)
   subject        text        NOT NULL,  -- sub claim: stable, never reassigned by the provider
   email          text,                  -- informational, as last seen
   date_created   timestamptz NOT NULL DEFAULT now(),
@@ -110,124 +219,145 @@ CREATE TABLE user_external_identity (
 );
 ```
 
-Users are matched by `(issuer, subject)`, never by email alone after the first link: emails can change or be
-reassigned at the provider.
+Env providers are not in `auth_provider`: either insert a placeholder row for them at startup (`type`, `props.source =
+'env'`, no secret) or drop the foreign key; decide in Task 2 (placeholder row preferred, keeps the cascade).
+
+Users are matched by `(issuer, subject)`, never by email alone after the first link.
 
 ### Access rules
 
-On callback, with the validated claims:
+On callback, with the normalized identity:
 
-1. `(issuer, sub)` already linked → that user. Done.
-2. Not linked: require `email` and `email_verified === true` (and the domain in `ALLOWED_EMAIL_DOMAINS` when set);
-   otherwise reject (`oidcEmailNotVerified` / `oidcEmailDomainNotAllowed`).
-3. Look up the Arena user by email (case-insensitive):
-   - `ACCEPTED` or `FORCE_CHANGE_PASSWORD` → link the identity and log in. A verified email at the provider proves
-     ownership of the address, which is the same proof the password reset flow relies on.
-   - `INVITED` → link, set status to `ACCEPTED`, set the name from the `name` claim if the user has none, log in
-     (this replaces the "set your password" step of the invitation; the user can still set a password later through
-     "forgot password").
+1. `(issuer, subject)` already linked → that user. Done.
+2. Not linked: require `email`, and `emailVerified` (or the provider's `trustEmail` flag); the email domain must be in
+   `allowedEmailDomains` when set. Otherwise reject (`oidcEmailNotVerified` / `oidcEmailDomainNotAllowed`).
+3. Look up the Arena user by email: case-insensitive; for `gmail.com` / `googlemail.com` addresses, compare the
+   normalized form (lowercase, dots and `+suffix` removed from the local part, `googlemail.com` → `gmail.com`), since
+   Gmail delivers all those variants to the same mailbox. If more than one Arena user matches the normalized form,
+   reject (`oidcAmbiguousEmail`) and let the user link from their profile instead.
+   - `ACCEPTED` or `FORCE_CHANGE_PASSWORD` → link the identity and log in.
+   - `INVITED` → link, set status to `ACCEPTED`, set the name from the `name` claim if the user has none, log in.
    - not found → reject with `oidcUserNotFound`; the message points to the access request page when
      `ALLOW_USER_ACCESS_REQUEST` is on. No automatic sign-up.
+4. A logged-in user linking from the profile page skips the email match: the identity is linked to the current user
+   (still refused if already linked to another user).
 
-Rate limiting: the existing login rate limiters also apply to the callback route.
+The login rate limiters also apply to the callback route.
 
 ### 2FA
 
-Arena 2FA is skipped for OIDC logins: authentication strength is the provider's responsibility (it can enforce MFA).
-Documented in the user manual. A per-provider `OIDC_<ID>_REQUIRE_ARENA_2FA=true` can be added later if needed.
+Per provider, `requireArena2FA` (default `true`): users who enabled Arena 2FA must still enter their Arena code after
+the provider login, so the external provider does not become a way around it. Implementation: the callback stores the
+pending login in a short-lived signed cookie and redirects to `/guest/login?step=2fa`; the existing 2FA step of the
+login form submits the code to a new `POST /auth/oidc/2fa` endpoint, which completes the login. Admins can turn it off
+for providers that enforce their own MFA.
 
 ### Users without a password
 
-Users created or accepted through OIDC may have no password. Check and adapt:
+Users accepted through an external provider may have no password:
 
-- Login with password: no password → "invalid credentials" (already the behavior of a failed compare; verify no
-  exception on `null` hash).
+- Password login: no password → "invalid credentials" (verify no exception on a `null` hash).
 - Profile "change password": allow setting a password without the old one when the user has none.
-- User export/backup (`server/modules/user/service/usersBackup/`, `userExportService.ts`): include linked identities
-  in the backup and import them back.
-- Arena Mobile: OIDC-only users cannot log in to the mobile app until mobile OIDC exists; they can set a password via
-  "forgot password". Note in the manual.
+- User export/backup (`server/modules/user/service/usersBackup/`, `userExportService.ts`): include identity links.
+- Arena Mobile: these users cannot log in to the mobile app until they set a password ("forgot password"); noted in
+  the manual.
 
 ### Account management
 
-- Profile page: "Linked accounts" section listing the user's identities (provider label, email, last used) with
-  "Link" (starts the flow in link mode, only for a logged-in user; the flow cookie records the user uuid) and "Unlink".
+- Profile page: "Linked accounts" section (provider icon and label, email, last used) with "Link" (starts the flow in
+  link mode; the flow cookie records the current user uuid) and "Unlink".
 - Unlink is refused if it would leave the user with no password and no other identity.
-- System admins see the linked providers in the user edit view (read-only) and can unlink them.
+- System admins see and can remove the linked identities in the user edit view.
 - User deletion: identities go with the `ON DELETE CASCADE`.
 
 ## Tasks
 
-### Task 1: arena-server — configuration and provider registry
+### Task 1: arena-server — adapter interface, OIDC adapter, provider service interface
 
 - Add `openid-client` dependency.
-- Parse `OIDC_*` variables in `ProcessEnv` (`oidcProviders: OidcProviderConfig[]`, `oidcRedirectBaseUrl`).
-- `OidcProviderRegistry`: lazy discovery + cache per provider, `getProvider(id)`, `listPublicProviders()`.
-- Unit tests: env parsing (missing/invalid variables, defaults), discovery failure isolates the provider.
+- `AuthProviderAdapter` and `ExternalIdentity` types; OIDC adapter with the Google and Microsoft presets (multi-tenant
+  issuer validation) and discovery cache.
+- `ServerServiceType.authProvider` interface: `getEnabledProviders()`, `getProvider(id)` (with decrypted secret),
+  `getIcon(id)`; in-process cache with 60 s TTL and explicit invalidation.
+- Unit tests: adapter against a mock OIDC provider (`oauth2-mock-server`), Microsoft issuer template, discovery
+  failure isolates the provider.
 
-### Task 2: arena-server — migration and repository
+### Task 2: arena-server — migrations and repositories
 
-- Migration creating `user_external_identity` (public schema).
-- `UserExternalIdentityRepository`: `insert`, `findByIssuerAndSubject`, `findByUserUuid`, `delete`, `updateLastUsed`.
-- Expose it through a `ServerServiceType.userExternalIdentity` service so Arena can call it.
+- Migrations creating `auth_provider` and `user_external_identity`.
+- `UserExternalIdentityRepository`: `insert`, `findByIssuerAndSubject`, `findByUserUuid`, `countByProviderId`,
+  `delete`, `updateLastUsed`; exposed through a `ServerServiceType.userExternalIdentity` service.
 
 ### Task 3: arena-server — login routes
 
-- Refactor `authenticationSuccessful` in `src/api/auth/login.ts`: extract `createSessionTokens({ req, res, user })`
-  (tokens + refresh cookie), used by both the password login and the OIDC callback.
-- New `src/api/auth/oidc.ts`: `GET /auth/oidc/providers`, `GET /auth/oidc/:providerId`,
-  `GET /auth/oidc/:providerId/callback`, with the flow cookie and the access rules above. User lookup and
-  invitation acceptance go through the `user` service registered by Arena (add a method such as
-  `acceptInvitationExternal({ userUuid, name })` to the service interface in arena-core if needed).
-- Add the three paths to `pathsAllowedWithoutAuthentication`; add endpoints to `ApiEndpoint.auth`.
-- Apply the login rate limiters to the callback.
-- Tests against a mock OIDC provider (e.g. `oauth2-mock-server`): happy path, invalid state, nonce mismatch, unverified
-  email, unknown user, invited user acceptance, already linked user with a changed email, disallowed domain.
-- Release a new arena-server version (and arena-core if its user service interface changes).
+- Refactor `authenticationSuccessful` in `src/api/auth/login.ts`: extract `createSessionTokens({ req, res, user })`.
+- New `src/api/auth/oidc.ts`: `GET /auth/providers`, `GET /auth/providers/:id/icon`, `GET /auth/oidc/:providerId`,
+  `GET /auth/oidc/:providerId/callback`, `POST /auth/oidc/2fa`, link mode, test mode, access rules (incl. Gmail
+  normalization), per-provider flags.
+- Add the public paths to `pathsAllowedWithoutAuthentication`; endpoints in `ApiEndpoint.auth`; login rate limiters on
+  the callback and the 2FA endpoint.
+- Tests against the mock provider: happy path, invalid state, nonce mismatch, unverified email with and without
+  `trustEmail`, disallowed domain, unknown user, invited user acceptance, Gmail variants, ambiguous email, linked user
+  with changed email, 2FA required / not required, disabled provider, link mode.
+- Release a new arena-server version (and arena-core if the user service interface changes).
 
-### Task 4: Arena — server side
+### Task 4: Arena — provider configuration module
 
-- Bump `@openforis/arena-server` (and arena-core, keeping a single version: `yarn dedupe @openforis/arena-core`).
-- Implement the user service method(s) needed by the callback in `server/modules/user/service/userService.ts`
-  (invited user acceptance without a password).
-- API for the logged-in user: `GET /api/user/:userUuid/external-identities`, `DELETE .../:identityId` (self or system
-  admin; unlink rule above), in `server/modules/user/api/userApi.ts`.
-- Users backup export/import: include identities.
+- Generalize `server/utils/crypto/secretBox.ts` to take the key name; `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`.
+- `server/modules/authProvider/`: repository (`auth_provider`), env config parsing (`AUTH_PROVIDERS_CONFIG`,
+  `AUTH_PROVIDER_<ID>_CLIENT_SECRET`), service (validation: slug format, immutable id, required fields per type, unique
+  id across DB and env; SVG sanitization and size limit for icons), admin API, implementation of
+  `ServerServiceType.authProvider` registered in `server/system/arenaServerServices.ts`.
+- Bump `@openforis/arena-server` (and arena-core, single version: `yarn dedupe @openforis/arena-core`).
+- Integration tests for the admin API (permissions, secret never returned, env providers read-only, delete cascade).
+
+### Task 5: Arena — user side
+
+- User service method(s) needed by the callback (invited user acceptance without a password).
+- `GET /api/user/:userUuid/external-identities`, `DELETE .../:identityId` (self or system admin; unlink rule).
+- Users backup export/import: include identity links.
 - Allow setting a password without the old one when the user has none.
-- Integration tests for the new user API endpoints.
+- Integration tests.
 
-### Task 5: Arena — webapp
+### Task 6: Arena — webapp
 
-- `webapp/service/api/`: fetch providers, list/unlink identities.
-- Login page (`webapp/views/Guest/views/Login/Login.js`): provider buttons below the form (hidden when the list is
-  empty), `oidcError` query param → translated error.
+- Built-in icons in `web-resources/img/auth-providers/` (official Google and Microsoft SVG logos).
+- Login page: provider buttons with icons, `?provider=<id>` direct start, `?step=2fa` for the external login 2FA
+  step, `oidcError` messages.
+- System admin "Login providers" page: list, add (preset choice), edit form, secret field, icon picker/upload,
+  redirect URI with copy button, test connection, test sign-in, reorder, disable, delete with affected users list.
 - Profile / user edit view: "Linked accounts" section.
-- i18n keys (all supported languages) for buttons and the `oidc*` error keys.
-- No hard-coded colors: provider buttons use the standard secondary button style (no provider logos/brand colors).
+- i18n keys (all supported languages).
 
-### Task 6: Tests and documentation
+### Task 7: Tests and documentation
 
-- E2E (Playwright): run a mock OIDC provider in the e2e setup; spec covering login of an existing user, invitation
-  acceptance and the unknown-user error.
-- `docs/architecture.md`: authentication section (password, OIDC, tokens).
-- `docs/server-requirements.md`: OIDC environment variables and how to register the redirect URI at the provider.
-- User manual (`docs/user-manual/`, EN/FR/ES): login with an external provider, linked accounts, 2FA and Arena Mobile
-  notes, with screenshots.
+- E2E (Playwright) with a mock OIDC provider in the e2e setup: admin creates a generic provider in the UI, existing
+  user logs in with it, invitation acceptance, unknown-user error, 2FA step.
+- `docs/architecture.md`: authentication section (password, external providers, tokens, adapters).
+- `docs/server-requirements.md`: `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`, `AUTH_PROVIDERS_CONFIG`, how to register the
+  redirect URI at Google, Microsoft and Keycloak.
+- User manual (`docs/user-manual/`, EN/FR/ES): signing in with an external provider, linked accounts, the "Login
+  providers" admin page, 2FA and Arena Mobile notes, with screenshots.
 
 ## Security checklist
 
-- PKCE (S256) + `state` + `nonce` on every flow; flow cookie signed, `httpOnly`, `Secure` in production, 10 min TTL,
-  cleared on callback.
+- PKCE (S256) + `state` + `nonce` on every flow; flow and pending-2FA cookies signed, `httpOnly`, `Secure` in
+  production, short TTL, cleared after use.
 - ID token validated by `openid-client` (signature via JWKS, `iss`, `aud`, `exp`, `nonce`); algorithm `none` refused.
-- `email_verified` required for first-time linking by email.
+- Verified email (or explicit per-provider `trustEmail`) required for first-time linking by email.
+- Arena 2FA kept by default for users who enabled it.
+- Client secrets encrypted at rest, write-only in the API, never logged; uploaded SVG icons sanitized.
 - Redirect after login is always `/app/home/` (no user-supplied `returnTo`, avoiding open redirects).
-- No tokens or error details in URLs; client secrets only in environment variables, never logged.
-- Login rate limiting applied to the callback.
+- No tokens or error details in URLs.
+- Admin API restricted to system admins; every configuration change logged.
+- Login rate limiting applied to the callback and the external-login 2FA endpoint.
 
 ## Open questions
 
-- Should a system admin be able to restrict a user (or all users) to OIDC only, disabling password login?
-- Should first-time linking of an existing *password* user by verified email require confirmation (e.g. entering the
-  Arena password once), to protect against providers with weak email verification? Default in this plan: no, but
-  `ALLOWED_EMAIL_DOMAINS` and only configuring trusted providers mitigate the risk.
-- Is self sign-up through OIDC (creating users without an invitation) wanted for some instances?
+- Should a system admin be able to restrict a user (or all users) to external providers only, disabling password
+  login?
+- Should first-time linking of an existing *password* user by verified email require confirmation (entering the Arena
+  password once)? Default in this plan: no, mitigated by per-provider allowed domains, `trustEmail` off by default and
+  Arena 2FA kept.
+- Is self sign-up through external providers (creating users without an invitation) wanted for some instances?
+- Should survey admins (not only system admins) be able to see which login method their survey users use?
