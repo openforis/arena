@@ -10,4 +10,4 @@ export const columns = {
 
 export const name = '_node_keys'
 
-export const getNameWithSchema = (surveyId) => `${SchemaRdb.getName(surveyId)}.${name}`
+export const getNameWithSchema = (surveyId: number): string => `${SchemaRdb.getName(surveyId)}.${name}`

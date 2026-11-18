@@ -3,7 +3,9 @@ import Job from '@server/job/job'
 import SurveyRdbCreationJob from './surveyRdbCreationJob'
 
 export default class SurveysRdbRefreshJob extends Job {
-  constructor(params) {
+  static readonly type = 'SurveysRdbRefreshJob'
+
+  constructor(params?: any) {
     super(SurveysRdbRefreshJob.type, params)
   }
 
@@ -39,5 +41,3 @@ export default class SurveysRdbRefreshJob extends Job {
     this.logDebug(message)
   }
 }
-
-SurveysRdbRefreshJob.type = 'SurveysRdbRefreshJob'

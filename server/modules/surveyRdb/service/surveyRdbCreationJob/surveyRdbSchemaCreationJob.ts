@@ -3,7 +3,9 @@ import Job from '@server/job/job'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 export default class SurveyRdbSchemaCreationJob extends Job {
-  constructor(params) {
+  static readonly type = 'SurveyRdbSchemaCreationJob'
+
+  constructor(params?: any) {
     super(SurveyRdbSchemaCreationJob.type, params)
   }
 
@@ -17,5 +19,3 @@ export default class SurveyRdbSchemaCreationJob extends Job {
     this.logDebug(`${jobDescription} - end`)
   }
 }
-
-SurveyRdbSchemaCreationJob.type = 'SurveyRdbSchemaCreationJob'

@@ -1,3 +1,5 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
@@ -12,8 +14,10 @@ export const getName = NodeDefTable.getViewName
 /**
  * @deprecated - Use ViewDataNodeDef.
  */
-export const getNameWithSchema = (surveyId) => (nodeDef) =>
-  `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDef)}`
+export const getNameWithSchema =
+  (surveyId: number) =>
+  (nodeDef: ArenaNodeDef<NodeDefType>): string =>
+    `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDef)}`
 
 /**
  * @deprecated - Use ViewDataNodeDef.
@@ -29,4 +33,5 @@ export const columns = {
 /**
  * @deprecated - Use ViewDataNodeDef.
  */
-export const getColUuid = (nodeDef) => `${NodeDef.getName(nodeDef)}_${DataTable.columnNameUuid}`
+export const getColUuid = (nodeDef: ArenaNodeDef<NodeDefType>): string =>
+  `${NodeDef.getName(nodeDef)}_${DataTable.columnNameUuid}`
