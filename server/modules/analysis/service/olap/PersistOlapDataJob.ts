@@ -1,4 +1,4 @@
-import { FileNames } from '@openforis/arena-core'
+import { FileNames, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
@@ -18,7 +18,14 @@ const insertBatchSize = 1000
 const zipEntryNamePrefix = 'OLAP_'
 
 export default class PersistOlapDataJob extends Job {
-  constructor(params) {
+  static readonly type = 'PersistOlapDataJob'
+  chain: any
+  cycle: string
+  fileZip: any
+  reader: any
+  survey: ArenaSurvey
+
+  constructor(params?: any) {
     super(PersistOlapDataJob.type, params)
 
     this.survey = null
@@ -71,7 +78,7 @@ export default class PersistOlapDataJob extends Job {
     await SurveyRdbManager.clearOlapData({ survey, cycle, chain, entityDef }, tx)
 
     const olapDataRowsBatchPersister = new BatchPersister(
-      async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
+      (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
       insertBatchSize
     )
     const stream = await this.fileZip.getEntryStream(zipEntryName)
@@ -122,5 +129,3 @@ export default class PersistOlapDataJob extends Job {
     this.fileZip?.close()
   }
 }
-
-PersistOlapDataJob.type = 'PersistOlapDataJob'
