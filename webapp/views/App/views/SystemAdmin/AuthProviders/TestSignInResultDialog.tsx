@@ -45,9 +45,9 @@ export const TestSignInResultDialog = ({ result, onClose }: { result: TestSignIn
           </div>
         ) : (
           <>
-            <div className="auth-providers__alert auth-providers__alert--success" role="status">
+            <output className="auth-providers__alert auth-providers__alert--success">
               {i18n.t('authProvidersView:testResult.success')}
-            </div>
+            </output>
             <dl className="auth-providers__kv" data-testid="auth-provider-test-result">
               <Row label="authProvidersView:testResult.issuer">{identity.issuer}</Row>
               <Row label="authProvidersView:testResult.subject">{identity.subject}</Row>

@@ -122,7 +122,7 @@ export const deleteProvider = async ({
   const usersToNotify = notifyUsers ? await service.getUsersWithoutOtherSignInMethod(id) : []
   const { deletedIdentities } = await service.deleteItem(id)
   logChange({ user, action: 'deleted', id })
-  for (const userToNotify of usersToNotify) {
+  const notifyUser = async (userToNotify: { email: string; name: string | null }) => {
     try {
       await Mailer.sendEmail({
         to: userToNotify.email,
@@ -133,6 +133,7 @@ export const deleteProvider = async ({
       logger.error(`error notifying ${userToNotify.email} of the deletion of provider "${id}": ${error.message}`)
     }
   }
+  await Promise.all(usersToNotify.map(notifyUser))
   return { deletedIdentities, notifiedUsers: usersToNotify.length }
 }
 

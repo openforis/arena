@@ -23,7 +23,8 @@ export const AuthProviderIcon = ({ providerId, type, iconKind, iconVersion }: Pr
     return <img alt="" aria-hidden="true" className="auth-provider-icon" src={builtinIconByType[type]} />
   }
   if (iconKind === 'uploaded') {
-    const src = `${getProviderIconUrl(providerId)}${iconVersion ? `?v=${iconVersion}` : ''}`
+    const versionQuery = iconVersion ? `?v=${iconVersion}` : ''
+    const src = getProviderIconUrl(providerId) + versionQuery
     return <img alt="" aria-hidden="true" className="auth-provider-icon" src={src} />
   }
   return <span aria-hidden="true" className="icon icon-enter auth-provider-icon auth-provider-icon--generic" />

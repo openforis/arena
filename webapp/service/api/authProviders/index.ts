@@ -23,7 +23,8 @@ export const getExternalLoginStartUrl = ({
   query?: Record<string, string>
 }): string => {
   const search = new URLSearchParams(query).toString()
-  return `/auth/oidc/${encodeURIComponent(providerId)}${search ? `?${search}` : ''}`
+  const path = `/auth/oidc/${encodeURIComponent(providerId)}`
+  return search ? `${path}?${search}` : path
 }
 
 export const getProviderIconUrl = (providerId: string): string =>

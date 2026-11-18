@@ -33,7 +33,8 @@ import { TestSignInResultDialog } from './TestSignInResultDialog'
 
 type Draft = Partial<AdminAuthProvider> & { clientSecret?: string }
 type OnChange = (changes: Partial<Draft>) => void
-type SectionProps = { draft: Draft; isNew?: boolean; readOnly: boolean; onChange: OnChange }
+type SectionProps = { draft: Draft; readOnly: boolean; onChange: OnChange }
+type SectionWithNewProps = SectionProps & { isNew?: boolean }
 
 const listUri = () => appModuleUri(systemAdminModules.authProviders)
 
@@ -67,16 +68,16 @@ const toI18nKey = (key: string): string => key.replace(/^appErrors\./, 'appError
 
 const getErrorMessage = (error: any, i18n): string => {
   const data = error?.response?.data
-  const fieldErrors = data?.params?.errors
+  const fieldErrors: Record<string, string> | undefined = data?.params?.errors
   if (fieldErrors) {
     return Object.values(fieldErrors)
-      .map((key) => i18n.t(toI18nKey(String(key))))
+      .map((key) => i18n.t(toI18nKey(key)))
       .join('. ')
   }
   return i18n.t(toI18nKey(data?.key ?? data?.message ?? 'appErrors:generic'), data?.params)
 }
 
-const GeneralSection = ({ draft, isNew = false, readOnly, onChange }: SectionProps) => {
+const GeneralSection = ({ draft, isNew = false, readOnly, onChange }: SectionWithNewProps) => {
   const i18n = useI18n()
   const isPreset = draft.type !== 'oidc'
   return (
@@ -146,7 +147,7 @@ const IconEditor = ({ draft, onChange }: { draft: Draft; onChange: OnChange }) =
   )
 }
 
-const ConnectionSection = ({ draft, isNew = false, readOnly, onChange }: SectionProps) => {
+const ConnectionSection = ({ draft, isNew = false, readOnly, onChange }: SectionWithNewProps) => {
   const i18n = useI18n()
   return (
     <section className="auth-provider-edit__section">
