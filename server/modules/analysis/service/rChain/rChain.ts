@@ -37,6 +37,40 @@ const FILE_R_PROFILE = FileUtils.join(__dirname, 'rFile', '.Rprofile')
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
 class RChain {
+  static readonly dirNames = { user: 'user', system: 'system', sampling: 'sampling' }
+  _analysisNodeDefs: any
+  _chain: any
+  _chainUuid: string
+  _cycle: any
+  _dir: any
+  _dirNames: any
+  _dirResults: any
+  _dirSampling: any
+  _dirSystem: any
+  _dirUser: any
+  _entities: any
+  _entitiesWithActiveQuantitativeVariables: any
+  _fileArena: any
+  _fileCalculateResults: any
+  _fileChainSummaryJsonPath: any
+  _fileClose: any
+  _fileCommon: any
+  _fileCommonEnd: any
+  _fileInit: any
+  _fileLogin: any
+  _filePersistResults: any
+  _filePersistUserScripts: any
+  _fileRProfile: any
+  _fileRStudioProject: any
+  _fileReadData: any
+  _fileStatisticalAnalysis: any
+  _listCategories: any
+  _listTaxonomies: any
+  _serverUrl: any
+  _survey: any
+  _surveyId: number
+  _token: any
+
   constructor({ surveyId, cycle, chainUuid, serverUrl, token }) {
     this._surveyId = surveyId
     this._survey = null
@@ -366,7 +400,5 @@ class RChain {
     return this
   }
 }
-
-RChain.dirNames = { user: 'user', system: 'system', sampling: 'sampling' }
 
 export default RChain

@@ -17,5 +17,6 @@ export default class RFileStatisticalAnalysis extends RFileSystem {
         print('arena_process_response')
       )
     }
+    return this
   }
 }
