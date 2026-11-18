@@ -1,4 +1,4 @@
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import { getFileContentStorageType, fileContentStorageTypes } from '@server/modules/file/manager/fileManagerCommon'
@@ -17,7 +17,7 @@ const contentDeleteFunctionByStorageType = {
  * @param recordUuids
  * @param client
  */
-export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
+export const deleteFilesByRecordUuids = async (surveyId: number, recordUuids: string[], client: DbClient = db) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
   if (deleteFn) {
@@ -39,7 +39,7 @@ export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = d
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<void>} - The result promise.
  */
-export const deleteFiles = async ({ surveyId, files }, client = db) => {
+export const deleteFiles = async ({ surveyId, files }: { surveyId: number; files: any }, client: DbClient = db) => {
   if (files.length === 0) return
   const fileSummaries = files.map(({ fileUuid, recordUuid }) => ({ uuid: fileUuid, props: { recordUuid } }))
   await SurveyFileManager.deleteFilesAndContent({ surveyId, fileSummaries }, client)
@@ -54,8 +54,10 @@ export const deleteFiles = async ({ surveyId, files }, client = db) => {
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<void>} - The result promise.
  */
-export const deleteFileByUuid = async ({ surveyId, fileUuid, recordUuid }, client = db) =>
-  deleteFiles({ surveyId, files: [{ fileUuid, recordUuid }] }, client)
+export const deleteFileByUuid = (
+  { surveyId, fileUuid, recordUuid }: { surveyId: number; fileUuid: string; recordUuid: string },
+  client: DbClient = db
+) => deleteFiles({ surveyId, files: [{ fileUuid, recordUuid }] }, client)
 
 /**
  * Hard-deletes the files (storage content + DB rows) associated with file-attribute nodes
@@ -72,7 +74,10 @@ export const deleteFileByUuid = async ({ surveyId, fileUuid, recordUuid }, clien
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<void>} - The result promise.
  */
-export const deleteFilesByNodeDefUuids = async ({ surveyId, nodeDefUuids }, client = db) => {
+export const deleteFilesByNodeDefUuids = async (
+  { surveyId, nodeDefUuids }: { surveyId: number; nodeDefUuids: string[] },
+  client: DbClient = db
+) => {
   const fileNodes = await NodeRepository.fetchFileValueNodesByNodeDefUuids({ surveyId, nodeDefUuids }, client)
   await deleteFiles({ surveyId, files: fileNodes }, client)
 }

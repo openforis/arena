@@ -41,7 +41,7 @@ export const findFilesToRemove = ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  nodes: any[]
+  nodes: ArenaRecordNode[]
 }): FileToRemove[] => {
   const files: FileToRemove[] = []
   for (const node of nodes) {

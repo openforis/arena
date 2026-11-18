@@ -1,4 +1,4 @@
-import { Objects } from '@openforis/arena-core'
+import { Objects, type Record as ArenaRecord, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -43,6 +43,12 @@ export const recordMatchesQualifierFilters = ({
   qualifierFilters,
   pendingNode = null,
   canEditQualifierValue = false,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+  qualifierFilters: any
+  pendingNode?: any
+  canEditQualifierValue?: any
 }) => {
   if (qualifierFilters.length === 0) return true
   if (Record.getNodesArray(record).length === 0) return true

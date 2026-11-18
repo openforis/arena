@@ -1,6 +1,14 @@
 import * as A from '@core/arena'
 
-import { Authorizer } from '@openforis/arena-core'
+import {
+  Authorizer,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type ArenaRecordNode,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+} from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -17,7 +25,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -59,8 +67,23 @@ export const fetchRecordsSummaryBySurveyId = async (
     includePreview = false,
     includeCounts = false,
     user = null,
+  }: {
+    surveyId: number
+    offset?: number
+    limit?: number | null
+    sortBy?: string | null
+    sortOrder?: string | null
+    cycle?: string
+    search?: string | null
+    step?: any
+    recordUuid?: string
+    ownerUuid?: string
+    includeRootKeyValues?: boolean
+    includePreview?: boolean
+    includeCounts?: boolean
+    user?: ArenaUser
   },
-  client = db
+  client: DbClient = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft =
@@ -152,8 +175,13 @@ export const fetchRecordsSummaryBySurveyId = async (
 }
 
 export const fetchRecordSummary = async (
-  { surveyId, recordUuid, includeRootKeyValues = true, includePreview = false },
-  client = db
+  {
+    surveyId,
+    recordUuid,
+    includeRootKeyValues = true,
+    includePreview = false,
+  }: { surveyId: number; recordUuid: string; includeRootKeyValues?: boolean; includePreview?: boolean },
+  client: DbClient = db
 ) => {
   const { list } = await fetchRecordsSummaryBySurveyId(
     { surveyId, recordUuid, includeRootKeyValues, includePreview },
@@ -163,8 +191,14 @@ export const fetchRecordSummary = async (
 }
 
 export const countRecordsBySurveyId = async (
-  { surveyId, cycle: cycleParam, search, ownerUuid, user = null },
-  client = db
+  {
+    surveyId,
+    cycle: cycleParam,
+    search,
+    ownerUuid,
+    user = null,
+  }: { surveyId: number; cycle: string; search: string | null; ownerUuid: string; user?: ArenaUser },
+  client: DbClient = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft =
@@ -198,7 +232,7 @@ export const countRecordsBySurveyId = async (
 // Cheap existence/count check across all cycles, without the survey/root-node-def/summary-defs
 // lookups the search-aware countRecordsBySurveyId above needs - used where only "does this survey
 // have any records at all" matters (e.g. the publish record-values-update warning check).
-export const countAllRecordsBySurveyId = async ({ surveyId }, client = db) =>
+export const countAllRecordsBySurveyId = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   RecordRepository.countRecordsBySurveyId({ surveyId }, client)
 
 export {
@@ -216,7 +250,10 @@ export {
   updateRecordMergedInto,
 } from '../repository/recordRepository'
 
-const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
+const _fetchAndSetRecordOwner = async (
+  { ownerUuid, record }: { ownerUuid: string; record: ArenaRecord },
+  client: DbClient = db
+) => {
   const owner = await UserManager.fetchUserByUuid(ownerUuid, client)
   record[Record.keys.ownerName] = User.getName(owner)
   record[Record.keys.ownerEmail] = User.getEmail(owner)
@@ -231,7 +268,10 @@ const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
 // a given user) recomputes it fresh in memory for that user. The pure recompute algorithm
 // lives in core (Record.recomputeUserDependentNodeState) - this only handles the DB-dependent
 // parts: the cheap gate to skip survey-wide expression scanning, and loading node defs.
-const _recomputeUserDependentNodeState = async ({ user, surveyId, draft, record }, client) => {
+const _recomputeUserDependentNodeState = async (
+  { user, surveyId, draft, record }: { user: ArenaUser; surveyId: number; draft: boolean; record: ArenaRecord },
+  client: DbClient
+) => {
   const hasUserDependentExpressions = await NodeDefRepository.fetchSurveyHasUserDependentExpressions(
     { surveyId, draft },
     client
@@ -257,8 +297,17 @@ export const fetchRecordAndNodesByUuid = async (
     includeSurveyUuid = true,
     includeRecordUuid = true,
     user = null,
+  }: {
+    surveyId: number
+    recordUuid: string
+    draft?: boolean
+    fetchForUpdate?: boolean
+    includeRefData?: boolean
+    includeSurveyUuid?: boolean
+    includeRecordUuid?: boolean
+    user?: ArenaUser
   },
-  client = db
+  client: DbClient = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
   if (!record) return null
@@ -296,7 +345,10 @@ export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/no
 
 export { recordMatchesQualifierFilters } from './_recordManager/recordQualifierMatcher'
 
-const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
+const fetchNodeRefData = async (
+  { survey, node, isCode }: { survey: ArenaSurvey; node: ArenaRecordNode; isCode: boolean },
+  client: DbClient
+) => {
   const surveyId = Survey.getId(survey)
   if (isCode) {
     const categoryItemUuid = Node.getCategoryItemUuid(node)
@@ -324,7 +376,15 @@ const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   }
 }
 
-const isRefDataSourceBig = ({ survey, nodeDef, isCode }) => {
+const isRefDataSourceBig = ({
+  survey,
+  nodeDef,
+  isCode,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  isCode: boolean
+}) => {
   if (isCode) {
     const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
     const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
@@ -335,7 +395,14 @@ const isRefDataSourceBig = ({ survey, nodeDef, isCode }) => {
   return Taxonomy.isBigTaxonomy(taxonomy)
 }
 
-export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesTaxonomies = true }, client = db) => {
+export const assocRefDataToNodes = async (
+  {
+    survey,
+    nodes,
+    onlyForBigCategoriesTaxonomies = true,
+  }: { survey: ArenaSurvey; nodes: ArenaRecordNode[]; onlyForBigCategoriesTaxonomies?: boolean },
+  client: DbClient = db
+) => {
   for (const node of nodes) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const isCode = NodeDef.isCode(nodeDef)
@@ -370,7 +437,17 @@ export {
   findNodeDefUuidsToClearOnNodePersist,
 } from './_recordManager/nonApplicableValuesClearPreview'
 
-export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo, recordUuids }, client = db) =>
+export const updateRecordsStep = (
+  {
+    user,
+    surveyId,
+    cycle,
+    stepFrom,
+    stepTo,
+    recordUuids,
+  }: { user: ArenaUser; surveyId: number; cycle: string; stepFrom: any; stepTo: any; recordUuids: string[] },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const recordsSummaryToMove = await RecordRepository.fetchRecordsSummaryBySurveyId(
       {
@@ -390,7 +467,10 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
     return { count: recordsSummaryToMove.length }
   })
 
-export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
+export const updateNodes = (
+  { user, surveyId, nodes }: { user: ArenaUser; surveyId: number; nodes: ArenaRecordNode[] },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
       const logContent = A.pick([
@@ -409,7 +489,15 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
 
 export { updateRecordDateModified, updateRecordsOwner } from '../repository/recordRepository'
 
-export const updateRecordOwner = async ({ user, surveyId, recordUuid, ownerUuid }, client = db) =>
+export const updateRecordOwner = (
+  {
+    user,
+    surveyId,
+    recordUuid,
+    ownerUuid,
+  }: { user: ArenaUser; surveyId: number; recordUuid: string; ownerUuid: string },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const logContent = { recordUuid, ownerUuid }
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordOwnerUpdate, logContent, false, t)

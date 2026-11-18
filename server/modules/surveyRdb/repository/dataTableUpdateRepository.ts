@@ -4,6 +4,7 @@ import type {
   ArenaRecordNode,
   Survey as ArenaSurvey,
   NodeDef as ArenaNodeDef,
+  NodeDefEntity,
   NodeDefType,
 } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
@@ -222,7 +223,12 @@ export const updateTables = async (
 }
 
 export const updateRecordStep = (
-  { surveyId, recordUuid, stepId, tableDef }: { surveyId: number; recordUuid: string; stepId: number; tableDef: any },
+  {
+    surveyId,
+    recordUuid,
+    stepId,
+    tableDef,
+  }: { surveyId: number; recordUuid: string; stepId: string; tableDef: NodeDefEntity },
   client: DbClient
 ) => {
   const tableName = NodeDefTable.getTableName(tableDef)
