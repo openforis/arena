@@ -1,17 +1,18 @@
-import { db } from '@server/db/db'
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { Schemata } from '@common/model/db'
 import * as NodeHierarchyDisaggregatedView from '../schemaRdb/nodeHierarchyDisaggregatedView'
 
 const { columns } = NodeHierarchyDisaggregatedView
 
 // ====== CREATE
 
-export const createNodeHierarchyDisaggregatedView = async (survey, client = db) => {
+export const createNodeHierarchyDisaggregatedView = async (survey: ArenaSurvey, client: DbClient = db) => {
   const surveyId = Survey.getId(survey)
-  const surveySchema = getSurveyDBSchema(surveyId)
+  const surveySchema = Schemata.getSchemaSurvey(surveyId)
 
   await client.query(`
     CREATE VIEW ${NodeHierarchyDisaggregatedView.getNameWithSchema(surveyId)} AS

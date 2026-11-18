@@ -1,20 +1,20 @@
 import { Schemata } from '@common/model/db'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 const dataTablePrefix = 'data_'
 const nodeViewPrefix = '_node_'
 const olapDataTablePrefix = TableOlapData.tableNamePrefix
 
-export const dropSchema = async (surveyId, client = db) =>
+export const dropSchema = (surveyId: number, client: DbClient = db) =>
   client.query(`DROP SCHEMA IF EXISTS ${Schemata.getSchemaSurveyRdb(surveyId)} CASCADE`)
 
-export const createSchema = async (surveyId, client = db) =>
+export const createSchema = (surveyId: number, client: DbClient = db) =>
   client.query(`CREATE SCHEMA IF NOT EXISTS ${Schemata.getSchemaSurveyRdb(surveyId)}`)
 
-export const selectSchemaExists = async (surveyId, client = db) => {
+export const selectSchemaExists = async (surveyId: number, client: DbClient = db) => {
   const result = await client.one(
     `
      SELECT COUNT(*) = 1 AS res
@@ -26,7 +26,10 @@ export const selectSchemaExists = async (surveyId, client = db) => {
   return result.res
 }
 
-const dropDataTablesAndViewsWithPrefixes = async ({ surveyId, prefixes }, client = db) => {
+const dropDataTablesAndViewsWithPrefixes = async (
+  { surveyId, prefixes }: { surveyId: number; prefixes: any },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurveyRdb(surveyId)
   const items = await DbUtils.selectTablesAndViewsStartingWithPrefixes({ schema, prefixes }, client)
   for (const { table_name: name, table_type: tableType } of items) {
@@ -35,7 +38,7 @@ const dropDataTablesAndViewsWithPrefixes = async ({ surveyId, prefixes }, client
   }
 }
 
-export const selectOlapDataTablesExists = async (surveyId, client = db) => {
+export const selectOlapDataTablesExists = async (surveyId: number, client: DbClient = db) => {
   const schema = Schemata.getSchemaSurveyRdb(surveyId)
   const items = await DbUtils.selectTablesAndViewsStartingWithPrefixes(
     { schema, prefixes: [olapDataTablePrefix] },
@@ -44,8 +47,8 @@ export const selectOlapDataTablesExists = async (surveyId, client = db) => {
   return items.length > 0
 }
 
-export const dropDataTablesAndViews = async (surveyId, client = db) =>
+export const dropDataTablesAndViews = (surveyId: number, client: DbClient = db) =>
   dropDataTablesAndViewsWithPrefixes({ surveyId, prefixes: [dataTablePrefix, nodeViewPrefix] }, client)
 
-export const dropOlapDataTablesAndViews = async (surveyId, client = db) =>
+export const dropOlapDataTablesAndViews = (surveyId: number, client: DbClient = db) =>
   dropDataTablesAndViewsWithPrefixes({ surveyId, prefixes: [olapDataTablePrefix] }, client)

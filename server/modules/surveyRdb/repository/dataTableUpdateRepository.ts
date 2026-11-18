@@ -1,3 +1,11 @@
+import type { DbClient } from '@server/db/db'
+import type {
+  Record as ArenaRecord,
+  ArenaRecordNode,
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+} from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -13,9 +21,9 @@ const types = RdbUpdateTypes
 
 // ==== parsing
 
-const _hasTable = (nodeDef) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)
+const _hasTable = (nodeDef: ArenaNodeDef<NodeDefType>) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)
 
-const _getType = (nodeDef, node) => {
+const _getType = (nodeDef: ArenaNodeDef<NodeDefType>, node: ArenaRecordNode) => {
   const created = Node.isCreated(node)
   const deleted = Node.isDeleted(node)
   const updated = Node.isUpdated(node)
@@ -37,10 +45,31 @@ const _getType = (nodeDef, node) => {
   return null
 }
 
-const _getValuesByColumnNameDefault = ({ survey, nodeDef, node }) =>
-  TableDataNodeDefColUtils.getValuesByColumnName({ survey, nodeDefCol: nodeDef, nodeCol: node })
+const _getValuesByColumnNameDefault = ({
+  survey,
+  nodeDef,
+  node,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  node: ArenaRecordNode
+}) => TableDataNodeDefColUtils.getValuesByColumnName({ survey, nodeDefCol: nodeDef, nodeCol: node })
 
-const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
+const _getValuesByColumnName = ({
+  survey,
+  record,
+  nodeDef,
+  node,
+  ancestorMultipleEntity,
+  type,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+  nodeDef: ArenaNodeDef<NodeDefType>
+  node: ArenaRecordNode
+  ancestorMultipleEntity: any
+  type: any
+}) => {
   if (type !== types.insert) {
     return _getValuesByColumnNameDefault({ survey, nodeDef, node })
   } else {
@@ -66,7 +95,15 @@ const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipl
   }
 }
 
-const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
+const _findAncestor = ({
+  ancestorDefUuid,
+  node,
+  nodes,
+}: {
+  ancestorDefUuid: string
+  node: ArenaRecordNode
+  nodes: any
+}) => {
   let currentParent = nodes[Node.getParentUuid(node)]
   while (currentParent && !Node.isRoot(currentParent) && Node.getNodeDefUuid(currentParent) !== ancestorDefUuid) {
     currentParent = nodes[Node.getParentUuid(currentParent)]
@@ -74,15 +111,30 @@ const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
   return currentParent
 }
 
-const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
-  _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
+const _getRowUuid = ({
+  nodeDef,
+  ancestorMultipleEntity,
+  node,
+}: {
+  nodeDef: ArenaNodeDef<NodeDefType>
+  ancestorMultipleEntity: any
+  node: ArenaRecordNode
+}) => (_hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity))
 
-export const generateRdbUpdates = ({ survey, record, nodes }) => {
+export const generateRdbUpdates = ({
+  survey,
+  record,
+  nodes,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+  nodes: Record<string, ArenaRecordNode>
+}): RdbUpdates => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
-  const nodesArray = Object.values(nodes).sort(
+  const nodesArray: ArenaRecordNode[] = Object.values(nodes).sort(
     (nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
   )
-  return nodesArray.reduce((updatesAcc, node) => {
+  return nodesArray.reduce((updatesAcc: RdbUpdates, node) => {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     // skip single entities
     if (!NodeDef.isRoot(nodeDef) && NodeDef.isSingleEntity(nodeDef)) {
@@ -110,7 +162,7 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
 
 // ==== execution
 
-const _update = (update, client) => {
+const _update = (update: any, client: DbClient) => {
   const { schema, table, valuesByColumnName, rowUuid } = update
   const columnNames = Object.keys(valuesByColumnName).map((colName) => DbUtils.asName(colName))
   const values = Object.values(valuesByColumnName)
@@ -123,7 +175,7 @@ const _update = (update, client) => {
   )
 }
 
-const _insert = (update, client) => {
+const _insert = (update: any, client: DbClient) => {
   const { schema, table, valuesByColumnName } = update
   const columnNames = Object.keys(valuesByColumnName).map((colName) => DbUtils.asName(colName))
   const values = Object.values(valuesByColumnName)
@@ -137,7 +189,7 @@ const _insert = (update, client) => {
   )
 }
 
-const _delete = (update, client) => {
+const _delete = (update: any, client: DbClient) => {
   const { schema, table, rowUuid } = update
   return client.oneOrNone(
     `DELETE FROM ${schema}.${table} 
@@ -153,7 +205,7 @@ const queryByType = {
   [types.update]: _update,
 }
 
-export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
+export const updateTablesFromUpdates = async ({ rdbUpdates }: { rdbUpdates: any }, client: DbClient) => {
   // run the updates one at a time, in the order they have been generated (e.g. a row can be updated right after
   // being inserted); they share the same client (usually a transaction), where queries cannot run concurrently
   for (const update of rdbUpdates.getAll()) {
@@ -161,12 +213,18 @@ export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
   }
 }
 
-export const updateTables = async ({ survey, record, nodes }, client) => {
+export const updateTables = async (
+  { survey, record, nodes }: { survey: ArenaSurvey; record: ArenaRecord; nodes: any },
+  client: DbClient
+) => {
   const rdbUpdates = generateRdbUpdates({ survey, record, nodes })
   await updateTablesFromUpdates({ rdbUpdates }, client)
 }
 
-export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef }, client) => {
+export const updateRecordStep = (
+  { surveyId, recordUuid, stepId, tableDef }: { surveyId: number; recordUuid: string; stepId: number; tableDef: any },
+  client: DbClient
+) => {
   const tableName = NodeDefTable.getTableName(tableDef)
 
   return client.one(

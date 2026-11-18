@@ -1,24 +1,26 @@
-import { NodeDefs, NodeDefType, Objects } from '@openforis/arena-core'
-import type {
-  Labels,
-  NodeDef as ArenaNodeDef,
-  NodeDefBoolean,
-  NodeDefCode,
-  NodeDefCoordinate,
-  NodeDefDate,
-  NodeDefDecimal,
-  NodeDefEntity,
-  NodeDefExpression as ArenaNodeDefExpression,
-  NodeDefFile,
-  NodeDefFormHeader,
-  NodeDefGeo,
-  NodeDefInteger,
-  NodeDefMeta,
-  NodeDefPropsAdvanced,
-  NodeDefTaxon,
-  NodeDefText,
-  NodeDefTime,
-  NodeDefValidations as ArenaNodeDefValidations,
+import {
+  NodeDefs,
+  NodeDefType,
+  Objects,
+  type Labels,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefBoolean,
+  type NodeDefCode,
+  type NodeDefCoordinate,
+  type NodeDefDate,
+  type NodeDefDecimal,
+  type NodeDefEntity,
+  type NodeDefExpression as ArenaNodeDefExpression,
+  type NodeDefFile,
+  type NodeDefFormHeader,
+  type NodeDefGeo,
+  type NodeDefInteger,
+  type NodeDefMeta,
+  type NodeDefPropsAdvanced,
+  type NodeDefTaxon,
+  type NodeDefText,
+  type NodeDefTime,
+  type NodeDefValidations as ArenaNodeDefValidations,
 } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
@@ -250,7 +252,7 @@ export const createAutoIncrementalKeyDefaultValues = ({
   nodeDefParent,
 }: {
   nodeDef: AnyNodeDef
-  nodeDefParent: AnyNodeDef
+  nodeDefParent: NodeDefEntity
 }): ArenaNodeDefExpression[] => {
   const nodeDefName = getName(nodeDef)
   const nodeDefParentName = getName(nodeDefParent)
@@ -772,7 +774,7 @@ export const isHiddenInReport = (nodeDef: AnyNodeDef): boolean =>
 // ==== CREATE
 
 export const newNodeDef = (
-  nodeDefParent: AnyNodeDef | null,
+  nodeDefParent: NodeDefEntity | null,
   type: NodeDefType,
   cycles: string[],
   props: PropsObject = {},
@@ -845,7 +847,7 @@ export const cloneIntoEntityDef =
     ignoreApplicability = true,
     ignoreValidations = true,
   }: {
-    nodeDefParent: AnyNodeDef
+    nodeDefParent: NodeDefEntity
     clonedNodeDefName: string
     ignoreDefaultValues?: boolean
     ignoreApplicability?: boolean
@@ -880,7 +882,7 @@ export const cloneIntoEntityDef =
   }
 
 export const changeParentEntity =
-  ({ targetParentNodeDef }: { targetParentNodeDef: AnyNodeDef }): NodeDefUpdater =>
+  ({ targetParentNodeDef }: { targetParentNodeDef: NodeDefEntity }): NodeDefUpdater =>
   (nodeDef) => {
     const targetParentNodeDefUuid = getUuid(targetParentNodeDef)
     return {
@@ -1065,7 +1067,7 @@ export const canHaveAutoIncrementalKey = ({
   nodeDefParent,
 }: {
   nodeDef: AnyNodeDef
-  nodeDefParent: AnyNodeDef
+  nodeDefParent: NodeDefEntity
 }): boolean => {
   if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
 
