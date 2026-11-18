@@ -1,3 +1,4 @@
+import type { NodeDefEntity } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -151,7 +152,7 @@ export default class NodeDefsImportJob extends Job {
     parentPath,
     instanceElement,
   }: {
-    parentNodeDef: any
+    parentNodeDef: NodeDefEntity
     parentPath: string | null
     instanceElement: XmlElement
   }): Promise<any> {
@@ -245,7 +246,7 @@ export default class NodeDefsImportJob extends Job {
     labels,
     categoriesByKey,
   }: {
-    parentNodeDef: any
+    parentNodeDef: NodeDefEntity
     path: string
     nodeName: string
     bind: XFormBind | null

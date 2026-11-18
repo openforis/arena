@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { NodeDef as ArenaNodeDef, NodeDefType, NodeDefEntity } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
@@ -160,7 +160,7 @@ export default class NodeDefsImportJob extends Job {
     multiple,
     tableLayout,
   }: {
-    parentNodeDef: ArenaNodeDef<NodeDefType>
+    parentNodeDef: NodeDefEntity
     collectNodeDef: CollectSurvey.CollectNodeDef
     type: any
     field: string | null
@@ -217,7 +217,7 @@ export default class NodeDefsImportJob extends Job {
    * @returns {Promise<object>} - Inserted node definitions.
    */
   async insertNodeDef(
-    parentNodeDef: ArenaNodeDef<NodeDefType> | null,
+    parentNodeDef: NodeDefEntity | null,
     parentPath: string,
     collectNodeDef: CollectSurvey.CollectNodeDef,
     type: string,
@@ -740,12 +740,8 @@ export default class NodeDefsImportJob extends Job {
   }
 }
 
-const _createNodeDef = (
-  parentNodeDef: ArenaNodeDef<NodeDefType>,
-  type: any,
-  props: Record<string, any>,
-  propsAdvanced = {}
-) => NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
+const _createNodeDef = (parentNodeDef: NodeDefEntity, type: any, props: Record<string, any>, propsAdvanced = {}) =>
+  NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
 
 const determineNodeDefPageUuid = (type: any, collectNodeDef: CollectSurvey.CollectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {

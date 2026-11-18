@@ -1,13 +1,16 @@
 import * as A from '@core/arena'
 
-import { Objects, Queue, Surveys, TraverseMethod } from '@openforis/arena-core'
-import type {
-  Category as ArenaCategory,
-  NodeDef as ArenaNodeDef,
-  NodeDefCode,
-  NodeDefEntity,
-  NodeDefType,
-  Survey as ArenaSurvey,
+import {
+  Objects,
+  Queue,
+  Surveys,
+  TraverseMethod,
+  type Category as ArenaCategory,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefCode,
+  type NodeDefEntity,
+  type NodeDefType,
+  type Survey as ArenaSurvey,
 } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
@@ -268,9 +271,10 @@ export const getNodeDefChildByName =
 
 export const getNodeDefParent =
   (nodeDef: AnyNodeDef) =>
-  (survey: ArenaSurvey): AnyNodeDef | null => {
+  (survey: ArenaSurvey): NodeDefEntity | null => {
     if (NodeDef.isRoot(nodeDef)) return null
-    const nodeDefParent = getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
+    // only entity defs can be parents
+    const nodeDefParent = getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey) as NodeDefEntity | null
     return NodeDef.isVirtual(nodeDef) ? getNodeDefParent(nodeDefParent)(survey) : nodeDefParent
   }
 
@@ -452,7 +456,7 @@ export const cloneNodeDef =
   }) =>
   (survey: ArenaSurvey): { clonedNodeDefs: AnyNodeDef[]; rootClonedNodeDef: AnyNodeDef } => {
     const nodeDef = getNodeDefByUuid(nodeDefUuid)(survey)
-    const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey)
+    const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey) as NodeDefEntity
     const existingNodeDefNames = existingNodeDefNamesParam ?? getNodeDefsArray(survey).map((nd) => NodeDef.getName(nd))
 
     // Gather all descendants (including nested entities)
@@ -479,7 +483,7 @@ export const cloneNodeDef =
       // clone descendants are visited in parent-first (BFS) order, so the cloned parent is already available
       const clonedNodeDefParent = isRoot
         ? nodeDefParent
-        : clonedNodeDefsByNewUuid[newUuidByOldUuid[NodeDef.getParentUuid(nd)]]
+        : (clonedNodeDefsByNewUuid[newUuidByOldUuid[NodeDef.getParentUuid(nd)]] as NodeDefEntity)
       const clonedName = getUniqueName(NodeDef.getName(nd))
       const cloned = NodeDef.cloneIntoEntityDef({
         nodeDefParent: clonedNodeDefParent,
@@ -562,11 +566,11 @@ export const isNodeDefAncestor =
 
 export const getNodeDefAncestorMultipleEntity =
   (nodeDef: AnyNodeDef) =>
-  (survey: ArenaSurvey): AnyNodeDef | null => {
-    let nodeDefCurrent = nodeDef
-    do {
+  (survey: ArenaSurvey): NodeDefEntity | null => {
+    let nodeDefCurrent = getNodeDefParent(nodeDef)(survey)
+    while (nodeDefCurrent && !NodeDef.isRoot(nodeDefCurrent) && !NodeDef.isMultipleEntity(nodeDefCurrent)) {
       nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
-    } while (nodeDefCurrent && !NodeDef.isRoot(nodeDefCurrent) && !NodeDef.isMultipleEntity(nodeDefCurrent))
+    }
     return nodeDefCurrent
   }
 

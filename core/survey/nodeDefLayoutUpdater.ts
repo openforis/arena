@@ -3,6 +3,7 @@ import type {
   NodeDefEntityChildPosition,
   NodeDefType,
   Survey as ArenaSurvey,
+  NodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -27,7 +28,7 @@ const _calculateChildPagesIndex = ({
 }: {
   survey: ArenaSurvey
   cycle: string
-  nodeDefParent: AnyNodeDef
+  nodeDefParent: NodeDefEntity
 }): string[] => {
   const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren({ nodeDef: nodeDefParent })(survey).filter(
     (childDef) =>
@@ -213,16 +214,16 @@ const _updateParentLayoutForCycle = ({
   nodeDef,
   cycle,
   updateFn,
-}: ParentLayoutCycleParams & { updateFn: (params: ParentLayoutCycleParams) => LayoutCycle }): AnyNodeDef => {
+}: ParentLayoutCycleParams & { updateFn: (params: ParentLayoutCycleParams) => LayoutCycle }): NodeDefEntity => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
   return NodeDef.updateLayout((layout) => {
     const layoutCycleUpdated = updateFn({ survey, cycle, nodeDef })
     const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCycleUpdated)(layout)
     return layoutUpdated
-  })(nodeDefParent)
+  })(nodeDefParent) as NodeDefEntity
 }
 
-type ParentParams = { survey: ArenaSurvey; cycle: string; nodeDefParent: AnyNodeDef }
+type ParentParams = { survey: ArenaSurvey; cycle: string; nodeDefParent: NodeDefEntity }
 
 const _getOrInitializeChildPagesIndex = ({ survey, cycle, nodeDefParent }: ParentParams): string[] => {
   const childrenFormsIndexPrev = NodeDefLayout.getIndexChildren(cycle)(nodeDefParent)
