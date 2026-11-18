@@ -13,6 +13,7 @@ import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIc
 import {
   createProvider,
   fetchAdminProvider,
+  fetchAdminProviders,
   fetchExternalLoginTicket,
   fetchTestSignInResult,
   getExternalLoginStartUrl,
@@ -31,7 +32,8 @@ import {
 } from './authProviderTypes'
 import { TestSignInResultDialog } from './TestSignInResultDialog'
 
-type Draft = Partial<AdminAuthProvider> & { clientSecret?: string }
+// redirectUriTemplate: redirect URI of a new provider, with "{id}" in place of its identifier
+type Draft = Partial<AdminAuthProvider> & { clientSecret?: string; redirectUriTemplate?: string }
 type OnChange = (changes: Partial<Draft>) => void
 type SectionProps = { draft: Draft; readOnly: boolean; onChange: OnChange }
 type SectionWithNewProps = SectionProps & { isNew?: boolean }
@@ -93,7 +95,7 @@ const GeneralSection = ({ draft, isNew = false, readOnly, onChange }: SectionWit
           />
         </FormItem>
         <FormItem info="authProvidersView:form.idInfo" label="authProvidersView:form.id">
-          <Input disabled={!isNew} name="id" onChange={(id) => onChange({ id })} value={draft.id ?? ''} />
+          <Input disabled={!isNew} name="providerId" onChange={(id) => onChange({ id })} value={draft.id ?? ''} />
         </FormItem>
       </div>
       {!isPreset && !readOnly && !isNew && (
@@ -187,6 +189,8 @@ const ConnectionSection = ({ draft, isNew = false, readOnly, onChange }: Section
             label="authProvidersView:form.clientSecret"
           >
             <Input
+              // new-password: the browser must not fill in the saved login credentials (nor the email before it)
+              autoComplete="new-password"
               name="clientSecret"
               onChange={(clientSecret) => onChange({ clientSecret })}
               placeholder={draft.hasClientSecret ? i18n.t('authProvidersView:form.clientSecretSet') : ''}
@@ -248,7 +252,11 @@ const AccessSection = ({ draft, readOnly, onChange }: SectionProps) => {
 const SidePanel = ({ draft }: { draft: Draft }) => {
   const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
-  const redirectUri = draft.redirectUri ?? `${globalThis.location.origin}/auth/oidc/${draft.id || '<id>'}/callback`
+  // steps specific to the type of provider, naming the fields of the form to fill in
+  const setupSteps = i18n.t(`authProvidersView:form.setupSteps.${draft.type ?? 'oidc'}`, {
+    returnObjects: true,
+  }) as unknown as string[]
+  const redirectUri = draft.redirectUri ?? draft.redirectUriTemplate?.replace('{id}', draft.id || '<id>') ?? ''
   const onCopy = async () => {
     await navigator.clipboard.writeText(redirectUri)
     notifyInfo({ key: 'authProvidersView:form.redirectUriCopied' })
@@ -260,9 +268,10 @@ const SidePanel = ({ draft }: { draft: Draft }) => {
         <code data-testid="auth-provider-redirect-uri">{redirectUri}</code>
         <Button iconClassName="icon-copy" onClick={onCopy} showLabel={false} title="common.copy" variant="text" />
       </div>
+      <h4>{i18n.t('authProvidersView:form.setupStepsTitle')}</h4>
       <ol className="auth-provider-edit__steps">
-        {['register', 'redirectUri', 'scopes', 'credentials'].map((step) => (
-          <li key={step}>{i18n.t(`authProvidersView:form.setupSteps.${step}`)}</li>
+        {setupSteps.map((step) => (
+          <li key={step}>{step}</li>
         ))}
       </ol>
       <h4>{i18n.t('authProvidersView:form.loginPagePreview')}</h4>
@@ -284,7 +293,8 @@ const useProviderDraft = () => {
 
   const load = useCallback(async () => {
     if (isNew) {
-      setDraft(createNewProvider((searchParams.get('type') as AuthProviderType) ?? 'oidc'))
+      const { redirectUriTemplate } = await fetchAdminProviders()
+      setDraft({ ...createNewProvider((searchParams.get('type') as AuthProviderType) ?? 'oidc'), redirectUriTemplate })
     } else {
       setDraft(await fetchAdminProvider({ id: providerId }))
     }

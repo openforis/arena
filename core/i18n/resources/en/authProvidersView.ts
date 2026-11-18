@@ -93,11 +93,24 @@ export default {
       'Link accounts by email even when the provider does not confirm that the email is verified. Turn on only for providers that verify emails themselves.',
     redirectUri: 'Redirect URI',
     redirectUriCopied: 'Redirect URI copied',
+    setupStepsTitle: 'How to set up the provider',
     setupSteps: {
-      register: 'Register Arena as a confidential web application at the provider.',
-      redirectUri: 'Add the redirect URI above.',
-      scopes: 'Allow the openid, email and profile scopes.',
-      credentials: 'Paste the client ID and secret here.',
+      google: [
+        'In the Google Cloud console, open Google Auth Platform (or APIs & Services) > Clients and create an OAuth client of type "Web application".',
+        'Add the redirect URI above to the "Authorized redirect URIs" of the client.',
+        'Copy the client ID and client secret created by Google into the Client ID and Client secret fields of the Connection section (on the left), then click Save.',
+      ],
+      microsoft: [
+        'In the Microsoft Entra admin center, open App registrations > New registration.',
+        'Add the redirect URI above as a "Web" redirect URI of the application.',
+        'In Certificates & secrets, create a new client secret.',
+        'Copy the Application (client) ID and the value of the secret into the Client ID and Client secret fields of the Connection section (on the left), then click Save.',
+      ],
+      oidc: [
+        'At the provider (e.g. Keycloak, Okta), register Arena as a confidential web application (OpenID Connect, authorization code flow).',
+        'Add the redirect URI above to the allowed redirect URIs of the application, and allow the openid, email and profile scopes.',
+        'Copy the issuer URL, client ID and client secret of the application into the Issuer URL, Client ID and Client secret fields of the Connection section (on the left), then click Save.',
+      ],
     },
     loginPagePreview: 'Login page preview',
     readOnlyEnv:

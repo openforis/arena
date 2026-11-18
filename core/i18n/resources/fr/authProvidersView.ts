@@ -93,11 +93,24 @@ export default {
       "Lier les comptes par e-mail même si le fournisseur ne confirme pas que l'e-mail est vérifié. À activer uniquement pour les fournisseurs qui vérifient eux-mêmes les e-mails.",
     redirectUri: 'URI de redirection',
     redirectUriCopied: 'URI de redirection copiée',
+    setupStepsTitle: 'Comment configurer le fournisseur',
     setupSteps: {
-      register: 'Enregistrez Arena comme application web confidentielle chez le fournisseur.',
-      redirectUri: "Ajoutez l'URI de redirection ci-dessus.",
-      scopes: 'Autorisez les portées openid, email et profile.',
-      credentials: "Collez ici l'ID client et le secret.",
+      google: [
+        'Dans Google Cloud console, ouvrez Google Auth Platform (ou API et services) > Clients et créez un client OAuth de type « Application Web ».',
+        "Ajoutez l'URI de redirection ci-dessus aux « URI de redirection autorisés » du client.",
+        "Copiez l'ID client et le secret client créés par Google dans les champs ID client et Secret client de la section Connexion (à gauche), puis cliquez sur Sauvegarder.",
+      ],
+      microsoft: [
+        "Dans le centre d'administration Microsoft Entra, ouvrez Inscriptions d'applications > Nouvelle inscription.",
+        "Ajoutez l'URI de redirection ci-dessus comme URI de redirection « Web » de l'application.",
+        'Dans Certificats et secrets, créez un nouveau secret client.',
+        "Copiez l'ID d'application (client) et la valeur du secret dans les champs ID client et Secret client de la section Connexion (à gauche), puis cliquez sur Sauvegarder.",
+      ],
+      oidc: [
+        "Chez le fournisseur (par exemple Keycloak, Okta), enregistrez Arena comme application web confidentielle (OpenID Connect, flux avec code d'autorisation).",
+        "Ajoutez l'URI de redirection ci-dessus aux URI de redirection autorisées de l'application et autorisez les portées openid, email et profile.",
+        "Copiez l'URL de l'émetteur, l'ID client et le secret client de l'application dans les champs URL de l'émetteur, ID client et Secret client de la section Connexion (à gauche), puis cliquez sur Sauvegarder.",
+      ],
     },
     loginPagePreview: 'Aperçu de la page de connexion',
     readOnlyEnv:

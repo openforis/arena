@@ -93,11 +93,24 @@ export default {
       'Vincular las cuentas por correo electrónico aunque el proveedor no confirme que el correo está verificado. Actívelo solo para proveedores que verifican ellos mismos los correos.',
     redirectUri: 'URI de redirección',
     redirectUriCopied: 'URI de redirección copiado',
+    setupStepsTitle: 'Cómo configurar el proveedor',
     setupSteps: {
-      register: 'Registre Arena como aplicación web confidencial en el proveedor.',
-      redirectUri: 'Añada el URI de redirección anterior.',
-      scopes: 'Permita los ámbitos openid, email y profile.',
-      credentials: 'Pegue aquí el ID y el secreto de cliente.',
+      google: [
+        'En Google Cloud console, abra Google Auth Platform (o APIs y servicios) > Clientes y cree un cliente OAuth de tipo "Aplicación web".',
+        'Añada el URI de redirección anterior a los "URI de redireccionamiento autorizados" del cliente.',
+        'Copie el ID de cliente y el secreto de cliente creados por Google en los campos ID de cliente y Secreto de cliente de la sección Conexión (a la izquierda) y haga clic en Guardar.',
+      ],
+      microsoft: [
+        'En el centro de administración de Microsoft Entra, abra Registros de aplicaciones > Nuevo registro.',
+        'Añada el URI de redirección anterior como URI de redirección "Web" de la aplicación.',
+        'En Certificados y secretos, cree un nuevo secreto de cliente.',
+        'Copie el Id. de aplicación (cliente) y el valor del secreto en los campos ID de cliente y Secreto de cliente de la sección Conexión (a la izquierda) y haga clic en Guardar.',
+      ],
+      oidc: [
+        'En el proveedor (p. ej. Keycloak, Okta), registre Arena como aplicación web confidencial (OpenID Connect, flujo de código de autorización).',
+        'Añada el URI de redirección anterior a los URI de redirección permitidos de la aplicación y permita los ámbitos openid, email y profile.',
+        'Copie la URL del emisor, el ID de cliente y el secreto de cliente de la aplicación en los campos URL del emisor, ID de cliente y Secreto de cliente de la sección Conexión (a la izquierda) y haga clic en Guardar.',
+      ],
     },
     loginPagePreview: 'Vista previa de la página de inicio de sesión',
     readOnlyEnv:

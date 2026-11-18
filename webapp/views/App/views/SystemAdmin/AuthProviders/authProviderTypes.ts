@@ -49,6 +49,8 @@ export const toProviderId = (label: string): string =>
 
 export const createNewProvider = (type: AuthProviderType): Partial<AdminAuthProvider> => ({
   type,
+  // presets: the type is a good identifier (e.g. "google"); generic providers get one from their label
+  id: type === 'oidc' ? '' : type,
   source: 'db',
   label: { google: 'Google', microsoft: 'Microsoft', oidc: '' }[type],
   enabled: true,

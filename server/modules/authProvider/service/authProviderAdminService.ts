@@ -39,6 +39,8 @@ export const fetchProviders = async ({ baseUrl }: { baseUrl: string }) => {
   return {
     providers: providers.map((provider) => toAdminProvider(service, provider, linkedCounts, baseUrl)),
     secretEncryptionAvailable: service.isSecretEncryptionAvailable(),
+    // redirect URI of a provider not saved yet (same public URL as the saved ones)
+    redirectUriTemplate: service.getRedirectUri('{id}', baseUrl),
   }
 }
 
