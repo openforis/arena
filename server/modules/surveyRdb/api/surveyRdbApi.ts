@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as User from '@core/user/user'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -15,7 +16,7 @@ import {
   requireSurveyRdbRefreshPermission,
 } from '../../auth/authApiMiddleware'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res, next) => {
     try {
       const { job } = await SurveyRdbService.refreshAllRdbs()
