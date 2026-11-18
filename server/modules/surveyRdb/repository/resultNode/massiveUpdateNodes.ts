@@ -1,3 +1,4 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import pgPromise from 'pg-promise'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,7 +11,15 @@ import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 const pgp = pgPromise()
 const { Column } = pgp.helpers
 
-const extractValueFromRowResult = ({ rowResult, nodeDef, columnName }) => {
+const extractValueFromRowResult = ({
+  rowResult,
+  nodeDef,
+  columnName,
+}: {
+  rowResult: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  columnName: any
+}) => {
   const cellValue = rowResult[columnName]
 
   if (cellValue && cellValue !== NA) {
@@ -28,6 +37,8 @@ const extractValueFromRowResult = ({ rowResult, nodeDef, columnName }) => {
 }
 
 export default class MassiveUpdateNodes extends MassiveUpdate {
+  nodeDefsByColumnName: Record<string, any>
+
   constructor({ survey, analysisNodeDefs }, tx) {
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefs,
@@ -69,7 +80,5 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       [TableNode.columnSet.value]: extractValueFromRowResult({ rowResult, nodeDef, columnName }),
     }))
     await super.push(...valuesList)
-
-    return true
   }
 }
