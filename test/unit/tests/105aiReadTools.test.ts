@@ -19,6 +19,11 @@ beforeAll(async () => {
 const ctxWithSurvey = (overrides = {}) => createToolContext({ survey, ...overrides })
 
 describe('survey_getOverview', () => {
+  test('the description says what it is not for, and does not ask to be called first', () => {
+    expect(surveyGetOverviewTool.description).toContain('no descriptions, validation problems or record values')
+    expect(surveyGetOverviewTool.description).not.toContain('Call it first')
+  })
+
   test('lists languages, cycles and the entity tree', async () => {
     const result: any = await runTool(surveyGetOverviewTool, {}, ctxWithSurvey())
     expect(result.languages).toEqual(['en'])

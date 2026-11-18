@@ -34,6 +34,37 @@ describe('runTool', () => {
     expect(called).toBe(false)
   })
 
+  describe('a list sent as a string (small models do it)', () => {
+    const listTool: AiTool = {
+      ...makeTool(async (input) => input),
+      inputSchema: z.object({
+        names: z.array(z.string().max(5)).max(3).nullish(),
+        filter: z.string().nullish(),
+        measures: z.array(z.object({ functions: z.array(z.string()) })).nullish(),
+      }),
+    }
+    const run = (input: unknown): Promise<any> => runTool(listTool, input, createToolContext())
+
+    test('names separated by commas, one name or a JSON array become the list', async () => {
+      expect(await run({ names: 'dbh, h' })).toEqual({ names: ['dbh', 'h'] })
+      expect(await run({ names: 'dbh' })).toEqual({ names: ['dbh'] })
+      expect(await run({ names: '["dbh","h"]' })).toEqual({ names: ['dbh', 'h'] })
+      expect(await run({ measures: [{ functions: 'avg, cnt' }] })).toEqual({
+        measures: [{ functions: ['avg', 'cnt'] }],
+      })
+    })
+
+    test('the list is still validated: the limits of the schema hold', async () => {
+      expect((await run({ names: 'a, b, c, d' })).error.code).toBe('invalidInput')
+      expect((await run({ names: 'too_long_name' })).error.code).toBe('invalidInput')
+      expect((await run({ measures: 'avg' })).error.code).toBe('invalidInput')
+    })
+
+    test('a string where a string is expected is left as it is', async () => {
+      expect(await run({ filter: 'a == 1, b' })).toEqual({ filter: 'a == 1, b' })
+    })
+  })
+
   test('an AiToolFailure keeps its code and details', async () => {
     const tool = makeTool(async () => {
       throw new AiToolFailure('nodeDefNotFound', 'No node definition named tre.', { closestNames: ['tree'] })

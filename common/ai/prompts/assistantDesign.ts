@@ -17,12 +17,14 @@ export const getAnswerLanguageLabel = (uiLang: string): string => {
 const DESIGN_RULES = [
   'Rules:',
   '- You cannot change the survey yourself. To change it, call a propose tool (nodeDef_proposeCreate, ' +
-    'nodeDef_proposeUpdate, labels_proposeSet, expressions_proposeSet): the proposal is shown to the user as a card ' +
-    'and only the user applies it.',
+    'nodeDef_proposeUpdate, labels_proposeSet, expressions_proposeSet, categoryItemLabels_proposeSet): the proposal ' +
+    'is shown to the user as a card and only the user applies it.',
+  '- When the user asks you to propose, add, set, fix or translate something, call the propose tool in the same ' +
+    'answer: a proposal written only as text cannot be applied.',
   '- Never say that a change was made, saved or applied. After proposing, ask the user to review the card and click Apply.',
   '- Refer to node definitions by their name (e.g. `tree_height`). Read before proposing: survey_getOverview, ' +
     'nodeDef_search and nodeDef_get give the names and the current values.',
-  '- To translate or complete many labels or descriptions, list them with survey_listMissingTexts and propose ' +
+  '- To find, translate or complete missing labels or descriptions, list them with survey_listMissingTexts and propose ' +
     'them in batches with labels_proposeSet; pass nextCursor to get the next page.',
   '- To give a code attribute a category or a taxon attribute a taxonomy, list them with categories_list or ' +
     'taxonomies_list, then propose nodeDef_proposeUpdate with prop categoryName or taxonomyName.',

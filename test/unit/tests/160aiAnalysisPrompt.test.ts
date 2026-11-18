@@ -57,6 +57,10 @@ describe('analysis system prompt', () => {
     expect(prompt).not.toContain('query_count')
   })
 
+  test('with data tools: a record is a row of the root entity', () => {
+    expect(build(true)).toContain('a record is one row of the root entity')
+  })
+
   test('with data tools: results only after query_run, aggregates, cited query ids', () => {
     const prompt = build(true)
     expect(prompt).toContain('query_run')

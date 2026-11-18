@@ -73,6 +73,55 @@ const toCallContext = (ctx: AiToolContext): AiToolContext => {
 }
 
 /**
+ * Turns the text a model sent in place of a list into the list: a JSON array, or names separated by commas.
+ * @param {string} text - The text.
+ * @returns {unknown[]} The list.
+ */
+const toList = (text: string): unknown[] => {
+  try {
+    const parsed = JSON.parse(text)
+    if (Array.isArray(parsed)) return parsed
+  } catch {
+    // not JSON: names separated by commas
+  }
+  return text
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+/**
+ * Returns a copy of the input with the strings sent where the schema expects a list turned into lists.
+ * @param {unknown} input - Raw input from the model.
+ * @param {object[]} issues - Issues of the failed validation.
+ * @returns {unknown} The input to validate again.
+ */
+const withStringsAsLists = (input: unknown, issues: z.core.$ZodIssue[]): unknown => {
+  const fixed: any = structuredClone(input)
+  for (const issue of issues) {
+    if (issue.code !== 'invalid_type' || issue.expected !== 'array' || issue.path.length === 0) continue
+    const parent = issue.path.slice(0, -1).reduce((value: any, key) => value?.[key as PropertyKey], fixed)
+    const key = issue.path.at(-1) as PropertyKey
+    if (typeof parent?.[key] === 'string') parent[key] = toList(parent[key])
+  }
+  return fixed
+}
+
+/**
+ * Validates the input of a tool; small models often send a list as a string, which is read as the list.
+ * @param {AiTool} tool - The tool.
+ * @param {unknown} input - Raw input from the model.
+ * @returns {object} The zod result.
+ */
+const parseInput = (tool: AiTool, input: unknown) => {
+  const parsed = tool.inputSchema.safeParse(input)
+  if (parsed.success) return parsed
+  // validated again with the same schema: its limits hold
+  const retried = tool.inputSchema.safeParse(withStringsAsLists(input, parsed.error.issues))
+  return retried.success ? retried : parsed
+}
+
+/**
  * Runs a tool safely: checks the input, turns errors into structured results the model can recover from, limits the
  * result size and honours the abort signal (an abort is re-thrown, so the turn stops).
  * @param {AiTool} tool - The tool.
@@ -88,7 +137,7 @@ export const runTool = async (
   maxResultChars: number = TOOL_RESULT_MAX_CHARS
 ): Promise<unknown> => {
   ctx.signal.throwIfAborted()
-  const parsed = tool.inputSchema.safeParse(input)
+  const parsed = parseInput(tool, input)
   if (!parsed.success) return toolError('invalidInput', z.prettifyError(parsed.error))
   try {
     const output = await tool.execute(parsed.data, { ...toCallContext(ctx), resultCapChars: maxResultChars })

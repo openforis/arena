@@ -37,6 +37,8 @@ const toEntityItem = ({ survey, entityDef, cycle, lang, includeAnalysis }: Entit
     name: NodeDef.getName(entityDef),
     label: NodeDef.getLabel(entityDef, lang),
     parentEntity: parentDef ? NodeDef.getName(parentDef) : null,
+    // models count a child entity when asked for the number of records
+    ...(parentDef ? {} : { oneRowPerRecord: true }),
     attributes: QueryNodeDefs.getRawAttributeDefs(params).map((nodeDef) => ({
       name: NodeDef.getName(nodeDef),
       label: NodeDef.getLabel(nodeDef, lang),
@@ -76,7 +78,7 @@ const execute = async (input: Input, ctx: any) => {
   const result = { entities: entityDefs.map(toItem) }
   if (JSON.stringify(result).length <= getResultBudget(ctx)) return result
   return {
-    entities: result.entities.map(({ name, label, parentEntity }) => ({ name, label, parentEntity })),
+    entities: result.entities.map(({ attributes: _attributes, ...entity }) => entity),
     attributesOmitted: true,
     hint: 'Call query_listEntities again with "entity" to get the attributes of one entity.',
   }
@@ -86,7 +88,8 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
   name: 'query_listEntities',
   description:
     'Lists the entities that can be queried and their attributes (name, label, type; "dimension" = can group by, ' +
-    '"measure" = can be aggregated). An entity can also use the attributes of its ancestor entities.',
+    '"measure" = can be aggregated). An entity can also use the attributes of its ancestor entities. ' +
+    'The root entity (oneRowPerRecord) has one row per record: count it to count records.',
   inputSchema,
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',

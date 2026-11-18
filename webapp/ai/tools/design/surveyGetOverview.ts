@@ -84,7 +84,8 @@ export const surveyGetOverviewTool: AiTool<z.infer<typeof inputSchema>> = {
   name: 'survey_getOverview',
   description:
     'Returns the survey name, languages, cycles and all node definitions (entities and attributes) depth-first ' +
-    'with name, type, label, parent, key and multiple flags. Call it first to learn the survey structure. ' +
+    'with name, type, label, parent, key and multiple flags. It gives the structure only: no descriptions, ' +
+    'validation problems or record values, which have their own tools. ' +
     'A large survey returns only its entities, each with its number of attributes (attributesOmitted: true): ' +
     'call it again with "entity" to list the attributes of one entity.',
   inputSchema,

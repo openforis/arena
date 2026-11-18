@@ -45,6 +45,10 @@ describe('assistant prompts', () => {
     for (const rule of ['expression_check', 'invalidProposal', 'Never say that a change was made', 'docs_search']) {
       expect(prompt).toContain(rule)
     }
+    // a proposal is a tool call, and the missing texts have their own tool
+    expect(prompt).toContain('a proposal written only as text cannot be applied')
+    expect(prompt).toMatch(/call a propose tool \([^)]*categoryItemLabels_proposeSet/)
+    expect(prompt).toContain('To find, translate or complete')
   })
 
   test('design: survey texts are quoted, an unknown interface language falls back to English', () => {

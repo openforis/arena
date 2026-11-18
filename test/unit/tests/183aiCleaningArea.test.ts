@@ -216,6 +216,7 @@ describe('cleaning prompt', () => {
     // query_propose is offered here too: its rules (filter syntax) come with it
     expect(prompt).toContain('a boolean expression in JavaScript syntax')
     expect(prompt).toContain('the schema is returned by query_listEntities')
+    expect(prompt).toContain('survey_getOverview gives the survey structure only')
     // phrases the mock provider's canned answers match must not appear
     for (const phrase of ['Data Explorer', '<expression>', 'translate survey labels', 'activity log']) {
       expect(prompt).not.toContain(phrase)

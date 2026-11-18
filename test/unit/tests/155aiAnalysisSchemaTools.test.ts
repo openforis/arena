@@ -68,6 +68,9 @@ describe('query_listEntities', () => {
     expect(result.entities.map((entity) => entity.name)).toEqual(['cluster', 'plot', 'tree'])
     const tree = result.entities.find((entity) => entity.name === 'tree')
     expect(tree.parentEntity).toBe('plot')
+    // "how many records" is a count of the root entity, not of a child one
+    expect(result.entities.map((entity) => entity.oneRowPerRecord)).toEqual([true, undefined, undefined])
+    expect(listEntitiesTool.description).toContain('oneRowPerRecord')
     const byName = Object.fromEntries(tree.attributes.map((attribute) => [attribute.name, attribute]))
     expect(byName.dbh).toMatchObject({ type: 'decimal', dimension: false, measure: true })
     expect(byName.tree_type).toMatchObject({ type: 'code', dimension: true, measure: false })
@@ -97,6 +100,7 @@ describe('query_listEntities', () => {
     expect(all.hint).toContain('entity')
     expect(all.entities.map((entity) => entity.name)).toEqual(['cluster', 'plot', 'tree'])
     expect(all.entities[0].attributes).toBeUndefined()
+    expect(all.entities.map((entity) => entity.oneRowPerRecord)).toEqual([true, undefined, undefined])
     expect(JSON.stringify(all).length).toBeLessThanOrEqual(7000)
 
     const one = await runTool(listEntitiesTool, { entity: 'tree' }, ctx)

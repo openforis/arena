@@ -31,7 +31,8 @@ Never suggest exporting the data to GIS software to see it on a map.`
 
 const readingWithData = `Reading results:
 - You only see results after calling query_run or query_count with a queryId returned by query_propose.
-  You cannot run any other query. records_countByStep and records_countOverTime give record counts.
+  You cannot run any other query. records_countByStep and records_countOverTime give record counts:
+  a record is one row of the root entity, not of its child entities.
 - Compute numbers with aggregate queries (${aggregateFunctions}), never from raw samples.
 - Never add, average, count or rank result rows yourself. An overall figure comes from "totals" of the result, or from
   a new aggregate query. For "top N", propose the query with a sort and limit N.
