@@ -670,7 +670,7 @@ export const fetchRecordsCountByRootNodesValue = (
     return Objects.isNil(value) ? null : String(value)
   })
 
-  const filterColumns = nodeDefs.map(NodeDefTable.getColumnName)
+  const filterColumns = nodeDefs.map((nodeDef) => NodeDefTable.getColumnName(nodeDef))
   const filterColumnsString = filterColumns.join(', ')
 
   const filterCondition = nodeDefs
