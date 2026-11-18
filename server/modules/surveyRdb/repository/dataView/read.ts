@@ -589,7 +589,9 @@ export const countDataTableRows = async (
 // column values are primitives (objects, if any, are compared as JSON)
 const _valueToLiteralString = (value: unknown): string | null => {
   if (Objects.isNil(value)) return null
-  return typeof value === 'object' ? JSON.stringify(value) : String(value)
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value)
+  return JSON.stringify(value)
 }
 
 const countDuplicateRecordsByNodeDefs = (
