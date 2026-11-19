@@ -4,6 +4,7 @@ export default {
     subtitle: 'Bem-vindo! Insira suas credenciais para acessar o $t(common.appNameFull).',
     backToLogin: 'Voltar para o login',
     newToArena: 'Novo no $t(common.appNameFull)?',
+    registerBeforeLoggingIn: 'Solicite acesso primeiro: apenas usuários registrados podem entrar.',
     or: 'ou',
     twoFactorTitle: 'Verificação em duas etapas',
     verify: 'Verificar',
@@ -29,6 +30,7 @@ Insira o código gerado pelo seu aplicativo autenticador.`,
   externalLogin: {
     signInWith: 'Entrar com {{provider}}',
     continueWith: 'Continuar com {{provider}}',
+    registeredUsersOnly: 'Somente usuários registrados',
     errors: {
       providerNotAvailable:
         'Esta opção de início de sessão não está disponível. Tente mais tarde ou entre com o seu e-mail e palavra-passe.',

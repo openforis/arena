@@ -4,6 +4,7 @@ export default {
     subtitle: 'Тавтай морил! $t(common.appNameFull)-д нэвтрэхийн тулд мэдээллээ оруулна уу.',
     backToLogin: 'Нэвтрэх хуудас руу буцах',
     newToArena: '$t(common.appNameFull)-д шинээр ирсэн үү?',
+    registerBeforeLoggingIn: 'Эхлээд хандалтын хүсэлт илгээнэ үү: зөвхөн бүртгэлтэй хэрэглэгчид нэвтрэх боломжтой.',
     or: 'эсвэл',
     twoFactorTitle: 'Хоёр шаттай баталгаажуулалт',
     verify: 'Баталгаажуулах',
@@ -29,6 +30,7 @@ export default {
   externalLogin: {
     signInWith: '{{provider}}-ээр нэвтрэх',
     continueWith: '{{provider}}-ээр үргэлжлүүлэх',
+    registeredUsersOnly: 'Зөвхөн бүртгэлтэй хэрэглэгчид',
     errors: {
       providerNotAvailable:
         'Энэ нэвтрэх сонголт одоогоор боломжгүй байна. Дараа дахин оролдох эсвэл имэйл, нууц үгээрээ нэвтэрнэ үү.',
