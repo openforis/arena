@@ -4,6 +4,7 @@ export default {
     subtitle: 'ようこそ！$t(common.appNameFull)を利用するには認証情報を入力してください。',
     backToLogin: 'ログインに戻る',
     newToArena: '$t(common.appNameFull)を初めて利用しますか？',
+    registerBeforeLoggingIn: 'まずアクセスを申請してください。ログインできるのは登録済みユーザーのみです。',
     or: 'または',
     twoFactorTitle: '2段階認証',
     verify: '確認',
@@ -29,6 +30,7 @@ export default {
   externalLogin: {
     signInWith: '{{provider}}でサインイン',
     continueWith: '{{provider}}で続行',
+    registeredUsersOnly: '登録済みユーザーのみ',
     errors: {
       providerNotAvailable:
         'このサインイン方法は現在利用できません。後でもう一度お試しいただくか、メールアドレスとパスワードでサインインしてください。',

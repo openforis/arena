@@ -4,6 +4,7 @@ export default {
     subtitle: 'Bienvenue ! Saisissez vos identifiants pour accéder à $t(common.appNameFull).',
     backToLogin: 'Retour à la connexion',
     newToArena: 'Nouveau sur $t(common.appNameFull) ?',
+    registerBeforeLoggingIn: "Demandez d'abord l'accès : seuls les utilisateurs enregistrés peuvent se connecter.",
     or: 'ou',
     twoFactorTitle: 'Vérification en deux étapes',
     verify: 'Vérifier',
@@ -29,6 +30,7 @@ Entrez le code généré par votre application d'authentification.`,
   externalLogin: {
     signInWith: 'Se connecter avec {{provider}}',
     continueWith: 'Continuer avec {{provider}}',
+    registeredUsersOnly: 'Utilisateurs enregistrés uniquement',
     errors: {
       providerNotAvailable:
         "Cette option de connexion n'est pas disponible. Réessayez plus tard ou connectez-vous avec votre e-mail et votre mot de passe.",
