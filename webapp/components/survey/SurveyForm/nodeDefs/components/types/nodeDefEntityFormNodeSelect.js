@@ -13,7 +13,7 @@ import { Button, ButtonDelete } from '@webapp/components/buttons'
 import { RecordPageStatusIcon } from '@webapp/components/survey/SurveyForm/components/RecordPageStatusIcon'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useEntitySubtreeStatus } from '@webapp/store/ui/record'
 import { useNodeKeysLabelValues } from '@webapp/store/ui/surveyForm'
@@ -45,7 +45,7 @@ EntitySelectOptionLabel.propTypes = {
 }
 
 /**
- * Shared props for native and experimental entity instance selectors.
+ * Props of the entity instance selector.
  * @typedef {object} EntitySelectProps
  * @property {string} selectedValue - Selected node UUID or placeholder
  * @property {(nodeUuid: string) => void} onChange - Called with the selected node UUID
@@ -55,38 +55,7 @@ EntitySelectOptionLabel.propTypes = {
  */
 
 /**
- * Native `<select>` used when experimental features are off.
- * @param {EntitySelectProps} props - Select props
- * @returns {React.ReactElement} Native select
- */
-const EntitySelectNative = ({ selectedValue, onChange, nodes, nodeKeysLabelValues, placeholderLabel }) => (
-  <select
-    className="node-select"
-    data-testid={TestId.entities.form.nodeSelect}
-    value={selectedValue}
-    onChange={(e) => onChange(e.target.value)}
-  >
-    <option value={PLACEHOLDER_VALUE} disabled hidden>
-      {placeholderLabel}
-    </option>
-    {nodes.map((n, index) => (
-      <option key={Node.getUuid(n)} value={Node.getUuid(n)} data-testid={TestId.entities.form.nodeSelectOption(index)}>
-        {nodeKeysLabelValues[index]}
-      </option>
-    ))}
-  </select>
-)
-
-EntitySelectNative.propTypes = {
-  selectedValue: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  nodes: PropTypes.array.isRequired,
-  nodeKeysLabelValues: PropTypes.arrayOf(PropTypes.string).isRequired,
-  placeholderLabel: PropTypes.string.isRequired,
-}
-
-/**
- * MUI Select with per-instance status icons (experimental features).
+ * MUI Select with per-instance status icons.
  * @param {EntitySelectProps} props - Select props
  * @returns {React.ReactElement} MUI select with status icons
  */
@@ -145,7 +114,6 @@ const NodeDefEntityFormNodeSelect = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const dispatch = useDispatch()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
   const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes, { includeSummaryAttributes: true })
@@ -195,11 +163,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
             label={selectedNode ? 'surveyForm:nodeDefEntityForm.selectedEntity' : 'surveyForm:nodeDefEntityForm.select'}
             labelParams={{ name: nodeDefName }}
           >
-            {experimentalFeatures ? (
-              <EntitySelectWithStatus {...selectProps} />
-            ) : (
-              <EntitySelectNative {...selectProps} />
-            )}
+            <EntitySelectWithStatus {...selectProps} />
           </FormItem>
 
           {canDeleteNode && (

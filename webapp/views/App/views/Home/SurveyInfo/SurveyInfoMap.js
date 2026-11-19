@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 
 import { Checkbox } from '@webapp/components/form'
 
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SamplingPolygonEditor from './SamplingPolygonEditor'
@@ -28,7 +27,6 @@ export const SurveyInfoMap = (props) => {
   } = props
 
   const readOnly = !useAuthCanEditSurvey()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   return (
     <div className="survey-info__map">
@@ -54,23 +52,19 @@ export const SurveyInfoMap = (props) => {
         readOnly={readOnly}
         setAreasOfInterest={setAreasOfInterest}
       />
-      {experimentalFeatures && (
-        <>
-          <Checkbox
-            checked={preloadedMapLayersEnabled}
-            disabled={readOnly}
-            label="homeView:surveyInfo.preloadedMapLayers.enabledMessage"
-            onChange={setPreloadedMapLayersEnabled}
-            validation={getFieldValidation(Survey.infoKeys.preloadedMapLayersEnabled)}
-          />
-          {(preloadedMapLayersEnabled || preloadedMapLayers?.length > 0) && (
-            <PreloadedMapLayersEditor
-              preloadedMapLayers={preloadedMapLayers}
-              setPreloadedMapLayers={setPreloadedMapLayers}
-              readOnly={readOnly}
-            />
-          )}
-        </>
+      <Checkbox
+        checked={preloadedMapLayersEnabled}
+        disabled={readOnly}
+        label="homeView:surveyInfo.preloadedMapLayers.enabledMessage"
+        onChange={setPreloadedMapLayersEnabled}
+        validation={getFieldValidation(Survey.infoKeys.preloadedMapLayersEnabled)}
+      />
+      {(preloadedMapLayersEnabled || preloadedMapLayers?.length > 0) && (
+        <PreloadedMapLayersEditor
+          preloadedMapLayers={preloadedMapLayers}
+          setPreloadedMapLayers={setPreloadedMapLayers}
+          readOnly={readOnly}
+        />
       )}
     </div>
   )

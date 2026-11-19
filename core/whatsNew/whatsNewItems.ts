@@ -144,9 +144,8 @@ export const whatsNewItems: WhatsNewItem[] = [
   },
   {
     id: 'odkImport',
-    version: '2.8.3',
+    version: '3.0.0',
     audience: whatsNewAudiences.surveyAdmin,
-    experimental: true,
     images: ['/img/whats-new/odkImport.png'],
   },
   {
