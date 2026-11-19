@@ -1,116 +1,376 @@
 @use '~@webapp/style/vars' as *;
 
+// side nav + one column of section cards; the nav stacks above the content on narrow screens
 .user-edit {
-  margin: auto;
-  padding: 1rem;
-  display: grid;
-  grid-row-gap: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.75rem;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 1rem;
+}
 
-  .form-item,
-  .form-item-container,
-  .profile-picture,
-  .expansion-panel {
-    justify-self: center;
+.user-edit__content {
+  flex: 999 1 35rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.user-edit-nav {
+  flex: 0 0 14rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.user-edit-nav__item {
+  border: 0;
+  background: transparent;
+  color: $colorOnSurface;
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background: $colorSurfaceVariant;
   }
 
-  .dropdown-user-title {
-    width: 15rem;
+  &:focus-visible {
+    outline: 2px solid $colorPrimary;
+    outline-offset: 1px;
   }
+}
 
-  .form-item {
-    height: auto;
-    width: 100%;
-    max-width: 40rem;
+.user-edit__banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: $colorWarningContainer;
+  color: $colorOnSurface;
 
-    .input-text {
-      width: 100%;
-    }
-
-    .tooltip,
-    .tooltip-error {
-      &:hover {
-        cursor: default;
-      }
-    }
-
-    .form-input-container {
-      justify-self: unset;
-      max-width: 30rem;
-    }
-
-    .form-label {
-      white-space: nowrap;
-    }
-
-    &.mobile {
-      display: flex;
-
-      .tooltip,
-      .tooltip-error {
-        width: 100%;
-      }
-    }
+  > span {
+    flex: 1;
+    min-width: 15rem;
   }
+}
+
+.user-edit-header,
+.user-edit-section {
+  background: $colorSurface;
+  border: 1px solid $colorOutline;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.user-edit-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.user-edit-header__picture {
+  width: 88px;
+  height: 88px;
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  object-fit: cover;
+  background: $colorSurfaceVariant;
 
   .profile-picture {
-    margin-bottom: 20px;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    object-fit: cover;
+  }
+}
+
+.user-edit-header__text {
+  flex: 1;
+  min-width: 14rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.user-edit-header__name {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.user-edit-header__email {
+  color: $colorOnSurfaceVariant;
+  overflow-wrap: anywhere;
+}
+
+.user-edit-header__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.15rem;
+}
+
+.user-edit-header__chip {
+  display: inline-flex;
+  align-items: center;
+  height: 1.5rem;
+  padding: 0 0.65rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: $colorPrimaryContainer;
+  color: $colorOnPrimaryContainer;
+
+  &--warning {
+    background: $colorWarningContainer;
+    color: $colorOnSurface;
+  }
+}
+
+.user-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-margin-top: 1rem;
+
+  &--danger {
+    border-color: $colorError;
+  }
+}
+
+.user-edit-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.user-edit-section__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.user-edit-section__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.user-edit-section__description,
+.user-edit-section__row-description {
+  margin: 0;
+  font-size: 0.85rem;
+  color: $colorOnSurfaceVariant;
+}
+
+.user-edit-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  // panels shared with other pages: full width, no frame (the section is the frame)
+  .user-ai-settings-panel,
+  .extra-props,
+  .sign-in-methods {
+    width: 100%;
   }
 
-  .form-input-container {
-    max-width: 20rem;
-    justify-self: center;
-  }
+  > .user-ai-settings-panel {
+    border: 0;
+    border-top: 1px solid $colorOutline;
+    border-radius: 0;
+    margin: 0;
+    padding: 1rem 0 0;
 
-  .map-api-keys,
-  .notification-prefs {
-    width: 40rem;
-    justify-self: center;
-  }
-
-  .map-api-keys {
-    .form-item {
-      grid-template-columns: 0.3fr 0.7fr 5rem;
+    > legend {
+      float: left;
+      width: 100%;
+      padding: 0 0 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
   }
+}
 
-  .extra-props {
-    .form {
-      height: auto;
-      grid-row-gap: 0;
+.user-edit-section__actions {
+  display: flex;
+  justify-content: flex-end;
+}
 
-      .form-item {
-        width: 20rem;
-        white-space: nowrap;
+.user-edit-section__rows {
+  display: flex;
+  flex-direction: column;
+}
 
-        .form-input-container {
-          width: 12rem;
-        }
-      }
-    }
+.sign-in-methods + .user-edit-section__rows {
+  border-top: 1px solid $colorOutline;
+  padding-top: 0.75rem;
+}
 
-    .btn-add {
-      justify-self: center;
-    }
+.user-edit-section__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+
+  & + & {
+    border-top: 1px solid $colorOutline;
   }
 
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  // control on the right keeps its size
+  > :last-child:not(.user-edit-section__row-text) {
+    flex: none;
+  }
+
+  .form-input-container:has(.max-surveys-input),
   .max-surveys-input {
     width: 5rem;
   }
 }
 
-.user-edit__buttons {
+.user-edit-section__row-icon {
+  width: 1.25rem;
+  text-align: center;
+  color: $colorOnSurfaceVariant;
+}
+
+.user-edit-section__row-text {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+}
+
+.user-edit-section__row-title {
+  font-weight: 600;
+}
+
+// password of a new user: label above the input
+.user-edit-password-form {
+  max-width: 30rem;
+
+  .form-item {
+    grid-template-columns: minmax(0, 1fr);
+    grid-row-gap: 0.35rem;
+    padding: 0 0 0.75rem;
+    height: auto;
+
+    .form-label {
+      justify-self: start;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $colorOnSurfaceVariant;
+    }
+  }
+}
+
+// form fields with the label above the input: two per row, one on narrow screens
+.user-edit-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(14rem, calc(50% - 1rem)), 1fr));
+  gap: 1rem;
+
+  .form-item {
+    grid-template-columns: minmax(0, 1fr);
+    grid-row-gap: 0.35rem;
+    padding: 0;
+    height: auto;
+
+    .form-label {
+      justify-self: start;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $colorOnSurfaceVariant;
+    }
+
+    .form-input-container,
+    .input-text {
+      width: 100%;
+    }
+  }
+}
+
+.user-edit-fields__wide {
+  grid-column: 1 / -1;
+}
+
+.user-edit-section .extra-props .form {
+  height: auto;
+  grid-row-gap: 0;
+
+  .btn-add {
+    justify-self: start;
+  }
+}
+
+.user-edit-map-api-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-edit-map-api-keys__row {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
   align-items: center;
-  position: relative;
-  gap: 3rem;
-  margin-top: 1rem;
 
-  .btn-back {
-    align-self: flex-start;
+  label {
+    font-weight: 500;
   }
+}
 
-  .btn-save {
-    align-self: center;
-  }
+.user-edit-save-bar {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
+  border: 1px solid $colorOutline;
+  border-radius: 10px;
+  background: $colorSurface;
+  box-shadow: 0 6px 20px with-alpha($colorShadow, 0.15);
+}
+
+.user-edit-save-bar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $colorPrimary;
+}
+
+.user-edit-save-bar__text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.user-edit-picture-modal .modal-content {
+  max-width: 30rem;
 }
