@@ -1,11 +1,11 @@
 import type {
-  Chain as ArenaChain,
-  NodeDef as ArenaNodeDef,
+  ArenaChain,
+  ArenaNodeDef,
   NodeDefEntityChildPosition,
   NodeDefType,
-  Survey as ArenaSurvey,
-  User as ArenaUser,
-  Validation as ArenaValidation,
+  ArenaSurvey,
+  ArenaUser,
+  ArenaValidation,
 } from '@openforis/arena-core'
 import * as A from '@core/arena'
 

@@ -2,11 +2,11 @@ import * as A from '@core/arena'
 
 import {
   Points,
-  type CategoryItem as ArenaCategoryItem,
-  type CategoryLevel as ArenaCategoryLevel,
-  type Validation as ArenaValidation,
-  type Category as ArenaCategory,
-  type Survey as ArenaSurvey,
+  type ArenaCategoryItem,
+  type ArenaCategoryLevel,
+  type ArenaValidation,
+  type ArenaCategory,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'

@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey } from '@openforis/arena-core'
 import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'

@@ -3,9 +3,9 @@ import { z } from 'zod'
 import {
   Objects,
   Surveys,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaUser,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
 } from '@openforis/arena-core'
 

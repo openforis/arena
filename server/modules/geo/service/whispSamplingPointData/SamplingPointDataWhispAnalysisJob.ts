@@ -1,7 +1,7 @@
 import * as readline from 'node:readline'
 import { Readable } from 'node:stream'
 
-import { Points, type Survey as ArenaSurvey, type Category as ArenaCategory } from '@openforis/arena-core'
+import { Points, type ArenaSurvey, type ArenaCategory } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import SystemError from '@core/systemError'

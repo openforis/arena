@@ -1,4 +1,4 @@
-import { ArenaRecord, Authorizer, NodeDef, NodeDefType, User, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { ArenaRecord, Authorizer, NodeDef, NodeDefType, User, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 

@@ -1,4 +1,4 @@
-import type { Category as ArenaCategory } from '@openforis/arena-core'
+import type { ArenaCategory } from '@openforis/arena-core'
 import { GeoPackageAPI, GeometryColumns, FeatureColumn, GeometryType, GeoPackageDataType } from '@ngageoint/geopackage'
 import type { GeoPackage } from '@ngageoint/geopackage'
 

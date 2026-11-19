@@ -1,10 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type {
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Chain as ArenaChain,
-} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaNodeDef, NodeDefType, ArenaChain } from '@openforis/arena-core'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as Survey from '@core/survey/survey'

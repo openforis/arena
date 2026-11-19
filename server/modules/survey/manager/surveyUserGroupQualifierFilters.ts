@@ -1,10 +1,4 @@
-import {
-  Objects,
-  ServiceRegistry,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type UserGroup as ArenaUserGroup,
-} from '@openforis/arena-core'
+import { Objects, ServiceRegistry, type ArenaUser, type ArenaSurvey, type ArenaUserGroup } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as User from '@core/user/user'

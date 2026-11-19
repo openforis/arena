@@ -1,4 +1,4 @@
-import { Authorizer, Survey as SurveyType, User } from '@openforis/arena-core'
+import { Authorizer, ArenaSurvey, User } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import { TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
@@ -44,7 +44,7 @@ const _buildFilterBySurveyAttrs = ({
   }
 }
 
-const _buildRecordAccessFilters = async ({ user, survey }: { user: User; survey: SurveyType }) => {
+const _buildRecordAccessFilters = async ({ user, survey }: { user: User; survey: ArenaSurvey }) => {
   const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, Survey.getSurveyInfo(survey))
   const { own, readable } = await SurveyManager.fetchUserGroupAccessFilters({ user, survey })
   return {

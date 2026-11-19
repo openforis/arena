@@ -1,9 +1,4 @@
-import {
-  SystemError,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
-  type Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import { SystemError, type ArenaUser, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 

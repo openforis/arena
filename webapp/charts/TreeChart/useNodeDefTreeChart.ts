@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 

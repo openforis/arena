@@ -1,5 +1,5 @@
 import { JobBase, JobStatus } from '@openforis/arena-core'
-import type { JobContext, User as ArenaUser } from '@openforis/arena-core'
+import type { JobContext, ArenaUser } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'

@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import '../../../../cloneFromSurveyDialog.scss'
 import './nodeDefCloneFromSurveyDialog.scss'
 

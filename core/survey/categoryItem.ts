@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { CategoryItem as ArenaCategoryItem, CategoryItems, LanguageCode } from '@openforis/arena-core'
+import { ArenaCategoryItem, CategoryItems, LanguageCode } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'

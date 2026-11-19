@@ -1,7 +1,7 @@
 import { NodeValues } from '@core/record/nodeValues'
 import { nodeDefType } from '@core/survey/nodeDefType'
 
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 // minimal fixtures: only the props read by NodeValues
 const newNodeDef = (type: NodeDefType) => ({ type }) as ArenaNodeDef<NodeDefType>

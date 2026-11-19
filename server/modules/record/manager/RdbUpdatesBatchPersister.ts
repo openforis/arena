@@ -1,4 +1,4 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 import BatchPersister from '@server/db/batchPersister'
 import { RdbUpdates } from '@server/modules/surveyRdb/repository/RdbUpdates'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'

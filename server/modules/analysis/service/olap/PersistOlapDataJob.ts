@@ -1,9 +1,4 @@
-import {
-  FileNames,
-  type NodeDefEntity,
-  type Survey as ArenaSurvey,
-  type Chain as ArenaChain,
-} from '@openforis/arena-core'
+import { FileNames, type NodeDefEntity, type ArenaSurvey, type ArenaChain } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'

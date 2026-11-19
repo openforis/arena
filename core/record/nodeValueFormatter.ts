@@ -3,9 +3,9 @@ import type {
   ArenaRecord,
   ArenaRecordNode,
   LanguageCode,
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefType,
-  Survey as ArenaSurvey,
+  ArenaSurvey,
 } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'

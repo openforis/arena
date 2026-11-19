@@ -1,9 +1,9 @@
 import type {
-  User as ArenaUser,
-  Survey as ArenaSurvey,
+  ArenaUser,
+  ArenaSurvey,
   ArenaRecordNode,
-  Record as ArenaRecord,
-  NodeDef as ArenaNodeDef,
+  ArenaRecord,
+  ArenaNodeDef,
   NodeDefType,
 } from '@openforis/arena-core'
 import { Authorizer, Queue } from '@openforis/arena-core'

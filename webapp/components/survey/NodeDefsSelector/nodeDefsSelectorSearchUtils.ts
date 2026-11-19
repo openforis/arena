@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 
 export type NodeDefFilterFunction = (nodeDef: ArenaNodeDef<NodeDefType>) => boolean

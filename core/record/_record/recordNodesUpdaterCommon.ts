@@ -8,10 +8,10 @@ import type {
   ArenaRecord,
   ArenaRecordNode,
   CategoryItemProvider,
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefType,
   NodesMap,
-  Survey as ArenaSurvey,
+  ArenaSurvey,
   TaxonProvider,
 } from '@openforis/arena-core'
 

@@ -1,4 +1,4 @@
-import { MessagePropsKey, type Validation as ArenaValidation } from '@openforis/arena-core'
+import { MessagePropsKey, type ArenaValidation } from '@openforis/arena-core'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'

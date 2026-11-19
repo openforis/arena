@@ -1,9 +1,4 @@
-import type {
-  User as ArenaUser,
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-} from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as Chain from '@common/analysis/chain'
 import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'

@@ -2,7 +2,7 @@ import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 import { Query } from '../../../../common/model/query'
 
-import { Authorizer, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Authorizer, type ArenaUser, type ArenaSurvey } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'

@@ -2,7 +2,7 @@ import '../../cloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import { ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'

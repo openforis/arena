@@ -1,9 +1,4 @@
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  Validation as ArenaValidation,
-} from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

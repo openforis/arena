@@ -1,10 +1,10 @@
 import { Nodes } from '@openforis/arena-core'
-import type { ArenaRecordNode, NodeMeta as ArenaNodeMeta } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecordNodeMeta } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
 type NodeUpdater = (node: ArenaRecordNode) => ArenaRecordNode
-type MetaUpdater = (meta: ArenaNodeMeta) => ArenaNodeMeta
+type MetaUpdater = (meta: ArenaRecordNodeMeta) => ArenaRecordNodeMeta
 
 const keys = {
   meta: 'meta',
@@ -38,7 +38,7 @@ const metaKeysOmittedWhenFalsy = new Set<string>([metaKeys.defaultValue, metaKey
 
 // READ
 
-const getMeta = (node: ArenaRecordNode): ArenaNodeMeta => A.propOr({}, keys.meta)(node) as ArenaNodeMeta
+const getMeta = (node: ArenaRecordNode): ArenaRecordNodeMeta => A.propOr({}, keys.meta)(node) as ArenaRecordNodeMeta
 
 const isChildApplicable =
   (childDefUuid: string) =>
@@ -75,7 +75,7 @@ const _isMetaValueDefault = ([key, value]: [string, unknown]): boolean =>
  * @param meta - The node meta.
  * @returns The keys of the items having the default value.
  */
-const getMetaKeysWithDefaultValue = (meta?: ArenaNodeMeta | null): string[] =>
+const getMetaKeysWithDefaultValue = (meta?: ArenaRecordNodeMeta | null): string[] =>
   Object.entries(meta ?? {})
     .filter(_isMetaValueDefault)
     .map(([key]) => key)
@@ -86,13 +86,13 @@ const getMetaKeysWithDefaultValue = (meta?: ArenaNodeMeta | null): string[] =>
  * @param meta - The node meta.
  * @returns The node meta without the items having the default value.
  */
-const compactMeta = (meta?: ArenaNodeMeta | null): ArenaNodeMeta =>
+const compactMeta = (meta?: ArenaRecordNodeMeta | null): ArenaRecordNodeMeta =>
   Object.fromEntries(Object.entries(meta ?? {}).filter((entry) => !_isMetaValueDefault(entry)))
 
 // UPDATE
 
 const assocMeta =
-  (meta: ArenaNodeMeta): NodeUpdater =>
+  (meta: ArenaRecordNodeMeta): NodeUpdater =>
   (node) =>
     A.assoc(keys.meta, meta, node)
 
@@ -104,7 +104,7 @@ const _updateMeta =
     return assocMeta(metaUpdated)(node)
   }
 
-const mergeMeta = (meta: ArenaNodeMeta): NodeUpdater => _updateMeta((metaOld) => A.mergeLeft(meta)(metaOld))
+const mergeMeta = (meta: ArenaRecordNodeMeta): NodeUpdater => _updateMeta((metaOld) => A.mergeLeft(meta)(metaOld))
 
 // sets the flag only when true (missing means false)
 const _assocMetaFlag =

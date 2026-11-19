@@ -8,7 +8,7 @@ import {
   SurveyDocPlace,
   surveyDocImagePropKeys,
   type SurveyDocImage,
-  type Validation as ArenaValidation,
+  type ArenaValidation,
 } from '@openforis/arena-core'
 
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'

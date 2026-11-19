@@ -6,7 +6,7 @@ import {
   Authorizer,
   NodeDef,
   NodeDefType,
-  Survey as ArenaSurvey,
+  ArenaSurvey,
   User,
 } from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'

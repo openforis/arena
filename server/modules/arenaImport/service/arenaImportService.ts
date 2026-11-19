@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 
 import ArenaImportJob from './arenaImport/arenaImportJob'

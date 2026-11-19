@@ -1,4 +1,4 @@
-import { Authorizer, Survey as ArenaSurvey, User } from '@openforis/arena-core'
+import { Authorizer, ArenaSurvey, User } from '@openforis/arena-core'
 
 /**
  * Returns true if the user can export the survey with its records, users and activity log:

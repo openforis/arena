@@ -1,6 +1,6 @@
 import { NodeDefs } from '@openforis/arena-core'
 import type {
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefEntity,
   NodeDefEntityChildPosition,
   NodeDefEntityLayoutChildItem,

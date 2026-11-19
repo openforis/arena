@@ -2,11 +2,11 @@ import { Nodes, Queue, Records } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefCode,
   NodeDefType,
   NodePointer,
-  Survey as ArenaSurvey,
+  ArenaSurvey,
   SurveyDependencyType,
 } from '@openforis/arena-core'
 

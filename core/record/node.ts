@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
-import type { ArenaRecordNode, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'

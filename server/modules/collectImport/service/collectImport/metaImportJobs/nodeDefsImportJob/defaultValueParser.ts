@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'

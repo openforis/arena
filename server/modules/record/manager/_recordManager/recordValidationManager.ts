@@ -4,10 +4,10 @@ import * as A from '@core/arena'
 import {
   RecordValidator,
   type ArenaRecordNode,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaUser,
+  type ArenaRecord,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
 } from '@openforis/arena-core'
 

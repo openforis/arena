@@ -1,4 +1,4 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaValidation } from '@openforis/arena-core'
 import { ExtraPropDef, ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 import * as ObjectUtils from '@core/objectUtils'

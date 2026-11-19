@@ -3,10 +3,10 @@ import {
   Records,
   SurveyDependencyType,
   type NodePointer,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
+  type ArenaUser,
+  type ArenaRecord,
   type ArenaRecordNode,
-  type Survey as ArenaSurvey,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { Popup } from 'react-leaflet'
 import { Link as RouterLink } from 'react-router'
 

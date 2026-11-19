@@ -2,12 +2,7 @@ import {
   NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
   NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
 } from '@openforis/arena-core'
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  ValidationResult as ArenaValidationResult,
-} from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaValidationResult } from '@openforis/arena-core'
 
 type AnyNodeDef = ArenaNodeDef<NodeDefType>
 

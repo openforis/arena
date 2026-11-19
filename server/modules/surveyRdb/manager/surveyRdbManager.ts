@@ -5,9 +5,9 @@ import {
   Objects,
   SystemError,
   UniqueFileNamesGenerator,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaUser,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
   type NodeDefEntity,
 } from '@openforis/arena-core'

@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import { Objects, Records } from '@openforis/arena-core'
-import type { ArenaRecord, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

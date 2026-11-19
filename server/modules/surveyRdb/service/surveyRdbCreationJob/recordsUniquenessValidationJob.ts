@@ -1,4 +1,4 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

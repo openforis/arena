@@ -1,5 +1,5 @@
 import { Records, Dates } from '@openforis/arena-core'
-import type { ArenaRecord, ArenaRecordNode, NodesMap, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, NodesMap, ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

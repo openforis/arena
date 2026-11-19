@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validation from '@core/validation/validation'

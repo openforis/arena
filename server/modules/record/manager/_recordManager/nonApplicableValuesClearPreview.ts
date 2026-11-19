@@ -1,9 +1,4 @@
-import type {
-  User as ArenaUser,
-  ArenaRecordNode,
-  Record as ArenaRecord,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import type { ArenaUser, ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'

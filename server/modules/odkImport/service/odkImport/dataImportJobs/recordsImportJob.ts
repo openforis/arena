@@ -1,11 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  ArenaRecordNode,
-  Record as ArenaRecord,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import { isUuid } from '@core/uuid'

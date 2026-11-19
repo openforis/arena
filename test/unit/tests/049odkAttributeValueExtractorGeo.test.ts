@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 import { extractAttributeValue } from '@server/modules/odkImport/service/odkImport/dataImportJobs/odkAttributeValueExtractor'
 
 const geoNodeDef = { type: 'geo' } as ArenaNodeDef<NodeDefType>

@@ -1,11 +1,6 @@
 import { Writable } from 'node:stream'
 
-import {
-  ArenaExportInfoFactory,
-  ArenaExportType,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import { ArenaExportInfoFactory, ArenaExportType, type ArenaUser, type ArenaSurvey } from '@openforis/arena-core'
 import { ZipArchive } from 'archiver'
 
 import { AppInfo } from '@core/app/appInfo'

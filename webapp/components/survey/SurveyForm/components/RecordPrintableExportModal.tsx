@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Box } from '@mui/material'
-import type { ArenaRecord, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'

@@ -9,7 +9,7 @@ import {
   surveyDocImagePropKeys as propKeys,
   ValidationResult,
   type SurveyDocImage,
-  type Survey as ArenaSurvey,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()

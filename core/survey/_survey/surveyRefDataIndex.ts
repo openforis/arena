@@ -1,13 +1,13 @@
 import { Objects, SurveyRefDataFactory, Surveys } from '@openforis/arena-core'
 import type {
   ArenaRecord,
-  CategoryItem as ArenaCategoryItem,
-  Node as ArenaNode,
-  NodeDef as ArenaNodeDef,
+  ArenaCategoryItem,
+  ArenaRecordNode,
+  ArenaNodeDef,
   NodeDefTaxon,
   NodeDefType,
-  Survey as ArenaSurvey,
-  Taxon as ArenaTaxon,
+  ArenaSurvey,
+  ArenaTaxon,
 } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -52,7 +52,7 @@ export const getCategoryItemUuidAndCodeHierarchy =
     nodeDef: AnyNodeDef
     code: string
     record?: ArenaRecord | null
-    parentNode?: ArenaNode | null
+    parentNode?: ArenaRecordNode | null
   }) =>
   (survey: ArenaSurvey): { itemUuid: string | undefined; hierarchyCode: string[] } => {
     const categoryUuid = NodeDef.getCategoryUuid(nodeDef)

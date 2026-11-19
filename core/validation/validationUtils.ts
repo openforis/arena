@@ -9,9 +9,9 @@ import {
   I18n as I18nCore,
   LanguageCode,
   ValidationSeverity,
-  type Survey as ArenaSurvey,
-  type Validation as ArenaValidation,
-  type ValidationResult as ArenaValidationResult,
+  type ArenaSurvey,
+  type ArenaValidation,
+  type ArenaValidationResult,
 } from '@openforis/arena-core'
 
 type I18n = I18nCore & { language: string }

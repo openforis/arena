@@ -1,11 +1,11 @@
 import {
   Dates,
   Objects,
-  type Validation as ArenaValidation,
+  type ArenaValidation,
   type NodeDefEntity,
-  type NodeDef as ArenaNodeDef,
+  type ArenaNodeDef,
   type NodeDefType,
-  type Record as ArenaRecord,
+  type ArenaRecord,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'

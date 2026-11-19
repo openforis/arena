@@ -1,4 +1,4 @@
-import type { User as ArenaUser, Survey as ArenaSurvey, LanguageCode } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, LanguageCode } from '@openforis/arena-core'
 
 import type { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 

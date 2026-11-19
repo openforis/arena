@@ -1,4 +1,4 @@
-import type { NodeDefEntity, User as ArenaUser, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { NodeDefEntity, ArenaUser, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'

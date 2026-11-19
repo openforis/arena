@@ -1,5 +1,5 @@
 import { Objects } from '@openforis/arena-core'
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { RecordCycle } from '@core/record/recordCycle'

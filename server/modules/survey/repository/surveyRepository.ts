@@ -1,9 +1,4 @@
-import type {
-  User as ArenaUser,
-  Survey as ArenaSurvey,
-  SurveyDependencyGraph,
-  SurveyProps,
-} from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, SurveyDependencyGraph, SurveyProps } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import camelize from 'camelize'
 

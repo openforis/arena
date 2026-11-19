@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Objects, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaUser, type ArenaSurvey } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 

@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaValidation } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { AggregateFunction, AggregateFunctionItem } from '@core/survey/aggregateFunction'

@@ -1,10 +1,10 @@
 import {
   FlatDataExportModel,
   Objects,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
-  type CategoryItem as ArenaCategoryItem,
+  type ArenaCategoryItem,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'

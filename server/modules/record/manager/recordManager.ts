@@ -2,11 +2,11 @@ import * as A from '@core/arena'
 
 import {
   Authorizer,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
+  type ArenaUser,
+  type ArenaRecord,
   type ArenaRecordNode,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
 } from '@openforis/arena-core'
 

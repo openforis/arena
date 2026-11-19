@@ -3,7 +3,7 @@ import './UserGroupsList.scss'
 import React, { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { GridColDef } from '@mui/x-data-grid'
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
@@ -33,7 +33,7 @@ const UserGroupsList = (): React.ReactElement => {
   const { rows, loading } = useUserGroupsList()
 
   const onRowOpen = useCallback(
-    (userGroup: UserGroupType): void => {
+    (userGroup: ArenaUserGroup): void => {
       navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(userGroup)}`)
     },
     [navigate]

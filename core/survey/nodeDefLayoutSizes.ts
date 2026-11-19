@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 

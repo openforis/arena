@@ -5,9 +5,9 @@ import {
   SurveyDocImages,
   SurveyDocPlace,
   type SurveyDocImage,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type SurveyFile as ArenaSurveyFile,
+  type ArenaUser,
+  type ArenaSurvey,
+  type ArenaSurveyFile,
 } from '@openforis/arena-core'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'

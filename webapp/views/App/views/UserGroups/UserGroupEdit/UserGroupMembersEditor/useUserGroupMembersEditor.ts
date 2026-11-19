@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
@@ -22,7 +22,7 @@ interface SurveyUsersResponse {
 
 interface FetchedData {
   members: UserGroupMemberType[]
-  otherGroups: UserGroupType[]
+  otherGroups: ArenaUserGroup[]
   surveyUsers: SurveyUserType[]
 }
 
@@ -60,7 +60,7 @@ const buildOtherGroupsMembersByUserMap = ({
   otherGroups,
   membersByGroup,
 }: {
-  otherGroups: UserGroupType[]
+  otherGroups: ArenaUserGroup[]
   membersByGroup: UserGroupMemberType[][]
 }): Record<string, OtherGroupMembership> => {
   const map: Record<string, OtherGroupMembership> = {}
@@ -101,7 +101,7 @@ export const useUserGroupMembersEditor = ({
 
   const [members, setMembers] = useState<UserGroupMemberType[]>([])
   const [surveyUsers, setSurveyUsers] = useState<SurveyUserType[]>([])
-  const [otherGroups, setOtherGroups] = useState<UserGroupType[]>([])
+  const [otherGroups, setOtherGroups] = useState<ArenaUserGroup[]>([])
   const [otherGroupsMembersByUser, setOtherGroupsMembersByUser] = useState<Record<string, OtherGroupMembership>>({})
 
   // Pure data fetcher: never sets state itself, so it's safe to call both from the reactive effect

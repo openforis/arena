@@ -1,11 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import {
-  Objects,
-  RecordUpdater,
-  SystemError,
-  type Survey as ArenaSurvey,
-  type Record as ArenaRecord,
-} from '@openforis/arena-core'
+import { Objects, RecordUpdater, SystemError, type ArenaSurvey, type ArenaRecord } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

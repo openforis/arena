@@ -5,12 +5,12 @@ import {
   Queue,
   Surveys,
   TraverseMethod,
-  type Category as ArenaCategory,
-  type NodeDef as ArenaNodeDef,
+  type ArenaCategory,
+  type ArenaNodeDef,
   type NodeDefCode,
   type NodeDefEntity,
   type NodeDefType,
-  type Survey as ArenaSurvey,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'

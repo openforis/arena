@@ -1,4 +1,4 @@
-import type { Taxonomy as ArenaTaxonomy, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaTaxonomy, ArenaUser } from '@openforis/arena-core'
 
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'

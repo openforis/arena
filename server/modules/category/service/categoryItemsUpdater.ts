@@ -1,4 +1,4 @@
-import type { Category as ArenaCategory, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaUser } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'

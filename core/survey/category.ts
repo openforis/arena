@@ -1,8 +1,4 @@
-import type {
-  Category as ArenaCategory,
-  CategoryItem as ArenaCategoryItem,
-  CategoryLevel as ArenaCategoryLevel,
-} from '@openforis/arena-core'
+import type { ArenaCategory, ArenaCategoryItem, ArenaCategoryLevel } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { uuidv4 } from '@core/uuid'

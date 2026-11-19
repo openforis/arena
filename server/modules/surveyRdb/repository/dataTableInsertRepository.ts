@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { insertAllQueryBatch } from '@server/db/dbUtils'
 
 import { Schemata, TableDataNodeDef } from '@common/model/db'

@@ -1,4 +1,4 @@
-import { Objects, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'

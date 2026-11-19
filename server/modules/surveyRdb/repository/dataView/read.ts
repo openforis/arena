@@ -4,9 +4,9 @@ import camelize from 'camelize'
 
 import {
   Objects,
-  type Record as ArenaRecord,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaRecord,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
   type ArenaRecordNode,
 } from '@openforis/arena-core'

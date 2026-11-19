@@ -1,4 +1,4 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as Survey from '@core/survey/survey'

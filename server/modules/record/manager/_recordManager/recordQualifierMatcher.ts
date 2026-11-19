@@ -1,4 +1,4 @@
-import { Objects, type Record as ArenaRecord, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'

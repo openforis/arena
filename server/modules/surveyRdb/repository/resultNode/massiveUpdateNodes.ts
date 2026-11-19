@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import pgPromise from 'pg-promise'
 
 import * as NodeDef from '@core/survey/nodeDef'

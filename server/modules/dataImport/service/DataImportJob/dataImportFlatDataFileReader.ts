@@ -1,10 +1,10 @@
 import {
   FlatDataExportModel,
   Objects,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
+  type ArenaSurvey,
+  type ArenaNodeDef,
   type NodeDefType,
-  type Taxon as ArenaTaxon,
+  type ArenaTaxon,
 } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'

@@ -7,10 +7,10 @@ import {
   type ArenaRecord,
   type ArenaRecordNode,
   type CategoryItemProvider,
-  type NodeDef as ArenaNodeDef,
+  type ArenaNodeDef,
   type NodeDefType,
-  type NodeRefData as ArenaNodeRefData,
-  type Survey as ArenaSurvey,
+  type ArenaRecordNodeRefData,
+  type ArenaSurvey,
   type NodeDefEntity,
 } from '@openforis/arena-core'
 
@@ -201,7 +201,7 @@ const _addOrUpdateAttribute =
     entity: ArenaRecordNode
     attributeDef: AnyNodeDef
     value: any
-    refData?: ArenaNodeRefData | null
+    refData?: ArenaRecordNodeRefData | null
     sideEffect?: boolean
   }) =>
   async (record: ArenaRecord): Promise<RecordUpdateResult | null> => {
@@ -444,7 +444,7 @@ const updateAttributesInEntityWithValues =
   }: {
     entity: ArenaRecordNode
     valuesByDefUuid: ValuesByDefUuid
-    refDataByDefUuid?: Record<string, ArenaNodeRefData> | null
+    refDataByDefUuid?: Record<string, ArenaRecordNodeRefData> | null
     sideEffect?: boolean
     updateDependents?: boolean
   } & ContextParams) =>

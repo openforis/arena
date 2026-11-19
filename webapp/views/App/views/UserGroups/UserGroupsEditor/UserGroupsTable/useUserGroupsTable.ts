@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
@@ -54,7 +54,7 @@ const fetchUsersByUuid = async (surveyId: string): Promise<UsersByUuid> => {
   return usersByUuid
 }
 
-const getGroupInfo = (group: UserGroupType, preferredLang: string): GroupInfo => ({
+const getGroupInfo = (group: ArenaUserGroup, preferredLang: string): GroupInfo => ({
   groupUuid: UserGroup.getUuid(group) as string,
   groupName: UserGroup.getName(group),
   groupLabel: UserGroup.getLabel(preferredLang)(group),
@@ -98,7 +98,7 @@ const buildMemberRow = (params: {
 }
 
 const buildGroupRows = (params: {
-  group: UserGroupType
+  group: ArenaUserGroup
   members: Record<string, unknown>[]
   usersByUuid: UsersByUuid
   surveyUuid: string
@@ -122,12 +122,12 @@ const fetchUserGroupsTableRows = async (params: {
   const [groups, usersByUuid] = await Promise.all([API.fetchUserGroups({ surveyId }), fetchUsersByUuid(surveyId)])
 
   const membersByGroup = await Promise.all(
-    groups.map((group: UserGroupType) =>
+    groups.map((group: ArenaUserGroup) =>
       API.fetchUserGroupMembers({ surveyId, groupUuid: UserGroup.getUuid(group) as string })
     )
   )
 
-  return groups.flatMap((group: UserGroupType, groupIndex: number) =>
+  return groups.flatMap((group: ArenaUserGroup, groupIndex: number) =>
     buildGroupRows({ group, members: membersByGroup[groupIndex], usersByUuid, surveyUuid, preferredLang })
   )
 }

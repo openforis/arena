@@ -4,11 +4,11 @@ import { Nodes, RecordExpressionEvaluator, RecordNodesUpdater as CoreRecordNodes
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefExpression,
   NodeDefType,
-  Survey as ArenaSurvey,
-  User as ArenaUser,
+  ArenaSurvey,
+  ArenaUser,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'

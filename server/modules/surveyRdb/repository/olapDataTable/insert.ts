@@ -1,4 +1,4 @@
-import type { Chain as ArenaChain, Survey as ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaChain, ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
 import { Schemata } from '@common/model/db'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 

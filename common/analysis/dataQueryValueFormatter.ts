@@ -1,5 +1,5 @@
 import { Numbers } from '@openforis/arena-core'
-import type { I18n, NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { I18n, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

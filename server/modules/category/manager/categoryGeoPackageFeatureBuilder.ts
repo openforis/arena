@@ -1,4 +1,4 @@
-import { type Category as ArenaCategory, Points, type SRSIndex } from '@openforis/arena-core'
+import { type ArenaCategory, Points, type SRSIndex } from '@openforis/arena-core'
 import type { Feature } from 'geojson'
 
 import * as Category from '@core/survey/category'

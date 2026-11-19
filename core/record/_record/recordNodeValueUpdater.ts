@@ -2,10 +2,10 @@ import { RecordUpdateResult } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefType,
-  NodeRefData as ArenaNodeRefData,
-  Survey as ArenaSurvey,
+  ArenaRecordNodeRefData,
+  ArenaSurvey,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -21,7 +21,7 @@ type UpdateAttributeValueParams = {
   attributeDef: ArenaNodeDef<NodeDefType>
   attribute: ArenaRecordNode
   value: any
-  refData?: ArenaNodeRefData | null
+  refData?: ArenaRecordNodeRefData | null
   dateModified?: Date | string | null
   sideEffect?: boolean
 }

@@ -1,7 +1,7 @@
 import { NodeDefExpressionFactory } from '@openforis/arena-core'
 import type {
   Labels,
-  NodeDefExpression as ArenaNodeDefExpression,
+  ArenaNodeDefExpression,
   NodeDefExpressionFactoryParams,
   ValidationSeverity,
 } from '@openforis/arena-core'

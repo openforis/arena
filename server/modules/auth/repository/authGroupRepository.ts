@@ -1,4 +1,4 @@
-import type { AuthGroup as ArenaAuthGroup } from '@openforis/arena-core'
+import type { ArenaAuthGroup } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 

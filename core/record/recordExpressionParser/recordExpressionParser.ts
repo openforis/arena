@@ -1,11 +1,5 @@
 import { RecordExpressionEvaluator } from '@openforis/arena-core'
-import type {
-  ArenaRecord,
-  ArenaRecordNode,
-  NodeDefExpression,
-  Survey as ArenaSurvey,
-  User as ArenaUser,
-} from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, NodeDefExpression, ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 
 export const evalNodeQuery = (
   survey: ArenaSurvey,

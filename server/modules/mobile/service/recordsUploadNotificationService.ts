@@ -1,4 +1,4 @@
-import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'

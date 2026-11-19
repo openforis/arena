@@ -3,14 +3,14 @@ import {
   NodeDefType,
   Objects,
   type Labels,
-  type NodeDef as ArenaNodeDef,
+  type ArenaNodeDef,
   type NodeDefBoolean,
   type NodeDefCode,
   type NodeDefCoordinate,
   type NodeDefDate,
   type NodeDefDecimal,
   type NodeDefEntity,
-  type NodeDefExpression as ArenaNodeDefExpression,
+  type ArenaNodeDefExpression,
   type NodeDefFile,
   type NodeDefFormHeader,
   type NodeDefGeo,
@@ -20,7 +20,7 @@ import {
   type NodeDefTaxon,
   type NodeDefText,
   type NodeDefTime,
-  type NodeDefValidations as ArenaNodeDefValidations,
+  type ArenaNodeDefValidations,
 } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'

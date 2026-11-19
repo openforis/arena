@@ -1,5 +1,5 @@
 import camelize from 'camelize'
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import * as Survey from '../../../../../core/survey/survey'

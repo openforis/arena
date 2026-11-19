@@ -1,4 +1,4 @@
-import type { ArenaRecordNode as ArenaNode, NodeDef as ArenaNodeDef } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -7,7 +7,7 @@ import { NodeValues } from '../nodeValues'
 
 type KeyDef = ArenaNodeDef<any>
 
-type KeyAttributeGetter = (entity: ArenaNode, keyDefUuid: string) => ArenaNode | undefined
+type KeyAttributeGetter = (entity: ArenaRecordNode, keyDefUuid: string) => ArenaRecordNode | undefined
 
 type Entry = {
   keyDefs: KeyDef[]
@@ -18,7 +18,7 @@ type Entry = {
 
 type CompositeKey = { supported: boolean; key: string | null }
 
-const toEntryKey = ({ parentNode, childDefUuid }: { parentNode: ArenaNode; childDefUuid: string }): string =>
+const toEntryKey = ({ parentNode, childDefUuid }: { parentNode: ArenaRecordNode; childDefUuid: string }): string =>
   `${Node.getUuid(parentNode)}|${childDefUuid}`
 
 // key values are compared with record context (see RecordReader.findChildByKeyValues)
@@ -41,7 +41,7 @@ const getEntityCompositeKey = ({
   getKeyAttribute,
 }: {
   keyDefs: KeyDef[]
-  entity: ArenaNode
+  entity: ArenaRecordNode
   getKeyAttribute: KeyAttributeGetter
 }): CompositeKey =>
   getCompositeKey({
@@ -98,10 +98,10 @@ export class EntityKeysIndexCache {
     getKeyAttribute,
     keyValuesByDefUuid,
   }: {
-    parentNode: ArenaNode
+    parentNode: ArenaRecordNode
     childDefUuid: string
     keyDefs: KeyDef[]
-    siblings: ArenaNode[]
+    siblings: ArenaRecordNode[]
     getKeyAttribute: KeyAttributeGetter
     keyValuesByDefUuid: Record<string, any>
   }): string[] | null {
@@ -134,8 +134,8 @@ export class EntityKeysIndexCache {
     entity,
     getKeyAttribute,
   }: {
-    parentNode: ArenaNode
-    entity: ArenaNode
+    parentNode: ArenaRecordNode
+    entity: ArenaRecordNode
     getKeyAttribute: KeyAttributeGetter
   }): void {
     const entry = this.entriesByKey.get(toEntryKey({ parentNode, childDefUuid: Node.getNodeDefUuid(entity) }))
@@ -157,7 +157,7 @@ export class EntityKeysIndexCache {
     getKeyAttribute,
   }: {
     keyDefs: KeyDef[]
-    siblings: ArenaNode[]
+    siblings: ArenaRecordNode[]
     getKeyAttribute: KeyAttributeGetter
   }): Entry {
     const entry: Entry = { keyDefs, siblingsCount: siblings.length, entityUuidsByKey: new Map(), usable: true }

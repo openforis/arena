@@ -1,4 +1,4 @@
-import type { User as ArenaUser, Taxon as ArenaTaxon, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import type { ArenaUser, ArenaTaxon, ArenaTaxonomy } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 

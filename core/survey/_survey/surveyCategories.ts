@@ -1,10 +1,5 @@
 import { Objects, Surveys } from '@openforis/arena-core'
-import type {
-  Category as ArenaCategory,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import type { ArenaCategory, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { functionNames } from '@core/expressionParser/expression'

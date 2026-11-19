@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
 import { db, DbClient } from '@server/db/db'

@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 import { DB, TableNodeDef, Schemata, NodeDefRepository as NodeDefRepositoryServer } from '@openforis/arena-server'
 

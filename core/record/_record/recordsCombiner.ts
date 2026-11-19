@@ -1,11 +1,5 @@
 import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs } from '@openforis/arena-core'
-import type {
-  ArenaRecord,
-  ArenaRecordNode,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'

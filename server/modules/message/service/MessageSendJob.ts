@@ -1,5 +1,5 @@
 import { Messages, MessageNotificationType, MessageStatus } from '@openforis/arena-core'
-import type { Message, User as ArenaUser } from '@openforis/arena-core'
+import type { Message, ArenaUser } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'

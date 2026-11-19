@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import Job from '@server/job/job'
 import * as AuthGroup from '@core/auth/authGroup'

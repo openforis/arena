@@ -1,9 +1,9 @@
 import type { DbClient } from '@server/db/db'
 import type {
-  Record as ArenaRecord,
+  ArenaRecord,
   ArenaRecordNode,
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
+  ArenaSurvey,
+  ArenaNodeDef,
   NodeDefEntity,
   NodeDefType,
 } from '@openforis/arena-core'

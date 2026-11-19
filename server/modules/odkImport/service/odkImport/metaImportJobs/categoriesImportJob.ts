@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { Category as ArenaCategory } from '@openforis/arena-core'
+import type { ArenaCategory } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'

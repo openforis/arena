@@ -3,10 +3,10 @@ import * as fs from 'node:fs'
 import {
   Authorizer,
   ServiceRegistry,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
+  type ArenaUser,
+  type ArenaSurvey,
   type Message,
-  type Validation as ArenaValidation,
+  type ArenaValidation,
 } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 

@@ -1,8 +1,8 @@
 import { Surveys } from '@openforis/arena-core'
 import type {
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefType,
-  Survey as ArenaSurvey,
+  ArenaSurvey,
   SurveyDependencyGraph,
   SurveyDependencyType,
 } from '@openforis/arena-core'

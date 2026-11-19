@@ -1,5 +1,5 @@
 import { Surveys } from '@openforis/arena-core'
-import type { Survey as ArenaSurvey, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

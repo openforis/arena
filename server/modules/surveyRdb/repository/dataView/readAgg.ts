@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { db } from '../../../../db/db'

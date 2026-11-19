@@ -2,7 +2,7 @@ import './AreaOfInterestDialog.scss'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { AreaOfInterest, AreaOfInterestDescriptor, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { AreaOfInterest, AreaOfInterestDescriptor, ArenaValidation } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'

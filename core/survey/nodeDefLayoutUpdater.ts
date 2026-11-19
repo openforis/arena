@@ -1,8 +1,8 @@
 import type {
-  NodeDef as ArenaNodeDef,
+  ArenaNodeDef,
   NodeDefEntityChildPosition,
   NodeDefType,
-  Survey as ArenaSurvey,
+  ArenaSurvey,
   NodeDefEntity,
 } from '@openforis/arena-core'
 
