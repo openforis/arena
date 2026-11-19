@@ -1,7 +1,15 @@
-import { Dates, Objects } from '@openforis/arena-core'
+import {
+  Dates,
+  Objects,
+  type Validation as ArenaValidation,
+  type NodeDefEntity,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+  type Record as ArenaRecord,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import { DbOrder } from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -66,7 +74,7 @@ const dbTransformCallback =
 
 // ============== CREATE
 
-export const insertRecord = async (surveyId, record, client = db) => {
+export const insertRecord = (surveyId: number, record: ArenaRecord, client: DbClient = db) => {
   const now = new Date()
   return client.one(
     `
@@ -81,7 +89,7 @@ export const insertRecord = async (surveyId, record, client = db) => {
       Record.getStep(record),
       Record.getCycle(record),
       Record.isPreview(record),
-      Validation.isObjValid(record) ? {} : Record.getValidation(record),
+      Validation.isValid(Record.getValidation(record)) ? {} : Record.getValidation(record),
       Dates.formatForStorage(Record.getDateCreated(record) || now),
       Dates.formatForStorage(Record.getDateModified(record) || now),
       Record.getInfo(record),
@@ -92,7 +100,10 @@ export const insertRecord = async (surveyId, record, client = db) => {
   )
 }
 
-export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, client = db) =>
+export const insertRecordsInBatch = (
+  { surveyId, records, userUuid }: { surveyId: number; records: ArenaRecord[]; userUuid: string },
+  client: DbClient = db
+) =>
   client.none(
     DbUtils.insertAllQueryBatch(
       `${getSchemaSurvey(surveyId)}`,
@@ -103,7 +114,9 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         owner_uuid: userUuid || Record.getOwnerUuid(record),
         date_created: Record.getDateCreated(record),
         date_modified: Record.getDateModified(record),
-        validation: JSON.stringify(Validation.isObjValid(record) ? {} : Record.getValidation(record)),
+        validation: JSON.stringify(
+          Validation.isValid(Record.getValidation(record)) ? {} : Record.getValidation(record)
+        ),
         info: Record.getInfo(record),
         merged_into_record_uuid: Record.getMergedIntoRecordUuid(record),
       }))
@@ -140,8 +153,19 @@ export const countRecordsBySurveyId = async (
     includeMerged = false,
     qualifierNodeDefFilters = [],
     readableQualifierNodeDefFilterSets = [],
+  }: {
+    surveyId: number
+    cycle?: string
+    nodeDefRoot?: NodeDefEntity
+    nodeDefKeys?: ArenaNodeDef<NodeDefType>[]
+    summaryDefs?: ArenaNodeDef<NodeDefType>[]
+    search?: string | null
+    ownerUuid?: string
+    includeMerged?: boolean
+    qualifierNodeDefFilters?: any
+    readableQualifierNodeDefFilterSets?: any
   },
-  client = db
+  client: DbClient = db
 ) => {
   if (!A.isEmpty(search) || !A.isEmpty(qualifierNodeDefFilters)) {
     const recordsWithSearch = await fetchRecordsSummaryBySurveyId({
@@ -173,7 +197,10 @@ export const countRecordsBySurveyId = async (
   )
 }
 
-export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, client = db) => {
+export const countRecordsGroupedByApp = async (
+  { surveyId, cycle = null }: { surveyId: number; cycle?: string },
+  client: DbClient = db
+) => {
   const counts = await client.any(
     `
         SELECT COALESCE(info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}', '${AppInfo.arenaAppId}') AS created_with, count(*)
@@ -192,7 +219,10 @@ export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, clien
   }, {})
 }
 
-export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, client = db) => {
+export const countRecordsBySurveyIdGroupedByStep = async (
+  { surveyId, cycle }: { surveyId: number; cycle: string },
+  client: DbClient = db
+) => {
   const counts = await client.manyOrNone(
     `SELECT step, count(*)
     FROM ${getSchemaSurvey(surveyId)}.record 
@@ -212,7 +242,15 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
   )
 }
 
-const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
+const determineOrderBy = ({
+  nodeDefKeys,
+  summaryDefs,
+  sortBy,
+}: {
+  nodeDefKeys: ArenaNodeDef<NodeDefType>[]
+  summaryDefs: ArenaNodeDef<NodeDefType>[]
+  sortBy: string | null
+}) => {
   const getColumnName = (nodeDef) =>
     NodeDef.isCode(nodeDef)
       ? // consider label for sorting if nodeDef is code
@@ -248,7 +286,15 @@ const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
   return StringUtils.toSnakeCase(sortBy)
 }
 
-const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
+const nodeDefsToJsonb = ({
+  nodeDefs,
+  tableAlias,
+  alias,
+}: {
+  nodeDefs: ArenaNodeDef<NodeDefType>[]
+  tableAlias: string
+  alias: string
+}) => {
   if (!nodeDefs) return null
   return `jsonb_build_object(${nodeDefs
     .flatMap((nodeDef) => {
@@ -265,7 +311,13 @@ const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
     .join(', ')}) AS ${alias}`
 }
 
-const buildRecordsSummarySearchCondition = ({ nodeDefKeysWhereConditions, summaryDefsWhereConditions }) => {
+const buildRecordsSummarySearchCondition = ({
+  nodeDefKeysWhereConditions,
+  summaryDefsWhereConditions,
+}: {
+  nodeDefKeysWhereConditions: any
+  summaryDefsWhereConditions: any
+}) => {
   const searchConditions = []
   if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
   if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
@@ -283,6 +335,16 @@ const buildRecordsSummarySelectWhereConditions = ({
   includeMerged,
   nodeDefKeysWhereConditions,
   summaryDefsWhereConditions,
+}: {
+  cycle: string
+  step: string
+  search: string | null
+  ownerUuid: string
+  recordUuids: string[]
+  includePreview: boolean
+  includeMerged: boolean
+  nodeDefKeysWhereConditions: any
+  summaryDefsWhereConditions: any
 }) => {
   const conditions = []
   if (!includePreview) conditions.push('preview = FALSE')
@@ -297,7 +359,7 @@ const buildRecordsSummarySelectWhereConditions = ({
   return conditions
 }
 
-export const fetchRecordsSummaryBySurveyId = async (
+export const fetchRecordsSummaryBySurveyId = (
   {
     surveyId,
     nodeDefRoot = null,
@@ -316,8 +378,26 @@ export const fetchRecordsSummaryBySurveyId = async (
     includeMerged = false,
     qualifierNodeDefFilters = [],
     readableQualifierNodeDefFilterSets = [],
+  }: {
+    surveyId: number
+    nodeDefRoot?: NodeDefEntity
+    nodeDefKeys?: ArenaNodeDef<NodeDefType>[]
+    summaryDefs?: ArenaNodeDef<NodeDefType>[]
+    cycle?: string
+    step?: string
+    offset?: number
+    limit?: number | null
+    sortBy?: string | null
+    sortOrder?: string | null
+    search?: string | null
+    ownerUuid?: string
+    recordUuids?: string[]
+    includePreview?: boolean
+    includeMerged?: boolean
+    qualifierNodeDefFilters?: any
+    readableQualifierNodeDefFilterSets?: any
   },
-  client = db
+  client: DbClient = db
 ) => {
   const rootEntityTableAlias = 'n0'
   // readable groups' filters are relevant only when the user is restricted to its own group
@@ -468,7 +548,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 }
 
-export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) => {
+export const fetchRecordCountsByStep = async (surveyId: number, cycle: string, client: DbClient = db) => {
   const countsArray = await client.any(
     `
     SELECT
@@ -491,7 +571,7 @@ export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) => {
   }, {})
 }
 
-export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
+export const fetchRecordByUuid = (surveyId: number, recordUuid: string, client: DbClient = db) =>
   client.oneOrNone(
     `SELECT 
       ${recordSelectFields}, 
@@ -502,7 +582,7 @@ export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
+export const fetchRecordsByUuids = (surveyId: number, recordUuids: string[], client: DbClient = db) =>
   client.map(
     `SELECT 
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
@@ -512,9 +592,13 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const fetchRecordsUuidAndCycle = async (
-  { surveyId, recordUuidsIncluded = null, ownerUuid = null },
-  client = db
+export const fetchRecordsUuidAndCycle = (
+  {
+    surveyId,
+    recordUuidsIncluded = null,
+    ownerUuid = null,
+  }: { surveyId: number; recordUuidsIncluded?: string[] | null; ownerUuid?: string },
+  client: DbClient = db
 ) =>
   client.any(
     `
@@ -528,7 +612,13 @@ export const fetchRecordsUuidAndCycle = async (
     { recordUuidsIncluded, ownerUuid }
   )
 
-export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
+export const fetchRecordCreatedCountsByDates = (
+  surveyId: number,
+  cycle: string,
+  from: string,
+  to: string,
+  client: DbClient = db
+) =>
   client.any(
     `
     SELECT
@@ -551,7 +641,13 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
     [from, to, cycle]
   )
 
-export const fetchRecordCreatedCountsByDatesAndUser = async (surveyId, cycle, from, to, client = db) =>
+export const fetchRecordCreatedCountsByDatesAndUser = (
+  surveyId: number,
+  cycle: string,
+  from: string,
+  to: string,
+  client: DbClient = db
+) =>
   client.any(
     `
     SELECT
@@ -582,7 +678,13 @@ export const fetchRecordCreatedCountsByDatesAndUser = async (surveyId, cycle, fr
     [from, to, cycle]
   )
 
-export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, client = db) =>
+export const fetchRecordCreatedCountsByUser = (
+  surveyId: number,
+  cycle: string,
+  from: string,
+  to: string,
+  client: DbClient = db
+) =>
   client.any(
     `
     SELECT
@@ -613,7 +715,14 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
 
 // ============== UPDATE
 
-export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModified = new Date() }, client = db) =>
+export const updateRecordDateModified = (
+  {
+    surveyId,
+    recordUuid,
+    dateModified = new Date(),
+  }: { surveyId: number; recordUuid: string; dateModified?: Date | string },
+  client: DbClient = db
+) =>
   client.one(
     `UPDATE ${getSchemaSurvey(surveyId)}.record
      SET date_modified = $2
@@ -622,7 +731,10 @@ export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModif
     [recordUuid, Dates.formatForStorage(dateModified)]
   )
 
-export const fetchRecordDateModified = async ({ surveyId, recordUuid }, client = db) => {
+export const fetchRecordDateModified = async (
+  { surveyId, recordUuid }: { surveyId: number; recordUuid: string },
+  client: DbClient = db
+) => {
   const row = await client.oneOrNone(
     `SELECT ${DbUtils.selectDate('date_modified')}
      FROM ${getSchemaSurvey(surveyId)}.record
@@ -632,7 +744,12 @@ export const fetchRecordDateModified = async ({ surveyId, recordUuid }, client =
   return row?.date_modified ? Dates.parseISO(row.date_modified) : null
 }
 
-export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
+export const updateValidation = (
+  surveyId: number,
+  recordUuid: string,
+  validation: ArenaValidation,
+  client: DbClient = db
+) =>
   client.one(
     `UPDATE ${getSchemaSurvey(surveyId)}.record 
      SET validation = $1::jsonb
@@ -641,7 +758,7 @@ export const updateValidation = async (surveyId, recordUuid, validation, client 
     [validation, recordUuid]
   )
 
-export const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
+export const updateRecordStep = (surveyId: number, recordUuid: string, step: string, client: DbClient = db) =>
   client.none(
     `
       UPDATE ${getSchemaSurvey(surveyId)}.record
@@ -650,7 +767,10 @@ export const updateRecordStep = async (surveyId, recordUuid, step, client = db) 
     [step, recordUuid]
   )
 
-export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }, client = db) =>
+export const updateRecordOwner = (
+  { surveyId, recordUuid, ownerUuid }: { surveyId: number; recordUuid: string; ownerUuid: string },
+  client: DbClient = db
+) =>
   client.none(
     `
       UPDATE ${getSchemaSurvey(surveyId)}.record
@@ -659,7 +779,14 @@ export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }, cli
     { recordUuid, ownerUuid }
   )
 
-export const updateRecordMergedInto = async ({ surveyId, recordUuid, mergedIntoRecordUuid }, client = db) =>
+export const updateRecordMergedInto = (
+  {
+    surveyId,
+    recordUuid,
+    mergedIntoRecordUuid,
+  }: { surveyId: number; recordUuid: string; mergedIntoRecordUuid: string },
+  client: DbClient = db
+) =>
   client.one(
     `
       UPDATE ${getSchemaSurvey(surveyId)}.record
@@ -669,7 +796,10 @@ export const updateRecordMergedInto = async ({ surveyId, recordUuid, mergedIntoR
     { recordUuid, mergedIntoRecordUuid }
   )
 
-export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid }, client = db) =>
+export const updateRecordsOwner = (
+  { surveyId, fromOwnerUuid, toOwnerUuid }: { surveyId: number; fromOwnerUuid: string; toOwnerUuid: string },
+  client: DbClient = db
+) =>
   client.none(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.record
@@ -678,7 +808,11 @@ export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid 
     [toOwnerUuid, fromOwnerUuid]
   )
 
-export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
+export const updateRecordValidationsFromValues = (
+  surveyId: number,
+  recordUuidAndValidationValues: any,
+  client: DbClient = db
+) =>
   client.none(
     DbUtils.updateAllQuery(
       getSchemaSurvey(surveyId),
@@ -689,7 +823,11 @@ export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndV
     )
   )
 
-export const updateRecordDateModifiedFromValues = async (surveyId, recordUuidAndDateModifiedValues, client = db) =>
+export const updateRecordDateModifiedFromValues = (
+  surveyId: number,
+  recordUuidAndDateModifiedValues: any,
+  client: DbClient = db
+) =>
   client.none(
     DbUtils.updateAllQuery(
       getSchemaSurvey(surveyId),
@@ -702,7 +840,7 @@ export const updateRecordDateModifiedFromValues = async (surveyId, recordUuidAnd
 
 // ============== DELETE
 
-export const deleteRecord = async (surveyId, recordUuid, client = db) =>
+export const deleteRecord = (surveyId: number, recordUuid: string, client: DbClient = db) =>
   client.query(
     `
     DELETE FROM ${getSchemaSurvey(surveyId)}.record
@@ -711,7 +849,7 @@ export const deleteRecord = async (surveyId, recordUuid, client = db) =>
     [recordUuid]
   )
 
-export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, client = db) =>
+export const deleteRecordsPreview = (surveyId: number, olderThan24Hours = false, client: DbClient = db) =>
   client.map(
     `
     DELETE FROM ${getSchemaSurvey(surveyId)}.record
@@ -723,7 +861,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, c
     A.prop('uuid')
   )
 
-export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
+export const deleteRecordsByCycles = (surveyId: number, cycles: string[], client: DbClient = db) =>
   client.map(
     `
     DELETE FROM ${getSchemaSurvey(surveyId)}.record
@@ -734,5 +872,5 @@ export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
     A.prop('uuid')
   )
 
-export const deleteRecordsBySurvey = async (surveyId, client = db) =>
+export const deleteRecordsBySurvey = (surveyId: number, client: DbClient = db) =>
   client.none(`DELETE FROM ${getSchemaSurvey(surveyId)}.record`)
