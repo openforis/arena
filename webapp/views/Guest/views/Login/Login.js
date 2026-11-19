@@ -49,6 +49,25 @@ const useExternalLoginRedirect = () => {
   }, [dispatch, searchParams, setSearchParams])
 }
 
+/**
+ * Shown first, so that new users request access before trying to log in (e.g. with an external provider).
+ * @returns {React.ReactElement} The banner element.
+ */
+const RequestAccessBanner = () => {
+  const i18n = useI18n()
+  return (
+    <div className="guest-login__request-access" data-testid="login-request-access-banner">
+      <div className="guest-login__request-access-text">
+        <strong>{i18n.t('guest:loginView.newToArena')}</strong>
+        <span>{i18n.t('guest:loginView.registerBeforeLoggingIn')}</span>
+      </div>
+      <Link className="guest-login__request-access-button" to={appModuleUri(guestModules.accessRequest)}>
+        {i18n.t('guest:loginView.requestAccess')}
+      </Link>
+    </div>
+  )
+}
+
 const Login = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -169,6 +188,7 @@ const Login = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+      {allowAccessRequest && <RequestAccessBanner />}
       <GuestViewHeader description="guest:loginView.subtitle" title="guest:loginView.title" />
       <Error error={error} />
       <EmailInput
@@ -189,18 +209,7 @@ const Login = () => {
         {i18n.t('guest:loginView.forgotPassword')}
       </Link>
       <Button className="guest__submit" label="guest:loginView.login" onClick={onClickLogin} type="submit" />
-      <ExternalLoginButtons />
-      {allowAccessRequest && (
-        <>
-          <div className="guest__divider">{i18n.t('guest:loginView.or')}</div>
-          <p className="guest__footnote">
-            {i18n.t('guest:loginView.newToArena')}{' '}
-            <Link className="guest__link" to={appModuleUri(guestModules.accessRequest)}>
-              {i18n.t('guest:loginView.requestAccess')}
-            </Link>
-          </p>
-        </>
-      )}
+      <ExternalLoginButtons captionKey="guest:externalLogin.registeredUsersOnly" />
     </form>
   )
 }
