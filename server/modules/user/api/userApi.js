@@ -18,10 +18,9 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-import { isValidPrefsUpdate } from '../serverOnlyPrefs'
+import { isValidPrefsUpdate, omitServerOnlyPrefsFromUser } from '../serverOnlyPrefs'
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import { buildCurrentUserGroupBody } from './currentUserGroupBody'
 import { UserExportService } from '../service/userExportService'
 import { UsersBackupService } from '../service/usersBackup/usersBackupService'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -175,7 +174,8 @@ export const init = (app) => {
         const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
         const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
         const userGroup = userGroups[0]
-        res.json(buildCurrentUserGroupBody({ user, userGroup }))
+        // the user of the request has the server-only prefs (AI keys, usage): never sent
+        res.json({ user: omitServerOnlyPrefsFromUser(user), userGroup })
       } catch (error) {
         next(error)
       }

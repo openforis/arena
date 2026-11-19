@@ -31,20 +31,12 @@ export const notAllowed = (baseUrl: string) =>
   new SystemError('aiBaseUrlNotAllowed', { baseUrl: String(baseUrl).slice(0, 200) }, StatusCodes.BAD_REQUEST)
 
 /**
- * Returns true when the address must not be called (internal, reserved, or not an IP at all). The ranges are the ones
- * the browser uses to tell the local network from the internet (common/ai/ipAddress).
- * @param {string} address - IPv4 or IPv6 address.
- * @returns {boolean} True when blocked.
- */
-export const isBlockedAddress = (address: string): boolean => isNonPublicIpAddress(address)
-
-/**
- * Returns true when every address may be called (and there is at least one).
+ * Returns true when every address may be called (and there is at least one): none is internal, reserved or not an IP.
  * @param {string[]} addresses - Resolved IPv4 / IPv6 addresses.
  * @returns {boolean} Whether the server may connect to them.
  */
 export const areAddressesAllowed = (addresses: string[]): boolean =>
-  addresses.length > 0 && !addresses.some(isBlockedAddress)
+  addresses.length > 0 && !addresses.some(isNonPublicIpAddress)
 
 const resolveAddresses = async (hostname: string, lookup: LookupFn): Promise<string[]> => {
   try {

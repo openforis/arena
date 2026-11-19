@@ -1,6 +1,5 @@
-import { classifyIpAddress, type IpAddressClass } from '@common/ai/ipAddress'
+import { classifyIpAddress, type IpAddressClass, isNonPublicIpAddress } from '@common/ai/ipAddress'
 import { isLoopbackHost, isPrivateHost } from '@common/ai/localServerAddress'
-import { isBlockedAddress } from '@server/modules/ai/service/baseUrlGuard'
 
 // one table for both callers: the server blocks every address that is not public, the browser tells loopback and the
 // local network (private) from the rest
@@ -32,7 +31,6 @@ const cases: [string, IpAddressClass][] = [
   ['fc00::1', 'private'],
   ['fd12:3456::1', 'private'],
   ['fe80::1', 'private'],
-  ['fe80::1%eth0', 'private'],
   ['fec0::1', 'private'],
   ['::ffff:10.0.0.1', 'private'],
   ['::ffff:a9fe:a9fe', 'private'],
@@ -47,6 +45,7 @@ const cases: [string, IpAddressClass][] = [
   ['2001::1', 'reserved'],
   ['::ffff:0:7f00:1', 'reserved'],
   ['ff02::1', 'reserved'],
+  ['fe80::1%eth0', 'invalid'],
   ['not an address', 'invalid'],
   ['256.1.1.1', 'invalid'],
   ['1.2.3', 'invalid'],
@@ -61,7 +60,7 @@ describe('one IP classification for the server guard and the browser (481)', () 
   })
 
   test.each(cases)('the server guard blocks %s only when it is not public (%s)', (address, ipClass) => {
-    expect(isBlockedAddress(address)).toBe(ipClass !== 'public')
+    expect(isNonPublicIpAddress(address)).toBe(ipClass !== 'public')
   })
 
   test.each(cases.filter(([address]) => !address.includes('%') && address !== '' && !address.includes(' ')))(

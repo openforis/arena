@@ -4,7 +4,8 @@ import type { AddressInfo } from 'node:net'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { buildModel, buildUserModel } from '@server/modules/ai/service/providerRegistry'
-import { assertBaseUrlAllowed, isAllowlisted, isBlockedAddress } from '@server/modules/ai/service/baseUrlGuard'
+import { isNonPublicIpAddress } from '@common/ai/ipAddress'
+import { assertBaseUrlAllowed, isAllowlisted } from '@server/modules/ai/service/baseUrlGuard'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const lookupTo =
@@ -20,7 +21,7 @@ const neverCalledLookup = async () => {
   throw new Error('lookup must not be called')
 }
 
-describe('isBlockedAddress', () => {
+describe('isNonPublicIpAddress', () => {
   test.each([
     '127.0.0.1',
     '10.1.2.3',
@@ -46,11 +47,11 @@ describe('isBlockedAddress', () => {
     '::ffff:0:7f00:1', // IPv4-translated
     'not-an-ip',
   ])('blocks %s', (address) => {
-    expect(isBlockedAddress(address)).toBe(true)
+    expect(isNonPublicIpAddress(address)).toBe(true)
   })
 
   test.each(['8.8.8.8', '172.32.0.1', '2606:4700::1111', '::ffff:8.8.8.8'])('allows %s', (address) => {
-    expect(isBlockedAddress(address)).toBe(false)
+    expect(isNonPublicIpAddress(address)).toBe(false)
   })
 })
 

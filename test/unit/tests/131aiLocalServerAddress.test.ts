@@ -1,10 +1,5 @@
-import {
-  getLocalServerHostingClass,
-  getTargetAddressSpace,
-  isLoopbackHost,
-  parseIpv4,
-  parseIpv6,
-} from '@common/ai/localServerAddress'
+import { parseIpv4, parseIpv6 } from '@common/ai/ipAddress'
+import { getLocalServerHostingClass, getTargetAddressSpace, isLoopbackHost } from '@common/ai/localServerAddress'
 
 const allowlist = ['http://10.0.0.5:8000/v1', 'https://llm.internal.example/v1', 'http://localhost:1234/v1']
 

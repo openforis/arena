@@ -13,13 +13,13 @@ import { Readable } from 'node:stream'
 
 import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
+import { isNonPublicIpAddress } from '@common/ai/ipAddress'
 
 import {
   areAddressesAllowed,
   type GuardOptions,
   defaultLookup,
   isAllowlisted,
-  isBlockedAddress,
   type LookupFn,
   notAllowed,
 } from './baseUrlGuard'
@@ -114,7 +114,7 @@ const toFetchError = (error: unknown): Error =>
  */
 const assertLiteralAddressAllowed = (url: URL, allowlist: string[]): void => {
   const hostname = url.hostname.replace(/^\[|\]$/g, '')
-  if (isIP(hostname) && !isAllowlisted(url, allowlist) && isBlockedAddress(hostname)) throw notAllowed(url.href)
+  if (isIP(hostname) && !isAllowlisted(url, allowlist) && isNonPublicIpAddress(hostname)) throw notAllowed(url.href)
 }
 
 /**

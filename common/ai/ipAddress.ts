@@ -1,6 +1,7 @@
 /**
- * Classification of IP addresses, shared by the server (which addresses a provider endpoint may be called on) and the
- * browser (which URLs are on this device or the local network). Pure: no DNS, no Node modules, so it runs in both.
+ * Classification of IP addresses, shared by the server (which addresses a provider endpoint or a map service may be
+ * called on) and the browser (which URLs are on this device or the local network). Pure: no DNS, no Node modules, so it
+ * runs in both.
  */
 
 export type IpAddressClass =
@@ -12,7 +13,8 @@ export type IpAddressClass =
   | 'loopback'
   // the local network: private ranges, link-local, carrier-grade NAT, unique local and site-local
   | 'private'
-  // multicast, reserved, benchmarking, protocol assignments and the transition mechanisms that embed an IPv4 address
+  // multicast, reserved, benchmarking, documentation, protocol assignments, the transition mechanisms that embed an
+  // IPv4 address and IPv6 outside global unicast
   | 'reserved'
   // everything else
   | 'public'
@@ -97,8 +99,11 @@ const IPV4_RANGES: Range[] = [
   ipv4Range('169.254.0.0', 16, 'private'), // link-local (cloud metadata) // NOSONAR: range table used to classify addresses
   ipv4Range('172.16.0.0', 12, 'private'), // NOSONAR: range table used to classify addresses
   ipv4Range('192.0.0.0', 24, 'reserved'), // IETF protocol assignments // NOSONAR: range table used to classify addresses
+  ipv4Range('192.0.2.0', 24, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
   ipv4Range('192.168.0.0', 16, 'private'), // NOSONAR: range table used to classify addresses
   ipv4Range('198.18.0.0', 15, 'reserved'), // benchmarking // NOSONAR: range table used to classify addresses
+  ipv4Range('198.51.100.0', 24, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
+  ipv4Range('203.0.113.0', 24, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
   ipv4Range('224.0.0.0', 4, 'reserved'), // multicast // NOSONAR: range table used to classify addresses
   ipv4Range('240.0.0.0', 4, 'reserved'), // reserved and broadcast // NOSONAR: range table used to classify addresses
 ]
@@ -109,13 +114,22 @@ const IPV6_RANGES: Range[] = [
   ipv6Range('::', 96, 'reserved'), // IPv4-compatible
   ipv6Range('64:ff9b::', 96, 'reserved'), // NAT64 (can reach internal IPv4) // NOSONAR: range table used to classify addresses
   ipv6Range('64:ff9b:1::', 48, 'reserved'), // local-use NAT64 // NOSONAR: range table used to classify addresses
+  ipv6Range('100::', 64, 'reserved'), // discard // NOSONAR: range table used to classify addresses
   ipv6Range('2002::', 16, 'reserved'), // 6to4 (embeds an IPv4) // NOSONAR: range table used to classify addresses
-  ipv6Range('2001::', 32, 'reserved'), // Teredo (embeds an IPv4) // NOSONAR: range table used to classify addresses
+  // IETF protocol assignments, Teredo (embeds an IPv4), benchmarking and ORCHID included
+  ipv6Range('2001::', 23, 'reserved'), // NOSONAR: range table used to classify addresses
+  ipv6Range('2001:db8::', 32, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
+  ipv6Range('3ffe::', 16, 'reserved'), // former 6bone // NOSONAR: range table used to classify addresses
+  ipv6Range('3fff::', 20, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
   ipv6Range('::ffff:0:0:0', 96, 'reserved'), // IPv4-translated (SIIT) // NOSONAR: range table used to classify addresses
   ipv6Range('fc00::', 7, 'private'), // unique local // NOSONAR: range table used to classify addresses
   ipv6Range('fe80::', 10, 'private'), // link-local // NOSONAR: range table used to classify addresses
   ipv6Range('fec0::', 10, 'private'), // deprecated site-local // NOSONAR: range table used to classify addresses
   ipv6Range('ff00::', 8, 'reserved'), // multicast // NOSONAR: range table used to classify addresses
+  // outside 2000::/3, the only block allocated to global unicast: unrouted or special-purpose
+  ipv6Range('::', 3, 'reserved'), // NOSONAR: range table used to classify addresses
+  ipv6Range('4000::', 2, 'reserved'), // NOSONAR: range table used to classify addresses
+  ipv6Range('8000::', 1, 'reserved'), // NOSONAR: range table used to classify addresses
 ]
 
 /**
@@ -140,11 +154,12 @@ const toMappedIpv4Groups = (groups: number[]): number[] | null =>
 
 /**
  * Classifies an IP address; an IPv4-mapped IPv6 address is classified as the IPv4 address it carries.
- * @param {string} address - IPv4 or IPv6 address, without brackets. A zone id (fe80::1%eth0) is ignored.
+ * @param {string} address - IPv4 or IPv6 address, without brackets. One with a zone id (fe80::1%eth0) is `invalid`:
+ *   neither URL hosts nor DNS answers to a public name carry one.
  * @returns {IpAddressClass} The class; `invalid` when the text is not an IP address.
  */
 export const classifyIpAddress = (address: string): IpAddressClass => {
-  const text = address.toLowerCase().split('%')[0]
+  const text = address.toLowerCase()
   const ipv4 = parseIpv4(text)
   if (ipv4) return classifyGroups(toGroups(ipv4), IPV4_RANGES)
   const ipv6 = parseIpv6(text)

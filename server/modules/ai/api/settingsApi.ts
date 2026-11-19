@@ -24,7 +24,7 @@ import * as AiProviderService from '../service/aiProviderService'
 import * as AiSettingsService from '../service/aiSettingsService'
 import * as ProviderResolver from '../service/providerResolver'
 import { getDisabledFeatureKeys } from '../service/featureGate'
-import { getEngineSettingsFields } from '../service/engineSettings'
+import { getAiPolicyCeilings } from '../service/policyCeilings'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 import { limitProviderCalls, releaseProviderCall } from './providerRateLimit'
 
@@ -41,8 +41,10 @@ export const buildResponseBody = (user: SettingsUser) => ({
   // the dialog offers the mock type only where the server accepts it (e2e servers)
   mockProviderEnabled: ENV.aiMockProviderEnabled === true,
   disabledFeatures: getDisabledFeatureKeys(),
-  // orgHostedBaseUrls, policyCeilings (instance ceilings) and maxPromptChars, for the browser engines
-  ...getEngineSettingsFields(),
+  // for the browser engines: org-hosted allowlist, instance policy ceilings and gateway prompt cap
+  orgHostedBaseUrls: [...ENV.aiOrgHostedBaseUrls],
+  policyCeilings: getAiPolicyCeilings(),
+  maxPromptChars: ENV.aiMaxPromptChars,
 })
 
 type ArenaUser = User

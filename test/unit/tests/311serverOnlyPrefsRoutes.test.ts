@@ -1,4 +1,3 @@
-import { buildCurrentUserGroupBody } from '@server/modules/user/api/currentUserGroupBody'
 import { stripServerOnlyPrefsFromLoginResponse } from '@server/modules/auth/authResponseMiddleware'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 
@@ -8,15 +7,6 @@ const user = {
 }
 
 describe('Server-only prefs on the user routes (311)', () => {
-  test('the body of current-user-group has no AI prefs and keeps the user group', () => {
-    const userGroup = { uuid: 'g1', name: 'admins' }
-    const body = buildCurrentUserGroupBody({ user, userGroup })
-    expect(body).toEqual({ user: { uuid: 'u1', prefs: { language: 'en' } }, userGroup })
-    expect(JSON.stringify(body)).not.toMatch(/secret|aiUsage/)
-    // the user of the request keeps its prefs: the AI gates read them
-    expect(user.prefs.ai).toBeDefined()
-  })
-
   test.each(['/auth/login', '/AUTH/LOGIN', '/Auth/Login/', '/auth/login/temp', '/Auth/LOGIN/Temp/'])(
     'the user of the login response at %s is sent without the AI prefs',
     (path) => {

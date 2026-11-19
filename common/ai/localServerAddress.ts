@@ -7,9 +7,6 @@ import type { AiHostingClass } from '@common/ai/policy'
 import { isAllowlisted } from '@common/ai/allowlist'
 import { classifyIpAddress } from '@common/ai/ipAddress'
 
-// the parsers moved to the shared IP classification; they stay importable from here
-export { parseIpv4, parseIpv6 } from '@common/ai/ipAddress'
-
 const parseHttpUrl = (value: string): URL | null => {
   if (typeof value !== 'string') return null
   try {

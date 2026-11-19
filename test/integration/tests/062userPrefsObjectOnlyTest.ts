@@ -82,6 +82,11 @@ describe('The prefs of a user stay an object (062)', () => {
       const updated = await service.updateUserPrefs({ userToUpdate: { uuid: User.getUuid(member), prefs } })
       expect(User.getUuid(updated)).toBe(User.getUuid(member))
     }
+    // the server-only prefs are neither written nor returned by that path
+    const userToUpdate = { uuid: User.getUuid(member), prefs: { ai: { providers: [1] }, aiUsage: { calls: 9 } } }
+    const updated = await service.updateUserPrefs({ userToUpdate })
+    expect(User.getPrefs(updated)).not.toHaveProperty('ai')
+    expect((await readPrefs()).aiUsage).toBeUndefined()
     await expectPrefsIntact()
   })
 
