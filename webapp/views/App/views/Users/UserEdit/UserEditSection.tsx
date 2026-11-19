@@ -10,6 +10,7 @@ type Props = {
   description?: string
   descriptionParams?: Record<string, unknown>
   danger?: boolean
+  hidden?: boolean
   children: React.ReactNode
 }
 
@@ -17,13 +18,14 @@ type Props = {
  * Card grouping related fields of the user edit page, with a title and a short description.
  */
 export const UserEditSection = (props: Props) => {
-  const { id, title, titleParams, description, descriptionParams, danger = false, children } = props
+  const { id, title, titleParams, description, descriptionParams, danger = false, hidden = false, children } = props
   const i18n = useI18n()
   const titleId = `${id}-title`
   return (
     <section
       aria-labelledby={titleId}
       className={classNames('user-edit-section', { 'user-edit-section--danger': danger })}
+      hidden={hidden}
       id={id}
     >
       <div className="user-edit-section__header">

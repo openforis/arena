@@ -23,7 +23,6 @@ export default {
   'sourceAdmin-default': 'la configuration par defaut de la plateforme',
   notConfigured:
     'L IA n est pas configuree pour votre compte ou ce deploiement. Configurez un fournisseur personnel ci-dessous ou contactez votre administrateur.',
-  featuresDisabled: 'Les fonctionnalites IA sont desactivees sur ce deploiement.',
   encryptionMissing:
     'Le deploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les cles API personnelles ne peuvent pas etre enregistrees tant qu un administrateur ne l a pas configure.',
 

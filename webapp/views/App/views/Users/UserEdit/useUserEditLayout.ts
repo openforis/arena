@@ -90,7 +90,9 @@ export const useUserEditLayout = (params: Params) => {
     visible: {
       access: Object.values(access).some(Boolean),
       security: Object.values(security).some(Boolean),
-      integrations: ownSettingsVisible && (canUseMap || aiFeaturesEnabled),
+      integrations: ownSettingsVisible && canUseMap,
+      // also hidden when the server reports AI features as disabled (see AiFeaturesSection)
+      aiFeatures: ownSettingsVisible && aiFeaturesEnabled,
       notifications: ownSettingsVisible && User.isSystemAdmin(userToUpdate),
       removeFromSurvey: surveyGroupsVisible && canRemove,
       invitationExpired: surveyGroupsVisible && User.isInvitationExpired(userToUpdate),

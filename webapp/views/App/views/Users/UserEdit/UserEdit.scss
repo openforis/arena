@@ -150,6 +150,10 @@
   &--danger {
     border-color: $colorError;
   }
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 .user-edit-section__header {
@@ -183,7 +187,6 @@
   gap: 1.25rem;
 
   // panels shared with other pages: full width, no frame (the section is the frame)
-  .user-ai-settings-panel,
   .extra-props,
   .sign-in-methods {
     width: 100%;
@@ -191,17 +194,11 @@
 
   > .user-ai-settings-panel {
     border: 0;
-    border-top: 1px solid $colorOutline;
-    border-radius: 0;
     margin: 0;
-    padding: 1rem 0 0;
+    padding: 0;
 
-    > legend {
-      float: left;
-      width: 100%;
-      padding: 0 0 0.5rem;
-      font-size: 0.9rem;
-      font-weight: 600;
+    > legend:empty {
+      display: none;
     }
   }
 }

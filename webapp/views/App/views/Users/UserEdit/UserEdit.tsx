@@ -15,6 +15,7 @@ import { UserActions, useUser } from '@webapp/store/user'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import { AccessSection } from './sections/AccessSection'
+import { AiFeaturesSection } from './sections/AiFeaturesSection'
 import { IntegrationsSection } from './sections/IntegrationsSection'
 import { NotificationsSection } from './sections/NotificationsSection'
 import { PersonalInfoSection } from './sections/PersonalInfoSection'
@@ -85,6 +86,7 @@ const UserEdit = (props: Props) => {
 
   const aiSaveRef = useRef<() => Promise<void>>(null)
   const [aiSettingsDirty, setAiSettingsDirty] = useState(false)
+  const [aiFeaturesAvailable, setAiFeaturesAvailable] = useState(false)
   const notificationPrefs = useNotificationPrefs(user)
 
   const surveyInfo = useSurveyInfo()
@@ -115,6 +117,11 @@ const UserEdit = (props: Props) => {
     { id: 'user-edit-access', label: 'usersView:profile.sections.access', visible: visible.access },
     { id: 'user-edit-security', label: 'usersView:profile.sections.security', visible: visible.security },
     { id: 'user-edit-integrations', label: 'usersView:profile.sections.integrations', visible: visible.integrations },
+    {
+      id: 'user-edit-ai-features',
+      label: 'userAiSettings:section',
+      visible: visible.aiFeatures && aiFeaturesAvailable,
+    },
     { id: 'user-edit-notifications', label: 'usersView:prefs.title', visible: visible.notifications },
     { id: 'user-edit-remove', label: 'userView.removeFromSurvey', visible: visible.removeFromSurvey },
   ].filter((item) => item.visible)
@@ -183,15 +190,19 @@ const UserEdit = (props: Props) => {
         )}
         {visible.integrations && (
           <IntegrationsSection
-            aiFeaturesEnabled={aiFeaturesEnabled}
-            aiSaveRef={aiSaveRef}
             canEditMapApiKeys={editUser.canEditEmail}
-            canUseMap={canUseMap}
-            onAiSettingsDirtyChange={setAiSettingsDirty}
             onMapApiKeyTest={editUser.onMapApiKeyTest}
             onUpdate={onUpdate}
             userToUpdate={userToUpdate}
             validation={validation}
+          />
+        )}
+        {visible.aiFeatures && (
+          <AiFeaturesSection
+            aiSaveRef={aiSaveRef}
+            available={aiFeaturesAvailable}
+            onAvailableChange={setAiFeaturesAvailable}
+            onDirtyChange={setAiSettingsDirty}
           />
         )}
         {visible.notifications && (
