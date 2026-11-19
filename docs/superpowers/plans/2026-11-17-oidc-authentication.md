@@ -37,7 +37,6 @@ Out of scope (follow-ups):
 - Adapters for OAuth2-only providers (Facebook, GitHub) and Apple (OIDC, but needs a signed JWT client secret and a
   form POST callback).
 - Domain-based routing (user types the email first, Arena picks the provider configured for that domain).
-- Arena Mobile login (native flow with PKCE and an app redirect URI).
 - Single logout at the provider (RP-initiated logout).
 - Self sign-up through external providers, SCIM provisioning, mapping provider groups/claims to Arena roles.
 - SAML.
@@ -307,8 +306,8 @@ Users accepted through an external provider may have no password:
 - Password login: no password → "invalid credentials" (verify no exception on a `null` hash).
 - Profile "change password": allow setting a password without the old one when the user has none.
 - User export/backup (`server/modules/user/service/usersBackup/`, `userExportService.ts`): include identity links.
-- Arena Mobile: these users cannot log in to the mobile app until they set a password ("forgot password"); noted in
-  the manual.
+- Arena Mobile: they sign in with the same providers (see "Arena Mobile login" below); with an Arena Mobile version
+  released before it, they need a password ("forgot password").
 
 ### Account management
 
@@ -372,6 +371,30 @@ Implemented (arena-server 2.8.17):
   *System administration > Login providers* (list, add, edit, test connection, test sign-in, delete), *Sign-in
   methods* in the profile and user edit view. Password change without the old password when the user has none.
 - e2e: `test/e2e/specs/externalLogin.spec.ts` with `oauth2-mock-server`.
+
+### Arena Mobile login
+
+Added after the first release (arena-server PR openforis/arena-server#237, Arena Mobile PR
+openforis/arena-mobile#427). The browser flow cannot be reused as is: it sets the refresh token cookie in the browser
+and redirects to `/app/home/`. The app runs the sign-in in the system browser (`expo-web-browser` auth session) and the
+server redirects back to the app with a code that only the app that started the sign-in can exchange:
+
+1. The app generates a PKCE verifier and opens `GET /auth/oidc/:id?mobileCodeChallenge=<S256 challenge>` (login mode
+   only); the challenge is kept in the signed flow cookie.
+2. After the provider callback and the access rules, instead of creating the session the server redirects to the app
+   redirect URI `org.openforis.arena-mobile://external-login?code=<code>` (the app URL scheme). The code is a signed
+   token (purpose `externalLoginMobileCode`, 5 minutes) with the user, the provider and the challenge. Errors go to
+   the same URI with `?externalLoginError=<key>`. The URI is a constant of the server, never taken from the request.
+3. The app sends `POST /auth/oidc/_mobile-token` `{ code, codeVerifier, twoFactorToken?, appInfo }`: the server checks
+   SHA-256(`codeVerifier`) against the challenge and, when Arena 2FA is required, answers `{ twoFactorRequired: true }`
+   until a valid code is sent. The response is the same as `POST /auth/login` (refresh token cookie and
+   `{ user, authToken }`), so the rest of the app login is unchanged.
+4. `GET /auth/providers` sets `mobileLogin: true` on each provider: the app shows only these, so it shows no provider
+   buttons with older servers.
+
+The code is not single-use within its validity, so the app can retry a wrong 2FA code; it is useless without the PKCE
+verifier, which never leaves the app. Like the browser flow, the mobile flow never creates accounts: the app login
+screen invites new users to request access first, as the login page does.
 
 Not done (follow-ups): the "recent login" check before setting a first password, the *Sign-in method* filter and
 column of the users list, the identity links in the users backup export/import, the admin page translations other
@@ -460,8 +483,10 @@ than English, French and Spanish (they fall back to English).
 - Verified email (or explicit per-provider `trustEmail`) required for first-time linking by email.
 - Arena 2FA kept by default for users who enabled it.
 - Client secrets encrypted at rest, write-only in the API, never logged; uploaded SVG icons sanitized.
-- Redirect after login is always `/app/home/` (no user-supplied `returnTo`, avoiding open redirects).
-- No tokens or error details in URLs.
+- Redirect after login is always `/app/home/`, or the fixed Arena Mobile redirect URI (no user-supplied `returnTo`,
+  avoiding open redirects).
+- No session tokens or error details in URLs: the Arena Mobile redirect carries only a short-lived code bound to the
+  app's PKCE verifier.
 - Admin API restricted to system admins; every configuration change logged.
 - Login rate limiting applied to the callback and the external-login 2FA endpoint.
 
