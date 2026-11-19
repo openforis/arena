@@ -1,4 +1,4 @@
-import type { Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { NodeDefEntity, Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 
@@ -16,7 +16,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
  * @param {!pgPromise.IDatabase} client - The database client.
  */
 export const deleteNodeResultsByChainUuid = (
-  { survey, chain, entity, cycle }: { survey: ArenaSurvey; chain: ArenaChain; entity: any; cycle: string },
+  { survey, chain, entity, cycle }: { survey: ArenaSurvey; chain: ArenaChain; entity: NodeDefEntity; cycle: string },
   client: DbClient = db
 ) => {
   const tableData = new TableDataNodeDef(survey, entity)

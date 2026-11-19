@@ -3,7 +3,7 @@ import './SignInMethodsPanel.scss'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 
-import { Button, Fieldset } from '@webapp/components'
+import { Button } from '@webapp/components'
 import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { useConfirm, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import {
@@ -45,6 +45,8 @@ type Props = {
   // system admin editing another user: can remove the last sign-in method after confirmation
   systemAdmin: boolean
   onSetPasswordClick: () => void
+  // when set, a change password button is shown in the password row (if a password is set)
+  onChangePasswordClick?: () => void
 }
 
 const formatDate = (date?: string): string | null => (date ? new Date(date).toLocaleDateString() : null)
@@ -107,7 +109,7 @@ const IdentityRow = (props: {
  * Sign-in methods of a user: password and linked external login providers, with link and unlink.
  */
 export const SignInMethodsPanel = (props: Props) => {
-  const { userUuid, editingLoggedInUser, systemAdmin, onSetPasswordClick } = props
+  const { userUuid, editingLoggedInUser, systemAdmin, onSetPasswordClick, onChangePasswordClick } = props
   const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
@@ -179,7 +181,8 @@ export const SignInMethodsPanel = (props: Props) => {
   const canUnlink = editingLoggedInUser || systemAdmin
 
   return (
-    <Fieldset className="sign-in-methods" legend="usersView:signInMethods.title">
+    <div className="sign-in-methods">
+      <h3 className="sign-in-methods__title">{i18n.t('usersView:signInMethods.title')}</h3>
       <div className="sign-in-methods__row">
         <span aria-hidden="true" className="icon icon-key sign-in-methods__password-icon" />
         <div className="sign-in-methods__text">
@@ -194,6 +197,14 @@ export const SignInMethodsPanel = (props: Props) => {
             iconClassName="icon-pencil"
             label="usersView:signInMethods.setPassword"
             onClick={onSetPasswordClick}
+            variant="outlined"
+          />
+        )}
+        {hasPassword && onChangePasswordClick && (
+          <Button
+            className="btn-s"
+            label="userPasswordChangeView.changePassword"
+            onClick={onChangePasswordClick}
             variant="outlined"
           />
         )}
@@ -227,6 +238,6 @@ export const SignInMethodsPanel = (props: Props) => {
           ))}
         </div>
       )}
-    </Fieldset>
+    </div>
   )
 }

@@ -4,8 +4,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: 40rem;
-  justify-self: center;
 
   &__status {
     background: $colorSurfaceVariant;
@@ -71,33 +69,33 @@
     }
   }
 
+  // subgroups with a left-aligned title, no frame (the panel sits in a section card of the user edit page)
   &__categories,
   &__provider {
-    border: 1px solid shade($colorOutline, 30%);
-    border-radius: 4px;
-    padding: 0.25rem 0.75rem 0.5rem;
-    margin: 0.25rem 0;
+    border: 0;
+    padding: 0;
+    margin: 0.75rem 0 0;
 
     > legend {
-      padding: 0 0.5rem;
-      margin: 0 auto;
-      font-size: 0.85rem;
+      padding: 0 0 0.35rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      color: $colorOnSurfaceVariant;
-      text-align: center;
     }
   }
 
-  &__categories {
-    .form-item {
-      padding: 0.1rem 0.25rem;
-      grid-template-columns: 0.5fr auto;
-      grid-column-gap: 0.5rem;
-    }
+  &__categories .form-label {
+    font-size: 0.85rem;
+    letter-spacing: 0;
+  }
+
+  // label on the left, control on its right
+  .form-item {
+    grid-template-columns: 16rem minmax(0, 1fr);
+    padding: 0.35rem 0;
 
     .form-label {
-      font-size: 0.85rem;
-      letter-spacing: 0;
+      justify-self: start;
+      text-align: left;
     }
   }
 

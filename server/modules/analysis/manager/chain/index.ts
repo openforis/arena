@@ -1,5 +1,11 @@
 import type { DbClient } from '@server/db/db'
-import { Authorizer, ChainFactory, type Chain as ArenaChain, type User as ArenaUser } from '@openforis/arena-core'
+import {
+  Authorizer,
+  ChainFactory,
+  type Chain as ArenaChain,
+  type User as ArenaUser,
+  type Validation as ArenaValidation,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
@@ -65,7 +71,7 @@ export const { countChains, fetchChains, fetchChain } = ChainRepository
 export const { updateChain } = ChainRepository
 
 export const updateChainValidation = (
-  { surveyId, chainUuid, validation }: { surveyId: number; chainUuid: string; validation: any },
+  { surveyId, chainUuid, validation }: { surveyId: number; chainUuid: string; validation: ArenaValidation },
   client: DbClient = DB.client
 ) =>
   ChainRepository.updateChain(

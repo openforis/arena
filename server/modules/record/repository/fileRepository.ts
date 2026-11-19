@@ -14,7 +14,7 @@ const NOT_DELETED_CONDITION = `COALESCE(props ->> '${SurveyFile.propKeys.deleted
 
 // ============== CREATE
 
-export const insertFile = (surveyId: number, file: any, client: DbClient = db) => {
+export const insertFile = (surveyId: number, file: SurveyFile.SurveyFile, client: DbClient = db) => {
   const { uuid, props, content } = file
 
   return client.one(
@@ -272,7 +272,7 @@ export const clearAllSurveyFilesContent = ({ surveyId }: { surveyId: number }, c
   )
 
 export const cleanupFileProps = (
-  { surveyId, fileSummary }: { surveyId: number; fileSummary: any },
+  { surveyId, fileSummary }: { surveyId: number; fileSummary: SurveyFile.SurveyFile },
   client: DbClient = db
 ) => {
   const fileUuid = SurveyFile.getUuid(fileSummary)

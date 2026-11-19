@@ -1,5 +1,5 @@
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export const findUniqueSurveyName = async ({
@@ -7,7 +7,7 @@ export const findUniqueSurveyName = async ({
   client = db,
 }: {
   startingName: string
-  client?: any
+  client?: DbClient
 }): Promise<string> => {
   const surveyIdsAndNames = await SurveyManager.fetchSurveyIdsAndNames(client)
   const surveyNames = new Set(surveyIdsAndNames.map(({ name }) => name))

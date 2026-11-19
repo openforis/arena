@@ -1,10 +1,11 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 
 import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportJob'
 import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportSummaryJob'
 
 export interface ArenaMobileImportSummaryParams {
-  user: any
+  user: ArenaUser
   filePath?: string
   fileId?: string
   totalChunks?: number

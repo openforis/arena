@@ -1,5 +1,10 @@
-import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
-import { PointFactory, Points } from '@openforis/arena-core'
+import {
+  PointFactory,
+  Points,
+  type CategoryLevel as ArenaCategoryLevel,
+  type Category as ArenaCategory,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 
@@ -57,7 +62,7 @@ const generateDescendantItems = ({
   previousLevelCodes = [],
   numItemsPerLevel = 2,
 }: {
-  levels: any
+  levels: ArenaCategoryLevel[]
   levelIndex?: any
   previousLevelCodes?: any
   numItemsPerLevel?: any
@@ -101,7 +106,7 @@ const generateExtraDefsForTemplate = (category: ArenaCategory) => {
   }, [])
 }
 
-const generateItems = ({ levels, numItemsPerLevel = 2 }: { levels: any; numItemsPerLevel?: any }) =>
+const generateItems = ({ levels, numItemsPerLevel = 2 }: { levels: ArenaCategoryLevel[]; numItemsPerLevel?: any }) =>
   generateDescendantItems({ levels, numItemsPerLevel })
 
 const generateTemplate = ({

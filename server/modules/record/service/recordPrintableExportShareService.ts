@@ -80,7 +80,7 @@ type ShareRepositoryLike = {
 }
 
 type DatabaseLike = {
-  tx: <T>(callback: (tx: any) => Promise<T>) => Promise<T>
+  tx: <T>(callback: (tx: DbClient) => Promise<T>) => Promise<T>
 }
 
 type ShareServiceDependencies = {

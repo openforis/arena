@@ -23,7 +23,6 @@ export default {
   'sourceAdmin-default': 'the platform default',
   notConfigured:
     'AI is not configured for your account or this deployment. Configure a personal provider below or contact your administrator.',
-  featuresDisabled: 'AI features are disabled on this deployment.',
   encryptionMissing:
     'The deployment is missing AI_USER_KEY_ENCRYPTION_SECRET; personal API keys cannot be saved until an administrator configures it.',
 

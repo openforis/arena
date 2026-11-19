@@ -5,7 +5,7 @@ import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import FileZip from '@server/utils/file/fileZip'
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 
 import { SurveyCompareSourceSurvey, fetchSurveyFromDb, readSurveyFromFile } from './surveyCompareSurveysReader'
 
@@ -99,7 +99,7 @@ const readSurveyFileFromZip = async ({ filePath, fileUuid }): Promise<Buffer | n
 export const withSource = async <T>(
   sourceRef: SurveyCompareSourceRef,
   fn: (source: SurveyCompareSource) => Promise<T>,
-  client: any = db
+  client: DbClient = db
 ): Promise<T> => {
   const { sourceFileId, sourceSurveyId } = sourceRef
   if (sourceSurveyId) {
@@ -108,7 +108,7 @@ export const withSource = async <T>(
       ...source,
       readSurveyFileContent: (fileUuid) =>
         SurveyFileManager.fetchFileContentAsBuffer(
-          { surveyId: sourceSurveyId, fileSummary: { uuid: fileUuid } },
+          { surveyId: sourceSurveyId, fileSummary: { uuid: fileUuid, props: {} } },
           client
         ),
     })

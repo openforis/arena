@@ -222,7 +222,7 @@ const _insertOrCloneSurvey = async ({
 
 type UserAccessRequestAcceptResult = {
   validation?: ArenaValidation
-  survey?: any
+  survey?: ArenaSurvey
   userInvited?: ArenaUser
 }
 
@@ -868,7 +868,7 @@ const _notifyUserRegistrationExpired = async ({
   i18n,
 }: {
   user: ArenaUser
-  surveys: any
+  surveys: { name: string; label?: string }[]
   i18n: any
 }) => {
   const email = User.getEmail(user)

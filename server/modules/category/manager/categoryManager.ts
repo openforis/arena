@@ -1,4 +1,11 @@
-import type { Category as ArenaCategory, User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type {
+  CategoryItem as ArenaCategoryItem,
+  CategoryLevel as ArenaCategoryLevel,
+  Validation as ArenaValidation,
+  Category as ArenaCategory,
+  User as ArenaUser,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -45,7 +52,7 @@ const _isBigCategory = async (
   (await CategoryRepository.countItemsByCategoryUuid(surveyId, categoryUuid, client)) > Category.maxCategoryItemsInIndex
 
 const _updateCategoryValidation = async (
-  { surveyId, category, validation }: { surveyId: number; category: ArenaCategory; validation: any },
+  { surveyId, category, validation }: { surveyId: number; category: ArenaCategory; validation: ArenaValidation },
   client: DbClient
 ) => {
   const categoryUuid = Category.getUuid(category)
@@ -270,7 +277,7 @@ export const checkLevelProp = (key: string, value: unknown) => {
  * @param {!object} level - The level to check.
  * @returns {void}
  */
-export const checkLevel = (level: any) => {
+export const checkLevel = (level: ArenaCategoryLevel) => {
   for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(level)) {
     checkLevelProp(key, value)
   }
@@ -297,7 +304,7 @@ const _insertLevelInTransaction = async ({
 }: {
   user: ArenaUser
   surveyId: number
-  level: any
+  level: ArenaCategoryLevel
   system?: boolean
   addLogs?: boolean
   validate?: boolean
@@ -330,7 +337,7 @@ export const insertLevel = (
     system = false,
     addLogs = true,
     validate = true,
-  }: { user: ArenaUser; surveyId: number; level: any; system?: any; addLogs?: any; validate?: any },
+  }: { user: ArenaUser; surveyId: number; level: ArenaCategoryLevel; system?: any; addLogs?: any; validate?: any },
   client: DbClient = db
 ) => {
   checkLevel(level)
@@ -476,7 +483,7 @@ export const insertItem = (
  * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<*>} - The result promise (void).
  */
-export const insertItems = (user: ArenaUser, surveyId: number, items: any[], client: DbClient = db) =>
+export const insertItems = (user: ArenaUser, surveyId: number, items: ArenaCategoryItem[], client: DbClient = db) =>
   client.tx(async (t) => {
     const activityLogs = items.map((item) => ActivityLog.newActivity(ActivityLog.type.categoryItemInsert, item, true))
     await DbUtils.runQueries(t, [
@@ -676,7 +683,13 @@ export const updateLevelProp = (
     return { level, category: await _validateCategory({ surveyId, categoryUuid, validateItems: false }, t) }
   })
 
-const _newCategoryItemUpdateLogActivity = (categoryUuid: string, item: any, key: string, value: unknown, system: any) =>
+const _newCategoryItemUpdateLogActivity = (
+  categoryUuid: string,
+  item: ArenaCategoryItem,
+  key: string,
+  value: unknown,
+  system: any
+) =>
   ActivityLog.newActivity(
     ActivityLog.type.categoryItemPropUpdate,
     {
@@ -724,7 +737,7 @@ export const updateItemsProps = (
   user: ArenaUser,
   surveyId: number,
   categoryUuid: string,
-  items: any[],
+  items: ArenaCategoryItem[],
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -1204,7 +1217,12 @@ export const deleteItem = (
   })
 
 export const deleteItems = async (
-  { user, surveyId, categoryUuid, items }: { user: ArenaUser; surveyId: number; categoryUuid: string; items: any[] },
+  {
+    user,
+    surveyId,
+    categoryUuid,
+    items,
+  }: { user: ArenaUser; surveyId: number; categoryUuid: string; items: ArenaCategoryItem[] },
   t: DbClient = db
 ) => {
   const activities = items.map((item) => {
