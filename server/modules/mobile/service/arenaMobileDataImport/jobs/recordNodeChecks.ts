@@ -18,7 +18,7 @@ const _checkParentValid = ({
   node,
   nodeDef,
 }: {
-  nodes: any
+  nodes: { [nodeUuid: string]: ArenaRecordNode }
   node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }) => {
@@ -41,7 +41,7 @@ const _checkHierarchyValid = ({
   node,
   nodeDef,
 }: {
-  nodes: any
+  nodes: { [nodeUuid: string]: ArenaRecordNode }
   node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }) => {
@@ -98,7 +98,7 @@ export const checkNodeIsValid = async ({
   nodeDef,
 }: {
   survey: ArenaSurvey
-  nodes: any
+  nodes: { [nodeUuid: string]: ArenaRecordNode }
   node: ArenaRecordNode
   nodeDef: ArenaNodeDef<NodeDefType>
 }): Promise<NodeCheckResult> => {

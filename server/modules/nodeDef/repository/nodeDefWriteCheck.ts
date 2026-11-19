@@ -1,3 +1,4 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validation from '@core/validation/validation'
@@ -27,7 +28,7 @@ export const checkNodeDefType = (type: unknown): void => {
  * Throws a bad request error if the node def has an unknown type or a name with characters not allowed in names.
  * @param nodeDef - The node def to check (published and draft props).
  */
-export const checkNodeDef = (nodeDef: any): void => {
+export const checkNodeDef = (nodeDef: ArenaNodeDef<NodeDefType>): void => {
   checkNodeDefType(NodeDef.getType(nodeDef))
   checkNodeDefProps(NodeDef.getProps(nodeDef))
   checkNodeDefProps(NodeDef.getPropsDraft(nodeDef))

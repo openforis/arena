@@ -1,7 +1,6 @@
-import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 
@@ -239,7 +238,7 @@ const _attachAuthGroupsAndInvitationToUsers = async ({
   invitationsByUserUuid = {},
   t,
 }: {
-  users: any
+  users: ArenaUser[]
   invitationsByUserUuid?: Record<string, any>
   t: DbClient
 }) => {

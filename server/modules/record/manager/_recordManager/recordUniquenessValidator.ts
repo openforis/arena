@@ -1,3 +1,11 @@
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  ArenaRecordNode,
+  Record as ArenaRecord,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -9,7 +17,15 @@ import * as Validation from '@core/validation/validation'
 
 import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataView'
 
-const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) => {
+const createNodesRecordUniqueValidation = ({
+  nodes,
+  unique,
+  errorKey,
+}: {
+  nodes: ArenaRecordNode[]
+  unique: boolean
+  errorKey: string
+}) => {
   const validationAcc = {}
   for (const node of nodes) {
     validationAcc[Node.getUuid(node)] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
@@ -17,14 +33,20 @@ const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) => {
   return validationAcc
 }
 
-const validateRecordKeysUniqueness = async ({ survey, record }, tx) => {
+const validateRecordKeysUniqueness = async (
+  { survey, record }: { survey: ArenaSurvey; record: ArenaRecord },
+  tx: DbClient
+) => {
   const rootNode = Record.getRootNode(record)
   const unique = await DataViewRepository.isRecordUniqueByKeys({ survey, record }, tx)
   const nodes = Record.getEntityKeyNodes(survey, rootNode)(record)
   return createNodesRecordUniqueValidation({ nodes, unique, errorKey: Validation.messageKeys.record.keyDuplicate })
 }
 
-const validateRecordUniqueNodesUniqueness = async ({ survey, record }, tx) => {
+const validateRecordUniqueNodesUniqueness = async (
+  { survey, record }: { survey: ArenaSurvey; record: ArenaRecord },
+  tx: DbClient
+) => {
   const rootNode = Record.getRootNode(record)
   const unique = await DataViewRepository.isRecordUniqueByUniqueNodes({ survey, record }, tx)
   const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
@@ -42,7 +64,10 @@ const validateRecordUniqueNodesUniqueness = async ({ survey, record }, tx) => {
   })
 }
 
-export const validateRecordUniqueNodes = async ({ survey, record }, tx) => {
+export const validateRecordUniqueNodes = async (
+  { survey, record }: { survey: ArenaSurvey; record: ArenaRecord },
+  tx: DbClient
+) => {
   const keysValidation = await validateRecordKeysUniqueness({ survey, record }, tx)
   const uniqueNodesValidation = await validateRecordUniqueNodesUniqueness({ survey, record }, tx)
   return { ...keysValidation, ...uniqueNodesValidation }
@@ -50,8 +75,22 @@ export const validateRecordUniqueNodes = async ({ survey, record }, tx) => {
 
 // Returns an indexed object with recordUuid as key and validation as value
 export const validateRecordsUniqueness = async (
-  { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, errorKey },
-  tx
+  {
+    survey,
+    cycle,
+    nodeDefsUnique,
+    nodesUnique,
+    recordUuidsExcluded,
+    errorKey,
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    nodeDefsUnique: ArenaNodeDef<NodeDefType>[]
+    nodesUnique: ArenaRecordNode[]
+    recordUuidsExcluded: any
+    errorKey: any
+  },
+  tx: DbClient
 ) => {
   const recordsCountRows = await DataViewRepository.fetchRecordsCountByRootNodesValue(
     { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded },

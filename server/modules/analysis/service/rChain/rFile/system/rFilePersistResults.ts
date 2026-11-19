@@ -1,3 +1,4 @@
+import type { NodeDefEntity } from '@openforis/arena-core'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -8,7 +9,15 @@ import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
 
 const persistScriptJobVar = 'persistScriptJob'
 
-const getSendResultsToServerScripts = ({ rChain, entity, dfResults }: { rChain: any; entity: any; dfResults: any }) => {
+const getSendResultsToServerScripts = ({
+  rChain,
+  entity,
+  dfResults,
+}: {
+  rChain: any
+  entity: NodeDefEntity
+  dfResults: any
+}) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
   const { name: dfResultName, dfSourceName } = dfResults
   const scripts = []

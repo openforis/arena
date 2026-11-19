@@ -1,5 +1,4 @@
-import type { Category as ArenaCategory } from '@openforis/arena-core'
-import { Objects } from '@openforis/arena-core'
+import { Objects, type CategoryItem as ArenaCategoryItem, type Category as ArenaCategory } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -8,9 +7,9 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import { db, DbClient } from '@server/db/db'
 import * as CategoryRepository from '../repository/categoryRepository'
 
-const shouldItemIndexBeInitialized = (item: any) => item && Objects.isEmpty(CategoryItem.getIndex(item))
+const shouldItemIndexBeInitialized = (item: ArenaCategoryItem) => item && Objects.isEmpty(CategoryItem.getIndex(item))
 
-const isIndexable = ({ item, draft }: { item: any; draft: boolean }) =>
+const isIndexable = ({ item, draft }: { item: ArenaCategoryItem; draft: boolean }) =>
   (draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))
 
 const itemsSortFunction = (itemA: any, itemB: any) => {
@@ -65,7 +64,7 @@ const calculateIndexesByItemUuid = ({
   return indexByItemUuid
 }
 
-const groupItemsByParentUuid = (items: any[]) => {
+const groupItemsByParentUuid = (items: ArenaCategoryItem[]) => {
   const itemsByParentUuid = {}
   let shouldIndexesBeInitialized = false
   for (const item of items) {

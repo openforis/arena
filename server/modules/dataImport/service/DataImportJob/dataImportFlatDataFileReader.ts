@@ -4,6 +4,7 @@ import {
   type Survey as ArenaSurvey,
   type NodeDef as ArenaNodeDef,
   type NodeDefType,
+  type Taxon as ArenaTaxon,
 } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
@@ -83,7 +84,7 @@ const extractDateOrTime = ({
   return DateUtils.format(dateObj, formatTo)
 }
 
-const extractVernacularNameUuid = ({ taxon, vernacularName }: { taxon: any; vernacularName: any }) => {
+const extractVernacularNameUuid = ({ taxon, vernacularName }: { taxon: ArenaTaxon; vernacularName: any }) => {
   if (Objects.isEmpty(vernacularName)) return null
 
   // match vernacular names with language specified (e.g. "Mahogany (eng)") or simple ones, like "Mahogany"

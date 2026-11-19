@@ -1,3 +1,4 @@
+import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
@@ -13,7 +14,7 @@ const logger = Log.getLogger('RecordsUploadNotificationService')
 
 const fetchSurveyAdmins = async ({ surveyId, surveyUuid }: { surveyId: number; surveyUuid: string }) => {
   const users = await UserManager.fetchUsersBySurveyId({ surveyId, onlyAccepted: true })
-  return users.filter((user: any) => {
+  return users.filter((user: ArenaUser) => {
     const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
     return authGroup && AuthGroup.getName(authGroup) === AuthGroup.groupNames.surveyAdmin
   })
@@ -36,8 +37,8 @@ export const notifySurveyAdmins = async ({
   serverUrl = null,
   dateSubmitted = new Date(),
 }: {
-  surveyInfo: any
-  user: any
+  surveyInfo: ArenaSurvey
+  user: ArenaUser
   records: UploadedRecordInfo[]
   serverUrl?: string | null
   dateSubmitted?: Date

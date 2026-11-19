@@ -50,7 +50,7 @@ const contentDeleteFunctionByStorageType = {
 }
 
 export const fetchFileContentAsStream = (
-  { surveyId, fileSummary }: { surveyId: number; fileSummary: any },
+  { surveyId, fileSummary }: { surveyId: number; fileSummary: SurveyFile.SurveyFile },
   client: DbClient = db
 ): Promise<Readable | null> => {
   const storageType = getFileContentStorageType()
@@ -63,7 +63,7 @@ export const fetchFileContentAsStream = (
 }
 
 export const fetchFileContentAsBuffer = async (
-  { surveyId, fileSummary }: { surveyId: number; fileSummary: any },
+  { surveyId, fileSummary }: { surveyId: number; fileSummary: SurveyFile.SurveyFile },
   client: DbClient = db
 ) => {
   const contentStream = await fetchFileContentAsStream({ surveyId, fileSummary }, client)
@@ -76,7 +76,7 @@ export const fetchSurveyFilesTotalSpace = async ({ surveyId }: { surveyId: numbe
   return NumberConversionUtils.dataStorageValueToBytes(NumberConversionUtils.dataStorageUnits.MB)(totalSpaceMB)
 }
 
-export const insertFile = async (surveyId: number, file: any, client: DbClient = db) => {
+export const insertFile = async (surveyId: number, file: SurveyFile.SurveyFile, client: DbClient = db) => {
   const storageType = getFileContentStorageType()
   const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
   if (contentStoreFunction) {

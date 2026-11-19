@@ -1,4 +1,10 @@
-import { RecordNodesUpdater } from '@openforis/arena-core'
+import {
+  RecordNodesUpdater,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type ArenaRecordNode,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -10,8 +16,7 @@ import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as ObjectUtils from '@core/objectUtils'
 
-import { db } from '@server/db/db'
-import * as Log from '@server/log/log'
+import { db, DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
@@ -20,17 +25,20 @@ import * as RecordFileManager from '../recordFileManager'
 import { findFilesToRemove, removeFiles } from './nodeFilesRemover'
 import * as DbUtils from '@server/db/dbUtils'
 
-const logger = Log.getLogger('NodeUpdateManager')
+type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
 
-const _isFileValueNode = (survey, node) => {
+const _isFileValueNode = (survey: ArenaSurvey, node: ArenaRecordNode) => {
   if (!Node.getFileUuid(node)) return false
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   return NodeDef.isFile(nodeDef)
 }
 
-const _toFileDeleteParams = (node) => ({ fileUuid: Node.getFileUuid(node), recordUuid: Node.getRecordUuid(node) })
+const _toFileDeleteParams = (node: ArenaRecordNode) => ({
+  fileUuid: Node.getFileUuid(node),
+  recordUuid: Node.getRecordUuid(node),
+})
 
-const _createUpdateResult = (record, node = null, nodes = {}) => {
+const _createUpdateResult = (record: ArenaRecord, node: ArenaRecordNode | null = null, nodes = {}) => {
   if (!node && A.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
@@ -50,7 +58,13 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   }
 }
 
-const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
+const _onNodeUpdate = async (
+  survey: ArenaSurvey,
+  record: ArenaRecord,
+  node: ArenaRecordNode,
+  nodeDependents: any,
+  t: DbClient
+) => {
   const surveyId = Survey.getId(survey)
 
   let updatedNodes = nodeDependents || {}
@@ -91,7 +105,24 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
 
 // ==== UPDATE
 
-export const updateNode = async ({ user, survey, record, node, system = false, updateDependents = true }, t) => {
+export const updateNode = async (
+  {
+    user,
+    survey,
+    record,
+    node,
+    system = false,
+    updateDependents = true,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    node: ArenaRecordNode
+    system?: boolean
+    updateDependents?: any
+  },
+  t: DbClient
+) => {
   const surveyId = Survey.getId(survey)
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   const meta = { ...Node.getMeta(node) }
@@ -148,7 +179,10 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   }
 }
 
-const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
+const _reloadNodes = async (
+  { surveyId, record, nodes }: { surveyId: number; record: ArenaRecord; nodes: NodesByUuid },
+  tx: DbClient
+) => {
   const nodesReloadedArray = (
     await NodeRepository.fetchNodesWithRefDataByUuids(
       { surveyId, nodeUuids: Object.keys(nodes), draft: Record.isPreview(record) },
@@ -166,7 +200,7 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
-const _groupNodesByFlags = (nodesArray) =>
+const _groupNodesByFlags = (nodesArray: ArenaRecordNode[]) =>
   nodesArray.reduce(
     (acc, node) => {
       if (Node.isCreated(node) && !Node.getId(node)) {
@@ -181,7 +215,15 @@ const _groupNodesByFlags = (nodesArray) =>
     { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
   )
 
-const _persistNodes = async ({ survey, record, nodesArray, isPreview = false }, tx) => {
+const _persistNodes = async (
+  {
+    survey,
+    record,
+    nodesArray,
+    isPreview = false,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodesArray: ArenaRecordNode[]; isPreview?: boolean },
+  tx: DbClient
+) => {
   const surveyId = Survey.getId(survey)
   const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
 
@@ -211,7 +253,19 @@ const _persistNodes = async ({ survey, record, nodesArray, isPreview = false }, 
  * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
  * @returns {Promise<object>} - The update result (updated record and nodes).
  */
-export const updateRequiredFlags = async ({ user, survey, record, nodeDefUuids, sideEffect = false }) =>
+export const updateRequiredFlags = ({
+  user,
+  survey,
+  record,
+  nodeDefUuids,
+  sideEffect = false,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  record: ArenaRecord
+  nodeDefUuids: string[]
+  sideEffect?: boolean
+}) =>
   RecordNodesUpdater.updateRequiredFlags({
     ...createRecordEvaluationContext({ user, survey, lang: Survey.getDefaultLanguage(survey) }),
     record,
@@ -245,8 +299,18 @@ export const updateNodesDependents = async (
     persistNodes = true,
     sideEffect = false,
     clearNonApplicableValues = false,
+  }: {
+    user?: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodes: NodesByUuid
+    timezoneOffset?: number
+    lang?: string
+    persistNodes?: boolean
+    sideEffect?: boolean
+    clearNonApplicableValues?: boolean
   },
-  tx
+  tx: DbClient
 ) => {
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
     // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
@@ -254,7 +318,6 @@ export const updateNodesDependents = async (
     ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang: lang ?? Survey.getDefaultLanguage(survey) }),
     record,
     nodes,
-    logger,
     sideEffect,
     clearNonApplicableValues,
   })
@@ -283,7 +346,7 @@ export const updateNodesDependents = async (
 
 // ==== DELETE
 
-const _getNodeDependentKeyAttributes = (survey, record, node) => {
+const _getNodeDependentKeyAttributes = (survey: ArenaSurvey, record: ArenaRecord, node: ArenaRecordNode) => {
   const nodeDependentKeyAttributes = {}
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.isMultipleEntity(nodeDef)) {
@@ -314,7 +377,13 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
   return nodeDependentKeyAttributes
 }
 
-export const deleteNode = async (user, survey, record, nodeUuid, t) => {
+export const deleteNode = async (
+  user: ArenaUser,
+  survey: ArenaSurvey,
+  record: ArenaRecord,
+  nodeUuid: string,
+  t: DbClient
+) => {
   const surveyId = Survey.getId(survey)
 
   if (Record.isPreview(record)) {
@@ -380,7 +449,12 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
 // a job worker's heap - see NodeRepository.deleteNodesByNodeDefUuids. Callers that need to reflect
 // the deletion in an already-loaded record should do so locally instead, filtering that record's
 // own nodes by nodeDefUuids (they're already in memory, so this needs no extra data from here).
-export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, client = db) =>
+export const deleteNodesByNodeDefUuids = (
+  user: ArenaUser,
+  surveyId: number,
+  nodeDefUuids: string[],
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     // NOTE: do not gate this on Record.isPreview(record) (that would wrongly skip cleanup of other
     // preview records' files). Correctness relies entirely on the SQL-level `record.preview = true`
@@ -396,7 +470,15 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, cl
     return deletedCount
   })
 
-export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {
+export const deleteNodesByUuids = async (
+  {
+    user,
+    surveyId,
+    nodeUuids,
+    systemActivity = false,
+  }: { user: ArenaUser; surveyId: number; nodeUuids: string[]; systemActivity?: boolean },
+  tx: DbClient
+) => {
   const nodesDeleted = await NodeRepository.deleteNodesByUuids(surveyId, nodeUuids, tx)
   const activities = nodeUuids.map((uuid) =>
     ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid }, systemActivity)

@@ -1,4 +1,13 @@
-import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-core'
+import {
+  NodePointers,
+  Records,
+  SurveyDependencyType,
+  type NodePointer,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type ArenaRecordNode,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -13,7 +22,7 @@ import * as Node from '@core/record/node'
 
 import SystemError from '@core/systemError'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
@@ -28,6 +37,8 @@ import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
 import { NodeRdbManager } from './nodeRDBManager'
 import * as DbUtils from '@server/db/dbUtils'
+
+type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
 
 /**
  * =======.
@@ -47,8 +58,17 @@ export const initNewRecord = async (
     nodesUpdateListener = null,
     nodesValidationListener = null,
     createMultipleEntities = true,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    timezoneOffset?: number
+    lang: string
+    nodesUpdateListener?: any
+    nodesValidationListener?: any
+    createMultipleEntities?: boolean
   },
-  client = db
+  client: DbClient = db
 ) => {
   const rootNodeDef = Survey.getNodeDefRoot(survey)
 
@@ -88,8 +108,24 @@ export const initNewRecord = async (
 // in the qualifiers of the current user's group for this survey, and marks
 // the affected node as non-editable in the UI.
 const _applyGroupQualifierValues = async (
-  { user, survey, record, timezoneOffset, lang, nodesUpdateListener, nodesValidationListener },
-  client
+  {
+    user,
+    survey,
+    record,
+    timezoneOffset,
+    lang,
+    nodesUpdateListener,
+    nodesValidationListener,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    timezoneOffset?: number
+    lang: string
+    nodesUpdateListener: any
+    nodesValidationListener: any
+  },
+  client: DbClient
 ) => {
   const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
   if (qualifierFilters.length === 0) return record
@@ -125,7 +161,16 @@ const _applyGroupQualifierValues = async (
 
 // ==== UPDATE
 
-export const updateRecordStep = async ({ user, surveyId, record, stepId, system = false }, client = db) => {
+export const updateRecordStep = async (
+  {
+    user,
+    surveyId,
+    record,
+    stepId,
+    system = false,
+  }: { user: ArenaUser; surveyId: number; record: ArenaRecord; stepId: string; system?: boolean },
+  client: DbClient = db
+) => {
   // Check if the step exists and that is't adjacent to the current one
   const currentStepId = Record.getStep(record)
   const stepCurrent = RecordStep.getStep(currentStepId)
@@ -157,11 +202,19 @@ export const updateRecordStep = async ({ user, surveyId, record, stepId, system 
   }
 }
 
-export const updateRecordStepInTransaction = async ({ user, surveyId, record, stepId, system = false }, client = db) =>
-  client.tx(async (t) => updateRecordStep({ user, surveyId, record, stepId, system }, t))
+export const updateRecordStepInTransaction = (
+  {
+    user,
+    surveyId,
+    record,
+    stepId,
+    system = false,
+  }: { user: ArenaUser; surveyId: number; record: ArenaRecord; stepId: string; system?: boolean },
+  client: DbClient = db
+) => client.tx((t) => updateRecordStep({ user, surveyId, record, stepId, system }, t))
 
 // ==== DELETE
-export const deleteRecord = async (user, survey, record, client = db) =>
+export const deleteRecord = (user: ArenaUser, survey: ArenaSurvey, record: ArenaRecord, client: DbClient = db) =>
   client.tx(async (t) => {
     const { uuid } = record
     const rootDef = Survey.getNodeDefRoot(survey)
@@ -198,14 +251,14 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     ])
   })
 
-export const deleteRecordPreview = async (surveyId, recordUuid) =>
+export const deleteRecordPreview = async (surveyId: number, recordUuid: string) =>
   await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
     await RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid }, t)
     await RecordFileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
-export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
+export const deleteRecordsPreview = (surveyId: number, olderThan24Hours: any) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!A.isEmpty(recordUuids)) {
@@ -215,7 +268,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
     return recordUuids.length
   })
 
-export const deleteRecordsByCycles = async (surveyId, cycles, client = db) => {
+export const deleteRecordsByCycles = async (surveyId: number, cycles: any, client: DbClient = db) => {
   const recordUuids = await RecordRepository.deleteRecordsByCycles(surveyId, cycles, client)
   if (!A.isEmpty(recordUuids)) {
     await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, client)
@@ -234,7 +287,7 @@ export const { updateNode } = NodeUpdateManager
 export const { insertNode } = NodeCreationManager
 
 // inserts/updates a node and validate records uniqueness
-export const persistNode = async (
+export const persistNode = (
   {
     user,
     survey,
@@ -247,8 +300,20 @@ export const persistNode = async (
     system = false,
     createMultipleEntities = true,
     clearNonApplicableValues = false,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    node: ArenaRecordNode
+    timezoneOffset?: number
+    lang: string
+    nodesUpdateListener?: any
+    nodesValidationListener?: any
+    system?: boolean
+    createMultipleEntities?: boolean
+    clearNonApplicableValues?: boolean
   },
-  client = db
+  client: DbClient = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(
     {
@@ -259,7 +324,7 @@ export const persistNode = async (
       timezoneOffset,
       lang,
       clearNonApplicableValues,
-      nodesUpdateFn: async (user, survey, record, node, t) => {
+      nodesUpdateFn: (user, survey, record, node, t) => {
         const nodeUuid = Node.getUuid(node)
 
         const existingNode = Record.getNodeByUuid(nodeUuid)(record)
@@ -281,7 +346,7 @@ export const persistNode = async (
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
 export const updateRequiredFlags = NodeUpdateManager.updateRequiredFlags
 
-export const deleteNode = async (
+export const deleteNode = (
   {
     user,
     survey,
@@ -292,8 +357,18 @@ export const deleteNode = async (
     nodesUpdateListener = null,
     nodesValidationListener = null,
     clearNonApplicableValues = false,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodeUuid: string
+    timezoneOffset?: number
+    lang: string
+    nodesUpdateListener?: any
+    nodesValidationListener?: any
+    clearNonApplicableValues?: boolean
   },
-  t = db
+  t: DbClient = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(
     {
@@ -314,24 +389,36 @@ export const deleteNode = async (
 
 export const { deleteNodesByUuids } = NodeUpdateManager
 
-export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids }, client = db) =>
-  NodeUpdateManager.deleteNodesByNodeDefUuids(user, surveyId, nodeDefUuids, client)
+export const deleteNodesByNodeDefUuids = (
+  { user, surveyId, nodeDefUuids }: { user: ArenaUser; surveyId: number; nodeDefUuids: string[] },
+  client: DbClient = db
+) => NodeUpdateManager.deleteNodesByNodeDefUuids(user, surveyId, nodeDefUuids, client)
 
-const _updateNodeAndValidateRecordUniqueness = async (
+const _updateNodeAndValidateRecordUniqueness = (
   {
     user,
     survey,
     record,
     node,
-    categoryItemProvider,
     timezoneOffset,
     lang,
     clearNonApplicableValues = false,
     nodesUpdateFn,
     nodesUpdateListener = null,
     nodesValidationListener = null,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    node: ArenaRecordNode
+    timezoneOffset?: number
+    lang: string
+    clearNonApplicableValues?: boolean
+    nodesUpdateFn: any
+    nodesUpdateListener?: any
+    nodesValidationListener?: any
   },
-  client = db
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     await _beforeNodeUpdate({ survey, record, node }, t)
@@ -360,7 +447,6 @@ const _updateNodeAndValidateRecordUniqueness = async (
         survey,
         record: recordUpdated,
         nodes: updatedNodesAndDependents,
-        categoryItemProvider,
         nodesValidationListener,
       },
       t
@@ -369,7 +455,10 @@ const _updateNodeAndValidateRecordUniqueness = async (
     return recordUpdated
   })
 
-const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
+const _beforeNodeUpdate = async (
+  { survey, record, node }: { survey: ArenaSurvey; record: ArenaRecord; node: ArenaRecordNode },
+  t: DbClient
+) => {
   if (Record.isPreview(record)) return
 
   const nodeDefUuid = Node.getNodeDefUuid(node)
@@ -401,14 +490,22 @@ const validationDependencyTypes = [
   SurveyDependencyType.maxCount,
 ]
 
-const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
-  const dependentNodePointersToValidate = Object.values(nodes).reduce((acc, node) => {
-    validationDependencyTypes.forEach((dependencyType) => {
+const _getDependentNodesToValidate = ({
+  survey,
+  record,
+  nodes,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+  nodes: NodesByUuid
+}) => {
+  const dependentNodePointersToValidate: NodePointer[] = []
+  for (const node of Object.values(nodes)) {
+    for (const dependencyType of validationDependencyTypes) {
       const dependentPointers = Records.getDependentNodePointers(survey, node, dependencyType, true)(record)
-      acc.push(...dependentPointers)
-    })
-    return acc
-  }, [])
+      dependentNodePointersToValidate.push(...dependentPointers)
+    }
+  }
   const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
     record,
     nodePointers: dependentNodePointersToValidate,
@@ -427,8 +524,18 @@ const _onNodesUpdate = async (
     clearNonApplicableValues,
     nodesUpdateListener,
     nodesValidationListener,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodesUpdated: NodesByUuid
+    timezoneOffset?: number
+    lang: string
+    clearNonApplicableValues: boolean
+    nodesUpdateListener: any
+    nodesValidationListener: any
   },
-  t
+  t: DbClient
 ) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
@@ -459,7 +566,15 @@ const _onNodesUpdate = async (
   return { record: recordUpdated, nodes: updatedNodesAndDependents }
 }
 
-const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {
+const _afterNodesUpdate = async (
+  {
+    survey,
+    record,
+    nodes,
+    nodesValidationListener = null,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodes: NodesByUuid; nodesValidationListener?: any },
+  t: DbClient
+) => {
   if (Record.isPreview(record)) return
 
   const nodeDefsModified = Object.values(nodes).map((node) =>
@@ -507,7 +622,16 @@ const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListene
   await RecordRepository.updateRecordDateModified({ surveyId, recordUuid }, t)
 }
 
-const validateNodesAndPersistToRDB = async ({ user, survey, record, nodes, nodesValidationListener = null }, t) => {
+const validateNodesAndPersistToRDB = async (
+  {
+    user,
+    survey,
+    record,
+    nodes,
+    nodesValidationListener = null,
+  }: { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord; nodes: NodesByUuid; nodesValidationListener?: any },
+  t: DbClient
+) => {
   const nodesArray = Object.values(nodes)
   const nodesToValidate = nodesArray.reduce(
     (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),

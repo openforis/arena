@@ -1,4 +1,4 @@
-import { ServiceRegistry } from '@openforis/arena-core'
+import { ServiceRegistry, type User as ArenaUser } from '@openforis/arena-core'
 import type { AuthProvider, AuthProviderInput, AuthProviderService } from '@openforis/arena-server'
 import { ServerServiceType } from '@openforis/arena-server'
 
@@ -52,13 +52,13 @@ export const fetchProvider = async ({ id, baseUrl }: { id: string; baseUrl: stri
   return toAdminProvider(service, provider, linkedCounts, baseUrl)
 }
 
-const logChange = (params: { user: any; action: string; id: string; fields?: string[] }) => {
+const logChange = (params: { user: ArenaUser; action: string; id: string; fields?: string[] }) => {
   const { user, action, id, fields } = params
   const fieldsText = fields?.length ? ` (${fields.join(', ')})` : ''
   logger.info(`auth provider "${id}" ${action} by ${user?.email}${fieldsText}`)
 }
 
-export const createProvider = async ({ user, input }: { user: any; input: AuthProviderInput }) => {
+export const createProvider = async ({ user, input }: { user: ArenaUser; input: AuthProviderInput }) => {
   const provider = await getAuthProviderService().create(input)
   logChange({ user, action: 'created', id: provider.id })
   return provider
@@ -70,7 +70,7 @@ export const updateProvider = async ({
   props,
   clientSecret,
 }: {
-  user: any
+  user: ArenaUser
   id: string
   props: Partial<AuthProvider>
   clientSecret?: string
@@ -82,7 +82,7 @@ export const updateProvider = async ({
   return provider
 }
 
-export const reorderProviders = async ({ user, ids }: { user: any; ids: string[] }) => {
+export const reorderProviders = async ({ user, ids }: { user: ArenaUser; ids: string[] }) => {
   await getAuthProviderService().reorder(ids)
   logChange({ user, action: 'reordered', id: ids.join(',') })
 }
@@ -93,7 +93,7 @@ export const setProviderIcon = async ({
   file,
   mime,
 }: {
-  user: any
+  user: ArenaUser
   id: string
   file: Buffer | null
   mime: string | null
@@ -114,7 +114,7 @@ export const deleteProvider = async ({
   notifyUsers,
   serverUrl,
 }: {
-  user: any
+  user: ArenaUser
   id: string
   notifyUsers: boolean
   serverUrl: string

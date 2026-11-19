@@ -4,6 +4,7 @@ import type {
   ArenaRecordNode,
   Survey as ArenaSurvey,
   NodeDef as ArenaNodeDef,
+  NodeDefEntity,
   NodeDefType,
 } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
@@ -102,7 +103,7 @@ const _findAncestor = ({
 }: {
   ancestorDefUuid: string
   node: ArenaRecordNode
-  nodes: any
+  nodes: { [nodeUuid: string]: ArenaRecordNode }
 }) => {
   let currentParent = nodes[Node.getParentUuid(node)]
   while (currentParent && !Node.isRoot(currentParent) && Node.getNodeDefUuid(currentParent) !== ancestorDefUuid) {
@@ -214,7 +215,11 @@ export const updateTablesFromUpdates = async ({ rdbUpdates }: { rdbUpdates: any 
 }
 
 export const updateTables = async (
-  { survey, record, nodes }: { survey: ArenaSurvey; record: ArenaRecord; nodes: any },
+  {
+    survey,
+    record,
+    nodes,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodes: { [nodeUuid: string]: ArenaRecordNode } },
   client: DbClient
 ) => {
   const rdbUpdates = generateRdbUpdates({ survey, record, nodes })
@@ -222,7 +227,12 @@ export const updateTables = async (
 }
 
 export const updateRecordStep = (
-  { surveyId, recordUuid, stepId, tableDef }: { surveyId: number; recordUuid: string; stepId: number; tableDef: any },
+  {
+    surveyId,
+    recordUuid,
+    stepId,
+    tableDef,
+  }: { surveyId: number; recordUuid: string; stepId: string; tableDef: NodeDefEntity },
   client: DbClient
 ) => {
   const tableName = NodeDefTable.getTableName(tableDef)

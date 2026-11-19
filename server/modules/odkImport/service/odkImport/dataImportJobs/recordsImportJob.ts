@@ -1,4 +1,11 @@
-import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  ArenaRecordNode,
+  Record as ArenaRecord,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import { isUuid } from '@core/uuid'
@@ -241,7 +248,7 @@ export default class RecordsImportJob extends Job {
   }: {
     survey: ArenaSurvey
     nodeDefsInfoByPath: { [path: string]: string }
-    nodeDef: any
+    nodeDef: ArenaNodeDef<NodeDefType>
     nodeDefUuid: string
     parentNode: ArenaRecordNode
     childPath: string
@@ -291,7 +298,7 @@ export default class RecordsImportJob extends Job {
     submissionDir,
   }: {
     survey: ArenaSurvey
-    nodeDef: any
+    nodeDef: ArenaNodeDef<NodeDefType>
     nodeDefUuid: string
     parentNode: ArenaRecordNode
     rawText: string | null
@@ -372,7 +379,7 @@ export default class RecordsImportJob extends Job {
     }
   }
 
-  async nodesBatchInsertHandler(nodesArray: any[], tx: any) {
+  async nodesBatchInsertHandler(nodesArray: any[], tx: DbClient) {
     await RecordManager.insertNodesInBulk(
       { user: this.user, surveyId: this.surveyId, nodesArray, systemActivity: true },
       tx

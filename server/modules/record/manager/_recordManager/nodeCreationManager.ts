@@ -1,4 +1,12 @@
-import { Objects, RecordNodesUpdater } from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
+import {
+  Objects,
+  RecordNodesUpdater,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type ArenaRecordNode,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -12,7 +20,19 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 
-const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = false }) => {
+type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
+
+const _createUpdateResult = ({
+  record,
+  node = null,
+  nodes = {},
+  sideEffect = false,
+}: {
+  record: ArenaRecord
+  node?: ArenaRecordNode
+  nodes?: NodesByUuid
+  sideEffect?: boolean
+}) => {
   if (!node && Objects.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
@@ -31,7 +51,15 @@ const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = fal
   }
 }
 
-export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActivity = false }, tx) => {
+export const insertNodesInBulk = async (
+  {
+    user,
+    surveyId,
+    nodesArray,
+    systemActivity = false,
+  }: { user: ArenaUser; surveyId: number; nodesArray: ArenaRecordNode[]; systemActivity?: boolean },
+  tx: DbClient
+) => {
   const nodeValues = nodesArray.map((node) => [
     Node.getUuid(node),
     Node.getDateCreated(node),
@@ -51,7 +79,15 @@ export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActi
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
 }
 
-export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity = false }, tx) => {
+export const insertNodesInBatch = async (
+  {
+    user,
+    surveyId,
+    nodes,
+    systemActivity = false,
+  }: { user: ArenaUser; surveyId: number; nodes: ArenaRecordNode[]; systemActivity?: boolean },
+  tx: DbClient
+) => {
   const nodesInserted = await NodeRepository.insertNodesInBatch({ surveyId, nodes }, tx)
   const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
@@ -86,8 +122,19 @@ export const insertNode = async (
     persistNodes = true,
     createMultipleEntities = true,
     sideEffect = false,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    node: ArenaRecordNode
+    system: boolean
+    timezoneOffset?: number
+    lang?: string
+    persistNodes?: boolean
+    createMultipleEntities?: boolean
+    sideEffect?: boolean
   },
-  t
+  t: DbClient
 ) => {
   node[Node.keys.created] = true // mark node as created (flag used by RDB manager to update data tables)
 

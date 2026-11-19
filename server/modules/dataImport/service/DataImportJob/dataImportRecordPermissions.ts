@@ -1,4 +1,4 @@
-import { ArenaRecord, Authorizer, NodeDef, NodeDefType, User } from '@openforis/arena-core'
+import { ArenaRecord, Authorizer, NodeDef, NodeDefType, User, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 
@@ -26,7 +26,7 @@ const canUpdateRecord = ({
   userQualifierFilters,
 }: {
   user: User
-  survey: any
+  survey: ArenaSurvey
   record: ArenaRecord
   updateRecordsInAnalysis: boolean
   userQualifierFilters: QualifierFilter[]
