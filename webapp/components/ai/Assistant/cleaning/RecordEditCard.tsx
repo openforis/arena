@@ -11,7 +11,6 @@ import {
   getSelectableOperationIds,
   groupOperationsByRecord,
 } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
-import { chunkOperationsByRecord } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { Button } from '@webapp/components/buttons'
 import { useNotifyError } from '@webapp/components/hooks'
 import { useI18nT } from '@webapp/store/system'
@@ -120,9 +119,8 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
     async (operationIds: string[]) => {
       const ok = await runWithFailureNotice({
         action: async () => {
-          // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
-          const selected = operations.filter((operation) => operationIds.includes(operation.id))
-          setProgress({ done: 0, total: chunkOperationsByRecord(selected).length })
+          // one request, as the applier will report it (no "0 of 0" while it is prepared)
+          setProgress({ done: 0, total: 1 })
           try {
             await onApply(operationIds, (done, total) => setProgress({ done, total }))
           } finally {
@@ -135,7 +133,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
       if (ok) statusRef.current?.focus()
       return ok
     },
-    [notifyError, onApply, operations]
+    [notifyError, onApply]
   )
 
   const retryIds = getRetryOperationIds(results)

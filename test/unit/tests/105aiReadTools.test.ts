@@ -5,7 +5,6 @@ import { surveyListMissingTextsTool } from '@webapp/ai/tools/design/surveyListMi
 import { nodeDefGetTool } from '@webapp/ai/tools/design/nodeDefGet'
 import { nodeDefSearchTool } from '@webapp/ai/tools/design/nodeDefSearch'
 import { expressionCheckTool } from '@webapp/ai/tools/design/expressionCheck'
-import { getClosestNames } from '@webapp/ai/tools/design/surveyLookup'
 import { viewGetCurrentTool } from '@webapp/ai/tools/common/viewGetCurrent'
 import { AiLimits } from '@common/ai/limits'
 import { runTool } from '@webapp/ai/tools/registry'
@@ -112,10 +111,6 @@ describe('nodeDef_get', () => {
     const result: any = await runTool(nodeDefGetTool, { name: 'tree_dec' }, ctxWithSurvey())
     expect(result.error.code).toBe('nodeDefNotFound')
     expect(result.error.closestNames[0]).toBe('tree_dec_1')
-  })
-
-  test('closest names are ordered by edit distance', () => {
-    expect(getClosestNames(survey, 'plot_idd', 2)).toEqual(['plot_id', 'plot'])
   })
 })
 

@@ -1,48 +1,8 @@
-import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import { isTimeoutError } from '@webapp/ai/tools/analysis/analysisApi'
 
 import { postRecordEdits, type PostRecordEdits } from './recordEditsClient'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation, type RecordEditResult } from './types'
-
-// the limits of the endpoint, shared with the server
-export const RECORDS_PER_REQUEST = NodesBatchLimits.maxRecords
-export const EDITS_PER_REQUEST = NodesBatchLimits.maxEdits
-
-/**
- * Splits edits into chunks of at most `maxRecords` records and `maxEdits` edits; all the edits of a record go to
- * the same chunk (a record with more than `maxEdits` edits gets a chunk of its own).
- * @param {RecordAttributeUpdateOperation[]} operations - Edits, in change set order.
- * @param {number} [maxRecords] - Records per chunk.
- * @param {number} [maxEdits] - Edits per chunk.
- * @returns {RecordAttributeUpdateOperation[][]} The chunks.
- */
-export const chunkOperationsByRecord = (
-  operations: RecordAttributeUpdateOperation[],
-  maxRecords: number = RECORDS_PER_REQUEST,
-  maxEdits: number = EDITS_PER_REQUEST
-): RecordAttributeUpdateOperation[][] => {
-  const operationsByRecord = new Map<string, RecordAttributeUpdateOperation[]>()
-  for (const operation of operations) {
-    const recordOperations = operationsByRecord.get(operation.recordUuid) ?? []
-    recordOperations.push(operation)
-    operationsByRecord.set(operation.recordUuid, recordOperations)
-  }
-  const chunks: RecordAttributeUpdateOperation[][] = []
-  let recordsInLastChunk = 0
-  for (const recordOperations of operationsByRecord.values()) {
-    const last = chunks[chunks.length - 1]
-    const fits = last && recordsInLastChunk < maxRecords && last.length + recordOperations.length <= maxEdits
-    if (fits) {
-      last.push(...recordOperations)
-      recordsInLastChunk += 1
-    } else {
-      chunks.push([...recordOperations])
-      recordsInLastChunk = 1
-    }
-  }
-  return chunks
-}
 
 /**
  * Converts a result of the endpoint into the result of an operation.
@@ -72,12 +32,12 @@ export const toChunkErrorResult = (id: string, error: any): OperationResult => {
 }
 
 /**
- * Sends one chunk and returns the results of its edits.
+ * Sends the edits in one request (the propose tool caps a change set at the endpoint limits) and returns their results.
  * @param {object} params - Parameters.
  * @param {RecordAttributeUpdateOperation[]} params.chunk - The edits.
  * @param {PostRecordEdits} params.post - Endpoint call.
  * @param {object} params.request - surveyId, cycle, timezoneOffset, lang, signal.
- * @returns {Promise<OperationResult[]>} The results, in chunk order.
+ * @returns {Promise<OperationResult[]>} The results, in edit order.
  */
 const applyChunk = async ({
   chunk,
@@ -101,7 +61,7 @@ const applyChunk = async ({
 }
 
 /**
- * Applies the selected edits of a record-edit change set, chunk by chunk.
+ * Applies the selected edits of a record-edit change set.
  * @param {object} params - Parameters.
  * @param {ChangeSet} params.changeSet - The change set.
  * @param {string[]} params.operationIds - Selected edits.
@@ -109,7 +69,7 @@ const applyChunk = async ({
  * @param {number} params.timezoneOffset - Browser timezone offset.
  * @param {string} params.lang - Survey language.
  * @param {PostRecordEdits} [params.post] - Endpoint call (injectable for tests).
- * @param {Function} [params.onProgress] - Called with (chunks done, chunks total).
+ * @param {Function} [params.onProgress] - Called with (requests done, requests total).
  * @param {AbortSignal} [params.signal] - Aborts the request in flight.
  * @returns {Promise<OperationResult[]>} One result per selected edit, in operation order.
  */
@@ -136,7 +96,6 @@ export const applyRecordEdits = async ({
     (operation): operation is RecordAttributeUpdateOperation =>
       isRecordEditOperation(operation) && operationIds.includes(operation.id)
   )
-  const chunks = chunkOperationsByRecord(selected)
   // the cycle of the proposal wins over the current one (a record of another cycle would be a conflict)
   const request = {
     surveyId: changeSet.surveyId,
@@ -145,12 +104,9 @@ export const applyRecordEdits = async ({
     lang,
     ...(signal ? { signal } : {}),
   }
-  const results: OperationResult[] = []
-  onProgress?.(0, chunks.length)
-  for (const [index, chunk] of chunks.entries()) {
-    results.push(...(await applyChunk({ chunk, post, request })))
-    onProgress?.(index + 1, chunks.length)
-  }
+  onProgress?.(0, 1)
+  const results = await applyChunk({ chunk: selected, post, request })
+  onProgress?.(1, 1)
   const resultById = new Map(results.map((result) => [result.id, result]))
   return selected.map((operation) => resultById.get(operation.id) as OperationResult)
 }

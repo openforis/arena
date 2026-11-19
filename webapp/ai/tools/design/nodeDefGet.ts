@@ -6,16 +6,11 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
+import { getCurrentNodeDefs } from '../common/nodeDefLookup'
 import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { getResultBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
-import {
-  getDesignNodeDefs,
-  getNodeDefPathNames,
-  requireNodeDefByName,
-  requireSurvey,
-  toExpressionView,
-} from './surveyLookup'
+import { getNodeDefPathNames, requireNodeDefByName, requireSurvey, toExpressionView } from './surveyLookup'
 import { getNodeDefIssues } from './surveyGetValidation'
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
@@ -42,7 +37,7 @@ const getExpressionsView = (nodeDef: any) => {
  * @returns {string[]} The child names.
  */
 const getChildNames = (survey: any, nodeDef: any): string[] =>
-  getDesignNodeDefs(survey)
+  getCurrentNodeDefs(survey)
     .filter((child) => NodeDef.getParentUuid(child) === NodeDef.getUuid(nodeDef))
     .map((child) => NodeDef.getName(child))
 

@@ -4,7 +4,7 @@
  */
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { getDesignNodeDefs } from '@webapp/ai/tools/design/surveyLookup'
+import { getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
 
 import type { SuggestionGeneration } from './generation'
 
@@ -24,7 +24,7 @@ const startVisit = (generation: SuggestionGeneration, survey: any): DesignerVisi
   generationId: generation.id,
   userUuid: generation.userUuid,
   surveyId: generation.surveyId,
-  snapshot: getDesignNodeDefs(survey).map((nodeDef) => NodeDef.getUuid(nodeDef)),
+  snapshot: getCurrentNodeDefs(survey).map((nodeDef) => NodeDef.getUuid(nodeDef)),
 })
 
 /**
@@ -35,7 +35,7 @@ const startVisit = (generation: SuggestionGeneration, survey: any): DesignerVisi
  */
 const newSavedUuids = (visit: DesignerVisit, survey: any): string[] => {
   const seen = new Set(visit.snapshot)
-  return getDesignNodeDefs(survey)
+  return getCurrentNodeDefs(survey)
     .filter((nodeDef) => !NodeDef.isTemporary(nodeDef) && !seen.has(NodeDef.getUuid(nodeDef)))
     .map((nodeDef) => NodeDef.getUuid(nodeDef))
 }

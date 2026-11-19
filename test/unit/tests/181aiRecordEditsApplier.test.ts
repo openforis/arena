@@ -1,8 +1,4 @@
-import {
-  applyRecordEdits,
-  chunkOperationsByRecord,
-  RECORDS_PER_REQUEST,
-} from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
+import { applyRecordEdits } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 
 const operation = (recordUuid: string, nodeUuid: string, id = `${recordUuid}/${nodeUuid}`) => ({
   id,
@@ -29,36 +25,6 @@ const changeSetOf = (operations: any[]) => ({
 
 const applied = (edits: any[]) => edits.map((_edit, index) => ({ index, status: 'applied' as const }))
 
-describe('chunkOperationsByRecord', () => {
-  test('at most 50 records per chunk; the edits of a record stay together, in order', () => {
-    const operations = Array.from({ length: 120 }, (_, index) => operation(`r${index}`, 'n1'))
-    operations.splice(1, 0, operation('r0', 'n2'))
-    const chunks = chunkOperationsByRecord(operations)
-    expect(chunks.map((chunk) => new Set(chunk.map((op) => op.recordUuid)).size)).toEqual([50, 50, 20])
-    expect(chunks[0].slice(0, 2).map((op) => op.id)).toEqual(['r0/n1', 'r0/n2'])
-    expect(chunks.flat()).toHaveLength(121)
-    expect(RECORDS_PER_REQUEST).toBe(50)
-  })
-
-  test('an edit of a record met before goes to that record’s chunk', () => {
-    const chunks = chunkOperationsByRecord([operation('a', '1'), operation('b', '1'), operation('a', '2')], 1)
-    expect(chunks.map((chunk) => chunk.map((op) => op.id))).toEqual([['a/1', 'a/2'], ['b/1']])
-  })
-})
-
-describe('chunkOperationsByRecord edit limit', () => {
-  test('at most 200 edits per chunk, a record never split', () => {
-    const operations = [
-      ...Array.from({ length: 150 }, (_, index) => operation('a', `n${index}`)),
-      ...Array.from({ length: 60 }, (_, index) => operation('b', `n${index}`)),
-      operation('c', 'n'),
-    ]
-    const chunks = chunkOperationsByRecord(operations)
-    expect(chunks.map((chunk) => chunk.length)).toEqual([150, 61])
-    expect(chunks[1].map((op) => op.recordUuid)).toEqual([...Array(60).fill('b'), 'c'])
-  })
-})
-
 describe('applyRecordEdits', () => {
   test('sends the cycle of the proposal, not the current one', async () => {
     const operations = [{ ...operation('r0', 'n'), cycle: '1' }]
@@ -77,7 +43,7 @@ describe('applyRecordEdits', () => {
     expect(requests[0].cycle).toBe('1')
   })
 
-  test('posts each chunk and merges the results by edit, in operation order', async () => {
+  test('posts the edits in one request and merges the results by edit, in operation order', async () => {
     const operations = Array.from({ length: 60 }, (_, index) => operation(`r${index}`, 'n'))
     const requests: any[] = []
     const progress: any[] = []
@@ -96,23 +62,21 @@ describe('applyRecordEdits', () => {
       post,
       onProgress: (done, total) => progress.push([done, total]),
     })
-    expect(requests).toHaveLength(2)
+    expect(requests).toHaveLength(1)
     expect(requests[0]).toEqual({
       surveyId: 1,
       cycle: '0',
       timezoneOffset: -60,
       lang: 'en',
-      edits: operations.slice(0, 50).map(({ recordUuid, nodeUuid, from, to }) => ({ recordUuid, nodeUuid, from, to })),
+      edits: operations.map(({ recordUuid, nodeUuid, from, to }) => ({ recordUuid, nodeUuid, from, to })),
     })
     expect(progress).toEqual([
-      [0, 2],
-      [1, 2],
-      [2, 2],
+      [0, 1],
+      [1, 1],
     ])
     expect(results).toHaveLength(60)
     expect(results[0]).toEqual({ id: 'r0/n', status: 'conflict' })
     expect(results[1]).toEqual({ id: 'r1/n', status: 'applied' })
-    expect(results[50]).toEqual({ id: 'r50/n', status: 'conflict' })
   })
 
   test('only the selected edits are sent', async () => {
@@ -148,15 +112,10 @@ describe('applyRecordEdits', () => {
     ])
   })
 
-  test('a failed request fails its chunk only, with the error key or a network error', async () => {
+  test('a failed request fails every edit, with the error key or a network error', async () => {
     const operations = Array.from({ length: 51 }, (_, index) => operation(`r${index}`, 'n'))
-    let call = 0
-    const post = async (request: any) => {
-      call += 1
-      if (call === 1)
-        throw Object.assign(new Error('403'), { response: { data: { key: 'appErrors:forbidden', params: {} } } })
-      if (call === 2) return applied(request.edits)
-      return []
+    const post = async () => {
+      throw Object.assign(new Error('403'), { response: { data: { key: 'appErrors:forbidden', params: {} } } })
     }
     const results = await applyRecordEdits({
       changeSet: changeSetOf(operations),
@@ -167,7 +126,7 @@ describe('applyRecordEdits', () => {
       post,
     })
     expect(results[0]).toEqual({ id: 'r0/n', status: 'failed', message: 'appErrors:forbidden', params: {} })
-    expect(results[50]).toEqual({ id: 'r50/n', status: 'applied' })
+    expect(results[50]).toEqual({ id: 'r50/n', status: 'failed', message: 'appErrors:forbidden', params: {} })
 
     const offline = await applyRecordEdits({
       changeSet: changeSetOf([operation('a', '1')]),

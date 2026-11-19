@@ -4,7 +4,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { isDesignNodeDef } from '@webapp/ai/tools/design/surveyLookup'
+import { isCurrentNodeDef } from '@webapp/ai/tools/common/nodeDefLookup'
 
 import type { AssistantSuggestion, SuggestionKind } from '../types'
 import type { DetectorContext } from './types'
@@ -63,7 +63,7 @@ export const newDesignSuggestion = ({
  */
 export const findDesignNodeDef = (survey: any, uuid: string): any | null => {
   const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
-  return nodeDef && isDesignNodeDef(nodeDef) ? nodeDef : null
+  return nodeDef && isCurrentNodeDef(nodeDef) ? nodeDef : null
 }
 
 /**
