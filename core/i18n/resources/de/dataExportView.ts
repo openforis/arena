@@ -1,0 +1,43 @@
+export default {
+  error: 'Fehler beim Exportieren der Daten: {{details}}',
+  optionNotCompatibleWithDataImport: 'Nicht mit dem Datenimport kompatibel',
+  options: {
+    header: '$t(common.options)',
+    fileFormatLabel: 'Dateiformat',
+    fileFormat: {
+      csv: 'CSV',
+      xlsx: 'Excel',
+    },
+    includeCategoryItemsLabels: 'Bezeichnungen der Kategorieelemente einbeziehen',
+    includeCategories: 'Kategorien einbeziehen',
+    expandCategoryItems: 'Kategorieelemente erweitern',
+    exportSingleEntitiesIntoSeparateFiles: 'Einzelentitäten in separate Dateien exportieren',
+    includeAncestorAttributes: 'Attribute übergeordneter Entitäten einbeziehen',
+    includeAnalysis: 'Ergebnisvariablen einbeziehen',
+    includeDataFromAllCycles: 'Daten aus allen Zyklen einbeziehen',
+    includeDateCreated: 'Erstellungsdatum einbeziehen',
+    includeFiles: 'Dateien einbeziehen',
+    includeFileAttributeDefs: 'Dateiattributspalten einbeziehen',
+    includeInternalUuids: 'Interne UUIDs einbeziehen',
+    recordsModifiedAfter: 'Datensätze geändert nach',
+    recordsModifiedBefore: 'Datensätze geändert vor',
+  },
+  optionsInfo: {
+    expandCategoryItems:
+      'fügt für jedes Kategorieelement eine boolesche Spalte hinzu; der Wert ist TRUE, wenn das Element ausgewählt wurde, andernfalls FALSE',
+    exportSingleEntitiesIntoSeparateFiles: `exportiert Einzelentitäten in separate Dateien; ist die Option nicht aktiviert, werden die Attribute einer Einzelentität zusammen mit denen ihrer nächstgelegenen übergeordneten Mehrfachentität ausgegeben`,
+    includeAnalysis: 'bezieht Analyseattribute ein',
+    includeAncestorAttributes: 'bezieht Attribute der übergeordneten Entitäten bis hin zur Wurzelentität ein',
+    includeCategoryItemsLabels: 'fügt für jedes Kategorieelement eine Spalte mit dessen Bezeichnung hinzu',
+    includeCategories: `exportiert Kategorien in einen Unterordner namens "categories"`,
+    includeDataFromAllCycles:
+      'bezieht Daten aus allen Zyklen ein; andernfalls wird nur der ausgewählte Zyklus berücksichtigt',
+    includeDateCreated: 'fügt das Erstellungsdatum jeder Entität (Zeile) in einer Spalte namens "date_created" ein',
+    includeFiles: `exportiert mit den Datensätzen verknüpfte Dateien in einen Unterordner namens "files"`,
+    includeFileAttributeDefs: `fügt Spalten für Dateiattribute hinzu: interne Dateikennung (file_uuid) und Dateiname (file_name)`,
+    includeInternalUuids: 'bezieht interne Kennungen (UUIDs) in Spalten ein, deren Name auf "_uuid" endet',
+    recordsModifiedAfter: 'exportiert nur Daten aus Datensätzen, die nach dem angegebenen Datum geändert wurden',
+    recordsModifiedBefore: 'exportiert nur Daten aus Datensätzen, die vor dem angegebenen Datum geändert wurden',
+  },
+  startExport: 'Export starten',
+}
