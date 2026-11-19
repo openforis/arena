@@ -12,9 +12,8 @@ import {
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
-  type ArenaNodeDef,
-  type NodeDefType,
   type ArenaSurveyDocImage,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
@@ -188,7 +187,7 @@ export const {
  * @param {object} params.nodeDef - The time node definition the value belongs to.
  * @returns {string} The formatted time value.
  */
-export const formatTimeSummaryValue = ({ value, nodeDef }: { value: string; nodeDef: ArenaNodeDef<NodeDefType> }) =>
+export const formatTimeSummaryValue = ({ value, nodeDef }: { value: string; nodeDef: ArenaAnyNodeDef }) =>
   DateUtils.convertDate({
     dateStr: value,
     formatFrom: DateUtils.formats.timeWithSeconds,

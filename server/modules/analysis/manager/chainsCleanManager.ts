@@ -1,4 +1,4 @@
-import type { ArenaUser, ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as Chain from '@common/analysis/chain'
 import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
@@ -35,7 +35,7 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDef = (
     survey,
     nodeDef,
     areaBasedEstimatedOfNodeDef,
-  }: { user: ArenaUser; survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType>; areaBasedEstimatedOfNodeDef: any },
+  }: { user: ArenaUser; survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef; areaBasedEstimatedOfNodeDef: any },
   tx: DbClient
 ) => {
   const nodeDefUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({

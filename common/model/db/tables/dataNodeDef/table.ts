@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -11,8 +11,6 @@ import TableSurveyRdb from '../tableSurveyRdb'
 import TableRecord from '../record'
 import ColumnNodeDef from './columnNodeDef'
 import { TableDataNodeDefRowUtils } from './rowUtils'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 const tableNamePrefix = 'data'
 
@@ -57,9 +55,9 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   static readonly rootDefColumnNames = rootDefColumnNames
 
   private readonly _survey: ArenaSurvey
-  private readonly _nodeDef: AnyNodeDef
+  private readonly _nodeDef: ArenaAnyNodeDef
 
-  constructor(survey: ArenaSurvey, nodeDef: AnyNodeDef) {
+  constructor(survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef) {
     super(Survey.getId(survey), `${tableNamePrefix}_${NodeDef.getName(nodeDef)}`, columnSet)
     this._survey = survey
     this._nodeDef = nodeDef
@@ -69,7 +67,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this._survey
   }
 
-  get nodeDef(): AnyNodeDef {
+  get nodeDef(): ArenaAnyNodeDef {
     return this._nodeDef
   }
 
@@ -101,7 +99,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.recordOwnerUuid)
   }
 
-  getNodeDefsForColumns({ includeAnalysis = true }: { includeAnalysis?: boolean } = {}): AnyNodeDef[] {
+  getNodeDefsForColumns({ includeAnalysis = true }: { includeAnalysis?: boolean } = {}): ArenaAnyNodeDef[] {
     const { nodeDef, survey } = this
     if (NodeDef.isAttribute(nodeDef)) {
       // Multiple attr table
@@ -181,7 +179,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     nodeDefColumns,
   }: {
     nodeRow: Record<string, any>
-    nodeDefColumns: AnyNodeDef[]
+    nodeDefColumns: ArenaAnyNodeDef[]
   }): Record<string, unknown> => {
     const { survey, nodeDef } = this
     const valuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })

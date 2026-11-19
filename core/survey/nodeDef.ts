@@ -3,7 +3,6 @@ import {
   NodeDefType,
   Objects,
   type ArenaLabels,
-  type ArenaNodeDef,
   type ArenaNodeDefBoolean,
   type ArenaNodeDefCode,
   type ArenaNodeDefCoordinate,
@@ -21,6 +20,7 @@ import {
   type ArenaNodeDefText,
   type ArenaNodeDefTime,
   type ArenaNodeDefValidations,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
@@ -40,16 +40,15 @@ import * as NodeDefExpression from './nodeDefExpression'
 import { valuePropsTaxon } from './nodeValueProps'
 
 // Any node def; the getters below are null-tolerant (a missing parent def is a common argument).
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-type NodeDefUpdater = (nodeDef: AnyNodeDef) => AnyNodeDef
-type NodeDefPredicate = (nodeDef: AnyNodeDef) => boolean
+type NodeDefUpdater = (nodeDef: ArenaAnyNodeDef) => ArenaAnyNodeDef
+type NodeDefPredicate = (nodeDef: ArenaAnyNodeDef) => boolean
 type PropsObject = Record<string, any>
 
 // ObjectUtils helpers are typed on plain objects: narrow their result back to a node def.
 const setProp =
   (key: string, value: unknown): NodeDefUpdater =>
   (nodeDef) =>
-    ObjectUtils.setProp(key, value)(nodeDef) as AnyNodeDef
+    ObjectUtils.setProp(key, value)(nodeDef) as ArenaAnyNodeDef
 
 // ======== NODE DEF PROPERTIES
 
@@ -251,7 +250,7 @@ export const createAutoIncrementalKeyDefaultValues = ({
   nodeDef,
   nodeDefParent,
 }: {
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   nodeDefParent: ArenaNodeDefEntity
 }): ArenaNodeDefExpression[] => {
   const nodeDefName = getName(nodeDef)
@@ -281,33 +280,33 @@ export const {
   dissocProp,
 } = ObjectUtils
 
-export const getType = (nodeDef: AnyNodeDef): NodeDefType => A.prop(keys.type)(nodeDef)
-export const getName = (nodeDef: AnyNodeDef): string => getProp<string>(propKeys.name, '')(nodeDef)
-export const getCycles = (nodeDef: AnyNodeDef): string[] => getProp<string[]>(propKeys.cycles, [])(nodeDef)
+export const getType = (nodeDef: ArenaAnyNodeDef): NodeDefType => A.prop(keys.type)(nodeDef)
+export const getName = (nodeDef: ArenaAnyNodeDef): string => getProp<string>(propKeys.name, '')(nodeDef)
+export const getCycles = (nodeDef: ArenaAnyNodeDef): string[] => getProp<string[]>(propKeys.cycles, [])(nodeDef)
 
 export const isKey: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.key)
 export const isQualifier: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.qualifier)
 export const isAutoIncrementalKey: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
-export const isRoot = (nodeDef: AnyNodeDef): boolean => A.isNil(getParentUuid(nodeDef))
+export const isRoot = (nodeDef: ArenaAnyNodeDef): boolean => A.isNil(getParentUuid(nodeDef))
 export const isMultiple: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.multiple)
-export const isSingle = (nodeDef: AnyNodeDef): boolean => !isMultiple(nodeDef)
+export const isSingle = (nodeDef: ArenaAnyNodeDef): boolean => !isMultiple(nodeDef)
 
 const isType =
-  <T extends AnyNodeDef>(type: NodeDefType) =>
-  (nodeDef: AnyNodeDef): nodeDef is T =>
+  <T extends ArenaAnyNodeDef>(type: NodeDefType) =>
+  (nodeDef: ArenaAnyNodeDef): nodeDef is T =>
     getType(nodeDef) === type
 
 export const isEntity = isType<ArenaNodeDefEntity>(NodeDefType.entity)
-export const isSingleEntity = (nodeDef: AnyNodeDef): nodeDef is ArenaNodeDefEntity =>
+export const isSingleEntity = (nodeDef: ArenaAnyNodeDef): nodeDef is ArenaNodeDefEntity =>
   isEntity(nodeDef) && isSingle(nodeDef)
-export const isMultipleEntity = (nodeDef: AnyNodeDef): nodeDef is ArenaNodeDefEntity =>
+export const isMultipleEntity = (nodeDef: ArenaAnyNodeDef): nodeDef is ArenaNodeDefEntity =>
   isEntity(nodeDef) && isMultiple(nodeDef)
-export const isEntityOrMultiple = (nodeDef: AnyNodeDef): boolean => isEntity(nodeDef) || isMultiple(nodeDef)
+export const isEntityOrMultiple = (nodeDef: ArenaAnyNodeDef): boolean => isEntity(nodeDef) || isMultiple(nodeDef)
 
-export const isAttribute = (nodeDef: AnyNodeDef): boolean => !isEntity(nodeDef)
-export const isSingleAttribute = (nodeDef: AnyNodeDef): boolean => isAttribute(nodeDef) && isSingle(nodeDef)
-export const isMultipleAttribute = (nodeDef: AnyNodeDef): boolean => isAttribute(nodeDef) && isMultiple(nodeDef)
-export const isAttributeComposite = (nodeDef: AnyNodeDef): boolean =>
+export const isAttribute = (nodeDef: ArenaAnyNodeDef): boolean => !isEntity(nodeDef)
+export const isSingleAttribute = (nodeDef: ArenaAnyNodeDef): boolean => isAttribute(nodeDef) && isSingle(nodeDef)
+export const isMultipleAttribute = (nodeDef: ArenaAnyNodeDef): boolean => isAttribute(nodeDef) && isMultiple(nodeDef)
+export const isAttributeComposite = (nodeDef: ArenaAnyNodeDef): boolean =>
   [nodeDefType.coordinate, nodeDefType.date, nodeDefType.file, nodeDefType.taxon, nodeDefType.time].includes(
     getType(nodeDef)
   )
@@ -326,47 +325,47 @@ export const isTime = isType<ArenaNodeDefTime>(NodeDefType.time)
 // layout elments
 export const isFormHeader = isType<ArenaNodeDefFormHeader>(NodeDefType.formHeader)
 
-export const isReadOnly = (nodeDef: AnyNodeDef): boolean => getProp<boolean>(propKeys.readOnly, false)(nodeDef)
-export const isHidden = (nodeDef: AnyNodeDef): boolean => getProp<boolean>(propKeys.hidden, false)(nodeDef)
+export const isReadOnly = (nodeDef: ArenaAnyNodeDef): boolean => getProp<boolean>(propKeys.readOnly, false)(nodeDef)
+export const isHidden = (nodeDef: ArenaAnyNodeDef): boolean => getProp<boolean>(propKeys.hidden, false)(nodeDef)
 
-export const getLayout = (nodeDef: AnyNodeDef): PropsObject => getProp<PropsObject>(propKeys.layout, {})(nodeDef)
+export const getLayout = (nodeDef: ArenaAnyNodeDef): PropsObject => getProp<PropsObject>(propKeys.layout, {})(nodeDef)
 
 export const isDeleted: NodeDefPredicate = ObjectUtils.isKeyTrue(keys.deleted)
 
-export const getDescriptions = (nodeDef: AnyNodeDef): ArenaLabels =>
+export const getDescriptions = (nodeDef: ArenaAnyNodeDef): ArenaLabels =>
   getProp<ArenaLabels>(propKeys.descriptions, {})(nodeDef)
 
 export const isEnumerate: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.enumerate)
 export const isAutoCreateMinCountItems: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.autoCreateMinCountItems)
 
 // boolean
-export const getLabelValue = (nodeDef: AnyNodeDef): string =>
+export const getLabelValue = (nodeDef: ArenaAnyNodeDef): string =>
   getProp<string>(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef)
-export const isBooleanLabelYesNo = (nodeDef: AnyNodeDef): boolean =>
+export const isBooleanLabelYesNo = (nodeDef: ArenaAnyNodeDef): boolean =>
   isBoolean(nodeDef) && getLabelValue(nodeDef) === booleanLabelValues.yesNo
 // code
-export const getCategoryUuid = (nodeDef: AnyNodeDef): string | null =>
+export const getCategoryUuid = (nodeDef: ArenaAnyNodeDef): string | null =>
   getProp<string | null>(propKeys.categoryUuid)(nodeDef)
 // coordinate
 export const isAllowOnlyDeviceCoordinate: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
 export const isAccuracyIncluded: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
 export const isAltitudeIncluded: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.includeAltitude)
 export const isAltitudeAccuracyIncluded: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
-export const getMapMarkerColor = (nodeDef: AnyNodeDef): string | null =>
+export const getMapMarkerColor = (nodeDef: ArenaAnyNodeDef): string | null =>
   getProp<string | null>(propKeys.mapMarkerColor)(nodeDef)
 export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFields
 // decimal / integer
-export const getUnit = (nodeDef: AnyNodeDef): string => getProp<string>(propKeys.unit, '')(nodeDef)
+export const getUnit = (nodeDef: ArenaAnyNodeDef): string => getProp<string>(propKeys.unit, '')(nodeDef)
 // decimal
-export const getMaxNumberDecimalDigits = (nodeDef: AnyNodeDef): number => {
+export const getMaxNumberDecimalDigits = (nodeDef: ArenaAnyNodeDef): number => {
   const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, Number.NaN)(nodeDef)
   return A.isEmpty(decimalDigits) ? Number.NaN : Number(decimalDigits)
 }
 // file
 export const isNumberOfFilesEnabled = isMultiple
-export const getMaxFileSize = (nodeDef: AnyNodeDef): number =>
+export const getMaxFileSize = (nodeDef: ArenaAnyNodeDef): number =>
   Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
-export const getFileType = (nodeDef: AnyNodeDef): string =>
+export const getFileType = (nodeDef: ArenaAnyNodeDef): string =>
   getProp<string>(propKeys.fileType, fileTypeValues.other)(nodeDef)
 export const isGeotagInformationShown: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
 export const isScreenCaptureInMapAllowed: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.screenCaptureInMapAllowed)
@@ -375,15 +374,15 @@ export const isPositionTracking: NodeDefPredicate = ObjectUtils.isPropTrue(propK
 // time
 export const isSecondsIncluded: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.includeSeconds)
 // taxon
-export const getTaxonomyUuid = (nodeDef: AnyNodeDef): string | null =>
+export const getTaxonomyUuid = (nodeDef: ArenaAnyNodeDef): string | null =>
   getProp<string | null>(propKeys.taxonomyUuid)(nodeDef)
-export const getVernacularNameLabels = (nodeDef: AnyNodeDef): ArenaLabels =>
+export const getVernacularNameLabels = (nodeDef: ArenaAnyNodeDef): ArenaLabels =>
   getProp<ArenaLabels>(propKeys.vernacularNameLabels, {})(nodeDef)
 export const getVernacularNameLabel =
   (lang: string) =>
-  (nodeDef: AnyNodeDef): string | undefined =>
+  (nodeDef: ArenaAnyNodeDef): string | undefined =>
     getVernacularNameLabels(nodeDef)[lang]
-export const getVisibleFields = (nodeDef: AnyNodeDef): string[] | undefined => {
+export const getVisibleFields = (nodeDef: ArenaAnyNodeDef): string[] | undefined => {
   const visibleFieldsDefault = visibleFieldsDefaultByType[getType(nodeDef)]
   return getProp<string[] | undefined>(propKeys.visibleFields, visibleFieldsDefault)(nodeDef)
 }
@@ -394,16 +393,16 @@ export const isVernacularNameAlwaysIncludedIfSingle: NodeDefPredicate = ObjectUt
   propKeys.vernacularNameAlwaysIncludedIfSingle
 )
 // text
-export const getTextInputType = (nodeDef: AnyNodeDef): string =>
+export const getTextInputType = (nodeDef: ArenaAnyNodeDef): string =>
   getProp<string>(propKeys.textInputType, textInputTypes.singleLine)(nodeDef)
-export const getTextTransform = (nodeDef: AnyNodeDef): string =>
+export const getTextTransform = (nodeDef: ArenaAnyNodeDef): string =>
   getProp<string>(propKeys.textTransform, textTransformValues.none)(nodeDef)
-export const getTextTransformFunction = (nodeDef: AnyNodeDef) =>
+export const getTextTransformFunction = (nodeDef: ArenaAnyNodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
 // layout elements
 
-export const getHeaderColor = (nodeDef: AnyNodeDef): string | null =>
+export const getHeaderColor = (nodeDef: ArenaAnyNodeDef): string | null =>
   getProp<string | null>(propKeys.headerColor)(nodeDef)
 export const isLayoutElement = isFormHeader
 
@@ -412,15 +411,16 @@ export const isLayoutElement = isFormHeader
  * @param nodeDef - Entity node definition.
  * @returns 'portrait' | 'landscape' | null.
  */
-export const getPrintOrientation = (nodeDef: AnyNodeDef): string | null =>
+export const getPrintOrientation = (nodeDef: ArenaAnyNodeDef): string | null =>
   getProp<string | null>(propKeys.printOrientation)(nodeDef)
 
 // ==== READ meta
-export const getMeta = (nodeDef: AnyNodeDef): ArenaNodeDefMeta => A.propOr({}, keys.meta)(nodeDef) as ArenaNodeDefMeta
-export const getMetaHierarchy = (nodeDef: AnyNodeDef): string[] => A.pathOr([], [keys.meta, metaKeys.h])(nodeDef)
+export const getMeta = (nodeDef: ArenaAnyNodeDef): ArenaNodeDefMeta =>
+  A.propOr({}, keys.meta)(nodeDef) as ArenaNodeDefMeta
+export const getMetaHierarchy = (nodeDef: ArenaAnyNodeDef): string[] => A.pathOr([], [keys.meta, metaKeys.h])(nodeDef)
 
 // Utils
-const getLabelFirstPart = (nodeDef: AnyNodeDef, lang: string, type: NodeDefLabelType): string => {
+const getLabelFirstPart = (nodeDef: ArenaAnyNodeDef, lang: string, type: NodeDefLabelType): string => {
   const name = getName(nodeDef)
   if (type === NodeDefLabelTypes.name) return name
 
@@ -431,14 +431,14 @@ const getLabelFirstPart = (nodeDef: AnyNodeDef, lang: string, type: NodeDefLabel
   return ''
 }
 
-const getLabelSuffix = (nodeDef: AnyNodeDef): string => {
+const getLabelSuffix = (nodeDef: ArenaAnyNodeDef): string => {
   if (isVirtual(nodeDef)) return ' (V)'
   if (isAnalysis(nodeDef) && isAttribute(nodeDef)) return ' (C)'
   return ''
 }
 
 export const getLabel = (
-  nodeDef: AnyNodeDef,
+  nodeDef: ArenaAnyNodeDef,
   lang: string,
   type: NodeDefLabelType = NodeDefLabelTypes.label,
   defaultToName = true
@@ -455,60 +455,60 @@ export const getLabelWithType = ({
   lang,
   type,
 }: {
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   lang: string
   type?: NodeDefLabelType
 }): string => getLabel(nodeDef, lang, type)
 
 export const getDescription =
   (lang: string) =>
-  (nodeDef: AnyNodeDef): string =>
+  (nodeDef: ArenaAnyNodeDef): string =>
     A.propOr('', lang, getDescriptions(nodeDef)) as string
 
-export const getCycleFirst = (nodeDef: AnyNodeDef): string | undefined => A.head(getCycles(nodeDef))
+export const getCycleFirst = (nodeDef: ArenaAnyNodeDef): string | undefined => A.head(getCycles(nodeDef))
 
 export const isInCycle =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     getCycles(nodeDef).includes(cycle)
 
 export const isAncestorOf =
-  (nodeDefDescendant: AnyNodeDef) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDefDescendant: ArenaAnyNodeDef) =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     A.startsWith([...getMetaHierarchy(nodeDef), getUuid(nodeDef)], getMetaHierarchy(nodeDefDescendant))
 
 export const isDescendantOf =
-  (nodeDefAncestor: AnyNodeDef) =>
-  (nodeDef: AnyNodeDef): boolean => {
+  (nodeDefAncestor: ArenaAnyNodeDef) =>
+  (nodeDef: ArenaAnyNodeDef): boolean => {
     const hAncestor = [...getMetaHierarchy(nodeDefAncestor), getUuid(nodeDefAncestor)]
     return A.startsWith(hAncestor, getMetaHierarchy(nodeDef))
   }
 
 // Advanced props
 
-export const getPropsAdvanced = (nodeDef: AnyNodeDef): ArenaNodeDefPropsAdvanced & PropsObject =>
+export const getPropsAdvanced = (nodeDef: ArenaAnyNodeDef): ArenaNodeDefPropsAdvanced & PropsObject =>
   A.propOr({}, keys.propsAdvanced)(nodeDef) as PropsObject
-export const getPropsAdvancedDraft = (nodeDef: AnyNodeDef): ArenaNodeDefPropsAdvanced & PropsObject =>
+export const getPropsAdvancedDraft = (nodeDef: ArenaAnyNodeDef): ArenaNodeDefPropsAdvanced & PropsObject =>
   A.propOr({}, keys.propsAdvancedDraft)(nodeDef) as PropsObject
 
 export const getPropAdvanced =
   <T = any>(prop: string, defaultTo: T = null) =>
-  (nodeDef: AnyNodeDef): T =>
+  (nodeDef: ArenaAnyNodeDef): T =>
     A.pathOr(defaultTo, prop.split('.'))(getPropsAdvanced(nodeDef))
 
 export const getPropAdvancedDraft =
   <T = any>(prop: string, defaultTo: T = null) =>
-  (nodeDef: AnyNodeDef): T =>
+  (nodeDef: ArenaAnyNodeDef): T =>
     A.pathOr(defaultTo, prop.split('.'))(getPropsAdvancedDraft(nodeDef))
 
 export const getPropOrDraftAdvanced =
   <T = any>(prop: string, defaultTo: T = null) =>
-  (nodeDef: AnyNodeDef): T =>
+  (nodeDef: ArenaAnyNodeDef): T =>
     getPropAdvancedDraft(prop, getPropAdvanced(prop, defaultTo)(nodeDef))(nodeDef)
 
 export const getAllPropsAndAllPropsDraft =
   ({ backup = false }: { backup?: boolean }) =>
-  (nodeDef: AnyNodeDef) => {
+  (nodeDef: ArenaAnyNodeDef) => {
     const { props, propsDraft } = ObjectUtils.getPropsAndPropsDraft({ backup })(nodeDef as PropsObject)
     const propsAdvanced = getPropsAdvanced(nodeDef)
     const propsAdvancedDraft = getPropsAdvancedDraft(nodeDef)
@@ -522,7 +522,7 @@ export const getAllPropsAndAllPropsDraft =
 
 const isKeyStrictlyTrue =
   (key: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     A.prop(key, nodeDef) === true
 
 export const hasAdvancedPropsDraft = isKeyStrictlyTrue(keys.draftAdvanced)
@@ -536,22 +536,22 @@ export const hasAdvancedPropsValidationsDraft = isKeyStrictlyTrue(keys.draftAdva
 // propsAdvancedDraft. This only works if the node def was fetched with backup: true (see
 // fetchSurveyAndNodeDefsBySurveyId) - a plain draft fetch merges propsAdvancedDraft into propsAdvanced
 // and discards it, at which point these would always read as unchanged.
-export const hasAdvancedPropsEnumeratingItemsExpressionDraft = (nodeDef: AnyNodeDef): boolean =>
+export const hasAdvancedPropsEnumeratingItemsExpressionDraft = (nodeDef: ArenaAnyNodeDef): boolean =>
   Boolean(getPropAdvancedDraft(keysPropsAdvanced.enumeratingItemsExpression)(nodeDef))
-export const hasAdvancedPropsItemsFilterDraft = (nodeDef: AnyNodeDef): boolean =>
+export const hasAdvancedPropsItemsFilterDraft = (nodeDef: ArenaAnyNodeDef): boolean =>
   Boolean(getPropAdvancedDraft(keysPropsAdvanced.itemsFilter)(nodeDef))
 // Node defs whose value (or, for auto-enumerated entities, their enumerated child nodes) can be
 // recalculated on publish - see RecordCheckJob. Requires the node def to have been fetched with
 // backup: true (see the two functions above).
 // True if the "required if" condition in the draft advanced props differs from the published one.
 // Like the checks below, it works only if the node def was fetched with backup: true.
-export const hasRequiredIfDraftChanged = (nodeDef: AnyNodeDef): boolean => {
+export const hasRequiredIfDraftChanged = (nodeDef: ArenaAnyNodeDef): boolean => {
   if (!hasAdvancedPropsValidationsDraft(nodeDef)) return false
   const requiredIfPath = `${keysPropsAdvanced.validations}.${NodeDefValidations.keys.requiredIf}`
   return !A.equals(getPropAdvancedDraft(requiredIfPath, [])(nodeDef), getPropAdvanced(requiredIfPath, [])(nodeDef))
 }
 
-export const hasValueAffectingAdvancedPropsDraft = (nodeDef: AnyNodeDef): boolean =>
+export const hasValueAffectingAdvancedPropsDraft = (nodeDef: ArenaAnyNodeDef): boolean =>
   hasAdvancedPropsApplicableDraft(nodeDef) ||
   hasAdvancedPropsDefaultValuesDraft(nodeDef) ||
   hasAdvancedPropsFileNameExpressionDraft(nodeDef) ||
@@ -561,24 +561,24 @@ const isPropAdvanced = (key: string): boolean => Object.keys(keysPropsAdvanced).
 
 const getExpressionsPropAdvanced =
   (prop: string) =>
-  (nodeDef: AnyNodeDef): ArenaNodeDefExpression[] =>
+  (nodeDef: ArenaAnyNodeDef): ArenaNodeDefExpression[] =>
     getPropAdvanced<ArenaNodeDefExpression[]>(prop, [])(nodeDef)
 
 export const getDefaultValues = getExpressionsPropAdvanced(keysPropsAdvanced.defaultValues)
-export const hasDefaultValues = (nodeDef: AnyNodeDef): boolean => !A.isEmpty(getDefaultValues(nodeDef))
-export const isDefaultValueEvaluatedOneTime = (nodeDef: AnyNodeDef): boolean =>
+export const hasDefaultValues = (nodeDef: ArenaAnyNodeDef): boolean => !A.isEmpty(getDefaultValues(nodeDef))
+export const isDefaultValueEvaluatedOneTime = (nodeDef: ArenaAnyNodeDef): boolean =>
   getPropAdvanced<boolean>(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)(nodeDef)
 
 export const getEditableIf = getExpressionsPropAdvanced(keysPropsAdvanced.editableIf)
-export const isAlwaysEditable = (nodeDef: AnyNodeDef): boolean => A.isEmpty(getEditableIf(nodeDef))
+export const isAlwaysEditable = (nodeDef: ArenaAnyNodeDef): boolean => A.isEmpty(getEditableIf(nodeDef))
 export const getVisibleIf = getExpressionsPropAdvanced(keysPropsAdvanced.visibleIf)
-export const isAlwaysVisible = (nodeDef: AnyNodeDef): boolean => A.isEmpty(getVisibleIf(nodeDef))
+export const isAlwaysVisible = (nodeDef: ArenaAnyNodeDef): boolean => A.isEmpty(getVisibleIf(nodeDef))
 
-export const getValidations = (nodeDef: AnyNodeDef): ArenaNodeDefValidations =>
+export const getValidations = (nodeDef: ArenaAnyNodeDef): ArenaNodeDefValidations =>
   getPropAdvanced<ArenaNodeDefValidations>(keysPropsAdvanced.validations, {})(nodeDef)
-export const getValidationExpressions = (nodeDef: AnyNodeDef): ArenaNodeDefExpression[] =>
+export const getValidationExpressions = (nodeDef: ArenaAnyNodeDef): ArenaNodeDefExpression[] =>
   NodeDefValidations.getExpressions(getValidations(nodeDef))
-export const hasValidationsDefined = (nodeDef: AnyNodeDef): boolean => {
+export const hasValidationsDefined = (nodeDef: ArenaAnyNodeDef): boolean => {
   const validations = getValidations(nodeDef)
   return (
     NodeDefValidations.isRequired(validations) ||
@@ -602,7 +602,7 @@ const _expressionStringsFromNodeDefExpressions = (nodeDefExpressions: ArenaNodeD
     return acc
   }, [])
 
-export const getAllExpressions = (nodeDef: AnyNodeDef): string[] => {
+export const getAllExpressions = (nodeDef: ArenaAnyNodeDef): string[] => {
   const nodeDefExpressions = [
     ...getDefaultValues(nodeDef),
     ...getValidationExpressions(nodeDef),
@@ -623,7 +623,7 @@ export const getAllExpressions = (nodeDef: AnyNodeDef): string[] => {
 // editableIf, visibleIf are excluded). Used to find node defs whose value needs recalculating when
 // something they read (e.g. a category/taxonomy extra prop) changes - see
 // referencesCategoryExtraProp/referencesTaxonomyExtraProp below.
-export const getValueAffectingExpressions = (nodeDef: AnyNodeDef): string[] => {
+export const getValueAffectingExpressions = (nodeDef: ArenaAnyNodeDef): string[] => {
   const expressions = _expressionStringsFromNodeDefExpressions([
     ...getDefaultValues(nodeDef),
     ...getApplicable(nodeDef),
@@ -637,14 +637,14 @@ export const getValueAffectingExpressions = (nodeDef: AnyNodeDef): string[] => {
 // Plain expression strings from the node def's validation expressions only (see
 // getValidationExpressions) - used by referencesCategoryExtraPropInValidations/
 // referencesTaxonomyExtraPropInValidations below.
-const getValidationOnlyExpressionStrings = (nodeDef: AnyNodeDef): string[] =>
+const getValidationOnlyExpressionStrings = (nodeDef: ArenaAnyNodeDef): string[] =>
   _expressionStringsFromNodeDefExpressions(getValidationExpressions(nodeDef))
 
 const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
 
 // Returns true if any of the node def's expressions references a function whose
 // result depends on the currently logged in user (e.g. userProp).
-export const hasUserDependentExpressions = (nodeDef: AnyNodeDef): boolean =>
+export const hasUserDependentExpressions = (nodeDef: ArenaAnyNodeDef): boolean =>
   getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
 
 type ExtraPropChangeParams = {
@@ -674,7 +674,7 @@ const _referencesExtraPropChange = ({
 // categoryItemProp(categoryName, propName, ...) with propName in changedPropNames (or unresolvable).
 export const referencesCategoryExtraProp =
   ({ categoryName, changedPropNames }: ExtraPropChangeParams & { categoryName: string }) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     _referencesExtraPropChange({
       expressions: getValueAffectingExpressions(nodeDef),
       functionName: functionNames.categoryItemProp,
@@ -685,7 +685,7 @@ export const referencesCategoryExtraProp =
 // Same as referencesCategoryExtraProp, for taxonProp(taxonomyName, propName, ...) calls.
 export const referencesTaxonomyExtraProp =
   ({ taxonomyName, changedPropNames }: ExtraPropChangeParams & { taxonomyName: string }) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     _referencesExtraPropChange({
       expressions: getValueAffectingExpressions(nodeDef),
       functionName: functionNames.taxonProp,
@@ -698,7 +698,7 @@ export const referencesTaxonomyExtraProp =
 // reference a changed extra prop from a validation expression.
 export const referencesCategoryExtraPropInValidations =
   ({ categoryName, changedPropNames }: ExtraPropChangeParams & { categoryName: string }) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     _referencesExtraPropChange({
       expressions: getValidationOnlyExpressionStrings(nodeDef),
       functionName: functionNames.categoryItemProp,
@@ -708,7 +708,7 @@ export const referencesCategoryExtraPropInValidations =
 
 export const referencesTaxonomyExtraPropInValidations =
   ({ taxonomyName, changedPropNames }: ExtraPropChangeParams & { taxonomyName: string }) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     _referencesExtraPropChange({
       expressions: getValidationOnlyExpressionStrings(nodeDef),
       functionName: functionNames.taxonProp,
@@ -716,61 +716,61 @@ export const referencesTaxonomyExtraPropInValidations =
       changedPropNames,
     })
 
-export const isExcludedInClone = (nodeDef: AnyNodeDef): boolean =>
+export const isExcludedInClone = (nodeDef: ArenaAnyNodeDef): boolean =>
   getPropAdvanced<boolean>(keysPropsAdvanced.excludedInClone, false)(nodeDef)
 
 // code and taxon
-export const getItemsFilter = (nodeDef: AnyNodeDef): string =>
+export const getItemsFilter = (nodeDef: ArenaAnyNodeDef): string =>
   getPropAdvanced<string>(keysPropsAdvanced.itemsFilter, '')(nodeDef)
 // file
-export const getFileNameExpression = (nodeDef: AnyNodeDef): string =>
+export const getFileNameExpression = (nodeDef: ArenaAnyNodeDef): string =>
   getPropAdvanced<string>(keysPropsAdvanced.fileNameExpression, '')(nodeDef)
-export const getEnumeratingItemsExpression = (nodeDef: AnyNodeDef): string =>
+export const getEnumeratingItemsExpression = (nodeDef: ArenaAnyNodeDef): string =>
   getPropAdvanced<string>(keysPropsAdvanced.enumeratingItemsExpression, '')(nodeDef)
 
 // Advanced props - Analysis
 export const getFormula = getExpressionsPropAdvanced(keysPropsAdvanced.formula)
 
-export const getParentCodeDefUuid = (nodeDef: AnyNodeDef): string | null =>
+export const getParentCodeDefUuid = (nodeDef: ArenaAnyNodeDef): string | null =>
   getProp<string | null>(propKeys.parentCodeDefUuid)(nodeDef)
 
-export const getChainUuid = (nodeDef: AnyNodeDef): string | null =>
+export const getChainUuid = (nodeDef: ArenaAnyNodeDef): string | null =>
   getPropOrDraftAdvanced<string | null>(keysPropsAdvanced.chainUuid, null)(nodeDef)
 
-export const getChainIndex = (nodeDef: AnyNodeDef): number =>
+export const getChainIndex = (nodeDef: ArenaAnyNodeDef): number =>
   getPropOrDraftAdvanced<number>(keysPropsAdvanced.index, 0)(nodeDef)
 
-export const isActive = (nodeDef: AnyNodeDef): boolean =>
+export const isActive = (nodeDef: ArenaAnyNodeDef): boolean =>
   getPropAdvanced<boolean>(keysPropsAdvanced.active, false)(nodeDef)
-export const getScript = (nodeDef: AnyNodeDef): string =>
+export const getScript = (nodeDef: ArenaAnyNodeDef): string =>
   getPropOrDraftAdvanced<string>(keysPropsAdvanced.script, '')(nodeDef)
 
-export const getAggregateFunctions = (nodeDef: AnyNodeDef): Record<string, any> =>
+export const getAggregateFunctions = (nodeDef: ArenaAnyNodeDef): Record<string, any> =>
   getPropOrDraftAdvanced<Record<string, any>>(keysPropsAdvanced.aggregateFunctions, {})(nodeDef)
 export const getAggregateFunctionByUuid =
   (uuid: string) =>
-  (nodeDef: AnyNodeDef): any =>
+  (nodeDef: ArenaAnyNodeDef): any =>
     A.propOr(null, uuid)(getAggregateFunctions(nodeDef))
 
 // READ Analysis
 export const isAnalysis: NodeDefPredicate = ObjectUtils.isKeyTrue(keys.analysis)
 export const isVirtual: NodeDefPredicate = ObjectUtils.isKeyTrue(keys.virtual)
-export const isReadOnlyOrAnalysis = (nodeDef: AnyNodeDef): boolean => isReadOnly(nodeDef) || isAnalysis(nodeDef)
+export const isReadOnlyOrAnalysis = (nodeDef: ArenaAnyNodeDef): boolean => isReadOnly(nodeDef) || isAnalysis(nodeDef)
 
 const isPropOrDraftAdvancedTrue =
   (prop: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     Boolean(getPropOrDraftAdvanced(prop, false)(nodeDef))
 
 export const isBaseUnit = isPropOrDraftAdvancedTrue(keysPropsAdvanced.isBaseUnit)
 export const isSampling = isPropOrDraftAdvancedTrue(keysPropsAdvanced.isSampling)
 export const hasAreaBasedEstimated = isPropOrDraftAdvancedTrue(keysPropsAdvanced.hasAreaBasedEstimated)
-export const getAreaBasedEstimatedOf = (nodeDef: AnyNodeDef): string | null =>
+export const getAreaBasedEstimatedOf = (nodeDef: ArenaAnyNodeDef): string | null =>
   getPropOrDraftAdvanced<string | null>(keysPropsAdvanced.areaBasedEstimatedOf, null)(nodeDef)
-export const isAreaBasedEstimatedOf = (nodeDef: AnyNodeDef): boolean => Boolean(getAreaBasedEstimatedOf(nodeDef))
+export const isAreaBasedEstimatedOf = (nodeDef: ArenaAnyNodeDef): boolean => Boolean(getAreaBasedEstimatedOf(nodeDef))
 
 // Reporting
-export const isHiddenInReport = (nodeDef: AnyNodeDef): boolean =>
+export const isHiddenInReport = (nodeDef: ArenaAnyNodeDef): boolean =>
   getPropAdvanced<boolean>(keysPropsAdvanced.hiddenInReport, false)(nodeDef)
 
 // ==== CREATE
@@ -783,7 +783,7 @@ export const newNodeDef = (
   propsAdvanced: PropsObject = {},
   analysis = false,
   virtual = false
-): AnyNodeDef =>
+): ArenaAnyNodeDef =>
   ({
     [keys.uuid]: uuidv4(),
     [keys.parentUuid]: getUuid(nodeDefParent),
@@ -801,7 +801,7 @@ export const newNodeDef = (
     [keys.analysis]: analysis,
     [keys.virtual]: virtual,
     [keys.temporary]: true,
-  }) as AnyNodeDef
+  }) as ArenaAnyNodeDef
 
 // ==== UPDATE
 
@@ -812,7 +812,7 @@ export const assocMetaHierarchy = A.assocPath([keys.meta, metaKeys.h])
 export const mergeProps =
   (props: PropsObject): NodeDefUpdater =>
   (nodeDef) =>
-    ObjectUtils.mergeProps(props)(nodeDef) as AnyNodeDef
+    ObjectUtils.mergeProps(props)(nodeDef) as ArenaAnyNodeDef
 const assocPropsAdvanced = A.assoc(keys.propsAdvanced)
 export const mergePropsAdvanced =
   (propsAdvanced: PropsObject): NodeDefUpdater =>
@@ -898,7 +898,7 @@ export const changeParentEntity =
   }
 
 // published attributes have data: they can only be converted to a type that keeps it (integer to decimal)
-export const getConvertibleTypes = (nodeDef: AnyNodeDef): NodeDefType[] => {
+export const getConvertibleTypes = (nodeDef: ArenaAnyNodeDef): NodeDefType[] => {
   if (!isAttribute(nodeDef)) return []
   if (isPublished(nodeDef)) return isInteger(nodeDef) ? [nodeDefType.decimal] : []
   return Object.values(nodeDefType).filter((type) => ![nodeDefType.entity, getType(nodeDef)].includes(type))
@@ -925,7 +925,7 @@ export const convertToType =
       [keys.type]: toType,
       [keys.props]: propsUpdated,
       [keys.propsAdvanced]: propsAdvancedUpdated,
-    } as AnyNodeDef
+    } as ArenaAnyNodeDef
   }
 
 // layout
@@ -978,7 +978,7 @@ export const keepOnlyOneCycle =
   }
 
 // ==== UTILS
-export const canNodeDefBeMultiple = (nodeDef: AnyNodeDef): boolean =>
+export const canNodeDefBeMultiple = (nodeDef: ArenaAnyNodeDef): boolean =>
   // Entity def but not root
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
   // Attribute def but not layout element and not analysis
@@ -1003,10 +1003,10 @@ export const canNodeDefTypeBeKey = (type: NodeDefType): boolean =>
     nodeDefType.time,
   ])
 
-export const canNodeDefBeKey = (nodeDef: AnyNodeDef): boolean =>
+export const canNodeDefBeKey = (nodeDef: ArenaAnyNodeDef): boolean =>
   !isLayoutElement(nodeDef) && !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
-export const canHaveDefaultValue = (nodeDef: AnyNodeDef): boolean =>
+export const canHaveDefaultValue = (nodeDef: ArenaAnyNodeDef): boolean =>
   isSingleAttribute(nodeDef) &&
   A.includes(getType(nodeDef), [
     nodeDefType.boolean,
@@ -1023,28 +1023,29 @@ export const canHaveDefaultValue = (nodeDef: AnyNodeDef): boolean =>
 
 export const belongsToAllCycles =
   (cycles: string[]) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     A.isEmpty(A.difference(cycles, getCycles(nodeDef)))
-export const canBeExcludedInClone = (nodeDef: AnyNodeDef): boolean => !isRoot(nodeDef) && !isKey(nodeDef)
+export const canBeExcludedInClone = (nodeDef: ArenaAnyNodeDef): boolean => !isRoot(nodeDef) && !isKey(nodeDef)
 
-const isEntityAndNotRoot = (nodeDef: AnyNodeDef): boolean => isEntity(nodeDef) && !isRoot(nodeDef)
+const isEntityAndNotRoot = (nodeDef: ArenaAnyNodeDef): boolean => isEntity(nodeDef) && !isRoot(nodeDef)
 export const isDisplayAsEnabled = isEntityAndNotRoot
 export const isDisplayInEnabled = isEntityAndNotRoot
 
-export const canMultipleAttributeBeAggregated = (nodeDef: AnyNodeDef): boolean =>
+export const canMultipleAttributeBeAggregated = (nodeDef: ArenaAnyNodeDef): boolean =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
 
-export const canNameBeEdited = (nodeDef: AnyNodeDef): boolean => !isSampling(nodeDef)
-export const canBeHidden = (nodeDef: AnyNodeDef): boolean => isReadOnly(nodeDef)
-export const canBeShownAsHyperlinkOrMarkdown = (nodeDef: AnyNodeDef): boolean => isText(nodeDef) && isReadOnly(nodeDef)
-export const canBeHiddenInMobile = (nodeDef: AnyNodeDef): boolean =>
+export const canNameBeEdited = (nodeDef: ArenaAnyNodeDef): boolean => !isSampling(nodeDef)
+export const canBeHidden = (nodeDef: ArenaAnyNodeDef): boolean => isReadOnly(nodeDef)
+export const canBeShownAsHyperlinkOrMarkdown = (nodeDef: ArenaAnyNodeDef): boolean =>
+  isText(nodeDef) && isReadOnly(nodeDef)
+export const canBeHiddenInMobile = (nodeDef: ArenaAnyNodeDef): boolean =>
   !isKey(nodeDef) &&
   !NodeDefValidations.isRequired(getValidations(nodeDef)) &&
   !NodeDefValidations.isRequiredIfDefined(getValidations(nodeDef))
 
 export const canIncludeInMultipleEntitySummary =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     isAttribute(nodeDef) &&
     !isLayoutElement(nodeDef) &&
     !isKey(nodeDef) &&
@@ -1056,19 +1057,19 @@ export const canIncludeInMultipleEntitySummary =
 
 export const canIncludeInPreviousCycleLink =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
 export const canHaveMobileProps =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     canBeHiddenInMobile(nodeDef) || canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
 export const canHaveAutoIncrementalKey = ({
   nodeDef,
   nodeDefParent,
 }: {
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   nodeDefParent: ArenaNodeDefEntity
 }): boolean => {
   if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
@@ -1085,18 +1086,19 @@ export const canHaveAutoIncrementalKey = ({
   )
 }
 
-export const canShowGeotagInformation = (nodeDef: AnyNodeDef): boolean => getFileType(nodeDef) === fileTypeValues.image
+export const canShowGeotagInformation = (nodeDef: ArenaAnyNodeDef): boolean =>
+  getFileType(nodeDef) === fileTypeValues.image
 
-export const canAllowScreenCaptureInMap = (nodeDef: AnyNodeDef): boolean =>
+export const canAllowScreenCaptureInMap = (nodeDef: ArenaAnyNodeDef): boolean =>
   isFile(nodeDef) && getFileType(nodeDef) === fileTypeValues.image
 
 // Arena Mobile records the track only in single geo attributes
-export const canBePositionTracking = (nodeDef: AnyNodeDef): boolean => isGeo(nodeDef) && isSingle(nodeDef)
+export const canBePositionTracking = (nodeDef: ArenaAnyNodeDef): boolean => isGeo(nodeDef) && isSingle(nodeDef)
 
-export const canBeHiddenInReport = (nodeDef: AnyNodeDef): boolean =>
+export const canBeHiddenInReport = (nodeDef: ArenaAnyNodeDef): boolean =>
   [NodeDefType.boolean, NodeDefType.code, NodeDefType.taxon].includes(getType(nodeDef))
 
-export const canHaveAutoCreateMinCountItems = (nodeDef: AnyNodeDef): boolean =>
+export const canHaveAutoCreateMinCountItems = (nodeDef: ArenaAnyNodeDef): boolean =>
   isMultipleEntity(nodeDef) && !isEnumerate(nodeDef)
 
 type NotApplicablePropClearer = { isToClear: NodeDefPredicate; clear: NodeDefUpdater }

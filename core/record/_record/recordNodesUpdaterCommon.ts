@@ -3,13 +3,12 @@ import {
   RecordUpdateResult,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordNodeValues,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
   ArenaCategoryItemProvider,
-  ArenaNodeDef,
-  NodeDefType,
   ArenaRecordNodesMap,
   ArenaSurvey,
   ArenaTaxonProvider,
@@ -30,7 +29,7 @@ const { updateNodesDependents } = CoreRecordNodesUpdater
 type PopulateRefDataParams = {
   survey: ArenaSurvey
   node: ArenaRecordNode
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   value: any
 }
 

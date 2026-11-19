@@ -1,7 +1,5 @@
-import { Objects, Surveys } from '@openforis/arena-core'
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaSurveyNodeDefsIndex } from '@openforis/arena-core'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
+import { Objects, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaSurveyNodeDefsIndex } from '@openforis/arena-core'
 
 // the arena-core index functions work on a survey: wrap the index alone in a survey-like object
 const toSurvey = (nodeDefsIndex: ArenaSurveyNodeDefsIndex): ArenaSurvey => ({ nodeDefsIndex }) as ArenaSurvey
@@ -33,7 +31,7 @@ export const addNodeDefToIndex = ({
   nodeDef,
 }: {
   nodeDefsIndex: ArenaSurveyNodeDefsIndex
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
 }): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.addNodeDefToIndex(nodeDef)(toSurvey(nodeDefsIndex))
   return getNodeDefsIndex(surveyUpdated)
@@ -45,8 +43,8 @@ export const updateNodeDefUuidByNameIndex = ({
   nodeDefPrevious,
 }: {
   nodeDefsIndex: ArenaSurveyNodeDefsIndex
-  nodeDef: AnyNodeDef
-  nodeDefPrevious?: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
+  nodeDefPrevious?: ArenaAnyNodeDef
 }): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.updateNodeDefUuidByNameIndex(nodeDef, nodeDefPrevious)(toSurvey(nodeDefsIndex))
   return getNodeDefsIndex(surveyUpdated)
@@ -59,7 +57,7 @@ export const deleteNodeDefIndex = ({
   nodeDef,
 }: {
   nodeDefsIndex: ArenaSurveyNodeDefsIndex
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
 }): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.deleteNodeDefIndex(nodeDef)(toSurvey(nodeDefsIndex))
   return getNodeDefsIndex(surveyUpdated)

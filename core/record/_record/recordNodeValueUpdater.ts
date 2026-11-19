@@ -1,12 +1,5 @@
-import { RecordUpdateResult } from '@openforis/arena-core'
-import type {
-  ArenaRecord,
-  ArenaRecordNode,
-  ArenaNodeDef,
-  NodeDefType,
-  ArenaRecordNodeRefData,
-  ArenaSurvey,
-} from '@openforis/arena-core'
+import { RecordUpdateResult, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, ArenaRecordNodeRefData, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
@@ -18,7 +11,7 @@ type UpdateAttributeValueParams = {
   survey: ArenaSurvey
   record: ArenaRecord
   entity: ArenaRecordNode
-  attributeDef: ArenaNodeDef<NodeDefType>
+  attributeDef: ArenaAnyNodeDef
   attribute: ArenaRecordNode
   value: any
   refData?: ArenaRecordNodeRefData | null

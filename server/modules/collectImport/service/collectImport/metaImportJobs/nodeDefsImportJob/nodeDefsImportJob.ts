@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaNodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
@@ -101,7 +101,7 @@ export default class NodeDefsImportJob extends Job {
   static readonly type = 'NodeDefsImportJob'
   importIssues: any
   nodeDefUniqueNameGenerator: any
-  nodeDefs: { [nodeDefUuid: string]: ArenaNodeDef<NodeDefType> }
+  nodeDefs: { [nodeDefUuid: string]: ArenaAnyNodeDef }
   nodeDefsInfoByCollectPath: Record<string, any>
 
   constructor(params?: any) {
@@ -386,7 +386,7 @@ export default class NodeDefsImportJob extends Job {
     type,
     collectNodeDef,
   }: {
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     type: any
     collectNodeDef: CollectSurvey.CollectNodeDef
   }) {
@@ -471,7 +471,7 @@ export default class NodeDefsImportJob extends Job {
     multiple,
     collectNodeDef,
   }: {
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     type: any
     multiple: any
     collectNodeDef: CollectSurvey.CollectNodeDef
@@ -554,7 +554,7 @@ export default class NodeDefsImportJob extends Job {
     nodeDef,
     collectNodeDef,
   }: {
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     collectNodeDef: CollectSurvey.CollectNodeDef
   }) {
     const { defaultLanguage } = this.context
@@ -577,7 +577,7 @@ export default class NodeDefsImportJob extends Job {
     nodeDef,
     collectNodeDef,
   }: {
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     collectNodeDef: CollectSurvey.CollectNodeDef
   }) {
     const { defaultLanguage } = this.context

@@ -1,10 +1,4 @@
-import type {
-  ArenaNodeDef,
-  ArenaNodeDefExpression,
-  NodeDefType,
-  ArenaSurvey,
-  ArenaValidation,
-} from '@openforis/arena-core'
+import type { ArenaNodeDefExpression, ArenaSurvey, ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -20,9 +14,7 @@ import * as SurveyDependencyTypes from '../_survey/surveyDependencyTypes'
 
 const { dependencyTypes } = SurveyDependencyTypes
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
-const expressionsByDependencyTypeFns: Record<string, (nodeDef: AnyNodeDef) => ArenaNodeDefExpression[]> = {
+const expressionsByDependencyTypeFns: Record<string, (nodeDef: ArenaAnyNodeDef) => ArenaNodeDefExpression[]> = {
   [dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
   [dependencyTypes.applicable]: NodeDef.getApplicable,
   [dependencyTypes.validations]: A.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
@@ -56,7 +48,8 @@ const errorKeyByDependencyType: Record<string, string> = {
 }
 
 const _validateExpressionProp =
-  (survey: ArenaSurvey, nodeDef: AnyNodeDef, dependencyType: string) => async (propName: string, item: unknown) => {
+  (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef, dependencyType: string) =>
+  async (propName: string, item: unknown) => {
     const exprString: string | null = A.pathOr(null, propName.split('.'), item)
     const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
 
@@ -105,7 +98,7 @@ const _validateExpression = async ({
   index,
 }: {
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   dependencyType: string
   nodeDefExpressions: ArenaNodeDefExpression[]
   nodeDefExpression: ArenaNodeDefExpression
@@ -138,7 +131,7 @@ const _validateExpression = async ({
 
 export const validate = async (
   survey: ArenaSurvey,
-  nodeDef: AnyNodeDef,
+  nodeDef: ArenaAnyNodeDef,
   dependencyType: string
 ): Promise<ArenaValidation | null> => {
   const result = Validation.newInstance()

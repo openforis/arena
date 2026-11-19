@@ -7,11 +7,10 @@ import {
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaCategoryItemProvider,
-  type ArenaNodeDef,
-  type NodeDefType,
   type ArenaRecordNodeRefData,
   type ArenaSurvey,
   type ArenaNodeDefEntity,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -32,7 +31,6 @@ const { updateNodesDependents } = CoreRecordNodesUpdater
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 import type { EntityKeysIndexCache } from './entityKeysIndexCache'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type ValuesByDefUuid = Record<string, any>
 // RecordEvaluationContext params, forwarded to arena-core
 type ContextParams = { [contextParam: string]: unknown }
@@ -111,7 +109,7 @@ const _findCategoryItemUuidByAttribute = async ({
 }: CategoryItemProviderParams & {
   record: ArenaRecord
   parentNode: ArenaRecordNode
-  attributeDef: AnyNodeDef
+  attributeDef: ArenaAnyNodeDef
   value: any
 }): Promise<string | null> => {
   const valueItemUuid = RecordNodeValues.getValueItemUuid(value)
@@ -177,7 +175,7 @@ type AttributeValueParams = {
   context: RecordEvaluationContext
   record: ArenaRecord
   parentNode: ArenaRecordNode
-  attributeDef: AnyNodeDef
+  attributeDef: ArenaAnyNodeDef
   value: any
 }
 
@@ -199,7 +197,7 @@ const _addOrUpdateAttribute =
   }: {
     context: RecordEvaluationContext
     entity: ArenaRecordNode
-    attributeDef: AnyNodeDef
+    attributeDef: ArenaAnyNodeDef
     value: any
     refData?: ArenaRecordNodeRefData | null
     sideEffect?: boolean
@@ -421,7 +419,7 @@ const _canAttributeBeUpdated = ({
   attributeDef,
 }: {
   entityDef: ArenaNodeDefEntity
-  attributeDef: AnyNodeDef
+  attributeDef: ArenaAnyNodeDef
 }) =>
   // consider only attributes descendants of the specified entity
   NodeDef.isDescendantOf(entityDef)(attributeDef) &&

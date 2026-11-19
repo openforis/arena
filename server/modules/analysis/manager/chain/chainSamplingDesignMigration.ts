@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaNodeDef, NodeDefType, ArenaChain } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaChain, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as Survey from '@core/survey/survey'
@@ -28,7 +28,7 @@ const _isSelectableAsPhase2JoinEntity = ({
   nodeDef,
   baseUnitNodeDef,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   baseUnitNodeDef?: any
 }) =>
   NodeDef.isRoot(nodeDef) ||

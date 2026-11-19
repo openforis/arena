@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,13 +8,7 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as SQL from '@common/model/db/sql'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 
-const canJoinWithMultipleAttributeTable = ({
-  nodeDef,
-  viewNodeDef,
-}: {
-  nodeDef: ArenaNodeDef<NodeDefType>
-  viewNodeDef: any
-}) =>
+const canJoinWithMultipleAttributeTable = ({ nodeDef, viewNodeDef }: { nodeDef: ArenaAnyNodeDef; viewNodeDef: any }) =>
   NodeDef.isMultipleAttribute(nodeDef) &&
   NodeDef.canMultipleAttributeBeAggregated(nodeDef) &&
   !NodeDef.isEqual(nodeDef)(viewNodeDef) &&
@@ -94,7 +88,7 @@ const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef: any) => {
  * @returns {Promise<null|*>} - The result promise.
  */
 export const createDataView = (
-  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef },
   client: DbClient
 ) => {
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)

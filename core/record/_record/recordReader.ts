@@ -1,10 +1,8 @@
-import { RecordNodes, Queue, Records } from '@openforis/arena-core'
+import { RecordNodes, Queue, Records, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  ArenaNodeDef,
   ArenaNodeDefCode,
-  NodeDefType,
   ArenaRecordNodePointer,
   ArenaSurvey,
   SurveyDependencyType,
@@ -22,7 +20,6 @@ import { NodeValues } from '../nodeValues'
 import { keys } from './recordKeys'
 import { EntityKeysIndexCache } from './entityKeysIndexCache'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type NodeVisitor = (node: ArenaRecordNode) => void
 type NodePredicate = (node: ArenaRecordNode) => boolean
 
@@ -241,7 +238,7 @@ export const getDependentCodeAttributes =
     Records.getDependentCodeAttributes(node)(record)
 
 export const getParentCodeAttribute =
-  (_survey: ArenaSurvey, parentNode: ArenaRecordNode, nodeDef: AnyNodeDef) =>
+  (_survey: ArenaSurvey, parentNode: ArenaRecordNode, nodeDef: ArenaAnyNodeDef) =>
   (record: ArenaRecord): ArenaRecordNode | undefined =>
     Records.getParentCodeAttribute(parentNode, nodeDef as ArenaNodeDefCode)(record)
 
@@ -255,7 +252,7 @@ export const visitAncestorCodeAttributes =
   }: {
     survey: ArenaSurvey
     parentNode: ArenaRecordNode
-    nodeDef: AnyNodeDef
+    nodeDef: ArenaAnyNodeDef
     visitor: NodeVisitor
   }) =>
   (record: ArenaRecord): void => {
@@ -274,7 +271,7 @@ export const visitAncestorCodeAttributes =
 
 // Returns the ancestor code attributes, in top-down order
 export const getAncestorCodeAttributes =
-  ({ survey, parentNode, nodeDef }: { survey: ArenaSurvey; parentNode: ArenaRecordNode; nodeDef: AnyNodeDef }) =>
+  ({ survey, parentNode, nodeDef }: { survey: ArenaSurvey; parentNode: ArenaRecordNode; nodeDef: ArenaAnyNodeDef }) =>
   (record: ArenaRecord): ArenaRecordNode[] => {
     const result: ArenaRecordNode[] = []
     visitAncestorCodeAttributes({
@@ -399,7 +396,7 @@ export const getAttributesUniqueSibling = ({
 }: {
   record: ArenaRecord
   attribute: ArenaRecordNode
-  attributeDef: AnyNodeDef
+  attributeDef: ArenaAnyNodeDef
 }): ArenaRecordNode[] => {
   const parentEntity = getParentNode(attribute)(record)
   const ancestorEntity = getParentNode(parentEntity)(record)
@@ -414,7 +411,8 @@ export const getAttributesUniqueSibling = ({
   )
 }
 
-const _isNodeDefUnique = (nodeDef: AnyNodeDef): boolean => NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+const _isNodeDefUnique = (nodeDef: ArenaAnyNodeDef): boolean =>
+  NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
 
 export const getAttributesUniqueDependent = ({
   survey,

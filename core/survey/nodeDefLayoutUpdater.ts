@@ -1,9 +1,8 @@
 import type {
-  ArenaNodeDef,
   ArenaNodeDefEntityChildPosition,
-  NodeDefType,
   ArenaSurvey,
   ArenaNodeDefEntity,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -15,8 +14,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 import { NodeDefLayoutSizes } from './nodeDefLayoutSizes'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-type NodeDefsByUuid = Record<string, AnyNodeDef>
+type NodeDefsByUuid = Record<string, ArenaAnyNodeDef>
 type LayoutCycle = Record<string, any>
 // width and height to keep when adding a node def to the parent layout, by cycle
 type LayoutInParentByCycle = Record<string, { h?: number; w?: number }>
@@ -49,13 +47,13 @@ const _calculateChildPagesIndex = ({
   return index
 }
 
-type SurveyCycleNodeDefParams = { survey: ArenaSurvey; surveyCycleKey: string; nodeDef: AnyNodeDef }
+type SurveyCycleNodeDefParams = { survey: ArenaSurvey; surveyCycleKey: string; nodeDef: ArenaAnyNodeDef }
 
 const _updateParentLayoutChildrenIndex = ({
   survey,
   surveyCycleKey,
   nodeDef,
-}: SurveyCycleNodeDefParams): AnyNodeDef => {
+}: SurveyCycleNodeDefParams): ArenaAnyNodeDef => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
 
   const indexChildren = _calculateChildPagesIndex({ survey, cycle: surveyCycleKey, nodeDefParent })
@@ -66,7 +64,7 @@ const _updateParentLayoutChildrenIndex = ({
   })(nodeDefParent)
 }
 
-const _onEntityRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }: SurveyCycleNodeDefParams): AnyNodeDef =>
+const _onEntityRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }: SurveyCycleNodeDefParams): ArenaAnyNodeDef =>
   NodeDef.updateLayout((layout) => {
     if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)) {
       // render type changed from 'form' to 'table':
@@ -92,9 +90,9 @@ const _removeChildFromLayoutChildren = ({
   childDefUuid,
 }: {
   surveyCycleKey: string
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   childDefUuid: string
-}): AnyNodeDef => {
+}): ArenaAnyNodeDef => {
   const layoutChildrenPrev = NodeDefLayout.getLayoutChildrenItems(surveyCycleKey)(nodeDef)
   const layoutChildrenUpdated = layoutChildrenPrev.filter((layoutChildrenItem) => layoutChildrenItem.i !== childDefUuid)
   return NodeDef.updateLayoutProp({
@@ -113,8 +111,8 @@ export const updateLayoutProp =
     value,
   }: {
     surveyCycleKey: string
-    nodeDef: AnyNodeDef
-    nodeDefPrev?: AnyNodeDef | null
+    nodeDef: ArenaAnyNodeDef
+    nodeDefPrev?: ArenaAnyNodeDef | null
     key: string
     value: unknown
   }) =>
@@ -163,7 +161,7 @@ export const updateLayout = ({
   survey: ArenaSurvey
   nodeDefUuid: string
   layout: Record<string, LayoutCycle>
-  nodeDefPrev?: AnyNodeDef | null
+  nodeDefPrev?: ArenaAnyNodeDef | null
 }): NodeDefsByUuid => {
   let surveyUpdated = { ...survey }
   const nodeDefsUpdated: NodeDefsByUuid = {}
@@ -187,10 +185,10 @@ const _addLayoutForCycle = ({
   cycle,
   cyclePrev = null,
 }: {
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   cycle: string
   cyclePrev?: string | null
-}): AnyNodeDef =>
+}): ArenaAnyNodeDef =>
   NodeDef.updateLayout((layout) => {
     if (cyclePrev) {
       // If cycle prev exists, copy layout from previous cycle
@@ -207,7 +205,7 @@ const _addLayoutForCycle = ({
     return layoutUpdated
   })(nodeDef)
 
-type ParentLayoutCycleParams = { survey: ArenaSurvey; cycle: string; nodeDef: AnyNodeDef }
+type ParentLayoutCycleParams = { survey: ArenaSurvey; cycle: string; nodeDef: ArenaAnyNodeDef }
 
 const _updateParentLayoutForCycle = ({
   survey,
@@ -234,7 +232,7 @@ const _getOrInitializeChildPagesIndex = ({ survey, cycle, nodeDefParent }: Paren
   return _calculateChildPagesIndex({ survey, cycle, nodeDefParent })
 }
 
-export const initializeParentLayout = ({ survey, cycle, nodeDefParent }: ParentParams): AnyNodeDef => {
+export const initializeParentLayout = ({ survey, cycle, nodeDefParent }: ParentParams): ArenaAnyNodeDef => {
   const index = _calculateChildPagesIndex({ survey, cycle, nodeDefParent })
   return NodeDef.updateLayout((layout) => {
     const layoutUpdated = NodeDefLayout.assocIndexChildren(cycle, index)(layout)
@@ -329,11 +327,11 @@ export const updateParentLayout = ({
   layoutInParentByCycle = null,
 }: {
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   cyclesAdded?: string[]
   cyclesDeleted?: string[]
   layoutInParentByCycle?: LayoutInParentByCycle | null
-}): AnyNodeDef | null => {
+}): ArenaAnyNodeDef | null => {
   if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) {
     return null
   }
@@ -437,8 +435,8 @@ export const adjustLayoutChildrenHeights = ({
   nodeDef,
 }: {
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
-}): AnyNodeDef => {
+  nodeDef: ArenaAnyNodeDef
+}): ArenaAnyNodeDef => {
   const layout = NodeDefLayout.getLayout(nodeDef)
   const cyclesKeys = Object.keys(layout)
   const layoutUpdated = cyclesKeys.reduce(

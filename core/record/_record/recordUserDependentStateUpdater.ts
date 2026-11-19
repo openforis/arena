@@ -4,13 +4,12 @@ import {
   RecordNodes,
   RecordExpressionEvaluator,
   RecordNodesUpdater as CoreRecordNodesUpdater,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  ArenaNodeDef,
   ArenaNodeDefExpression,
-  NodeDefType,
   ArenaSurvey,
   ArenaUser,
 } from '@openforis/arena-core'
@@ -24,7 +23,6 @@ import * as RecordUpdater from './recordUpdater'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type UserSurveyRecord = { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord }
 type ChildStateUpdater = (params: {
   parentNode: ArenaRecordNode
@@ -51,8 +49,8 @@ const _recomputeBooleanState = async ({
   getExpressions,
   assocValue,
 }: UserSurveyRecord & {
-  nodeDefs: AnyNodeDef[]
-  getExpressions: (nodeDef: AnyNodeDef) => ArenaNodeDefExpression[]
+  nodeDefs: ArenaAnyNodeDef[]
+  getExpressions: (nodeDef: ArenaAnyNodeDef) => ArenaNodeDefExpression[]
   assocValue: ChildStateUpdater
 }): Promise<ArenaRecord> => {
   const evaluator = new RecordExpressionEvaluator()
@@ -98,7 +96,7 @@ const _recomputeDefaultValues = async ({
   survey,
   record,
   nodeDefs,
-}: UserSurveyRecord & { nodeDefs: AnyNodeDef[] }): Promise<ArenaRecord> => {
+}: UserSurveyRecord & { nodeDefs: ArenaAnyNodeDef[] }): Promise<ArenaRecord> => {
   const nodeDefsToRecompute = nodeDefs.filter(
     (nodeDef) => !A.isEmpty(NodeDef.getDefaultValues(nodeDef)) && !NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   )

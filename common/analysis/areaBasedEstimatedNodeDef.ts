@@ -1,4 +1,4 @@
-import type { ArenaLabels, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaLabels, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -6,12 +6,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { SamplingNodeDefs } from './samplingNodeDefs'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
-const getName = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: AnyNodeDef }): string =>
+const getName = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: ArenaAnyNodeDef }): string =>
   `${NodeDef.getName(estimatedOfNodeDef)}_ha`
 
-const getLabels = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: AnyNodeDef }): ArenaLabels => {
+const getLabels = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: ArenaAnyNodeDef }): ArenaLabels => {
   const labels: ArenaLabels = {}
   for (const [lang, label] of Object.entries(NodeDef.getLabels(estimatedOfNodeDef))) {
     labels[lang] = `${label} (ha)`
@@ -19,7 +17,13 @@ const getLabels = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: AnyNodeDef }): 
   return labels
 }
 
-const getScript = ({ survey, estimatedOfNodeDef }: { survey: ArenaSurvey; estimatedOfNodeDef: AnyNodeDef }): string => {
+const getScript = ({
+  survey,
+  estimatedOfNodeDef,
+}: {
+  survey: ArenaSurvey
+  estimatedOfNodeDef: ArenaAnyNodeDef
+}): string => {
   const nodeDefName = getName({ estimatedOfNodeDef })
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
   const parentName = NodeDef.getName(nodeDefParent)
@@ -37,8 +41,8 @@ const newNodeDef = ({
 }: {
   survey: ArenaSurvey
   chainUuid: string
-  estimatedOfNodeDef: AnyNodeDef
-}): AnyNodeDef => {
+  estimatedOfNodeDef: ArenaAnyNodeDef
+}): ArenaAnyNodeDef => {
   const cycleKeys = Survey.getCycleKeys(Survey.getSurveyInfo(survey))
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
 
@@ -69,9 +73,9 @@ const updateNodeDef = ({
   areaBasedEstimatedOfNodeDef,
 }: {
   survey: ArenaSurvey
-  nodeDefAreaBasedEstimate: AnyNodeDef
-  areaBasedEstimatedOfNodeDef: AnyNodeDef
-}): AnyNodeDef => {
+  nodeDefAreaBasedEstimate: ArenaAnyNodeDef
+  areaBasedEstimatedOfNodeDef: ArenaAnyNodeDef
+}): ArenaAnyNodeDef => {
   const name = getName({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
   const labels = getLabels({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
   const script = getScript({ survey, estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })

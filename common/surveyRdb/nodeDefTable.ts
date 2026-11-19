@@ -1,19 +1,18 @@
-import type { ArenaNodeDef, NodeDefType, ArenaNodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import ColumnNodeDef from '@common/model/db/tables/dataNodeDef/columnNodeDef'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-type NodeDefsColumnsParams = { nodeDefs: AnyNodeDef[]; includeExtendedCols?: boolean }
+type NodeDefsColumnsParams = { nodeDefs: ArenaAnyNodeDef[]; includeExtendedCols?: boolean }
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'
 
 const composeTableName = (nodeDefName: string): string => `${tablePrefix}${nodeDefName}`
 
-export const getTableName = (nodeDef: AnyNodeDef, nodeDefParent?: ArenaNodeDefEntity | null): string => {
+export const getTableName = (nodeDef: ArenaAnyNodeDef, nodeDefParent?: ArenaNodeDefEntity | null): string => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefParentName = NodeDef.getName(nodeDefParent)
 
@@ -22,22 +21,22 @@ export const getTableName = (nodeDef: AnyNodeDef, nodeDefParent?: ArenaNodeDefEn
     : composeTableName(nodeDefParentName)
 }
 
-export const getViewName = (nodeDef: AnyNodeDef, nodeDefParent?: ArenaNodeDefEntity | null): string =>
+export const getViewName = (nodeDef: ArenaAnyNodeDef, nodeDefParent?: ArenaNodeDefEntity | null): string =>
   getTableName(nodeDef, nodeDefParent) + viewSuffix
 
-const getDefaultColumnName = (nodeDef: AnyNodeDef): string =>
+const getDefaultColumnName = (nodeDef: ArenaAnyNodeDef): string =>
   NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
 
-export const getColumnNames = (nodeDef: AnyNodeDef, includeExtendedCols = true): string[] =>
+export const getColumnNames = (nodeDef: ArenaAnyNodeDef, includeExtendedCols = true): string[] =>
   includeExtendedCols ? ColumnNodeDef.getColumnNames(nodeDef) : [getDefaultColumnName(nodeDef)]
 
-export const getColumnName = (nodeDef: AnyNodeDef, includeExtendedCols = true): string =>
+export const getColumnName = (nodeDef: ArenaAnyNodeDef, includeExtendedCols = true): string =>
   getColumnNames(nodeDef, includeExtendedCols)[0]
 
 export const getNodeDefsWithColumnNames = ({
   nodeDefs,
   includeExtendedCols,
-}: NodeDefsColumnsParams): { columnName: string; nodeDef: AnyNodeDef }[] =>
+}: NodeDefsColumnsParams): { columnName: string; nodeDef: ArenaAnyNodeDef }[] =>
   nodeDefs.flatMap((nodeDef) => {
     const columnNames = getColumnNames(nodeDef, includeExtendedCols)
     return columnNames.map((colName) => ({ columnName: colName, nodeDef }))
@@ -49,8 +48,8 @@ export const getNodeDefsColumnNames = ({ nodeDefs, includeExtendedCols }: NodeDe
 export const getNodeDefsByColumnNames = ({
   nodeDefs,
   includeExtendedCols,
-}: NodeDefsColumnsParams): Record<string, AnyNodeDef> => {
-  const nodeDefsByColumnName: Record<string, AnyNodeDef> = {}
+}: NodeDefsColumnsParams): Record<string, ArenaAnyNodeDef> => {
+  const nodeDefsByColumnName: Record<string, ArenaAnyNodeDef> = {}
   for (const { columnName, nodeDef } of getNodeDefsWithColumnNames({ nodeDefs, includeExtendedCols })) {
     nodeDefsByColumnName[columnName] = nodeDef
   }

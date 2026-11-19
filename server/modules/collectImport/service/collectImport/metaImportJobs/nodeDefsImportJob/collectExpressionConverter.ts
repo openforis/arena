@@ -1,4 +1,4 @@
-import type { ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -21,7 +21,7 @@ const convert = async ({
   advancedExpressionEditor = true,
 }: {
   survey: ArenaSurvey
-  nodeDefCurrent: ArenaNodeDef<NodeDefType>
+  nodeDefCurrent: ArenaAnyNodeDef
   expression: any
   advancedExpressionEditor?: any
 }) => {

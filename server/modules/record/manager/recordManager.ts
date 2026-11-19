@@ -6,8 +6,7 @@ import {
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
-  type ArenaNodeDef,
-  type NodeDefType,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -382,7 +381,7 @@ const isRefDataSourceBig = ({
   isCode,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   isCode: boolean
 }) => {
   if (isCode) {

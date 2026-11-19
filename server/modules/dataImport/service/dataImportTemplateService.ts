@@ -1,4 +1,4 @@
-import type { ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { FlatDataExportModel, PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -28,7 +28,7 @@ let templateFileValue = null
  * @param {object} params.nodeDef - The time node definition to generate the sample value for.
  * @returns {string} The formatted current time, including seconds if the node definition includes them.
  */
-export const getTimeTemplateValue = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
+export const getTimeTemplateValue = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   const now = new Date()
   return DateUtils.formatTime(
     now.getHours(),

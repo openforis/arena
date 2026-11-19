@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 
-import { Objects } from '@openforis/arena-core'
-import type { ArenaRecordNode, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import { Objects, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaRecordNode } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -22,7 +22,6 @@ import {
   valuePropsTime,
 } from '@core/survey/nodeValueProps'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type Node = ArenaRecordNode
 type NodeUpdater = (node: Node) => Node
 // node value shape depends on the node def type: kept as a named alias for readability
@@ -69,7 +68,7 @@ export const keys = {
   ...flagKeys,
 } as const
 
-export const isValueProp = ({ nodeDef, prop }: { nodeDef: AnyNodeDef; prop: string }): boolean =>
+export const isValueProp = ({ nodeDef, prop }: { nodeDef: ArenaAnyNodeDef; prop: string }): boolean =>
   Boolean(A.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))
 
 //
@@ -99,7 +98,7 @@ export const getNodeDefUuids = (nodes: Record<string, Node>): string[] =>
 
 const _isChildHiddenWhenNotRelevantDefault =
   ({ cycle, node }: { cycle: string; node: Node }) =>
-  (childDef: AnyNodeDef): boolean =>
+  (childDef: ArenaAnyNodeDef): boolean =>
     NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDef.uuid)(node)
 
 export const getNodeLayoutChildren =
@@ -110,9 +109,9 @@ export const getNodeLayoutChildren =
     isChildHidden = null,
   }: {
     cycle: string
-    nodeDef: AnyNodeDef
-    childDefs: AnyNodeDef[]
-    isChildHidden?: ((childDef: AnyNodeDef) => boolean) | null
+    nodeDef: ArenaAnyNodeDef
+    childDefs: ArenaAnyNodeDef[]
+    isChildHidden?: ((childDef: ArenaAnyNodeDef) => boolean) | null
   }) =>
   (node: Node) => {
     const isHidden = isChildHidden ?? _isChildHiddenWhenNotRelevantDefault({ cycle, node })
@@ -191,7 +190,7 @@ export const newNode = (
   }
 }
 
-export const newNodePlaceholder = (nodeDef: AnyNodeDef, parentNode: Node, value: NodeValue = null): Node => ({
+export const newNodePlaceholder = (nodeDef: ArenaAnyNodeDef, parentNode: Node, value: NodeValue = null): Node => ({
   ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
   [keys.placeholder]: true,
 })
@@ -396,7 +395,7 @@ const _valuePropGetters: Record<string, (prop: string) => NodeValuePropGetter> =
   [NodeDef.nodeDefType.time]: (prop) => _timePropGetters[prop],
 }
 
-export const getValueProp = ({ nodeDef, prop }: { nodeDef: AnyNodeDef; prop: string }): NodeValuePropGetter => {
+export const getValueProp = ({ nodeDef, prop }: { nodeDef: ArenaAnyNodeDef; prop: string }): NodeValuePropGetter => {
   const propGetter = _valuePropGetters[NodeDef.getType(nodeDef)]
   return propGetter ? propGetter(prop) : _getValuePropRaw(prop)
 }

@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -48,7 +48,7 @@ const getKeysSelf: ItemGetter<Record<string, unknown>> = (item) =>
 const isValidationCount = (item: ValidationReportItem): boolean => !A.isNil(getValidationCountChildDefUuid(item))
 
 export const getNodeDef =
-  (survey: ArenaSurvey): ItemGetter<ArenaNodeDef<NodeDefType> | null> =>
+  (survey: ArenaSurvey): ItemGetter<ArenaAnyNodeDef | null> =>
   (item) =>
     Survey.getNodeDefByUuid(getNodeDefUuid(item))(survey)
 

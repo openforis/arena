@@ -1,10 +1,10 @@
-import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDefUtils from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 // see SurveyManager.fetchUserGroupAccessFilters
-export type QualifierFilter = { nodeDef: ArenaNodeDef<NodeDefType>; value: unknown }
+export type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 
 export type QualifierFiltersSqlConditions = {
   // matches the records of the user's own group (null when the user is unrestricted)

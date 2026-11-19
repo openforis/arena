@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Box } from '@mui/material'
-import type { ArenaRecord, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -44,7 +44,7 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const surveyId = useSurveyId() as string | number
   const lang = useSurveyPreferredLang() as string
   const record = useRecord() as ArenaRecord | null | undefined
-  const nodeDefPage = useNodeDefPage() as ArenaNodeDef<NodeDefType>
+  const nodeDefPage = useNodeDefPage() as ArenaAnyNodeDef
   const pagesUuidMap = usePagesUuidMap() as PagesUuidMap
 
   const [format, setFormat] = useState<PrintableExportFormat>(initialFormat)

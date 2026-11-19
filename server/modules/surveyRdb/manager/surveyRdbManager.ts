@@ -7,9 +7,8 @@ import {
   UniqueFileNamesGenerator,
   type ArenaUser,
   type ArenaSurvey,
-  type ArenaNodeDef,
-  type NodeDefType,
   type ArenaNodeDefEntity,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -339,7 +338,7 @@ const createEntityFetchParams = ({
   recordOwnerUuid: string | null
   uniqueFileNamesGenerator: any
   options: any
-  nodeDefContext: ArenaNodeDef<NodeDefType>
+  nodeDefContext: ArenaAnyNodeDef
   idx: number
 }) => {
   const {
@@ -437,7 +436,7 @@ const checkCanExportEntitiesData = async ({
   client,
 }: {
   fileFormat: string
-  nodeDefs: ArenaNodeDef<NodeDefType>[]
+  nodeDefs: ArenaAnyNodeDef[]
   fetchParamsByNodeDefUuid: Record<string, any>
   client: DbClient
 }) => {
@@ -535,7 +534,7 @@ const getDataMatrixColumnName = ({
   nodeDef,
 }: {
   viewDataNodeDef: ViewDataNodeDef
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }) => {
   const { name } = new ColumnNodeDef(viewDataNodeDef, nodeDef)
   // taxon codes cannot be used: unlisted taxa have different scientific names but the same code (e.g. UNL)

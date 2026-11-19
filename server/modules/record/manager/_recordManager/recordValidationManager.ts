@@ -7,8 +7,7 @@ import {
   type ArenaUser,
   type ArenaRecord,
   type ArenaSurvey,
-  type ArenaNodeDef,
-  type NodeDefType,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -178,7 +177,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
   }: {
     survey: ArenaSurvey
     cycle: string
-    nodeDefsUnique: ArenaNodeDef<NodeDefType>[]
+    nodeDefsUnique: ArenaAnyNodeDef[]
     nodesUnique: ArenaRecordNode[]
     recordUuidsExcluded: any
     errorKey: any

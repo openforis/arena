@@ -1,5 +1,5 @@
-import { Objects, Surveys } from '@openforis/arena-core'
-import type { ArenaCategory, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import { Objects, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { functionNames } from '@core/expressionParser/expression'
@@ -9,8 +9,6 @@ import * as NodeDef from '../nodeDef'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
 type CategoriesByUuid = Record<string, ArenaCategory>
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
 const categoriesKey = 'categories'
 
 const compareByName = (category1: ArenaCategory, category2: ArenaCategory): number => {
@@ -40,7 +38,7 @@ export const getCategoryByName =
 
 export const getSamplingPointDataCategory = getCategoryByName(Category.samplingPointDataCategoryName)
 
-export const getSamplingPointDataNodeDefs = (survey: ArenaSurvey): AnyNodeDef[] => {
+export const getSamplingPointDataNodeDefs = (survey: ArenaSurvey): ArenaAnyNodeDef[] => {
   const samplingPointDataCategory = getSamplingPointDataCategory(survey)
   if (!samplingPointDataCategory) return []
 

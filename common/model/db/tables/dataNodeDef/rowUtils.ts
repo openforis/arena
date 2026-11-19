@@ -1,14 +1,13 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { TableDataNodeDefColUtils } from './colUtils'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type NodeRow = Record<string, any>
 
-const getNodeCol = (nodeDefCol: AnyNodeDef, nodeRow: NodeRow): NodeRow => {
+const getNodeCol = (nodeDefCol: ArenaAnyNodeDef, nodeRow: NodeRow): NodeRow => {
   const nodeDefUuidCol = NodeDef.getUuid(nodeDefCol)
   const nodeDefUuidRow = nodeRow.node_def_uuid
 
@@ -23,7 +22,7 @@ const getValuesByColumnName = ({
 }: {
   survey: ArenaSurvey
   nodeRow: NodeRow
-  nodeDefColumns: AnyNodeDef[]
+  nodeDefColumns: ArenaAnyNodeDef[]
 }): Record<string, unknown> => {
   const result: Record<string, unknown> = {}
   for (const nodeDefCol of nodeDefColumns) {

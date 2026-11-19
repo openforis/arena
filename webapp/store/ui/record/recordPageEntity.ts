@@ -1,4 +1,4 @@
-import type { ArenaRecord, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,7 +15,7 @@ type GetPageEntityParams = {
 }
 
 type GetPageEntityFromParentParams = {
-  pageNodeDef: ArenaNodeDef<NodeDefType>
+  pageNodeDef: ArenaAnyNodeDef
   pageNodeDefUuid: string
   parentDefUuid: string
   pagesUuidMap?: PagesUuidMap
@@ -98,11 +98,11 @@ export const getPageEntity = ({ survey, record, pagesUuidMap, pageNodeDefUuid }:
  * @returns True when a multiple ancestor is unresolved
  */
 export const hasUnresolvedMultipleAncestor = (
-  pageNodeDef: ArenaNodeDef<NodeDefType>,
+  pageNodeDef: ArenaAnyNodeDef,
   survey: ArenaSurvey,
   pagesUuidMap?: PagesUuidMap
 ): boolean => {
-  let currentDef: ArenaNodeDef<NodeDefType> | null | undefined = pageNodeDef
+  let currentDef: ArenaAnyNodeDef | null | undefined = pageNodeDef
   while (currentDef) {
     const parentDef = Survey.getNodeDefParent(currentDef)(survey)
     if (!parentDef) break
@@ -134,7 +134,7 @@ export const getMultiplePageScopeEntityUuid = ({
   survey: ArenaSurvey
   record: ArenaRecord
   pagesUuidMap?: PagesUuidMap
-  pageNodeDef: ArenaNodeDef<NodeDefType>
+  pageNodeDef: ArenaAnyNodeDef
 }): string | null => {
   const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
   if (!parentDefUuid) return null

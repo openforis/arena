@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import pgPromise from 'pg-promise'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -17,7 +17,7 @@ const extractValueFromRowResult = ({
   columnName,
 }: {
   rowResult: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   columnName: any
 }) => {
   const cellValue = rowResult[columnName]

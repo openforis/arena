@@ -7,8 +7,7 @@ import {
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
-  type ArenaNodeDef,
-  type NodeDefType,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -510,7 +509,7 @@ const _insertMissingSingleNode = ({
   sideEffect = false,
 }: {
   survey: ArenaSurvey
-  childDef: ArenaNodeDef<NodeDefType>
+  childDef: ArenaAnyNodeDef
   record: ArenaRecord
   parentNode: ArenaRecordNode
   user: ArenaUser

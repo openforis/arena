@@ -1,11 +1,5 @@
-import { Surveys } from '@openforis/arena-core'
-import type {
-  ArenaNodeDef,
-  NodeDefType,
-  ArenaSurvey,
-  ArenaSurveyDependencyGraph,
-  SurveyDependencyType,
-} from '@openforis/arena-core'
+import { Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaSurveyDependencyGraph, SurveyDependencyType } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -15,7 +9,6 @@ import type { DependencyType } from './surveyDependencyTypes'
 
 export { dependencyTypes } from './surveyDependencyTypes'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
 
 const keys = {
@@ -37,7 +30,7 @@ export const hasDependencyGraph = (survey: ArenaSurvey): boolean => {
 
 export const getNodeDefDependencies =
   (nodeDefUuid: string, dependencyType: DependencyType | null = null) =>
-  (survey: ArenaSurvey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): ArenaAnyNodeDef[] =>
     Surveys.getNodeDefDependents({ survey, nodeDefUuid, dependencyType: toCoreDependencyType(dependencyType) })
 
 export const getNodeDefDependentsUuids =
@@ -88,12 +81,12 @@ export const assocDependencyGraph =
 
 // ====== CREATE
 export const addNodeDefDependencies =
-  (nodeDef: AnyNodeDef) =>
+  (nodeDef: ArenaAnyNodeDef) =>
   (survey: ArenaSurvey): Promise<ArenaSurvey> =>
     Surveys.addNodeDefDependencies({ nodeDef, survey })
 
 export const addNodeDefsDependencies =
-  (nodeDefsIndexedByUuid: Record<string, AnyNodeDef>) =>
+  (nodeDefsIndexedByUuid: Record<string, ArenaAnyNodeDef>) =>
   async (survey: ArenaSurvey): Promise<ArenaSurvey> => {
     let surveyUpdated = survey
     for (const nodeDef of Object.values(nodeDefsIndexedByUuid)) {

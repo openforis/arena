@@ -1,14 +1,13 @@
 import {
   NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
   NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaValidationResult } from '@openforis/arena-core'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
+import type { ArenaSurvey, ArenaValidationResult } from '@openforis/arena-core'
 
 type FindReferencedNodeDefLastParams = {
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   exprString: string
   isContextParent?: boolean
   selfReferenceAllowed?: boolean
@@ -20,7 +19,7 @@ export const findReferencedNodeDefLast = ({
   exprString,
   isContextParent = true,
   selfReferenceAllowed = true,
-}: FindReferencedNodeDefLastParams): Promise<AnyNodeDef | null> => {
+}: FindReferencedNodeDefLastParams): Promise<ArenaAnyNodeDef | null> => {
   return new CoreNodeDefExpressionEvaluator().evalExpression({
     survey,
     nodeDef,
@@ -38,7 +37,7 @@ export const validate = async ({
   includeAnalysis = false,
 }: {
   survey: ArenaSurvey
-  nodeDefCurrent: AnyNodeDef
+  nodeDefCurrent: ArenaAnyNodeDef
   exprString: string
   selfReferenceAllowed?: boolean
   includeAnalysis?: boolean

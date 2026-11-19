@@ -1,5 +1,5 @@
-import { Numbers } from '@openforis/arena-core'
-import type { ArenaI18n, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import { Numbers, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaI18n, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -10,12 +10,10 @@ import * as DateUtils from '@core/dateUtils'
 // Aggregate function results (mean, median, sum, etc.) are capped to this many decimal places
 const MAX_AGGREGATE_VALUE_DECIMAL_DIGITS = 3
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
 type FormatParams = {
   i18n: ArenaI18n
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   value: any
   label?: string | null
   isMeasure?: boolean
@@ -63,7 +61,7 @@ const formatDataItemKey = ({
 }: {
   i18n: ArenaI18n
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   dataItem: Record<string, any>
 }): string => {
   const nodeDefName = NodeDef.getName(nodeDef)

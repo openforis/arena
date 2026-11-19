@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
@@ -20,8 +20,6 @@ const columnSet = {
   sampleOutlier: '_sample_outlier',
 }
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
 // makes numeric literals SQL numbers instead of text (e.g. integer_attr > 1.5 would fail with a text literal)
 const _numericLiteralsAsNumbers = (node: any): any => {
   if (Array.isArray(node)) return node.map((item) => _numericLiteralsAsNumbers(item))
@@ -38,7 +36,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
   private readonly _tableData: TableDataNodeDef
   private readonly _viewDataParent: ViewDataNodeDef | null
 
-  constructor(survey: ArenaSurvey, nodeDef: AnyNodeDef) {
+  constructor(survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef) {
     super(survey, nodeDef)
     this.name = `${super.name}_view`
     this._virtual = NodeDef.isVirtual(this.nodeDef)

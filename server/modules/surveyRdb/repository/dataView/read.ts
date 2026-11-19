@@ -6,9 +6,8 @@ import {
   Objects,
   type ArenaRecord,
   type ArenaSurvey,
-  type ArenaNodeDef,
-  type NodeDefType,
   type ArenaRecordNode,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import { quote } from '@core/stringUtils'
@@ -38,7 +37,7 @@ import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/co
 
 import { getUserGroupAccessCondition } from './userGroupAccessCondition'
 
-const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef: any, nodeDef: ArenaNodeDef<NodeDefType>) => {
+const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef: any, nodeDef: ArenaAnyNodeDef) => {
   const { survey } = viewDataNodeDef
   const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
@@ -56,7 +55,7 @@ export const getTimeColumnToCharFormat = (nodeDefCol: any) =>
 type ColumnTransformParams = {
   streamMode: boolean
   viewAlias: string
-  nodeDefCol: ArenaNodeDef<NodeDefType>
+  nodeDefCol: ArenaAnyNodeDef
   nameFull: string
   namesFull: string[]
   names: string[]
@@ -311,8 +310,7 @@ const _prepareRecordsWhereConditions = ({
 // values farther than this many interquartile ranges from the quartiles are outliers (Tukey's fences)
 const outlierIqrFactor = 1.5
 
-const _isNumericNodeDef = (nodeDef: ArenaNodeDef<NodeDefType>) =>
-  NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
+const _isNumericNodeDef = (nodeDef: ArenaAnyNodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
 
 const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }: { viewDataNodeDef: any; nodeDefCols: any }) =>
   nodeDefCols
@@ -596,11 +594,7 @@ const _valueToLiteralString = (value: unknown): string | null => {
 }
 
 const countDuplicateRecordsByNodeDefs = (
-  {
-    survey,
-    record,
-    nodeDefsUnique,
-  }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefsUnique: ArenaNodeDef<NodeDefType>[] },
+  { survey, record, nodeDefsUnique }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefsUnique: ArenaAnyNodeDef[] },
   client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)
@@ -671,7 +665,7 @@ export const fetchRecordsCountByRootNodesValue = (
   }: {
     survey: ArenaSurvey
     cycle: string
-    nodeDefs: ArenaNodeDef<NodeDefType>[]
+    nodeDefs: ArenaAnyNodeDef[]
     nodes: ArenaRecordNode[]
     recordUuidsExcluded?: any
   },

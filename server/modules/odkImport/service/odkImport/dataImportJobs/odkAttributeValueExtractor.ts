@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
@@ -81,7 +81,7 @@ const extractCode = async ({
   tx,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   categoryItemProvider: { getItemByCode: (params: any) => Promise<any> }
   text: string
   tx: DbClient
@@ -122,7 +122,7 @@ export const extractAttributeValue = async ({
   tx,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   categoryItemProvider: { getItemByCode: (params: any) => Promise<any> }
   rawText: string | null
   tx: DbClient

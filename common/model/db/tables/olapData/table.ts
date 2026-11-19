@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaNodeDefEntity } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -6,8 +6,6 @@ import * as StringUtils from '@core/stringUtils'
 
 import TableSurveyRdb from '../tableSurveyRdb'
 import * as SQL from '../../sql'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 const tableNamePrefix = 'olap_data'
 
@@ -56,9 +54,9 @@ export default class TableOlapData extends TableSurveyRdb {
     this._baseUnitDef = baseUnitDef
   }
 
-  get attributeDefsForColumns(): AnyNodeDef[] {
-    const sortedAttributeDefs: AnyNodeDef[] = []
-    const attributeDefsByUuid: Record<string, AnyNodeDef> = {}
+  get attributeDefsForColumns(): ArenaAnyNodeDef[] {
+    const sortedAttributeDefs: ArenaAnyNodeDef[] = []
+    const attributeDefsByUuid: Record<string, ArenaAnyNodeDef> = {}
     Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
       const defs = Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef: ancestorDef,

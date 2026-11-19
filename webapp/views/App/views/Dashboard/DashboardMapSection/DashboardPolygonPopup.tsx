@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import { Popup } from 'react-leaflet'
 import { Link as RouterLink } from 'react-router'
 
@@ -24,7 +24,7 @@ type DashboardPolygonFeature = {
 }
 
 type DashboardPolygonPopupProps = {
-  attributeDef: ArenaNodeDef<NodeDefType>
+  attributeDef: ArenaAnyNodeDef
   pointFeature: DashboardPolygonFeature
 }
 

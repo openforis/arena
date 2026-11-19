@@ -1,19 +1,18 @@
 import * as A from '@core/arena'
 
-import { CategoryItems, DateFormats, Dates, Objects } from '@openforis/arena-core'
-import type { ArenaRecord, ArenaRecordNode, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import { CategoryItems, DateFormats, Dates, Objects, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type NodeValue = any // NOSONAR: node value shape depends on the node def type
 
 type ValueComparatorParams = {
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   record?: ArenaRecord | null
   parentNode?: ArenaRecordNode | null
   value: NodeValue
@@ -242,7 +241,7 @@ const getFastEqualityKeyWithoutRecordContext = ({
   value,
 }: {
   survey: ArenaSurvey
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   value: NodeValue
 }): FastEqualityKey => {
   const extractor = fastEqualityKeyExtractorByNodeDefType[NodeDef.getType(nodeDef)]
@@ -287,7 +286,7 @@ const getFastEqualityKeyInRecordContext = ({
   nodeDef,
   value,
 }: {
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   value: NodeValue
 }): FastEqualityKey => {
   const extractor = fastEqualityKeyInRecordContextExtractorByNodeDefType[NodeDef.getType(nodeDef)]
@@ -322,8 +321,8 @@ const getFastEqualityCompositeKey = ({
   nodeDefs,
   getKey,
 }: {
-  nodeDefs: AnyNodeDef[]
-  getKey: (nodeDef: AnyNodeDef) => FastEqualityKey
+  nodeDefs: ArenaAnyNodeDef[]
+  getKey: (nodeDef: ArenaAnyNodeDef) => FastEqualityKey
 }): FastEqualityKey => {
   const keyParts: string[] = []
   let hasEmptyValues = false

@@ -1,12 +1,11 @@
-import { RecordNodeValueFormatter as CoreNodeValueFormatter, Objects, Records, Surveys } from '@openforis/arena-core'
-import type {
-  ArenaRecord,
-  ArenaRecordNode,
-  LanguageCode,
-  ArenaNodeDef,
-  NodeDefType,
-  ArenaSurvey,
+import {
+  RecordNodeValueFormatter as CoreNodeValueFormatter,
+  Objects,
+  Records,
+  Surveys,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, LanguageCode, ArenaSurvey } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
 
@@ -24,7 +23,7 @@ const _valueToString = (value: unknown): string => {
 type FormatParams = {
   survey: ArenaSurvey
   cycle?: string
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   value: unknown
   node?: ArenaRecordNode | null
   showLabel?: boolean

@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaValidation } from '@openforis/arena-core'
+import type { ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { AggregateFunction, AggregateFunctionItem } from '@core/survey/aggregateFunction'
@@ -19,7 +19,7 @@ export const validateAggregateFunction = ({
   columnNames,
 }: {
   aggregateFunction: AggregateFunctionItem
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   columnNames: string[]
 }): Promise<ArenaValidation> =>
   Validator.validate(aggregateFunction, {

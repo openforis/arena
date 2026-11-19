@@ -3,9 +3,8 @@ import {
   Objects,
   type ArenaValidation,
   type ArenaNodeDefEntity,
-  type ArenaNodeDef,
-  type NodeDefType,
   type ArenaRecord,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -157,8 +156,8 @@ export const countRecordsBySurveyId = async (
     surveyId: number
     cycle?: string
     nodeDefRoot?: ArenaNodeDefEntity
-    nodeDefKeys?: ArenaNodeDef<NodeDefType>[]
-    summaryDefs?: ArenaNodeDef<NodeDefType>[]
+    nodeDefKeys?: ArenaAnyNodeDef[]
+    summaryDefs?: ArenaAnyNodeDef[]
     search?: string | null
     ownerUuid?: string
     includeMerged?: boolean
@@ -247,8 +246,8 @@ const determineOrderBy = ({
   summaryDefs,
   sortBy,
 }: {
-  nodeDefKeys: ArenaNodeDef<NodeDefType>[]
-  summaryDefs: ArenaNodeDef<NodeDefType>[]
+  nodeDefKeys: ArenaAnyNodeDef[]
+  summaryDefs: ArenaAnyNodeDef[]
   sortBy: string | null
 }) => {
   const getColumnName = (nodeDef) =>
@@ -291,7 +290,7 @@ const nodeDefsToJsonb = ({
   tableAlias,
   alias,
 }: {
-  nodeDefs: ArenaNodeDef<NodeDefType>[]
+  nodeDefs: ArenaAnyNodeDef[]
   tableAlias: string
   alias: string
 }) => {
@@ -381,8 +380,8 @@ export const fetchRecordsSummaryBySurveyId = (
   }: {
     surveyId: number
     nodeDefRoot?: ArenaNodeDefEntity
-    nodeDefKeys?: ArenaNodeDef<NodeDefType>[]
-    summaryDefs?: ArenaNodeDef<NodeDefType>[]
+    nodeDefKeys?: ArenaAnyNodeDef[]
+    summaryDefs?: ArenaAnyNodeDef[]
     cycle?: string
     step?: string
     offset?: number

@@ -1,24 +1,21 @@
-import { NodeDefs } from '@openforis/arena-core'
+import { NodeDefs, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
-  ArenaNodeDef,
   ArenaNodeDefEntity,
   ArenaNodeDefEntityChildPosition,
   ArenaNodeDefEntityLayoutChildItem,
-  NodeDefType,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 // layout of a node def: layout props by cycle key
 type Layout = Record<string, Record<string, any>>
 type LayoutUpdater = (layout: Layout) => Layout
-type CyclePredicate = (cycle?: string) => (nodeDef: AnyNodeDef) => boolean
+type CyclePredicate = (cycle?: string) => (nodeDef: ArenaAnyNodeDef) => boolean
 
 // layout getters delegated to the arena-core NodeDefs ones (the same defaults); note: they use cycle '0' when cycle is not specified
-const asEntity = (nodeDef: AnyNodeDef): ArenaNodeDefEntity => nodeDef as ArenaNodeDefEntity
+const asEntity = (nodeDef: ArenaAnyNodeDef): ArenaNodeDefEntity => nodeDef as ArenaNodeDefEntity
 
 export const keys = {
   layout: 'layout',
@@ -94,46 +91,46 @@ const layoutPropsDefault: Record<string, unknown> = {
   layoutChildren: [],
 }
 
-export const getLayout = (nodeDef: AnyNodeDef): Layout => ObjectUtils.getProp<Layout>(keys.layout, {})(nodeDef)
+export const getLayout = (nodeDef: ArenaAnyNodeDef): Layout => ObjectUtils.getProp<Layout>(keys.layout, {})(nodeDef)
 
 export const getLayoutCycle =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): Record<string, any> | undefined =>
+  (nodeDef: ArenaAnyNodeDef): Record<string, any> | undefined =>
     getLayout(nodeDef)[cycle]
 
 export const hasLayoutCycle =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     Boolean(getLayoutCycle(cycle)(nodeDef))
 
 export const getPropLayout =
   (cycle: string, prop: string) =>
-  (nodeDef: AnyNodeDef): any =>
+  (nodeDef: ArenaAnyNodeDef): any =>
     A.propOr(layoutPropsDefault[prop], prop)(getLayoutCycle(cycle)(nodeDef))
 
 export const getIndexChildren =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): string[] =>
+  (nodeDef: ArenaAnyNodeDef): string[] =>
     NodeDefs.getChildrenEntitiesInOwnPageUuids(cycle)(asEntity(nodeDef))
 
-const getDefaultRenderType = (nodeDef: AnyNodeDef): string | null =>
+const getDefaultRenderType = (nodeDef: ArenaAnyNodeDef): string | null =>
   nodeDef?.type === 'text' ? textRenderType.text : null
 
 export const getRenderType =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): string | null =>
+  (nodeDef: ArenaAnyNodeDef): string | null =>
     getPropLayout(cycle, keys.renderType)(nodeDef) ?? getDefaultRenderType(nodeDef)
 
 export const getLayoutChildren =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): ArenaNodeDefEntityLayoutChildItem[] =>
+  (nodeDef: ArenaAnyNodeDef): ArenaNodeDefEntityLayoutChildItem[] =>
     NodeDefs.getLayoutChildren(cycle)(asEntity(nodeDef))
 
 // form layout children (grid items with position)
-export const getLayoutChildrenItems = (cycle: string) => (nodeDef: AnyNodeDef) =>
+export const getLayoutChildrenItems = (cycle: string) => (nodeDef: ArenaAnyNodeDef) =>
   getLayoutChildren(cycle)(nodeDef) as ArenaNodeDefEntityChildPosition[]
 
-export const getLayoutChildrenSorted = (cycle: string) => (nodeDef: AnyNodeDef) => {
+export const getLayoutChildrenSorted = (cycle: string) => (nodeDef: ArenaAnyNodeDef) => {
   const layoutChildren = getLayoutChildrenItems(cycle)(nodeDef)
   // sort layout items from top to bottom
   return [...layoutChildren].sort((item1, item2) => item1.y - item2.y || item1.x - item2.x)
@@ -141,7 +138,7 @@ export const getLayoutChildrenSorted = (cycle: string) => (nodeDef: AnyNodeDef) 
 
 export const getLayoutChildrenCompressed =
   ({ cycle, hiddenDefsByUuid = {} }: { cycle: string; hiddenDefsByUuid?: Record<string, unknown> }) =>
-  (nodeDef: AnyNodeDef): ArenaNodeDefEntityChildPosition[] => {
+  (nodeDef: ArenaAnyNodeDef): ArenaNodeDefEntityChildPosition[] => {
     const layoutChildren = getLayoutChildrenSorted(cycle)(nodeDef)
     let itemPrev = { x: 0, y: 0, w: 0, h: 0, xOriginal: 0, yOriginal: 0 }
     return (
@@ -180,7 +177,7 @@ export const getLayoutChildrenCompressed =
 
 export const getLayoutChild =
   ({ cycle, childDefUuid }: { cycle: string; childDefUuid: string }) =>
-  (nodeDef: AnyNodeDef): ArenaNodeDefEntityChildPosition | undefined =>
+  (nodeDef: ArenaAnyNodeDef): ArenaNodeDefEntityChildPosition | undefined =>
     getLayoutChildrenItems(cycle)(nodeDef).find((l) => l.i === childDefUuid)
 
 export const isHiddenWhenNotRelevant: CyclePredicate = (cycle) => NodeDefs.isHiddenWhenNotRelevant(cycle)
@@ -206,7 +203,7 @@ export const isIncludedInPreviousCycleLink: CyclePredicate = (cycle) => NodeDefs
  */
 export const getLayoutChildrenUuids =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): string[] => {
+  (nodeDef: ArenaAnyNodeDef): string[] => {
     const nodeDefRenderType = getRenderType(cycle)(nodeDef)
     if (nodeDefRenderType === renderType.table) return getLayoutChildren(cycle)(nodeDef) as string[]
 
@@ -218,27 +215,27 @@ export const getLayoutChildrenUuids =
 
 export const getColumnsNo =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): number =>
+  (nodeDef: ArenaAnyNodeDef): number =>
     getPropLayout(cycle, keys.columnsNo)(nodeDef)
 
 export const getPageUuid =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): string | undefined =>
+  (nodeDef: ArenaAnyNodeDef): string | undefined =>
     NodeDefs.getPageUuid(cycle)(asEntity(nodeDef))
 
 export const hasPage =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     !A.isNil(getPageUuid(cycle)(nodeDef))
 
 export const getDisplayIn =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): string =>
+  (nodeDef: ArenaAnyNodeDef): string =>
     hasPage(cycle)(nodeDef) ? displayIn.ownPage : displayIn.parentPage
 
 const isRenderType =
   (cycle: string, type: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     getRenderType(cycle)(nodeDef) === type
 export const isRenderTable: CyclePredicate = (cycle) => (nodeDef) =>
   NodeDefs.isLayoutRenderTypeTable(cycle)(asEntity(nodeDef))
@@ -249,18 +246,18 @@ export const isRenderCheckbox = (cycle: string) => isRenderType(cycle, renderTyp
 
 const isDisplayIn =
   (cycle: string, value: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     getDisplayIn(cycle)(nodeDef) === value
 export const isDisplayInParentPage = (cycle: string) => isDisplayIn(cycle, displayIn.parentPage)
 export const isDisplayInOwnPage = (cycle: string) => isDisplayIn(cycle, displayIn.ownPage)
 export const isRenderFromInOwnPage =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): boolean =>
+  (nodeDef: ArenaAnyNodeDef): boolean =>
     isRenderForm(cycle)(nodeDef) && isDisplayInOwnPage(cycle)(nodeDef)
 
 export const getColumnWidth =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): string =>
+  (nodeDef: ArenaAnyNodeDef): string =>
     getPropLayout(cycle, keys.columnWidth)(nodeDef)
 
 const _getColumnWidthPart = ({
@@ -269,16 +266,16 @@ const _getColumnWidthPart = ({
   partIndex,
 }: {
   cycle: string
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   partIndex: number
 }): string | null => {
   const width = getColumnWidth(cycle)(nodeDef)
   const match = widthRegEx.exec(width)
   return match ? match[partIndex] : null
 }
-export const getColumnWidthValue = (cycle: string) => (nodeDef: AnyNodeDef) =>
+export const getColumnWidthValue = (cycle: string) => (nodeDef: ArenaAnyNodeDef) =>
   _getColumnWidthPart({ cycle, nodeDef, partIndex: 1 })
-export const getColumnWidthUnit = (cycle: string) => (nodeDef: AnyNodeDef) =>
+export const getColumnWidthUnit = (cycle: string) => (nodeDef: ArenaAnyNodeDef) =>
   _getColumnWidthPart({ cycle, nodeDef, partIndex: 2 })
 
 export const isCodeShown: CyclePredicate = (cycle) => (nodeDef) => NodeDefs.isCodeShown(cycle)(nodeDef as any)
@@ -333,5 +330,5 @@ export const assocIncludeInMultipleEntitySummary = (cycle: string, value: boolea
 
 export const rejectNodeDefsWithPage =
   (cycle: string) =>
-  (nodeDefs: AnyNodeDef[]): AnyNodeDef[] =>
+  (nodeDefs: ArenaAnyNodeDef[]): ArenaAnyNodeDef[] =>
     nodeDefs.filter((nodeDef) => !hasPage(cycle)(nodeDef))
