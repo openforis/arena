@@ -15,6 +15,8 @@ Documentation for people working on the Arena code. User documentation: the [use
 - [Webapp conventions](webapp-conventions.md): React components, styling, state, i18n.
 - [Server requirements](server-requirements.md): software, hardware, storage and infrastructure to host
   Arena (e.g. for a National Forest Inventory).
+- [Install on Ubuntu Server](install-ubuntu.md): Docker, PostgreSQL/PostGIS, nginx with HTTPS, updates and
+  backups on a single server.
 - [Login providers](login-providers/README.md): how to register Arena at Google, Microsoft, Keycloak and other
   OpenID Connect providers.
 
