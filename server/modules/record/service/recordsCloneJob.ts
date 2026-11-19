@@ -17,7 +17,11 @@ import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 
 export default class RecordsCloneJob extends Job {
-  constructor(params) {
+  nodesInsertBatchPersister: any
+
+  static readonly type: string = 'RecordsCloneJob'
+
+  constructor(params?: any) {
     super(RecordsCloneJob.type, params)
   }
 
@@ -115,7 +119,15 @@ export default class RecordsCloneJob extends Job {
     this.incrementProcessedItems()
   }
 
-  async cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid }) {
+  async cloneFiles({
+    newFileUuidsByOldUuid,
+    newNodeUuidsByOldUuid,
+    newRecordUuid,
+  }: {
+    newFileUuidsByOldUuid: { [oldUuid: string]: string }
+    newNodeUuidsByOldUuid: { [oldUuid: string]: string }
+    newRecordUuid: string
+  }) {
     const { context, tx } = this
     const { surveyId } = context
 
@@ -139,5 +151,3 @@ export default class RecordsCloneJob extends Job {
     }
   }
 }
-
-RecordsCloneJob.type = 'RecordsCloneJob'
