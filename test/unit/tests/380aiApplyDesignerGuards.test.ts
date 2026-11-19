@@ -261,4 +261,19 @@ describe('NodeDefManager.updateNodeDefProps refuses a category change on a publi
       statusCode: 409,
     })
   })
+
+  // e.g. a node def of another cycle: its lock can't be checked, so its category or taxonomy can't change
+  test('a node def missing from the survey is refused when the category or taxonomy changes', async () => {
+    const { assertNodeDefsRefPropsCanChange } = await import('@server/modules/nodeDef/manager/nodeDefManager')
+    const update = (props: Record<string, unknown>) => () =>
+      assertNodeDefsRefPropsCanChange({ survey: publish(survey), nodeDefs: [{ nodeDefUuid: 'missing', props }] })
+    let error: unknown
+    try {
+      update({ taxonomyUuid: 'another-taxonomy' })()
+    } catch (caught) {
+      error = caught
+    }
+    expect(error).toMatchObject({ key: 'appErrors:survey.nodeDefNameNotFound', statusCode: 404 })
+    expect(update({ labels: { en: 'X' } })).not.toThrow()
+  })
 })

@@ -193,7 +193,12 @@ const _updateAreaBasedEstimateOnPropsUpdate = async ({ survey, nodeDefPrev, node
 }
 
 // the category or taxonomy of a published attribute cannot change (the designer disables the selectors)
-const _assertRefPropsCanChange = ({ survey, nodeDef, props }) => {
+const _assertRefPropsCanChange = ({ survey, nodeDefUuid, props }) => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  // a node def missing from the (cycle filtered) survey can't be checked: its lock would be skipped
+  if (!nodeDef && [NodeDef.propKeys.categoryUuid, NodeDef.propKeys.taxonomyUuid].some((key) => key in props)) {
+    throw new SystemError('appErrors:survey.nodeDefNameNotFound', { name: nodeDefUuid }, StatusCodes.NOT_FOUND)
+  }
   const [propKey] = getLockedRefPropsChanged({ survey, nodeDef, props })
   if (propKey) {
     throw new SystemError(
@@ -214,7 +219,7 @@ const _assertRefPropsCanChange = ({ survey, nodeDef, props }) => {
  */
 export const assertNodeDefsRefPropsCanChange = ({ survey, nodeDefs }) => {
   nodeDefs.forEach(({ nodeDefUuid, props = {} }) => {
-    _assertRefPropsCanChange({ survey, nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey), props })
+    _assertRefPropsCanChange({ survey, nodeDefUuid, props })
   })
 }
 
@@ -227,7 +232,7 @@ export const updateNodeDefProps = async (
 
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-    _assertRefPropsCanChange({ survey, nodeDef: nodeDefPrev, props })
+    _assertRefPropsCanChange({ survey, nodeDefUuid, props })
 
     const nodeDefsUpdated = {}
     let surveyUpdated = survey
