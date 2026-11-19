@@ -9,6 +9,7 @@ import {
   NO_ANSWER_ERROR_KEY,
   TOOL_CALL_TEXT_ERROR_KEY,
   assistantAreaFeatures,
+  ASSISTANT_MAX_STEPS,
   getLastStepCheck,
   runAssistantTurn,
 } from '@webapp/ai/agent/runAssistantTurn'
@@ -419,6 +420,17 @@ describe('runAssistantTurn', () => {
       // not in a row: the count is of the turn
       expect(at([failed({ a: 1 }), failed({ a: 2 }), failed({ a: 1 }), failed({ a: 1 })])).toBe('repeatedFailure')
       expect(at([thrown, failed({ a: 1 }), thrown])).toBe('repeatedFailure')
+      // the same input in another key order, nested too, is the same call
+      const input = (b: unknown) => ({ a: 1, n: { x: 1, y: 2 }, b })
+      const reordered = (b: unknown) => ({ b, n: { y: 2, x: 1 }, a: 1 })
+      expect(at([ok(input(1)), ok(reordered(1)), ok(input(1))])).toBe('repeatedCall')
+      expect(at([ok(input(1)), ok(reordered(2)), ok(input(1))])).toBeNull()
+    })
+
+    test('the last step of the turn has no tools, whatever the calls', () => {
+      const check = getLastStepCheck({ limits: { maxPromptChars: 200000 }, fixedChars: 0 })
+      expect(check({ stepNumber: ASSISTANT_MAX_STEPS - 2, messages: [], steps: [] })).toBeNull()
+      expect(check({ stepNumber: ASSISTANT_MAX_STEPS - 1, messages: [], steps: [] })).toBe('stepLimit')
     })
   })
 
@@ -478,6 +490,25 @@ describe('runAssistantTurn', () => {
     ])
     expect(JSON.stringify(model.doStreamCalls[3].prompt.at(-1))).toContain('made 3 times')
     expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: 'Here it is.' })
+  })
+
+  test('a model paging through results: the last step of the turn has no tools and asks for the answer', async () => {
+    const echo = makeTool('test_echo', async () => ({ ok: true }))
+    let call = 0
+    const model = new MockLanguageModelV4({
+      doStream: async (options: any) =>
+        ({
+          stream:
+            options.toolChoice?.type === 'none'
+              ? textStream('Here is what I found.')
+              : toolCallStream(`call-${call}`, 'test_echo', { summary: 'x', page: call++ }),
+        }) as any,
+    })
+    const result = await run({ model, tools: [echo] })
+    expect(model.doStreamCalls).toHaveLength(ASSISTANT_MAX_STEPS)
+    expect(model.doStreamCalls.at(-1)!.toolChoice?.type).toBe('none')
+    expect(JSON.stringify(model.doStreamCalls.at(-1)!.prompt.at(-1))).toContain(`limit of ${ASSISTANT_MAX_STEPS} steps`)
+    expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: 'Here is what I found.' })
   })
 
   describe('a turn that ends without a word', () => {

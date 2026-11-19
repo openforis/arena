@@ -3,6 +3,8 @@
  * switches, reloads and logout. When the storage is blocked or full, the values live in memory for the session.
  * Stored as `{ "<surveyId|help>": { "<area>": "<conversationId>" } }` under `arena.ai.openConversations.<userUuid>`.
  */
+import { isWireObject } from '@common/ai/wire'
+
 import {
   createResilientStorage,
   getBrowserLocalStorage,
@@ -43,14 +45,6 @@ export const getOpenConversationsKey = (userUuid: string): string => `${KEY_PREF
 const toSurveyEntry = (surveyId: number | null): string => (surveyId === null ? NO_SURVEY_ENTRY : String(surveyId))
 
 /**
- * Returns true for a non-array object.
- * @param {unknown} value - Value.
- * @returns {boolean} True for a plain object.
- */
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
-
-/**
  * Keeps the area entries whose value is a non-empty id.
  * @param {Record<string, unknown>} areas - Raw area entries.
  * @returns {Record<string, string>} The valid entries.
@@ -73,10 +67,10 @@ export const parseOpenConversations = (raw: string | null): OpenConversationsMap
   } catch {
     return {}
   }
-  if (!isPlainObject(parsed)) return {}
+  if (!isWireObject(parsed)) return {}
   const result: OpenConversationsMap = {}
   for (const [surveyEntry, areas] of Object.entries(parsed)) {
-    const valid = isPlainObject(areas) ? validAreas(areas) : {}
+    const valid = isWireObject(areas) ? validAreas(areas) : {}
     if (Object.keys(valid).length > 0) result[surveyEntry] = valid
   }
   return result
@@ -146,7 +140,7 @@ export const createOpenConversations = ({
         area,
         conversationId,
       })
-      storage.write(key, JSON.stringify(next))
+      writeMap(key, next)
     },
     clear: (userUuid) => storage.remove(getOpenConversationsKey(userUuid)),
     clearSurvey: (surveyId) => {

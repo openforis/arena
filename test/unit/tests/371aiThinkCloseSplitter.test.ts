@@ -51,6 +51,10 @@ describe('think close splitter', () => {
     })
   })
 
+  test('plain JSON arguments are kept as they are, a string holding ",word:" included', () => {
+    expect(gemmaArgsToJson('{"q":"a,b:c"}')).toBe('{"q":"a,b:c"}')
+  })
+
   test('a tool call after a </think> text (split across deltas) becomes a tool call', async () => {
     const parts = await split(reasoningStream(['I will propose it.</th', 'ink>', CALL.slice(0, 40), CALL.slice(40)]))
     expect(reasoningOf(parts)).toBe('I will propose it.')

@@ -16,6 +16,7 @@ import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
 import type { AiPolicy } from '@common/ai/policy'
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
+import { isWireObject } from '@common/ai/wire'
 
 import { getConversationDataClass, isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
@@ -29,7 +30,7 @@ import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import { CHARS_PER_TOKEN } from '@webapp/ai/engines/localServerProbe'
 import type { AiEngineLimits } from '@webapp/ai/engines/types'
 import { resolveModel, type ResolveModelParams, type ResolvedModel } from '@webapp/ai/engines/resolveModel'
-import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import { getAiErrorKey, getAiErrorParams, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getToolResultCap } from '@webapp/ai/tools/common/toolResult'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
@@ -68,9 +69,11 @@ const TOOL_CALL_CLOSE = /<\|?\/?tool_call\|?>$/
 
 // the same call (tool and input) made this many times in a turn ends the tool loop, whether it fails or succeeds
 export const REPEATED_FAILURE_LIMIT = 3
+// steps of a turn: the last one has no tools (a model paging through results never repeats a call)
+export const ASSISTANT_MAX_STEPS = 40
 
 // why a step is sent without tools, and is the last one
-export type LastStepReason = 'contextFull' | 'repeatedFailure' | 'repeatedCall'
+export type LastStepReason = 'contextFull' | 'repeatedFailure' | 'repeatedCall' | 'stepLimit'
 
 const REPEATED_FAILURE_NOTE =
   `${APPLY_NOTE_PREFIX}the same tool call failed ${REPEATED_FAILURE_LIMIT} times, so the tools are now off. ` +
@@ -78,6 +81,14 @@ const REPEATED_FAILURE_NOTE =
 const REPEATED_CALL_NOTE =
   `${APPLY_NOTE_PREFIX}the same tool call was made ${REPEATED_FAILURE_LIMIT} times and returned the same result, ` +
   'so the tools are now off. Answer the user now from the results you have.'
+const STEP_LIMIT_NOTE =
+  `${APPLY_NOTE_PREFIX}this turn reached its limit of ${ASSISTANT_MAX_STEPS} steps, so the tools are now off. ` +
+  'Answer the user now with what you have, and say briefly what is left to do.'
+const LAST_STEP_NOTES: Partial<Record<LastStepReason, string>> = {
+  repeatedFailure: REPEATED_FAILURE_NOTE,
+  repeatedCall: REPEATED_CALL_NOTE,
+  stepLimit: STEP_LIMIT_NOTE,
+}
 const ANSWER_REQUEST_NOTE =
   `${APPLY_NOTE_PREFIX}you ended without writing an answer. Call the tool you still need, if any, ` +
   'then write the answer to the user from the results you have.'
@@ -87,6 +98,16 @@ type RanStep = {
   usage?: { inputTokens?: number }
   content: { type: string; toolName?: string; input?: unknown; output?: unknown }[]
 }
+
+/**
+ * Returns the JSON of a value with the keys of its objects sorted, so the same input is one key in any key order.
+ * @param {unknown} value - The value.
+ * @returns {string} The JSON.
+ */
+const toSortedJson = (value: unknown): string =>
+  JSON.stringify(value, (_key, nested) =>
+    isWireObject(nested) ? Object.fromEntries(Object.entries(nested).sort(([a], [b]) => (a < b ? -1 : 1))) : nested
+  )
 
 /**
  * Tells whether one call (same tool, same input) was made REPEATED_FAILURE_LIMIT times in the turn.
@@ -99,7 +120,7 @@ const getRepeatedCall = (steps: RanStep[]): LastStepReason | null => {
     if (part.type !== 'tool-error' && part.type !== 'tool-result') continue
     // a tool that threw, or the structured error result of the tool wrapper
     const failed = part.type === 'tool-error' || Boolean((part.output as any)?.error)
-    const key = `${failed}:${part.toolName}:${JSON.stringify(part.input)}`
+    const key = `${failed}:${part.toolName}:${toSortedJson(part.input)}`
     const count = (counts.get(key) ?? 0) + 1
     if (count >= REPEATED_FAILURE_LIMIT) return failed ? 'repeatedFailure' : 'repeatedCall'
     counts.set(key, count)
@@ -133,6 +154,7 @@ export const getLastStepCheck = ({ limits, fixedChars }: { limits: AssistantLimi
     countedChars = chars
     // the first step keeps its tools: the model could never act otherwise
     if (stepNumber === 0) return null
+    if (stepNumber >= ASSISTANT_MAX_STEPS - 1) return 'stepLimit'
     const repeated = getRepeatedCall(steps)
     if (repeated) return repeated
     const inputTokens = steps.at(-1)?.usage?.inputTokens
@@ -166,9 +188,8 @@ const withNote = (messages: ModelMessage[], note: string): ModelMessage[] => {
  */
 const toStepSettings = (reason: LastStepReason | null, messages: ModelMessage[]) => {
   if (!reason) return undefined
-  if (reason === 'contextFull') return { toolChoice: 'none' as const }
-  const note = reason === 'repeatedFailure' ? REPEATED_FAILURE_NOTE : REPEATED_CALL_NOTE
-  return { toolChoice: 'none' as const, messages: withNote(messages, note) }
+  const note = LAST_STEP_NOTES[reason]
+  return note ? { toolChoice: 'none' as const, messages: withNote(messages, note) } : { toolChoice: 'none' as const }
 }
 
 /**
@@ -321,17 +342,6 @@ const escalateOnDataResult = ({
   const tool = toolList.find((candidate) => candidate.name === part.toolName)
   // saved with the tool result: a turn stopped after a data result keeps the class
   if (tool && isDataToolResult({ tool, output: part.output })) state.escalateDataClass(tool.dataClass)
-}
-
-/**
- * Returns the interpolation params of an AI error (the `{{baseUrl}}` of the unreachable server).
- * @param {unknown} error - The error.
- * @returns {Record<string, unknown>|undefined} The params.
- */
-const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined => {
-  const key = getAiErrorKey(error)
-  const holders = [error, (error as any)?.lastError, (error as any)?.cause, (error as any)?.error]
-  return holders.find((holder) => key && holder?.key === key)?.params
 }
 
 /**

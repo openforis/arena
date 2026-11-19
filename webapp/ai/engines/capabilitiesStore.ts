@@ -54,10 +54,12 @@ export const loadAiCapabilities = (): Promise<AiCapabilities> =>
 
 /**
  * Reloads the AI settings and probes the local server again (after a settings change, or Retry).
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.probe] - False to keep the stored probes (only the settings are read again).
  * @returns {Promise<AiCapabilities>} The capabilities.
  */
-export const refreshAiCapabilities = (): Promise<AiCapabilities> =>
-  capabilitiesStore.refresh({ userUuid: getCurrentUserUuid() })
+export const refreshAiCapabilities = ({ probe = true }: { probe?: boolean } = {}): Promise<AiCapabilities> =>
+  capabilitiesStore.refresh({ userUuid: getCurrentUserUuid(), probe })
 
 /**
  * Probes a local server and asks it one question for the settings' Test button, with the same fetch as the engine (the capabilities do not change).

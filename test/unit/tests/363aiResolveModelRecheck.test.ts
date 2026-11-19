@@ -76,7 +76,7 @@ type Setup = {
   // read each time, like the policy
   settings?: () => AiFeatureSwitches
   // the last check reads the settings again through this
-  onRefresh?: () => void
+  onRefresh?: (options?: { probe?: boolean }) => void
 }
 
 const setup = ({
@@ -100,8 +100,8 @@ const setup = ({
     isInstanceEnabled: () => true,
     getSettings: settings,
     loadCapabilities: async () => ({ ...capabilities(baseUrl()), ...(defaultProviderId ? { defaultProviderId } : {}) }),
-    refreshCapabilities: async () => {
-      onRefresh?.()
+    refreshCapabilities: async (options) => {
+      onRefresh?.(options)
       return { ...capabilities(baseUrl()), ...(defaultProviderId ? { defaultProviderId } : {}) }
     },
     getEffectivePolicyFor: async ({ surveyId, fresh }) => {
@@ -162,11 +162,11 @@ describe('resolveModel: the last policy check before a local engine is created (
   })
 
   test('the last check reads the settings again, not the cached capabilities', async () => {
-    let refreshed = 0
-    const { resolve } = setup({ answers: ['continue'], onRefresh: () => (refreshed += 1) })
+    const refreshes: unknown[] = []
+    const { resolve } = setup({ answers: ['continue'], onRefresh: (options) => refreshes.push(options) })
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
-    // before the dialog and right before the model is created
-    expect(refreshed).toBe(2)
+    // before the dialog and right before the model is created; the local servers are not probed again
+    expect(refreshes).toEqual([{ probe: false }, { probe: false }])
   })
 
   test('the user turns the feature off while the dialog was open: nothing is created', async () => {

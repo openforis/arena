@@ -20,6 +20,16 @@ export const getAiErrorKey = (error: unknown): string | null => {
 }
 
 /**
+ * Returns the interpolation params of an AI error (the `{{baseUrl}}` of the unreachable server).
+ * @param {unknown} error - The error.
+ * @returns {Record<string, unknown>|undefined} The params.
+ */
+export const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined => {
+  const aiKey = getAiErrorKey(error)
+  return aiKey ? unwrap(error).find((candidate) => candidate?.key === aiKey)?.params : undefined
+}
+
+/**
  * Returns true for errors caused by a user cancel (to be ignored by the UI): an abort, or the local server's
  * first-use dialog closed without an answer.
  * @param {unknown} error - The error.
@@ -37,10 +47,9 @@ export const isAiAbortError = (error: unknown): boolean =>
  */
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
   const aiKey = getAiErrorKey(error)
-  const withParams = aiKey ? unwrap(error).find((candidate) => candidate?.key === aiKey) : null
   // React escapes the text: i18next must not escape it too
   if (aiKey)
-    return String(i18n.t(`appErrors:${aiKey}`, { ...withParams?.params, interpolation: { escapeValue: false } }))
+    return String(i18n.t(`appErrors:${aiKey}`, { ...getAiErrorParams(error), interpolation: { escapeValue: false } }))
   // an API error (axios) carrying an appErrors-style key, e.g. the activity-log fetch failing
   const data = (error as any)?.response?.data
   const responseKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''

@@ -71,7 +71,7 @@ export type ModelResolverDeps = {
   getSettings: () => AiFeatureSwitches | null
   loadCapabilities: () => Promise<AiCapabilities>
   // reads the settings again (the last check before a local request); loadCapabilities when absent
-  refreshCapabilities?: () => Promise<AiCapabilities>
+  refreshCapabilities?: (options?: { probe?: boolean }) => Promise<AiCapabilities>
   // getEffectivePolicyFor: survey policy within the ceilings (the ceilings alone for features without a survey);
   // null fails closed. fresh: read from the server now, not from the cache
   getEffectivePolicyFor: (params: {
@@ -286,7 +286,10 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    */
   const recheckLocal = async (context: Context, engine: AiSelectedEngine, capability: AiLocalServerCapability) => {
     const { options } = context
-    const capabilities = await (deps.refreshCapabilities ?? deps.loadCapabilities)()
+    // fresh settings, stored probes: a probe of every server before each local request is too slow
+    const capabilities = await (deps.refreshCapabilities
+      ? deps.refreshCapabilities({ probe: false })
+      : deps.loadCapabilities())
     assertFeatureEnabled(options.feature)
     const policy = await deps.getEffectivePolicyFor({
       feature: options.feature,

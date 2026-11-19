@@ -47,6 +47,8 @@ export const createSseParser = ({
   let pending: string[] = []
   let pendingChars = 0
   let terminated = false
+  // a chunk that ended with \r: it may be the first half of \r\n
+  let heldCr = false
 
   const terminate = (receivedDoneToken: boolean) => {
     if (terminated) return
@@ -103,13 +105,26 @@ export const createSseParser = ({
     if (pendingChars > maxFrameChars) throw tooLarge()
   }
 
+  /**
+   * Converts the line ends of a chunk to \n (the SSE spec also allows \r\n and \r), holding back a final \r.
+   * @param {string} text - The chunk.
+   * @returns {string} The chunk with \n line ends.
+   */
+  const normalizeLineEnds = (text: string): string => {
+    const joined = heldCr ? `\r${text}` : text
+    heldCr = joined.endsWith('\r')
+    return (heldCr ? joined.slice(0, -1) : joined).replace(/\r\n?/g, '\n')
+  }
+
   return {
     push: (text: string) => {
       if (terminated || !text) return
-      drain(text)
+      drain(normalizeLineEnds(text))
     },
     end: () => {
-      const tail = pending.join('')
+      // a \r held back at the end is a line end
+      const tail = pending.join('') + (heldCr ? '\n' : '')
+      heldCr = false
       pending = []
       pendingChars = 0
       if (!terminated && tail.length > 0) handleFrame(tail)

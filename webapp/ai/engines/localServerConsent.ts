@@ -3,6 +3,7 @@
  * A consent for record data covers the survey design too, never the other way round.
  */
 import { type AiDataClass, getAiDataClassLevel, isAiDataClass } from '@common/ai/features'
+import { isWireObject } from '@common/ai/wire'
 
 import type { AiConsentDecision, StorageLike } from './types'
 
@@ -36,7 +37,7 @@ const surveyKey = (surveyId?: number | null): string => (surveyId ? String(surve
 const readMap = (storage: StorageLike, userUuid: string): ConsentMap => {
   try {
     const parsed = JSON.parse(storage.getItem(getLocalServerConsentKey(userUuid)) ?? '{}')
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+    return isWireObject(parsed) ? (parsed as ConsentMap) : {}
   } catch {
     return {}
   }

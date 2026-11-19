@@ -40,7 +40,8 @@ export type AiCapabilitiesStore = {
   getSettings: () => AiSettingsSnapshot | null
   getLoadedFor: () => string | null | undefined
   load: (params: { userUuid: string | null }) => Promise<AiCapabilities>
-  refresh: (params: { userUuid: string | null }) => Promise<AiCapabilities>
+  // probe false: the stored probes are kept (a provider not probed at its current address and model is probed)
+  refresh: (params: { userUuid: string | null; probe?: boolean }) => Promise<AiCapabilities>
   reset: () => void
   subscribe: (listener: () => void) => () => void
   notify: () => void
@@ -258,13 +259,28 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     safely<LocalServerProbeResult | null>(() => deps.probe({ baseUrl, modelId }), null)
 
   /**
+   * Returns the stored probe of a provider of the same user, at the same address and model, or null.
+   * @param {LocalProvider} provider - Local provider.
+   * @param {string|null} userUuid - UUID of the user.
+   * @returns {LocalServerProbeResult|null} The stored probe, or null.
+   */
+  const storedProbe = (provider: LocalProvider, userUuid: string | null): LocalServerProbeResult | null => {
+    const stored = loadedFor === userUuid ? capabilities.local[provider.id] : undefined
+    if (!stored || stored.reachable === null) return null
+    if (stored.baseUrl !== provider.baseUrl || stored.modelId !== provider.modelId) return null
+    const { reachable, models, contextTokens, error } = stored
+    return { reachable, models, contextTokens, error }
+  }
+
+  /**
    * Loads the settings and the local providers, probes every local server and stores the capabilities.
    * @param {object} params - Parameters.
    * @param {string|null} params.userUuid - UUID of the user.
    * @param {boolean} params.force - Read the settings again instead of using the cache.
+   * @param {boolean} params.probe - Probe every server again, instead of reusing the stored probes.
    * @returns {Promise<AiCapabilities>} The capabilities (those of a newer run when one started meanwhile).
    */
-  const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
+  const compute = async ({ userUuid, force, probe }: { userUuid: string | null; force: boolean; probe: boolean }) => {
     const current = ++sequence
     const loaded = await safely(() => deps.loadSettings({ force, userUuid }), null)
     // a refresh that failed keeps the settings of the same user: AI must not vanish for one failed request
@@ -279,7 +295,9 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
       : await Promise.all(
           localProviders.map((provider) =>
             // an invalid address is never called
-            provider.addressInvalid ? null : probeSafely(provider.baseUrl, provider.modelId)
+            provider.addressInvalid
+              ? null
+              : (!probe && storedProbe(provider, userUuid)) || probeSafely(provider.baseUrl, provider.modelId)
           )
         )
     // a newer run started meanwhile: wait for its result; after a reset or a user change nothing is returned
@@ -297,9 +315,10 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * @param {object} params - Parameters.
    * @param {string|null} params.userUuid - UUID of the user.
    * @param {boolean} params.force - Read the settings again instead of using the cache.
+   * @param {boolean} params.probe - Probe every server again, instead of reusing the stored probes.
    * @returns {Promise<AiCapabilities>} The capabilities.
    */
-  const run = (params: { userUuid: string | null; force: boolean }): Promise<AiCapabilities> => {
+  const run = (params: { userUuid: string | null; force: boolean; probe: boolean }): Promise<AiCapabilities> => {
     const entry = { promise: null as unknown as Promise<AiCapabilities>, ...params }
     entry.promise = compute(params).finally(() => {
       if (inflight === entry) inflight = null
@@ -317,12 +336,12 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
       // a run in flight first: a forced one is newer than the stored capabilities
       if (inflight && inflight.userUuid === userUuid) return inflight.promise
       if (loadedFor === userUuid && complete) return Promise.resolve(capabilities)
-      return run({ userUuid, force: false })
+      return run({ userUuid, force: false, probe: true })
     },
-    refresh: ({ userUuid }) => {
+    refresh: ({ userUuid, probe = true }) => {
       resetIfOtherUser(userUuid)
       // never joins a run in flight: it may have read the settings before the change that asks for this refresh
-      return run({ userUuid, force: true })
+      return run({ userUuid, force: true, probe })
     },
     reset,
     subscribe: (listener) => {

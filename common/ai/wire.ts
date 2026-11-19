@@ -138,7 +138,7 @@ type WireObject = Record<string, unknown>
  * @param {unknown} json - Parsed JSON.
  * @returns {boolean} True for an object that is not null or an array.
  */
-const isWireObject = (json: unknown): json is WireObject =>
+export const isWireObject = (json: unknown): json is WireObject =>
   typeof json === 'object' && json !== null && !Array.isArray(json)
 
 /**

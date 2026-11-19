@@ -1,5 +1,5 @@
 import SystemError from '@core/systemError'
-import { getAiErrorKey, getAiErrorMessage, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import { getAiErrorKey, getAiErrorMessage, getAiErrorParams, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { runStreamWithCallbacks } from '@webapp/ai/runtime/streamCallbacks'
 import { fakeT } from '../utils/fakeT'
 
@@ -13,6 +13,12 @@ describe('runtime errors', () => {
     expect(getAiErrorKey(Object.assign(new Error('x'), { cause: error }))).toBe('aiRateLimited')
     expect(getAiErrorKey(new Error('HTTP 401'))).toBeNull()
     expect(getAiErrorKey(new SystemError('appErrors:generic'))).toBeNull()
+  })
+
+  test('reads the params of the error that carries the AI key', () => {
+    const error = new SystemError('aiLocalServerUnreachable', { baseUrl: 'http://localhost:1234/v1' })
+    expect(getAiErrorParams({ lastError: error })).toEqual({ baseUrl: 'http://localhost:1234/v1' })
+    expect(getAiErrorParams(new Error('x'))).toBeUndefined()
   })
 
   test('messages are always translated appErrors keys', () => {

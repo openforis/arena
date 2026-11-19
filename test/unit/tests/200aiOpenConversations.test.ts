@@ -61,6 +61,14 @@ describe('open conversations (200)', () => {
     })
   })
 
+  test('removing the last entry removes the key', () => {
+    const { items, storage } = fakeStorage()
+    const open = createOpenConversations({ getStorage: () => storage, log: noLog })
+    open.set({ ...design7, conversationId: 'c-design' })
+    open.set({ ...design7, conversationId: null })
+    expect(items.has('arena.ai.openConversations.u1')).toBe(false)
+  })
+
   test('Help without a survey uses the help entry', () => {
     const { items, storage } = fakeStorage()
     const open = createOpenConversations({ getStorage: () => storage, log: noLog })

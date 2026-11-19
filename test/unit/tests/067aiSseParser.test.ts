@@ -38,6 +38,15 @@ describe('createSseParser', () => {
     expect(events).toEqual([{ ok: true }])
   })
 
+  test('splits frames on \r\n and \r line ends, also when \r and \n arrive in two chunks', () => {
+    const { parser, events } = collect()
+    parser.push('data: {"a":1}\r\n\r\ndata: {"b":2}\r\n\r')
+    parser.push('\ndata: {"c":3}\r\rdata: {"d":4}\r')
+    expect(events).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }])
+    parser.end()
+    expect(events).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }, { d: 4 }])
+  })
+
   test('propagates errors thrown by onEvent', () => {
     const parser = createSseParser({
       onEvent: () => {

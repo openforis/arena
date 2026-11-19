@@ -114,6 +114,20 @@ describe('createCapabilitiesStore', () => {
     expect(notified).toBe(2)
   })
 
+  test('a refresh without probe reads the settings and keeps the stored probes; a changed address is probed', async () => {
+    const providers = [desk]
+    const { calls, deps } = fakeDeps(providers)
+    const store = createCapabilitiesStore(deps)
+    await store.load({ userUuid: 'u1' })
+    const capabilities = await store.refresh({ userUuid: 'u1', probe: false })
+    expect(calls.settings).toEqual([false, true])
+    expect(calls.probes).toEqual([desk.baseUrl])
+    expect(capabilities.local[desk.id]).toMatchObject({ reachable: true, contextTokens: 4096 })
+    providers[0] = { ...desk, baseUrl: 'http://localhost:5678/v1' }
+    await store.refresh({ userUuid: 'u1', probe: false })
+    expect(calls.probes).toEqual([desk.baseUrl, 'http://localhost:5678/v1'])
+  })
+
   test('a refresh whose settings could not be read keeps those of the same user', async () => {
     let fail = false
     const { deps } = fakeDeps([])

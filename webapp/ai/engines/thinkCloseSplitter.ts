@@ -22,6 +22,12 @@ const GEMMA_TOKEN = /<\|"\|>([\s\S]*?)<\|"\|>|([{,]\s*)([A-Za-z_]\w*)(\s*:)/g
  * @throws {SyntaxError} When the result is not JSON.
  */
 export const gemmaArgsToJson = (args: string): string => {
+  // plain JSON first: the Gemma rewrite would break a string holding `,word:`
+  try {
+    return JSON.stringify(JSON.parse(args))
+  } catch {
+    // the Gemma format
+  }
   const json = args.replace(GEMMA_TOKEN, (_match, text, before, key, colon) =>
     text === undefined ? `${before}"${key}"${colon}` : JSON.stringify(text)
   )
