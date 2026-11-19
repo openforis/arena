@@ -53,13 +53,12 @@ const drawNorthArrow = (context: CanvasRenderingContext2D, rect: OverlayRect): v
 const CENTER_MARKER = { radius: 18, haloWidth: 6, haloColor: 'rgba(0, 0, 0, 0.55)', ringWidth: 3, ringColor: '#ffd400' }
 
 /**
- * Draws a ring at the canvas centre: in a fit-to-plot capture the selected plot sits there, among nearby plots.
+ * Draws a ring around the selected plot of a fit-to-plot capture, to tell it from nearby plots.
  * @param {CanvasRenderingContext2D} context - The canvas context.
- * @param {number} width - The canvas width.
- * @param {number} height - The canvas height.
+ * @param {{x: number, y: number}} point - The plot position, in image px.
  * @returns {void}
  */
-const drawCenterMarker = (context: CanvasRenderingContext2D, width: number, height: number): void => {
+const drawPlotMarker = (context: CanvasRenderingContext2D, point: { x: number; y: number }): void => {
   const { radius, haloWidth, haloColor, ringWidth, ringColor } = CENTER_MARKER
   for (const [color, lineWidth] of [
     [haloColor, haloWidth],
@@ -68,7 +67,7 @@ const drawCenterMarker = (context: CanvasRenderingContext2D, width: number, heig
     context.strokeStyle = color
     context.lineWidth = lineWidth
     context.beginPath()
-    context.arc(width / 2, height / 2, radius, 0, 2 * Math.PI)
+    context.arc(point.x, point.y, radius, 0, 2 * Math.PI)
     context.stroke()
   }
 }
@@ -99,7 +98,7 @@ const drawLayout = (context: CanvasRenderingContext2D, layout: OverlayLayout): v
  * Draws the scale bar, north arrow and stamp over a captured map.
  * @param {object} params - The parameters.
  * @param {HTMLCanvasElement} params.source - The captured map.
- * @param {boolean} params.markCenter - Whether to ring the centre (the selected plot of a fit-to-plot capture).
+ * @param {object|null} params.markPoint - Where to ring the selected plot of a fit-to-plot capture (null: no ring).
  * @param {boolean} params.includeScale - Whether to draw the scale bar and the north arrow.
  * @param {boolean} params.includeStamp - Whether to draw the stamp.
  * @param {object|null} params.scaleBar - Scale bar width and label (null: unknown scale).
@@ -109,7 +108,7 @@ const drawLayout = (context: CanvasRenderingContext2D, layout: OverlayLayout): v
  */
 export const composeScreenshot = ({
   source,
-  markCenter,
+  markPoint,
   includeScale,
   includeStamp,
   scaleBar,
@@ -117,7 +116,7 @@ export const composeScreenshot = ({
   rightLines,
 }: {
   source: HTMLCanvasElement
-  markCenter: boolean
+  markPoint: { x: number; y: number } | null
   includeScale: boolean
   includeStamp: boolean
   scaleBar: { widthPx: number; label: string } | null
@@ -130,7 +129,7 @@ export const composeScreenshot = ({
   const context = canvas.getContext('2d')
   if (!context) return source
   context.drawImage(source, 0, 0)
-  if (markCenter) drawCenterMarker(context, canvas.width, canvas.height)
+  if (markPoint) drawPlotMarker(context, markPoint)
   const layout = computeOverlayLayout({
     width: canvas.width,
     height: canvas.height,
