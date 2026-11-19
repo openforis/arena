@@ -8,15 +8,16 @@ import * as DateUtils from '@core/dateUtils'
 import { isUuid } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
-type ShapeCheck = (value: unknown) => boolean
+type ShapeCheck = (value: unknown, nodeDef?: any) => boolean
 type PlainObject = Record<string, unknown>
 
 // codes, names and srs ids
 const maxShortStringChars = 255
-const integerPattern = /^[+-]?\d{1,16}$/
+// no leading zeros: "007" is not what a form stores
+const integerPattern = /^[+-]?(0|[1-9]\d{0,15})$/
 const decimalPattern = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/
 const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/
-const timePattern = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
+const timePattern = /^(\d{2}):(\d{2})(?::(\d{2}))?$/
 const booleanValues = new Set(['true', 'false'])
 
 /**
@@ -83,13 +84,15 @@ const isDate: ShapeCheck = (value) => {
 }
 
 /**
- * Returns true when a value is a time (H:mm or H:mm:ss).
+ * Returns true when a value is a time (HH:mm, or HH:mm:ss when the attribute includes seconds).
  * @param {unknown} value - The value.
+ * @param {object} nodeDef - The time attribute definition.
  * @returns {boolean} Whether the value is a time.
  */
-const isTime: ShapeCheck = (value) => {
+const isTime: ShapeCheck = (value, nodeDef) => {
   const parts = typeof value === 'string' ? timePattern.exec(value) : null
-  return Boolean(parts) && DateUtils.isValidTime(parts![1], parts![2], parts![3] ?? 0)
+  if (!parts || (parts[3] !== undefined && !NodeDef.isSecondsIncluded(nodeDef))) return false
+  return DateUtils.isValidTime(parts[1], parts[2], parts[3] ?? 0)
 }
 
 /**
@@ -196,7 +199,7 @@ export const isNodeValueShapeValid = ({ nodeDef, value }: { nodeDef: any; value:
   const check = shapeCheckByType[NodeDef.getType(nodeDef)]
   if (!check) return false
   if (value === null || value === undefined) return true
-  return check(value)
+  return check(value, nodeDef)
 }
 
 // quotes, keys and separators around the longest string of a value

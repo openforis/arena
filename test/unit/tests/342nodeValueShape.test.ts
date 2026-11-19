@@ -28,6 +28,9 @@ describe('Node value shape of a batch edit (342)', () => {
     [nodeDefType.integer, 12, true],
     [nodeDefType.integer, '12', true],
     [nodeDefType.integer, '-3', true],
+    [nodeDefType.integer, '0', true],
+    [nodeDefType.integer, '007', false],
+    [nodeDefType.integer, '-01', false],
     [nodeDefType.integer, 1.5, false],
     [nodeDefType.integer, '1.5', false],
     [nodeDefType.integer, 'abc', false],
@@ -48,8 +51,9 @@ describe('Node value shape of a batch edit (342)', () => {
     [nodeDefType.date, '31/05/2024', false],
     [nodeDefType.date, 20240531, false],
     [nodeDefType.time, '14:30', true],
-    [nodeDefType.time, '9:05', true],
-    [nodeDefType.time, '14:30:15', true],
+    [nodeDefType.time, '09:05', true],
+    [nodeDefType.time, '9:05', false],
+    [nodeDefType.time, '14:30:15', false],
     [nodeDefType.time, '24:00', false],
     [nodeDefType.time, '14:60', false],
     [nodeDefType.time, '2pm', false],
@@ -80,6 +84,13 @@ describe('Node value shape of a batch edit (342)', () => {
     [nodeDefType.entity, {}, false],
   ])('%s: %j → %s', (type, value, expected) => {
     expect(isNodeValueShapeValid({ nodeDef: nodeDefOf(type), value })).toBe(expected)
+  })
+
+  test('seconds only on a time attribute that includes them', () => {
+    const nodeDef = { type: nodeDefType.time, props: { includeSeconds: true } }
+    expect(isNodeValueShapeValid({ nodeDef, value: '14:30:15' })).toBe(true)
+    expect(isNodeValueShapeValid({ nodeDef, value: '14:30' })).toBe(true)
+    expect(isNodeValueShapeValid({ nodeDef, value: '14:30:60' })).toBe(false)
   })
 
   test.each([nodeDefType.text, nodeDefType.integer, nodeDefType.code, nodeDefType.coordinate, nodeDefType.taxon])(
