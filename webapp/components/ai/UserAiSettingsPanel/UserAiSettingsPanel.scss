@@ -1,8 +1,4 @@
-// small texts: the status tokens darkened to at least 4.5:1 on white and on their 12% tint
-// (the tokens themselves stay on the borders and tints)
-$text-ok: color-mix(in srgb, var(--color-success) 60%, black);
-$text-warn: color-mix(in srgb, var(--color-warning) 55%, black);
-$text-bad: color-mix(in srgb, var(--color-error) 60%, black);
+@use './statusText' as *;
 
 .user-ai-settings-panel {
   display: flex;

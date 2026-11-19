@@ -1,0 +1,7 @@
+@use '~@webapp/style/vars' as *;
+
+// small status texts: the status tokens mixed with the text color reach 4.5:1 on the surface and on their 12% tint
+// in both themes (the tokens themselves stay on the borders and tints)
+$text-ok: shade($colorSuccess, 50%);
+$text-warn: shade($colorWarning, 55%);
+$text-bad: shade($colorError, 40%);

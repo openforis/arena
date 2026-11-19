@@ -425,6 +425,57 @@ describe('assistant conversation controller (403)', () => {
       expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'stopped' })
     })
 
+    test('streamed updates are shown at most once per frame, and the final answer cancels the pending frame', async () => {
+      const original = {
+        requestAnimationFrame: globalThis.requestAnimationFrame,
+        cancelAnimationFrame: globalThis.cancelAnimationFrame,
+      }
+      const frames = new Map<number, () => void>()
+      let frameId = 0
+      const runFrames = () => {
+        const callbacks = [...frames.values()]
+        frames.clear()
+        for (const callback of callbacks) callback()
+      }
+      globalThis.requestAnimationFrame = jest.fn((callback: FrameRequestCallback) => {
+        frameId += 1
+        frames.set(frameId, () => callback(0))
+        return frameId
+      })
+      globalThis.cancelAnimationFrame = jest.fn((id: number) => {
+        frames.delete(id)
+      })
+      try {
+        const turn = createTurnControl()
+        const { controller, registry } = await setup({ runTurn: turn.run })
+        await controller.send(env, 'hello')
+        await flush()
+        const listener = jest.fn()
+        controller.subscribe(listener)
+        const streamed = (text: string) => ({
+          ...withTurn(turn.params[0].conversation, 'hello', 'streaming'),
+          title: text,
+        })
+        turn.params[0].onUpdate(streamed('a'))
+        turn.params[0].onUpdate(streamed('ab'))
+        turn.params[0].onUpdate(streamed('abc'))
+        expect(listener).not.toHaveBeenCalled()
+        expect(globalThis.requestAnimationFrame).toHaveBeenCalledTimes(1)
+        runFrames()
+        expect(listener).toHaveBeenCalledTimes(1)
+        expect(controller.getState().conversation?.title).toBe('abc')
+        // a frame still pending when the turn ends: the final answer is shown, the streamed one never lands
+        turn.params[0].onUpdate(streamed('abcd'))
+        turn.release(0, 'done')
+        await registry.settle()
+        expect(globalThis.cancelAnimationFrame).toHaveBeenCalled()
+        runFrames()
+        expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'done' })
+      } finally {
+        Object.assign(globalThis, original)
+      }
+    })
+
     test('Retry sends the user message of the failed answer again, without the failed pair', async () => {
       const failed = withTurn(storedConversation('c1'), 'the question', 'error')
       const { controller, panel, runTurn, registry } = await setup({ conversations: [failed] })

@@ -164,6 +164,20 @@ const toScopeKey = ({ userUuid, surveyId, area }: AssistantConversationScope): s
   `${userUuid}|${surveyId}|${area}`
 
 /**
+ * Calls back on the next animation frame (on a timer where there are no frames, as in Node).
+ * @param {Function} callback - Called once.
+ * @returns {Function} Cancels the call.
+ */
+const requestFrame = (callback: () => void): (() => void) => {
+  if (typeof globalThis.requestAnimationFrame === 'function') {
+    const id = globalThis.requestAnimationFrame(callback)
+    return () => globalThis.cancelAnimationFrame(id)
+  }
+  const id = setTimeout(callback, 16)
+  return () => clearTimeout(id)
+}
+
+/**
  * Creates the conversation of a first message. A Cleaning conversation has record content from its first turn, so
  * it starts as `data`: the engine is selected for `data` already for that turn.
  * @param {AssistantConversationScope} scope - User, survey and area.
@@ -375,6 +389,17 @@ export const createAssistantConversationController = (
     set({ busy: true, conversation: base })
     panel.setConversationId(base.id)
     let saved = false
+    // the streamed answer is shown at most once per frame (one render per token would re-parse the whole answer)
+    let latest: Conversation | null = null
+    let cancelFrame: (() => void) | null = null
+    const dropFrame = () => {
+      cancelFrame?.()
+      cancelFrame = null
+    }
+    const showLatest = () => {
+      cancelFrame = null
+      if (latest && isCurrent()) set({ conversation: latest })
+    }
     try {
       const final = await deps.runTurn({
         conversation: base,
@@ -384,13 +409,16 @@ export const createAssistantConversationController = (
         ctx: env.buildToolContext(env.area),
         signal: controller.signal,
         onUpdate: (next) => {
-          if (isCurrent()) set({ conversation: next })
+          latest = next
+          cancelFrame ??= requestFrame(showLatest)
           if (!saved) {
             saved = true
             void persist(next)
           }
         },
       })
+      // the final answer replaces the streamed one that is still waiting for its frame
+      dropFrame()
       if (isCurrent() || holdsCopy()) set({ conversation: final })
       suggestions.reportSettle({ conversation: final, running: false })
       try {
@@ -402,11 +430,14 @@ export const createAssistantConversationController = (
       }
     } catch (error) {
       // an unexpected failure (not the model's: runAssistantTurn reports those in the answer): no spinner is left
-      if ((isCurrent() || holdsCopy()) && state.conversation) {
-        set({ conversation: withStreamingFailed(state.conversation) })
+      dropFrame()
+      const last = latest ?? state.conversation
+      if ((isCurrent() || holdsCopy()) && last) {
+        set({ conversation: withStreamingFailed(last) })
       }
       throw error
     } finally {
+      dropFrame()
       registry.unregister(controller)
       if (running === turn) releaseTurn()
     }

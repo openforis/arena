@@ -60,12 +60,6 @@ export const useAiBatchRun = () => {
   }, [])
 
   /**
-   * Starts a run (abandoning the previous one) and calls onDone with its result, unless it was abandoned. A run
-   * stopped with results calls onDone too, after a notice of where it stopped.
-   * @param {StartParams} params - Title, run function and completion callback.
-   * @returns {Promise<void>} Resolves when the run ends.
-   */
-  /**
    * Shows the notice of a stopped run.
    * @param {AiBatchStop} stop - Where and why the run stopped.
    * @returns {void}
@@ -85,6 +79,12 @@ export const useAiBatchRun = () => {
     [dispatch, i18n]
   )
 
+  /**
+   * Starts a run (abandoning the previous one) and calls onDone with its result, unless it was abandoned. A run
+   * stopped with results calls onDone too, after a notice of where it stopped.
+   * @param {StartParams} params - Title, run function and completion callback.
+   * @returns {Promise<void>} Resolves when the run ends.
+   */
   const start = useCallback(
     async <T extends { stop?: AiBatchStop | null }>({ titleKey, run: runBatch, onDone }: StartParams<T>) => {
       controlRef.current?.abandon()

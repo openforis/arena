@@ -1,4 +1,6 @@
-// white text on each background: contrast at least 4.5:1
+@use '~@webapp/style/vars' as *;
+
+// a tone per provider mixed with the surface: the text color on it is at least 5:1 in both themes
 .provider-monogram {
   flex: none;
   display: inline-grid;
@@ -8,8 +10,9 @@
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #fff;
-  background: #646b78;
+  color: $colorOnSurface;
+  // default and other
+  background: tint($colorSecondary, 60%);
 
   &--small {
     width: 24px;
@@ -19,27 +22,22 @@
   }
 
   &--local {
-    background: #4f6d7a;
+    background: tint(color-mix(in srgb, #{$colorPrimary}, #{$colorSuccess}), 60%);
   }
 
   &--openai {
-    background: #3e7a6a;
+    background: tint($colorSuccess, 60%);
   }
 
   &--anthropic {
-    background: #8a6a4f;
+    background: tint($colorWarning, 60%);
   }
 
   &--google {
-    background: #5468a8;
+    background: tint($colorPrimary, 60%);
   }
 
   &--compatible {
-    background: #6d5b8f;
-  }
-
-  &--default,
-  &--other {
-    background: #646b78;
+    background: tint($colorError, 60%);
   }
 }

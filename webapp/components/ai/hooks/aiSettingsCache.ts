@@ -61,7 +61,9 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
    * Tells every subscriber that the cache changed.
    * @returns {void} Nothing.
    */
-  const notify = () => listeners.forEach((listener) => listener())
+  const notify = () => {
+    for (const listener of listeners) listener()
+  }
 
   /**
    * Fetches the settings; a failure gives a stand-in that hides AI (rather than flashing buttons in).

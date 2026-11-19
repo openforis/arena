@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import { isRecordEditChangeSet } from '@webapp/ai/changeSets/recordEdits/types'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
@@ -61,12 +63,16 @@ const ToolRow = ({ part, interrupted }: { part: ConversationToolPart; interrupte
  */
 const ThinkingSection = ({ part, active }: { part: ConversationReasoningPart; active: boolean }) => {
   const t = useI18nT({ unescapeHtml: true })
+  // collapsed: the reasoning is not rendered (it would be parsed again on every streamed token)
+  const [open, setOpen] = useState(false)
   return (
-    <details className="ai-assistant-thinking" data-testid={TestId.aiAssistant.thinking}>
+    <details
+      className="ai-assistant-thinking"
+      data-testid={TestId.aiAssistant.thinking}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
       <summary>{t(active ? 'aiAssistant.thinkingActive' : 'aiAssistant.thinking')}</summary>
-      <div className="ai-assistant-thinking__text">
-        <AssistantMarkdown text={part.text} />
-      </div>
+      <div className="ai-assistant-thinking__text">{open && <AssistantMarkdown text={part.text} />}</div>
     </details>
   )
 }

@@ -1,6 +1,4 @@
-// small texts on white: at least 4.5:1
-$text-warn: color-mix(in srgb, var(--color-warning) 55%, black);
-$text-bad: color-mix(in srgb, var(--color-error) 60%, black);
+@use '../statusText' as *;
 
 .provider-dialog {
   .modal-content {
