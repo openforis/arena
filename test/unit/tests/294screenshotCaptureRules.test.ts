@@ -2,6 +2,7 @@ import {
   createImageFailureCounter,
   getCaptureNotice,
   getFitToPlotZoom,
+  getPlotCaptureView,
   isMapAtCaptureView,
   shouldExcludeFromCapture,
   TRANSPARENT_PIXEL,
@@ -127,5 +128,37 @@ describe('Screenshot capture view restore (294)', () => {
   test('does not restore after the user panned or zoomed', () => {
     expect(isMapAtCaptureView({ current: { lat: 10.01, lng: 20 }, currentZoom: 17, set, setZoom: 17 })).toBe(false)
     expect(isMapAtCaptureView({ current: set, currentZoom: 15, set, setZoom: 17 })).toBe(false)
+  })
+})
+
+describe('Screenshot fit to plot view (294)', () => {
+  const size = { x: 800, y: 500 }
+
+  test('keeps the current view when zoomed in and the plot is well inside it', () => {
+    expect(getPlotCaptureView({ currentZoom: 16, fitZoom: 17, plotPixel: { x: 600, y: 120 }, size })).toEqual({
+      keepView: true,
+      zoom: 16,
+    })
+  })
+
+  test('centres the plot at the current zoom when it is near the edge of the view', () => {
+    expect(getPlotCaptureView({ currentZoom: 18, fitZoom: 17, plotPixel: { x: 790, y: 250 }, size })).toEqual({
+      keepView: false,
+      zoom: 18,
+    })
+  })
+
+  test('zooms in to the fit-to-plot zoom when the map is zoomed out', () => {
+    expect(getPlotCaptureView({ currentZoom: 10, fitZoom: 17, plotPixel: { x: 400, y: 250 }, size })).toEqual({
+      keepView: false,
+      zoom: 17,
+    })
+  })
+
+  test('keeps the view at the max zoom of a base layer stopping below the minimum', () => {
+    expect(getPlotCaptureView({ currentZoom: 13, fitZoom: 13, plotPixel: { x: 400, y: 250 }, size })).toEqual({
+      keepView: true,
+      zoom: 13,
+    })
   })
 })
