@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -14,7 +15,7 @@ const startExportJob = ({
   emails = null,
   serverUrl,
 }: {
-  user: any
+  user: ArenaUser
   includePasswords?: boolean
   // when null, all the users are exported
   emails?: string[] | null
@@ -59,7 +60,7 @@ const startImportJob = ({
   actionsByEmail = {},
   restorePasswordEmails = null,
 }: {
-  user: any
+  user: ArenaUser
   tempFileName: string
   actionsByEmail?: Record<string, UsersBackupUserAction>
   // when null, all the passwords in the backup are restored

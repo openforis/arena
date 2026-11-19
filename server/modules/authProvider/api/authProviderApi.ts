@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import type { Router } from 'express'
 
 import * as User from '@core/user/user'
@@ -24,7 +25,7 @@ const handleError = (error: any, res, next) => {
 }
 
 // only the user themself or a system admin can see and change their sign-in methods
-const checkCanManageSignInMethods = (req): { user: any; userUuid: string } => {
+const checkCanManageSignInMethods = (req): { user: ArenaUser; userUuid: string } => {
   const user = Request.getUser(req)
   const { userUuid } = Request.getParams(req)
   if (User.getUuid(user) !== userUuid && !User.isSystemAdmin(user)) {

@@ -101,7 +101,7 @@ export default class NodeDefsImportJob extends Job {
   static readonly type = 'NodeDefsImportJob'
   importIssues: any
   nodeDefUniqueNameGenerator: any
-  nodeDefs: any
+  nodeDefs: { [nodeDefUuid: string]: ArenaNodeDef<NodeDefType> }
   nodeDefsInfoByCollectPath: Record<string, any>
 
   constructor(params?: any) {

@@ -79,7 +79,13 @@ const deleteFileIfExists = async (filePath: string) => {
 }
 
 // files are independent from each other: delete them in parallel
-export const deleteFiles = ({ surveyId, files }: { surveyId: number; files: any }) =>
+export const deleteFiles = ({
+  surveyId,
+  files,
+}: {
+  surveyId: number
+  files: { fileUuid: string; recordUuid?: string | null }[]
+}) =>
   Promise.all(
     files.map(({ fileUuid, recordUuid }) => deleteFileIfExists(getFilePath({ surveyId, fileUuid, recordUuid })))
   )

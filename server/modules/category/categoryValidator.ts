@@ -1,7 +1,13 @@
-import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
-import { Points } from '@openforis/arena-core'
+import {
+  Points,
+  type CategoryItem as ArenaCategoryItem,
+  type CategoryLevel as ArenaCategoryLevel,
+  type Validation as ArenaValidation,
+  type Category as ArenaCategory,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -29,7 +35,15 @@ const validateNotEmptyFirstLevelItems =
       ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
       : null
 
-const levelValidators = ({ levels, itemsCache, bigCategory }: { levels: any; itemsCache: any; bigCategory: any }) => ({
+const levelValidators = ({
+  levels,
+  itemsCache,
+  bigCategory,
+}: {
+  levels: ArenaCategoryLevel[]
+  itemsCache: any
+  bigCategory: any
+}) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateName(Validation.messageKeys.nameInvalid),
@@ -72,10 +86,10 @@ const validateLevels = async ({
 
 const codeToKey = (code: string) => (code ?? '').toLocaleLowerCase()
 
-const groupItemsByParentAndCode = (items: any[]) =>
+const groupItemsByParentAndCode = (items: ArenaCategoryItem[]) =>
   ObjectUtils.groupByProps(CategoryItem.getParentUuid, (item) => codeToKey(CategoryItem.getCode(item)))(items)
 
-const getSiblingItems = ({ itemsByParentAndCode, item }: { itemsByParentAndCode: any; item: any }) =>
+const getSiblingItems = ({ itemsByParentAndCode, item }: { itemsByParentAndCode: any; item: ArenaCategoryItem }) =>
   A.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
 
 const validateItemCodeUniqueness = (itemsByParentAndCode: any) => (_propName, item) => {
@@ -175,7 +189,7 @@ const _addChildrenValidation = ({
 }: {
   itemsValidationsByUuid: Record<string, any>
   itemChildren: any
-  validation: any
+  validation: ArenaValidation
 }) => {
   const childrenValid = A.all((itemChild) =>
     Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)])
@@ -335,7 +349,7 @@ export const validateCategory = async ({
   survey: ArenaSurvey
   categories: ArenaCategory[]
   category: ArenaCategory
-  items: any[]
+  items: ArenaCategoryItem[]
   bigCategory?: any
   validateLevels?: any
   validateItems?: any
@@ -401,7 +415,7 @@ export const validateItems = async ({
 }
 
 class ItemsCache {
-  items: any[]
+  items: ArenaCategoryItem[]
   itemsByParentUuid: Record<string, any>
   itemsByUuid: Record<string, any>
 

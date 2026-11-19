@@ -1,4 +1,9 @@
-import { SystemError } from '@openforis/arena-core'
+import {
+  SystemError,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -9,7 +14,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
@@ -17,7 +22,13 @@ import * as RecordRepository from '../../repository/recordRepository'
 import * as NodeCreationManager from './nodeCreationManager'
 import { NodeRdbManager } from './nodeRDBManager'
 
-export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
+export const insertRecord = (
+  user: ArenaUser,
+  surveyId: number,
+  record: ArenaRecord,
+  system = false,
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     let recordSummaryToStore = Record.dissocNodes(record)
     delete recordSummaryToStore['_nodesIndex']
@@ -31,7 +42,15 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
     return recordDb
   })
 
-const _createRecordAndNodes = async ({ user, survey, cycle }) => {
+const _createRecordAndNodes = async ({
+  user,
+  survey,
+  cycle,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  cycle: string
+}) => {
   const record = Record.newRecord(user, cycle)
   const { record: recordWithNodes } = await Record.createRootEntity({
     ...createRecordEvaluationContext({ user, survey }),
@@ -40,7 +59,10 @@ const _createRecordAndNodes = async ({ user, survey, cycle }) => {
   return recordWithNodes
 }
 
-const _fetchCategoryItemAndAncestors = async ({ surveyId, itemUuid }, tx) => {
+const _fetchCategoryItemAndAncestors = async (
+  { surveyId, itemUuid }: { surveyId: number; itemUuid: string },
+  tx: DbClient
+) => {
   const items = []
   let currentItemUuid = itemUuid
   while (currentItemUuid) {
@@ -51,7 +73,10 @@ const _fetchCategoryItemAndAncestors = async ({ surveyId, itemUuid }, tx) => {
   return items
 }
 
-const _fetchKeyValuesBySamplingPointDataItem = async ({ survey, itemUuid }, tx) => {
+const _fetchKeyValuesBySamplingPointDataItem = async (
+  { survey, itemUuid }: { survey: ArenaSurvey; itemUuid: string },
+  tx: DbClient
+) => {
   const valuesByDefUuid = {}
 
   const surveyId = Survey.getId(survey)
@@ -75,7 +100,10 @@ const _fetchKeyValuesBySamplingPointDataItem = async ({ survey, itemUuid }, tx) 
   return valuesByDefUuid
 }
 
-export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycle, itemUuid }, client = db) =>
+export const createRecordFromSamplingPointDataItem = (
+  { user, survey, cycle, itemUuid }: { user: ArenaUser; survey: ArenaSurvey; cycle: string; itemUuid: string },
+  client: DbClient = db
+) =>
   client.tx(async (tx) => {
     if (!Survey.canRecordBeIdentifiedBySamplingPointDataItem(survey))
       throw new SystemError('record.fromSamplingPointData.cannotCreateRecords')

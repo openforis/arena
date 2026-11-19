@@ -2,7 +2,7 @@ import * as A from '@core/arena'
 
 import { Schemata } from '@common/model/db'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import { transformCallback } from '@server/db'
 
@@ -39,7 +39,7 @@ export const fetchItems = (
     offset?: number
     limit?: number | null
   },
-  client: any = db
+  client: DbClient = db
 ) =>
   client.map(
     `
@@ -51,12 +51,12 @@ export const fetchItems = (
       OFFSET $/offset/
     `,
     { source, limit, offset },
-    transformCallback
+    (row) => transformCallback(row)
   )
 
 export const countItems = (
   { surveyId, source, excludeResolved }: { surveyId: number; source: ImportReportSource; excludeResolved: boolean },
-  client: any = db
+  client: DbClient = db
 ) =>
   client.one(
     `
@@ -72,7 +72,7 @@ export const insertItem = (
   surveyId: number,
   source: ImportReportSource,
   item: { nodeDefUuid: string; props: any; resolved: boolean },
-  client: any = db
+  client: DbClient = db
 ) =>
   client.one(
     `
@@ -90,7 +90,7 @@ export const insertItems = (
     source,
     items = [],
   }: { surveyId: number; source: ImportReportSource; items?: { nodeDefUuid: string; props: any; resolved: boolean }[] },
-  client: any = db
+  client: DbClient = db
 ): Promise<unknown> =>
   items.length === 0
     ? Promise.resolve()
@@ -114,7 +114,7 @@ export const updateItem = (
   itemId: number,
   props: any,
   resolved: boolean,
-  client: any = db
+  client: DbClient = db
 ) =>
   client.one(
     `

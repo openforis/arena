@@ -1,4 +1,4 @@
-import type { NodeDefEntity } from '@openforis/arena-core'
+import type { NodeDef as ArenaNodeDef, NodeDefType, NodeDefEntity } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -370,7 +370,7 @@ export default class NodeDefsImportJob extends Job {
     bodyControl,
     categoryMissing,
   }: {
-    nodeDef: any
+    nodeDef: ArenaNodeDef<NodeDefType>
     type: string
     path: string
     bodyControl: XFormBodyControl | null
@@ -402,7 +402,7 @@ export default class NodeDefsImportJob extends Job {
     path,
     bind,
   }: {
-    nodeDef: any
+    nodeDef: ArenaNodeDef<NodeDefType>
     path: string
     bind: XFormBind | null
   }): Promise<any> {
@@ -502,7 +502,7 @@ export default class NodeDefsImportJob extends Job {
     validations,
     convertAndReport,
   }: {
-    nodeDef: any
+    nodeDef: ArenaNodeDef<NodeDefType>
     requiredRaw: string | null | undefined
     validations: Record<string, any>
     convertAndReport: (params: { itemType: string; expression: string }) => Promise<string | null>

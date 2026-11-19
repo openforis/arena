@@ -1,7 +1,6 @@
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
-import { Objects, PointFactory, Points, SystemError } from '@openforis/arena-core'
+import { Objects, PointFactory, Points, SystemError, type Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -20,7 +19,15 @@ const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: any;
   }
 }
 
-const _getItemValue = ({ survey, item, row }: { survey: ArenaSurvey; item: any; row: any }) => {
+const _getItemValue = ({
+  survey,
+  item,
+  row,
+}: {
+  survey: ArenaSurvey
+  item: CategoryImportSummary.CategoryImportSummaryItem
+  row: Record<string, any>
+}) => {
   // single column
   const itemColumns = CategoryImportSummary.getItemColumns(item)
   if (itemColumns.length === 1) {

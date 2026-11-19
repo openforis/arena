@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import BatchPersister from '@server/db/batchPersister'
 import { RdbUpdates } from '@server/modules/surveyRdb/repository/RdbUpdates'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
@@ -5,6 +6,10 @@ import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 const BATCH_SIZE = 10000
 
 export class RdbUpdatesBatchPersister extends BatchPersister {
+  rdbUpdates: RdbUpdates
+  surveyId: number
+  user: ArenaUser
+
   constructor({ user, surveyId, tx }) {
     super(null, BATCH_SIZE, tx)
     this.user = user

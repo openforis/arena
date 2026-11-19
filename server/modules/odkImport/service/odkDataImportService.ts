@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 import OdkDataImportJob from './odkImport/odkDataImportJob'
 
@@ -23,7 +24,7 @@ export const startOdkDataImportJob = ({
   totalFileSize,
   cycle,
 }: {
-  user: any
+  user: ArenaUser
   surveyId: number
   filePath?: string
   fileId?: string

@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import { Versions } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -9,7 +10,7 @@ import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/tax
 
 export type SurveyDataMigrationStep = {
   version: string
-  migrate: (params: { surveyId: number; client: any }) => Promise<void>
+  migrate: (params: { surveyId: number; client: DbClient }) => Promise<void>
   // run outside of any transaction, after the survey data migration has been committed (e.g. VACUUM); best effort
   migrateAfterCommit?: (params: { surveyId: number }) => Promise<void>
 }

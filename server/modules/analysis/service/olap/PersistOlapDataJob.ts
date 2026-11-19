@@ -1,4 +1,9 @@
-import { FileNames, type NodeDefEntity, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import {
+  FileNames,
+  type NodeDefEntity,
+  type Survey as ArenaSurvey,
+  type Chain as ArenaChain,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
@@ -19,7 +24,7 @@ const zipEntryNamePrefix = 'OLAP_'
 
 export default class PersistOlapDataJob extends Job {
   static readonly type = 'PersistOlapDataJob'
-  chain: any
+  chain: ArenaChain
   cycle: string
   fileZip: any
   reader: any

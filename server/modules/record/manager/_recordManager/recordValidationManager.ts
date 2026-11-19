@@ -1,6 +1,15 @@
+import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
-import { RecordValidator } from '@openforis/arena-core'
+import {
+  RecordValidator,
+  type ArenaRecordNode,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -16,10 +25,20 @@ import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
-export const persistValidation = async ({ survey, record }, tx) =>
+type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
+
+export const persistValidation = ({ survey, record }: { survey: ArenaSurvey; record: ArenaRecord }, tx: DbClient) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
-const _processAndPersistValidation = async ({ survey, record, nodesValidation, startValidation }, tx) => {
+const _processAndPersistValidation = async (
+  {
+    survey,
+    record,
+    nodesValidation,
+    startValidation,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: any; startValidation: any },
+  tx: DbClient
+) => {
   const validationUpdated = A.pipe(
     Validation.mergeValidation(nodesValidation, true),
     Validation.updateCounts
@@ -29,17 +48,23 @@ const _processAndPersistValidation = async ({ survey, record, nodesValidation, s
   return recordUpdated
 }
 
-export const replaceAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
+export const replaceAndPersistValidation = (
+  { survey, record, nodesValidation }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: any },
+  tx: DbClient
+) => {
   const startValidation = Validation.newInstance()
   return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
-export const mergeAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
+export const mergeAndPersistValidation = (
+  { survey, record, nodesValidation }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: any },
+  tx: DbClient
+) => {
   const startValidation = Record.getValidation(record)
   return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
-const isRootUniqueNodesUpdated = ({ survey, nodesArray }) =>
+const isRootUniqueNodesUpdated = ({ survey, nodesArray }: { survey: ArenaSurvey; nodesArray: ArenaRecordNode[] }) =>
   nodesArray.some((node) => {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
@@ -50,8 +75,22 @@ const isRootUniqueNodesUpdated = ({ survey, nodesArray }) =>
   })
 
 export const validateSortedNodesAndPersistValidation = async (
-  { user, survey, record, nodesArray, validateRecordUniqueness = false, mergeValidation = true },
-  tx
+  {
+    user,
+    survey,
+    record,
+    nodesArray,
+    validateRecordUniqueness = false,
+    mergeValidation = true,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodesArray: ArenaRecordNode[]
+    validateRecordUniqueness?: boolean
+    mergeValidation?: any
+  },
+  tx: DbClient
 ) => {
   // 1. validate node values
   const nodesValueValidation = await RecordValidator.validateSortedNodes({
@@ -107,9 +146,21 @@ export const validateSortedNodesAndPersistValidation = async (
   return { record: recordUpdated, nodesValidation }
 }
 
-export const validateNodesAndPersistValidation = async (
-  { user, survey, record, nodes, validateRecordUniqueness = false },
-  tx
+export const validateNodesAndPersistValidation = (
+  {
+    user,
+    survey,
+    record,
+    nodes,
+    validateRecordUniqueness = false,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodes: NodesByUuid
+    validateRecordUniqueness?: boolean
+  },
+  tx: DbClient
 ) =>
   validateSortedNodesAndPersistValidation(
     { user, survey, record, nodesArray: Object.values(nodes), validateRecordUniqueness },
@@ -117,8 +168,22 @@ export const validateNodesAndPersistValidation = async (
   )
 
 export const validateRecordsUniquenessAndPersistValidation = async (
-  { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, errorKey },
-  t
+  {
+    survey,
+    cycle,
+    nodeDefsUnique,
+    nodesUnique,
+    recordUuidsExcluded,
+    errorKey,
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    nodeDefsUnique: ArenaNodeDef<NodeDefType>[]
+    nodesUnique: ArenaRecordNode[]
+    recordUuidsExcluded: any
+    errorKey: any
+  },
+  t: DbClient
 ) => {
   const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(
     { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, errorKey },
@@ -131,13 +196,17 @@ export const validateRecordsUniquenessAndPersistValidation = async (
   return validationByRecord
 }
 
-export const validateRecordKeysUniquenessAndPersistValidation = async (
-  { survey, record, excludeRecordFromCount = false },
-  t
+export const validateRecordKeysUniquenessAndPersistValidation = (
+  {
+    survey,
+    record,
+    excludeRecordFromCount = false,
+  }: { survey: ArenaSurvey; record: ArenaRecord; excludeRecordFromCount?: boolean },
+  t: DbClient
 ) => {
   const nodesUnique = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
   if (nodesUnique.length === 0) {
-    return {} // empty record, consider its uniqueness as valid
+    return Promise.resolve({}) // empty record, consider its uniqueness as valid
   }
   const nodeDefsUnique = Survey.getNodeDefRootKeys(survey)
 
@@ -154,14 +223,19 @@ export const validateRecordKeysUniquenessAndPersistValidation = async (
   )
 }
 
-export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
-  { survey, record, nodeDefUniqueUuid, excludeRecordFromCount = false },
-  t
+export const validateRecordUniqueNodesUniquenessAndPersistValidation = (
+  {
+    survey,
+    record,
+    nodeDefUniqueUuid,
+    excludeRecordFromCount = false,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefUniqueUuid: string; excludeRecordFromCount?: boolean },
+  t: DbClient
 ) => {
   const rootNode = Record.getRootNode(record)
   const nodesUnique = Record.getNodeChildrenByDefUuid(rootNode, nodeDefUniqueUuid)(record)
   if (nodesUnique.length === 0) {
-    return {} // empty record, consider its uniqueness as valid
+    return Promise.resolve({}) // empty record, consider its uniqueness as valid
   }
   const nodeDefUnique = Survey.getNodeDefByUuid(nodeDefUniqueUuid)(survey)
 

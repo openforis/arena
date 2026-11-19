@@ -30,7 +30,7 @@ const formatKeyValue = async ({
   value,
 }: {
   survey: ArenaSurvey
-  cycle: any
+  cycle: string
   keyDef: any
   value: any
 }): Promise<any> => {
@@ -97,7 +97,7 @@ const findExistingRecordSummaryWithSameKeys = async ({
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const recordSummaryKeyProps = keyDefs.map((keyDef: any) => A.camelize(NodeDef.getName(keyDef)))
   const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
-  return existingRecordsSummary.find((recordSummary: any) => {
+  return existingRecordsSummary.find((recordSummary: ArenaRecord) => {
     const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])
     return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
   })
@@ -120,7 +120,7 @@ export const findExistingRecordSummary = async ({
 }): Promise<any> => {
   const recordUuid = Record.getUuid(record)
   const existingRecordWithSameUuid = existingRecordsSummary.find(
-    (recordSummary: any) => Record.getUuid(recordSummary) === recordUuid
+    (recordSummary: ArenaRecord) => Record.getUuid(recordSummary) === recordUuid
   )
   if (existingRecordWithSameUuid) {
     return existingRecordWithSameUuid
