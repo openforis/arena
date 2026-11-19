@@ -383,7 +383,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     changelog: 'Registro de cambios',
     whatsNew: 'Novedades',
     termsOfService: 'Términos de servicio',
-    privacyNotice: 'Aviso de privacidad',
+    privacyPolicy: 'Política de privacidad',
     userManual: 'Manual de usuario',
   },
   surveyDefsLoader: {

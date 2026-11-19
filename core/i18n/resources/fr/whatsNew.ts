@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    googleSignIn: {
+      title: 'Connexion avec votre compte Google',
+      description: `Sur la page de connexion, cliquez sur **Se connecter avec Google** pour vous connecter avec votre compte Google (Gmail ou Google Workspace) au lieu de saisir votre mot de passe.
+
+La première fois, le compte Google est associé à votre compte Arena par son adresse e-mail : utilisez la même adresse e-mail que celle de votre compte Arena. Les utilisateurs invités peuvent aussi accepter l'invitation avec Google. Associez ou dissociez votre compte Google dans **Mon profil > Méthodes de connexion** ; la connexion par e-mail et mot de passe reste disponible.`,
+    },
     loginProviders: {
       title: 'Connexion avec Google, Microsoft ou le compte de votre organisation',
       description: `Dans **Administration du système > Fournisseurs de connexion**, permettez aux utilisateurs de se connecter avec **Google**, **Microsoft** ou tout fournisseur **OpenID Connect** (par ex. Keycloak, Okta ou l'authentification unique de votre organisation) : chaque fournisseur a un bouton sur la page de connexion. Le formulaire du fournisseur indique l'URI de redirection à enregistrer chez le fournisseur, les étapes de configuration et un lien vers un guide détaillé ; **Tester la connexion** et **Tester la connexion utilisateur** vérifient la configuration sans connecter personne.

@@ -408,7 +408,7 @@ Réessayer ?`,
     changelog: 'Journal des modifications',
     whatsNew: 'Nouveautés',
     termsOfService: "Conditions d'utilisation",
-    privacyNotice: 'Avis de confidentialité',
+    privacyPolicy: 'Politique de confidentialité',
     userManual: 'Manuel utilisateur',
   },
   surveyDefsLoader: {

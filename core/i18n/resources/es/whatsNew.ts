@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    googleSignIn: {
+      title: 'Inicio de sesión con su cuenta de Google',
+      description: `En la página de inicio de sesión, haga clic en **Iniciar sesión con Google** para iniciar sesión con su cuenta de Google (Gmail o Google Workspace) en lugar de escribir su contraseña.
+
+La primera vez, la cuenta de Google se vincula a su cuenta de Arena por su dirección de correo electrónico: utilice la misma dirección de correo electrónico de su cuenta de Arena. Los usuarios invitados también pueden aceptar la invitación con Google. Vincule o desvincule su cuenta de Google en **Mi perfil > Métodos de inicio de sesión**; el inicio de sesión con correo electrónico y contraseña sigue disponible.`,
+    },
     loginProviders: {
       title: 'Inicio de sesión con Google, Microsoft o la cuenta de su organización',
       description: `En **Administración del sistema > Proveedores de inicio de sesión**, permita a los usuarios iniciar sesión con **Google**, **Microsoft** o cualquier proveedor **OpenID Connect** (p. ej., Keycloak, Okta o el inicio de sesión único de su organización): cada proveedor tiene un botón en la página de inicio de sesión. El formulario del proveedor muestra el URI de redirección que hay que registrar en el proveedor, los pasos de configuración y un enlace a una guía detallada; **Probar la conexión** y **Probar el inicio de sesión** comprueban la configuración sin iniciar la sesión de nadie.

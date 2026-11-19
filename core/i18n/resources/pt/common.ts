@@ -407,7 +407,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     changelog: 'Registo de alterações',
     whatsNew: 'Novidades',
     termsOfService: 'Termos de serviço',
-    privacyNotice: 'Aviso de privacidade',
+    privacyPolicy: 'Política de privacidade',
     userManual: 'Manual do usuário',
   },
   surveyDefsLoader: {

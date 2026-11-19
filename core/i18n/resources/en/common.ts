@@ -404,7 +404,7 @@ Try again?`,
     changelog: 'Changelog',
     whatsNew: "What's new",
     termsOfService: 'Terms of Service',
-    privacyNotice: 'Privacy Notice',
+    privacyPolicy: 'Privacy Policy',
     userManual: 'User Manual',
   },
   surveyDefsLoader: {

@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} von {{total}}',
   noItems: 'Keine neuen Funktionen vorhanden.',
   items: {
+    googleSignIn: {
+      title: 'Mit Ihrem Google-Konto anmelden',
+      description: `Klicken Sie auf der Anmeldeseite auf **Mit Google anmelden**, um sich mit Ihrem Google-Konto (Gmail oder Google Workspace) anzumelden, ohne Ihr Passwort einzugeben.
+
+Beim ersten Mal wird das Google-Konto über seine E-Mail-Adresse mit Ihrem Arena-Konto verknüpft: Verwenden Sie dieselbe E-Mail-Adresse wie für Ihr Arena-Konto. Eingeladene Benutzer können die Einladung auch mit Google annehmen. Verknüpfen oder trennen Sie Ihr Google-Konto unter **Mein Profil > Anmeldemethoden**; die Anmeldung mit E-Mail und Passwort bleibt verfügbar.`,
+    },
     loginProviders: {
       title: 'Mit Google, Microsoft oder dem Konto Ihrer Organisation anmelden',
       description: `Unter **Systemverwaltung > Anmeldeanbieter** können Sie Benutzern die Anmeldung mit **Google**, **Microsoft** oder einem beliebigen **OpenID-Connect-Anbieter** (z. B. Keycloak, Okta oder dem Single Sign-on Ihrer Organisation) ermöglichen. Jeder Anbieter erhält eine Schaltfläche auf der Anmeldeseite. Das Anbieterformular zeigt die beim Anbieter zu registrierende Weiterleitungs-URI, die Einrichtungsschritte und einen Link zu einer ausführlichen Anleitung. Mit **Verbindung testen** und **Anmeldung testen** lässt sich die Konfiguration prüfen, ohne jemanden anzumelden.

@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    googleSignIn: {
+      title: 'Sign in with your Google account',
+      description: `On the login page, click **Sign in with Google** to sign in with your Google account (Gmail or Google Workspace) instead of typing your password.
+
+The first time, the Google account is linked to your Arena account by its email address: use the same email address as your Arena account. Invited users can accept the invitation with Google too. Link or unlink your Google account in **My profile > Sign-in methods**; email and password login is still available.`,
+    },
     loginProviders: {
       title: "Sign in with Google, Microsoft or your organization's account",
       description: `In **System Administration > Login providers**, let the users sign in with **Google**, **Microsoft** or any **OpenID Connect** provider (e.g. Keycloak, Okta or the single sign-on of your organization): each provider gets a button on the login page. The provider form shows the redirect URI to register at the provider, the setup steps and a link to a detailed guide; **Test connection** and **Test sign-in** check the configuration without logging anybody in.

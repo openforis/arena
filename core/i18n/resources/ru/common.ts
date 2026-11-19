@@ -464,7 +464,7 @@ export default {
     changelog: 'Журнал изменений',
     whatsNew: 'Что нового',
     termsOfService: 'Условия использования',
-    privacyNotice: 'Уведомление о конфиденциальности',
+    privacyPolicy: 'Политика конфиденциальности',
     userManual: 'Руководство пользователя',
   },
   surveyDefsLoader: {

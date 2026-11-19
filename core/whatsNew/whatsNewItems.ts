@@ -27,8 +27,14 @@ export type WhatsNewItem = {
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
   {
+    id: 'googleSignIn',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    images: ['/img/whats-new/googleSignIn.png'],
+  },
+  {
     id: 'loginProviders',
-    version: '2.14.0',
+    version: '3.0.0',
     audience: whatsNewAudiences.systemAdmin,
     images: ['/img/whats-new/loginProviders.png', '/img/whats-new/loginProvidersAdmin.png'],
   },
