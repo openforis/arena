@@ -133,7 +133,7 @@ export const formatTime = (hour: unknown, minute: unknown, seconds?: unknown): s
   return seconds === undefined ? base : `${base}:${normalizeDateTimeValue(2)(seconds)}`
 }
 
-export const getTimeFormat = (includeSeconds: boolean): string =>
+export const getTimeFormat = (includeSeconds: boolean): DateFormats =>
   includeSeconds ? formats.timeWithSeconds : formats.timeStorage
 
 export const parseDateISO = (dateStr: string): unknown => parse(dateStr, formats.dateISO)
