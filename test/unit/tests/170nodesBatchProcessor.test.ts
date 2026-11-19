@@ -213,7 +213,7 @@ describe('processNodesBatch', () => {
     expect(calls.persistNode).toBe(0)
   })
 
-  test('a persist error rolls back the record: applied and pending edits fail, conflicts stay, no events', async () => {
+  test('a persist error rolls back the record: the failing edit gets the error, the others are rolled back', async () => {
     const { deps, posted, calls, errors } = createDeps({ failOnNodeUuid: bUuid })
     const results = await processNodesBatch({
       msg: msgOf([
@@ -225,10 +225,10 @@ describe('processNodesBatch', () => {
       deps,
     })
     expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
+      { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchRolledBack' },
       { index: 1, status: 'conflict' },
       { index: 2, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
-      { index: 3, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
+      { index: 3, status: 'failed', messageKey: 'appErrors:record.nodesBatchRolledBack' },
     ])
     expect(posted).toEqual([])
     expect(calls.cacheRecord).toBe(0)
@@ -444,7 +444,7 @@ describe('processNodesBatch', () => {
     expect(results).toEqual([{ index: 0, status: 'conflict' }])
   })
 
-  test('a duplicate on the second edit rolls back the first one too: both fail, cache cleared, no events', async () => {
+  test('a duplicate on the second edit rolls back the first one too: only the second gets the duplicate error', async () => {
     const { deps, posted, calls } = createDeps({
       validationFor: (node) =>
         Node.getUuid(node) === bUuid
@@ -459,7 +459,7 @@ describe('processNodesBatch', () => {
       deps,
     })
     expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: 'validationErrors:record.keyDuplicate' },
+      { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchRolledBack' },
       { index: 1, status: 'failed', messageKey: 'validationErrors:record.keyDuplicate' },
     ])
     expect(calls.clearCachedRecord).toBe(1)

@@ -70,6 +70,8 @@ const transientFailureKeys = new Set([
   'appErrors:aiApplyTimeout',
   'appErrors:networkError',
   'appErrors:generic',
+  // valid edits undone because another edit of the same record failed
+  'appErrors:record.nodesBatchRolledBack',
 ])
 
 /**

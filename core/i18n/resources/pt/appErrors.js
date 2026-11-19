@@ -121,6 +121,7 @@ export default {
     nodesBatchWouldClearValues:
       'Esta edição apagaria outros valores que deixam de ser aplicáveis; edite este valor no formulário para confirmar.',
     nodesBatchUnexpected: 'Não foi possível aplicar a edição devido a um erro inesperado no servidor.',
+    nodesBatchRolledBack: 'A edição não foi aplicada porque outra edição do mesmo registro falhou.',
   },
   recordPrintableExport: {
     missingEntityParams: 'A exportação da página atual requer entityDefUuid e entityNodeUuid',

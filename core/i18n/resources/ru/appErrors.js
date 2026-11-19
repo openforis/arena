@@ -121,6 +121,7 @@ export default {
     nodesBatchWouldClearValues:
       'Эта правка очистит другие значения, которые станут неприменимыми; измените это значение в форме, чтобы подтвердить.',
     nodesBatchUnexpected: 'Не удалось применить правку из-за непредвиденной ошибки на сервере.',
+    nodesBatchRolledBack: 'Правка не применена, потому что не удалась другая правка той же записи.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',

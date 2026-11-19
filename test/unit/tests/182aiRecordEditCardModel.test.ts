@@ -62,8 +62,9 @@ describe('record edit card model', () => {
       { id: 'a/5', status: 'failed' as const, message: 'appErrors:record.nodeNotInRecord' },
       { id: 'a/6', status: 'failed' as const, message: 'validationErrors:nodeValueParser.attributeNotEditable' },
       { id: 'a/7', status: 'conflict' as const },
+      { id: 'a/8', status: 'failed' as const, message: 'appErrors:record.nodesBatchRolledBack' },
     ]
-    expect(getRetryOperationIds(results)).toEqual(['a/1', 'a/2', 'a/3'])
+    expect(getRetryOperationIds(results)).toEqual(['a/1', 'a/2', 'a/3', 'a/8'])
   })
 
   test('a retry replaces the results of the retried edits only', () => {

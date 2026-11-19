@@ -118,6 +118,7 @@ export default {
     nodesBatchWouldClearValues:
       'Энэ засвар нь хамааралгүй болох бусад утгыг арилгана; баталгаажуулахын тулд энэ утгыг маягт дээр засна уу.',
     nodesBatchUnexpected: 'Серверт гэнэтийн алдаа гарсны улмаас засварыг хэрэгжүүлж чадсангүй.',
+    nodesBatchRolledBack: 'Ижил бичлэгийн өөр засвар амжилтгүй болсон тул энэ засварыг хэрэгжүүлээгүй.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',

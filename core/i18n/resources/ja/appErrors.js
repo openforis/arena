@@ -90,6 +90,7 @@ export default {
     nodesBatchWouldClearValues:
       'この編集により、該当しなくなる他の値が消去されます。確認するにはフォームでこの値を編集してください。',
     nodesBatchUnexpected: 'サーバーで予期しないエラーが発生したため、編集を適用できませんでした。',
+    nodesBatchRolledBack: '同じレコードの別の編集が失敗したため、この編集は適用されませんでした。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',

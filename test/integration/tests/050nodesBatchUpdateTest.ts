@@ -227,7 +227,7 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
     ])
 
     expect(results).toEqual([
-      expect.objectContaining({ index: 0, status: 'failed' }),
+      { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchRolledBack' },
       { index: 1, status: 'failed', messageKey: 'validationErrors:record.keyDuplicate' },
     ])
     const recordDb = await fetchRecord(record)

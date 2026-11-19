@@ -126,6 +126,8 @@ export default {
     nodesBatchWouldClearValues:
       "Cette modification effacerait d'autres valeurs qui ne sont plus applicables ; modifiez cette valeur dans le formulaire pour confirmer.",
     nodesBatchUnexpected: "La modification n'a pas pu être appliquée à cause d'une erreur inattendue du serveur.",
+    nodesBatchRolledBack:
+      "La modification n'a pas été appliquée car une autre modification du même enregistrement a échoué.",
   },
   recordPrintableExport: {
     missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",

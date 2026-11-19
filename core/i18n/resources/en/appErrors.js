@@ -88,6 +88,7 @@ export default {
     nodesBatchWouldClearValues:
       'This edit would clear other values that become non-applicable; edit this value in the form to confirm.',
     nodesBatchUnexpected: 'The edit could not be applied because of an unexpected error on the server.',
+    nodesBatchRolledBack: 'The edit was not applied because another edit of the same record failed.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',

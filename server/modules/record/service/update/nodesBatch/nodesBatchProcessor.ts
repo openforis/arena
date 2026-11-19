@@ -80,6 +80,8 @@ type BatchState = {
   // results of the edits refused by the check (conflicts, not editable): kept when the record rolls back
   refusedResults: NodesBatchEditResult[]
   appliedEdits: NodesBatchRecordEdit[]
+  // index of the edit being persisted: when it throws, only that edit gets the error, the others are rolled back
+  persistingEditIndex: number | null
   // socket events, posted only after the transaction commits
   events: ThreadMessage[]
 }
@@ -301,7 +303,9 @@ const applyEdit = async ({
       return record
     }
   }
+  state.persistingEditIndex = edit.index
   const recordUpdated = await persistEdit({ state, record, node: check.node, edit, t })
+  state.persistingEditIndex = null
   appliedEdits.push(edit)
   return recordUpdated
 }
@@ -340,16 +344,23 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
 }
 
 /**
- * Builds the results of a record whose transaction rolled back: refused edits keep their result, the others fail.
+ * Builds the results of a record whose transaction rolled back: refused edits keep their result, the others fail
+ * (with the error when it hit them all, e.g. a timeout; as rolled back when another edit raised it).
  * @param {BatchState} state - The batch state.
  * @param {unknown} error - The error.
  * @returns {NodesBatchEditResult[]} The results.
  */
 const rolledBackResults = (state: BatchState, error: unknown): NodesBatchEditResult[] => {
   const { messageKey, params } = toFailureMessage(error)
+  const { persistingEditIndex } = state
   const refusedIndexes = new Set(state.refusedResults.map(({ index }) => index))
   const failedEdits = state.msg.edits.filter(({ index }) => !refusedIndexes.has(index))
-  return [...state.refusedResults, ...failedResults(failedEdits, messageKey, params)]
+  const failed = failedEdits.map(({ index }) =>
+    persistingEditIndex === null || index === persistingEditIndex
+      ? failedResult(index, messageKey, params)
+      : failedResult(index, NodesBatchMessageKeys.rolledBack)
+  )
+  return [...state.refusedResults, ...failed]
 }
 
 /**
@@ -394,6 +405,7 @@ export const processNodesBatch = async ({
     qualifierFilters: [],
     refusedResults: [],
     appliedEdits: [],
+    persistingEditIndex: null,
     events: [],
   }
   try {

@@ -91,6 +91,7 @@ export default {
     nodesBatchWouldClearValues:
       'Ova izmjena bi obrisala druge vrijednosti koje više nisu primjenjive; izmijenite ovu vrijednost u obrascu da potvrdite.',
     nodesBatchUnexpected: 'Izmjena nije mogla biti primijenjena zbog neočekivane greške na serveru.',
+    nodesBatchRolledBack: 'Izmjena nije primijenjena jer druga izmjena istog zapisa nije uspjela.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Izvoz trenutne stranice zahtijeva entityDefUuid i entityNodeUuid',

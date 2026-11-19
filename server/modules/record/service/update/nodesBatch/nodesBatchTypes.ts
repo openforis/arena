@@ -21,6 +21,8 @@ export const NodesBatchMessageKeys = {
   wouldClearValues: 'appErrors:record.nodesBatchWouldClearValues',
   applyTimeout: 'appErrors:aiApplyTimeout',
   busy: 'appErrors:record.nodesBatchBusy',
+  // not applied because another edit of the same record failed and its transaction rolled back
+  rolledBack: 'appErrors:record.nodesBatchRolledBack',
   // the text of an unexpected error is logged on the server, never sent to the client
   unexpected: 'appErrors:record.nodesBatchUnexpected',
 } as const
