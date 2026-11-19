@@ -1,4 +1,9 @@
-import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type {
+  User as ArenaUser,
+  ArenaRecordNode,
+  Record as ArenaRecord,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
@@ -8,7 +13,7 @@ import * as Survey from '@core/survey/survey'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 type PreviewParams = {
-  user: any
+  user: ArenaUser
   survey: ArenaSurvey
   record: ArenaRecord
   timezoneOffset?: number | null

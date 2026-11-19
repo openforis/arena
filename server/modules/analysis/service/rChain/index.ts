@@ -1,4 +1,4 @@
-import type { User as ArenaUser, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { NodeDefEntity, User as ArenaUser, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
@@ -124,7 +124,13 @@ export const startPersistOlapDataJob = ({
   return JobManager.enqueueJob(job)
 }
 
-const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }: { entity: any; nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getAnalysisNodeDefZipEntryName = ({
+  entity,
+  nodeDef,
+}: {
+  entity: NodeDefEntity
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   const nodeDefName = NodeDef.getName(nodeDef)
 
   if (NodeDef.isBaseUnit(nodeDef)) {

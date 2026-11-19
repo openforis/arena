@@ -528,7 +528,7 @@ const _onNodesUpdate = async (
     user: ArenaUser
     survey: ArenaSurvey
     record: ArenaRecord
-    nodesUpdated: any
+    nodesUpdated: NodesByUuid
     timezoneOffset?: number
     lang: string
     clearNonApplicableValues: boolean

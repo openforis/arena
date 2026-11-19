@@ -1,7 +1,7 @@
 import * as readline from 'node:readline'
 import { Readable } from 'node:stream'
 
-import { Points } from '@openforis/arena-core'
+import { Points, type Survey as ArenaSurvey, type Category as ArenaCategory } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import SystemError from '@core/systemError'
@@ -109,7 +109,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     columnsCollector,
     whispValuesFilePath,
   }: {
-    category: any
+    category: ArenaCategory
     headers: string[]
     samplingPointDataFilePath: string
     columnsCollector: WhispColumnsCollector
@@ -151,7 +151,15 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     return category
   }
 
-  async exportSamplingPointData({ survey, category, filePath }: { survey: any; category: any; filePath: string }) {
+  async exportSamplingPointData({
+    survey,
+    category,
+    filePath,
+  }: {
+    survey: ArenaSurvey
+    category: ArenaCategory
+    filePath: string
+  }) {
     await CategoryManager.exportCategoryToStream(
       {
         survey,

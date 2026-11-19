@@ -1,5 +1,5 @@
+import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
-import type { Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Record from '@core/record/record'
 
@@ -14,7 +14,7 @@ const generateRdbUpates = ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  nodesArray: any
+  nodesArray: ArenaRecordNode[]
 }) => {
   // include ancestor nodes (used to find the correct rdb table to update)
   const nodesAndDependentsAndAncestors = nodesArray.reduce((nodesAcc, node) => {
@@ -36,7 +36,7 @@ const generateRdbUpates = ({
 }
 
 const persistNodesToRDB = async (
-  { survey, record, nodesArray }: { survey: ArenaSurvey; record: ArenaRecord; nodesArray: any },
+  { survey, record, nodesArray }: { survey: ArenaSurvey; record: ArenaRecord; nodesArray: ArenaRecordNode[] },
   t: DbClient
 ) => {
   const { rdbUpdates, record: recordUpdated } = generateRdbUpates({ survey, record, nodesArray })

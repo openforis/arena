@@ -75,7 +75,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     sortOrder?: string | null
     cycle?: string
     search?: string | null
-    step?: any
+    step?: string
     recordUuid?: string
     ownerUuid?: string
     includeRootKeyValues?: boolean

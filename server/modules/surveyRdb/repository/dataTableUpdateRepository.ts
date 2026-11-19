@@ -103,7 +103,7 @@ const _findAncestor = ({
 }: {
   ancestorDefUuid: string
   node: ArenaRecordNode
-  nodes: any
+  nodes: { [nodeUuid: string]: ArenaRecordNode }
 }) => {
   let currentParent = nodes[Node.getParentUuid(node)]
   while (currentParent && !Node.isRoot(currentParent) && Node.getNodeDefUuid(currentParent) !== ancestorDefUuid) {
@@ -215,7 +215,11 @@ export const updateTablesFromUpdates = async ({ rdbUpdates }: { rdbUpdates: any 
 }
 
 export const updateTables = async (
-  { survey, record, nodes }: { survey: ArenaSurvey; record: ArenaRecord; nodes: any },
+  {
+    survey,
+    record,
+    nodes,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodes: { [nodeUuid: string]: ArenaRecordNode } },
   client: DbClient
 ) => {
   const rdbUpdates = generateRdbUpdates({ survey, record, nodes })

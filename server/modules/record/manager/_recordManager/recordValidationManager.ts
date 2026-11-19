@@ -7,6 +7,8 @@ import {
   type User as ArenaUser,
   type Record as ArenaRecord,
   type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -62,7 +64,7 @@ export const mergeAndPersistValidation = (
   return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
-const isRootUniqueNodesUpdated = ({ survey, nodesArray }: { survey: ArenaSurvey; nodesArray: any }) =>
+const isRootUniqueNodesUpdated = ({ survey, nodesArray }: { survey: ArenaSurvey; nodesArray: ArenaRecordNode[] }) =>
   nodesArray.some((node) => {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
@@ -84,7 +86,7 @@ export const validateSortedNodesAndPersistValidation = async (
     user: ArenaUser
     survey: ArenaSurvey
     record: ArenaRecord
-    nodesArray: any
+    nodesArray: ArenaRecordNode[]
     validateRecordUniqueness?: boolean
     mergeValidation?: any
   },
@@ -176,8 +178,8 @@ export const validateRecordsUniquenessAndPersistValidation = async (
   }: {
     survey: ArenaSurvey
     cycle: string
-    nodeDefsUnique: any
-    nodesUnique: any
+    nodeDefsUnique: ArenaNodeDef<NodeDefType>[]
+    nodesUnique: ArenaRecordNode[]
     recordUuidsExcluded: any
     errorKey: any
   },

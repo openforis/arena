@@ -39,7 +39,10 @@ export const deleteFilesByRecordUuids = async (surveyId: number, recordUuids: st
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<void>} - The result promise.
  */
-export const deleteFiles = async ({ surveyId, files }: { surveyId: number; files: any }, client: DbClient = db) => {
+export const deleteFiles = async (
+  { surveyId, files }: { surveyId: number; files: { fileUuid: string; recordUuid?: string | null }[] },
+  client: DbClient = db
+) => {
   if (files.length === 0) return
   const fileSummaries = files.map(({ fileUuid, recordUuid }) => ({ uuid: fileUuid, props: { recordUuid } }))
   await SurveyFileManager.deleteFilesAndContent({ surveyId, fileSummaries }, client)

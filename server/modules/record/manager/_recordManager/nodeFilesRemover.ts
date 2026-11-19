@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -82,7 +83,7 @@ const _deleteFileContentSafely = async ({ surveyId, fileUuid, recordUuid }: File
  */
 export const removeFiles = async (
   { surveyId, files, isPreview = false }: { surveyId: number; files: FileToRemove[]; isPreview?: boolean },
-  tx: any
+  tx: DbClient
 ): Promise<void> => {
   const fileUuids = [...new Set(files.map(({ fileUuid }) => fileUuid))]
   if (fileUuids.length === 0) return

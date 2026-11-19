@@ -200,7 +200,7 @@ const _reloadNodes = async (
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
-const _groupNodesByFlags = (nodesArray: any) =>
+const _groupNodesByFlags = (nodesArray: ArenaRecordNode[]) =>
   nodesArray.reduce(
     (acc, node) => {
       if (Node.isCreated(node) && !Node.getId(node)) {
@@ -221,7 +221,7 @@ const _persistNodes = async (
     record,
     nodesArray,
     isPreview = false,
-  }: { survey: ArenaSurvey; record: ArenaRecord; nodesArray: any; isPreview?: boolean },
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodesArray: ArenaRecordNode[]; isPreview?: boolean },
   tx: DbClient
 ) => {
   const surveyId = Survey.getId(survey)

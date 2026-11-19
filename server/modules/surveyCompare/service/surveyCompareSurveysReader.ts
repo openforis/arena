@@ -1,3 +1,9 @@
+import type {
+  Taxon as ArenaTaxon,
+  Survey as ArenaSurvey,
+  Category as ArenaCategory,
+  Taxonomy as ArenaTaxonomy,
+} from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
@@ -11,7 +17,7 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 const hasDraftProps = (obj: any): boolean => Boolean(obj?.propsDraft || obj?.propsAdvancedDraft)
@@ -32,7 +38,7 @@ const combineProps = (obj: any): any => {
 const combinePropsInObjects = (objsByUuid: Record<string, any> = {}): Record<string, any> =>
   Object.fromEntries(Object.entries(objsByUuid).map(([uuid, obj]) => [uuid, combineProps(obj)]))
 
-const combineCategoryProps = (category: any) => {
+const combineCategoryProps = (category: ArenaCategory) => {
   const categoryCombined = combineProps(category)
   const levels = Category.getLevelsArray(categoryCombined).map(combineProps)
   return Category.assocLevelsArray(levels)(categoryCombined)
@@ -62,7 +68,7 @@ const readTaxa = async ({ zipFile, taxonomyUuid }): Promise<any[]> => {
   return result
 }
 
-const combineTaxonProps = (taxon: any) => {
+const combineTaxonProps = (taxon: ArenaTaxon) => {
   const vernacularNames = Object.fromEntries(
     Object.entries(Taxon.getVernacularNames(taxon) as Record<string, any[]>).map(([lang, names]) => [
       lang,
@@ -82,7 +88,7 @@ const readTaxaByTaxonomyUuid = async ({ zipFile, taxonomyUuids }): Promise<TaxaB
 }
 
 export interface SurveyCompareSourceSurvey {
-  survey: any
+  survey: ArenaSurvey
   itemsByCategoryUuid: CategoryItemsByCategoryUuid
   taxaByTaxonomyUuid: TaxaByTaxonomyUuid
 }
@@ -104,7 +110,7 @@ export const readSurveyFromFile = async ({ filePath }: { filePath: string }): Pr
     }
     const categoriesInZip = await ArenaSurveyFileZip.getCategories(zipFile)
     const categoriesByUuid = Object.fromEntries(
-      Object.values({ ...arenaSurvey.categories, ...categoriesInZip }).map((category: any) => [
+      Object.values({ ...arenaSurvey.categories, ...categoriesInZip }).map((category: ArenaCategory) => [
         Category.getUuid(category),
         combineCategoryProps(category),
       ])
@@ -133,13 +139,13 @@ export const readSurveyFromFile = async ({ filePath }: { filePath: string }): Pr
 }
 
 // vernacular names are fetched with draft props: their published flag is fetched separately
-const fetchTaxa = async ({ surveyId, taxonomyUuid, draft }, client: any) => {
+const fetchTaxa = async ({ surveyId, taxonomyUuid, draft }, client: DbClient) => {
   const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft }, client)
   if (!draft) return taxa
   const publishedVernacularNameUuids = new Set(
     await TaxonomyRepository.fetchPublishedVernacularNameUuids({ surveyId, taxonomyUuid }, client)
   )
-  return taxa.map((taxon: any) =>
+  return taxa.map((taxon: ArenaTaxon) =>
     Taxon.assocVernacularNamesByLang(
       Object.fromEntries(
         Object.entries(Taxon.getVernacularNames(taxon) as Record<string, any[]>).map(([lang, names]) => [
@@ -160,11 +166,11 @@ const fetchTaxa = async ({ surveyId, taxonomyUuid, draft }, client: any) => {
  * @param {number} params.surveyId - The survey id.
  * @param {boolean} [params.draft] - Whether to fetch the draft (default) or the published version.
  * @param {any} [client] - Database client.
- * @returns {Promise<{survey: any, itemsByCategoryUuid: CategoryItemsByCategoryUuid, taxaByTaxonomyUuid: TaxaByTaxonomyUuid, usedNodeDefUuids: string[]}>} - The survey, the items, the taxa and all the node def uuids (deleted ones included).
+ * @returns {Promise<{survey: ArenaSurvey, itemsByCategoryUuid: CategoryItemsByCategoryUuid, taxaByTaxonomyUuid: TaxaByTaxonomyUuid, usedNodeDefUuids: string[]}>} - The survey, the items, the taxa and all the node def uuids (deleted ones included).
  */
 export const fetchSurveyFromDb = async (
   { surveyId, draft = true }: { surveyId: number; draft?: boolean },
-  client: any = db
+  client: DbClient = db
 ) => {
   const surveyWithDeleted = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     { surveyId, draft, advanced: true, includeDeleted: true },
@@ -185,7 +191,7 @@ export const fetchSurveyFromDb = async (
   const itemsByCategoryUuid: CategoryItemsByCategoryUuid = Object.fromEntries(
     categoryUuids.map((categoryUuid, index) => [categoryUuid, itemsArrays[index]])
   )
-  const taxonomyUuids = Survey.getTaxonomiesArray(survey).map((taxonomy: any) => taxonomy.uuid)
+  const taxonomyUuids = Survey.getTaxonomiesArray(survey).map((taxonomy: ArenaTaxonomy) => taxonomy.uuid)
   const taxaArrays = await DbUtils.runQueries(
     client,
     taxonomyUuids.map((taxonomyUuid) => () => fetchTaxa({ surveyId, taxonomyUuid, draft }, client))

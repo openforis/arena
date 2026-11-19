@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { Category as ArenaCategory } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -157,7 +159,7 @@ export default class CategoriesImportJob extends Job {
     return CategoryManager.insertCategory({ user: this.user, surveyId: this.surveyId, category, system: true }, this.tx)
   }
 
-  async _insertItems(category: any, items: CategorySourceItem[]) {
+  async _insertItems(category: ArenaCategory, items: CategorySourceItem[]) {
     const categoryUuid = Category.getUuid(category)
     const level = Category.getLevelByIndex(0)(category)
     const levelUuid = CategoryLevel.getUuid(level)
@@ -176,7 +178,7 @@ export default class CategoriesImportJob extends Job {
     }
   }
 
-  async itemsInsertHandler(items: any[], tx: any) {
+  async itemsInsertHandler(items: any[], tx: DbClient) {
     await CategoryManager.insertItems(this.user, this.surveyId, items, tx)
   }
 }

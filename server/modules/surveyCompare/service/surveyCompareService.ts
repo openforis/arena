@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 
@@ -6,7 +7,7 @@ import SurveyCompareApplyJob from './surveyCompareApplyJob'
 import { readKeptJson } from './surveyCompareSource'
 
 export const startSurveyCompareJob = (params: {
-  user: any
+  user: ArenaUser
   surveyId: number
   filePath?: string
   fileId?: string
@@ -18,7 +19,7 @@ export const startSurveyCompareJob = (params: {
 }) => JobManager.enqueueJob(new SurveyCompareJob(params))
 
 export const startSurveyCompareApplyJob = (params: {
-  user: any
+  user: ArenaUser
   surveyId: number
   sourceFileId?: string
   sourceSurveyId?: number

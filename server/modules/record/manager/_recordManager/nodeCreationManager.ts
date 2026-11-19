@@ -57,7 +57,7 @@ export const insertNodesInBulk = async (
     surveyId,
     nodesArray,
     systemActivity = false,
-  }: { user: ArenaUser; surveyId: number; nodesArray: any; systemActivity?: boolean },
+  }: { user: ArenaUser; surveyId: number; nodesArray: ArenaRecordNode[]; systemActivity?: boolean },
   tx: DbClient
 ) => {
   const nodeValues = nodesArray.map((node) => [

@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
 
@@ -20,7 +21,7 @@ export const fetchItems = (
     offset = 0,
     limit = null,
   }: { surveyId: number; excludeResolved?: boolean; offset?: number; limit?: number | null },
-  client?: any
+  client?: DbClient
 ) => ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
 
 export const fetchItemsStream = ({ surveyId }: { surveyId: number }) => {
@@ -45,10 +46,10 @@ export const fetchItemsStream = ({ surveyId }: { surveyId: number }) => {
 
 export const countItems = (
   { surveyId, excludeResolved }: { surveyId: number; excludeResolved: boolean },
-  client?: any
+  client?: DbClient
 ) => ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
 
-export const insertItem = (surveyId: number, item: any, client?: any) =>
+export const insertItem = (surveyId: number, item: any, client?: DbClient) =>
   ImportReportRepository.insertItem(
     surveyId,
     source,
@@ -60,7 +61,7 @@ export const insertItem = (surveyId: number, item: any, client?: any) =>
     client
   )
 
-export const insertItems = async ({ surveyId, items = [] }: { surveyId: number; items?: any[] }, client?: any) =>
+export const insertItems = async ({ surveyId, items = [] }: { surveyId: number; items?: any[] }, client?: DbClient) =>
   ImportReportRepository.insertItems(
     {
       surveyId,
@@ -74,5 +75,5 @@ export const insertItems = async ({ surveyId, items = [] }: { surveyId: number; 
     client
   )
 
-export const updateItem = (surveyId: number, itemId: number, props: any, resolved: boolean, client?: any) =>
+export const updateItem = (surveyId: number, itemId: number, props: any, resolved: boolean, client?: DbClient) =>
   ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)

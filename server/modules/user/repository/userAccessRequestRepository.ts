@@ -1,11 +1,11 @@
 import camelize from 'camelize'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 
-export const countUserAccessRequests = (client: any = db): Promise<number> =>
+export const countUserAccessRequests = (client: DbClient = db): Promise<number> =>
   client.one(
     `
       SELECT COUNT (*) FROM user_access_request
@@ -45,7 +45,7 @@ const userAccessRequestsSelect = `
 
 export const fetchUserAccessRequests = (
   { offset = 0, limit = null }: { offset?: number; limit?: number | null } = {},
-  client: any = db
+  client: DbClient = db
 ): Promise<UserAccessRequest.UserAccessRequest[]> =>
   client.map(
     `${userAccessRequestsSelect}
@@ -58,12 +58,12 @@ export const fetchUserAccessRequests = (
 
 export const fetchUserAccessRequestsAsStream = (
   { processor }: { processor: (dbStream: any) => any },
-  client: any = db
+  client: DbClient = db
 ) => DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(userAccessRequestsSelect, []), client, processor })
 
 export const fetchUserAccessRequestByEmail = (
   { email }: { email: string },
-  client: any = db
+  client: DbClient = db
 ): Promise<UserAccessRequest.UserAccessRequest | null> =>
   client.oneOrNone(
     `
@@ -77,7 +77,7 @@ export const fetchUserAccessRequestByEmail = (
 
 export const fetchUserAccessRequestByUuid = (
   { uuid }: { uuid: string },
-  client: any = db
+  client: DbClient = db
 ): Promise<UserAccessRequest.UserAccessRequest | null> =>
   client.oneOrNone(
     `
@@ -91,7 +91,7 @@ export const fetchUserAccessRequestByUuid = (
 
 export const insertUserAccessRequest = (
   { userAccessRequest }: { userAccessRequest: Pick<UserAccessRequest.UserAccessRequest, 'email' | 'props'> },
-  client: any = db
+  client: DbClient = db
 ): Promise<UserAccessRequest.UserAccessRequest> =>
   client.one(
     `
@@ -104,7 +104,7 @@ export const insertUserAccessRequest = (
 
 export const updateUserAccessRequestStatus = (
   { userUuid, email, status }: { userUuid: string; email: string; status: UserAccessRequest.UserAccessRequestStatus },
-  client: any = db
+  client: DbClient = db
 ) =>
   client.oneOrNone(
     `
@@ -118,14 +118,17 @@ export const updateUserAccessRequestStatus = (
     { email, status, userUuid }
   )
 
-export const deleteUserAccessRequestsByEmail = ({ emails }: { emails: string[] }, client: any = db): Promise<null> =>
+export const deleteUserAccessRequestsByEmail = (
+  { emails }: { emails: string[] },
+  client: DbClient = db
+): Promise<null> =>
   client.none(
     `DELETE FROM user_access_request 
     WHERE email IN ($1:csv)`,
     [emails]
   )
 
-export const deleteExpiredUserAccessRequests = (client: any = db): Promise<null> =>
+export const deleteExpiredUserAccessRequests = (client: DbClient = db): Promise<null> =>
   client.none(
     `DELETE FROM user_access_request 
     WHERE status = '${UserAccessRequest.status.CREATED}' 

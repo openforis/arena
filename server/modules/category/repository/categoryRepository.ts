@@ -1,8 +1,14 @@
-import type { Category as ArenaCategory } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
-import { Objects, Strings } from '@openforis/arena-core'
+import {
+  Objects,
+  Strings,
+  type CategoryItem as ArenaCategoryItem,
+  type CategoryLevel as ArenaCategoryLevel,
+  type Validation as ArenaValidation,
+  type Category as ArenaCategory,
+} from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
 import {
@@ -58,7 +64,7 @@ export const insertLevel = ({
   client = db,
 }: {
   surveyId: number
-  level: any
+  level: ArenaCategoryLevel
   backup?: boolean
   client?: DbClient
 }) => {
@@ -73,7 +79,7 @@ export const insertLevel = ({
   )
 }
 
-export const insertItem = (surveyId: number, item: any, client: DbClient = db) =>
+export const insertItem = (surveyId: number, item: ArenaCategoryItem, client: DbClient = db) =>
   client.one(
     `
         INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
@@ -84,7 +90,7 @@ export const insertItem = (surveyId: number, item: any, client: DbClient = db) =
   )
 
 export const insertItems = async (
-  { surveyId, items, backup = false }: { surveyId: number; items: any[]; backup?: boolean },
+  { surveyId, items, backup = false }: { surveyId: number; items: ArenaCategoryItem[]; backup?: boolean },
   client: DbClient = db
 ) => {
   const values = items.map((item) => {
@@ -838,7 +844,7 @@ export const updateCategoryProp = (
 export const updateCategoryValidation = (
   surveyId: number,
   categoryUuid: string,
-  validation: any,
+  validation: ArenaValidation,
   client: DbClient = db
 ) =>
   client.none(
@@ -895,7 +901,7 @@ export const updateItemsIndexes = async (
 }
 
 export const updateItemsProps = async (
-  { surveyId, items, draftProps = true }: { surveyId: number; items: any[]; draftProps?: any },
+  { surveyId, items, draftProps = true }: { surveyId: number; items: ArenaCategoryItem[]; draftProps?: any },
   client: DbClient = db
 ) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])

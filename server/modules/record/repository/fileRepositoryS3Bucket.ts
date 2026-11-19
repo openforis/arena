@@ -29,7 +29,13 @@ const {
   getFileKey,
 })
 
-const deleteFiles = async ({ surveyId, files }: { surveyId: number; files: any }) => {
+const deleteFiles = async ({
+  surveyId,
+  files,
+}: {
+  surveyId: number
+  files: { fileUuid: string; recordUuid?: string | null }[]
+}) => {
   for (const { fileUuid, recordUuid } of files) {
     await deleteFile({ surveyId, fileUuid, recordUuid }) // NOSONAR
   }

@@ -8,6 +8,7 @@ import {
   type Survey as ArenaSurvey,
   type NodeDef as ArenaNodeDef,
   type NodeDefType,
+  type ArenaRecordNode,
 } from '@openforis/arena-core'
 
 import { quote } from '@core/stringUtils'
@@ -595,7 +596,11 @@ const _valueToLiteralString = (value: unknown): string | null => {
 }
 
 const countDuplicateRecordsByNodeDefs = (
-  { survey, record, nodeDefsUnique }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefsUnique: any },
+  {
+    survey,
+    record,
+    nodeDefsUnique,
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodeDefsUnique: ArenaNodeDef<NodeDefType>[] },
   client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)
@@ -663,7 +668,13 @@ export const fetchRecordsCountByRootNodesValue = (
     nodeDefs,
     nodes,
     recordUuidsExcluded = [],
-  }: { survey: ArenaSurvey; cycle: string; nodeDefs: any; nodes: any; recordUuidsExcluded?: any },
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    nodeDefs: ArenaNodeDef<NodeDefType>[]
+    nodes: ArenaRecordNode[]
+    recordUuidsExcluded?: any
+  },
   client: DbClient = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
