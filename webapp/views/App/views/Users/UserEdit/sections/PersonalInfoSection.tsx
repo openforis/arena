@@ -1,8 +1,11 @@
+import React from 'react'
+
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
 
 import { UserEditSection } from '../UserEditSection'
 import { UserExtraPropsEditor } from '../UserExtraPropsEditor'
@@ -18,6 +21,17 @@ type Props = {
   onUpdate: (user: any) => void
   userToUpdate: any
   validation: any
+}
+
+// width of the title column: enough for the longest title label in the current language (plus clear and arrow icons)
+const useTitleColumnWidth = (): string => {
+  const i18n = useI18n()
+  const maxLength = Math.max(
+    i18n.t('user.title').length,
+    ...User.titleKeysArray.map((key) => i18n.t(`user.titleValues.${key}`).length)
+  )
+  // 1.2: the app font has letter spacing, wider than the `ch` unit
+  return `calc(${Math.ceil(maxLength * 1.2)}ch + 5rem)`
 }
 
 /**
@@ -37,6 +51,8 @@ export const PersonalInfoSection = (props: Props) => {
     validation,
   } = props
 
+  const titleColumnWidth = useTitleColumnWidth()
+
   return (
     <UserEditSection
       description={
@@ -47,7 +63,10 @@ export const PersonalInfoSection = (props: Props) => {
       id="user-edit-personal"
       title="usersView:profile.sections.personal"
     >
-      <div className="user-edit-fields">
+      <div
+        className="user-edit-fields user-edit-fields--personal"
+        style={{ '--title-column-width': titleColumnWidth } as React.CSSProperties}
+      >
         <FormItem label="user.title">
           <DropdownUserTitle
             disabled={!canEdit}

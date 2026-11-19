@@ -315,6 +315,15 @@
   grid-column: 1 / -1;
 }
 
+// title only needs room for its few short values; name takes the rest
+.user-edit-fields--personal {
+  grid-template-columns: var(--title-column-width, 13rem) minmax(0, 1fr);
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .user-edit-section .extra-props .form {
   height: auto;
   grid-row-gap: 0;
