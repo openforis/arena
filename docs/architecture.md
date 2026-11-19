@@ -39,11 +39,11 @@ Things to keep in mind:
 
 ## Server runtime
 
-Entry point: `server/server.js` → `server/system/appCluster.js`, which:
+Entry point: `server/server.ts` → `server/system/appCluster.ts`, which:
 
 1. creates the Express app with `ArenaServer.init` (arena-server); this also migrates the `public` DB
    schema;
-2. registers the arena API routes (`server/system/apiRouter.js`), the static webapp bundle and Swagger
+2. registers the arena API routes (`server/system/apiRouter.ts`), the static webapp bundle and Swagger
    (`/api-docs`, built from the `@swagger` comments in [api/](api/));
 3. starts listening, then the schedulers (`server/system/schedulers/`) and the background job that
    migrates every survey's schema and data (`AllSurveysDataMigrationJob`).
@@ -54,7 +54,7 @@ Work that doesn't fit in a request runs elsewhere:
   `JobQueue` runs them in worker threads with limited concurrency, persists their status in the `job`
   table and pushes progress to the client through the WebSocket.
 - **Record updates** from the data entry form run in a single worker thread per server instance,
-  shared by all surveys (`server/modules/record/service/update/surveyRecordsThreadService.js`); see
+  shared by all surveys (`server/modules/record/service/update/surveyRecordsThreadService.ts`); see
   [record-editing.md](record-editing.md).
 
 **Multiple instances.** Several server instances can run against the same DB: they exchange events
@@ -93,7 +93,7 @@ PostgreSQL with PostGIS, accessed with pg-promise. Schemas:
   not yet published). The designer works on the draft; `SurveyPublishJob`
   (`server/modules/survey/service/publish/`) validates the survey, moves the draft props into `props`
   and regenerates the RDB schema. Repositories read one or the other with `mergeProps({ draft })`
-  (`server/db/utils/mergeProps.js`).
+  (`server/db/utils/mergeProps.ts`).
 - **Migrations** live in arena-server (`src/db/dbMigrator/migration/public` and `.../survey`); the
   survey ones run for every `survey_<id>` schema.
 - **Files** (record attachments) are stored in the DB, on the file system or in S3, depending on the

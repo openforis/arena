@@ -28,7 +28,7 @@ entity's plot area:
 entity$attr_ha <- entity$attr / entity$entity_plot_area_
 ```
 
-(see `AreaBasedEstimatedOfNodeDef.getScript` in `common/analysis/areaBasedEstimatedNodeDef.js`).
+(see `AreaBasedEstimatedOfNodeDef.getScript` in `common/analysis/areaBasedEstimatedNodeDef.ts`).
 For that division to resolve, the entity needs the `entity_plot_area_` variable to exist -
 that's what this generation step provides. The `weight` variable serves an analogous purpose
 for the base unit entity, e.g. as the starting point for sampling-design weight calculations.
@@ -36,7 +36,7 @@ for the base unit entity, e.g. as the starting point for sampling-design weight 
 ### Where it's computed
 
 `SamplingNodeDefs.determinePlotAreaNodeDefs({ survey, chain })` in
-`common/analysis/samplingNodeDefs.js`:
+`common/analysis/samplingNodeDefs.ts`:
 
 1. **Weight**: looked up/created directly against the chain's base unit entity
    (`Survey.getBaseUnitNodeDef({ chain })(survey)`), independently of where that entity sits in
@@ -64,13 +64,13 @@ its own criteria.
 ### Where it's run
 
 This function runs once per chain, on every survey publish, via
-`ChainsSamplingNodeDefsCheckJob` (`server/modules/survey/service/publish/jobs/chainsSamplingNodeDefsCheckJob.js`),
+`ChainsSamplingNodeDefsCheckJob` (`server/modules/survey/service/publish/jobs/chainsSamplingNodeDefsCheckJob.ts`),
 wired into `SurveyPublishJob`. The returned `nodeDefsToCreate` / `nodeDefsToDelete` are
 persisted through `NodeDefManager`.
 
 ### R script generation
 
-When the R analysis chain is generated (`server/modules/analysis/service/rChain/rChain.js`),
+When the R analysis chain is generated (`server/modules/analysis/service/rChain/rChain.ts`),
 `SamplingNodeDefs.getSamplingDefsInEntities` collects these sampling node defs across the
 chain's entities and orders `weight` first, followed by the base unit's own plot area (if any),
 then the rest - each one is written out as its own `.R` file under the chain's `sampling/`

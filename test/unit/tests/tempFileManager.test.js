@@ -66,7 +66,7 @@ describe('TempFileManager storage routing', () => {
     // fileSystem for temp-chunk storage. These are the real, unmocked functions.
     // Passing a totalFileSize far above the old 10MB threshold proves there's no lingering
     // size-based branch that would route this elsewhere or fail.
-    // The real server creates this folder on startup (see server/server.js); unit tests don't run
+    // The real server creates this folder on startup (see server/server.ts); unit tests don't run
     // that startup path, so ensure it exists here too (this is the actual temp folder, not a mock).
     await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
 
