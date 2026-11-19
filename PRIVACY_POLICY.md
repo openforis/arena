@@ -26,6 +26,7 @@ Personal data is processed in accordance with the following principles:
 
 - **Access requests**: when you request access to Arena, we collect your email address, first and last name, institution, country, the purpose of your request and the name of the survey you intend to create.
 - **User account**: your name, email address and password (stored only in hashed form), your preferences (e.g. language, theme, last used survey) and, optionally, a profile picture. If you enable two-factor authentication, the related secret is stored to verify your access codes.
+- **External sign-in**: if you sign in through an external identity provider configured on the platform, we receive from it the information needed to identify you, such as your name and email address.
 - **Invitations**: when a survey administrator invites a new user, the invitee's email address and the role assigned to them.
 - **Survey and record data**: the surveys you design and the data you or your collaborators enter, upload or import (records, files, images, coordinates, categories, taxonomies, etc.).
 - **Communications**: information you share when contacting the Open Foris team (e.g. through the support forum or by email).
