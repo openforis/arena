@@ -240,13 +240,17 @@ Keep comments short and to the point (JSDoc descriptions included): one line whe
 Give new branches a meaningful, possibly short name describing the change (e.g. `dashboard-activity-log-env-visibility`).
 
 **No Claude attribution:**
-Never add a `Co-Authored-By: Claude` trailer, a "Generated with Claude Code" line or a session link to commits and pull requests.
+Never add a `Co-Authored-By: Claude` trailer, a "Generated with Claude Code" line, a `Claude-Session` line or a session link to commits, pull requests, PR/issue comments, reviews or code comments.
 
-After creating a PR, wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
+**Assignee:**
+Assign every PR you open to `SteRiccio`.
+
+After creating a PR, subscribe to its activity and wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
 
 - Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the checks status).
 - Fix every finding that can reasonably be solved, and push the fixes to the PR branch.
 - Reply to each finding on GitHub: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
+- Keep watching until the checks are green.
 
 ## Important Notes
 
