@@ -8,6 +8,13 @@ import {
   RecordExpressionEvaluator,
   SurveyDocImages,
   SurveyDocPlace,
+  type User as ArenaUser,
+  type Record as ArenaRecord,
+  type ArenaRecordNode,
+  type Survey as ArenaSurvey,
+  type NodeDef as ArenaNodeDef,
+  type NodeDefType,
+  type SurveyDocImage,
 } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
@@ -30,7 +37,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validation from '@core/validation/validation'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
@@ -66,7 +73,7 @@ const Logger = Log.getLogger('RecordService')
 // It is DB-backed (socket_id is NOT NULL and a FK to connected_socket), so a missing socket id
 // (e.g. a request sent while the client WebSocket is reconnecting) or an already-disconnected one
 // would otherwise throw where the previous in-memory implementation silently tolerated it.
-const _assocSocketBestEffort = async ({ recordUuid, socketId }) => {
+const _assocSocketBestEffort = async ({ recordUuid, socketId }: { recordUuid: string; socketId: string }) => {
   if (!socketId) return
   try {
     await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
@@ -75,7 +82,7 @@ const _assocSocketBestEffort = async ({ recordUuid, socketId }) => {
   }
 }
 
-const _dissocSocketBestEffort = async ({ recordUuid, socketId }) => {
+const _dissocSocketBestEffort = async ({ recordUuid, socketId }: { recordUuid: string; socketId: string }) => {
   if (!socketId) return
   try {
     await RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
@@ -86,7 +93,7 @@ const _dissocSocketBestEffort = async ({ recordUuid, socketId }) => {
 
 // RECORD
 // preview records are allowed to survey editors or, when enabled in the (published) survey, to data entry users
-export const canCreateRecordPreview = async ({ user, surveyId }) => {
+export const canCreateRecordPreview = async ({ user, surveyId }: { user: ArenaUser; surveyId: number }) => {
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
   return (
     Authorizer.canEditSurvey(user, surveyInfo) ||
@@ -94,13 +101,31 @@ export const canCreateRecordPreview = async ({ user, surveyId }) => {
   )
 }
 
-export const createRecord = async ({ user, surveyId, recordToCreate }) => {
+export const createRecord = ({
+  user,
+  surveyId,
+  recordToCreate,
+}: {
+  user: ArenaUser
+  surveyId: number
+  recordToCreate: any
+}) => {
   Logger.debug('creating record: ', recordToCreate)
 
   return RecordManager.insertRecord(user, surveyId, recordToCreate)
 }
 
-export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cycle, itemUuid }) => {
+export const createRecordFromSamplingPointDataItem = async ({
+  user,
+  surveyId,
+  cycle,
+  itemUuid,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  itemUuid: string
+}) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true })
   return RecordManager.createRecordFromSamplingPointDataItem({
     user,
@@ -118,7 +143,13 @@ export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cy
  * @param {Array<string>} params.recordUuids - The record UUIDs to fetch files for.
  * @returns {Promise<{[recordUuid: string]: Array<string>}>} File UUIDs grouped by record UUID.
  */
-export const fetchFileUuidsByRecordUuid = async ({ surveyId, recordUuids }) => {
+export const fetchFileUuidsByRecordUuid = async ({
+  surveyId,
+  recordUuids,
+}: {
+  surveyId: number
+  recordUuids: string[]
+}) => {
   const files = await RecordFileManager.fetchNonDeletedFileUuidsByRecordUuids({ surveyId, recordUuids })
   const fileUuidsByRecordUuid = {}
   for (const { fileUuid, recordUuid } of files) {
@@ -157,15 +188,29 @@ export const {
  * @param {object} params.nodeDef - The time node definition the value belongs to.
  * @returns {string} The formatted time value.
  */
-export const formatTimeSummaryValue = ({ value, nodeDef }) =>
+export const formatTimeSummaryValue = ({ value, nodeDef }: { value: string; nodeDef: ArenaNodeDef<NodeDefType> }) =>
   DateUtils.convertDate({
     dateStr: value,
-    formatFrom: 'HH:mm:ss',
+    formatFrom: DateUtils.formats.timeWithSeconds,
     formatTo: DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef)),
     keepTimeZone: false,
   })
 
-export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, ownerUuid = null, user }) => {
+export const exportRecordsSummary = async ({
+  res,
+  surveyId,
+  cycle,
+  fileFormat,
+  ownerUuid = null,
+  user,
+}: {
+  res: any
+  surveyId: number
+  cycle: string
+  fileFormat: string
+  ownerUuid?: string
+  user: ArenaUser
+}) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
     cycle,
@@ -233,18 +278,40 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, o
 }
 
 // Records export job
-export const startRecordsExportJob = ({ user, surveyId, recordUuids, excludedFileUuids = [] }) => {
+export const startRecordsExportJob = ({
+  user,
+  surveyId,
+  recordUuids,
+  excludedFileUuids = [],
+}: {
+  user: ArenaUser
+  surveyId: number
+  recordUuids: string[]
+  excludedFileUuids?: string[]
+}) => {
   const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
   JobManager.enqueueJob(job)
   return job
 }
 
-export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
+export const updateRecordStep = async (user: ArenaUser, surveyId: number, recordUuid: string, stepId: string) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
   return await RecordManager.updateRecordStepInTransaction({ user, surveyId, record, stepId })
 }
 
-export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notifySameUser = false }) => {
+export const deleteRecord = async ({
+  socketId,
+  user,
+  surveyId,
+  recordUuid,
+  notifySameUser = false,
+}: {
+  socketId: string
+  user: ArenaUser
+  surveyId: number
+  recordUuid: string
+  notifySameUser?: any
+}) => {
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
@@ -256,7 +323,17 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   RecordsUpdateThreadService.clearRecordDataFromThread({ surveyId, cycle, draft: false, recordUuid })
 }
 
-export const deleteRecords = async ({ socketId, user, surveyId, recordUuids }) => {
+export const deleteRecords = async ({
+  socketId,
+  user,
+  surveyId,
+  recordUuids,
+}: {
+  socketId: string
+  user: ArenaUser
+  surveyId: number
+  recordUuids: string[]
+}) => {
   Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
   for (const recordUuid of recordUuids) {
@@ -276,13 +353,41 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
-const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, cycle, draft, record }) => {
+const _recordMatchesUserGroupQualifiers = async ({
+  user,
+  surveyId,
+  cycle,
+  draft,
+  record,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  draft: boolean
+  record: ArenaRecord
+}) => {
   const surveyWithDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft })
   const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey: surveyWithDefs })
   return RecordManager.recordMatchesQualifierFilters({ survey: surveyWithDefs, record, qualifierFilters })
 }
 
-export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset, lang }) => {
+export const checkIn = async ({
+  socketId,
+  user,
+  surveyId,
+  recordUuid,
+  draft,
+  timezoneOffset,
+  lang,
+}: {
+  socketId: string
+  user: ArenaUser
+  surveyId: number
+  recordUuid: string
+  draft: boolean
+  timezoneOffset: any
+  lang: string
+}) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   // Passing `user` re-evaluates user-dependent applicability/relevance (e.g. userProp) for
@@ -320,7 +425,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
   return readOnly ? Record.assocReadOnly(true)(record) : record
 }
 
-export const checkOut = async (socketId, user, surveyId, recordUuid) => {
+export const checkOut = async (socketId: string, user: ArenaUser, surveyId: number, recordUuid: string) => {
   const recordSummary = await RecordManager.fetchRecordSummary({
     surveyId,
     recordUuid,
@@ -358,6 +463,18 @@ export const fetchValidationReport = async ({
   messageTypeKeys = null,
   sortBy,
   sortOrder,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  offset: number
+  limit: number | null
+  recordUuid: string
+  query: any
+  attributeDefUuids?: string[]
+  messageTypeKeys?: any
+  sortBy: string | null
+  sortOrder: string | null
 }) => {
   const { rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
     user,
@@ -389,6 +506,14 @@ export const countValidationReportItems = async ({
   query,
   attributeDefUuids = null,
   messageTypeKeys = null,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  recordUuid: string
+  query: any
+  attributeDefUuids?: string[]
+  messageTypeKeys?: any
 }) => {
   const { rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
     user,
@@ -409,7 +534,19 @@ export const countValidationReportItems = async ({
 }
 
 // RECORDS CLONE
-export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
+export const startRecordsCloneJob = ({
+  user,
+  surveyId,
+  cycleFrom,
+  cycleTo,
+  recordsUuids,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycleFrom: any
+  cycleTo: any
+  recordsUuids: string[]
+}) => {
   const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
   JobManager.enqueueJob(job)
   return job
@@ -426,6 +563,16 @@ export const startValidationReportGenerationJob = ({
   attributeDefUuids,
   messageTypeKeys,
   fileFormat,
+}: {
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  lang: string
+  recordUuid: string
+  query: any
+  attributeDefUuids: string[]
+  messageTypeKeys: any
+  fileFormat: string
 }) => {
   const job = new VaidationReportGenerationJob({
     user,
@@ -442,14 +589,24 @@ export const startValidationReportGenerationJob = ({
   return job
 }
 
-export const startRecordsValidationJob = ({ user, surveyId }) => {
+export const startRecordsValidationJob = ({ user, surveyId }: { user: ArenaUser; surveyId: number }) => {
   const job = new RecordsValidationJob({ user, surveyId })
   JobManager.enqueueJob(job)
   return job
 }
 
 // NODE
-const _sendNodeUpdateMessage = async ({ socketId, user, recordUuid, msg }) => {
+const _sendNodeUpdateMessage = async ({
+  socketId,
+  user,
+  recordUuid,
+  msg,
+}: {
+  socketId: string
+  user: ArenaUser
+  recordUuid: string
+  msg: any
+}) => {
   await _assocSocketBestEffort({ recordUuid, socketId })
 
   const thread = RecordsUpdateThreadService.getOrCreatedThread()
@@ -469,6 +626,17 @@ export const persistNode = async ({
   timezoneOffset = null,
   lang = null,
   clearNonApplicableValuesConfirmed = false,
+}: {
+  socketId: string
+  user: ArenaUser
+  surveyId: number
+  draft: boolean
+  cycle: string
+  node: ArenaRecordNode
+  file?: any
+  timezoneOffset?: number
+  lang?: string
+  clearNonApplicableValuesConfirmed?: boolean
 }) => {
   const recordUuid = Node.getRecordUuid(node)
 
@@ -520,6 +688,17 @@ export const deleteNode = ({
   timezoneOffset,
   lang,
   clearNonApplicableValuesConfirmed = false,
+}: {
+  socketId: string
+  user: ArenaUser
+  surveyId: number
+  cycle: string
+  draft: boolean
+  recordUuid: string
+  nodeUuid: string
+  timezoneOffset: any
+  lang: string
+  clearNonApplicableValuesConfirmed?: boolean
 }) =>
   _sendNodeUpdateMessage({
     socketId,
@@ -541,7 +720,15 @@ export const deleteNode = ({
   })
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
-export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
+export const generateNodeFileNameForDownload = async ({
+  surveyId,
+  nodeUuid,
+  file,
+}: {
+  surveyId: number
+  nodeUuid: string
+  file: SurveyFile.SurveyFile
+}) => {
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
   const record = await fetchRecordAndNodesByUuid({
     surveyId,
@@ -604,7 +791,15 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
-const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
+const persistRecordNodes = async (
+  {
+    user,
+    survey,
+    record,
+    nodesArray,
+  }: { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord; nodesArray: ArenaRecordNode[] },
+  tx: DbClient
+) => {
   const surveyId = Survey.getId(survey)
   const isPreview = Record.isPreview(record)
 
@@ -646,9 +841,15 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
   await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
 }
 
-export const mergeRecords = async (
-  { user, surveyId, sourceRecordUuid, targetRecordUuid, dryRun = false },
-  client = db
+export const mergeRecords = (
+  {
+    user,
+    surveyId,
+    sourceRecordUuid,
+    targetRecordUuid,
+    dryRun = false,
+  }: { user: ArenaUser; surveyId: number; sourceRecordUuid: string; targetRecordUuid: string; dryRun?: boolean },
+  client: DbClient = db
 ) =>
   client.tx(async (tx) => {
     const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid, user }, tx)
@@ -693,7 +894,17 @@ export const mergeRecords = async (
     }
   })
 
-const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid }) => {
+const assertCurrentPageEntity = ({
+  survey,
+  record,
+  entityDefUuid,
+  entityNodeUuid,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+  entityDefUuid: string
+  entityNodeUuid: string
+}) => {
   if (!entityDefUuid || !entityNodeUuid) {
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
   }
@@ -714,6 +925,15 @@ const generateDocumentWithQrCode = async ({
   generatorOptions,
   generator,
   extension,
+}: {
+  surveyId: number
+  recordUuid: string
+  entityDefUuid: string
+  entityNodeUuid: string
+  serverUrl: any
+  generatorOptions: any
+  generator: any
+  extension: any
 }) => {
   if (!serverUrl) {
     throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
@@ -765,6 +985,21 @@ const exportRecordDocument = async ({
   orientation = PrintOrientations.portrait,
   includeQrCode = false,
   serverUrl = null,
+}: {
+  user: ArenaUser
+  surveyId: number
+  recordUuid: string
+  outputStream: any
+  lang: string
+  generator: any
+  extension: any
+  contentType: any
+  exportScope?: any
+  entityDefUuid: string
+  entityNodeUuid: string
+  orientation?: any
+  includeQrCode?: boolean
+  serverUrl?: any
 }) => {
   if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeUuid)) {
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
@@ -777,7 +1012,7 @@ const exportRecordDocument = async ({
     cycle,
     includeAnalysis: false,
   })
-  const surveyDocImages = Survey.getSurveyDocImages(survey)
+  const surveyDocImages = Survey.getSurveyDocImages(survey) as SurveyDocImage[]
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   let entityDef = null
@@ -885,6 +1120,18 @@ export const exportRecordDocx = ({
   orientation,
   includeQrCode,
   serverUrl,
+}: {
+  user: ArenaUser
+  surveyId: number
+  recordUuid: string
+  outputStream: any
+  lang?: string
+  exportScope: any
+  entityDefUuid: string
+  entityNodeUuid: string
+  orientation: any
+  includeQrCode: boolean
+  serverUrl: any
 }) =>
   exportRecordDocument({
     user,
@@ -915,6 +1162,18 @@ export const exportRecordPdf = ({
   orientation,
   includeQrCode,
   serverUrl,
+}: {
+  user: ArenaUser
+  surveyId: number
+  recordUuid: string
+  outputStream: any
+  lang?: string
+  exportScope: any
+  entityDefUuid: string
+  entityNodeUuid: string
+  orientation: any
+  includeQrCode: boolean
+  serverUrl: any
 }) =>
   exportRecordDocument({
     user,

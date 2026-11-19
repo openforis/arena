@@ -35,7 +35,7 @@ export default {
   plugins,
   target: 'node',
   entry: {
-    server: entry('server/server.js'),
+    server: entry('server/server.ts'),
     jobThread: entry('server/job/jobThread.ts'),
     recordsUpdateThread: entry('server/modules/record/service/update/thread/recordsUpdateThread.ts'),
   },
