@@ -36,6 +36,47 @@ export const getFitToPlotZoom = ({
     )
   )
 
+// below this zoom (or the fit-to-plot zoom, when lower) a plot is too small to see: "Fit to plot" zooms in
+export const PLOT_CAPTURE_MIN_ZOOM = 15
+
+// share of the map size, on each side, where a plot is too close to the edge to keep the view
+const PLOT_VIEW_EDGE_MARGIN = 0.1
+
+export type PlotCaptureView = { keepView: boolean; zoom: number }
+
+/**
+ * Chooses how "Fit to plot" frames the plot, keeping what the user sees as much as possible: the current view when
+ * it is zoomed in enough and the plot is not near its edges, else the current zoom (or the fit-to-plot zoom when the
+ * map is zoomed out) centred on the plot.
+ * @param {object} params - The parameters.
+ * @param {number} params.currentZoom - Current map zoom.
+ * @param {number} params.fitZoom - The fit-to-plot zoom.
+ * @param {{x: number, y: number}} params.plotPixel - The plot position in the map container, in px.
+ * @param {{x: number, y: number}} params.size - The map container size, in px.
+ * @returns {PlotCaptureView} Whether to keep the current view and the zoom of the capture.
+ */
+export const getPlotCaptureView = ({
+  currentZoom,
+  fitZoom,
+  plotPixel,
+  size,
+}: {
+  currentZoom: number
+  fitZoom: number
+  plotPixel: { x: number; y: number }
+  size: { x: number; y: number }
+}): PlotCaptureView => {
+  if (currentZoom < Math.min(PLOT_CAPTURE_MIN_ZOOM, fitZoom)) return { keepView: false, zoom: fitZoom }
+  const marginX = size.x * PLOT_VIEW_EDGE_MARGIN
+  const marginY = size.y * PLOT_VIEW_EDGE_MARGIN
+  const keepView =
+    plotPixel.x >= marginX &&
+    plotPixel.x <= size.x - marginX &&
+    plotPixel.y >= marginY &&
+    plotPixel.y <= size.y - marginY
+  return { keepView, zoom: currentZoom }
+}
+
 export type CaptureNodeInfo = {
   classList: { contains: (token: string) => boolean } | null | undefined
   isMapContainerChild: boolean
