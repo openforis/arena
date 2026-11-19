@@ -4037,7 +4037,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^3.0.0, @openforis/arena-core@npm:^3.1.0":
+"@openforis/arena-core@npm:^3.1.0":
   version: 3.1.0
   resolution: "@openforis/arena-core@npm:3.1.0"
   dependencies:
@@ -4059,13 +4059,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@openforis/arena-server@npm:3.0.0"
+"@openforis/arena-server@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@openforis/arena-server@npm:3.0.1"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1159.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^3.0.0"
+    "@openforis/arena-core": "npm:^3.1.0"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.2"
     cookie-parser: "npm:^1.4.7"
@@ -4087,7 +4087,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/0db193f40993993649acf58d03672019f40264e1fe7f075e9b473566e63f6722c72207c76bfb872f07162495fbcac263a92df203179a59e55b25a0bbb384f8a1
+  checksum: 10c0/29f84e738a2e015b12dd0d0738fa613fc82cce7c240b168568dd7e0e21cbe6c3563e1b7f555d766b394a2b40dcb9edf30633a0fd3c2b386da2601d996a354ffd
   languageName: node
   linkType: hard
 
@@ -15461,7 +15461,7 @@ __metadata:
     "@mui/x-tree-view": "npm:^9.18.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
     "@openforis/arena-core": "npm:^3.1.0"
-    "@openforis/arena-server": "npm:^3.0.0"
+    "@openforis/arena-server": "npm:^3.0.1"
     "@playwright/test": "npm:1.65.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@react-leaflet/core": "npm:3.0.0"
