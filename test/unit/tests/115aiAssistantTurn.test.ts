@@ -230,7 +230,7 @@ describe('runAssistantTurn', () => {
   test('stops when the context has no room for one more tool result: that step has no tools, and a turn without text gets the context-full notice', async () => {
     const echo = makeTool('test_echo', async () => ({ text: 'x'.repeat(400) }))
     let call = 0
-    const model = scriptedModel(() => toolCallStream(`call-${call++}`, 'test_echo', { summary: 'x' }))
+    const model = scriptedModel(() => toolCallStream(`call-${call}`, 'test_echo', { summary: `x${call++}` }))
     const result = await run({ model, tools: [echo], limits: { maxPromptChars: 4000 } })
     const toolChoices = model.doStreamCalls.map((streamCall) => streamCall.toolChoice?.type)
     expect(toolChoices.length).toBeGreaterThan(2)
@@ -246,14 +246,14 @@ describe('runAssistantTurn', () => {
   describe('the last step, sent without tools because the context is full', () => {
     const markup = '<|tool_call>call:test_echo{"summary":"x"}<tool_call|>'
     const echo = makeTool('test_echo', async () => ({ text: 'x'.repeat(400) }))
-    // calls the tool until the step without tools, which gets the given stream
+    // calls the tool (a new input each time) until the step without tools, which gets the given stream
     const modelEndingWith = (lastStep: () => any, firstStep?: () => any) => {
       let call = 0
       return new MockLanguageModelV4({
         doStream: async (options: any) => {
           if (options.toolChoice?.type === 'none') return { stream: lastStep() } as any
           const stream =
-            call === 0 && firstStep ? firstStep() : toolCallStream(`call-${call}`, 'test_echo', { summary: 'x' })
+            call === 0 && firstStep ? firstStep() : toolCallStream(`call-${call}`, 'test_echo', { summary: `x${call}` })
           call++
           return { stream } as any
         },
@@ -294,7 +294,7 @@ describe('runAssistantTurn', () => {
     const echo = makeTool('test_echo', async () => ({ ok: true }))
     let call = 0
     const model = scriptedModel(() =>
-      call++ < 15 ? toolCallStream(`call-${call}`, 'test_echo', { summary: 'x' }) : textStream('Done.')
+      call++ < 15 ? toolCallStream(`call-${call}`, 'test_echo', { summary: `x${call}` }) : textStream('Done.')
     )
     const result = await run({ model, tools: [echo] })
     expect(model.doStreamCalls).toHaveLength(16)
@@ -399,7 +399,7 @@ describe('runAssistantTurn', () => {
       expect(uncounted({ stepNumber: 1, messages: messages(3300), steps: [step()] })).toBe('contextFull')
     })
 
-    test('the same failing call three times ends the tool loop; other failures and successes do not', () => {
+    test('the same failing call three times ends the tool loop; other failures do not', () => {
       const result = (input: unknown, output: unknown) => ({ type: 'tool-result', toolName: 't', input, output })
       const failed = (input: unknown) => step(undefined, result(input, { error: { code: 'invalidProposal' } }))
       const ok = (input: unknown) => step(undefined, result(input, { ok: true }))
@@ -412,7 +412,10 @@ describe('runAssistantTurn', () => {
         })
       expect(at([failed({ a: 1 }), failed({ a: 1 })])).toBeNull()
       expect(at([failed({ a: 1 }), failed({ a: 2 }), failed({ a: 3 })])).toBeNull()
-      expect(at([ok({ a: 1 }), ok({ a: 1 }), ok({ a: 1 })])).toBeNull()
+      // a call that succeeds gives the same result again: three times is a loop too
+      expect(at([ok({ a: 1 }), ok({ a: 1 })])).toBeNull()
+      expect(at([ok({ a: 1 }), ok({ a: 2 }), ok({ a: 3 })])).toBeNull()
+      expect(at([ok({ a: 1 }), ok({ a: 1 }), ok({ a: 2 }), ok({ a: 1 })])).toBe('repeatedCall')
       // not in a row: the count is of the turn
       expect(at([failed({ a: 1 }), failed({ a: 2 }), failed({ a: 1 }), failed({ a: 1 })])).toBe('repeatedFailure')
       expect(at([thrown, failed({ a: 1 }), thrown])).toBe('repeatedFailure')
@@ -452,6 +455,29 @@ describe('runAssistantTurn', () => {
       expect(model.doStreamCalls).toHaveLength(4)
       expect(answerOf(result)).toMatchObject({ status: 'error', errorKey: NO_ANSWER_ERROR_KEY })
     })
+  })
+
+  test('the same successful call three times: the next step has no tools and asks for the answer', async () => {
+    const echo = makeTool('test_echo', async () => ({ ok: true }))
+    let call = 0
+    const model = new MockLanguageModelV4({
+      doStream: async (options: any) =>
+        ({
+          stream:
+            options.toolChoice?.type === 'none'
+              ? textStream('Here it is.')
+              : toolCallStream(`call-${call++}`, 'test_echo', { summary: 'x' }),
+        }) as any,
+    })
+    const result = await run({ model, tools: [echo] })
+    expect(model.doStreamCalls.map((streamCall) => streamCall.toolChoice?.type)).toEqual([
+      'auto',
+      'auto',
+      'auto',
+      'none',
+    ])
+    expect(JSON.stringify(model.doStreamCalls[3].prompt.at(-1))).toContain('made 3 times')
+    expect(answerOf(result).parts.at(-1)).toEqual({ type: 'text', text: 'Here it is.' })
   })
 
   describe('a turn that ends without a word', () => {
@@ -635,7 +661,7 @@ describe('runAssistantTurn', () => {
     test('the turn resolves its engine once and uses the engine limits', async () => {
       const echo = makeTool('test_echo', async () => ({ text: 'x'.repeat(400) }))
       let call = 0
-      const model = scriptedModel(() => toolCallStream(`c${call++}`, 'test_echo', { summary: 'a' }))
+      const model = scriptedModel(() => toolCallStream(`c${call}`, 'test_echo', { summary: `a${call++}` }))
       const calls: unknown[] = []
       /** Resolves the local engine and records the call. */
       const resolve = async (params: unknown) => {

@@ -66,15 +66,18 @@ export const TOOL_CALL_TEXT_ERROR_KEY = 'aiAssistantToolCallText'
 const TOOL_CALL_OPEN = /^<\|?tool_call\|?>/
 const TOOL_CALL_CLOSE = /<\|?\/?tool_call\|?>$/
 
-// the same call (tool and input) failing this many times in a turn ends the tool loop
+// the same call (tool and input) made this many times in a turn ends the tool loop, whether it fails or succeeds
 export const REPEATED_FAILURE_LIMIT = 3
 
 // why a step is sent without tools, and is the last one
-export type LastStepReason = 'contextFull' | 'repeatedFailure'
+export type LastStepReason = 'contextFull' | 'repeatedFailure' | 'repeatedCall'
 
 const REPEATED_FAILURE_NOTE =
   `${APPLY_NOTE_PREFIX}the same tool call failed ${REPEATED_FAILURE_LIMIT} times, so the tools are now off. ` +
   'Answer the user now with what you have, and say briefly what could not be done.'
+const REPEATED_CALL_NOTE =
+  `${APPLY_NOTE_PREFIX}the same tool call was made ${REPEATED_FAILURE_LIMIT} times and returned the same result, ` +
+  'so the tools are now off. Answer the user now from the results you have.'
 const ANSWER_REQUEST_NOTE =
   `${APPLY_NOTE_PREFIX}you ended without writing an answer. Call the tool you still need, if any, ` +
   'then write the answer to the user from the results you have.'
@@ -86,26 +89,27 @@ type RanStep = {
 }
 
 /**
- * Returns true when one call (same tool, same input) failed REPEATED_FAILURE_LIMIT times in the turn.
+ * Tells whether one call (same tool, same input) was made REPEATED_FAILURE_LIMIT times in the turn.
  * @param {RanStep[]} steps - Steps of the turn so far.
- * @returns {boolean} True for a repeated failure.
+ * @returns {LastStepReason|null} Whether the repeated call failed or succeeded, null when none is repeated.
  */
-const hasRepeatedFailure = (steps: RanStep[]): boolean => {
+const getRepeatedCall = (steps: RanStep[]): LastStepReason | null => {
   const counts = new Map<string, number>()
   for (const part of steps.flatMap((step) => step.content)) {
+    if (part.type !== 'tool-error' && part.type !== 'tool-result') continue
     // a tool that threw, or the structured error result of the tool wrapper
-    if (part.type !== 'tool-error' && !(part.type === 'tool-result' && (part.output as any)?.error)) continue
-    const key = `${part.toolName}:${JSON.stringify(part.input)}`
+    const failed = part.type === 'tool-error' || Boolean((part.output as any)?.error)
+    const key = `${failed}:${part.toolName}:${JSON.stringify(part.input)}`
     const count = (counts.get(key) ?? 0) + 1
-    if (count >= REPEATED_FAILURE_LIMIT) return true
+    if (count >= REPEATED_FAILURE_LIMIT) return failed ? 'repeatedFailure' : 'repeatedCall'
     counts.set(key, count)
   }
-  return false
+  return null
 }
 
 /**
  * Builds the check that ends the tool loop of a turn: the step it names is sent without tools, so the model answers
- * with what it has. The context is the limit (no room left for one more tool result), and a call that keeps failing.
+ * with what it has. The context is the limit (no room left for one more tool result), and a call that is repeated.
  * @param {object} params - Parameters.
  * @param {AssistantLimits} params.limits - Prompt limits of the engine.
  * @param {number} params.fixedChars - Characters of the system prompt and the tool definitions.
@@ -129,7 +133,8 @@ export const getLastStepCheck = ({ limits, fixedChars }: { limits: AssistantLimi
     countedChars = chars
     // the first step keeps its tools: the model could never act otherwise
     if (stepNumber === 0) return null
-    if (hasRepeatedFailure(steps)) return 'repeatedFailure'
+    const repeated = getRepeatedCall(steps)
+    if (repeated) return repeated
     const inputTokens = steps.at(-1)?.usage?.inputTokens
     // only what was added since the counted request is estimated (a context of unknown size: the characters decide)
     const full =
@@ -154,16 +159,16 @@ const withNote = (messages: ModelMessage[], note: string): ModelMessage[] => {
 }
 
 /**
- * Returns the settings of a step: none, or no tools on the last one (with the note after a repeated failure).
+ * Returns the settings of a step: none, or no tools on the last one (with the note after a repeated call).
  * @param {LastStepReason|null} reason - Why the step is the last one, or null.
  * @param {ModelMessage[]} messages - Messages of the step.
  * @returns {object|undefined} The prepareStep result.
  */
 const toStepSettings = (reason: LastStepReason | null, messages: ModelMessage[]) => {
   if (!reason) return undefined
-  return reason === 'repeatedFailure'
-    ? { toolChoice: 'none' as const, messages: withNote(messages, REPEATED_FAILURE_NOTE) }
-    : { toolChoice: 'none' as const }
+  if (reason === 'contextFull') return { toolChoice: 'none' as const }
+  const note = reason === 'repeatedFailure' ? REPEATED_FAILURE_NOTE : REPEATED_CALL_NOTE
+  return { toolChoice: 'none' as const, messages: withNote(messages, note) }
 }
 
 /**
