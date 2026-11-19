@@ -634,9 +634,9 @@ export const persistNode = async ({
   cycle: string
   node: ArenaRecordNode
   file?: any
-  timezoneOffset?: any
+  timezoneOffset?: number
   lang?: string
-  clearNonApplicableValuesConfirmed?: any
+  clearNonApplicableValuesConfirmed?: boolean
 }) => {
   const recordUuid = Node.getRecordUuid(node)
 
@@ -698,7 +698,7 @@ export const deleteNode = ({
   nodeUuid: string
   timezoneOffset: any
   lang: string
-  clearNonApplicableValuesConfirmed?: any
+  clearNonApplicableValuesConfirmed?: boolean
 }) =>
   _sendNodeUpdateMessage({
     socketId,
@@ -727,7 +727,7 @@ export const generateNodeFileNameForDownload = async ({
 }: {
   surveyId: number
   nodeUuid: string
-  file: any
+  file: SurveyFile.SurveyFile
 }) => {
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
   const record = await fetchRecordAndNodesByUuid({
@@ -792,7 +792,12 @@ export const generateNodeFileNameForDownload = async ({
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
 const persistRecordNodes = async (
-  { user, survey, record, nodesArray }: { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord; nodesArray: any },
+  {
+    user,
+    survey,
+    record,
+    nodesArray,
+  }: { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord; nodesArray: ArenaRecordNode[] },
   tx: DbClient
 ) => {
   const surveyId = Survey.getId(survey)
