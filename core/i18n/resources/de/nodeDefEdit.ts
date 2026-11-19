@@ -52,7 +52,7 @@ export default {
     parent: 'Gibt die übergeordnete Entität des angegebenen Knotens zurück',
     pow: 'Gibt den Wert einer potenzierten Basis zurück',
     prevCycleNote:
-      'Funktioniert nur in Arena Mobile, wenn mehrere Zyklen definiert und der Link zum vorherigen Zyklus aktiviert ist',
+      'Funktioniert nur in Arena Mobile, wenn mehrere Zyklen definiert sind und der Link zum vorherigen Zyklus aktiviert ist',
     prevCycleValue:
       'Gibt den Wert desselben Attributs im Datensatz des vorherigen Zyklus zurück. $t(nodeDefEdit:functionDescriptions.prevCycleNote)',
     prevCycleValues:
@@ -205,7 +205,7 @@ Damit lassen sich ganze Bereiche abhängig vom angemeldeten Benutzer, etwa seine
     maxFileSize: 'Maximale Dateigröße (MB)',
     numberOfFiles: 'Unter Validierungen kann die minimale und maximale Dateianzahl geändert werden.',
     showGeotagInformation: 'Geotag-Informationen anzeigen',
-    allowScreenCaptureInMap: 'Speichern von Bildschirmaufnahmen in der Kartenansicht zulassen',
+    allowScreenCaptureInMap: 'Speichern von Bildschirmfotos in der Kartenansicht erlauben',
   },
   mobileProps: {
     title: 'Mobile-App',
@@ -311,7 +311,7 @@ Damit lassen sich ganze Bereiche abhängig vom angemeldeten Benutzer, etwa seine
 
 ---
 
-Beispiel: In einer Struktur wie *Cluster -> Plot -> Baum* darf ein als **Eindeutig** markiertes Attribut *tree_species* innerhalb desselben *Plots* nur einen Baum je Art enthalten.`,
+Beispiel: Ist in einer Struktur wie *Cluster -> Probefläche -> Baum* das Attribut *tree_species* als **Eindeutig** markiert, darf es innerhalb derselben *Probefläche* nur einen Baum je Art geben.`,
   },
   nodeDefClonedSuccessfully:
     'Knotendefinition „{{nodeDefName}}“ erfolgreich nach „{{targetParentNodeDefName}}“ geklont',

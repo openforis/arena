@@ -5,7 +5,7 @@ export default {
     activeUsers: 'Aktive Benutzer',
     activityLog: {
       title: 'Aktivitätsprotokoll',
-      size: 'Größe des $t(homeView:dashboard.activityLog.title): {{size}}',
+      size: '$t(homeView:dashboard.activityLog.title) – Größe: {{size}}',
       loadError: 'Aktivitäten konnten nicht geladen werden.',
       empty: 'Noch keine Aktivitäten.',
     },
@@ -21,14 +21,14 @@ export default {
         `,
       secondary: `
         <p>Wenn Name und Bezeichnung stimmen, erstellen Sie das erste Attribut unter
-        <linkWithIcon>Erhebung \u003E Formulardesigner</linkWithIcon>
+        <linkWithIcon>Erhebung \u003E Formular-Designer</linkWithIcon>
         </p>
         `,
     },
     nodeDefCreate: {
       main: `<title>Erstellen Sie das erste Attribut von {{surveyName}}</title>
 
-        <p>Öffnen Sie <linkWithIcon>Erhebung \u003E Formulardesigner</linkWithIcon></p>
+        <p>Öffnen Sie <linkWithIcon>Erhebung \u003E Formular-Designer</linkWithIcon></p>
         <br />
         `,
     },
@@ -216,8 +216,8 @@ Wenn die Option aktiviert ist, bleiben diese Werte im Datensatz erhalten, auch w
     },
     userExtraProps: {
       title: 'Zusätzliche Benutzereigenschaften',
-      info: `Zusätzliche Eigenschaften, die jedem mit der Erhebung verknüpften Benutzer zugewiesen werden können.
-Diese Eigenschaften können in Standardwerten, Validierungsregeln und Relevanzausdrücken verwendet werden.
+      info: `Zusätzliche Eigenschaften, die jedem mit der Erhebung verknüpften Benutzer zugewiesen werden können.  
+Diese Eigenschaften können in Standardwerten, Validierungsregeln und Relevanzausdrücken verwendet werden.  
 Beispiel: *userProp('property_name') == 'some_value'*`,
     },
   },

@@ -42,7 +42,7 @@ export default {
     title: 'Importvorschau',
     generatePreview: 'Vorschau erzeugen',
     skipInfo:
-      'Mit „Überspringen“ markierte Datensätze können nicht ausgewählt werden: Es ist bereits ein neuerer vorhandener Datensatz vorhanden, daher werden sie nicht importiert.',
+      'Mit „Überspringen“ markierte Datensätze können nicht ausgewählt werden: Es existiert bereits ein später geänderter Datensatz, daher werden sie nicht importiert.',
     confirmImport: 'Ausgewählte Datensätze importieren ({{count}})',
     columns: {
       exists: 'Vorhanden',
@@ -129,15 +129,15 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     deleteExistingEntities: `Daten der ausgewählten Entität in allen Datensätzen löschen`,
   },
   optionsInfo: {
-    deleteExistingEntities: `WARNUNG: Alle Entitäten „{{nodeDefName}}“
-und alle ihre untergeordneten Elemente in sämtlichen Datensätzen
+    deleteExistingEntities: `WARNUNG: Alle Entitäten „{{nodeDefName}}“ 
+und alle ihre untergeordneten Elemente in sämtlichen Datensätzen  
 werden gelöscht, bevor die neuen eingefügt werden.`,
   },
   startImport: 'Import starten',
-  startImportConfirm: `Durch Klicken auf „OK“ starten Sie den Import.
-**Die Änderungen können nicht rückgängig gemacht werden.**
+  startImportConfirm: `Durch Klicken auf „OK“ starten Sie den Import.  
+**Die Änderungen können nicht rückgängig gemacht werden.**  
 Möchten Sie wirklich fortfahren?`,
-  startImportConfirmWithDeleteExistingEntities: `$t(dataImportView:startImportConfirm)
+  startImportConfirmWithDeleteExistingEntities: `$t(dataImportView:startImportConfirm)  
 **(Option „$t(dataImportView:options.deleteExistingEntities)“ ausgewählt: Vorhandene Entitäten werden gelöscht, bevor neue erstellt werden.)**
 `,
   steps: {

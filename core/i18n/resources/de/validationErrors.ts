@@ -150,7 +150,7 @@ export default {
     readOnlyCannotHaveEditableIf: 'Ein schreibgeschützter Knoten darf keine Bearbeitbarkeitsbedingung besitzen',
     requiredIfInvalid: 'Ungültige Bedingung „Erforderlich, wenn“',
     requiredIfNotAllowed:
-      '„Erforderlich, wenn“ ist nur für einzelne Nicht-Schlüsselattribute zulässig, die nicht immer erforderlich sind',
+      '„Erforderlich, wenn“ ist nur für Nicht-Schlüsselattribute zulässig, die weder mehrfach noch immer erforderlich sind',
     qualifierCannotHaveApplicableExpression:
       'Ein Qualifikatorattribut darf keine Bedingung „$t(nodeDefEdit:advancedProps.relevantIf)“ besitzen',
     qualifierCannotHaveEditabilityRule:
@@ -237,9 +237,9 @@ export default {
   },
 
   taxonomyImportJob: {
-    duplicateExtraPropsColumns: 'Doppelte Spalten mit Zusatzinformationen: {{duplicateColumns}}',
+    duplicateExtraPropsColumns: 'Doppelte Spalten für Zusatzeigenschaften: {{duplicateColumns}}',
     invalidExtraPropColumn:
-      'Ungültiger Name der Zusatzinformationsspalte „{{columnName}}“: Reservierte Wörter sind nicht zulässig',
+      'Ungültiger Name der Zusatzeigenschaftsspalte „{{columnName}}“: Reservierte Wörter sind nicht zulässig',
     missingRequiredColumns: 'Erforderliche Spalte(n) fehlen: {{columns}}',
     reservedScientificName:
       'Der wissenschaftliche Name „{{scientificName}}“ ist reserviert und kann nicht verwendet werden; er wird automatisch in die Taxonomie eingefügt.',

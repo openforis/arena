@@ -4,6 +4,7 @@ export default {
     subtitle: 'Willkommen! Geben Sie Ihre Zugangsdaten ein, um mit $t(common.appNameFull) fortzufahren.',
     backToLogin: 'Zurück zur Anmeldung',
     newToArena: 'Neu bei $t(common.appNameFull)?',
+    registerBeforeLoggingIn: 'Fordern Sie zuerst Zugriff an: Nur registrierte Benutzer können sich anmelden.',
     or: 'oder',
     twoFactorTitle: 'Zwei-Faktor-Authentifizierung',
     verify: 'Bestätigen',
@@ -29,6 +30,7 @@ Geben Sie den von Ihrer Authenticator-App erzeugten Code ein.`,
   externalLogin: {
     signInWith: 'Mit {{provider}} anmelden',
     continueWith: 'Mit {{provider}} fortfahren',
+    registeredUsersOnly: 'Nur für registrierte Benutzer',
     errors: {
       providerNotAvailable:
         'Diese Anmeldeoption ist nicht verfügbar. Versuchen Sie es später erneut oder melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an.',
@@ -69,7 +71,8 @@ Geben Sie den von Ihrer Authenticator-App erzeugten Code ein.`,
       },
       startWorking: {
         title: 'Arbeit beginnen',
-        description: 'Sie werden Administrator der neuen Erhebung und können bis zu fünf Erhebungen erstellen.',
+        description:
+          'Sie werden Erhebungsadministrator der neuen Erhebung und können bis zu fünf Erhebungen erstellen.',
       },
     },
     error: 'Fehler beim Anfordern des Zugriffs: {{error}}',

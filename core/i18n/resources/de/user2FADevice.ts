@@ -4,11 +4,11 @@ export default {
   authenticatorCodeTwoInfo: 'Warten Sie 30 Sekunden und geben Sie einen zweiten Code ein',
   backupCodesRegenerated: {
     title: 'Backup-Codes erfolgreich neu erzeugt',
-    message: `Bewahren Sie die folgenden 8 Backup-Codes an einem sicheren Ort auf:
-{{backupCodes}}
+    message: `Bewahren Sie die folgenden 8 Backup-Codes an einem sicheren Ort auf:  
+{{backupCodes}}  
 
-Mit ihnen können Sie auf Ihr Konto zugreifen, falls Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.
-**Jeder Backup-Code kann nur einmal verwendet werden**.
+Mit ihnen können Sie auf Ihr Konto zugreifen, falls Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.  
+**Jeder Backup-Code kann nur einmal verwendet werden**.  
 Die Codes werden nur jetzt angezeigt. Stellen Sie daher sicher, dass Sie sie **jetzt speichern**.`,
   },
   create: {
@@ -16,7 +16,7 @@ Die Codes werden nur jetzt angezeigt. Stellen Sie daher sicher, dass Sie sie **j
   },
   creationSuccessful: {
     title: '2FA-Gerät erfolgreich erstellt',
-    message: `Das 2FA-Gerät "{{deviceName}}" wurde erstellt.
+    message: `Das 2FA-Gerät "{{deviceName}}" wurde erstellt.  
 $t(user2FADevice:backupCodesRegenerated.message)`,
   },
   deletion: {
@@ -35,7 +35,7 @@ $t(user2FADevice:backupCodesRegenerated.message)`,
   },
   regenerateBackupCodes: {
     label: 'Backup-Codes neu erzeugen',
-    confirm: `Möchten Sie die Backup-Codes für das Gerät "{{deviceName}}" wirklich neu erzeugen?
+    confirm: `Möchten Sie die Backup-Codes für das Gerät "{{deviceName}}" wirklich neu erzeugen?  
 Die bisherigen Backup-Codes funktionieren anschließend nicht mehr.`,
   },
   showSecretKey: 'Geheimschlüssel anzeigen',

@@ -10,7 +10,7 @@ export default {
     },
     includeCategoryItemsLabels: 'Bezeichnungen der Kategorieelemente einbeziehen',
     includeCategories: 'Kategorien einbeziehen',
-    expandCategoryItems: 'Kategorieelemente erweitern',
+    expandCategoryItems: 'Kategorieelemente aufschlüsseln',
     exportSingleEntitiesIntoSeparateFiles: 'Einzelentitäten in separate Dateien exportieren',
     includeAncestorAttributes: 'Attribute übergeordneter Entitäten einbeziehen',
     includeAnalysis: 'Ergebnisvariablen einbeziehen',

@@ -44,7 +44,7 @@ export default {
     [ActivityLog.type.recordStepUpdate]:
       'hat den Schritt von Datensatz {{keys}} von {{stepFrom}} auf {{stepTo}} geändert',
     [ActivityLog.type.recordMerge]:
-      'hat Datensatz {{sourceRecordKeys}} mit Datensatz {{targetRecordKeys}} zusammengeführt',
+      'hat Datensatz {{sourceRecordKeys}} in Datensatz {{targetRecordKeys}} zusammengeführt',
 
     // Node
     [ActivityLog.type.nodeCreate]: 'hat Knoten {{name}} unter {{parentPath}} zum Datensatz {{recordKeys}} hinzugefügt',

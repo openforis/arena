@@ -36,7 +36,7 @@ export default {
     busy: 'Der Server lädt gerade andere Dienste. Versuchen Sie es gleich erneut.',
   },
   aggregateFunctionInvalid: `Die benutzerdefinierte Aggregatfunktion „{{name}}“ ist ungültig. Bearbeiten Sie sie, um den Fehler zu beheben.`,
-  cannotGetChild: `Unterelement „{{childName}}“ kann nicht aus Attribut {{name}} abgerufen werden`,
+  cannotGetChild: `Unterknoten „{{childName}}“ kann nicht aus Attribut {{name}} abgerufen werden`,
   cannotImportFilesExceedingQuota:
     'Datensatzdateien können nicht importiert werden: Das Speicherkontingent würde überschritten',
   cannotInsertFileExceedingQuota: 'Datei kann nicht eingefügt werden: Das Speicherkontingent würde überschritten',
@@ -87,9 +87,9 @@ export default {
   paramIsRequired: 'Parameter {{param}} ist erforderlich',
   paramMustBeInteger: 'Parameter {{param}} muss eine Ganzzahl sein',
   propUpdateNotAllowed: 'Eigenschaft „{{key}}“ kann nicht aktualisiert werden',
-  unableToFindParent: 'Übergeordnetes Element von {{name}} wurde nicht gefunden',
+  unableToFindParent: 'Übergeordneter Knoten von {{name}} wurde nicht gefunden',
   unableToFindNode: 'Knoten mit dem Namen {{name}} wurde nicht gefunden',
-  unableToFindSibling: 'Geschwisterelement mit dem Namen {{name}} wurde nicht gefunden',
+  unableToFindSibling: 'Geschwisterknoten mit dem Namen {{name}} wurde nicht gefunden',
   undefinedFunction: `Undefinierte Funktion „{{fnName}}“ oder falsche Parametertypen`,
   invalidSyntax: 'Die Ausdruckssyntax ist ungültig',
   networkError: 'Fehler bei der Kommunikation mit dem Server',
@@ -99,7 +99,7 @@ export default {
     errorUpdating: 'Fehler beim Aktualisieren des Datensatzes',
     entityNotFound: 'Entität „{{entityName}}“ mit den Schlüsseln „{{keyValues}}“ nicht gefunden',
     updateSelfAndDependentsDefaultValues:
-      '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
+      '$t(appErrors:record.errorUpdating); Fehler beim Auswerten des Ausdrucks im Knoten {{nodeDefName}}: {{details}}',
   },
   recordPrintableExport: {
     missingEntityParams: 'Der Export der aktuellen Seite erfordert entityDefUuid und entityNodeUuid',

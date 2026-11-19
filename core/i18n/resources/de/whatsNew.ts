@@ -18,19 +18,19 @@ Auf dem Server müssen die Umgebungsvariablen \`ARENA_PUBLIC_URL\` und \`AUTH_PR
       title: 'E-Mail-Benachrichtigung bei aus Arena Mobile hochgeladenen Datensätzen',
       description: `Aktivieren Sie unter **Erhebungsinformationen → Sicherheit** die Option **Erhebungsadministratoren per E-Mail benachrichtigen, wenn Datensätze aus Arena Mobile hochgeladen werden**. Nach jedem Upload erhalten alle Erhebungsadministratoren eine E-Mail mit den hochgeladenen Datensätzen, ihren Schlüsselwerten, dem Status „neu“ oder „aktualisiert“, dem Ersteller, den Datumsangaben sowie der Anzahl der Validierungsfehler und Warnungen.
 
-Pro Upload wird eine E-Mail gesendet, auch wenn ein Gerät viele Datensätze hochlädt. Die Option ist verfügbar, wenn **Hochladen von Datensätzen aus Arena Mobile auf den Server erlauben** aktiviert ist, und wird nach Veröffentlichung der Erhebung wirksam.`,
+Pro Upload wird eine E-Mail gesendet, auch wenn ein Gerät viele Datensätze hochlädt. Die Option ist verfügbar, wenn **Hochladen von Datensätzen aus Arena Mobile auf den Server zulassen** aktiviert ist, und wird nach Veröffentlichung der Erhebung wirksam.`,
     },
     surveyGuestRole: {
       title: 'Neue Rolle „Gast“ zum Anzeigen von Datensätzen ohne Bearbeitungsrecht',
       description: `Laden Sie Benutzer mit der neuen Rolle **Gast** ein (**Benutzer → Benutzer einladen**). Sie können alle Datensätze der Erhebung auch in **Arena Mobile** anzeigen, jedoch weder bearbeiten oder löschen noch neue hinzufügen.
 
-Fügen Sie den Gast einer **Benutzergruppe** (**Benutzer → Benutzergruppen**) mit Qualifikatoren hinzu, um nur einen Teil der Daten anzuzeigen: Datensätze, deren Qualifikatorattribute den Gruppenwerten entsprechen (z. B. Probeflächen einer Region). Gruppen mit der Einstellung **Kann Datensätze anzeigen von** gewähren zusätzlich Zugriff auf Datensätze anderer Gruppen.
+Fügen Sie den Gast einer **Benutzergruppe** (**Benutzer → Benutzergruppen**) mit Qualifikatoren hinzu, um nur einen Teil der Daten anzuzeigen: Datensätze, deren Qualifikatorattribute den Gruppenwerten entsprechen (z. B. Probeflächen einer Region). Gruppen mit der Einstellung **Kann Datensätze folgender Gruppen anzeigen** gewähren zusätzlich Zugriff auf Datensätze anderer Gruppen.
 
 Vorhandene Erhebungen erhalten die neue Rolle automatisch.`,
     },
     areaOfInterest: {
       title: 'Interessengebiete: Prüfen, ob eine Position innerhalb eines Gebiets liegt',
-      description: `Fügen Sie unter **Erhebungsinformationen → Karte** ein oder mehrere **Interessengebiete** hinzu (z. B. Gemeinden eines Pilotgebiets), jeweils mit Name und Polygon im GeoJSON-Format. Prüfen Sie sie beim Hinzufügen einzeln oder gemeinsam (**Alle auf Karte anzeigen**) und zeigen Sie sie unter **Daten → Karte** als Ebenen an.
+      description: `Fügen Sie unter **Erhebungsinformationen → Karte** ein oder mehrere **Interessengebiete** hinzu (z. B. Gemeinden eines Pilotgebiets), jeweils mit Name und Polygon im GeoJSON-Format. Prüfen Sie sie beim Hinzufügen einzeln oder gemeinsam (**Alle auf der Karte anzeigen**) und zeigen Sie sie unter **Daten → Karte** als Ebenen an.
 
 Die neue Ausdrucksfunktion \`geoDistanceToAOIBoundary(location, 'area_name')\` liefert den Abstand in Metern zwischen einer Position und der Gebietsgrenze: negativ innerhalb, positiv außerhalb. Vergleichen Sie ihn mit der GPS-Genauigkeit (\`location.accuracy\`), um Positionen als innen, außen oder unsicher einzustufen, etwa in Standardwerten schreibgeschützter Attribute und in Validierungsregeln mit Schweregrad *Warnung*. \`geoAOIContaining(location)\` liefert den Namen des Gebiets, das die Position enthält. Beide Funktionen arbeiten auch offline in **Arena Mobile**.
 
@@ -38,7 +38,7 @@ Vielen Dank an **[ASSEDEV Alerte Environnement](https://assedev.fr)** für die A
     },
     dataQueryTotals: {
       title: 'Gesamtsummen und Prozentwerte im Daten-Explorer',
-      description: `Öffnen Sie unter **Daten → Explorer** im Modus **Aggregieren** mit einem einzelnen Messwert (z. B. Summe des Baumvolumens nach Art) das Menü **Ansicht** und wählen Sie **Gesamtsumme und Prozentwert anzeigen**. Jede Zeile zeigt ihren Anteil an der Gesamtsumme; unten wird eine Zeile **Gesamt** ergänzt.
+      description: `Öffnen Sie unter **Daten → Explorer** im Modus **Aggregiert** mit einem einzelnen Messwert (z. B. Summe des Baumvolumens nach Art) das Menü **Ansicht** und wählen Sie **Gesamtsumme und Prozentsatz anzeigen**. Jede Zeile zeigt ihren Anteil an der Gesamtsumme; unten wird eine Zeile **Gesamt** ergänzt.
 
 Auch die Optionen **Namen anzeigen** und **Codes anzeigen** befinden sich im Menü **Ansicht**.`,
     },
@@ -56,7 +56,7 @@ Dieses Format wird von Vegetationsanalysewerkzeugen wie **Turboveg**, **Juice** 
     },
     mobilePreview: {
       title: 'Erhebungsvorschau in Arena Mobile',
-      description: `Öffnen Sie im Formular-Designer das Menü neben **Vorschau** und wählen Sie **Vorschau (mobil)**, um den Erhebungsentwurf so auszuprobieren, wie er in **Arena Mobile** auf einem Smartphone oder Tablet im Hoch- oder Querformat erscheint.
+      description: `Öffnen Sie im Formular-Designer das Menü neben **Vorschau** und wählen Sie **Vorschau (Mobilgerät)**, um den Erhebungsentwurf so auszuprobieren, wie er in **Arena Mobile** auf einem Smartphone oder Tablet im Hoch- oder Querformat erscheint.
 
 Die Vorschau läuft im Browser; einige Funktionen eines echten Geräts, etwa Karten und Kamera, sind nicht verfügbar.`,
     },
@@ -64,7 +64,7 @@ Die Vorschau läuft im Browser; einige Funktionen eines echten Geräts, etwa Kar
       title: 'Bedingt erforderliche Attribute',
       description: `Wählen Sie im Formular-Designer im Reiter **Validierungen** eines Attributs **Erforderlich, wenn Bedingung erfüllt ist** und geben Sie die Bedingung ein. Das Attribut ist nur erforderlich, wenn die Bedingung wahr ist.
 
-Bei der Dateneingabe wird der Fehler „Wert erforderlich“ nur angezeigt, wenn die Bedingung erfüllt ist.`,
+Bei der Datenerfassung wird der Fehler „Wert erforderlich“ nur angezeigt, wenn die Bedingung erfüllt ist.`,
     },
     themeSelector: {
       title: 'Helles und dunkles Design',
@@ -96,7 +96,7 @@ Die Analyse läuft im Hintergrund; die Ergebnisse werden in einer neuen Kategori
     },
     clearNonApplicableValues: {
       title: 'Nicht mehr relevante Werte werden gelöscht',
-      description: `Wenn eine Änderung bei der Dateneingabe dazu führt, dass andere Felder nicht mehr relevant sind, werden deren Werte nach Ihrer Bestätigung gelöscht.
+      description: `Wenn eine Änderung bei der Datenerfassung dazu führt, dass andere Felder nicht mehr relevant sind, werden deren Werte nach Ihrer Bestätigung gelöscht.
 
 Erhebungsadministratoren können das bisherige Verhalten mit **Werte nicht relevanter Attribute beibehalten** unter **Erhebungsinformationen → Sicherheit** aktivieren.`,
     },

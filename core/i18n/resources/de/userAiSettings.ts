@@ -23,7 +23,6 @@ export default {
   'sourceAdmin-default': 'Plattformstandard',
   notConfigured:
     'Für Ihr Konto oder diese Bereitstellung ist keine KI konfiguriert. Konfigurieren Sie unten einen persönlichen Anbieter oder wenden Sie sich an Ihren Administrator.',
-  featuresDisabled: 'KI-Funktionen sind in dieser Bereitstellung deaktiviert.',
   encryptionMissing:
     'In dieser Bereitstellung fehlt AI_USER_KEY_ENCRYPTION_SECRET. Persönliche API-Schlüssel können erst gespeichert werden, nachdem ein Administrator die Einstellung konfiguriert hat.',
 

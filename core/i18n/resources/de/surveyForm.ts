@@ -30,8 +30,8 @@ export default {
 {{nodeDefLabels}}
 
 Fortfahren?`,
-  confirmUpdateDependentEnumeratedEntities: `Wenn Sie fortfahren, werden einige aufgezählte Entitäten ({{entityDefs}}) neu aufgezählt.
-Dabei werden vorhandene darin eingetragene Werte gelöscht.
+  confirmUpdateDependentEnumeratedEntities: `Wenn Sie fortfahren, werden einige aufgezählte Entitäten ({{entityDefs}}) neu aufgezählt.  
+Dabei werden vorhandene darin eingetragene Werte gelöscht.  
 Fortfahren?`,
   convert: `„{{nodeDefLabel}}“ konvertieren`,
   delete: `„{{nodeDefLabel}}“ löschen`,
@@ -74,9 +74,9 @@ Fortfahren?`,
   },
   formEntryActions: {
     confirmDemote: 'Möchten Sie diesen Datensatz wirklich auf {{name}} zurückstufen?',
-    confirmPromote: `Möchten Sie diesen Datensatz wirklich **auf {{name}} hochstufen**?
+    confirmPromote: `Möchten Sie diesen Datensatz wirklich **auf {{name}} hochstufen**?  
 Sie können ihn anschließend nicht mehr bearbeiten.`,
-    confirmPromoteWithErrors: `**Dieser Datensatz enthält Fehler**.
+    confirmPromoteWithErrors: `**Dieser Datensatz enthält Fehler**.  
 $t(surveyForm:formEntryActions.confirmPromote)`,
     confirmDelete: 'Möchten Sie diesen Datensatz wirklich löschen?\n\n$t(common.cantUndoWarning)',
     closePreview: 'Vorschau schließen',
@@ -133,12 +133,12 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
     scientificName: 'Wissenschaftlicher Name',
     vernacularName: 'Trivialname',
     vernacularNameAlwaysIncludedIfSingle: 'Einzigen Trivialnamen immer einbeziehen',
-    vernacularNameAlwaysIncludedIfSingleInfo: `- **Aktiviert**: Ist für ein Taxon nur ein Trivialname definiert, wird dieser bei Auswahl des Taxons automatisch mit den Daten gespeichert.
+    vernacularNameAlwaysIncludedIfSingleInfo: `- **Aktiviert**: Ist für ein Taxon nur ein Trivialname definiert, wird dieser bei Auswahl des Taxons automatisch mit den Daten gespeichert.  
 - **Deaktiviert**: Es werden nur Taxoncode und wissenschaftlicher Name gespeichert, auch wenn das Taxon nur einen Trivialnamen besitzt.`,
     vernacularNameSelectionKept: 'Auswahl des Trivialnamens beibehalten',
-    vernacularNameSelectionKeptInfo: `- **Aktiviert**: Wird ein Taxon über einen Trivialnamen ausgewählt, wird der konkret für die Suche verwendete Trivialname ebenfalls gespeichert.
-- **Deaktiviert**: Es werden nur Taxoncode und wissenschaftlicher Name gespeichert, unabhängig vom verwendeten Trivialnamen.
-In Arena Mobile:
+    vernacularNameSelectionKeptInfo: `- **Aktiviert**: Wird ein Taxon über einen Trivialnamen ausgewählt, wird der konkret für die Suche verwendete Trivialname ebenfalls gespeichert.  
+- **Deaktiviert**: Es werden nur Taxoncode und wissenschaftlicher Name gespeichert, unabhängig vom verwendeten Trivialnamen.  
+In Arena Mobile:  
 - **Aktiviert**: Jeder Trivialname erscheint als eigenes Element in den Suchergebnissen.
 - **Deaktiviert**: Alle Trivialnamen eines Taxons werden gruppiert und zusammen mit dem Taxon in einem Eintrag angezeigt. Dadurch enthält die Autovervollständigung weniger Elemente.`,
     visibleFields: 'Sichtbare Felder',
@@ -169,7 +169,7 @@ In Arena Mobile:
     sourceNode: 'Quellknoten',
     targetEntityCurrentSurvey: 'Zielentität (aktuelle Erhebung)',
   },
-  confirmNodeDelete: 'Möchten Sie {{nodeDefType}} ({{nodeDefLabel}}) wirklich löschen?',
+  confirmNodeDelete: 'Möchten Sie „{{nodeDefLabel}}“ ({{nodeDefType}}) wirklich löschen?',
   downloadPrintableDocument: 'Druckbares Dokument herunterladen (Word)',
   downloadPrintableDocumentPdf: 'Druckbares Dokument herunterladen (PDF)',
   printableExport: {
@@ -204,7 +204,7 @@ In Arena Mobile:
   nodeDefsTranslation: {
     apply: 'Übersetzungen anwenden',
     applySuccess: 'Übersetzungen erfolgreich angewendet',
-    aiSuggestion: 'AI',
+    aiSuggestion: 'KI',
     current: 'Aktuell',
     custom: 'Benutzerdefiniert',
     defaultDescription: 'Standardbeschreibung',

@@ -1,7 +1,7 @@
 export default {
   body: {
     label: 'Nachrichtentext',
-    info: `Sie können den Nachrichtentext mit **Markdown** formatieren (weitere Informationen unter https://www.markdownguide.org).
+    info: `Sie können den Nachrichtentext mit **Markdown** formatieren (weitere Informationen unter https://www.markdownguide.org).  
 Folgende Platzhaltervariablen sind verfügbar:
 - \`{{userTitleAndName}}\`: wird durch Anrede und Namen des Benutzers ersetzt (z. B. "Herr John")
 - \`{{userName}}\`: wird durch den Namen des Benutzers ersetzt (z. B. "John")`,

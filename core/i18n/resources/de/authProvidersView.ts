@@ -95,7 +95,7 @@ export default {
       'Benutzer, die Arena-2FA aktiviert haben, müssen weiterhin ihren Code eingeben. Deaktivieren Sie diese Option nur, wenn der Anbieter eine eigene Multi-Faktor-Authentifizierung erzwingt.',
     trustEmail: 'E-Mail-Adressen dieses Anbieters vertrauen',
     trustEmailInfo:
-      'Konten anhand der E-Mail-Adresse verknüpfen, auch wenn der Anbieter deren Bestätigung nicht bestätigt. Aktivieren Sie dies nur für Anbieter, die E-Mail-Adressen selbst überprüfen.',
+      'Konten anhand der E-Mail-Adresse verknüpfen, auch wenn der Anbieter nicht bestätigt, dass die E-Mail-Adresse verifiziert ist. Aktivieren Sie dies nur für Anbieter, die E-Mail-Adressen selbst überprüfen.',
     redirectUri: 'Weiterleitungs-URI',
     redirectUriCopied: 'Weiterleitungs-URI kopiert',
     setupStepsTitle: 'Anbieter einrichten',

@@ -26,7 +26,8 @@ export default {
   clear: 'Leeren',
   reconnect: 'Erneut verbinden',
   jumpToLatest: 'Zum neuesten Eintrag springen',
-  fileNotFound: 'Instanz {{instanceId}}: Protokolldatei {{fileName}} wurde nicht gefunden; warte auf ihre Erstellung',
+  fileNotFound:
+    'Instanz {{instanceId}}: Protokolldatei {{fileName}} wurde nicht gefunden, es wird auf ihre Erstellung gewartet',
   linesCount: '{{visible}} von {{total}} Zeilen werden angezeigt',
   markers: {
     rotated: 'Protokolldatei wurde rotiert',

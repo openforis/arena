@@ -63,7 +63,7 @@ Verfeinern Sie die Abfrage (z. B. durch einen Filter), um die Anzahl zu verringe
   filterAttributes: 'Attribute filtern',
   filterMessages: 'Meldungen filtern',
   messageTypeFilter: {
-    valueRequired: 'Erforderlicher Wert',
+    valueRequired: 'Wert erforderlich',
     valueInvalid: 'Ungültiger Wert',
     uniqueDuplicate: 'Doppelter Wert',
     customValidation: 'Benutzerdefinierte Validierung',
@@ -112,11 +112,11 @@ Verfeinern Sie die Abfrage (z. B. durch einen Filter), um die Anzahl zu verringe
     merge: {
       label: 'Zusammenführen',
       confirmLabel: 'Zusammenführung bestätigen',
-      confirmTooManyDifferencesMessage: `**Zu viele Unterschiede**.
-Die Datensätze scheinen sich stark zu unterscheiden.
-Bei der Zusammenführung werden viele Attribute (~{{nodesUpdated}}) aktualisiert.
+      confirmTooManyDifferencesMessage: `**Zu viele Unterschiede**.  
+Die Datensätze scheinen sich stark zu unterscheiden.  
+Bei der Zusammenführung werden viele Attribute (~{{nodesUpdated}}) aktualisiert.  
 Mit der Vorschau fortfahren?`,
-      noChangesWillBeApplied: `Auf den Zieldatensatz würden keine Änderungen angewendet.
+      noChangesWillBeApplied: `Auf den Zieldatensatz würden keine Änderungen angewendet.  
 Die Zusammenführung kann nicht durchgeführt werden.`,
       performedSuccessfullyMessage: 'Datensätze erfolgreich zusammengeführt!',
       previewTitle: 'Vorschau der Zusammenführung (Datensatz {{keyValues}})',
@@ -194,7 +194,7 @@ Dieses Format wird von Vegetationsanalysewerkzeugen wie Turboveg, Juice und Synb
     previewRecord: '{{keys}} von Datensatz {{number}}',
     recordKeys: 'Schlüsselattribute zur Benennung der Datensatzspalten',
     recordKeysInfo:
-      'Jeder Datensatz wird zu einer Spalte, die nach den Werten der ausgewählten Schlüsselattribute benannt ist (z. B. nur die Plotnummer). Standardmäßig werden die im Daten-Explorer ausgewählten Schlüsselattribute verwendet; ist keines ausgewählt, werden alle verwendet. Mindestens eines ist erforderlich.',
+      'Jeder Datensatz wird zu einer Spalte, die nach den Werten der ausgewählten Schlüsselattribute benannt ist (z. B. nur die Probeflächennummer). Standardmäßig werden die im Daten-Explorer ausgewählten Schlüsselattribute verwendet; ist keines ausgewählt, werden alle verwendet. Mindestens eines ist erforderlich.',
     recordsAll:
       'Die Daten aller Datensätze werden exportiert. Legen Sie im Daten-Explorer einen Filter fest, um nur einen Teil zu exportieren.',
     recordsFiltered: 'Nur Daten, die dem aktuellen Filter des Daten-Explorers entsprechen, werden exportiert.',

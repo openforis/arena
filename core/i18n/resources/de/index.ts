@@ -6,7 +6,6 @@ import common from './common'
 import dataExportView from './dataExportView'
 import dataImportView from './dataImportView'
 import dataView from './dataView'
-import emails from './emails'
 import guest from './guest'
 import homeView from './homeView'
 import jobs from './jobs'
@@ -32,7 +31,6 @@ export default {
   dataExportView,
   dataImportView,
   dataView,
-  emails,
   guest,
   homeView,
   jobs,
