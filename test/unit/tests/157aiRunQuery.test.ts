@@ -273,6 +273,23 @@ describe('numbers the model must not compute itself', () => {
     expect(raw.calls).toHaveLength(1)
   })
 
+  test('an aggregate query without dimensions gives its figures as totals, with no row count to mistake for one', async () => {
+    const input = { ...aggregateInput, dimensions: [] }
+    const { countTool, runQueryTool, ctx } = await setUp({ input, count: 1 })
+    for (const tool of [runQueryTool, countTool]) {
+      const result = await runTool(tool, { queryId: 'q1' }, ctx)
+      expect(result).toEqual({ queryId: 'q1', mode: 'aggregate', totals: { dbh_avg: 99.5 } })
+    }
+  })
+
+  test('an aggregate query without dimensions: a timeout is reported, not swallowed', async () => {
+    const { api } = newFakeAnalysisApi({ fetchQueryRows: () => Promise.reject(new SystemError('queryTimeout')) })
+    const [, runQueryTool] = createRunQueryTools({ api })
+    const ctx = newAnalysisToolContext({ survey })
+    await runTool(proposeQueryTool, { ...aggregateInput, dimensions: [] }, ctx)
+    expect((await runTool(runQueryTool, { queryId: 'q1' }, ctx)).error.code).toBe('queryTimeout')
+  })
+
   test('limit: only the top rows are asked for and returned, and the note says they are the top ones', async () => {
     const rows = Array.from({ length: 6 }, (_, idx) => aggregateRow(idx))
     const { runQueryTool, ctx, calls } = await setUp({ input: { ...sortedInput, limit: 5 }, rows, count: 40 })

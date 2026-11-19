@@ -213,9 +213,6 @@ export const toQuery = ({
       candidates: QueryNodeDefs.getDimensionAttributeDefs({ survey, entityDef, cycle, includeAnalysis }),
       kind: 'dimension',
     })
-    if (dimensionDefs.length === 0 && aiResult.dimensions.length === 0) {
-      errors.push('aggregate mode requires at least one dimension')
-    }
     query = Query.assocDimensions(dimensionDefs.map(NodeDef.getUuid))(query)
     sortableDefs = dimensionDefs
 

@@ -57,6 +57,13 @@ describe('analysis system prompt', () => {
     expect(prompt).not.toContain('query_count')
   })
 
+  test('an overall figure is an aggregate query without dimensions', () => {
+    const prompt = build(true)
+    expect(prompt).toContain('"dimensions" may be empty')
+    expect(prompt).toContain('aggregate query with no dimensions')
+    expect(prompt).not.toContain('propose a raw query with the filter and call query_count')
+  })
+
   test('with data tools: a record is a row of the root entity', () => {
     expect(build(true)).toContain('a record is one row of the root entity')
   })

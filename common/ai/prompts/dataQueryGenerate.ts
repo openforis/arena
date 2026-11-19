@@ -35,6 +35,8 @@ export const getDataQueryRules = ({ schemaSource = defaultSchemaSource }: { sche
   `A query always targets ONE entity (a table: one row per entity instance) and has one of two modes:
 - "raw": lists rows; "attributes" are the columns to show.
 - "aggregate": groups rows; "dimensions" are the group-by attributes, "measures" are the aggregated values.
+  "dimensions" may be empty: the result is then one row with the measures over all the rows
+  (e.g. the number of trees, the mean dbh of all trees).
   Each measure has one or more aggregate functions among: ${aggregateFunctions.join(', ')}
   (avg = average, cnt = count, max, med = median, min, sum).
   To COUNT the entity instances (e.g. "number of trees"), use the entity name itself as measure attribute
@@ -76,7 +78,7 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape:
   "explanation": "<short explanation of the query for the user>"
 }
 - In raw mode "attributes" must contain at least one attribute, "dimensions" and "measures" must be empty.
-- In aggregate mode "dimensions" and "measures" must contain at least one item each, "attributes" must be empty.
+- In aggregate mode "measures" must contain at least one item, "attributes" must be empty.
 - Do not wrap the JSON in code fences or backticks.
 - Do not add prose before or after the JSON.`
 

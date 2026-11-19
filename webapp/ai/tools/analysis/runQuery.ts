@@ -101,7 +101,7 @@ const getTruncationNote = ({
  * @param {AnalysisApi} params.api - Analysis API.
  * @param {object} params.requestParams - Request parameters.
  * @param {QueryResultColumn[]} params.columns - Result columns.
- * @returns {Promise<object|null>} The totals by measure column, or null when they could not be computed.
+ * @returns {Promise<object|null>} The totals by measure column, or null when the query has no rows.
  */
 const fetchTotals = async ({
   api,
@@ -113,15 +113,41 @@ const fetchTotals = async ({
   columns: QueryResultColumn[]
 }): Promise<Record<string, unknown> | null> => {
   const query = Query.assocSort([])(Query.assocDimensions([])(requestParams.query))
+  const [row] = await api.fetchQueryRows({ ...requestParams, query, limit: 1 })
+  if (!row) return null
+  return Object.fromEntries(columns.filter((column) => column.fn).map(({ name }) => [name, row[name] ?? null]))
+}
+
+/**
+ * Fetches the totals of a grouped result: without them the rows are still worth returning.
+ * @param {object} params - The parameters of fetchTotals.
+ * @returns {Promise<object|null>} The totals, or null when they could not be computed.
+ */
+const fetchTotalsOrNull = async (params: Parameters<typeof fetchTotals>[0]) => {
   try {
-    const [row] = await api.fetchQueryRows({ ...requestParams, query, limit: 1 })
-    if (!row) return null
-    return Object.fromEntries(columns.filter((column) => column.fn).map(({ name }) => [name, row[name] ?? null]))
+    return await fetchTotals(params)
   } catch (error) {
-    if (requestParams.signal?.aborted) throw error
-    // the rows are still worth returning without the totals
+    if (params.requestParams.signal?.aborted) throw error
     return null
   }
+}
+
+// an aggregate query without dimensions: one figure per measure, over all the rows
+const isUngrouped = (entry: { mode: string; query: any }) =>
+  entry.mode === 'aggregate' && Query.getDimensions(entry.query).length === 0
+
+/**
+ * Runs an aggregate query without dimensions. Its figures are the "totals": a row count of 1 would be read as one.
+ * @param {object} params - Parameters.
+ * @param {AnalysisApi} params.api - Analysis API.
+ * @param {object} params.ctx - Tool context.
+ * @param {any} params.entry - Proposed query.
+ * @returns {Promise<object>} The result.
+ */
+const runUngrouped = async ({ api, ctx, entry }: { api: AnalysisApi; ctx: any; entry: any }) => {
+  const columns = getQueryResultColumns({ survey: ctx.survey, query: entry.query })
+  const totals = await fetchTotals({ api, requestParams: getRequestParams(ctx, entry), columns })
+  return { queryId: entry.id, mode: entry.mode, totals }
 }
 
 /**
@@ -153,7 +179,9 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
   const countTool: AiTool<Input, unknown> = {
     ...common,
     name: 'query_count',
-    description: 'Counts the rows (raw mode) or the groups (aggregate mode) of a proposed query.',
+    description:
+      'Counts the rows (raw mode) or the groups (aggregate mode) of a proposed query. An aggregate query with no ' +
+      'dimensions has no groups to count: it returns its figures in "totals".',
     /**
      * Counts a proposed query.
      * @param {Input} input - Tool input.
@@ -164,6 +192,7 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
       const entry = ctx.analysisQueries?.get(queryId)
       if (!entry) throw unknownQuery(queryId)
       try {
+        if (isUngrouped(entry)) return await runUngrouped({ api, ctx, entry })
         const total = await api.fetchQueryCount(getRequestParams(ctx, entry))
         return { queryId, mode: entry.mode, total }
       } catch (error) {
@@ -178,7 +207,8 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
     description:
       'Runs a proposed query and returns its columns and rows: at most 200 groups (aggregate) or 50 rows (raw), ' +
       'or its limit, plus the number of rows ("total"). An aggregate result has "totals": its measures over all ' +
-      'the rows, without grouping. Take overall figures from "totals", never by adding rows, and cite the query id.',
+      'the rows, without grouping (an aggregate query with no dimensions returns only "totals"). Take overall ' +
+      'figures from "totals", never by adding rows, and cite the query id.',
     /**
      * Runs a proposed query, capped.
      * @param {Input} input - Tool input.
@@ -192,11 +222,12 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
       const max = Math.min(entry.limit ?? Infinity, aggregate ? aggregateRowsMax : rawRowsMax)
       const requestParams = getRequestParams(ctx, entry)
       try {
+        if (isUngrouped(entry)) return await runUngrouped({ api, ctx, entry })
         const { rows, total, truncated } = await fetchCappedRows({ api, requestParams, max })
         const columns = getQueryResultColumns({ survey: ctx.survey, query: entry.query })
         const resultRows = toResultRows({ rows, columns })
         // one group is its own total
-        const totals = aggregate && total > 1 ? await fetchTotals({ api, requestParams, columns }) : null
+        const totals = aggregate && total > 1 ? await fetchTotalsOrNull({ api, requestParams, columns }) : null
         const head = { queryId, mode: entry.mode, columns: columns.map((column) => column.name) }
         const body = {
           ...(totals ? { totals } : {}),

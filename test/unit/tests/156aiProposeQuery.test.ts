@@ -64,11 +64,10 @@ describe('query_propose', () => {
     expect(JSON.stringify(result)).not.toContain('cannot be parsed')
   })
 
-  test('an aggregate query without a dimension is refused with the way to get a total', async () => {
-    const input = { ...aggregateInput, dimensions: [], sort: [], measures: [{ attribute: 'tree', functions: ['cnt'] }] }
+  test('an aggregate query without a dimension is one figure over all the rows', async () => {
+    const input = { ...aggregateInput, dimensions: [], sort: [], measures: [{ attribute: 'dbh', functions: ['avg'] }] }
     const result = await runTool(proposeQueryTool, input, newAnalysisToolContext({ survey }))
-    expect(result.error.code).toBe('invalidProposal')
-    expect(JSON.stringify(result.error.issues)).toContain('query_count')
+    expect(result).toMatchObject({ queryId: 'q1', mode: 'aggregate', chartAvailable: false })
   })
 
   test('an aggregate query can be sorted by a measure, in the order given', async () => {

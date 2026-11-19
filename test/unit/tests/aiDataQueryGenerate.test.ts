@@ -193,12 +193,11 @@ describe('AI data query generation', () => {
     })
 
     test('missing selection', () => {
-      expect(convert({}).errors).toEqual(
-        expect.arrayContaining([
-          'aggregate mode requires at least one dimension',
-          'aggregate mode requires at least one measure',
-        ])
-      )
+      expect(convert({}).errors).toEqual(['aggregate mode requires at least one measure'])
+      // measures alone: one figure over all the rows
+      const { query, errors } = convert({ measures: [{ attribute: 'tree', functions: ['cnt'] }] })
+      expect(errors).toEqual([])
+      expect(Query.hasSelection(query)).toBe(true)
       expect(convert({ mode: Query.modes.raw }).errors).toEqual(['raw mode requires at least one attribute'])
     })
 

@@ -19,7 +19,7 @@ export const proposeQueryInputSchema = z.object({
   entity: name.describe('Entity the query targets (one row per entity instance)'),
   mode: z.enum(['raw', 'aggregate']),
   attributes: nameList.describe('Raw mode: the attributes to show'),
-  dimensions: nameList.describe('Aggregate mode: the attributes to group by'),
+  dimensions: nameList.describe('Aggregate mode: the attributes to group by; empty for one figure over all rows'),
   measures: z
     .array(z.object({ attribute: name, functions: z.array(z.string().max(10)).max(6) }))
     .max(50)
@@ -85,12 +85,6 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
   // without a sort the first N rows are arbitrary ones
   if (input.limit && (input.sort ?? []).length === 0)
     errors.push('a limit needs a sort: add the sort that defines the first rows')
-  // the Explorer has no aggregate without a group: the row count of a raw query is the total
-  if (input.mode === 'aggregate' && (input.dimensions ?? []).length === 0)
-    errors.push(
-      'for a total with no grouping (e.g. "how many trees"), propose a raw query with the same filter: ' +
-        'query_count returns its number of rows'
-    )
   if (!query || errors.length > 0) {
     return {
       error: {
