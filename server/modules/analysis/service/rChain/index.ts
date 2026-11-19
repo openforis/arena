@@ -1,4 +1,4 @@
-import type { NodeDefEntity, User as ArenaUser, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, ArenaUser, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
@@ -128,8 +128,8 @@ const getAnalysisNodeDefZipEntryName = ({
   entity,
   nodeDef,
 }: {
-  entity: NodeDefEntity
-  nodeDef: ArenaNodeDef<NodeDefType>
+  entity: ArenaNodeDefEntity
+  nodeDef: ArenaAnyNodeDef
 }) => {
   const nodeDefName = NodeDef.getName(nodeDef)
 

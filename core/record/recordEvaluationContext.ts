@@ -1,11 +1,11 @@
-import type { RecordExpressionEvaluationContext } from '@openforis/arena-core'
+import type { ArenaRecordExpressionEvaluationContext } from '@openforis/arena-core'
 
 /**
  * Parameters needed to evaluate the survey expressions (relevance, default values, validations...)
  * while updating or validating a record: forward them all, using extract, to keep them in sync.
  */
 export type RecordEvaluationContext = Omit<
-  RecordExpressionEvaluationContext,
+  ArenaRecordExpressionEvaluationContext,
   'record' | 'prevCycleRecord' | 'sideEffect'
 >
 

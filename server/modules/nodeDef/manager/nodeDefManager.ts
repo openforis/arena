@@ -4,12 +4,11 @@ import { db, DbClient } from '@server/db/db'
 import {
   NodeDefsFixer,
   Objects,
-  type NodeDefPropsWithLayout,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
-  type NodeDefEntity,
+  type ArenaNodeDefPropsWithLayout,
+  type ArenaUser,
+  type ArenaSurvey,
+  type ArenaNodeDefEntity,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -43,11 +42,11 @@ export {
 } from '../repository/nodeDefRepository'
 
 const _persistNodeDefLayout = (
-  { surveyId, nodeDef }: { surveyId: number; nodeDef: ArenaNodeDef<NodeDefType> },
+  { surveyId, nodeDef }: { surveyId: number; nodeDef: ArenaAnyNodeDef },
   client: DbClient = db
 ) => {
   const { uuid: nodeDefUuid, parentUuid, props } = nodeDef
-  const { layout } = props as NodeDefPropsWithLayout<unknown>
+  const { layout } = props as ArenaNodeDefPropsWithLayout<unknown>
   return NodeDefRepository.updateNodeDefProps({ surveyId, nodeDefUuid, parentUuid, props: { layout } }, client)
 }
 
@@ -115,7 +114,7 @@ export const insertNodeDef = (
     user: ArenaUser
     survey: ArenaSurvey
     cycle?: string
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     system?: any
     addLogs?: any
   },
@@ -202,7 +201,7 @@ const _propsUpdateRequiresParentLayoutUpdate = ({
   nodeDef,
   props,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   props: Record<string, any>
 }) =>
   NodeDef.isCoordinate(nodeDef) &&
@@ -219,7 +218,7 @@ const _isNameOrLabelOrActiveChanged = ({
   propsAdvanced,
 }: {
   nodeDefPrev: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   props: Record<string, any>
   propsAdvanced: any
 }) =>
@@ -238,7 +237,7 @@ const _updateAreaBasedEstimateOnPropsUpdate = (
   }: {
     survey: ArenaSurvey
     nodeDefPrev: any
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     props: Record<string, any>
     propsAdvanced: any
   },
@@ -285,7 +284,7 @@ export const updateNodeDefProps = (
 
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-    const nodeDefsUpdated: Record<string, ArenaNodeDef<NodeDefType>> = {}
+    const nodeDefsUpdated: Record<string, ArenaAnyNodeDef> = {}
     let surveyUpdated = survey
 
     const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
@@ -398,8 +397,8 @@ const checkCanMoveNodeDef = ({
   nodeDef,
   targetParentNodeDef,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
-  targetParentNodeDef: NodeDefEntity
+  nodeDef: ArenaAnyNodeDef
+  targetParentNodeDef: ArenaNodeDefEntity
 }) => {
   if (NodeDef.isEntity(nodeDef)) {
     // Validation: prevent moving an entity into itself or into one of its descendants
@@ -458,13 +457,7 @@ const updateDescendantsLayout = async ({
   return nodeDefsUpdatedByUuid
 }
 
-const getLayoutInParentEntityByCycles = ({
-  survey,
-  nodeDef,
-}: {
-  survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
-}) => {
+const getLayoutInParentEntityByCycles = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef }) => {
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefSourceLayoutPrevByCycle = {}
   const nodeDefSourceParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -487,7 +480,7 @@ export const addOrRemoveNodeDefInParentLayout = async (
     layoutInParentByCycle = null,
   }: {
     survey: ArenaSurvey
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     add?: any
     layoutInParentByCycle?: Record<string, any>
   },

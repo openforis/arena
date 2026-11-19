@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
-import { SurveyDocImages, type SurveyDocImage } from '@openforis/arena-core'
+import { SurveyDocImages, type ArenaSurveyDocImage } from '@openforis/arena-core'
 
 import { ButtonAdd, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -20,8 +20,8 @@ import * as API from '@webapp/service/api'
 import SurveyDocImageEditor from './SurveyDocImageEditor'
 
 type Props = {
-  surveyDocImages: SurveyDocImage[]
-  setSurveyDocImages: (images: SurveyDocImage[]) => void
+  surveyDocImages: ArenaSurveyDocImage[]
+  setSurveyDocImages: (images: ArenaSurveyDocImage[]) => void
   surveyDocOptions?: Record<string, unknown>
   setSurveyDocOptions?: (options: Record<string, unknown>) => void
   readOnly?: boolean
@@ -36,7 +36,7 @@ const SurveyDocLayoutEditor = (props: Props) => {
   const confirm = useConfirmAsync()
 
   const [dialogVisible, setDialogVisible] = useState(false)
-  const [editedSurveyDocImage, setEditedSurveyDocImage] = useState<SurveyDocImage | null>(null)
+  const [editedSurveyDocImage, setEditedSurveyDocImage] = useState<ArenaSurveyDocImage | null>(null)
 
   const onAddClick = useCallback(() => {
     setDialogVisible(true)
@@ -48,7 +48,7 @@ const SurveyDocLayoutEditor = (props: Props) => {
   }, [])
 
   const onDialogOk = useCallback(
-    async ({ file, surveyDocImage }: { file: File | null; surveyDocImage: SurveyDocImage }) => {
+    async ({ file, surveyDocImage }: { file: File | null; surveyDocImage: ArenaSurveyDocImage }) => {
       setDialogVisible(false)
       setEditedSurveyDocImage(null)
 
@@ -77,7 +77,7 @@ const SurveyDocLayoutEditor = (props: Props) => {
     [confirm, setSurveyDocImages, surveyDocImages]
   )
 
-  const onEdit = useCallback((surveyDocImage: SurveyDocImage) => {
+  const onEdit = useCallback((surveyDocImage: ArenaSurveyDocImage) => {
     setEditedSurveyDocImage(surveyDocImage)
     setDialogVisible(true)
   }, [])
@@ -148,7 +148,7 @@ const SurveyDocLayoutEditor = (props: Props) => {
                 headerName: i18n.t('common.dateCreated'),
                 renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
-              ...rowActionColumns<SurveyDocImage>({
+              ...rowActionColumns<ArenaSurveyDocImage>({
                 getDownloadUrl: (surveyDocImage) =>
                   API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) }),
                 onEdit: readOnly ? undefined : onEdit,
@@ -156,7 +156,7 @@ const SurveyDocLayoutEditor = (props: Props) => {
               }),
             ]}
             density="compact"
-            getRowId={(row: SurveyDocImage) => SurveyFile.getUuid(row)}
+            getRowId={(row: ArenaSurveyDocImage) => SurveyFile.getUuid(row)}
             hideFooterPagination
             onRowOpen={readOnly ? undefined : onEdit}
             rows={surveyDocImages ?? []}

@@ -1,4 +1,4 @@
-import type { ArenaRecord, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaUser } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

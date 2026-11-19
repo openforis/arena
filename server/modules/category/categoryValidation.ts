@@ -1,4 +1,4 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaValidation } from '@openforis/arena-core'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'

@@ -1,3 +1,5 @@
+import type { ArenaUserGroup } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -17,7 +19,7 @@ export const keysProps = {
 }
 
 // ====== CREATE
-export const newUserGroup = (): Record<string, unknown> => ({ [keys.props]: {} })
+export const newUserGroup = (): Partial<ArenaUserGroup> => ({ [keys.props]: {} })
 
 // ====== READ
 export const { getUuid, getProps, getLabels, getLabel, isEqual } = ObjectUtils

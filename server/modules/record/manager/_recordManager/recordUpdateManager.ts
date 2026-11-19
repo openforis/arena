@@ -1,12 +1,12 @@
 import {
-  NodePointers,
+  RecordNodePointers,
   Records,
   SurveyDependencyType,
-  type NodePointer,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
+  type ArenaRecordNodePointer,
+  type ArenaUser,
+  type ArenaRecord,
   type ArenaRecordNode,
-  type Survey as ArenaSurvey,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -499,14 +499,14 @@ const _getDependentNodesToValidate = ({
   record: ArenaRecord
   nodes: NodesByUuid
 }) => {
-  const dependentNodePointersToValidate: NodePointer[] = []
+  const dependentNodePointersToValidate: ArenaRecordNodePointer[] = []
   for (const node of Object.values(nodes)) {
     for (const dependencyType of validationDependencyTypes) {
       const dependentPointers = Records.getDependentNodePointers(survey, node, dependencyType, true)(record)
       dependentNodePointersToValidate.push(...dependentPointers)
     }
   }
-  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
+  const dependentNodesToValidate = RecordNodePointers.getNodesFromNodePointers({
     record,
     nodePointers: dependentNodePointersToValidate,
   })

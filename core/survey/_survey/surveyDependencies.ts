@@ -1,11 +1,5 @@
-import { Surveys } from '@openforis/arena-core'
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  SurveyDependencyGraph,
-  SurveyDependencyType,
-} from '@openforis/arena-core'
+import { Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaSurveyDependencyGraph, SurveyDependencyType } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -15,7 +9,6 @@ import type { DependencyType } from './surveyDependencyTypes'
 
 export { dependencyTypes } from './surveyDependencyTypes'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
 
 const keys = {
@@ -27,8 +20,8 @@ const toCoreDependencyType = (dependencyType: DependencyType | null): SurveyDepe
   (dependencyType ?? undefined) as SurveyDependencyType | undefined
 
 // READ
-export const getDependencyGraph = (survey: ArenaSurvey): SurveyDependencyGraph =>
-  A.propOr({}, keys.dependencyGraph)(survey) as SurveyDependencyGraph
+export const getDependencyGraph = (survey: ArenaSurvey): ArenaSurveyDependencyGraph =>
+  A.propOr({}, keys.dependencyGraph)(survey) as ArenaSurveyDependencyGraph
 
 export const hasDependencyGraph = (survey: ArenaSurvey): boolean => {
   const graph = getDependencyGraph(survey)
@@ -37,7 +30,7 @@ export const hasDependencyGraph = (survey: ArenaSurvey): boolean => {
 
 export const getNodeDefDependencies =
   (nodeDefUuid: string, dependencyType: DependencyType | null = null) =>
-  (survey: ArenaSurvey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): ArenaAnyNodeDef[] =>
     Surveys.getNodeDefDependents({ survey, nodeDefUuid, dependencyType: toCoreDependencyType(dependencyType) })
 
 export const getNodeDefDependentsUuids =
@@ -82,18 +75,18 @@ export const isNodeDefDependentOn =
 
 // UPDATE
 export const assocDependencyGraph =
-  (dependencyGraph: SurveyDependencyGraph): SurveyUpdater =>
+  (dependencyGraph: ArenaSurveyDependencyGraph): SurveyUpdater =>
   (survey) =>
     A.assoc(keys.dependencyGraph, dependencyGraph, survey)
 
 // ====== CREATE
 export const addNodeDefDependencies =
-  (nodeDef: AnyNodeDef) =>
+  (nodeDef: ArenaAnyNodeDef) =>
   (survey: ArenaSurvey): Promise<ArenaSurvey> =>
     Surveys.addNodeDefDependencies({ nodeDef, survey })
 
 export const addNodeDefsDependencies =
-  (nodeDefsIndexedByUuid: Record<string, AnyNodeDef>) =>
+  (nodeDefsIndexedByUuid: Record<string, ArenaAnyNodeDef>) =>
   async (survey: ArenaSurvey): Promise<ArenaSurvey> => {
     let surveyUpdated = survey
     for (const nodeDef of Object.values(nodeDefsIndexedByUuid)) {
@@ -102,7 +95,7 @@ export const addNodeDefsDependencies =
     return surveyUpdated
   }
 
-export const buildGraph = async (survey: ArenaSurvey): Promise<SurveyDependencyGraph> => {
+export const buildGraph = async (survey: ArenaSurvey): Promise<ArenaSurveyDependencyGraph> => {
   const surveyUpdated = await Surveys.buildAndAssocDependencyGraph(survey)
   return getDependencyGraph(surveyUpdated)
 }

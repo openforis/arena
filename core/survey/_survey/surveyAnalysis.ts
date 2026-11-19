@@ -1,18 +1,10 @@
-import type {
-  Chain as ArenaChain,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  NodeDefEntity,
-} from '@openforis/arena-core'
+import type { ArenaChain, ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import * as SurveyNodeDefs from './surveyNodeDefs'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 // ====== READ
 const isInChainAndEntity = ({
@@ -21,9 +13,9 @@ const isInChainAndEntity = ({
   entity,
   entityDefUuid,
 }: {
-  nodeDef: AnyNodeDef
+  nodeDef: ArenaAnyNodeDef
   chain?: ArenaChain | null
-  entity?: AnyNodeDef | null
+  entity?: ArenaAnyNodeDef | null
   entityDefUuid?: string | null
 }): boolean => {
   if (chain && NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.chainUuid)(nodeDef) !== Chain.getUuid(chain))
@@ -32,7 +24,13 @@ const isInChainAndEntity = ({
   return !entityDefUuid || NodeDef.getParentUuid(nodeDef) === entityDefUuid
 }
 
-const hasSamplingSiblings = ({ nodeDef, nodeDefs }: { nodeDef: AnyNodeDef; nodeDefs: AnyNodeDef[] }): boolean =>
+const hasSamplingSiblings = ({
+  nodeDef,
+  nodeDefs,
+}: {
+  nodeDef: ArenaAnyNodeDef
+  nodeDefs: ArenaAnyNodeDef[]
+}): boolean =>
   nodeDefs.some(
     (_nodeDef) =>
       NodeDef.isSampling(_nodeDef) &&
@@ -40,14 +38,14 @@ const hasSamplingSiblings = ({ nodeDef, nodeDefs }: { nodeDef: AnyNodeDef; nodeD
       NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(_nodeDef)
   )
 
-const isActiveResultVariable = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: AnyNodeDef }): boolean =>
+const isActiveResultVariable = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef }): boolean =>
   NodeDef.isActive(nodeDef) &&
   (!NodeDef.isAreaBasedEstimatedOf(nodeDef) ||
     NodeDef.isActive(SurveyNodeDefs.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey)))
 
 type AnalysisNodeDefsParams = {
   chain?: ArenaChain | null
-  entity?: AnyNodeDef | null
+  entity?: ArenaAnyNodeDef | null
   entityDefUuid?: string | null
   showSamplingNodeDefs?: boolean
   hideSamplingNodeDefsWithoutSiblings?: boolean
@@ -65,7 +63,7 @@ export const getAnalysisNodeDefs =
     hideAreaBasedEstimate = true,
     showInactiveResultVariables = false,
   }: AnalysisNodeDefsParams) =>
-  (survey: ArenaSurvey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): ArenaAnyNodeDef[] => {
     const _nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey)
     const nodeDefs = _nodeDefs.filter((nodeDef) => {
       if (!NodeDef.isAnalysis(nodeDef)) return false
@@ -98,20 +96,20 @@ export const getAnalysisNodeDefs =
 
 export const getAnalysisEntities =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): NodeDefEntity[] => {
+  (survey: ArenaSurvey): ArenaNodeDefEntity[] => {
     const { root } = SurveyNodeDefs.getHierarchy()(survey)
 
     const clusteringNodeDefUuid = ChainSamplingDesign.getClusteringNodeDefUuid(Chain.getSamplingDesign(chain))
 
-    const isAnalysisEntity = (nodeDef: AnyNodeDef): boolean =>
+    const isAnalysisEntity = (nodeDef: ArenaAnyNodeDef): boolean =>
       (NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)) &&
       ((clusteringNodeDefUuid && NodeDef.getUuid(nodeDef) === clusteringNodeDefUuid) ||
         getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0)
 
-    const entities: NodeDefEntity[] = []
+    const entities: ArenaNodeDefEntity[] = []
     SurveyNodeDefs.traverseHierarchyItemSync(root, (nodeDef) => {
       if (isAnalysisEntity(nodeDef)) {
-        entities.push(nodeDef as NodeDefEntity)
+        entities.push(nodeDef as ArenaNodeDefEntity)
       }
     })
     return entities
@@ -119,16 +117,16 @@ export const getAnalysisEntities =
 
 export const getBaseUnitNodeDef =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): NodeDefEntity | null => {
+  (survey: ArenaSurvey): ArenaNodeDefEntity | null => {
     const samplingDesign = Chain.getSamplingDesign(chain)
     const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
     // the base unit is an entity
-    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) as NodeDefEntity | null
+    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) as ArenaNodeDefEntity | null
   }
 
 export const getSamplingNodeDefChild =
-  ({ nodeDefParent, chainUuid }: { nodeDefParent: NodeDefEntity; chainUuid: string }) =>
-  (survey: ArenaSurvey): AnyNodeDef | undefined =>
+  ({ nodeDefParent, chainUuid }: { nodeDefParent: ArenaNodeDefEntity; chainUuid: string }) =>
+  (survey: ArenaSurvey): ArenaAnyNodeDef | undefined =>
     SurveyNodeDefs.getNodeDefChildren({ nodeDef: nodeDefParent })(survey).find(
       (nodeDefChild) =>
         NodeDef.isSampling(nodeDefChild) &&
@@ -145,10 +143,10 @@ export const getSamplingNodeDefChild =
  */
 export const getAvailableReportingDataNodeDefs =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): ArenaAnyNodeDef[] => {
     const baseUnitNodeDef = getBaseUnitNodeDef({ chain })(survey)
 
-    const availableReportingDataNodeDefs: AnyNodeDef[] = []
+    const availableReportingDataNodeDefs: ArenaAnyNodeDef[] = []
     if (baseUnitNodeDef) {
       SurveyNodeDefs.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDefAncestor) => {
         const descendantAttributes = SurveyNodeDefs.getNodeDefDescendantAttributesInSingleEntities({

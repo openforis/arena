@@ -1,11 +1,5 @@
-import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs } from '@openforis/arena-core'
-import type {
-  ArenaRecord,
-  ArenaRecordNode,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -21,7 +15,6 @@ import * as RecordReader from './recordReader'
 import { updateAttributeValue } from './recordNodeValueUpdater'
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type KeyValuesByDefUuid = Record<string, unknown>
 // entities (with the same uuid or keys) whose descendants must be merged
 type EntitiesToMerge = { entitySource: ArenaRecordNode; entityTarget: ArenaRecordNode }
@@ -66,7 +59,7 @@ const _getNodesArrayIntersection = (nodes: ArenaRecordNode[], otherNodes: ArenaR
 
 type AttributeSourceAndTarget = {
   survey: ArenaSurvey
-  attrDef: AnyNodeDef
+  attrDef: ArenaAnyNodeDef
   recordTarget: ArenaRecord
   entityTarget: ArenaRecordNode
   attrSource: ArenaRecordNode
@@ -394,7 +387,7 @@ const _mergeSingleAttributeValues = ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  childDef: AnyNodeDef
+  childDef: ArenaAnyNodeDef
   entityTarget: ArenaRecordNode
   childSource: ArenaRecordNode
   childTarget: ArenaRecordNode
@@ -437,7 +430,7 @@ const _areNotSameValues = ({
   targetValues,
 }: {
   survey: ArenaSurvey
-  childDef: AnyNodeDef
+  childDef: ArenaAnyNodeDef
   updateResult: RecordUpdateResult
   entityTarget: ArenaRecordNode
   sourceValues: unknown[]
@@ -482,7 +475,7 @@ const _mergeMultipleAttributes = ({
   entityTarget,
   keepNodeUuids,
   sideEffect,
-}: ChildrenToMerge & { survey: ArenaSurvey; childDef: AnyNodeDef; keepNodeUuids: boolean }): void => {
+}: ChildrenToMerge & { survey: ArenaSurvey; childDef: ArenaAnyNodeDef; keepNodeUuids: boolean }): void => {
   if (childrenSource.length > 0) {
     const sourceValues = childrenSource.map((child) => Node.getValue(child))
     const targetValues = childrenTarget.map((child) => Node.getValue(child))
@@ -621,7 +614,7 @@ const _mergeRecordsNodes = ({
 }: {
   updateResult: RecordUpdateResult
   survey: ArenaSurvey
-  childDef: AnyNodeDef
+  childDef: ArenaAnyNodeDef
   recordSource: ArenaRecord
   entitySource: ArenaRecordNode
   entityTarget: ArenaRecordNode

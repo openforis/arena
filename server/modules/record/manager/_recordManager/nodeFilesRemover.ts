@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'

@@ -1,4 +1,4 @@
-import { Dates, type NodeDefEntity, type ArenaRecordNode } from '@openforis/arena-core'
+import { Dates, type ArenaNodeDefEntity, type ArenaRecordNode } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
 
@@ -66,7 +66,7 @@ const createDbTransformCallbackCompacting = () => {
 
 const _toValueQueryParam = (value: unknown) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
 
-const _getAncestorUuidSelectField = (ancestorDef: NodeDefEntity) => {
+const _getAncestorUuidSelectField = (ancestorDef: ArenaNodeDefEntity) => {
   const nodeAncestorEntityHierarchyIndex = ancestorDef ? NodeDef.getMetaHierarchy(ancestorDef).length : null
   return nodeAncestorEntityHierarchyIndex === null
     ? 'null'
@@ -99,7 +99,7 @@ export const getNodeSelectQuery = ({
   includeRecordUuid?: boolean
   includeRecordInfo?: boolean
   includeSurveyUuid?: boolean
-  ancestorDef?: NodeDefEntity
+  ancestorDef?: ArenaNodeDefEntity
   draft?: boolean
 }) => {
   const schema = Schemata.getSchemaSurvey(surveyId)

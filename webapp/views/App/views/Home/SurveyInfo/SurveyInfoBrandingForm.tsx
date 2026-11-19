@@ -1,4 +1,4 @@
-import type { Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaValidation } from '@openforis/arena-core'
 import './SurveyInfoBrandingForm.scss'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject } from 'react'

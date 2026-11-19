@@ -1,5 +1,5 @@
 import { Records, Dates } from '@openforis/arena-core'
-import type { ArenaRecord, ArenaRecordNode, NodesMap, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, ArenaRecordNodesMap, ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -35,7 +35,10 @@ const isNodeToBeAdded = ({ nodeExisting, node }: { nodeExisting: ArenaRecordNode
  * @returns Function returning the updated record.
  */
 export const mergeNodes =
-  (nodes: NodesMap, { removeFlags = false, removeDirtyFlag = true, sideEffect = false }: MergeNodesOptions = {}) =>
+  (
+    nodes: ArenaRecordNodesMap,
+    { removeFlags = false, removeDirtyFlag = true, sideEffect = false }: MergeNodesOptions = {}
+  ) =>
   (record: ArenaRecord): ArenaRecord => {
     let recordUpdated = sideEffect ? record : { ...record }
     if (!(keys.nodes in recordUpdated)) {
@@ -82,7 +85,7 @@ export const assocNodes =
     updateNodesIndex = true,
     sideEffect = false,
   }: {
-    nodes: NodesMap
+    nodes: ArenaRecordNodesMap
     updateNodesIndex?: boolean
     sideEffect?: boolean
   }): RecordUpdater =>
@@ -97,7 +100,7 @@ export const assocNodes =
  * @returns Function returning the updated record.
  */
 export const replaceNodes =
-  (nodes: NodesMap): RecordUpdater =>
+  (nodes: ArenaRecordNodesMap): RecordUpdater =>
   (record) => {
     const recordWithoutNodes = { ...record }
     delete recordWithoutNodes[keys.nodes]

@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { languageCodes } from '@core/app/languages'

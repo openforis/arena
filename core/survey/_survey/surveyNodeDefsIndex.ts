@@ -1,19 +1,12 @@
-import { Objects, Surveys } from '@openforis/arena-core'
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  SurveyNodeDefsIndex as NodeDefsIndex,
-} from '@openforis/arena-core'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
+import { Objects, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaSurveyNodeDefsIndex } from '@openforis/arena-core'
 
 // the arena-core index functions work on a survey: wrap the index alone in a survey-like object
-const toSurvey = (nodeDefsIndex: NodeDefsIndex): ArenaSurvey => ({ nodeDefsIndex }) as ArenaSurvey
+const toSurvey = (nodeDefsIndex: ArenaSurveyNodeDefsIndex): ArenaSurvey => ({ nodeDefsIndex }) as ArenaSurvey
 
 // ==== READ
 
-export const getNodeDefsIndex = (survey: ArenaSurvey): NodeDefsIndex => {
+export const getNodeDefsIndex = (survey: ArenaSurvey): ArenaSurveyNodeDefsIndex => {
   const { nodeDefsIndex } = survey
   return nodeDefsIndex || {}
 }
@@ -28,7 +21,7 @@ export const assocNodeDefsIndex = ({
   nodeDefsIndex,
 }: {
   survey: ArenaSurvey
-  nodeDefsIndex: NodeDefsIndex
+  nodeDefsIndex: ArenaSurveyNodeDefsIndex
 }): ArenaSurvey => ({ ...survey, nodeDefsIndex })
 
 // ==== UPDATE
@@ -37,9 +30,9 @@ export const addNodeDefToIndex = ({
   nodeDefsIndex,
   nodeDef,
 }: {
-  nodeDefsIndex: NodeDefsIndex
-  nodeDef: AnyNodeDef
-}): NodeDefsIndex => {
+  nodeDefsIndex: ArenaSurveyNodeDefsIndex
+  nodeDef: ArenaAnyNodeDef
+}): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.addNodeDefToIndex(nodeDef)(toSurvey(nodeDefsIndex))
   return getNodeDefsIndex(surveyUpdated)
 }
@@ -49,10 +42,10 @@ export const updateNodeDefUuidByNameIndex = ({
   nodeDef,
   nodeDefPrevious,
 }: {
-  nodeDefsIndex: NodeDefsIndex
-  nodeDef: AnyNodeDef
-  nodeDefPrevious?: AnyNodeDef
-}): NodeDefsIndex => {
+  nodeDefsIndex: ArenaSurveyNodeDefsIndex
+  nodeDef: ArenaAnyNodeDef
+  nodeDefPrevious?: ArenaAnyNodeDef
+}): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.updateNodeDefUuidByNameIndex(nodeDef, nodeDefPrevious)(toSurvey(nodeDefsIndex))
   return getNodeDefsIndex(surveyUpdated)
 }
@@ -63,16 +56,16 @@ export const deleteNodeDefIndex = ({
   nodeDefsIndex,
   nodeDef,
 }: {
-  nodeDefsIndex: NodeDefsIndex
-  nodeDef: AnyNodeDef
-}): NodeDefsIndex => {
+  nodeDefsIndex: ArenaSurveyNodeDefsIndex
+  nodeDef: ArenaAnyNodeDef
+}): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.deleteNodeDefIndex(nodeDef)(toSurvey(nodeDefsIndex))
   return getNodeDefsIndex(surveyUpdated)
 }
 
 // ==== CREATE
 
-export const initNodeDefsIndex = (survey: ArenaSurvey): NodeDefsIndex => {
+export const initNodeDefsIndex = (survey: ArenaSurvey): ArenaSurveyNodeDefsIndex => {
   const surveyUpdated = Surveys.buildAndAssocNodeDefsIndex(survey)
   return getNodeDefsIndex(surveyUpdated)
 }

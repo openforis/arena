@@ -1,11 +1,10 @@
 import type { DbClient } from '@server/db/db'
 import type {
-  Record as ArenaRecord,
+  ArenaRecord,
   ArenaRecordNode,
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefEntity,
-  NodeDefType,
+  ArenaSurvey,
+  ArenaNodeDefEntity,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -22,9 +21,9 @@ const types = RdbUpdateTypes
 
 // ==== parsing
 
-const _hasTable = (nodeDef: ArenaNodeDef<NodeDefType>) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)
+const _hasTable = (nodeDef: ArenaAnyNodeDef) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)
 
-const _getType = (nodeDef: ArenaNodeDef<NodeDefType>, node: ArenaRecordNode) => {
+const _getType = (nodeDef: ArenaAnyNodeDef, node: ArenaRecordNode) => {
   const created = Node.isCreated(node)
   const deleted = Node.isDeleted(node)
   const updated = Node.isUpdated(node)
@@ -52,7 +51,7 @@ const _getValuesByColumnNameDefault = ({
   node,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   node: ArenaRecordNode
 }) => TableDataNodeDefColUtils.getValuesByColumnName({ survey, nodeDefCol: nodeDef, nodeCol: node })
 
@@ -66,7 +65,7 @@ const _getValuesByColumnName = ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   node: ArenaRecordNode
   ancestorMultipleEntity: any
   type: any
@@ -117,7 +116,7 @@ const _getRowUuid = ({
   ancestorMultipleEntity,
   node,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   ancestorMultipleEntity: any
   node: ArenaRecordNode
 }) => (_hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity))
@@ -232,7 +231,7 @@ export const updateRecordStep = (
     recordUuid,
     stepId,
     tableDef,
-  }: { surveyId: number; recordUuid: string; stepId: string; tableDef: NodeDefEntity },
+  }: { surveyId: number; recordUuid: string; stepId: string; tableDef: ArenaNodeDefEntity },
   client: DbClient
 ) => {
   const tableName = NodeDefTable.getTableName(tableDef)

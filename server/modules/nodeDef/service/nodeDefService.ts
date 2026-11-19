@@ -1,11 +1,10 @@
 import type {
-  Chain as ArenaChain,
-  NodeDef as ArenaNodeDef,
-  NodeDefEntityChildPosition,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  User as ArenaUser,
-  Validation as ArenaValidation,
+  ArenaChain,
+  ArenaNodeDefEntityChildPosition,
+  ArenaSurvey,
+  ArenaUser,
+  ArenaValidation,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
@@ -41,11 +40,11 @@ const _validateNodeDefs = async ({
   nodeDefsDependentByUuid,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   updatedNodeDefs: any
   nodeDefsDependentByUuid: Record<string, any>
 }) => {
-  const nodeDefsToValidateByUuid: Record<string, ArenaNodeDef<NodeDefType>> = {}
+  const nodeDefsToValidateByUuid: Record<string, ArenaAnyNodeDef> = {}
 
   // always re-validate parent entity (keys may have been changed)
   const nodeDefParent = !nodeDef || NodeDef.isRoot(nodeDef) ? null : Survey.getNodeDefParent(nodeDef)(survey)
@@ -76,11 +75,11 @@ const afterNodeDefUpdate = async ({
   nodeDefsUpdated = {},
 }: {
   survey: ArenaSurvey
-  nodeDef?: ArenaNodeDef<NodeDefType>
+  nodeDef?: ArenaAnyNodeDef
   nodeDefsDependentsUuids?: string[]
   nodeDefsUpdated?: any
 }) => {
-  const allUpdatedNodeDefs: Record<string, ArenaNodeDef<NodeDefType>> = { ...nodeDefsUpdated }
+  const allUpdatedNodeDefs: Record<string, ArenaAnyNodeDef> = { ...nodeDefsUpdated }
   if (nodeDef && !allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)]) {
     allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)] = nodeDef
   }
@@ -128,7 +127,7 @@ export const insertNodeDef = (
     surveyId,
     cycle = Survey.cycleOneKey,
     nodeDef,
-  }: { user: ArenaUser; surveyId: number; cycle?: string; nodeDef: ArenaNodeDef<NodeDefType> },
+  }: { user: ArenaUser; surveyId: number; cycle?: string; nodeDef: ArenaAnyNodeDef },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -146,7 +145,7 @@ export const insertNodeDefs = (
     surveyId,
     cycle = Survey.cycleOneKey,
     nodeDefs,
-  }: { user: ArenaUser; surveyId: number; cycle?: string; nodeDefs: ArenaNodeDef<NodeDefType>[] },
+  }: { user: ArenaUser; surveyId: number; cycle?: string; nodeDefs: ArenaAnyNodeDef[] },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -427,7 +426,7 @@ const _insertClonedNodeDefsAndUpdateLayout = async ({
   const layoutRefParentChildren = NodeDefLayout.getLayoutChildren(defaultCycle)(layoutRefParentNodeDef)
   const layoutRefPosition = isLayoutRefParentForm
     ? layoutRefParentChildren.find(
-        (item): item is NodeDefEntityChildPosition => typeof item !== 'string' && item.i === layoutRefNodeDefUuid
+        (item): item is ArenaNodeDefEntityChildPosition => typeof item !== 'string' && item.i === layoutRefNodeDefUuid
       )
     : null
 

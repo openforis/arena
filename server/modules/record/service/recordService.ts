@@ -3,18 +3,17 @@ import { randomBytes } from 'node:crypto'
 
 import {
   Authorizer,
-  NodeValues,
+  RecordNodeValues,
   Objects,
   RecordExpressionEvaluator,
   SurveyDocImages,
   SurveyDocPlace,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
+  type ArenaUser,
+  type ArenaRecord,
   type ArenaRecordNode,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
-  type SurveyDocImage,
+  type ArenaSurvey,
+  type ArenaSurveyDocImage,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
@@ -188,7 +187,7 @@ export const {
  * @param {object} params.nodeDef - The time node definition the value belongs to.
  * @returns {string} The formatted time value.
  */
-export const formatTimeSummaryValue = ({ value, nodeDef }: { value: string; nodeDef: ArenaNodeDef<NodeDefType> }) =>
+export const formatTimeSummaryValue = ({ value, nodeDef }: { value: string; nodeDef: ArenaAnyNodeDef }) =>
   DateUtils.convertDate({
     dateStr: value,
     formatFrom: DateUtils.formats.timeWithSeconds,
@@ -746,7 +745,7 @@ export const generateNodeFileNameForDownload = async ({
   // return calculatd name (if any)
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.getFileNameExpression(nodeDef)) {
-    const calculatedName = NodeValues.getFileNameCalculated(node)
+    const calculatedName = RecordNodeValues.getFileNameCalculated(node)
     if (Objects.isNotEmpty(calculatedName)) {
       return calculatedName
     }
@@ -1012,7 +1011,7 @@ const exportRecordDocument = async ({
     cycle,
     includeAnalysis: false,
   })
-  const surveyDocImages = Survey.getSurveyDocImages(survey) as SurveyDocImage[]
+  const surveyDocImages = Survey.getSurveyDocImages(survey) as ArenaSurveyDocImage[]
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   let entityDef = null

@@ -1,4 +1,4 @@
-import type { AreaOfInterest, AreaOfInterestProvider } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest, ArenaAreaOfInterestProvider } from '@openforis/arena-core'
 import { Surveys } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
@@ -12,9 +12,9 @@ const Logger = Log.getLogger('AreaOfInterestProvider')
 
 // survey files are never modified (a new upload gets a new uuid): cached geometries never become stale
 const maxCachedAreas = 50
-const cache = new Map<string, AreaOfInterest>()
+const cache = new Map<string, ArenaAreaOfInterest>()
 
-const cacheGet = (key: string): AreaOfInterest | undefined => {
+const cacheGet = (key: string): ArenaAreaOfInterest | undefined => {
   const value = cache.get(key)
   if (value) {
     // most recently used last (Map keeps the insertion order)
@@ -24,7 +24,7 @@ const cacheGet = (key: string): AreaOfInterest | undefined => {
   return value
 }
 
-const cachePut = (key: string, value: AreaOfInterest): void => {
+const cachePut = (key: string, value: ArenaAreaOfInterest): void => {
   cache.set(key, value)
   if (cache.size > maxCachedAreas) {
     cache.delete(cache.keys().next().value!)
@@ -37,7 +37,7 @@ const fetchAreaOfInterest = async ({
 }: {
   surveyId: number
   fileUuid: string
-}): Promise<AreaOfInterest | undefined> => {
+}): Promise<ArenaAreaOfInterest | undefined> => {
   const fileSummary = await SurveyFileManager.fetchFileSummaryByUuid(surveyId, fileUuid)
   const content = fileSummary ? await SurveyFileManager.fetchFileContentAsBuffer({ surveyId, fileSummary }) : null
   const areaOfInterest = content ? parseAreaOfInterestJson(content.toString('utf8')) : null
@@ -55,7 +55,7 @@ const fetchAreaOfInterest = async ({
  * @param {string} params.name - The area of interest name.
  * @returns {Promise<AreaOfInterest|undefined>} - The geometry, or undefined if not defined or not readable.
  */
-const getAreaOfInterest: AreaOfInterestProvider['getAreaOfInterest'] = async ({ survey, name }) => {
+const getAreaOfInterest: ArenaAreaOfInterestProvider['getAreaOfInterest'] = async ({ survey, name }) => {
   const descriptor = Surveys.getAreaOfInterestByName({ survey, name })
   if (!descriptor) return undefined
   const surveyId = Survey.getId(survey)
@@ -68,4 +68,4 @@ const getAreaOfInterest: AreaOfInterestProvider['getAreaOfInterest'] = async ({ 
   return areaOfInterest
 }
 
-export const AreaOfInterestProviderDefault: AreaOfInterestProvider = { getAreaOfInterest }
+export const AreaOfInterestProviderDefault: ArenaAreaOfInterestProvider = { getAreaOfInterest }

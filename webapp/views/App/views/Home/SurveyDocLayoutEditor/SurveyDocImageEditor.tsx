@@ -7,8 +7,8 @@ import {
   SurveyDocImageFactory,
   SurveyDocPlace,
   surveyDocImagePropKeys,
-  type SurveyDocImage,
-  type Validation as ArenaValidation,
+  type ArenaSurveyDocImage,
+  type ArenaValidation,
 } from '@openforis/arena-core'
 
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'
@@ -31,14 +31,14 @@ const accept = {
 const maxSize = 5 // 5MB
 
 type Props = {
-  editedSurveyDocImage: SurveyDocImage | null
+  editedSurveyDocImage: ArenaSurveyDocImage | null
   onClose: () => void
-  onOk: (params: { file: File | null; surveyDocImage: SurveyDocImage }) => Promise<void>
-  surveyDocImages: SurveyDocImage[]
+  onOk: (params: { file: File | null; surveyDocImage: ArenaSurveyDocImage }) => Promise<void>
+  surveyDocImages: ArenaSurveyDocImage[]
 }
 
 type State = {
-  draftSurveyDocImage: SurveyDocImage
+  draftSurveyDocImage: ArenaSurveyDocImage
   file: File | null
   labels: Record<string, string>
   documentPlace: SurveyDocPlace | undefined
@@ -83,7 +83,7 @@ const SurveyDocImageEditor = (props: Props) => {
 
   useEffect(() => {
     const { name, size } = file ?? {}
-    let draft: SurveyDocImage
+    let draft: ArenaSurveyDocImage
     if (editedSurveyDocImage && file) {
       // New file uploaded during edit: fresh UUID so the old file becomes an orphan (removed when unused files are cleaned up, e.g. on publish)
       draft = SurveyDocImageFactory.createInstance({ labels, name, size, temporary: true })

@@ -1,13 +1,11 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
 export interface EntityAggregatedView {
-  entityDef: NodeDefEntity
+  entityDef: ArenaNodeDefEntity
   calculations: unknown[]
 }
 
@@ -18,7 +16,7 @@ const keys = {
 
 // ===== CREATE
 export const newEntityAggregatedView = (
-  entityDef: NodeDefEntity,
+  entityDef: ArenaNodeDefEntity,
   calculations: unknown[] = []
 ): EntityAggregatedView => ({
   [keys.entityDef]: entityDef,
@@ -26,7 +24,7 @@ export const newEntityAggregatedView = (
 })
 
 // ===== READ
-export const getEntityDef = (view: EntityAggregatedView): AnyNodeDef => A.propOr([], keys.entityDef)(view)
+export const getEntityDef = (view: EntityAggregatedView): ArenaAnyNodeDef => A.propOr([], keys.entityDef)(view)
 export const getCalculations = (view: EntityAggregatedView): unknown[] => A.propOr([], keys.calculations)(view)
 
 // ===== UPDATE

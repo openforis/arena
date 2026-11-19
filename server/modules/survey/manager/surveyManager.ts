@@ -1,12 +1,6 @@
 import * as A from '@core/arena'
 
-import {
-  Numbers,
-  Objects,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type SurveyProps,
-} from '@openforis/arena-core'
+import { Numbers, Objects, type ArenaUser, type ArenaSurvey, type ArenaSurveyProps } from '@openforis/arena-core'
 import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -107,7 +101,7 @@ const _addUserToSurveyAdmins = async (
 
 // language codes and cycle keys are used as JSON keys and export column names, SRS codes in queries:
 // imported surveys must have valid ones
-const _checkSurveyProps = (props: Partial<SurveyProps>) => {
+const _checkSurveyProps = (props: Partial<ArenaSurveyProps>) => {
   const langsInvalid = SurveyValidator.getInvalidLanguageCodes(props?.[Survey.infoKeys.languages] ?? [])
   if (langsInvalid.length > 0) {
     throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
@@ -579,7 +573,7 @@ const _fetchSurveysWithCounts = async ({
 /**
  * Fetches the info of the surveys visible to the specified user.
  * @param {object} params - The parameters.
- * @param {import('@openforis/arena-core').User} params.user - The user.
+ * @param {import('@openforis/arena-core').ArenaUser} params.user - The user.
  * @param {boolean} [params.draft] - Whether to fetch the draft props.
  * @param {boolean} [params.template] - Whether to fetch templates instead of surveys.
  * @param {number} [params.offset] - The offset.
@@ -595,7 +589,7 @@ const _fetchSurveysWithCounts = async ({
  * @param {boolean} [params.withChains] - Whether to fetch only the surveys with processing chains.
  * @param {Function} [params.onProgress] - Called with the progress while fetching the counts.
  * @param {Function} [params.stopIfFunction] - Returns true when the fetch must stop.
- * @returns {Promise<import('@openforis/arena-core').Survey[]>} - The surveys info.
+ * @returns {Promise<import('@openforis/arena-core').ArenaSurvey[]>} - The surveys info.
  */
 export const fetchUserSurveysInfo = async ({
   user,
@@ -682,7 +676,11 @@ export const updateSurveyProp = (
   })
 
 const updateSurveyCyclesProp = async (
-  { surveyId, value, valuePrev }: { surveyId: number; value: SurveyProps['cycles']; valuePrev: SurveyProps['cycles'] },
+  {
+    surveyId,
+    value,
+    valuePrev,
+  }: { surveyId: number; value: ArenaSurveyProps['cycles']; valuePrev: ArenaSurveyProps['cycles'] },
   client: DbClient = db
 ) => {
   const cycles = Object.keys(value)
@@ -703,7 +701,7 @@ const updateSurveyCyclesProp = async (
 export const updateSurveyProps = (
   user: ArenaUser,
   surveyId: number,
-  props: Partial<SurveyProps>,
+  props: Partial<ArenaSurveyProps>,
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -728,8 +726,8 @@ export const updateSurveyProps = (
         ])
 
         if (key === Survey.infoKeys.cycles) {
-          const cycles = value as SurveyProps['cycles']
-          const cyclesPrev = valuePrev as SurveyProps['cycles']
+          const cycles = value as ArenaSurveyProps['cycles']
+          const cyclesPrev = valuePrev as ArenaSurveyProps['cycles']
           await updateSurveyCyclesProp({ surveyId, value: cycles, valuePrev: cyclesPrev }, t) // NOSONAR
         }
       }

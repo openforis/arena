@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { JobSerialized } from '@openforis/arena-core'
+import { ArenaJobSerialized } from '@openforis/arena-core'
 import * as JobSerializedUtils from '@common/job/jobSerialized'
 import { useI18n } from '@webapp/store/system'
 
 import formatDuration from './formatDuration'
 
 type Props = {
-  job: JobSerialized
+  job: ArenaJobSerialized
 }
 
 /**

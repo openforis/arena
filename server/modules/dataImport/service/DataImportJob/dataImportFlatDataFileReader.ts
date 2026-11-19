@@ -1,11 +1,4 @@
-import {
-  FlatDataExportModel,
-  Objects,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
-  type Taxon as ArenaTaxon,
-} from '@openforis/arena-core'
+import { FlatDataExportModel, Objects, type ArenaSurvey, type ArenaTaxon, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
 import * as Srs from '@core/geo/srs'
@@ -107,7 +100,7 @@ const findCategoryItem = ({
 }: {
   survey: ArenaSurvey
   categoryItemProvider: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   code: string
 }) => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
@@ -129,7 +122,7 @@ const findTaxon = async ({
 }: {
   survey: ArenaSurvey
   taxonProvider: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   taxonCode: any
 }) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
@@ -156,7 +149,7 @@ export const extractTimeValue = ({
 }: {
   value: unknown
   headers: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }) => {
   const val = value[VALUE_PROP_DEFAULT]
   // Only apply the node def's seconds-including format when the input value itself carries

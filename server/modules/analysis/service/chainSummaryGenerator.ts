@@ -9,7 +9,7 @@ import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ChainManager from '../manager'
-import { Objects, type Chain as ArenaChain, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaChain, type ArenaSurvey } from '@openforis/arena-core'
 import { ArrayUtils } from '@core/arrayUtils'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 

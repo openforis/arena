@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -102,7 +102,7 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({
   })
   const nodeDefUuidsWithAdvancedPropsRisk = Survey.getNodeDefsArray(survey)
     .filter(
-      (nodeDef: ArenaNodeDef<NodeDefType>) =>
+      (nodeDef: ArenaAnyNodeDef) =>
         NodeDef.isPublished(nodeDef) &&
         !NodeDef.isDeleted(nodeDef) &&
         NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)

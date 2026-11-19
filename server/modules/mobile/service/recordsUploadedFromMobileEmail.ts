@@ -1,4 +1,4 @@
-import { I18n } from '@openforis/arena-core'
+import { ArenaI18n } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 
@@ -44,7 +44,7 @@ const buildRecordsTable = ({
   records,
   cycleVisible,
 }: {
-  i18n: I18n
+  i18n: ArenaI18n
   records: UploadedRecordInfo[]
   cycleVisible: boolean
 }): string => {
@@ -93,7 +93,7 @@ const buildRecordsTable = ({
  * @returns The message params.
  */
 const getMsgParams = (params: {
-  i18n: I18n
+  i18n: ArenaI18n
   recipientName: string
   surveyName: string
   surveyLabel?: string | null

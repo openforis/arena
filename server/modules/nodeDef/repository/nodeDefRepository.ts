@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 import { DB, TableNodeDef, Schemata, NodeDefRepository as NodeDefRepositoryServer } from '@openforis/arena-server'
 
@@ -29,7 +29,7 @@ const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, vir
 
 // ============== CREATE
 
-export const insertNodeDef = async (surveyId: number, nodeDef: ArenaNodeDef<NodeDefType>, client: DbClient = DB) => {
+export const insertNodeDef = async (surveyId: number, nodeDef: ArenaAnyNodeDef, client: DbClient = DB) => {
   checkNodeDef(nodeDef)
   return await client.one(
     `
@@ -52,7 +52,7 @@ export const insertNodeDef = async (surveyId: number, nodeDef: ArenaNodeDef<Node
 }
 
 export const insertNodeDefsBatch = async (
-  { surveyId, nodeDefs, backup = false }: { surveyId: number; nodeDefs: ArenaNodeDef<NodeDefType>[]; backup?: boolean },
+  { surveyId, nodeDefs, backup = false }: { surveyId: number; nodeDefs: ArenaAnyNodeDef[]; backup?: boolean },
   client: DbClient = DB
 ) => {
   for (const nodeDef of nodeDefs) {

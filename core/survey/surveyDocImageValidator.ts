@@ -7,16 +7,16 @@ import {
   NodeDefExpressionValidator,
   SurveyDocImages,
   surveyDocImagePropKeys as propKeys,
-  ValidationResult,
-  type SurveyDocImage,
-  type Survey as ArenaSurvey,
+  ArenaValidationResult,
+  type ArenaSurveyDocImage,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 
 const validateExpression =
   (survey: ArenaSurvey) =>
-  async (_propName: string, surveyDocImage: SurveyDocImage): Promise<ValidationResult> => {
+  async (_propName: string, surveyDocImage: ArenaSurveyDocImage): Promise<ArenaValidationResult> => {
     if (!survey) return null
     const applyIf = SurveyDocImages.getApplyIf(surveyDocImage)
     if (!applyIf) return null
@@ -31,7 +31,7 @@ const validateExpression =
       selfReferenceAllowed: true,
     })
     return validationResult && !validationResult.valid
-      ? (Validation.newInstance(false, {}, [validationResult as ValidationResult]) as any)
+      ? (Validation.newInstance(false, {}, [validationResult as ArenaValidationResult]) as any)
       : null
   }
 
@@ -41,8 +41,8 @@ const validate = async ({
   surveyDocImage,
 }: {
   survey?: ArenaSurvey | null
-  surveyDocImages: SurveyDocImage[]
-  surveyDocImage: SurveyDocImage
+  surveyDocImages: ArenaSurveyDocImage[]
+  surveyDocImage: ArenaSurveyDocImage
 }) =>
   Validator.validate(surveyDocImage, {
     [`${SurveyFile.keys.props}.${SurveyFile.propKeys.name}`]: [

@@ -28,7 +28,7 @@ const rowToSrs = (row: any) => {
  * @param {object} params - The parameters.
  * @param {string[]} params.srsCodes - The SRS codes.
  * @param {import('@server/db/db').DbClient} [client] - The database client.
- * @returns {Promise<import('@openforis/arena-core').SRS[]>} - The SRSs.
+ * @returns {Promise<import('@openforis/arena-core').ArenaSRS[]>} - The SRSs.
  */
 export const fetchSRSsByCodes = ({ srsCodes }: { srsCodes: any }, client: DbClient = db) =>
   // "IN ()" is not valid SQL

@@ -1,4 +1,4 @@
-import { JobStatus, Objects, User } from '@openforis/arena-core'
+import { JobStatus, Objects, ArenaUser } from '@openforis/arena-core'
 import { JobRepository, JobRow, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -7,7 +7,7 @@ import * as JobThreadExecutor from './jobThreadExecutor'
 import { jobRowToSummary } from './jobUtils'
 
 type JobParams = {
-  user: User
+  user: ArenaUser
   surveyId?: number
   [key: string]: any
 }

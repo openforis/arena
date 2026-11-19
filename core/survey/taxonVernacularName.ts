@@ -1,4 +1,4 @@
-import type { VernacularName as ArenaVernacularName } from '@openforis/arena-core'
+import type { ArenaVernacularName } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'

@@ -2,7 +2,7 @@ import '../../cloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Category as ArenaCategory } from '@openforis/arena-core'
+import { ArenaCategory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'

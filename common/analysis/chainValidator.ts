@@ -1,4 +1,4 @@
-import type { Chain as ArenaChain, Survey as ArenaSurvey, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaChain, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'

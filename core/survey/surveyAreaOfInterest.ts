@@ -1,4 +1,4 @@
-import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest, ArenaAreaOfInterestDescriptor } from '@openforis/arena-core'
 
 import { getAreaOfInterestSummary } from '@core/geo/areaOfInterestParser'
 import * as ObjectUtils from '@core/objectUtils'
@@ -45,8 +45,8 @@ export const newAreaOfInterestDescriptor = ({
   fileUuid: string
   fileName: string
   size: number
-  areaOfInterest: AreaOfInterest
-}): AreaOfInterestDescriptor => ({
+  areaOfInterest: ArenaAreaOfInterest
+}): ArenaAreaOfInterestDescriptor => ({
   name,
   ...(labels ? { labels } : {}),
   fileUuid,
@@ -61,8 +61,8 @@ export const newAreaOfInterestDescriptor = ({
  * @param {object} surveyOrSurveyInfo - The survey or the survey info.
  * @returns {AreaOfInterestDescriptor[]} - The descriptors (empty if none).
  */
-export const getAreasOfInterest = (surveyOrSurveyInfo: any): AreaOfInterestDescriptor[] =>
-  ObjectUtils.getProp(infoKeys.areasOfInterest, [])(getInfo(surveyOrSurveyInfo)) as AreaOfInterestDescriptor[]
+export const getAreasOfInterest = (surveyOrSurveyInfo: any): ArenaAreaOfInterestDescriptor[] =>
+  ObjectUtils.getProp(infoKeys.areasOfInterest, [])(getInfo(surveyOrSurveyInfo)) as ArenaAreaOfInterestDescriptor[]
 
 /**
  * Returns the label of an area of interest in a language, or its name if it has no label in that language.
@@ -72,7 +72,7 @@ export const getAreasOfInterest = (surveyOrSurveyInfo: any): AreaOfInterestDescr
  */
 export const getLabel =
   (lang: string) =>
-  (descriptor: AreaOfInterestDescriptor): string =>
+  (descriptor: ArenaAreaOfInterestDescriptor): string =>
     descriptor.labels?.[lang] || descriptor.name
 
 /**

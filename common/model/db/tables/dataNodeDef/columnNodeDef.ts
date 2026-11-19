@@ -1,7 +1,7 @@
 import toSnakeCase from 'to-snake-case'
 
-import { NodeDefs, NodeValues } from '@openforis/arena-core'
-import type { NodeDef as ArenaNodeDef, NodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
+import { NodeDefs, RecordNodeValues, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaNodeDefCoordinate } from '@openforis/arena-core'
 
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import { Query } from '../../../query'
@@ -10,8 +10,7 @@ import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-type ByNodeDefGetter = (params: { nodeDef: AnyNodeDef }) => string[]
+type ByNodeDefGetter = (params: { nodeDef: ArenaAnyNodeDef }) => string[]
 // table or view the column belongs to
 type ColumnTable = { alias: string }
 
@@ -25,13 +24,13 @@ const columnNamesSuffixGetterByType: Partial<Record<string, ByNodeDefGetter>> = 
   [nodeDefType.code]: () => ['', columnSuffixCodeLabel],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const suffixes = ['', '_x', '_y', '_srs']
-    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as NodeDefCoordinate)
+    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as ArenaNodeDefCoordinate)
     suffixes.push(...additionalFields.map((field) => `_${toSnakeCase(field)}`))
     return suffixes
   },
   [nodeDefType.taxon]: ({ nodeDef }) => {
     const colNames = ['', columnSuffixTaxonScientificName]
-    if (NodeDefs.isFieldVisible(NodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
+    if (NodeDefs.isFieldVisible(RecordNodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
       colNames.push(columnSuffixTaxonVernacularName)
     }
     return colNames
@@ -44,7 +43,7 @@ const colTypesGetterByType: Partial<Record<string, ByNodeDefGetter>> = {
   [nodeDefType.code]: () => [SQL.types.varchar, SQL.types.varchar],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const types: string[] = [SQL.types.geometryPoint, SQL.types.decimal, SQL.types.decimal, SQL.types.varchar]
-    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as NodeDefCoordinate)
+    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as ArenaNodeDefCoordinate)
     types.push(...additionalFields.map(() => SQL.types.decimal)) // additional fields are all numeric
     return types
   },
@@ -56,7 +55,7 @@ const colTypesGetterByType: Partial<Record<string, ByNodeDefGetter>> = {
   [nodeDefType.integer]: () => [SQL.types.bigint],
   [nodeDefType.taxon]: ({ nodeDef }) => {
     const colTypes = [SQL.types.varchar, SQL.types.varchar]
-    if (NodeDefs.isFieldVisible(NodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
+    if (NodeDefs.isFieldVisible(RecordNodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
       colTypes.push(SQL.types.varchar)
     }
     return colTypes
@@ -66,7 +65,7 @@ const colTypesGetterByType: Partial<Record<string, ByNodeDefGetter>> = {
   [nodeDefType.time]: () => [SQL.types.time],
 }
 
-const getColumnNames = (nodeDef: AnyNodeDef): string[] => {
+const getColumnNames = (nodeDef: ArenaAnyNodeDef): string[] => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const colsSuffixGetter = columnNamesSuffixGetterByType[NodeDef.getType(nodeDef)]
   const colsSuffix = colsSuffixGetter?.({ nodeDef })
@@ -79,7 +78,7 @@ const getColumnNames = (nodeDef: AnyNodeDef): string[] => {
   return [nodeDefName]
 }
 
-const extractColumnName = ({ nodeDef, columnName }: { nodeDef: AnyNodeDef; columnName: string }): string => {
+const extractColumnName = ({ nodeDef, columnName }: { nodeDef: ArenaAnyNodeDef; columnName: string }): string => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const prefix = `${nodeDefName}_`
   // this is because when there is not subfix we should return
@@ -89,11 +88,17 @@ const extractColumnName = ({ nodeDef, columnName }: { nodeDef: AnyNodeDef; colum
   return columnName.replace(prefix, '')
 }
 
-const getColumnNameWithSuffix = (suffix: string) => (nodeDef: AnyNodeDef) => `${NodeDef.getName(nodeDef)}${suffix}`
+const getColumnNameWithSuffix = (suffix: string) => (nodeDef: ArenaAnyNodeDef) => `${NodeDef.getName(nodeDef)}${suffix}`
 
-const getColumnName = (nodeDef: AnyNodeDef): string => getColumnNames(nodeDef)[0]
+const getColumnName = (nodeDef: ArenaAnyNodeDef): string => getColumnNames(nodeDef)[0]
 
-const getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }: { nodeDef: AnyNodeDef; aggregateFn: string }) => {
+const getColumnNameAggregateFunction = ({
+  nodeDef,
+  aggregateFn,
+}: {
+  nodeDef: ArenaAnyNodeDef
+  aggregateFn: string
+}) => {
   const columnName = getColumnName(nodeDef)
   if (Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)) {
     return `${columnName}_${aggregateFn}`
@@ -121,11 +126,11 @@ export default class ColumnNodeDef {
   static readonly extractColumnName = extractColumnName
 
   private readonly _table: ColumnTable
-  private readonly _nodeDef: AnyNodeDef
+  private readonly _nodeDef: ArenaAnyNodeDef
   private readonly _names: string[]
   private readonly _types: string[]
 
-  constructor(table: ColumnTable, nodeDef: AnyNodeDef) {
+  constructor(table: ColumnTable, nodeDef: ArenaAnyNodeDef) {
     this._table = table
     this._nodeDef = nodeDef
     this._names = getColumnNames(nodeDef)
@@ -136,7 +141,7 @@ export default class ColumnNodeDef {
     return this._table
   }
 
-  get nodeDef(): AnyNodeDef {
+  get nodeDef(): ArenaAnyNodeDef {
     return this._nodeDef
   }
 

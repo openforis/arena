@@ -1,6 +1,6 @@
 import i18next, { i18n, TFunction } from 'i18next'
 
-import { I18n } from '@openforis/arena-core'
+import { ArenaI18n } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -49,7 +49,7 @@ const createParams = (lang: string = defaultLanguage) => ({
   supportedLngs: supportedLanguages,
 })
 
-export const createI18nAsync = (lang: string = defaultLanguage): Promise<I18n & { lang: string }> => {
+export const createI18nAsync = (lang: string = defaultLanguage): Promise<ArenaI18n & { lang: string }> => {
   const createInstance = i18next.createInstance || (i18next as any).default.createInstance
 
   return new Promise((resolve, reject) => {

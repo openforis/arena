@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { validateUserGroup } from '@core/user/userGroup/userGroupValidator'
@@ -32,8 +32,8 @@ interface UseEditUserGroupResult {
   canEdit: boolean
   canSave: boolean
   canDelete: boolean
-  userGroup: UserGroupType
-  otherGroupsInSurvey: UserGroupType[]
+  userGroup: ArenaUserGroup
+  otherGroupsInSurvey: ArenaUserGroup[]
   onNameChange: (name: string) => void
   onLabelsChange: (labels: Record<string, string>) => void
   onQualifiersChange: (qualifiers: Array<{ name: string; value: string }>) => void
@@ -64,9 +64,9 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
   const surveyId = useSurveyId() as string
   const canManage = useAuthCanManageUserGroups()
 
-  const [userGroupOriginal, setUserGroupOriginal] = useState<UserGroupType>(UserGroup.newUserGroup() as UserGroupType)
-  const [userGroup, setUserGroup] = useState<UserGroupType>(UserGroup.newUserGroup() as UserGroupType)
-  const [otherGroupsInSurvey, setOtherGroupsInSurvey] = useState<UserGroupType[]>([])
+  const [userGroupOriginal, setUserGroupOriginal] = useState<ArenaUserGroup>(UserGroup.newUserGroup() as ArenaUserGroup)
+  const [userGroup, setUserGroup] = useState<ArenaUserGroup>(UserGroup.newUserGroup() as ArenaUserGroup)
+  const [otherGroupsInSurvey, setOtherGroupsInSurvey] = useState<ArenaUserGroup[]>([])
   const [ready, setReady] = useState(!groupUuid)
 
   const dirty = JSON.stringify(userGroup) !== JSON.stringify(userGroupOriginal)
@@ -125,7 +125,7 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
   }, [dispatch, fetchGroups, groupUuid, navigate])
 
   const updateAndValidate = useCallback(
-    async (userGroupUpdated: UserGroupType) => {
+    async (userGroupUpdated: ArenaUserGroup) => {
       const validation = await validateUserGroup(userGroupUpdated, otherGroupsInSurvey)
       setUserGroup(Validation.assocValidation(validation)(userGroupUpdated))
     },

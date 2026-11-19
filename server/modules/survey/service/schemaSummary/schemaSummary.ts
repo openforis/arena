@@ -1,13 +1,6 @@
 import { z } from 'zod'
 
-import {
-  Objects,
-  Surveys,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
-} from '@openforis/arena-core'
+import { Objects, Surveys, type ArenaUser, type ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
@@ -38,7 +31,7 @@ const AiDescriptionsSchema = z.object({
   descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
 })
 
-const getParentPath = (nodeDef: ArenaNodeDef<NodeDefType>, survey: ArenaSurvey) => {
+const getParentPath = (nodeDef: ArenaAnyNodeDef, survey: ArenaSurvey) => {
   const parts = []
   let cur = Survey.getNodeDefParent(nodeDef)(survey)
   while (cur && !NodeDef.isRoot(cur)) {
@@ -90,20 +83,20 @@ const runAiDescriptionBatchWithRetry = async ({
   }
 }
 
-const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef }) => {
   const pathParts = []
   Survey.visitAncestorsAndSelf(nodeDef, (ancestorDef) => pathParts.unshift(NodeDef.getName(ancestorDef)))(survey)
   return pathParts.join('.')
 }
 
-const getDefaultValuesSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getDefaultValuesSummary = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   const defaultValues = NodeDef.getDefaultValues(nodeDef)
   return defaultValues.length > 0
     ? defaultValues.map((defaultValue) => NodeDefExpression.getExpression(defaultValue)).join('; ')
     : ''
 }
 
-const getDefaultValueApplyIf = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getDefaultValueApplyIf = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   const defaultValues = NodeDef.getDefaultValues(nodeDef)
   return defaultValues.length > 0
     ? defaultValues.map((defaultValue) => NodeDefExpression.getApplyIf(defaultValue)).join('; ')
@@ -133,25 +126,25 @@ const getExpressionsSummary = ({
     }, [])
     .join('\n')
 
-const getValidationsSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getValidationsSummary = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
   return getExpressionsSummary({ expressions, includeSeverity: true })
 }
 
 // mirrors the 3 "Required" options in the node def editor: not required, always required, required if
-const getRequiredSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getRequiredSummary = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   if (NodeDefValidations.isRequiredIfDefined(validations)) return 'conditional'
   return String(NodeDefValidations.isRequired(validations))
 }
 
-const getRequiredIfSummary = ({ nodeDef }: { nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const getRequiredIfSummary = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   return getExpressionsSummary({ expressions: NodeDefValidations.getRequiredIf(validations) })
 }
 
-const getValidationCountSummary = ({ nodeDef, countType }: { nodeDef: ArenaNodeDef<NodeDefType>; countType: any }) => {
+const getValidationCountSummary = ({ nodeDef, countType }: { nodeDef: ArenaAnyNodeDef; countType: any }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const count = NodeDefValidations.getCountProp(countType)(validations)
   if (Objects.isEmpty(count)) {
@@ -163,12 +156,12 @@ const getValidationCountSummary = ({ nodeDef, countType }: { nodeDef: ArenaNodeD
   return String(count)
 }
 
-const getRelevantIf = (nodeDef: ArenaNodeDef<NodeDefType>) => {
+const getRelevantIf = (nodeDef: ArenaAnyNodeDef) => {
   const relevantExpressions = NodeDef.getApplicable(nodeDef)
   return relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
 }
 
-const getValidationMessages = ({ nodeDef, lang }: { nodeDef: ArenaNodeDef<NodeDefType>; lang: string }) => {
+const getValidationMessages = ({ nodeDef, lang }: { nodeDef: ArenaAnyNodeDef; lang: string }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
   return expressions
@@ -182,7 +175,7 @@ const getValidationMessages = ({ nodeDef, lang }: { nodeDef: ArenaNodeDef<NodeDe
     .join('\n')
 }
 
-const getCategoryName = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
+const getCategoryName = (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef) => {
   if (!NodeDef.isCode(nodeDef)) return ''
 
   const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
@@ -198,20 +191,20 @@ const getCategoryName = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>
   return `${categoryName}${levelNameSuffix}`
 }
 
-const getTaxonomyName = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
+const getTaxonomyName = (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef) => {
   if (!NodeDef.isTaxon(nodeDef)) return ''
 
   const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
   return Taxonomy.getName(taxonomy) || ''
 }
 
-const getParentCodeAttribute = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
+const getParentCodeAttribute = (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef) => {
   if (!NodeDef.isCode(nodeDef)) return ''
   const parentCodeAttribute = Survey.getNodeDefParentCode(nodeDef)(survey)
   return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
 }
 
-const getCodeAttributeCategoryLevel = (survey: ArenaSurvey, nodeDef: ArenaNodeDef<NodeDefType>) => {
+const getCodeAttributeCategoryLevel = (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef) => {
   if (!NodeDef.isCode(nodeDef)) return ''
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   return String(categoryLevelIndex + 1)
@@ -242,7 +235,7 @@ const buildNodeDefItem = ({
   includeAiDescriptions,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   languages: string[]
   defaultLang: string
   cycle: string

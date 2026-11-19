@@ -1,10 +1,10 @@
 import type {
-  CategoryItem as ArenaCategoryItem,
-  CategoryLevel as ArenaCategoryLevel,
-  Validation as ArenaValidation,
-  Category as ArenaCategory,
-  User as ArenaUser,
-  Survey as ArenaSurvey,
+  ArenaCategoryItem,
+  ArenaCategoryLevel,
+  ArenaValidation,
+  ArenaCategory,
+  ArenaUser,
+  ArenaSurvey,
 } from '@openforis/arena-core'
 import * as A from '@core/arena'
 

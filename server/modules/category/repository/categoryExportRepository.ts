@@ -1,4 +1,4 @@
-import type { Category as ArenaCategory } from '@openforis/arena-core'
+import type { ArenaCategory } from '@openforis/arena-core'
 import { Schemata } from '@openforis/arena-server'
 
 import * as Category from '@core/survey/category'

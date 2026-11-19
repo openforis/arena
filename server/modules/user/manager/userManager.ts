@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Objects, type User as ArenaUser, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaUser, type ArenaSurvey } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 
@@ -293,7 +293,7 @@ export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUser
  * @param {string} [params.sortBy] - The sort field.
  * @param {string} [params.sortOrder] - The sort order.
  * @param {object} [client] - The db client.
- * @returns {Promise<import('@openforis/arena-core').User[]>} - The users.
+ * @returns {Promise<import('@openforis/arena-core').ArenaUser[]>} - The users.
  */
 export const fetchUsers = (
   {

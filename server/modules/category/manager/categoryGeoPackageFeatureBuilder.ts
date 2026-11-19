@@ -1,4 +1,4 @@
-import { type Category as ArenaCategory, Points, type SRSIndex } from '@openforis/arena-core'
+import { type ArenaCategory, Points, type ArenaSRSIndex } from '@openforis/arena-core'
 import type { Feature } from 'geojson'
 
 import * as Category from '@core/survey/category'
@@ -21,7 +21,7 @@ export const buildCategoryItemFeature = ({
   category: ArenaCategory
   row: Record<string, any>
   languages: string[]
-  srsIndex: SRSIndex
+  srsIndex: ArenaSRSIndex
 }): Feature | null => {
   const point = parsePoint(row[locationExtraPropName])
   if (!point) return null

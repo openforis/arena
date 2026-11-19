@@ -1,9 +1,4 @@
-import type {
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  ArenaRecordNode,
-} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaRecordNode, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
@@ -20,7 +15,7 @@ const _checkParentValid = ({
 }: {
   nodes: { [nodeUuid: string]: ArenaRecordNode }
   node: ArenaRecordNode
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }) => {
   const parentUuid = Node.getParentUuid(node)
   if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
@@ -29,7 +24,7 @@ const _checkParentValid = ({
   return null
 }
 
-const _checkNotEmptyMultiple = ({ node, nodeDef }: { node: ArenaRecordNode; nodeDef: ArenaNodeDef<NodeDefType> }) => {
+const _checkNotEmptyMultiple = ({ node, nodeDef }: { node: ArenaRecordNode; nodeDef: ArenaAnyNodeDef }) => {
   if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
     return { warn: 'is multiple and has an empty value' }
   }
@@ -43,7 +38,7 @@ const _checkHierarchyValid = ({
 }: {
   nodes: { [nodeUuid: string]: ArenaRecordNode }
   node: ArenaRecordNode
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }) => {
   const nodeHierarchy = Node.getHierarchy(node)
   if (
@@ -62,7 +57,7 @@ const _checkCategoryItemExists = async ({
 }: {
   survey: ArenaSurvey
   node: ArenaRecordNode
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }) => {
   if (!NodeDef.isCode(nodeDef)) return null
   const itemUuid = Node.getCategoryItemUuid(node)
@@ -79,7 +74,7 @@ const _checkTaxonExists = async ({
 }: {
   survey: ArenaSurvey
   node: ArenaRecordNode
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }) => {
   if (!NodeDef.isTaxon(nodeDef)) return null
   const taxonUuid = Node.getTaxonUuid(node)
@@ -100,7 +95,7 @@ export const checkNodeIsValid = async ({
   survey: ArenaSurvey
   nodes: { [nodeUuid: string]: ArenaRecordNode }
   node: ArenaRecordNode
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
 }): Promise<NodeCheckResult> => {
   if (!nodeDef) {
     return { valid: false, warn: 'refers to a missing node definition' }

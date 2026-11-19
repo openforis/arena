@@ -3,10 +3,10 @@ import * as fs from 'node:fs'
 import {
   Authorizer,
   ServiceRegistry,
-  type User as ArenaUser,
-  type Survey as ArenaSurvey,
-  type Message,
-  type Validation as ArenaValidation,
+  type ArenaUser,
+  type ArenaSurvey,
+  type ArenaMessage,
+  type ArenaValidation,
 } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
@@ -791,7 +791,7 @@ export const deleteUser = ({ user, userUuidToDelete }: { user: ArenaUser; userUu
     // Messages the target authored block deletion the same way (message.created_by_user_uuid has no
     // ON DELETE action). MessageService has no by-author query, so fetch all and filter.
     const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message) as unknown as {
-      getAll(client?: DbClient): Promise<Message[]>
+      getAll(client?: DbClient): Promise<ArenaMessage[]>
     }
     const messages = await messageService.getAll(t)
     const ownMessagesCount = messages.filter((message) => message.createdByUserUuid === userUuidToDelete).length

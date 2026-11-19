@@ -4,11 +4,10 @@ import * as A from '@core/arena'
 import {
   RecordValidator,
   type ArenaRecordNode,
-  type User as ArenaUser,
-  type Record as ArenaRecord,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
+  type ArenaUser,
+  type ArenaRecord,
+  type ArenaSurvey,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -178,7 +177,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
   }: {
     survey: ArenaSurvey
     cycle: string
-    nodeDefsUnique: ArenaNodeDef<NodeDefType>[]
+    nodeDefsUnique: ArenaAnyNodeDef[]
     nodesUnique: ArenaRecordNode[]
     recordUuidsExcluded: any
     errorKey: any

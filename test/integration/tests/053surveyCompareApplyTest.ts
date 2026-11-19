@@ -1,4 +1,4 @@
-import type { NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as Survey from '@core/survey/survey'
@@ -101,7 +101,7 @@ describe('Survey compare: apply changes made in another environment', () => {
 
     // changes in Dev: new attribute, validation expression, new category item
     let dev = await fetchSurvey(devSurveyId)
-    const treeDef = Survey.getNodeDefByName('tree')(dev) as NodeDefEntity
+    const treeDef = Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity
     await NodeDefService.insertNodeDef({
       user,
       surveyId: devSurveyId,
@@ -233,7 +233,7 @@ describe('Survey compare: apply changes made in another environment', () => {
       surveyId: devSurveyId,
       cycle,
       nodeDef: NodeDef.newNodeDef(
-        Survey.getNodeDefByName('tree')(dev) as NodeDefEntity,
+        Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity,
         NodeDef.nodeDefType.taxon,
         [cycle],
         {
@@ -292,7 +292,7 @@ describe('Survey compare: apply changes made in another environment', () => {
       surveyId: devSurveyId,
       cycle,
       nodeDef: NodeDef.newNodeDef(
-        Survey.getNodeDefByName('tree')(dev) as NodeDefEntity,
+        Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity,
         NodeDef.nodeDefType.text,
         [cycle],
         {
@@ -336,7 +336,7 @@ describe('Survey compare: apply changes made in another environment', () => {
       surveyId: devSurveyId,
       cycle,
       nodeDef: NodeDef.newNodeDef(
-        Survey.getNodeDefByName('tree')(dev) as NodeDefEntity,
+        Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity,
         NodeDef.nodeDefType.text,
         [cycle],
         {

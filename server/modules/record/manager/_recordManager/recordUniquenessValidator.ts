@@ -1,10 +1,4 @@
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  ArenaRecordNode,
-  Record as ArenaRecord,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
@@ -85,7 +79,7 @@ export const validateRecordsUniqueness = async (
   }: {
     survey: ArenaSurvey
     cycle: string
-    nodeDefsUnique: ArenaNodeDef<NodeDefType>[]
+    nodeDefsUnique: ArenaAnyNodeDef[]
     nodesUnique: ArenaRecordNode[]
     recordUuidsExcluded: any
     errorKey: any

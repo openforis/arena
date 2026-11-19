@@ -1,9 +1,4 @@
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  Validation as ArenaValidation,
-} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -23,6 +18,6 @@ export const assocNodeDefsValidation =
     A.assoc(keys.nodeDefsValidation, nodeDefsValidation, survey)
 
 export const getNodeDefValidation =
-  (nodeDef: ArenaNodeDef<NodeDefType>) =>
+  (nodeDef: ArenaAnyNodeDef) =>
   (survey: ArenaSurvey): ArenaValidation =>
     Validation.getFieldValidation(NodeDef.getUuid(nodeDef))(getNodeDefsValidation(survey))

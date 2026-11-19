@@ -1,10 +1,9 @@
 import {
   FlatDataExportModel,
   Objects,
-  type Survey as ArenaSurvey,
-  type NodeDef as ArenaNodeDef,
-  type NodeDefType,
-  type CategoryItem as ArenaCategoryItem,
+  type ArenaSurvey,
+  type ArenaCategoryItem,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -29,7 +28,7 @@ const visitCategoryItems = ({
   itemVisitor,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   itemVisitor: (item: ArenaCategoryItem) => void
 }) => {
   const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)

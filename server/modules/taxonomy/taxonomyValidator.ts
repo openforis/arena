@@ -1,8 +1,4 @@
-import type {
-  Taxon as ArenaTaxon,
-  Taxonomy as ArenaTaxonomy,
-  Validation as ArenaValidation,
-} from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaTaxonomy, ArenaValidation } from '@openforis/arena-core'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'

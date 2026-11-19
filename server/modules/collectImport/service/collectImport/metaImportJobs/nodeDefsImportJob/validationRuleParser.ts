@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 
@@ -52,7 +52,7 @@ const operandConverterByNodeDefType = {
 
 const checkExpressionParserByType: Record<
   string,
-  (params: { collectCheck: any; nodeDef: ArenaNodeDef<NodeDefType> }) => string | null
+  (params: { collectCheck: any; nodeDef: ArenaAnyNodeDef }) => string | null
 > = {
   [collectCheckType.compare]: ({ collectCheck, nodeDef }) => {
     const attributes = CollectSurvey.getAttributes(collectCheck)
@@ -95,7 +95,7 @@ const isUniqueCheckConvertible = ({
 }: {
   survey: ArenaSurvey
   collectValidationRule: any
-  nodeDefCurrent: ArenaNodeDef<NodeDefType>
+  nodeDefCurrent: ArenaAnyNodeDef
 }) => {
   const { expr } = CollectSurvey.getAttributes(collectValidationRule)
   const nodeDefName = NodeDef.getName(nodeDefCurrent)
@@ -145,7 +145,7 @@ const convertCheckExpression = async ({
   checkType: any
   collectValidationRule: any
   collectExpr: any
-  nodeDefCurrent: ArenaNodeDef<NodeDefType>
+  nodeDefCurrent: ArenaAnyNodeDef
 }): Promise<{ exprConverted?: string | null; unique?: boolean }> => {
   const converter = checkExpressionConverterByType[checkType]
   if (converter) {
@@ -164,7 +164,7 @@ const parseValidationRule = async ({
 }: {
   survey: ArenaSurvey
   collectValidationRule: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   defaultLanguage: any
 }) => {
   const checkType = CollectSurvey.getElementName(collectValidationRule)
@@ -239,7 +239,7 @@ export const parseValidationRules = async ({
   defaultLanguage,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   collectValidationRules: any
   defaultLanguage: any
 }) => {

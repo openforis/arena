@@ -1,4 +1,4 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'

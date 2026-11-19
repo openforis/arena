@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
@@ -21,7 +21,7 @@ const insertNodeDefAreaBasedEstimate = (
 }
 
 const updateNodeDefAreaBasedEstimate = async (
-  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef },
   client: DbClient = db
 ) => {
   const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
@@ -49,7 +49,7 @@ const updateNodeDefAreaBasedEstimate = async (
 }
 
 const insertOrDeleteNodeDefAreaBasedEstimate = async (
-  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef },
   client: DbClient = db
 ) => {
   const chainUuid = NodeDef.getChainUuid(nodeDef)

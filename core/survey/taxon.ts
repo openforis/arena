@@ -1,4 +1,4 @@
-import type { Taxon as ArenaTaxon, VernacularName as ArenaVernacularName } from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaVernacularName } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

@@ -1,4 +1,4 @@
-import type { NodeDefType, NodeDefEntity } from '@openforis/arena-core'
+import type { NodeDefType, ArenaNodeDefEntity } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -10,7 +10,7 @@ import {
 const plotDef = {
   ...NodeDef.newNodeDef(null, NodeDef.nodeDefType.entity, ['0'], { name: 'plot' }),
   uuid: 'plot-def',
-} as NodeDefEntity
+} as ArenaNodeDefEntity
 
 const newAttributeDef = ({
   name,
@@ -87,7 +87,7 @@ describe('Screenshot image attributes (287)', () => {
       name: 'plot_photos',
       labels: { en: 'Plot photos' },
       multiple: true,
-    }) as NodeDefEntity
+    }) as ArenaNodeDefEntity
     const [option] = toImageAttributeOptions([photo], 'en', rowEntityDef)
     expect(option).toMatchObject({ label: 'Plot photos › photo label', rowParentDefUuid: 'plot-def' })
   })

@@ -1,11 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  ArenaRecordNode,
-  Record as ArenaRecord,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import { isUuid } from '@core/uuid'
@@ -248,7 +242,7 @@ export default class RecordsImportJob extends Job {
   }: {
     survey: ArenaSurvey
     nodeDefsInfoByPath: { [path: string]: string }
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     nodeDefUuid: string
     parentNode: ArenaRecordNode
     childPath: string
@@ -298,7 +292,7 @@ export default class RecordsImportJob extends Job {
     submissionDir,
   }: {
     survey: ArenaSurvey
-    nodeDef: ArenaNodeDef<NodeDefType>
+    nodeDef: ArenaAnyNodeDef
     nodeDefUuid: string
     parentNode: ArenaRecordNode
     rawText: string | null

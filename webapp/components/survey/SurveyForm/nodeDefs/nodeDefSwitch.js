@@ -6,7 +6,7 @@ import * as A from '@core/arena'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
-import { Nodes, Objects } from '@openforis/arena-core'
+import { RecordNodes, Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -46,12 +46,12 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
 }
 
 const _isNodesCountAboveMin = ({ parentNode, nodeDef, nodes }) => {
-  const minCount = Nodes.getChildrenMinCount({ parentNode, nodeDef })
+  const minCount = RecordNodes.getChildrenMinCount({ parentNode, nodeDef })
   return Objects.isEmpty(minCount) || nodes.length > Number(minCount)
 }
 
 const _isNodesCountBelowMax = ({ parentNode, nodeDef, nodes }) => {
-  const maxCount = Nodes.getChildrenMaxCount({ parentNode, nodeDef })
+  const maxCount = RecordNodes.getChildrenMaxCount({ parentNode, nodeDef })
   return Objects.isEmpty(maxCount) || nodes.length < Number(maxCount)
 }
 
@@ -80,7 +80,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) 
 
     const canDeleteNode = canAddOrDeleteNodeCommon && _isNodesCountAboveMin({ parentNode, nodeDef, nodes })
 
-    const nodesHaveValue = nodes.length > 0 && nodes.every((node) => Nodes.isValueNotBlank(node))
+    const nodesHaveValue = nodes.length > 0 && nodes.every((node) => RecordNodes.isValueNotBlank(node))
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
 
     return {

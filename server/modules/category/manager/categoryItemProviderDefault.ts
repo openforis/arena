@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
@@ -73,7 +73,7 @@ const getOrFetchItem = ({
   itemUuid,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   itemUuid: string
 }) => {
   const itemInSurvey = Survey.getCategoryItemByUuid(itemUuid)(survey)

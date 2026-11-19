@@ -1,4 +1,4 @@
-import type { Chain as ArenaChain } from '@openforis/arena-core'
+import type { ArenaChain } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import { DB } from '@openforis/arena-server'
 

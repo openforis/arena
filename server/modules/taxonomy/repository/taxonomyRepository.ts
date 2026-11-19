@@ -1,4 +1,4 @@
-import type { Taxon as ArenaTaxon, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaTaxonomy } from '@openforis/arena-core'
 import toSnakeCase from 'to-snake-case'
 
 import { Objects } from '@openforis/arena-core'

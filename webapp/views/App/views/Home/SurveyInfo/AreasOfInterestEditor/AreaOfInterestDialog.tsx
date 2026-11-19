@@ -2,7 +2,7 @@ import './AreaOfInterestDialog.scss'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { AreaOfInterest, AreaOfInterestDescriptor, Validation as ArenaValidation } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest, ArenaAreaOfInterestDescriptor, ArenaValidation } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
@@ -27,17 +27,23 @@ const accept = {
 }
 
 // geometry dropped and normalized, uploaded on OK
-type Upload = { surveyFile: any; content: File; areaOfInterest: AreaOfInterest }
+type Upload = { surveyFile: any; content: File; areaOfInterest: ArenaAreaOfInterest }
 
 type Props = {
   // the other areas of interest of the survey (the edited one excluded)
-  areasOfInterest: AreaOfInterestDescriptor[]
-  editedAreaOfInterest: AreaOfInterestDescriptor | null
+  areasOfInterest: ArenaAreaOfInterestDescriptor[]
+  editedAreaOfInterest: ArenaAreaOfInterestDescriptor | null
   onClose: () => void
-  onOk: (areaOfInterest: AreaOfInterestDescriptor) => void
+  onOk: (areaOfInterest: ArenaAreaOfInterestDescriptor) => void
 }
 
-const createUpload = ({ fileName, areaOfInterest }: { fileName: string; areaOfInterest: AreaOfInterest }): Upload => {
+const createUpload = ({
+  fileName,
+  areaOfInterest,
+}: {
+  fileName: string
+  areaOfInterest: ArenaAreaOfInterest
+}): Upload => {
   // only the geometry is stored (feature properties and other geometries are dropped)
   const content = new File([JSON.stringify(areaOfInterest)], fileName, { type: contentTypes.geojson })
   const surveyFile = SurveyFile.createFile({
@@ -55,11 +61,11 @@ const buildDraft = ({
   labels,
   upload,
 }: {
-  editedAreaOfInterest: AreaOfInterestDescriptor | null
+  editedAreaOfInterest: ArenaAreaOfInterestDescriptor | null
   name: string
   labels: Record<string, string>
   upload: Upload | null
-}): Partial<AreaOfInterestDescriptor> => {
+}): Partial<ArenaAreaOfInterestDescriptor> => {
   if (upload) {
     const { surveyFile, content, areaOfInterest } = upload
     return SurveyAreaOfInterest.newAreaOfInterestDescriptor({
@@ -124,7 +130,7 @@ export const AreaOfInterestDialog = (props: Props) => {
         setUploading(false)
       }
     }
-    onOk(draft as AreaOfInterestDescriptor)
+    onOk(draft as ArenaAreaOfInterestDescriptor)
   }, [draft, onOk, surveyId, upload])
 
   return (

@@ -1,4 +1,4 @@
-import type { Taxon as ArenaTaxon, VernacularName } from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaVernacularName } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -27,10 +27,10 @@ const prepareTaxonToCompare = (taxon: ArenaTaxon) =>
           return TaxonVernacularName.getName(vn1).localeCompare(TaxonVernacularName.getName(vn2))
         })
         // omit uuid
-        .map((vernacularName) => A.omit([ObjectUtils.keys.uuid])(vernacularName) as VernacularName)
+        .map((vernacularName) => A.omit([ObjectUtils.keys.uuid])(vernacularName) as ArenaVernacularName)
 
       const vernacularNamesUpdated = vernacularNamesArrayUpdated.reduce(
-        (acc: Record<string, VernacularName[]>, vernacularName) => {
+        (acc: Record<string, ArenaVernacularName[]>, vernacularName) => {
           const lang = TaxonVernacularName.getLang(vernacularName)
           let vernacularNamesWithSameLang = acc[lang]
           if (!vernacularNamesWithSameLang) {

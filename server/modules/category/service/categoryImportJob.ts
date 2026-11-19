@@ -1,7 +1,7 @@
 import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
-import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
 import { Objects, Points } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'

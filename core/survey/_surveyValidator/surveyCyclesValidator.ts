@@ -1,10 +1,6 @@
 import * as A from '@core/arena'
 
-import {
-  Dates,
-  type Validation as ArenaValidation,
-  type ValidationResult as ArenaValidationResult,
-} from '@openforis/arena-core'
+import { Dates, type ArenaValidation, type ArenaValidationResult } from '@openforis/arena-core'
 
 import * as SurveyCycle from '../surveyCycle'
 import type { SurveyCycle as SurveyCycleType } from '../surveyCycle'

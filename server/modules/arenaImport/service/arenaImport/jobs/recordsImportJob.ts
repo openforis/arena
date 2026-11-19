@@ -1,4 +1,4 @@
-import type { Record as ArenaRecord } from '@openforis/arena-core'
+import type { ArenaRecord } from '@openforis/arena-core'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'

@@ -1,10 +1,6 @@
 import * as A from '@core/arena'
 
-import {
-  Objects,
-  type Validation as ArenaValidation,
-  type ValidationResult as ArenaValidationResult,
-} from '@openforis/arena-core'
+import { Objects, type ArenaValidation, type ArenaValidationResult } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import SystemError, { StatusCodes } from '@core/systemError'

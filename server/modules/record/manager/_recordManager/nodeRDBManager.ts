@@ -1,4 +1,4 @@
-import type { ArenaRecordNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Record from '@core/record/record'

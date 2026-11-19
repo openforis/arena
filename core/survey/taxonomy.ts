@@ -1,4 +1,4 @@
-import type { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import type { ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

@@ -1,4 +1,4 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 import type { Router } from 'express'
 
 import * as User from '@core/user/user'

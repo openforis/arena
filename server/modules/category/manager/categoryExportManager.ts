@@ -1,4 +1,4 @@
-import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'

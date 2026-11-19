@@ -1,9 +1,4 @@
-import type {
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Taxon as ArenaTaxon,
-} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaTaxon, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -51,7 +46,7 @@ const getTaxonByUuid = ({
  * @param {object} params.survey - The survey.
  * @param {object} params.nodeDef - The taxon node definition.
  * @param {string} params.taxonUuid - The taxon uuid.
- * @returns {Promise<import('@openforis/arena-core').Taxon|null>} - The taxon, or null if not found.
+ * @returns {Promise<import('@openforis/arena-core').ArenaTaxon|null>} - The taxon, or null if not found.
  */
 const getOrFetchTaxon = ({
   survey,
@@ -59,7 +54,7 @@ const getOrFetchTaxon = ({
   taxonUuid,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   taxonUuid: string
 }): Promise<ArenaTaxon | null> => {
   const taxonInSurvey = Survey.getTaxonByUuid(taxonUuid)(survey)

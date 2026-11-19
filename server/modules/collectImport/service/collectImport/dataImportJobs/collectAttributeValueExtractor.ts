@@ -1,10 +1,4 @@
-import type {
-  Survey as ArenaSurvey,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  ArenaRecordNode,
-  Record as ArenaRecord,
-} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaRecordNode, ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
@@ -43,7 +37,7 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
 }: {
   survey: ArenaSurvey
   categoryItemProvider: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   code: string
   record: ArenaRecord
   parentNode: ArenaRecordNode
@@ -106,7 +100,7 @@ const extractCoordinateValueAndMeta = ({
   nodeDef,
   collectNode,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   collectNode: CollectRecord.CollectNode
 }) => {
   const { x, y, srs, accuracy, altitude } = CollectRecord.getTextValues(collectNode)
@@ -185,7 +179,7 @@ const findTaxonUuid = async ({
 }: {
   survey: ArenaSurvey
   taxonProvider: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   taxonCode: any
 }) => {
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
@@ -244,7 +238,7 @@ type AttributeValueExtractParams = {
   survey: ArenaSurvey
   categoryItemProvider?: any
   taxonProvider?: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   record?: ArenaRecord
   node?: ArenaRecordNode
   collectSurveyFileZip?: any

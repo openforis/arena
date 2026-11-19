@@ -1,9 +1,4 @@
-import type {
-  Taxon as ArenaTaxon,
-  Survey as ArenaSurvey,
-  Category as ArenaCategory,
-  Taxonomy as ArenaTaxonomy,
-} from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaSurvey, ArenaCategory, ArenaTaxonomy } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'

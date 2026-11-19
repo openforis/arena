@@ -1,4 +1,4 @@
-import type { AreaOfInterest } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest } from '@openforis/arena-core'
 import type { Position } from 'geojson'
 
 type GeoJsonObject = {
@@ -53,7 +53,7 @@ const extractPolygons = (geoJson: unknown): Position[][][] | null => {
  * @param {unknown} geoJson - The GeoJSON object.
  * @returns {AreaOfInterest|null} - A Polygon (single polygon) or MultiPolygon geometry, or null if no valid polygon is found.
  */
-export const parseAreaOfInterest = (geoJson: unknown): AreaOfInterest | null => {
+export const parseAreaOfInterest = (geoJson: unknown): ArenaAreaOfInterest | null => {
   const polygons = extractPolygons(geoJson)
   if (!polygons) return null
   return polygons.length === 1
@@ -67,7 +67,7 @@ export const parseAreaOfInterest = (geoJson: unknown): AreaOfInterest | null => 
  * @param {string} text - The GeoJSON text.
  * @returns {AreaOfInterest|null} - The area of interest or null if the text is not valid JSON or has no valid polygon.
  */
-export const parseAreaOfInterestJson = (text: string): AreaOfInterest | null => {
+export const parseAreaOfInterestJson = (text: string): ArenaAreaOfInterest | null => {
   try {
     return parseAreaOfInterest(JSON.parse(text))
   } catch {
@@ -82,7 +82,9 @@ export const parseAreaOfInterestJson = (text: string): AreaOfInterest | null => 
  * @param {AreaOfInterest} areaOfInterest - The area of interest.
  * @returns {{polygons: number, vertices: number}} - Number of polygons and vertices.
  */
-export const getAreaOfInterestSummary = (areaOfInterest: AreaOfInterest): { polygons: number; vertices: number } => {
+export const getAreaOfInterestSummary = (
+  areaOfInterest: ArenaAreaOfInterest
+): { polygons: number; vertices: number } => {
   const polygons = areaOfInterest.type === 'Polygon' ? [areaOfInterest.coordinates] : areaOfInterest.coordinates
   const vertices = polygons.reduce((acc, rings) => acc + rings.reduce((accRings, ring) => accRings + ring.length, 0), 0)
   return { polygons: polygons.length, vertices }

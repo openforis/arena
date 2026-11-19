@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { insertAllQueryBatch } from '@server/db/dbUtils'
 
 import { Schemata, TableDataNodeDef } from '@common/model/db'
@@ -18,7 +18,7 @@ const getSelectQuery = ({
   nodeDefColumnsUuids,
 }: {
   surveyId: number
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   nodeDefContext: any
   nodeDefAncestorMultipleEntity: any
   nodeDefColumnsUuids: string[]
@@ -79,7 +79,7 @@ export const populateTable = async (
     nodeDef,
     stopIfFunction = null,
     onProgress = null,
-  }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType>; stopIfFunction?: any; onProgress?: any },
+  }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef; stopIfFunction?: any; onProgress?: any },
   client: DbClient
 ) => {
   const surveyId = Survey.getId(survey)

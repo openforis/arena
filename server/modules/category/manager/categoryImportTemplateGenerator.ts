@@ -1,9 +1,9 @@
 import {
   PointFactory,
   Points,
-  type CategoryLevel as ArenaCategoryLevel,
-  type Category as ArenaCategory,
-  type Survey as ArenaSurvey,
+  type ArenaCategoryLevel,
+  type ArenaCategory,
+  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'

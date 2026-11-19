@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -29,7 +29,7 @@ const chunkArray = <T>(array: T[], size: number): T[][] => {
  * @param {string} defaultLang - Survey default language code.
  * @returns {{ items: Array, itemInfoById: object }} Items to translate and their metadata.
  */
-const buildTranslationItems = (nodeDefs: ArenaNodeDef<NodeDefType>[], defaultLang: string) => {
+const buildTranslationItems = (nodeDefs: ArenaAnyNodeDef[], defaultLang: string) => {
   const items = []
   const itemInfoById = {}
 

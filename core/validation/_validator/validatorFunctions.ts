@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Objects, Validation as ArenaValidation } from '@openforis/arena-core'
+import { Objects, ArenaValidation } from '@openforis/arena-core'
 
 import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'

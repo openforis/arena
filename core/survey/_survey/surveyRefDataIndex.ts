@@ -1,13 +1,11 @@
-import { Objects, SurveyRefDataFactory, Surveys } from '@openforis/arena-core'
+import { Objects, SurveyRefDataFactory, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
   ArenaRecord,
-  CategoryItem as ArenaCategoryItem,
-  Node as ArenaNode,
-  NodeDef as ArenaNodeDef,
-  NodeDefTaxon,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  Taxon as ArenaTaxon,
+  ArenaCategoryItem,
+  ArenaRecordNode,
+  ArenaNodeDefTaxon,
+  ArenaSurvey,
+  ArenaTaxon,
 } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -18,7 +16,6 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxon from '@core/survey/taxon'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
 
 // survey.refData is an arena-core SurveyRefData: category items by category uuid, taxa by uuid and by taxonomy uuid and code
@@ -49,10 +46,10 @@ export const getCategoryItemUuidAndCodeHierarchy =
     record = null,
     parentNode = null,
   }: {
-    nodeDef: AnyNodeDef
+    nodeDef: ArenaAnyNodeDef
     code: string
     record?: ArenaRecord | null
-    parentNode?: ArenaNode | null
+    parentNode?: ArenaRecordNode | null
   }) =>
   (survey: ArenaSurvey): { itemUuid: string | undefined; hierarchyCode: string[] } => {
     const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
@@ -97,7 +94,7 @@ export const getTaxonByCode =
     Surveys.getTaxonByCode({ survey, taxonomyUuid, taxonCode })
 
 export const getTaxonUuid =
-  (nodeDef: AnyNodeDef, taxonCode: string) =>
+  (nodeDef: ArenaAnyNodeDef, taxonCode: string) =>
   (survey: ArenaSurvey): string => {
     const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
     const taxon = getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
@@ -105,7 +102,7 @@ export const getTaxonUuid =
   }
 
 export const getTaxonVernacularNameUuid =
-  ({ nodeDef, taxonCode, vernacularName }: { nodeDef: AnyNodeDef; taxonCode: string; vernacularName: string }) =>
+  ({ nodeDef, taxonCode, vernacularName }: { nodeDef: ArenaAnyNodeDef; taxonCode: string; vernacularName: string }) =>
   (survey: ArenaSurvey): string | undefined => {
     const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
     const taxon = getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
@@ -113,9 +110,14 @@ export const getTaxonVernacularNameUuid =
   }
 
 export const includesTaxonVernacularName =
-  (nodeDef: AnyNodeDef, taxonCode: string, vernacularNameUuid: string) =>
+  (nodeDef: ArenaAnyNodeDef, taxonCode: string, vernacularNameUuid: string) =>
   (survey: ArenaSurvey): boolean =>
-    Surveys.includesTaxonVernacularName({ survey, nodeDef: nodeDef as NodeDefTaxon, taxonCode, vernacularNameUuid })
+    Surveys.includesTaxonVernacularName({
+      survey,
+      nodeDef: nodeDef as ArenaNodeDefTaxon,
+      taxonCode,
+      vernacularNameUuid,
+    })
 
 // ====== UPDATE
 

@@ -1,6 +1,6 @@
 import { setImmediate as waitForEventLoop } from 'node:timers/promises'
 
-import { Objects, RecordUpdateResult, type Survey as ArenaSurvey } from '@openforis/arena-core'
+import { Objects, RecordUpdateResult, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

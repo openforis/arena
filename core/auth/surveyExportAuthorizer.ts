@@ -1,4 +1,4 @@
-import { Authorizer, Survey as ArenaSurvey, User } from '@openforis/arena-core'
+import { Authorizer, ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 
 /**
  * Returns true if the user can export the survey with its records, users and activity log:
@@ -7,5 +7,5 @@ import { Authorizer, Survey as ArenaSurvey, User } from '@openforis/arena-core'
  * @param {ArenaSurvey} surveyInfo - The survey info.
  * @returns {boolean} - True if the survey export can include the survey data.
  */
-export const canExportSurveyData = (user: User, surveyInfo: ArenaSurvey): boolean =>
+export const canExportSurveyData = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
   Authorizer.canExportSurvey(user, surveyInfo) && Authorizer.canManageUserGroups(user, surveyInfo)

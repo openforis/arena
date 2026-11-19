@@ -1,4 +1,4 @@
-import type { NodeDefEntity, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -81,7 +81,7 @@ describe('Node def names in the data tables SQL', () => {
 
   test('OLAP data table columns are quoted', async () => {
     const survey = await buildSurvey()
-    const clusterDef = Survey.getNodeDefByName('cluster')(survey) as NodeDefEntity
+    const clusterDef = Survey.getNodeDefByName('cluster')(survey) as ArenaNodeDefEntity
     const table = new TableOlapData({ survey, cycle: '0', entityDef: clusterDef, baseUnitDef: clusterDef })
     expect(table.columnNamesAndTypes).toContain('"cluster_uuid" UUID')
   })

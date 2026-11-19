@@ -1,5 +1,5 @@
 import { Messages, MessageNotificationType, MessageStatus } from '@openforis/arena-core'
-import type { Message, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaMessage, ArenaUser } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -13,8 +13,8 @@ import { initArenaServerServices } from '@server/system/arenaServerServices'
 
 // the methods of the arena-server message service used here
 interface MessageService {
-  getByUuid(uuid: string, client?: unknown): Promise<Message | null>
-  update(uuid: string, message: Message, client?: unknown): Promise<unknown>
+  getByUuid(uuid: string, client?: unknown): Promise<ArenaMessage | null>
+  update(uuid: string, message: ArenaMessage, client?: unknown): Promise<unknown>
 }
 
 const getMessageService = (): MessageService => {

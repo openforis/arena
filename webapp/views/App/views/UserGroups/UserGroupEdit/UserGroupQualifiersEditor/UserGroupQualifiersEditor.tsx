@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { UserGroupQualifier as UserGroupQualifierType, type Validation as ArenaValidation } from '@openforis/arena-core'
+import { ArenaUserGroupQualifier, type ArenaValidation } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -13,15 +13,15 @@ import { Button, ButtonAdd, Fieldset } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 
 type Props = {
-  qualifiers: UserGroupQualifierType[]
-  onChange: (qualifiers: UserGroupQualifierType[]) => void
+  qualifiers: ArenaUserGroupQualifier[]
+  onChange: (qualifiers: ArenaUserGroupQualifier[]) => void
   readOnly?: boolean
 }
 
 // A qualifier annotated with a client-only uuid, used as a stable list key (qualifiers themselves have no id).
-type QualifierUi = UserGroupQualifierType & { uuid: string }
+type QualifierUi = ArenaUserGroupQualifier & { uuid: string }
 
-const toQualifier = (qualifierUi: QualifierUi): UserGroupQualifierType => ({
+const toQualifier = (qualifierUi: QualifierUi): ArenaUserGroupQualifier => ({
   name: qualifierUi.name,
   value: qualifierUi.value,
 })
@@ -48,7 +48,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   )
 
   const validateAll = useCallback(
-    (qualifiersToValidate: UserGroupQualifierType[]): Promise<ArenaValidation[]> =>
+    (qualifiersToValidate: ArenaUserGroupQualifier[]): Promise<ArenaValidation[]> =>
       Promise.all(
         qualifiersToValidate.map((qualifier) =>
           validateUserGroupQualifier({ qualifier, qualifiers: qualifiersToValidate })
@@ -76,7 +76,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
     onChange(qualifiersUiUpdated.map(toQualifier))
   }
 
-  const updateQualifierAt = (index: number, qualifierUpdated: UserGroupQualifierType) => {
+  const updateQualifierAt = (index: number, qualifierUpdated: ArenaUserGroupQualifier) => {
     const qualifiersUiUpdated = [...qualifiersUi]
     qualifiersUiUpdated[index] = { ...qualifierUpdated, uuid: qualifiersUi[index].uuid }
     emitChange(qualifiersUiUpdated)
@@ -101,7 +101,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
             onChange={(value: string) =>
               updateQualifierAt(
                 index,
-                UserGroupQualifier.assocName(StringUtils.normalizeName(value))(qualifier) as UserGroupQualifierType
+                UserGroupQualifier.assocName(StringUtils.normalizeName(value))(qualifier) as ArenaUserGroupQualifier
               )
             }
             validation={Validation.getFieldValidation(UserGroupQualifier.keys.name)(validations[index])}
@@ -111,7 +111,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
             readOnly={readOnly}
             value={UserGroupQualifier.getValue(qualifier)}
             onChange={(value: string) =>
-              updateQualifierAt(index, UserGroupQualifier.assocValue(value)(qualifier) as UserGroupQualifierType)
+              updateQualifierAt(index, UserGroupQualifier.assocValue(value)(qualifier) as ArenaUserGroupQualifier)
             }
           />
           {!readOnly && <Button iconClassName="icon-cross icon-12px" variant="text" onClick={() => onRemove(index)} />}

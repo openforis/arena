@@ -1,4 +1,4 @@
-import type { CategoryItem as ArenaCategoryItem, CategoryLevel as ArenaCategoryLevel } from '@openforis/arena-core'
+import type { ArenaCategoryItem, ArenaCategoryLevel } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

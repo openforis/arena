@@ -1,35 +1,28 @@
-import type {
-  Chain as ArenaChain,
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  NodeDefEntity,
-} from '@openforis/arena-core'
+import type { ArenaChain, ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Chain from '@common/analysis/chain'
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type SurveyChainParams = { survey: ArenaSurvey; chain: ArenaChain }
 
 const PLOT_AREA_SUFFIX = '_plot_area_'
 const WEIGHT_NODE_DEF_NAME = 'weight'
 const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(String.raw`^\w+${PLOT_AREA_SUFFIX}$`)
 
-const getEntityAreaNodeDefName = ({ nodeDefParent }: { nodeDefParent: NodeDefEntity }): string =>
+const getEntityAreaNodeDefName = ({ nodeDefParent }: { nodeDefParent: ArenaNodeDefEntity }): string =>
   `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
 
-const isWeightNodeDef = (nodeDef: AnyNodeDef): boolean => WEIGHT_NODE_DEF_NAME === NodeDef.getName(nodeDef)
+const isWeightNodeDef = (nodeDef: ArenaAnyNodeDef): boolean => WEIGHT_NODE_DEF_NAME === NodeDef.getName(nodeDef)
 
 const isEntityAreaNodeDef = ({
   nodeDef,
   nodeDefParent,
   includeOnlyValid = true,
 }: {
-  nodeDef: AnyNodeDef
-  nodeDefParent: NodeDefEntity
+  nodeDef: ArenaAnyNodeDef
+  nodeDefParent: ArenaNodeDefEntity
   includeOnlyValid?: boolean
 }): boolean => {
   if (!NodeDef.isSampling(nodeDef)) return false
@@ -47,7 +40,7 @@ const isBaseUnitEntityAreaNodeDef = ({
   survey,
   chain,
   nodeDef,
-}: SurveyChainParams & { nodeDef: AnyNodeDef }): boolean => {
+}: SurveyChainParams & { nodeDef: ArenaAnyNodeDef }): boolean => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   return (
@@ -55,7 +48,7 @@ const isBaseUnitEntityAreaNodeDef = ({
   )
 }
 
-const getAllEntityAreaNodeDefs = ({ survey, chain }: SurveyChainParams): AnyNodeDef[] => {
+const getAllEntityAreaNodeDefs = ({ survey, chain }: SurveyChainParams): ArenaAnyNodeDef[] => {
   const samplingNodeDefs = Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs: true })(survey)
   return samplingNodeDefs.filter((nodeDef) => {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -67,7 +60,7 @@ const getAreaNodeDefDefaultScript = ({
   nodeDefParent,
   isWeight,
 }: {
-  nodeDefParent: NodeDefEntity
+  nodeDefParent: ArenaNodeDefEntity
   isWeight: boolean
 }): string => {
   const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
@@ -83,12 +76,12 @@ const newEntityAreaNodeDef = ({
   cycleKeys,
   isWeight = false,
 }: {
-  nodeDefParent: NodeDefEntity
-  baseUnitNodeDef: AnyNodeDef | null
+  nodeDefParent: ArenaNodeDefEntity
+  baseUnitNodeDef: ArenaAnyNodeDef | null
   chainUuid: string
   cycleKeys: string[]
   isWeight?: boolean
-}): AnyNodeDef => {
+}): ArenaAnyNodeDef => {
   const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
   const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
 
@@ -119,10 +112,10 @@ const newEntityAreaNodeDef = ({
 const determinePlotAreaNodeDefs = ({
   survey,
   chain,
-}: SurveyChainParams): { nodeDefsToCreate: AnyNodeDef[]; nodeDefsToDelete: AnyNodeDef[] } => {
-  const nodeDefsToCreate: AnyNodeDef[] = []
-  const nodeDefsToDelete: AnyNodeDef[] = []
-  const validNodeDefsAlreadyExisting: AnyNodeDef[] = []
+}: SurveyChainParams): { nodeDefsToCreate: ArenaAnyNodeDef[]; nodeDefsToDelete: ArenaAnyNodeDef[] } => {
+  const nodeDefsToCreate: ArenaAnyNodeDef[] = []
+  const nodeDefsToDelete: ArenaAnyNodeDef[] = []
+  const validNodeDefsAlreadyExisting: ArenaAnyNodeDef[] = []
 
   const chainUuid = Chain.getUuid(chain)
   const cycleKeys = Survey.getCycleKeys(survey)
@@ -133,8 +126,8 @@ const determinePlotAreaNodeDefs = ({
     nodeDefParent,
     isWeight,
   }: {
-    existingNodeDef: AnyNodeDef | undefined
-    nodeDefParent: NodeDefEntity
+    existingNodeDef: ArenaAnyNodeDef | undefined
+    nodeDefParent: ArenaNodeDefEntity
     isWeight: boolean
   }) => {
     if (existingNodeDef) {
@@ -210,7 +203,7 @@ const getSamplingDefsInEntities = ({
   chain,
   entities,
   analysisNodeDefs,
-}: SurveyChainParams & { entities: AnyNodeDef[]; analysisNodeDefs: AnyNodeDef[] }): AnyNodeDef[] => {
+}: SurveyChainParams & { entities: ArenaAnyNodeDef[]; analysisNodeDefs: ArenaAnyNodeDef[] }): ArenaAnyNodeDef[] => {
   const entityUuids = new Set(entities.map(NodeDef.getUuid))
 
   const samplingDefs = analysisNodeDefs.filter(

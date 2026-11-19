@@ -1,5 +1,4 @@
-import { Objects, PointFactory, Points, Strings } from '@openforis/arena-core'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import { Objects, PointFactory, Points, Strings, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as DateTimeUtils from '@core/dateUtils'
@@ -188,7 +187,7 @@ const props = {
   },
 }
 
-export const getColValueProcessor = (nodeDef: ArenaNodeDef<NodeDefType>) =>
+export const getColValueProcessor = (nodeDef: ArenaAnyNodeDef) =>
   A.propOr(
     () => (node) => (Node.isValueBlank(node) ? null : Node.getValue(node)),
     colValueProcessor,

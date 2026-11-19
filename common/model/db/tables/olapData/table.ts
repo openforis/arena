@@ -1,4 +1,4 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -6,8 +6,6 @@ import * as StringUtils from '@core/stringUtils'
 
 import TableSurveyRdb from '../tableSurveyRdb'
 import * as SQL from '../../sql'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 const tableNamePrefix = 'olap_data'
 
@@ -28,7 +26,7 @@ const baseColumnNamesAndTypes = [
   `${baseColumnSet.expFactor}     ${SQL.types.decimal}`,
 ]
 
-const generateTableName = ({ cycle, entityDef }: { cycle: string; entityDef: NodeDefEntity }): string =>
+const generateTableName = ({ cycle, entityDef }: { cycle: string; entityDef: ArenaNodeDefEntity }): string =>
   `${tableNamePrefix}_cycle_${cycle}_${NodeDef.getName(entityDef)}`
 
 export default class TableOlapData extends TableSurveyRdb {
@@ -36,8 +34,8 @@ export default class TableOlapData extends TableSurveyRdb {
   static readonly tableNamePrefix = tableNamePrefix
 
   private readonly _survey: ArenaSurvey
-  private readonly _entityDef: NodeDefEntity
-  private readonly _baseUnitDef: NodeDefEntity
+  private readonly _entityDef: ArenaNodeDefEntity
+  private readonly _baseUnitDef: ArenaNodeDefEntity
 
   constructor({
     survey,
@@ -47,8 +45,8 @@ export default class TableOlapData extends TableSurveyRdb {
   }: {
     survey: ArenaSurvey
     cycle: string
-    entityDef: NodeDefEntity
-    baseUnitDef: NodeDefEntity
+    entityDef: ArenaNodeDefEntity
+    baseUnitDef: ArenaNodeDefEntity
   }) {
     super(Survey.getId(survey), generateTableName({ cycle, entityDef }))
     this._survey = survey
@@ -56,9 +54,9 @@ export default class TableOlapData extends TableSurveyRdb {
     this._baseUnitDef = baseUnitDef
   }
 
-  get attributeDefsForColumns(): AnyNodeDef[] {
-    const sortedAttributeDefs: AnyNodeDef[] = []
-    const attributeDefsByUuid: Record<string, AnyNodeDef> = {}
+  get attributeDefsForColumns(): ArenaAnyNodeDef[] {
+    const sortedAttributeDefs: ArenaAnyNodeDef[] = []
+    const attributeDefsByUuid: Record<string, ArenaAnyNodeDef> = {}
     Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
       const defs = Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef: ancestorDef,

@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -129,7 +129,7 @@ const _referencesChangedEntityValue = ({
   changedCategories,
   changedTaxonomies,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   changedCategories: ChangedEntity[]
   changedTaxonomies: ChangedEntity[]
 }): boolean =>
@@ -146,7 +146,7 @@ const _referencesChangedEntityInValidations = ({
   changedCategories,
   changedTaxonomies,
 }: {
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   changedCategories: ChangedEntity[]
   changedTaxonomies: ChangedEntity[]
 }): boolean =>

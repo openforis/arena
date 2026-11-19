@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -8,7 +8,7 @@ import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 interface TreeChartNode {
-  data: ArenaNodeDef<NodeDefType>
+  data: ArenaAnyNodeDef
 }
 
 interface IconDescriptor {

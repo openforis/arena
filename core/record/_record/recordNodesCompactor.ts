@@ -1,4 +1,4 @@
-import type { ArenaRecordNode as ArenaNode } from '@openforis/arena-core'
+import type { ArenaRecordNode } from '@openforis/arena-core'
 
 import { NodeMeta } from '../_node/nodeMeta'
 import * as NodeRefData from '../nodeRefData'
@@ -9,7 +9,7 @@ const { metaKeys } = NodeMeta
 
 const valueUuidProps = [valuePropsCode.itemUuid, valuePropsTaxon.taxonUuid, valuePropsTaxon.vernacularNameUuid]
 
-type NodeCompactor = (node: ArenaNode) => ArenaNode
+type NodeCompactor = (node: ArenaRecordNode) => ArenaRecordNode
 
 const internArrayItems = (array: string[] | undefined, intern: (value: string) => string): void => {
   if (!array) return
@@ -45,7 +45,7 @@ const createCompactor = (): NodeCompactor => {
     return value
   }
 
-  return (node: any): ArenaNode => {
+  return (node: any): ArenaRecordNode => {
     for (const key of ['uuid', 'parentUuid', 'recordUuid', 'nodeDefUuid', 'surveyUuid']) {
       if (node[key]) node[key] = intern(node[key])
     }
@@ -78,7 +78,7 @@ const createCompactor = (): NodeCompactor => {
  * @param {object|Array} nodes - Nodes array or nodes indexed by uuid.
  * @returns {object|Array} - The same nodes object.
  */
-const compactNodes = <T extends ArenaNode[] | Record<string, ArenaNode>>(nodes: T): T => {
+const compactNodes = <T extends ArenaRecordNode[] | Record<string, ArenaRecordNode>>(nodes: T): T => {
   if (!nodes) return nodes
   const compact = createCompactor()
   for (const node of Object.values(nodes)) {

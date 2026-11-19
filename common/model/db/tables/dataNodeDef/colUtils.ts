@@ -1,10 +1,8 @@
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 // MOVE import from table
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as ColProps from './dataColProps'
-
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 const getValuesByColumnName = ({
   survey,
@@ -12,7 +10,7 @@ const getValuesByColumnName = ({
   nodeCol = {},
 }: {
   survey: ArenaSurvey
-  nodeDefCol: AnyNodeDef
+  nodeDefCol: ArenaAnyNodeDef
   nodeCol?: Record<string, any>
 }): Record<string, unknown> => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
@@ -24,12 +22,12 @@ const getValuesByColumnName = ({
   return valuesByColumnName
 }
 
-const getValues = (survey: ArenaSurvey, nodeDefCol: AnyNodeDef, nodeCol: Record<string, any> = {}): unknown[] => {
+const getValues = (survey: ArenaSurvey, nodeDefCol: ArenaAnyNodeDef, nodeCol: Record<string, any> = {}): unknown[] => {
   const valuesByColumnName = getValuesByColumnName({ survey, nodeDefCol, nodeCol })
   return Object.values(valuesByColumnName)
 }
 
-const getValue = (survey: ArenaSurvey, nodeDefCol: AnyNodeDef, nodeCol: Record<string, any> = {}): unknown =>
+const getValue = (survey: ArenaSurvey, nodeDefCol: ArenaAnyNodeDef, nodeCol: Record<string, any> = {}): unknown =>
   getValues(survey, nodeDefCol, nodeCol)[0]
 
 export const TableDataNodeDefColUtils = {

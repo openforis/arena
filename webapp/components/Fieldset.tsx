@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Dictionary } from '@openforis/arena-core'
+import { ArenaDictionary } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconInfo } from './buttons'
@@ -13,7 +13,7 @@ type FieldsetProps = {
   infoTitleMaxWidth?: string
   isInfoMarkdown?: boolean
   legend?: string
-  legendParams?: Dictionary<any>
+  legendParams?: ArenaDictionary<any>
   onInfoClick?: ((event: any) => void) | null
 }
 

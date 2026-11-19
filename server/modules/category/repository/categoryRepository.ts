@@ -4,10 +4,10 @@ import * as A from '@core/arena'
 import {
   Objects,
   Strings,
-  type CategoryItem as ArenaCategoryItem,
-  type CategoryLevel as ArenaCategoryLevel,
-  type Validation as ArenaValidation,
-  type Category as ArenaCategory,
+  type ArenaCategoryItem,
+  type ArenaCategoryLevel,
+  type ArenaValidation,
+  type ArenaCategory,
 } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'

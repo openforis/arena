@@ -2,7 +2,7 @@ import './UserGroupsOverview.scss'
 
 import React, { useMemo } from 'react'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
@@ -17,7 +17,7 @@ import UserGroupColumn from './UserGroupColumn'
 
 interface ColumnData {
   key: string
-  group: UserGroupType | null
+  group: ArenaUserGroup | null
   members: SurveyUserType[]
 }
 

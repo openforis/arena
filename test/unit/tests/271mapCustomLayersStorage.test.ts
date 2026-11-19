@@ -1,4 +1,4 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 import type { MapCustomLayer } from '@core/map/customLayers/mapCustomLayer'
 import {
   MapCustomLayersRepository,

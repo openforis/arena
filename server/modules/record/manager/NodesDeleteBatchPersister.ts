@@ -1,4 +1,4 @@
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 import * as Node from '@core/record/node'
 
 import BatchPersister from '@server/db/batchPersister'

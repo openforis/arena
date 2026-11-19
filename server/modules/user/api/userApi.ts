@@ -1,6 +1,6 @@
 import type { Router } from 'express'
 import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
-import type { UserGroup } from '@openforis/arena-core'
+import type { ArenaUserGroup } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
@@ -174,7 +174,7 @@ export const init = (app: Router) => {
         const surveyUuid = Survey.getUuid(survey)
         // UserGroupService is not exported by arena-server
         const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup) as unknown as {
-          getManyByUser(params: { userUuid: string; surveyUuid?: string }): Promise<UserGroup[]>
+          getManyByUser(params: { userUuid: string; surveyUuid?: string }): Promise<ArenaUserGroup[]>
         }
         const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
         const userGroup = userGroups[0]

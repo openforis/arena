@@ -1,4 +1,4 @@
-import { SurveyDocImages, type SurveyDocImage } from '@openforis/arena-core'
+import { SurveyDocImages, type ArenaSurveyDocImage } from '@openforis/arena-core'
 
 /**
  * Returns the first image in surveyDocImages that matches the given documentPlace and passes the isApplicable check.
@@ -13,9 +13,9 @@ export const findSurveyDocImageApplicable = async ({
   documentPlace,
   isApplicable,
 }: {
-  surveyDocImages: SurveyDocImage[]
+  surveyDocImages: ArenaSurveyDocImage[]
   documentPlace: string
-  isApplicable: (imageFile: SurveyDocImage) => Promise<boolean>
+  isApplicable: (imageFile: ArenaSurveyDocImage) => Promise<boolean>
 }) => {
   for (const imageFile of surveyDocImages) {
     if (SurveyDocImages.getDocumentPlace(imageFile) === documentPlace && (await isApplicable(imageFile))) {

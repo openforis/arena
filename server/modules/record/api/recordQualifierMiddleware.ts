@@ -4,10 +4,9 @@ import {
   ArenaRecord,
   ArenaRecordNode,
   Authorizer,
-  NodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  User,
+  ArenaSurvey,
+  ArenaUser,
+  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
@@ -22,7 +21,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-type QualifierFilter = { nodeDef: NodeDef<NodeDefType>; value: unknown }
+type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 
 // see SurveyManager.fetchUserGroupAccessFilters
 type UserGroupAccessFilters = {
@@ -51,7 +50,7 @@ const _fetchSurveyAndAccessFiltersByCycleCached = ({
   user,
 }: {
   surveyId: number
-  user: User
+  user: ArenaUser
 }): FetchSurveyAndAccessFiltersByCycle => {
   const cacheByCycle = new Map<string, SurveyAndAccessFilters>()
   return async (cycle) => {
@@ -73,7 +72,7 @@ const _determineRecordAccessByUserGroup = async ({
   pendingNode = null,
   fetchSurveyAndAccessFiltersByCycle,
 }: {
-  user: User
+  user: ArenaUser
   surveyId: number
   recordUuid: string
   pendingNode?: ArenaRecordNode | null

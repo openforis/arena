@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -16,7 +16,7 @@ const parseConstantValue = async ({
   value,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   value: unknown
 }) => {
   if (NodeDef.isBoolean(nodeDef)) {
@@ -40,7 +40,7 @@ const parseDefaultValue = async ({
 }: {
   survey: ArenaSurvey
   collectDefaultValue: any
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   defaultLanguage: any
 }) => {
   const { value, expr: collectExpr, if: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
@@ -97,7 +97,7 @@ export const parseDefaultValues = async ({
   defaultLanguage,
 }: {
   survey: ArenaSurvey
-  nodeDef: ArenaNodeDef<NodeDefType>
+  nodeDef: ArenaAnyNodeDef
   collectDefaultValues: any
   defaultLanguage: any
 }) => {

@@ -1,4 +1,4 @@
-import type { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import type { ArenaTaxonomy } from '@openforis/arena-core'
 import { getLanguageISO639part2Label } from '@core/app/languages'
 import { DataImportTemplateTypes } from '@core/dataImport'
 import { ExtraPropDef } from '@core/survey/extraPropDef'

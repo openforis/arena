@@ -1,14 +1,17 @@
 import * as A from '@core/arena'
 
-import { Nodes, RecordExpressionEvaluator, RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
+import {
+  RecordNodes,
+  RecordExpressionEvaluator,
+  RecordNodesUpdater as CoreRecordNodesUpdater,
+  ArenaAnyNodeDef,
+} from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  NodeDef as ArenaNodeDef,
-  NodeDefExpression,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  User as ArenaUser,
+  ArenaNodeDefExpression,
+  ArenaSurvey,
+  ArenaUser,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -20,7 +23,6 @@ import * as RecordUpdater from './recordUpdater'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type UserSurveyRecord = { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord }
 type ChildStateUpdater = (params: {
   parentNode: ArenaRecordNode
@@ -47,8 +49,8 @@ const _recomputeBooleanState = async ({
   getExpressions,
   assocValue,
 }: UserSurveyRecord & {
-  nodeDefs: AnyNodeDef[]
-  getExpressions: (nodeDef: AnyNodeDef) => NodeDefExpression[]
+  nodeDefs: ArenaAnyNodeDef[]
+  getExpressions: (nodeDef: ArenaAnyNodeDef) => ArenaNodeDefExpression[]
   assocValue: ChildStateUpdater
 }): Promise<ArenaRecord> => {
   const evaluator = new RecordExpressionEvaluator()
@@ -94,7 +96,7 @@ const _recomputeDefaultValues = async ({
   survey,
   record,
   nodeDefs,
-}: UserSurveyRecord & { nodeDefs: AnyNodeDef[] }): Promise<ArenaRecord> => {
+}: UserSurveyRecord & { nodeDefs: ArenaAnyNodeDef[] }): Promise<ArenaRecord> => {
   const nodeDefsToRecompute = nodeDefs.filter(
     (nodeDef) => !A.isEmpty(NodeDef.getDefaultValues(nodeDef)) && !NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   )
@@ -131,7 +133,8 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSur
     record,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getApplicable,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildApplicability(parentNode, nodeDefUuid, value),
+    assocValue: ({ parentNode, nodeDefUuid, value }) =>
+      RecordNodes.assocChildApplicability(parentNode, nodeDefUuid, value),
   })
 
   recordUpdated = await _recomputeBooleanState({
@@ -140,7 +143,7 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSur
     record: recordUpdated,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getVisibleIf,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildVisible(parentNode, nodeDefUuid, value),
+    assocValue: ({ parentNode, nodeDefUuid, value }) => RecordNodes.assocChildVisible(parentNode, nodeDefUuid, value),
   })
 
   recordUpdated = await _recomputeBooleanState({
@@ -149,7 +152,7 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSur
     record: recordUpdated,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getEditableIf,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildEditable(parentNode, nodeDefUuid, value),
+    assocValue: ({ parentNode, nodeDefUuid, value }) => RecordNodes.assocChildEditable(parentNode, nodeDefUuid, value),
   })
 
   // Default values are recomputed last, using the applicability just recomputed above

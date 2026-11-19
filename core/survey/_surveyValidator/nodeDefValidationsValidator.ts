@@ -1,9 +1,4 @@
-import type {
-  NodeDef as ArenaNodeDef,
-  NodeDefType,
-  Survey as ArenaSurvey,
-  Validation as ArenaValidation,
-} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -18,8 +13,6 @@ import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
 
 const { keys } = NodeDefValidations
 
-type AnyNodeDef = ArenaNodeDef<NodeDefType>
-
 const validateCountProp =
   ({
     survey,
@@ -28,7 +21,7 @@ const validateCountProp =
     errorKey,
   }: {
     survey: ArenaSurvey
-    nodeDef: AnyNodeDef
+    nodeDef: ArenaAnyNodeDef
     dependencyType: string
     errorKey: string
   }) =>
@@ -40,13 +33,13 @@ const validateCountProp =
   }
 
 // "required if" is allowed only for single non-key attributes, as an alternative to "always required"
-const canHaveRequiredIf = (nodeDef: AnyNodeDef): boolean =>
+const canHaveRequiredIf = (nodeDef: ArenaAnyNodeDef): boolean =>
   NodeDef.isAttribute(nodeDef) &&
   NodeDef.isSingle(nodeDef) &&
   !NodeDef.isKey(nodeDef) &&
   !NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
 
-const validateRequiredIf = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ArenaValidation | null> => {
+const validateRequiredIf = async (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef): Promise<ArenaValidation | null> => {
   if (!NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(nodeDef))) return null
   if (!canHaveRequiredIf(nodeDef)) {
     return Validation.newInstance(false, {}, [
@@ -56,7 +49,7 @@ const validateRequiredIf = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Pro
   return NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.required)
 }
 
-export const validate = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ArenaValidation> => {
+export const validate = async (survey: ArenaSurvey, nodeDef: ArenaAnyNodeDef): Promise<ArenaValidation> => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {

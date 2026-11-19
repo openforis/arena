@@ -1,10 +1,4 @@
-import {
-  Objects,
-  Queue,
-  SystemError,
-  type Record as ArenaRecord,
-  type Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import { Objects, Queue, SystemError, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
