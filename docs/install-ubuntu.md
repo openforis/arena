@@ -60,14 +60,21 @@ SENDGRID_API_KEY=your_key
 
 RECAPTCHA_ENABLED=false
 
+# Secrets used to sign the login tokens and encrypt the 2FA secrets: Arena does not start without them.
+# Use long random values, e.g. generated with: openssl rand -hex 32
+USER_AUTH_TOKEN_SECRET=CHANGE_ME_RANDOM_SECRET_1
+USER_2FA_SECRET=CHANGE_ME_RANDOM_SECRET_2
+
 # System admin created on the first startup
 ADMIN_EMAIL=admin@example.org
 ADMIN_PASSWORD=a_strong_password
 ```
 
-Protect the file, since it contains passwords:
+Protect the file, since it contains passwords; it must stay readable by your user, because `docker run --env-file`
+reads it before starting the container:
 
 ```bash
+sudo chown $USER:$USER /opt/arena/arena.env
 sudo chmod 600 /opt/arena/arena.env
 ```
 
@@ -80,6 +87,11 @@ docker run -d --name arena --restart unless-stopped \
   openforis/arena:latest
 docker logs -f arena
 ```
+
+If the container keeps restarting, the reason is in the first error of `docker logs arena`: usually a required
+parameter missing from `arena.env` (e.g. `USER_AUTH_TOKEN_SECRET environment variable is required`) or the database
+not reachable on `PGHOST`:`PGPORT`. Fix `arena.env`, then recreate the container (`docker rm -f arena` and the same
+`docker run` command): `docker restart` does not reload the env file.
 
 Open `http://<server-ip>:9090` and log in with `ADMIN_EMAIL` and `ADMIN_PASSWORD`. Then remove `ADMIN_PASSWORD`
 from `arena.env` and change the password in Arena (**Change password**).
