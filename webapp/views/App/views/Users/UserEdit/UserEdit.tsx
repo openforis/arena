@@ -126,10 +126,10 @@ const UserEdit = (props: Props) => {
       {navItems.length > 2 && <UserEditNav items={navItems} />}
       <div className="user-edit__content">
         {visible.invitationExpired && (
-          <div className="user-edit__banner" role="status">
+          <output className="user-edit__banner">
             <span>{i18n.t('usersView:profile.invitationExpired')}</span>
             <ButtonInvite className="btn-invite" onClick={onInviteRepeat} />
-          </div>
+          </output>
         )}
         <UserEditHeader
           canEdit={canEdit}

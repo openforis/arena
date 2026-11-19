@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import classNames from 'classnames'
 
 import * as User from '@core/user/user'
 
@@ -68,7 +69,9 @@ export const UserEditHeader = (props: Props) => {
             {chips.map(({ key, label, variant }) => (
               <span
                 key={key}
-                className={`user-edit-header__chip${variant ? ` user-edit-header__chip--${variant}` : ''}`}
+                className={classNames('user-edit-header__chip', {
+                  [`user-edit-header__chip--${variant}`]: Boolean(variant),
+                })}
               >
                 {i18n.t(label)}
               </span>

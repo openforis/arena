@@ -13,10 +13,10 @@ export const UserEditSaveBar = (props: Props) => {
   const { canSave, onSave } = props
   const i18n = useI18n()
   return (
-    <div className="user-edit-save-bar" role="status">
+    <output className="user-edit-save-bar">
       <span aria-hidden="true" className="user-edit-save-bar__dot" />
       <span className="user-edit-save-bar__text">{i18n.t('usersView:profile.unsavedChanges')}</span>
       <ButtonSave className="btn-save" disabled={!canSave} onClick={onSave} />
-    </div>
+    </output>
   )
 }
