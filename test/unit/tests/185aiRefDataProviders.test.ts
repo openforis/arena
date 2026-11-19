@@ -44,4 +44,30 @@ describe('createRefDataProviders', () => {
     expect(await taxonProvider.getTaxonByUuid({ survey: {}, taxonUuid: 't2' })).toBe(taxon)
     expect(await taxonProvider.getTaxonByCode({ taxonomyUuid: 'tx', taxonCode: 'nope' })).toBeNull()
   })
+
+  test('one request per distinct lookup; a failed lookup is asked again', async () => {
+    let failNext = true
+    const { api, calls } = newFakeCleaningApi({
+      fetchCategoryItems: () => [{ uuid: 'a', props: { code: 'A' } }],
+      findTaxa: () => {
+        if (failNext) {
+          failNext = false
+          throw new Error('Network error')
+        }
+        return [{ uuid: 't1', props: { code: 'AFZ' } }]
+      },
+    })
+    const { categoryItemProvider, taxonProvider } = createRefDataProviders({ api, surveyId: 1 })
+    for (let i = 0; i < 3; i++) {
+      await categoryItemProvider.getItemByCodePaths({ categoryUuid: 'cat', codePaths: ['A'] })
+    }
+    await categoryItemProvider.getItemByCodePaths({ categoryUuid: 'cat2', codePaths: ['A'] })
+    expect(calls.map((call) => call.params.categoryUuid)).toEqual(['cat', 'cat2'])
+
+    const getTaxon = () => taxonProvider.getTaxonByCode({ taxonomyUuid: 'tx', taxonCode: 'AFZ' })
+    await expect(getTaxon()).rejects.toThrow('Network error')
+    expect((await getTaxon()).uuid).toBe('t1')
+    expect((await getTaxon()).uuid).toBe('t1')
+    expect(calls.filter((call) => call.name === 'findTaxa')).toHaveLength(2)
+  })
 })

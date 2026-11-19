@@ -37,11 +37,32 @@ export const createRefDataProviders = ({
 }) => {
   const itemsByUuid = new Map<string, any>()
   const taxaByUuid = new Map<string, any>()
+  const lookups = new Map<string, Promise<any>>()
 
-  const keepTaxon = (taxon: any) => {
-    if (taxon) taxaByUuid.set(taxon.uuid, taxon)
-    return taxon
+  // one request per distinct lookup (many edits share a code); a failed one is dropped so a retry asks again
+  const lookupOnce = (key: unknown[], load: () => Promise<any>): Promise<any> => {
+    const cacheKey = JSON.stringify(key)
+    let promise = lookups.get(cacheKey)
+    if (!promise) {
+      promise = load()
+      lookups.set(cacheKey, promise)
+      promise.catch(() => lookups.delete(cacheKey))
+    }
+    return promise
   }
+
+  const findTaxon = (
+    taxonomyUuid: string,
+    filterProp: 'code' | 'scientificName',
+    filterValue: string,
+    getText: (taxon: any) => string
+  ) =>
+    lookupOnce(['taxon', taxonomyUuid, filterProp, filterValue], async () => {
+      const taxa = await api.findTaxa({ surveyId, taxonomyUuid, filterProp, filterValue, signal })
+      const taxon = findExact(taxa, getText, filterValue, true)
+      if (taxon) taxaByUuid.set(taxon.uuid, taxon)
+      return taxon
+    })
 
   const categoryItemProvider = {
     /**
@@ -54,14 +75,14 @@ export const createRefDataProviders = ({
     getItemByCodePaths: async ({ categoryUuid, codePaths }: { categoryUuid: string; codePaths: string[] }) => {
       let item: any = null
       for (const code of codePaths) {
-        const items = await api.fetchCategoryItems({
-          surveyId,
-          categoryUuid,
-          parentUuid: item?.uuid ?? null,
-          search: code,
-          signal,
-        })
-        item = findExact(items, CategoryItem.getCode, code)
+        const parentUuid = item?.uuid ?? null
+        item = await lookupOnce(['item', categoryUuid, parentUuid, code], async () =>
+          findExact(
+            await api.fetchCategoryItems({ surveyId, categoryUuid, parentUuid, search: code, signal }),
+            CategoryItem.getCode,
+            code
+          )
+        )
         if (!item) return null
         itemsByUuid.set(item.uuid, item)
       }
@@ -95,10 +116,8 @@ export const createRefDataProviders = ({
      * @param {string} params.taxonCode - Code.
      * @returns {Promise<object|null>} The taxon.
      */
-    getTaxonByCode: async ({ taxonomyUuid, taxonCode }: { taxonomyUuid: string; taxonCode: string }) => {
-      const taxa = await api.findTaxa({ surveyId, taxonomyUuid, filterProp: 'code', filterValue: taxonCode, signal })
-      return keepTaxon(findExact(taxa, Taxon.getCode, taxonCode, true))
-    },
+    getTaxonByCode: async ({ taxonomyUuid, taxonCode }: { taxonomyUuid: string; taxonCode: string }) =>
+      findTaxon(taxonomyUuid, 'code', taxonCode, Taxon.getCode),
     /**
      * Finds a taxon by its scientific name (exact, case-insensitive).
      * @param {object} params - Parameters.
@@ -112,16 +131,7 @@ export const createRefDataProviders = ({
     }: {
       taxonomyUuid: string
       scientificName: string
-    }) => {
-      const taxa = await api.findTaxa({
-        surveyId,
-        taxonomyUuid,
-        filterProp: 'scientificName',
-        filterValue: scientificName,
-        signal,
-      })
-      return keepTaxon(findExact(taxa, Taxon.getScientificName, scientificName, true))
-    },
+    }) => findTaxon(taxonomyUuid, 'scientificName', scientificName, Taxon.getScientificName),
     /**
      * Finds a taxon by uuid: the survey index, then the taxa found before.
      * @param {object} params - Parameters.

@@ -138,6 +138,9 @@ export const axiosCleaningApi: CleaningApi = {
       parentUuid,
       search,
       draft: false,
+      // shortcut: the search is ILIKE %code% by item index with no exact-code filter, so the server maximum (1000)
+      // makes an exact code missing from the page unlikely; add an exact-code filter to the endpoint if one is missed
+      limit: 1000,
       signal,
     }),
   /**
