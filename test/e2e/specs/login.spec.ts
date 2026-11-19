@@ -23,4 +23,12 @@ test.describe('Login', () => {
     await expect(page.locator('.app-header')).toBeVisible()
     await expect(page).toHaveURL(/\/app\//)
   })
+
+  test('invites new users to request access before logging in', async ({ page }) => {
+    const banner = page.getByTestId('login-request-access-banner')
+    await expect(banner).toContainText('only registered users can log in')
+    await banner.getByRole('link', { name: 'Request access' }).click()
+
+    await expect(page).toHaveURL(/\/guest\/accessRequest/)
+  })
 })

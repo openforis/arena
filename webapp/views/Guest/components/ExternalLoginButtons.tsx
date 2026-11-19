@@ -18,13 +18,20 @@ type Props = {
   query?: Record<string, string>
   // shown above the buttons, only when there is at least one provider
   dividerLabelKey?: string
+  // shown under the provider name in every button (e.g. "Registered users only")
+  captionKey?: string
 }
 
 /**
  * Buttons to sign in with the external login providers configured by the system admins (none if there are no providers).
  */
 export const ExternalLoginButtons = (props: Props) => {
-  const { labelKey = 'guest:externalLogin.signInWith', query, dividerLabelKey = 'guest:loginView.or' } = props
+  const {
+    labelKey = 'guest:externalLogin.signInWith',
+    query,
+    dividerLabelKey = 'guest:loginView.or',
+    captionKey,
+  } = props
   const i18n = useI18n()
   const [providers, setProviders] = useState<LoginProvider[]>([])
 
@@ -49,7 +56,10 @@ export const ExternalLoginButtons = (props: Props) => {
             href={getExternalLoginStartUrl({ providerId: provider.id, query })}
           >
             <AuthProviderIcon iconKind={provider.iconKind} providerId={provider.id} type={provider.type} />
-            <span>{i18n.t(labelKey, { provider: provider.label })}</span>
+            <span className="guest-external-login__label">
+              {i18n.t(labelKey, { provider: provider.label })}
+              {captionKey && <span className="guest-external-login__caption">{i18n.t(captionKey)}</span>}
+            </span>
           </a>
         ))}
       </div>

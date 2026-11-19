@@ -4,6 +4,7 @@ export default {
     subtitle: 'Добро пожаловать! Введите свои учетные данные, чтобы продолжить работу в $t(common.appNameFull).',
     backToLogin: 'Вернуться ко входу',
     newToArena: 'Впервые в $t(common.appNameFull)?',
+    registerBeforeLoggingIn: 'Сначала запросите доступ: войти могут только зарегистрированные пользователи.',
     or: 'или',
     twoFactorTitle: 'Двухэтапная проверка',
     verify: 'Подтвердить',
@@ -29,6 +30,7 @@ export default {
   externalLogin: {
     signInWith: 'Войти через {{provider}}',
     continueWith: 'Продолжить через {{provider}}',
+    registeredUsersOnly: 'Только для зарегистрированных пользователей',
     errors: {
       providerNotAvailable:
         'Этот способ входа недоступен. Повторите попытку позже или войдите с помощью электронной почты и пароля.',
