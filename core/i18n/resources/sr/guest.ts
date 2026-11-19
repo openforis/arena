@@ -4,6 +4,7 @@ export default {
     subtitle: 'Dobrodošli! Unesite svoje podatke za nastavak u aplikaciji $t(common.appNameFull).',
     backToLogin: 'Nazad na prijavu',
     newToArena: 'Novi ste u $t(common.appNameFull)?',
+    registerBeforeLoggingIn: 'Prvo zatražite pristup: samo registrovani korisnici mogu da se prijave.',
     or: 'ili',
     twoFactorTitle: 'Verifikacija u dva koraka',
     verify: 'Potvrdi',
@@ -29,6 +30,7 @@ Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
   externalLogin: {
     signInWith: 'Prijavite se putem {{provider}}',
     continueWith: 'Nastavite putem {{provider}}',
+    registeredUsersOnly: 'Samo za registrovane korisnike',
     errors: {
       providerNotAvailable: 'Ova opcija prijave nije dostupna. Pokušajte kasnije ili se prijavite e-poštom i lozinkom.',
       flowInvalid: 'Prijava je istekla ili je započeta u drugom pregledaču. Pokušajte ponovo.',
