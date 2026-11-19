@@ -1,6 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { buildSurveyOverview, surveyGetOverviewTool } from '@webapp/ai/tools/design/surveyGetOverview'
+import { surveyListMissingTextsTool } from '@webapp/ai/tools/design/surveyListMissingTexts'
 import { nodeDefGetTool } from '@webapp/ai/tools/design/nodeDefGet'
 import { nodeDefSearchTool } from '@webapp/ai/tools/design/nodeDefSearch'
 import { expressionCheckTool } from '@webapp/ai/tools/design/expressionCheck'
@@ -17,6 +18,13 @@ beforeAll(async () => {
 })
 
 const ctxWithSurvey = (overrides = {}) => createToolContext({ survey, ...overrides })
+
+test('survey_listMissingTexts says in the words of the question what it answers', () => {
+  // "which attributes have no description": a small model otherwise reads the attributes one by one
+  expect(surveyListMissingTextsTool.description).toMatch(
+    /^Finds the attributes and entities that have no label or no description/
+  )
+})
 
 describe('survey_getOverview', () => {
   test('the description says what it is not for, and does not ask to be called first', () => {
@@ -55,7 +63,11 @@ describe('survey_getOverview', () => {
       ['plot', 1],
       ['tree', 1],
     ])
+    // the entities directly below each one, so the model does not rebuild them from "parent"
+    expect(overview.nodeDefs.map((def: any) => def.children)).toEqual([['plot'], ['tree'], []])
     expect(overview).toMatchObject({ attributesOmitted: true, truncated: false, total: 7 })
+    // without it a small model reads the entities one by one instead of calling the tool for its question
+    expect(overview.hint).toMatch(/only when you need the attributes of one entity.*their own tools/)
   })
 
   test('with an entity it lists the children of that entity', async () => {

@@ -25,6 +25,7 @@ const SUMMARY_ROWS_MAX = 1000
 const OFFSET_MAX = 1_000_000
 
 const summarizeInputSchema = z.object({
+  attributes: attributeNamesSchema(50).optional().describe('Only these attribute names; omit for all attributes.'),
   recordUuid: uuidSchema.nullish().describe('Only this record (UUID); omit for the whole cycle.'),
 })
 
@@ -49,6 +50,21 @@ const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
 }
 
 /**
+ * Returns the UUIDs of the named attributes, refusing unknown names.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - The survey.
+ * @param {string[]} [params.attributes] - Attribute names.
+ * @returns {string[]} The UUIDs (empty: all attributes).
+ */
+const resolveAttributeDefUuids = ({ survey, attributes = [] }: { survey: any; attributes?: string[] }): string[] => {
+  const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: attributes })
+  if (unknownNames.length > 0) {
+    throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+  }
+  return nodeDefs.map(NodeDef.getUuid)
+}
+
+/**
  * Creates validation_summarize.
  * @param {Deps} deps - API and translator.
  * @returns {AiTool} The tool.
@@ -58,7 +74,8 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
   name: 'validation_summarize',
   description:
     'Counts the errors and warnings of the validation report of the current cycle, grouped by attribute path, ' +
-    'message category and severity, optionally for one record. Start here to find the patterns to fix.',
+    'message category and severity, optionally for one record or for some attributes. Start here to find the ' +
+    'patterns to fix, then list the rows with validation_list.',
   inputSchema: summarizeInputSchema,
   /**
    * Fetches up to 1,000 report rows and the total, then groups them.
@@ -66,9 +83,10 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
    * @param {object} ctx - Tool context.
    * @returns {Promise<object>} The summary.
    */
-  execute: async ({ recordUuid }, ctx) => {
+  execute: async ({ attributes, recordUuid }, ctx) => {
     const { survey, surveyId, cycle } = getCleaningContext(ctx)
-    const filter = { surveyId, cycle, recordUuid: recordUuid ?? null, signal: ctx.signal }
+    const attributeDefUuids = resolveAttributeDefUuids({ survey, attributes })
+    const filter = { surveyId, cycle, recordUuid: recordUuid ?? null, attributeDefUuids, signal: ctx.signal }
     let rows: any[]
     let total: number
     try {
@@ -80,7 +98,9 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
       throw toRequestFailure(error, TIMEOUT_HINT)
     }
     const summary = summarizeValidationRows({ survey, rows, total, i18n: getI18n(), cycle })
-    return fitListToBudget(summary, 'groups', getResultBudget(ctx))
+    // a small model otherwise stops at the counts
+    const next = 'These are counts. For the records and values behind a group, call validation_list with its attribute.'
+    return fitListToBudget({ ...summary, next }, 'groups', getResultBudget(ctx))
   },
 })
 
@@ -105,16 +125,12 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
    */
   execute: async ({ attributes, categories, recordUuid, offset = 0 }, ctx) => {
     const { survey, surveyId, cycle, lang } = getCleaningContext(ctx)
-    const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: attributes ?? [] })
-    if (unknownNames.length > 0) {
-      throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
-    }
     const filter = {
       surveyId,
       cycle,
       signal: ctx.signal,
       recordUuid: recordUuid ?? null,
-      attributeDefUuids: nodeDefs.map(NodeDef.getUuid),
+      attributeDefUuids: resolveAttributeDefUuids({ survey, attributes }),
       messageTypeKeys: categories?.length ? expandMessageTypeFilterCategoriesToKeys(categories) : null,
     }
     let fetched: any[]

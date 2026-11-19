@@ -120,6 +120,19 @@ describe('validation_summarize tool', () => {
     expect(tool.requires(newCleaningToolContext({ survey: null }))).toBe(false)
   })
 
+  test('limits the summary to the given attributes and names the tool that lists the rows', async () => {
+    const { api, calls } = newFakeCleaningApi({
+      fetchValidationReportRows: () => rows,
+      countValidationReportRows: () => 4,
+    })
+    const result = await runTool(getTool(api), { attributes: ['dbh'] }, newCleaningToolContext({ survey }))
+    const dbhUuid = Survey.getNodeDefByName('dbh')(survey).uuid
+    for (const call of calls) expect(call.params.attributeDefUuids).toEqual([dbhUuid])
+    expect(result.next).toContain('validation_list')
+    const unknown = await runTool(getTool(api), { attributes: ['nope'] }, newCleaningToolContext({ survey }))
+    expect(unknown.error.code).toBe('unknownAttribute')
+  })
+
   test('fetches at most 1,000 rows of the current cycle and the total', async () => {
     const { api, calls } = newFakeCleaningApi({
       fetchValidationReportRows: () => rows,

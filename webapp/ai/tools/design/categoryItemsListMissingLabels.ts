@@ -196,6 +196,10 @@ const collectItems = (items: MissingLabelsItem[], state: PageState, params: Page
 const buildNote = (nextCursor: string | null, pendingCount: number): string => {
   const parts = [nextCursor ? 'More items remain: call again with cursor = nextCursor.' : 'No more items.']
   if (pendingCount > 0) parts.push(`${pendingCount} items already in pending cards are not listed.`)
+  // the last thing the model reads: without it a small model writes the labels as text
+  parts.push(
+    'To set labels, call categoryItemLabels_proposeSet with the refs: labels written as text cannot be applied.'
+  )
   return parts.join(' ')
 }
 

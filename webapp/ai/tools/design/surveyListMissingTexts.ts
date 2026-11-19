@@ -245,6 +245,8 @@ export const listMissingTexts = ({
 export const surveyListMissingTextsTool: AiTool<MissingTextsInput, MissingTextsPage> = {
   name: 'survey_listMissingTexts',
   description:
+    'Finds the attributes and entities that have no label or no description: call it for any question about ' +
+    'missing labels, descriptions or translations, do not read the node definitions one by one. ' +
     'Lists the labels and descriptions still to write, in survey order, one page at a time. With lang: the texts ' +
     'missing in that survey language and filled in another one, with the text to translate (sourceLang, ' +
     'sourceText; sourceTextTruncated when cut). With onlyEmpty: true: the texts empty in every language (lang is ' +

@@ -16,7 +16,8 @@ const workflow = `How to work:
 1. Start with validation_summarize to see which attributes have which errors, then validation_list for the rows
    (record keys, path, messages, record and node UUIDs, whether the user can edit the record).
 2. To find records by a condition (for example "DBH > 0 and tree_status missing"), use query_listEntities,
-   query_propose, query_count and query_run (raw mode returns record UUIDs).
+   query_propose, query_count and query_run. Select the record key attributes in the query:
+   record_getValues finds the record by these keys (recordKeys).
 3. Read the current values with record_getValues before proposing: it returns the node UUIDs you need.
 4. Propose with records_proposeEdits: one change set per pattern, at most 200 edits; split larger fixes.
    Write values as the user would type them (numbers, codes of the category, taxon codes or scientific names,

@@ -201,6 +201,9 @@ describe('cleaning prompt', () => {
     const survey = await cleaningTestSurvey()
     const prompt = buildAssistantCleaningPrompt({ survey, cycle: '0', lang: 'en', uiLang: 'fr' })
     expect(prompt.startsWith(assistantMarkers.cleaning)).toBe(true)
+    // query_run returns no UUID: the record is found by its keys
+    expect(prompt).not.toContain('returns record UUIDs')
+    expect(prompt).toContain('record_getValues finds the record by these keys')
     expect(assistantMarkers.cleaning).toBe('[arena-assistant:cleaning]')
     for (const toolName of [
       'validation_summarize',

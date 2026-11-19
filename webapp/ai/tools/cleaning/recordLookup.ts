@@ -69,7 +69,7 @@ export const findRecordUuidByKeys = async ({
   survey,
   surveyId,
   cycle,
-  keys,
+  keys: keysGiven,
   signal,
 }: {
   api: CleaningApi
@@ -81,13 +81,14 @@ export const findRecordUuidByKeys = async ({
 }) => {
   const keyDefs = Survey.getNodeDefRootKeys(survey)
   const keyNames = keyDefs.map(NodeDef.getName)
-  const givenNames = Object.keys(keys)
-  if (
-    keyDefs.length === 0 ||
-    givenNames.length !== keyNames.length ||
-    !keyNames.every((name: string) => givenNames.includes(name))
-  ) {
-    throw new AiToolFailure('recordKeysInvalid', `Give exactly the record key attributes: ${keyNames.join(', ')}.`)
+  // a small model wraps the names in stray tokens (<|"|>name<|"|>): only the characters of a name are kept
+  const given = Object.fromEntries(Object.entries(keysGiven).map(([name, value]) => [name.replace(/\W/g, ''), value]))
+  // keys of other entities (e.g. of a tree) do not find a record: they are left out
+  const keys = Object.fromEntries(
+    keyNames.filter((name: string) => name in given).map((name: string) => [name, given[name]])
+  )
+  if (keyDefs.length === 0 || Object.keys(keys).length !== keyNames.length) {
+    throw new AiToolFailure('recordKeysInvalid', `Give all the record key attributes: ${keyNames.join(', ')}.`)
   }
   const { matching, complete } = await collectMatches({
     api,

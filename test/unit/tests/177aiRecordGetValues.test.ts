@@ -103,6 +103,11 @@ describe('findRecordUuidByKeys', () => {
     expect(calls[0].params).toMatchObject({ surveyId: 1, cycle, search: '12', limit: 100, offset: 0 })
   })
 
+  test('reads key names a small model wraps in stray tokens, and ignores keys of other entities', async () => {
+    expect(await lookup({ '<|"|>cluster_id<|"|>': '12' }).result).toEqual({ recordUuid: 'r-12' })
+    expect(await lookup({ cluster_id: '12', plot_id: '1' }).result).toEqual({ recordUuid: 'r-12' })
+  })
+
   test('refuses names that are not the record keys', async () => {
     await expect(lookup({ plot_id: '1' }).result).rejects.toMatchObject({ code: 'recordKeysInvalid' })
     await expect(lookup({}).result).rejects.toMatchObject({ code: 'recordKeysInvalid' })

@@ -88,6 +88,8 @@ describe('categoryItems_listMissingLabels (233)', () => {
       ],
     })
     expect(result.items[0].sourceTextTruncated).toBeUndefined()
+    // the last thing the model reads names the tool that makes the card
+    expect(result.note).toContain('categoryItemLabels_proposeSet')
     expect(server.calls[0]).toMatchObject({
       surveyId: 7,
       categoryUuid: speciesUuid,

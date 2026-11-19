@@ -47,7 +47,7 @@ const inputSchema = z.object({
   edits: z
     .array(
       z.object({
-        recordUuid: uuidSchema.describe('Record UUID (from validation_list, record_getValues or query_run).'),
+        recordUuid: uuidSchema.describe('Record UUID (from validation_list or record_getValues).'),
         nodeUuid: uuidSchema.describe('Node UUID of the attribute (from validation_list or record_getValues).'),
         value: valueSchema,
       })

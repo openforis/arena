@@ -67,8 +67,18 @@ export const buildSurveyOverview = ({
   const countAttributes = (parent: any) => childrenOf(parent).filter(NodeDef.isAttribute).length
   return take(
     all.filter(NodeDef.isEntity),
-    (nodeDef) => ({ ...describeNodeDefBrief(survey, nodeDef, lang), attributes: countAttributes(nodeDef) }),
-    { attributesOmitted: true }
+    (nodeDef) => ({
+      ...describeNodeDefBrief(survey, nodeDef, lang),
+      attributes: countAttributes(nodeDef),
+      children: childrenOf(nodeDef).filter(NodeDef.isEntity).map(NodeDef.getName),
+    }),
+    {
+      attributesOmitted: true,
+      // a small model otherwise reads the entities one by one, whatever it was asked
+      hint:
+        'Call again with "entity" only when you need the attributes of one entity. Missing labels or descriptions, ' +
+        'validation problems and record values have their own tools: call those, do not read the entities one by one.',
+    }
   )
 }
 
@@ -86,7 +96,8 @@ export const surveyGetOverviewTool: AiTool<z.infer<typeof inputSchema>> = {
     'Returns the survey name, languages, cycles and all node definitions (entities and attributes) depth-first ' +
     'with name, type, label, parent, key and multiple flags. It gives the structure only: no descriptions, ' +
     'validation problems or record values, which have their own tools. ' +
-    'A large survey returns only its entities, each with its number of attributes (attributesOmitted: true): ' +
+    'A large survey returns only its entities, each with its number of attributes and the entities directly ' +
+    'below it in "children" (attributesOmitted: true): ' +
     'call it again with "entity" to list the attributes of one entity.',
   inputSchema,
   area: ['design', 'analysis', 'cleaning'],
