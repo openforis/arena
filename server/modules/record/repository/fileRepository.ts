@@ -4,7 +4,7 @@ import { Schemata } from '@common/model/db'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 const SUMMARY_FIELDS = ['id', 'uuid', 'props', 'date_created']
@@ -14,7 +14,7 @@ const NOT_DELETED_CONDITION = `COALESCE(props ->> '${SurveyFile.propKeys.deleted
 
 // ============== CREATE
 
-export const insertFile = async (surveyId, file, client = db) => {
+export const insertFile = (surveyId: number, file: any, client: DbClient = db) => {
   const { uuid, props, content } = file
 
   return client.one(
@@ -28,7 +28,7 @@ export const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-export const fetchFileSummariesBySurveyId = async (surveyId, client = db) =>
+export const fetchFileSummariesBySurveyId = (surveyId: number, client: DbClient = db) =>
   client.manyOrNone(
     `
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
@@ -36,7 +36,10 @@ export const fetchFileSummariesBySurveyId = async (surveyId, client = db) =>
     WHERE ${NOT_DELETED_CONDITION}`
   )
 
-export const fetchFileSummariesByType = async ({ surveyId, type }, client = db) =>
+export const fetchFileSummariesByType = (
+  { surveyId, type }: { surveyId: number; type: string },
+  client: DbClient = db
+) =>
   client.manyOrNone(
     `
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
@@ -46,7 +49,10 @@ export const fetchFileSummariesByType = async ({ surveyId, type }, client = db) 
     [type]
   )
 
-export const fetchFilesByRecordUuids = async ({ surveyId, recordUuids }, client = db) =>
+export const fetchFilesByRecordUuids = (
+  { surveyId, recordUuids }: { surveyId: number; recordUuids: string[] },
+  client: DbClient = db
+) =>
   client.map(
     `
     SELECT uuid AS "fileUuid", props ->> '${SurveyFile.propKeys.recordUuid}' AS "recordUuid"
@@ -58,7 +64,10 @@ export const fetchFilesByRecordUuids = async ({ surveyId, recordUuids }, client 
 
 // Like fetchFilesByRecordUuids, but excludes soft-deleted files: used to tell a mobile client
 // which files it can skip re-uploading (a deleted file must still be re-sent if referenced again).
-export const fetchNonDeletedFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, client = db) => {
+export const fetchNonDeletedFileUuidsByRecordUuids = (
+  { surveyId, recordUuids }: { surveyId: number; recordUuids: string[] },
+  client: DbClient = db
+) => {
   if (recordUuids.length === 0) return []
   return client.map(
     `
@@ -71,7 +80,7 @@ export const fetchNonDeletedFileUuidsByRecordUuids = async ({ surveyId, recordUu
   )
 }
 
-export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
+export const fetchFileUuidsBySurveyId = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.map(
     `
     SELECT uuid
@@ -80,7 +89,10 @@ export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
     (row) => row.uuid
   )
 
-export const fetchFileSummariesByUuids = async ({ surveyId, fileUuids }, client = db) => {
+export const fetchFileSummariesByUuids = (
+  { surveyId, fileUuids }: { surveyId: number; fileUuids: string[] },
+  client: DbClient = db
+) => {
   if (fileUuids.length === 0) return []
   return client.manyOrNone(
     `SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
@@ -90,7 +102,10 @@ export const fetchFileSummariesByUuids = async ({ surveyId, fileUuids }, client 
   )
 }
 
-export const fetchExistingNonDeletedFileUuids = async ({ surveyId, fileUuids }, client = db) => {
+export const fetchExistingNonDeletedFileUuids = (
+  { surveyId, fileUuids }: { surveyId: number; fileUuids: string[] },
+  client: DbClient = db
+) => {
   if (fileUuids.length === 0) return []
   return client.map(
     `SELECT uuid
@@ -102,7 +117,7 @@ export const fetchExistingNonDeletedFileUuids = async ({ surveyId, fileUuids }, 
   )
 }
 
-export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db) =>
+export const fetchFileUuidsOfFilesWithContent = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.map(
     `
     SELECT uuid
@@ -112,7 +127,7 @@ export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db
     (row) => row.uuid
   )
 
-export const fetchFileAndContentByUuid = async (surveyId, uuid, client = db) =>
+export const fetchFileAndContentByUuid = (surveyId: number, uuid: string, client: DbClient = db) =>
   client.one(
     `
     SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -120,7 +135,7 @@ export const fetchFileAndContentByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const fetchFileSummaryByUuid = async (surveyId, uuid, client = db) =>
+export const fetchFileSummaryByUuid = (surveyId: number, uuid: string, client: DbClient = db) =>
   client.oneOrNone(
     `
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED} 
@@ -129,7 +144,10 @@ export const fetchFileSummaryByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = db) => {
+export const fetchFileContentAsStream = async (
+  { surveyId, fileUuid }: { surveyId: number; fileUuid: string },
+  client: DbClient = db
+) => {
   const row = await client.oneOrNone(
     `
     SELECT content
@@ -141,7 +159,10 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
   return contentBuffer ? Readable.from(contentBuffer) : null
 }
 
-export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null }, client = db) => {
+export const fetchCountAndTotalFilesSize = async (
+  { surveyId, recordUuid = null }: { surveyId: number; recordUuid?: string },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereConditions = [NOT_DELETED_CONDITION]
   if (recordUuid) {
@@ -166,7 +187,10 @@ export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null 
  * @param {object} [client] - The database client.
  * @returns {Promise<object>} - Count and total size ({count, total}) indexed by record uuid (only records with files).
  */
-export const fetchCountAndTotalFilesSizeByRecordUuids = async ({ surveyId, recordUuids }, client = db) => {
+export const fetchCountAndTotalFilesSizeByRecordUuids = async (
+  { surveyId, recordUuids }: { surveyId: number; recordUuids: string[] },
+  client: DbClient = db
+) => {
   if (recordUuids.length === 0) return {}
   const schema = Schemata.getSchemaSurvey(surveyId)
   const recordUuidCol = `(props ->> '${SurveyFile.propKeys.recordUuid}')::uuid`
@@ -181,7 +205,7 @@ export const fetchCountAndTotalFilesSizeByRecordUuids = async ({ surveyId, recor
 }
 
 // ============== UPDATE
-export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
+export const markFileAsDeleted = (surveyId: number, uuid: string, client: DbClient = db) =>
   client.oneOrNone(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -191,7 +215,7 @@ export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const markFilesAsDeleted = async (surveyId, uuids, client = db) =>
+export const markFilesAsDeleted = (surveyId: number, uuids: string[], client: DbClient = db) =>
   uuids.length === 0
     ? []
     : client.manyOrNone(
@@ -203,7 +227,7 @@ export const markFilesAsDeleted = async (surveyId, uuids, client = db) =>
         [uuids]
       )
 
-export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db) =>
+export const markRecordFilesAsDeleted = (surveyId: number, recordUuid: string, client: DbClient = db) =>
   client.manyOrNone(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -213,7 +237,12 @@ export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db
     [recordUuid]
   )
 
-export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
+export const updateFileProps = (
+  surveyId: number,
+  fileUuid: string,
+  props: Record<string, any>,
+  client: DbClient = db
+) =>
   client.one(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -223,7 +252,7 @@ export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
     [fileUuid, props]
   )
 
-export const clearFileTemporaryFlag = async (surveyId, fileUuid, client = db) =>
+export const clearFileTemporaryFlag = (surveyId: number, fileUuid: string, client: DbClient = db) =>
   client.one(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -233,7 +262,7 @@ export const clearFileTemporaryFlag = async (surveyId, fileUuid, client = db) =>
     [fileUuid]
   )
 
-export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
+export const clearAllSurveyFilesContent = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.none(
     `
       UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -242,13 +271,16 @@ export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
       `
   )
 
-export const cleanupFileProps = async ({ surveyId, fileSummary }, client = db) => {
+export const cleanupFileProps = (
+  { surveyId, fileSummary }: { surveyId: number; fileSummary: any },
+  client: DbClient = db
+) => {
   const fileUuid = SurveyFile.getUuid(fileSummary)
   const fileSummaryUpdated = SurveyFile.cleanupInvalidProps(fileSummary)
   return updateFileProps(surveyId, fileUuid, SurveyFile.getProps(fileSummaryUpdated), client)
 }
 
-export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
+export const cleanupSurveyFilesProps = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.tx(async (t) => {
     const fileSummariesToClean = await t.manyOrNone(
       `SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
@@ -267,7 +299,7 @@ export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
   })
 
 // ============== DELETE
-export const deleteFileByUuid = async (surveyId, uuid, client = db) =>
+export const deleteFileByUuid = (surveyId: number, uuid: string, client: DbClient = db) =>
   client.query(
     `
     DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -275,7 +307,7 @@ export const deleteFileByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const deleteFilesByUuids = async (surveyId, uuids, client = db) =>
+export const deleteFilesByUuids = (surveyId: number, uuids: string[], client: DbClient = db) =>
   client.query(
     `
       DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -283,7 +315,7 @@ export const deleteFilesByUuids = async (surveyId, uuids, client = db) =>
     [uuids]
   )
 
-export const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
+export const deleteFilesByRecordUuids = (surveyId: number, uuids: string[], client: DbClient = db) =>
   client.query(
     `
     DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
@@ -291,7 +323,7 @@ export const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
     [uuids]
   )
 
-export const deleteTemporaryFiles = async (surveyId, client = db) =>
+export const deleteTemporaryFiles = (surveyId: number, client: DbClient = db) =>
   client.query(
     `
     DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file

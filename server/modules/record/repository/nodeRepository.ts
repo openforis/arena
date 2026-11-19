@@ -1,4 +1,4 @@
-import { Dates } from '@openforis/arena-core'
+import { Dates, type NodeDefEntity, type ArenaRecordNode } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
 
@@ -10,10 +10,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 const { keys: refDataKeys } = NodeRefData
 const { keys: categoryItemKeys } = CategoryItem
@@ -35,15 +33,15 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 // ============== UTILS
 
 // cache of camelized keys
-const nodeKeyByColumnName = {}
+const nodeKeyByColumnName: Record<string, string> = {}
 
-const _toISOString = (date) => (date instanceof Date ? date.toISOString() : date)
+const _toISOString = (date: unknown) => (date instanceof Date ? date.toISOString() : date)
 
-const dbTransformCallback = (row) => {
+const dbTransformCallback = (row: Record<string, unknown>): ArenaRecordNode => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
   // (do not camelize meta properties);
   // build a new object instead of deleting the row keys: "delete" would switch it to the (much bigger) V8 dictionary mode
-  const node = {}
+  const node: Record<string, any> = {}
   for (const [columnName, value] of Object.entries(row)) {
     let nodeKey = nodeKeyByColumnName[columnName]
     if (!nodeKey) {
@@ -57,7 +55,7 @@ const dbTransformCallback = (row) => {
   // ISO strings (as in arena-core nodes) take much less memory than Date objects
   node.dateCreated = _toISOString(node.dateCreated)
   node.dateModified = _toISOString(node.dateModified)
-  return node
+  return node as ArenaRecordNode
 }
 
 // shares identical uuid strings and ref data objects among the fetched nodes (see RecordNodesCompactor)
@@ -66,9 +64,9 @@ const createDbTransformCallbackCompacting = () => {
   return (row) => compact(dbTransformCallback(row))
 }
 
-const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
+const _toValueQueryParam = (value: unknown) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
 
-const _getAncestorUuidSelectField = (ancestorDef) => {
+const _getAncestorUuidSelectField = (ancestorDef: NodeDefEntity) => {
   const nodeAncestorEntityHierarchyIndex = ancestorDef ? NodeDef.getMetaHierarchy(ancestorDef).length : null
   return nodeAncestorEntityHierarchyIndex === null
     ? 'null'
@@ -95,8 +93,16 @@ export const getNodeSelectQuery = ({
   includeSurveyUuid = true,
   ancestorDef = null,
   draft = true,
+}: {
+  surveyId: number
+  includeRefData?: boolean
+  includeRecordUuid?: boolean
+  includeRecordInfo?: boolean
+  includeSurveyUuid?: boolean
+  ancestorDef?: NodeDefEntity
+  draft?: boolean
 }) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
 
   const selectFields = (includeRecordUuid ? tableColumnsSelect : A.without(['record_uuid'], tableColumnsSelect)).map(
     (field) => `n.${field}`
@@ -124,9 +130,9 @@ export const getNodeSelectQuery = ({
   if (includeRefData) {
     // include ref data (category items, taxa, etc.)
 
-    const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
-    const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
-    const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
+    const propsTaxon = DbUtils.getPropsCombined(draft, 't.', null)
+    const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', null)
+    const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', null)
 
     selectFields.push(
       ` CASE
@@ -160,7 +166,14 @@ export const getNodeSelectQuery = ({
   SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
 }
 
-export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, recordUuid = null }, client = db) => {
+export const countNodesWithMissingFile = (
+  {
+    surveyId,
+    nodeDefFileUuids,
+    recordUuid = null,
+  }: { surveyId: number; nodeDefFileUuids: string[]; recordUuid?: string },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereConditions = [
     `n.node_def_uuid IN ($/nodeDefFileUuids:csv/)`,
@@ -191,8 +204,8 @@ export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, re
  * @returns {Promise<object>} - Counts indexed by record uuid (only records with missing files).
  */
 export const countNodesWithMissingFileByRecordUuids = async (
-  { surveyId, nodeDefFileUuids, recordUuids },
-  client = db
+  { surveyId, nodeDefFileUuids, recordUuids }: { surveyId: number; nodeDefFileUuids: string[]; recordUuids: string[] },
+  client: DbClient = db
 ) => {
   if (nodeDefFileUuids.length === 0 || recordUuids.length === 0) return {}
   const schema = Schemata.getSchemaSurvey(surveyId)
@@ -222,13 +235,16 @@ export const countNodesWithMissingFileByRecordUuids = async (
  * @param {object} params - The parameters.
  * @param {number} params.surveyId - The survey ID.
  * @param {Array<string>} params.nodeDefUuids - Node def UUIDs being purged wholesale.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<Array<{fileUuid: string, recordUuid: string}>>} - The matching file-attribute nodes.
  */
-export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids }, client = db) => {
+export const fetchFileValueNodesByNodeDefUuids = (
+  { surveyId, nodeDefUuids }: { surveyId: number; nodeDefUuids: string[] },
+  client: DbClient = db
+) => {
   if (A.isEmpty(nodeDefUuids)) return []
 
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
 
   return client.manyOrNone(
     `
@@ -245,14 +261,13 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
              WHERE root.node_def_uuid IN ($/nodeDefUuids:csv/)
            )
       )`,
-    { nodeDefUuids },
-    (row) => row
+    { nodeDefUuids }
   )
 }
 
 // ============== CREATE
 
-export const insertNode = async (surveyId, node, draft, client = db) => {
+export const insertNode = async (surveyId: number, node: ArenaRecordNode, draft: boolean, client: DbClient = db) => {
   // items with default values (e.g. empty child applicability) are not stored to save space
   const meta = {
     ...Node.compactMeta(Node.getMeta(node)),
@@ -261,7 +276,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
 
   await client.query(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.node
+    INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.node
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
     VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
     `,
@@ -281,14 +296,17 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
-export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
-  client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumnsInsert, nodeValues))
+export const insertNodesFromValues = (surveyId: number, nodeValues: any, client: DbClient = db) =>
+  client.none(DbUtils.insertAllQuery(Schemata.getSchemaSurvey(surveyId), 'node', tableColumnsInsert, nodeValues))
 
-export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) => {
+export const insertNodesInBatch = async (
+  { surveyId, nodes = [] }: { surveyId: number; nodes?: ArenaRecordNode[] },
+  client: DbClient = db
+) => {
   if (nodes.length === 0) return []
 
   const query = DbUtils.insertAllQueryBatch(
-    getSurveyDBSchema(surveyId),
+    Schemata.getSchemaSurvey(surveyId),
     'node',
     tableColumnsInsert,
     nodes.map((node) => ({
@@ -313,9 +331,23 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
 
 // ============== READ
 
-export const fetchNodesByRecordUuid = async (
-  { surveyId, recordUuid, includeRefData = true, includeSurveyUuid = true, includeRecordUuid = true, draft = true },
-  client = db
+export const fetchNodesByRecordUuid = (
+  {
+    surveyId,
+    recordUuid,
+    includeRefData = true,
+    includeSurveyUuid = true,
+    includeRecordUuid = true,
+    draft = true,
+  }: {
+    surveyId: number
+    recordUuid: string
+    includeRefData?: boolean
+    includeSurveyUuid?: boolean
+    includeRecordUuid?: boolean
+    draft?: boolean
+  },
+  client: DbClient = db
 ) =>
   client.map(
     `${getNodeSelectQuery({ surveyId, includeRefData, includeSurveyUuid, includeRecordUuid, draft })}
@@ -325,16 +357,19 @@ export const fetchNodesByRecordUuid = async (
     createDbTransformCallbackCompacting()
   )
 
-export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
+export const fetchNodeByUuid = (surveyId: number, uuid: string, client: DbClient = db) =>
   client.one(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
+    SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.node
     WHERE uuid = $1`,
     [uuid],
     dbTransformCallback
   )
 
-export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft }, client = db) =>
+export const fetchNodesWithRefDataByUuids = (
+  { surveyId, nodeUuids, draft }: { surveyId: number; nodeUuids: string[]; draft: boolean },
+  client: DbClient = db
+) =>
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft })}
@@ -344,10 +379,18 @@ export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft 
     createDbTransformCallbackCompacting()
   )
 
-export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
-  (await fetchNodesWithRefDataByUuids({ surveyId, nodeUuids: [nodeUuid], draft }, client))[0]
+export const fetchNodeWithRefDataByUuid = async (
+  { surveyId, nodeUuid, draft }: { surveyId: number; nodeUuid: string; draft: boolean },
+  client: DbClient = db
+) => (await fetchNodesWithRefDataByUuids({ surveyId, nodeUuids: [nodeUuid], draft }, client))[0]
 
-export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUuids, client = db) =>
+export const fetchChildNodesByNodeDefUuids = (
+  surveyId: number,
+  recordUuid: string,
+  nodeUuid: string,
+  childDefUuids: string[],
+  client: DbClient = db
+) =>
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft: false })}
@@ -360,13 +403,27 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
 
 // ============== UPDATE
 export const updateNode = async (
-  { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
-  client = db
+  {
+    surveyId,
+    nodeUuid,
+    value = null,
+    meta = {},
+    draft,
+    reloadNode = true,
+  }: {
+    surveyId: number
+    nodeUuid: string
+    value?: unknown
+    meta?: Record<string, any>
+    draft: boolean
+    reloadNode?: boolean
+  },
+  client: DbClient = db
 ) => {
   // meta is merged into the stored one: items with default values are deleted instead of stored, to save space
   await client.query(
     `
-    UPDATE ${getSurveyDBSchema(surveyId)}.node
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node
     SET value = $1::jsonb,
     meta = (meta - $4::text[]) || $2::jsonb, 
     date_modified = ${DbUtils.now}
@@ -382,7 +439,10 @@ export const updateNode = async (
   return node
 }
 
-export const updateNodes = async ({ surveyId, nodes }, client = db) => {
+export const updateNodes = async (
+  { surveyId, nodes }: { surveyId: number; nodes: ArenaRecordNode[] },
+  client: DbClient = db
+) => {
   const values = nodes.map((node) => [
     Node.getId(node),
     _toValueQueryParam(Node.getValue(node)),
@@ -392,7 +452,7 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
   ])
   await client.none(
     DbUtils.updateAllQuery(
-      getSurveyDBSchema(surveyId),
+      Schemata.getSchemaSurvey(surveyId),
       'node',
       { name: 'id', cast: 'bigint' },
       [
@@ -406,10 +466,10 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
 }
 
 // ============== DELETE
-export const deleteNode = async (surveyId, nodeUuid, client = db) =>
+export const deleteNode = (surveyId: number, nodeUuid: string, client: DbClient = db) =>
   client.one(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
+    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node
     WHERE uuid = $1
     RETURNING *, true as ${Node.keys.deleted}
     `,
@@ -425,22 +485,22 @@ export const deleteNode = async (surveyId, nodeUuid, client = db) =>
  * payloads) into memory at once is enough on its own to exhaust a job worker's heap.
  * @param {number} surveyId - The survey ID.
  * @param {Array<string>} nodeDefUuids - Node def UUIDs being purged wholesale.
- * @param {pgPromise.IDatabase} [client] - The database client.
+ * @param {DbClient} [client] - The database client.
  * @returns {Promise<number>} - The number of nodes deleted.
  */
-export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
+export const deleteNodesByNodeDefUuids = (surveyId: number, nodeDefUuids: string[], client: DbClient = db) =>
   client.result(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
+    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node
     WHERE node_def_uuid IN ($1:csv)
     `,
     [nodeDefUuids],
     A.prop('rowCount')
   )
 
-export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
-  client.manyOrNone(
-    `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
+export const deleteNodesByUuids = (surveyId: number, nodeUuids: string[], client: DbClient = db) =>
+  client.map(
+    `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node
     WHERE uuid IN ($1:csv)
     RETURNING *, true as ${Node.keys.deleted}`,
     [nodeUuids],
@@ -454,8 +514,8 @@ export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
  * It cannot be run inside a transaction.
  * @param {!object} params - The parameters.
  * @param {!number} params.surveyId - The survey ID.
- * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
+ * @param {DbClient} [client] - The database client (not a transaction).
  * @returns {Promise<null>} - The query result.
  */
-export const vacuumFullNodeTable = async ({ surveyId }, client = db) =>
-  DbUtils.vacuumTable({ schema: getSurveyDBSchema(surveyId), table: 'node', full: true, analyze: true }, client)
+export const vacuumFullNodeTable = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
+  DbUtils.vacuumTable({ schema: Schemata.getSchemaSurvey(surveyId), table: 'node', full: true, analyze: true }, client)

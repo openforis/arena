@@ -7,12 +7,19 @@ import {
 
 export { checkCanAccessS3Bucket } from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
 
-const getSubfolder = ({ recordUuid }) => (recordUuid ? 'record_files' : 'survey_files')
+const getSubfolder = ({ recordUuid }: { recordUuid: string }) => (recordUuid ? 'record_files' : 'survey_files')
 
-const getFileKey = ({ surveyId, fileUuid, recordUuid = null }) =>
-  `surveys/${surveyId}/${getSubfolder({ recordUuid })}/${fileUuid}`
+const getFileKey = ({
+  surveyId,
+  fileUuid,
+  recordUuid = null,
+}: {
+  surveyId: number
+  fileUuid: string
+  recordUuid?: string
+}) => `surveys/${surveyId}/${getSubfolder({ recordUuid })}/${fileUuid}`
 
-const getLegacyFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
+const getLegacyFileKey = ({ surveyId, fileUuid }: { surveyId: number; fileUuid: string }) => `${surveyId}_${fileUuid}`
 
 const {
   uploadFileContent,
@@ -22,7 +29,7 @@ const {
   getFileKey,
 })
 
-const deleteFiles = async ({ surveyId, files }) => {
+const deleteFiles = async ({ surveyId, files }: { surveyId: number; files: any }) => {
   for (const { fileUuid, recordUuid } of files) {
     await deleteFile({ surveyId, fileUuid, recordUuid }) // NOSONAR
   }
@@ -31,7 +38,7 @@ const deleteFiles = async ({ surveyId, files }) => {
 // unlike the shared temp-file repository (where a missing object is always an error), a record
 // file registered in the DB can legitimately have no content left in the bucket, so return null
 // instead of throwing, matching the other storage backends (filesystem, DB)
-const getFileContentAsStream = async (params) => {
+const getFileContentAsStream = async (params: any) => {
   try {
     return await getFileContentAsStreamRaw(params)
   } catch (error) {
@@ -42,7 +49,15 @@ const getFileContentAsStream = async (params) => {
   }
 }
 
-export const migrateFileToNewKey = async ({ surveyId, fileUuid, recordUuid }) => {
+export const migrateFileToNewKey = async ({
+  surveyId,
+  fileUuid,
+  recordUuid,
+}: {
+  surveyId: number
+  fileUuid: string
+  recordUuid: string
+}) => {
   const legacyKey = getLegacyFileKey({ surveyId, fileUuid })
   const exists = await checkFileExistsInS3({ key: legacyKey })
   if (!exists) {

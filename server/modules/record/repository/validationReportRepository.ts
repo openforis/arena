@@ -1,5 +1,6 @@
 import { Transform } from 'node:stream'
 
+import { Schemata } from '@common/model/db'
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
@@ -7,10 +8,8 @@ import * as Expression from '@core/expressionParser/expression'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import { DbOrder } from '@server/db'
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 import { buildQualifierFiltersSqlConditions } from './qualifierFiltersSqlConditions'
 
@@ -24,7 +23,7 @@ const sortFieldBySortBy = {
   path: 'keys_hierarchy',
 }
 
-const getOrderByClause = ({ sortBy, sortOrder }) => {
+const getOrderByClause = ({ sortBy, sortOrder }: { sortBy: string | null; sortOrder: string | null }) => {
   const sortField = sortFieldBySortBy[sortBy] ?? sortFieldBySortBy.dateCreated
   const sortOrderNormalized = DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()
   return `${sortField} ${sortOrderNormalized}, node_id ASC`
@@ -35,7 +34,13 @@ const getOrderByClause = ({ sortBy, sortOrder }) => {
 const rootDataAlias = 'root_data'
 
 // conditions on the root entity data view: records filter (sent by the client) and user group qualifiers
-const getRootDataConditions = ({ filterBySurveyAttrs, recordAccessFilters }) => {
+const getRootDataConditions = ({
+  filterBySurveyAttrs,
+  recordAccessFilters,
+}: {
+  filterBySurveyAttrs: Record<string, any>
+  recordAccessFilters: any
+}) => {
   const filter = filterBySurveyAttrs?.filter
   const { clause: filterClause = null, params: filterParams = {} } = filter
     ? Expression.toSql(
@@ -56,7 +61,15 @@ const getRootDataConditions = ({ filterBySurveyAttrs, recordAccessFilters }) => 
   return { conditions, params: { ...filterParams, ...qualifierParams } }
 }
 
-const getRootDataClause = ({ surveyRdbSchema, rootDataViewName, rootDataConditions }) => {
+const getRootDataClause = ({
+  surveyRdbSchema,
+  rootDataViewName,
+  rootDataConditions,
+}: {
+  surveyRdbSchema: string
+  rootDataViewName: string | null
+  rootDataConditions: any
+}) => {
   if (rootDataConditions.length === 0) return ''
   if (!rootDataViewName) {
     throw new Error('rootDataViewName is required to filter the validation report')
@@ -72,7 +85,7 @@ const getRootDataClause = ({ surveyRdbSchema, rootDataViewName, rootDataConditio
 }
 
 // an empty selection (array) matches no rows, a missing one (null) doesn't filter
-const getSelectionFilterClause = ({ values, clause }) => {
+const getSelectionFilterClause = ({ values, clause }: { values: any; clause: any }) => {
   if (!Array.isArray(values)) return ''
   return values.length === 0 ? 'AND 1 = 0' : clause
 }
@@ -85,8 +98,16 @@ const query = ({
   recordAccessFilters = null,
   sortBy,
   sortOrder,
+}: {
+  surveyId: number
+  recordUuid: string
+  rootDataViewName?: string | null
+  filterBySurveyAttrs?: Record<string, any>
+  recordAccessFilters?: any
+  sortBy?: string | null
+  sortOrder?: string | null
 }) => {
-  const surveySchema = getSurveyDBSchema(surveyId)
+  const surveySchema = Schemata.getSchemaSurvey(surveyId)
   const surveyRdbSchema = SchemaRdb.getName(surveyId)
   const uuidLength = 36
   const attributeDefUuids = filterBySurveyAttrs?.attributeDefUuids
@@ -195,7 +216,7 @@ const query = ({
 
 const _rowToItem = A.camelizePartial({ limitToLevel: 1, sideEffect: true })
 
-export const fetchValidationReport = async (
+export const fetchValidationReport = (
   {
     surveyId,
     cycle,
@@ -207,8 +228,19 @@ export const fetchValidationReport = async (
     recordAccessFilters = null,
     sortBy,
     sortOrder,
+  }: {
+    surveyId: number
+    cycle: string
+    offset?: number
+    limit?: number | null
+    recordUuid?: string
+    rootDataViewName?: string | null
+    filterBySurveyAttrs?: Record<string, any>
+    recordAccessFilters?: any
+    sortBy: string | null
+    sortOrder: string | null
   },
-  client = db
+  client: DbClient = db
 ) => {
   const { text, params } = query({
     surveyId,
@@ -228,7 +260,7 @@ export const fetchValidationReport = async (
   )
 }
 
-export const countValidationReportItems = async (
+export const countValidationReportItems = (
   {
     surveyId,
     cycle,
@@ -236,8 +268,15 @@ export const countValidationReportItems = async (
     rootDataViewName = null,
     filterBySurveyAttrs = null,
     recordAccessFilters = null,
+  }: {
+    surveyId: number
+    cycle: string
+    recordUuid?: string
+    rootDataViewName?: string | null
+    filterBySurveyAttrs?: Record<string, any>
+    recordAccessFilters?: any
   },
-  client = db
+  client: DbClient = db
 ) => {
   const { text, params } = query({ surveyId, recordUuid, rootDataViewName, filterBySurveyAttrs, recordAccessFilters })
   return client.one(`SELECT COUNT(*) FROM(${text}) AS v`, { cycle, recordUuid, ...params }, (row) => Number(row.count))
@@ -252,8 +291,16 @@ export const getValidationReportAsStream = (
     filterBySurveyAttrs = null,
     recordAccessFilters = null,
     processor,
+  }: {
+    surveyId: number
+    cycle: string
+    recordUuid?: string
+    rootDataViewName?: string | null
+    filterBySurveyAttrs?: Record<string, any>
+    recordAccessFilters?: any
+    processor: any
   },
-  client = db
+  client: DbClient = db
 ) => {
   const { text, params } = query({ surveyId, recordUuid, rootDataViewName, filterBySurveyAttrs, recordAccessFilters })
   const queryFormatted = DbUtils.formatQuery(text, { cycle, recordUuid, ...params })
