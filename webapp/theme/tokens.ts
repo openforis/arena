@@ -49,6 +49,14 @@ const colorTokenValues = {
   brandGradientMiddle: ['#1d5a5a', '#10302f'],
   brandGradientEnd: ['#3c7a2f', '#1d3a17'],
   onBrandGradient: ['#ffffff', '#ffffff'],
+  // provider monograms: solid chips with white text (4.5:1 or more), same in both themes
+  monogramDefault: ['#646b78', '#646b78'],
+  monogramLocal: ['#4f6d7a', '#4f6d7a'],
+  monogramOpenai: ['#3e7a6a', '#3e7a6a'],
+  monogramAnthropic: ['#8a6a4f', '#8a6a4f'],
+  monogramGoogle: ['#5468a8', '#5468a8'],
+  monogramCompatible: ['#6d5b8f', '#6d5b8f'],
+  onMonogram: ['#ffffff', '#ffffff'],
 } as const satisfies Record<string, readonly [string, string]>
 
 export type ArenaColorToken = keyof typeof colorTokenValues

@@ -61,6 +61,15 @@
   --color-brand-gradient-middle: #1d5a5a;
   --color-brand-gradient-end: #3c7a2f;
   --color-on-brand-gradient: #ffffff;
+
+  // provider monograms: solid chips with white text (4.5:1 or more), same in both themes
+  --color-monogram-default: #646b78;
+  --color-monogram-local: #4f6d7a;
+  --color-monogram-openai: #3e7a6a;
+  --color-monogram-anthropic: #8a6a4f;
+  --color-monogram-google: #5468a8;
+  --color-monogram-compatible: #6d5b8f;
+  --color-on-monogram: #ffffff;
 }
 
 :root[data-theme='dark'] {
@@ -113,4 +122,13 @@
   --color-brand-gradient-middle: #10302f;
   --color-brand-gradient-end: #1d3a17;
   --color-on-brand-gradient: #ffffff;
+
+  // provider monograms: solid chips with white text (4.5:1 or more), same in both themes
+  --color-monogram-default: #646b78;
+  --color-monogram-local: #4f6d7a;
+  --color-monogram-openai: #3e7a6a;
+  --color-monogram-anthropic: #8a6a4f;
+  --color-monogram-google: #5468a8;
+  --color-monogram-compatible: #6d5b8f;
+  --color-on-monogram: #ffffff;
 }

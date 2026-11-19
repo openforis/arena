@@ -63,6 +63,14 @@ $colorBrandGradientMiddle: var(--color-brand-gradient-middle);
 $colorBrandGradientEnd: var(--color-brand-gradient-end);
 $colorOnBrandGradient: var(--color-on-brand-gradient);
 
+$colorMonogramDefault: var(--color-monogram-default);
+$colorMonogramLocal: var(--color-monogram-local);
+$colorMonogramOpenai: var(--color-monogram-openai);
+$colorMonogramAnthropic: var(--color-monogram-anthropic);
+$colorMonogramGoogle: var(--color-monogram-google);
+$colorMonogramCompatible: var(--color-monogram-compatible);
+$colorOnMonogram: var(--color-on-monogram);
+
 /// Returns the color with the given opacity (runtime equivalent of `rgba($color, $opacity)`).
 /// @param {Color} $color - Color (or CSS variable).
 /// @param {Number} $opacity - Opacity between 0 and 1.

@@ -1,6 +1,6 @@
 @use '~@webapp/style/vars' as *;
 
-// a tone per provider mixed with the surface: the text color on it is at least 5:1 in both themes
+// solid chip per provider, white text (the monogram tokens keep 4.5:1 or more)
 .provider-monogram {
   flex: none;
   display: inline-grid;
@@ -10,9 +10,9 @@
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 700;
-  color: $colorOnSurface;
+  color: $colorOnMonogram;
   // default and other
-  background: tint($colorSecondary, 60%);
+  background: $colorMonogramDefault;
 
   &--small {
     width: 24px;
@@ -22,22 +22,22 @@
   }
 
   &--local {
-    background: tint(color-mix(in srgb, #{$colorPrimary}, #{$colorSuccess}), 60%);
+    background: $colorMonogramLocal;
   }
 
   &--openai {
-    background: tint($colorSuccess, 60%);
+    background: $colorMonogramOpenai;
   }
 
   &--anthropic {
-    background: tint($colorWarning, 60%);
+    background: $colorMonogramAnthropic;
   }
 
   &--google {
-    background: tint($colorPrimary, 60%);
+    background: $colorMonogramGoogle;
   }
 
   &--compatible {
-    background: tint($colorError, 60%);
+    background: $colorMonogramCompatible;
   }
 }
