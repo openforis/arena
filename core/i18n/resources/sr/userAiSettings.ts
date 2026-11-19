@@ -24,7 +24,6 @@ export default {
   'sourceAdmin-default': 'podrazumijevani provajder platforme',
   notConfigured:
     'AI nije konfigurisan za vaš nalog ili ovu instalaciju. Konfigurišite lični provajder ispod ili kontaktirajte administratora.',
-  featuresDisabled: 'AI funkcije su onemogućene na ovoj instalaciji.',
   encryptionMissing:
     'Na ovoj instalaciji nedostaje AI_USER_KEY_ENCRYPTION_SECRET; lični API ključevi ne mogu se sačuvati dok ga administrator ne konfiguriše.',
 

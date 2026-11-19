@@ -23,7 +23,6 @@ export default {
   'sourceAdmin-default': 'プラットフォームのデフォルト',
   notConfigured:
     'あなたのアカウント、またはこのデプロイメントではAIが設定されていません。以下で個人用プロバイダーを設定するか、管理者に連絡してください。',
-  featuresDisabled: 'このデプロイメントではAI機能が無効になっています。',
   encryptionMissing:
     'このデプロイメントにはAI_USER_KEY_ENCRYPTION_SECRETが設定されていません。管理者が設定するまで、個人用APIキーは保存できません。',
 
