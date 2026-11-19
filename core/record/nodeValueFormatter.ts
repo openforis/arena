@@ -1,4 +1,4 @@
-import { NodeValueFormatter as CoreNodeValueFormatter, Objects, Records, Surveys } from '@openforis/arena-core'
+import { RecordNodeValueFormatter as CoreNodeValueFormatter, Objects, Records, Surveys } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,

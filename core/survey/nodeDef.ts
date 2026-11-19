@@ -2,24 +2,24 @@ import {
   NodeDefs,
   NodeDefType,
   Objects,
-  type Labels,
+  type ArenaLabels,
   type ArenaNodeDef,
-  type NodeDefBoolean,
-  type NodeDefCode,
-  type NodeDefCoordinate,
-  type NodeDefDate,
-  type NodeDefDecimal,
-  type NodeDefEntity,
+  type ArenaNodeDefBoolean,
+  type ArenaNodeDefCode,
+  type ArenaNodeDefCoordinate,
+  type ArenaNodeDefDate,
+  type ArenaNodeDefDecimal,
+  type ArenaNodeDefEntity,
   type ArenaNodeDefExpression,
-  type NodeDefFile,
-  type NodeDefFormHeader,
-  type NodeDefGeo,
-  type NodeDefInteger,
-  type NodeDefMeta,
-  type NodeDefPropsAdvanced,
-  type NodeDefTaxon,
-  type NodeDefText,
-  type NodeDefTime,
+  type ArenaNodeDefFile,
+  type ArenaNodeDefFormHeader,
+  type ArenaNodeDefGeo,
+  type ArenaNodeDefInteger,
+  type ArenaNodeDefMeta,
+  type ArenaNodeDefPropsAdvanced,
+  type ArenaNodeDefTaxon,
+  type ArenaNodeDefText,
+  type ArenaNodeDefTime,
   type ArenaNodeDefValidations,
 } from '@openforis/arena-core'
 
@@ -252,7 +252,7 @@ export const createAutoIncrementalKeyDefaultValues = ({
   nodeDefParent,
 }: {
   nodeDef: AnyNodeDef
-  nodeDefParent: NodeDefEntity
+  nodeDefParent: ArenaNodeDefEntity
 }): ArenaNodeDefExpression[] => {
   const nodeDefName = getName(nodeDef)
   const nodeDefParentName = getName(nodeDefParent)
@@ -297,9 +297,10 @@ const isType =
   (nodeDef: AnyNodeDef): nodeDef is T =>
     getType(nodeDef) === type
 
-export const isEntity = isType<NodeDefEntity>(NodeDefType.entity)
-export const isSingleEntity = (nodeDef: AnyNodeDef): nodeDef is NodeDefEntity => isEntity(nodeDef) && isSingle(nodeDef)
-export const isMultipleEntity = (nodeDef: AnyNodeDef): nodeDef is NodeDefEntity =>
+export const isEntity = isType<ArenaNodeDefEntity>(NodeDefType.entity)
+export const isSingleEntity = (nodeDef: AnyNodeDef): nodeDef is ArenaNodeDefEntity =>
+  isEntity(nodeDef) && isSingle(nodeDef)
+export const isMultipleEntity = (nodeDef: AnyNodeDef): nodeDef is ArenaNodeDefEntity =>
   isEntity(nodeDef) && isMultiple(nodeDef)
 export const isEntityOrMultiple = (nodeDef: AnyNodeDef): boolean => isEntity(nodeDef) || isMultiple(nodeDef)
 
@@ -311,19 +312,19 @@ export const isAttributeComposite = (nodeDef: AnyNodeDef): boolean =>
     getType(nodeDef)
   )
 
-export const isBoolean = isType<NodeDefBoolean>(NodeDefType.boolean)
-export const isCode = isType<NodeDefCode>(NodeDefType.code)
-export const isCoordinate = isType<NodeDefCoordinate>(NodeDefType.coordinate)
-export const isDate = isType<NodeDefDate>(NodeDefType.date)
-export const isDecimal = isType<NodeDefDecimal>(NodeDefType.decimal)
-export const isGeo = isType<NodeDefGeo>(NodeDefType.geo)
-export const isFile = isType<NodeDefFile>(NodeDefType.file)
-export const isInteger = isType<NodeDefInteger>(NodeDefType.integer)
-export const isTaxon = isType<NodeDefTaxon>(NodeDefType.taxon)
-export const isText = isType<NodeDefText>(NodeDefType.text)
-export const isTime = isType<NodeDefTime>(NodeDefType.time)
+export const isBoolean = isType<ArenaNodeDefBoolean>(NodeDefType.boolean)
+export const isCode = isType<ArenaNodeDefCode>(NodeDefType.code)
+export const isCoordinate = isType<ArenaNodeDefCoordinate>(NodeDefType.coordinate)
+export const isDate = isType<ArenaNodeDefDate>(NodeDefType.date)
+export const isDecimal = isType<ArenaNodeDefDecimal>(NodeDefType.decimal)
+export const isGeo = isType<ArenaNodeDefGeo>(NodeDefType.geo)
+export const isFile = isType<ArenaNodeDefFile>(NodeDefType.file)
+export const isInteger = isType<ArenaNodeDefInteger>(NodeDefType.integer)
+export const isTaxon = isType<ArenaNodeDefTaxon>(NodeDefType.taxon)
+export const isText = isType<ArenaNodeDefText>(NodeDefType.text)
+export const isTime = isType<ArenaNodeDefTime>(NodeDefType.time)
 // layout elments
-export const isFormHeader = isType<NodeDefFormHeader>(NodeDefType.formHeader)
+export const isFormHeader = isType<ArenaNodeDefFormHeader>(NodeDefType.formHeader)
 
 export const isReadOnly = (nodeDef: AnyNodeDef): boolean => getProp<boolean>(propKeys.readOnly, false)(nodeDef)
 export const isHidden = (nodeDef: AnyNodeDef): boolean => getProp<boolean>(propKeys.hidden, false)(nodeDef)
@@ -332,7 +333,8 @@ export const getLayout = (nodeDef: AnyNodeDef): PropsObject => getProp<PropsObje
 
 export const isDeleted: NodeDefPredicate = ObjectUtils.isKeyTrue(keys.deleted)
 
-export const getDescriptions = (nodeDef: AnyNodeDef): Labels => getProp<Labels>(propKeys.descriptions, {})(nodeDef)
+export const getDescriptions = (nodeDef: AnyNodeDef): ArenaLabels =>
+  getProp<ArenaLabels>(propKeys.descriptions, {})(nodeDef)
 
 export const isEnumerate: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.enumerate)
 export const isAutoCreateMinCountItems: NodeDefPredicate = ObjectUtils.isPropTrue(propKeys.autoCreateMinCountItems)
@@ -375,8 +377,8 @@ export const isSecondsIncluded: NodeDefPredicate = ObjectUtils.isPropTrue(propKe
 // taxon
 export const getTaxonomyUuid = (nodeDef: AnyNodeDef): string | null =>
   getProp<string | null>(propKeys.taxonomyUuid)(nodeDef)
-export const getVernacularNameLabels = (nodeDef: AnyNodeDef): Labels =>
-  getProp<Labels>(propKeys.vernacularNameLabels, {})(nodeDef)
+export const getVernacularNameLabels = (nodeDef: AnyNodeDef): ArenaLabels =>
+  getProp<ArenaLabels>(propKeys.vernacularNameLabels, {})(nodeDef)
 export const getVernacularNameLabel =
   (lang: string) =>
   (nodeDef: AnyNodeDef): string | undefined =>
@@ -414,7 +416,7 @@ export const getPrintOrientation = (nodeDef: AnyNodeDef): string | null =>
   getProp<string | null>(propKeys.printOrientation)(nodeDef)
 
 // ==== READ meta
-export const getMeta = (nodeDef: AnyNodeDef): NodeDefMeta => A.propOr({}, keys.meta)(nodeDef) as NodeDefMeta
+export const getMeta = (nodeDef: AnyNodeDef): ArenaNodeDefMeta => A.propOr({}, keys.meta)(nodeDef) as ArenaNodeDefMeta
 export const getMetaHierarchy = (nodeDef: AnyNodeDef): string[] => A.pathOr([], [keys.meta, metaKeys.h])(nodeDef)
 
 // Utils
@@ -484,9 +486,9 @@ export const isDescendantOf =
 
 // Advanced props
 
-export const getPropsAdvanced = (nodeDef: AnyNodeDef): NodeDefPropsAdvanced & PropsObject =>
+export const getPropsAdvanced = (nodeDef: AnyNodeDef): ArenaNodeDefPropsAdvanced & PropsObject =>
   A.propOr({}, keys.propsAdvanced)(nodeDef) as PropsObject
-export const getPropsAdvancedDraft = (nodeDef: AnyNodeDef): NodeDefPropsAdvanced & PropsObject =>
+export const getPropsAdvancedDraft = (nodeDef: AnyNodeDef): ArenaNodeDefPropsAdvanced & PropsObject =>
   A.propOr({}, keys.propsAdvancedDraft)(nodeDef) as PropsObject
 
 export const getPropAdvanced =
@@ -774,7 +776,7 @@ export const isHiddenInReport = (nodeDef: AnyNodeDef): boolean =>
 // ==== CREATE
 
 export const newNodeDef = (
-  nodeDefParent: NodeDefEntity | null,
+  nodeDefParent: ArenaNodeDefEntity | null,
   type: NodeDefType,
   cycles: string[],
   props: PropsObject = {},
@@ -828,13 +830,13 @@ export const assocProp = ({ key, value }: { key: string; value: unknown }): Node
 export const assocCycles = (cycles: string[]): NodeDefUpdater => assocProp({ key: propKeys.cycles, value: cycles })
 export const assocExcludedInClone = (value: boolean): NodeDefUpdater =>
   assocProp({ key: keysPropsAdvanced.excludedInClone, value })
-export const assocLabels = (labels: Labels): NodeDefUpdater => assocProp({ key: propKeys.labels, value: labels })
+export const assocLabels = (labels: ArenaLabels): NodeDefUpdater => assocProp({ key: propKeys.labels, value: labels })
 export const assocLabel =
   ({ label, lang }: { label: string; lang: string }): NodeDefUpdater =>
   (nodeDef) =>
     assocLabels({ ...getLabels(nodeDef), [lang]: label })(nodeDef)
 
-export const assocDescriptions = (descriptions: Labels): NodeDefUpdater =>
+export const assocDescriptions = (descriptions: ArenaLabels): NodeDefUpdater =>
   assocProp({ key: propKeys.descriptions, value: descriptions })
 export const assocHidden = (hidden: boolean): NodeDefUpdater => assocProp({ key: propKeys.hidden, value: hidden })
 
@@ -847,7 +849,7 @@ export const cloneIntoEntityDef =
     ignoreApplicability = true,
     ignoreValidations = true,
   }: {
-    nodeDefParent: NodeDefEntity
+    nodeDefParent: ArenaNodeDefEntity
     clonedNodeDefName: string
     ignoreDefaultValues?: boolean
     ignoreApplicability?: boolean
@@ -882,7 +884,7 @@ export const cloneIntoEntityDef =
   }
 
 export const changeParentEntity =
-  ({ targetParentNodeDef }: { targetParentNodeDef: NodeDefEntity }): NodeDefUpdater =>
+  ({ targetParentNodeDef }: { targetParentNodeDef: ArenaNodeDefEntity }): NodeDefUpdater =>
   (nodeDef) => {
     const targetParentNodeDefUuid = getUuid(targetParentNodeDef)
     return {
@@ -1067,7 +1069,7 @@ export const canHaveAutoIncrementalKey = ({
   nodeDefParent,
 }: {
   nodeDef: AnyNodeDef
-  nodeDefParent: NodeDefEntity
+  nodeDefParent: ArenaNodeDefEntity
 }): boolean => {
   if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
 

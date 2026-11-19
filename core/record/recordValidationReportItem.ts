@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey, Validation } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -105,6 +105,6 @@ export const getNodeDefContextUuid: ItemGetter<string> = A.ifElse(
   getValidationCountChildDefUuid,
   getNodeDefUuid
 )
-export const getValidation = getProp<Validation>(keys.validation)
+export const getValidation = getProp<ArenaValidation>(keys.validation)
 export const { getStep } = Record
 export const { getOwnerUuid } = Record

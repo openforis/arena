@@ -3,7 +3,7 @@ import { randomBytes } from 'node:crypto'
 
 import {
   Authorizer,
-  NodeValues,
+  RecordNodeValues,
   Objects,
   RecordExpressionEvaluator,
   SurveyDocImages,
@@ -14,7 +14,7 @@ import {
   type ArenaSurvey,
   type ArenaNodeDef,
   type NodeDefType,
-  type SurveyDocImage,
+  type ArenaSurveyDocImage,
 } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
@@ -746,7 +746,7 @@ export const generateNodeFileNameForDownload = async ({
   // return calculatd name (if any)
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.getFileNameExpression(nodeDef)) {
-    const calculatedName = NodeValues.getFileNameCalculated(node)
+    const calculatedName = RecordNodeValues.getFileNameCalculated(node)
     if (Objects.isNotEmpty(calculatedName)) {
       return calculatedName
     }
@@ -1012,7 +1012,7 @@ const exportRecordDocument = async ({
     cycle,
     includeAnalysis: false,
   })
-  const surveyDocImages = Survey.getSurveyDocImages(survey) as SurveyDocImage[]
+  const surveyDocImages = Survey.getSurveyDocImages(survey) as ArenaSurveyDocImage[]
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   let entityDef = null

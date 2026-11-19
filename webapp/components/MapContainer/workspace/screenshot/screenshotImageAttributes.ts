@@ -1,4 +1,4 @@
-import type { NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
@@ -38,7 +38,7 @@ export const filterImageAttributeDefs = (defs: any[], cycle: string): any[] =>
 export const toImageAttributeOptions = (
   defs: any[],
   lang: string,
-  rowEntityDef: NodeDefEntity | null = null
+  rowEntityDef: ArenaNodeDefEntity | null = null
 ): ScreenshotImageAttributeOption[] =>
   defs.map((def) => ({
     uuid: NodeDef.getUuid(def),
@@ -93,7 +93,7 @@ export const getImageAttributeOptions = ({
     sorted: true,
     cycle,
   })(survey)
-  const rowOptions = rowEntityDefs.flatMap((rowEntityDef: NodeDefEntity) =>
+  const rowOptions = rowEntityDefs.flatMap((rowEntityDef: ArenaNodeDefEntity) =>
     toImageAttributeOptions(
       filterImageAttributeDefs(Survey.getNodeDefChildrenSorted({ nodeDef: rowEntityDef, cycle })(survey), cycle),
       lang,

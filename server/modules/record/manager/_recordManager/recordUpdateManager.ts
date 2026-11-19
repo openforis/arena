@@ -1,8 +1,8 @@
 import {
-  NodePointers,
+  RecordNodePointers,
   Records,
   SurveyDependencyType,
-  type NodePointer,
+  type ArenaRecordNodePointer,
   type ArenaUser,
   type ArenaRecord,
   type ArenaRecordNode,
@@ -499,14 +499,14 @@ const _getDependentNodesToValidate = ({
   record: ArenaRecord
   nodes: NodesByUuid
 }) => {
-  const dependentNodePointersToValidate: NodePointer[] = []
+  const dependentNodePointersToValidate: ArenaRecordNodePointer[] = []
   for (const node of Object.values(nodes)) {
     for (const dependencyType of validationDependencyTypes) {
       const dependentPointers = Records.getDependentNodePointers(survey, node, dependencyType, true)(record)
       dependentNodePointersToValidate.push(...dependentPointers)
     }
   }
-  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
+  const dependentNodesToValidate = RecordNodePointers.getNodesFromNodePointers({
     record,
     nodePointers: dependentNodePointersToValidate,
   })

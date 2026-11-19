@@ -9,7 +9,7 @@ import {
   type ArenaSurvey,
   type ArenaNodeDef,
   type NodeDefType,
-  type NodeDefEntity,
+  type ArenaNodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -796,7 +796,7 @@ export const filterEntitiesWithData = async ({
 }: {
   survey: ArenaSurvey
   cycle: string
-  entityDefs: NodeDefEntity[]
+  entityDefs: ArenaNodeDefEntity[]
 }) => {
   const entityDefUuids = entityDefs.map(NodeDef.getUuid)
   const dataViewCountsByEntityDefUuid = await fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })

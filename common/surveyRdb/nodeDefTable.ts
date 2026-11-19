@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaNodeDefEntity } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -13,7 +13,7 @@ const tablePrefix = 'data_'
 
 const composeTableName = (nodeDefName: string): string => `${tablePrefix}${nodeDefName}`
 
-export const getTableName = (nodeDef: AnyNodeDef, nodeDefParent?: NodeDefEntity | null): string => {
+export const getTableName = (nodeDef: AnyNodeDef, nodeDefParent?: ArenaNodeDefEntity | null): string => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefParentName = NodeDef.getName(nodeDefParent)
 
@@ -22,7 +22,7 @@ export const getTableName = (nodeDef: AnyNodeDef, nodeDefParent?: NodeDefEntity 
     : composeTableName(nodeDefParentName)
 }
 
-export const getViewName = (nodeDef: AnyNodeDef, nodeDefParent?: NodeDefEntity | null): string =>
+export const getViewName = (nodeDef: AnyNodeDef, nodeDefParent?: ArenaNodeDefEntity | null): string =>
   getTableName(nodeDef, nodeDefParent) + viewSuffix
 
 const getDefaultColumnName = (nodeDef: AnyNodeDef): string =>

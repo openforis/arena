@@ -1,4 +1,4 @@
-import { I18n } from '@openforis/arena-core'
+import { ArenaI18n } from '@openforis/arena-core'
 
 type MsgParams = {
   invitingUserName: string
@@ -23,7 +23,7 @@ type MsgParams = {
  * @returns The message params.
  */
 const getMsgParams = (params: {
-  i18n: I18n
+  i18n: ArenaI18n
   invitingUserName: string
   serverUrl: string
   surveyName: string

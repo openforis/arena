@@ -2,7 +2,7 @@ import {
   Dates,
   Objects,
   type ArenaValidation,
-  type NodeDefEntity,
+  type ArenaNodeDefEntity,
   type ArenaNodeDef,
   type NodeDefType,
   type ArenaRecord,
@@ -156,7 +156,7 @@ export const countRecordsBySurveyId = async (
   }: {
     surveyId: number
     cycle?: string
-    nodeDefRoot?: NodeDefEntity
+    nodeDefRoot?: ArenaNodeDefEntity
     nodeDefKeys?: ArenaNodeDef<NodeDefType>[]
     summaryDefs?: ArenaNodeDef<NodeDefType>[]
     search?: string | null
@@ -380,7 +380,7 @@ export const fetchRecordsSummaryBySurveyId = (
     readableQualifierNodeDefFilterSets = [],
   }: {
     surveyId: number
-    nodeDefRoot?: NodeDefEntity
+    nodeDefRoot?: ArenaNodeDefEntity
     nodeDefKeys?: ArenaNodeDef<NodeDefType>[]
     summaryDefs?: ArenaNodeDef<NodeDefType>[]
     cycle?: string

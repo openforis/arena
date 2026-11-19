@@ -1,5 +1,5 @@
 import { RecordValidations } from '@openforis/arena-core'
-import type { ArenaRecordNode, ArenaValidation, ValidationResult } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaValidation, ArenaValidationResult } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResultUtils from '@core/validation/validationResult'
@@ -16,7 +16,7 @@ export const getValidationChildrenCountKey = (nodeParentUuid: string, nodeDefChi
   RecordValidations.getValidationChildrenCountKey({ nodeParentUuid, nodeDefChildUuid })
 export const isValidationFieldKeyChildrenCount = (field: string): boolean =>
   field.startsWith(prefixValidationFieldChildrenCount)
-export const isValidationResultErrorCount = (validationResult: ValidationResult): boolean =>
+export const isValidationResultErrorCount = (validationResult: ArenaValidationResult): boolean =>
   ValidationResultUtils.getKey(validationResult).startsWith('record.nodes.count.')
 export const getValidationCountNodeDefUuid = (field: string): string => field.split('_').at(-1)
 
@@ -30,7 +30,7 @@ export const newValidationRecordDuplicate = ({
 } = {}): ArenaValidation =>
   Validation.newInstance(unique, {
     // error stored with its key only (as before)
-    [keys.recordKeys]: Validation.newInstance(unique, {}, unique ? [] : [{ key: errorKey } as ValidationResult]),
+    [keys.recordKeys]: Validation.newInstance(unique, {}, unique ? [] : [{ key: errorKey } as ArenaValidationResult]),
   })
 
 // ===== READ

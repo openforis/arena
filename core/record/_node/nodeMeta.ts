@@ -1,4 +1,4 @@
-import { Nodes } from '@openforis/arena-core'
+import { RecordNodes } from '@openforis/arena-core'
 import type { ArenaRecordNode, ArenaRecordNodeMeta } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -44,25 +44,25 @@ const isChildApplicable =
   (childDefUuid: string) =>
   (node: ArenaRecordNode): boolean =>
     A.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])(node)
-const isDefaultValueApplied = (node: ArenaRecordNode): boolean => Nodes.isDefaultValueApplied(node)
-const isQualifierValueApplied = (node: ArenaRecordNode): boolean => Nodes.isQualifierValueApplied(node)
+const isDefaultValueApplied = (node: ArenaRecordNode): boolean => RecordNodes.isDefaultValueApplied(node)
+const isQualifierValueApplied = (node: ArenaRecordNode): boolean => RecordNodes.isQualifierValueApplied(node)
 
 const getHierarchy = (node: ArenaRecordNode): string[] => A.pathOr([], [keys.meta, metaKeys.hierarchy])(node)
 
 const isChildEditable =
   (childDefUuid: string) =>
   (node: ArenaRecordNode): boolean =>
-    Nodes.isChildEditable(node, childDefUuid)
+    RecordNodes.isChildEditable(node, childDefUuid)
 
 const isChildVisible =
   (childDefUuid: string) =>
   (node: ArenaRecordNode): boolean =>
-    Nodes.isChildVisible(node, childDefUuid)
+    RecordNodes.isChildVisible(node, childDefUuid)
 
 const isChildRequired =
   (childDefUuid: string) =>
   (node: ArenaRecordNode): boolean =>
-    Nodes.isChildRequired(node, childDefUuid)
+    RecordNodes.isChildRequired(node, childDefUuid)
 
 // Code metadata
 const getHierarchyCode = (node: ArenaRecordNode): string[] => A.pathOr([], [keys.meta, metaKeys.hierarchyCode])(node)

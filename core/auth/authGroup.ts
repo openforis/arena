@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { UserAuthGroup } from '@openforis/arena-core'
+import { ArenaUserAuthGroup } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -116,23 +116,23 @@ export const getSurveyUuid = A.prop(keys.surveyUuid)
 
 export const getSurveyId = A.prop(keys.surveyId)
 
-export const getPermissions = (group: UserAuthGroup): string[] =>
+export const getPermissions = (group: ArenaUserAuthGroup): string[] =>
   permissionsByGroupName[getName(group) as keyof typeof permissionsByGroupName] ?? []
 
 export const getRecordSteps = A.propOr([], keys.recordSteps)
 
 export const getRecordEditLevel = (step: string) => A.pipe(getRecordSteps, A.prop(step))
 
-export const isSystemAdminGroup = (group: UserAuthGroup): boolean => getName(group) === groupNames.systemAdmin
+export const isSystemAdminGroup = (group: ArenaUserAuthGroup): boolean => getName(group) === groupNames.systemAdmin
 
-export const isSurveyManagerGroup = (group: UserAuthGroup): boolean => getName(group) === groupNames.surveyManager
+export const isSurveyManagerGroup = (group: ArenaUserAuthGroup): boolean => getName(group) === groupNames.surveyManager
 
-export const isSurveyGroup = (group: UserAuthGroup): boolean =>
+export const isSurveyGroup = (group: ArenaUserAuthGroup): boolean =>
   !isSystemAdminGroup(group) && !isSurveyManagerGroup(group)
 
 export const { isEqual } = ObjectUtils
 
-export const sortGroups = (groups: UserAuthGroup[]): UserAuthGroup[] => {
+export const sortGroups = (groups: ArenaUserAuthGroup[]): ArenaUserAuthGroup[] => {
   const sortedGroups = [...groups]
   sortedGroups.sort((group1, group2) => {
     const sortOrder1 = sortedGroupNames.indexOf(getName(group1) as (typeof sortedGroupNames)[number])

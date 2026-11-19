@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefType, ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaNodeDefEntity } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -28,7 +28,7 @@ const baseColumnNamesAndTypes = [
   `${baseColumnSet.expFactor}     ${SQL.types.decimal}`,
 ]
 
-const generateTableName = ({ cycle, entityDef }: { cycle: string; entityDef: NodeDefEntity }): string =>
+const generateTableName = ({ cycle, entityDef }: { cycle: string; entityDef: ArenaNodeDefEntity }): string =>
   `${tableNamePrefix}_cycle_${cycle}_${NodeDef.getName(entityDef)}`
 
 export default class TableOlapData extends TableSurveyRdb {
@@ -36,8 +36,8 @@ export default class TableOlapData extends TableSurveyRdb {
   static readonly tableNamePrefix = tableNamePrefix
 
   private readonly _survey: ArenaSurvey
-  private readonly _entityDef: NodeDefEntity
-  private readonly _baseUnitDef: NodeDefEntity
+  private readonly _entityDef: ArenaNodeDefEntity
+  private readonly _baseUnitDef: ArenaNodeDefEntity
 
   constructor({
     survey,
@@ -47,8 +47,8 @@ export default class TableOlapData extends TableSurveyRdb {
   }: {
     survey: ArenaSurvey
     cycle: string
-    entityDef: NodeDefEntity
-    baseUnitDef: NodeDefEntity
+    entityDef: ArenaNodeDefEntity
+    baseUnitDef: ArenaNodeDefEntity
   }) {
     super(Survey.getId(survey), generateTableName({ cycle, entityDef }))
     this._survey = survey

@@ -1,11 +1,11 @@
-import { Nodes, Queue, Records } from '@openforis/arena-core'
+import { RecordNodes, Queue, Records } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
   ArenaNodeDef,
-  NodeDefCode,
+  ArenaNodeDefCode,
   NodeDefType,
-  NodePointer,
+  ArenaRecordNodePointer,
   ArenaSurvey,
   SurveyDependencyType,
 } from '@openforis/arena-core'
@@ -223,9 +223,9 @@ export const getDependentNodePointers =
     node: ArenaRecordNode,
     dependencyType: SurveyDependencyType | string,
     includeSelf = false,
-    filterFn: ((nodePointer: NodePointer) => boolean) | null = null
+    filterFn: ((nodePointer: ArenaRecordNodePointer) => boolean) | null = null
   ) =>
-  (record: ArenaRecord): NodePointer[] =>
+  (record: ArenaRecord): ArenaRecordNodePointer[] =>
     Records.getDependentNodePointers(
       survey,
       node,
@@ -243,7 +243,7 @@ export const getDependentCodeAttributes =
 export const getParentCodeAttribute =
   (_survey: ArenaSurvey, parentNode: ArenaRecordNode, nodeDef: AnyNodeDef) =>
   (record: ArenaRecord): ArenaRecordNode | undefined =>
-    Records.getParentCodeAttribute(parentNode, nodeDef as NodeDefCode)(record)
+    Records.getParentCodeAttribute(parentNode, nodeDef as ArenaNodeDefCode)(record)
 
 // Visits the ancestor code attributes in bottom-up order
 export const visitAncestorCodeAttributes =
@@ -318,7 +318,7 @@ export const findChildByKeyValues =
     }
     // key defs are computed once (and not for every sibling): siblings can be many (e.g. when importing data)
     const applicableKeyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey).filter((keyDef) =>
-      Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef))
+      RecordNodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef))
     )
     const hasKeyValues = (entity: ArenaRecordNode): boolean =>
       applicableKeyDefs.every((keyDef) => {

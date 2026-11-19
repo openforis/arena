@@ -4,12 +4,12 @@ import { db, DbClient } from '@server/db/db'
 import {
   NodeDefsFixer,
   Objects,
-  type NodeDefPropsWithLayout,
+  type ArenaNodeDefPropsWithLayout,
   type ArenaUser,
   type ArenaSurvey,
   type ArenaNodeDef,
   type NodeDefType,
-  type NodeDefEntity,
+  type ArenaNodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -47,7 +47,7 @@ const _persistNodeDefLayout = (
   client: DbClient = db
 ) => {
   const { uuid: nodeDefUuid, parentUuid, props } = nodeDef
-  const { layout } = props as NodeDefPropsWithLayout<unknown>
+  const { layout } = props as ArenaNodeDefPropsWithLayout<unknown>
   return NodeDefRepository.updateNodeDefProps({ surveyId, nodeDefUuid, parentUuid, props: { layout } }, client)
 }
 
@@ -399,7 +399,7 @@ const checkCanMoveNodeDef = ({
   targetParentNodeDef,
 }: {
   nodeDef: ArenaNodeDef<NodeDefType>
-  targetParentNodeDef: NodeDefEntity
+  targetParentNodeDef: ArenaNodeDefEntity
 }) => {
   if (NodeDef.isEntity(nodeDef)) {
     // Validation: prevent moving an entity into itself or into one of its descendants

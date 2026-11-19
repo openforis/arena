@@ -3,7 +3,7 @@ import type {
   ArenaNodeDef,
   NodeDefType,
   ArenaSurvey,
-  SurveyDependencyGraph,
+  ArenaSurveyDependencyGraph,
   SurveyDependencyType,
 } from '@openforis/arena-core'
 
@@ -27,8 +27,8 @@ const toCoreDependencyType = (dependencyType: DependencyType | null): SurveyDepe
   (dependencyType ?? undefined) as SurveyDependencyType | undefined
 
 // READ
-export const getDependencyGraph = (survey: ArenaSurvey): SurveyDependencyGraph =>
-  A.propOr({}, keys.dependencyGraph)(survey) as SurveyDependencyGraph
+export const getDependencyGraph = (survey: ArenaSurvey): ArenaSurveyDependencyGraph =>
+  A.propOr({}, keys.dependencyGraph)(survey) as ArenaSurveyDependencyGraph
 
 export const hasDependencyGraph = (survey: ArenaSurvey): boolean => {
   const graph = getDependencyGraph(survey)
@@ -82,7 +82,7 @@ export const isNodeDefDependentOn =
 
 // UPDATE
 export const assocDependencyGraph =
-  (dependencyGraph: SurveyDependencyGraph): SurveyUpdater =>
+  (dependencyGraph: ArenaSurveyDependencyGraph): SurveyUpdater =>
   (survey) =>
     A.assoc(keys.dependencyGraph, dependencyGraph, survey)
 
@@ -102,7 +102,7 @@ export const addNodeDefsDependencies =
     return surveyUpdated
   }
 
-export const buildGraph = async (survey: ArenaSurvey): Promise<SurveyDependencyGraph> => {
+export const buildGraph = async (survey: ArenaSurvey): Promise<ArenaSurveyDependencyGraph> => {
   const surveyUpdated = await Surveys.buildAndAssocDependencyGraph(survey)
   return getDependencyGraph(surveyUpdated)
 }

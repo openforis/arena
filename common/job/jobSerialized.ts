@@ -1,9 +1,9 @@
-import type { JobSerialized } from '@openforis/arena-core'
+import type { ArenaJobSerialized } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
 // serialized job or job summary (canceledByAdmin is set by arena)
-type Job = Omit<Partial<JobSerialized<any>>, 'status'> & { status?: string; canceledByAdmin?: boolean }
+type Job = Omit<Partial<ArenaJobSerialized<any>>, 'status'> & { status?: string; canceledByAdmin?: boolean }
 type JobGetter<T> = (job: Job | null | undefined) => T
 
 export const keys = {

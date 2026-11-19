@@ -1,4 +1,4 @@
-import type { ArenaChain, ArenaNodeDef, NodeDefType, ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaChain, ArenaNodeDef, NodeDefType, ArenaSurvey, ArenaNodeDefEntity } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
@@ -92,7 +92,7 @@ export const getAnalysisNodeDefs =
 
 export const getAnalysisEntities =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): NodeDefEntity[] => {
+  (survey: ArenaSurvey): ArenaNodeDefEntity[] => {
     const { root } = SurveyNodeDefs.getHierarchy()(survey)
 
     const clusteringNodeDefUuid = ChainSamplingDesign.getClusteringNodeDefUuid(Chain.getSamplingDesign(chain))
@@ -102,10 +102,10 @@ export const getAnalysisEntities =
       ((clusteringNodeDefUuid && NodeDef.getUuid(nodeDef) === clusteringNodeDefUuid) ||
         getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0)
 
-    const entities: NodeDefEntity[] = []
+    const entities: ArenaNodeDefEntity[] = []
     SurveyNodeDefs.traverseHierarchyItemSync(root, (nodeDef) => {
       if (isAnalysisEntity(nodeDef)) {
-        entities.push(nodeDef as NodeDefEntity)
+        entities.push(nodeDef as ArenaNodeDefEntity)
       }
     })
     return entities
@@ -113,15 +113,15 @@ export const getAnalysisEntities =
 
 export const getBaseUnitNodeDef =
   ({ chain }: { chain: ArenaChain }) =>
-  (survey: ArenaSurvey): NodeDefEntity | null => {
+  (survey: ArenaSurvey): ArenaNodeDefEntity | null => {
     const samplingDesign = Chain.getSamplingDesign(chain)
     const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
     // the base unit is an entity
-    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) as NodeDefEntity | null
+    return SurveyNodeDefs.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) as ArenaNodeDefEntity | null
   }
 
 export const getSamplingNodeDefChild =
-  ({ nodeDefParent, chainUuid }: { nodeDefParent: NodeDefEntity; chainUuid: string }) =>
+  ({ nodeDefParent, chainUuid }: { nodeDefParent: ArenaNodeDefEntity; chainUuid: string }) =>
   (survey: ArenaSurvey): AnyNodeDef | undefined =>
     SurveyNodeDefs.getNodeDefChildren({ nodeDef: nodeDefParent })(survey).find(
       (nodeDefChild) =>

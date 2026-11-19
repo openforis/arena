@@ -1,7 +1,7 @@
 import type {
   ArenaChain,
   ArenaNodeDef,
-  NodeDefEntityChildPosition,
+  ArenaNodeDefEntityChildPosition,
   NodeDefType,
   ArenaSurvey,
   ArenaUser,
@@ -427,7 +427,7 @@ const _insertClonedNodeDefsAndUpdateLayout = async ({
   const layoutRefParentChildren = NodeDefLayout.getLayoutChildren(defaultCycle)(layoutRefParentNodeDef)
   const layoutRefPosition = isLayoutRefParentForm
     ? layoutRefParentChildren.find(
-        (item): item is NodeDefEntityChildPosition => typeof item !== 'string' && item.i === layoutRefNodeDefUuid
+        (item): item is ArenaNodeDefEntityChildPosition => typeof item !== 'string' && item.i === layoutRefNodeDefUuid
       )
     : null
 

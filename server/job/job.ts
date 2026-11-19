@@ -1,5 +1,5 @@
 import { JobBase, JobStatus } from '@openforis/arena-core'
-import type { JobContext, ArenaUser } from '@openforis/arena-core'
+import type { ArenaJobContext, ArenaUser } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
@@ -12,7 +12,7 @@ const namespacedKeyRegex = /^[A-Za-z]+:/
 export type JobParams = { user: ArenaUser; surveyId?: number; [key: string]: any }
 
 // arena jobs: the context is not typed
-export default class Job<C extends JobContext = any, R = any> extends JobBase<C, R> {
+export default class Job<C extends ArenaJobContext = any, R = any> extends JobBase<C, R> {
   // original params reference, distinct from the (copied, shared) context
   params: JobParams
 

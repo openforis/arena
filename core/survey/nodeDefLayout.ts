@@ -1,9 +1,9 @@
 import { NodeDefs } from '@openforis/arena-core'
 import type {
   ArenaNodeDef,
-  NodeDefEntity,
-  NodeDefEntityChildPosition,
-  NodeDefEntityLayoutChildItem,
+  ArenaNodeDefEntity,
+  ArenaNodeDefEntityChildPosition,
+  ArenaNodeDefEntityLayoutChildItem,
   NodeDefType,
 } from '@openforis/arena-core'
 
@@ -18,7 +18,7 @@ type LayoutUpdater = (layout: Layout) => Layout
 type CyclePredicate = (cycle?: string) => (nodeDef: AnyNodeDef) => boolean
 
 // layout getters delegated to the arena-core NodeDefs ones (the same defaults); note: they use cycle '0' when cycle is not specified
-const asEntity = (nodeDef: AnyNodeDef): NodeDefEntity => nodeDef as NodeDefEntity
+const asEntity = (nodeDef: AnyNodeDef): ArenaNodeDefEntity => nodeDef as ArenaNodeDefEntity
 
 export const keys = {
   layout: 'layout',
@@ -126,12 +126,12 @@ export const getRenderType =
 
 export const getLayoutChildren =
   (cycle: string) =>
-  (nodeDef: AnyNodeDef): NodeDefEntityLayoutChildItem[] =>
+  (nodeDef: AnyNodeDef): ArenaNodeDefEntityLayoutChildItem[] =>
     NodeDefs.getLayoutChildren(cycle)(asEntity(nodeDef))
 
 // form layout children (grid items with position)
 export const getLayoutChildrenItems = (cycle: string) => (nodeDef: AnyNodeDef) =>
-  getLayoutChildren(cycle)(nodeDef) as NodeDefEntityChildPosition[]
+  getLayoutChildren(cycle)(nodeDef) as ArenaNodeDefEntityChildPosition[]
 
 export const getLayoutChildrenSorted = (cycle: string) => (nodeDef: AnyNodeDef) => {
   const layoutChildren = getLayoutChildrenItems(cycle)(nodeDef)
@@ -141,13 +141,13 @@ export const getLayoutChildrenSorted = (cycle: string) => (nodeDef: AnyNodeDef) 
 
 export const getLayoutChildrenCompressed =
   ({ cycle, hiddenDefsByUuid = {} }: { cycle: string; hiddenDefsByUuid?: Record<string, unknown> }) =>
-  (nodeDef: AnyNodeDef): NodeDefEntityChildPosition[] => {
+  (nodeDef: AnyNodeDef): ArenaNodeDefEntityChildPosition[] => {
     const layoutChildren = getLayoutChildrenSorted(cycle)(nodeDef)
     let itemPrev = { x: 0, y: 0, w: 0, h: 0, xOriginal: 0, yOriginal: 0 }
     return (
       layoutChildren
         // compact layout items
-        .reduce((layoutChildrenAcc: NodeDefEntityChildPosition[], item) => {
+        .reduce((layoutChildrenAcc: ArenaNodeDefEntityChildPosition[], item) => {
           const { i: childDefUuid, h, w, x: xOriginal, y: yOriginal } = item
 
           if (hiddenDefsByUuid[childDefUuid]) {
@@ -180,7 +180,7 @@ export const getLayoutChildrenCompressed =
 
 export const getLayoutChild =
   ({ cycle, childDefUuid }: { cycle: string; childDefUuid: string }) =>
-  (nodeDef: AnyNodeDef): NodeDefEntityChildPosition | undefined =>
+  (nodeDef: AnyNodeDef): ArenaNodeDefEntityChildPosition | undefined =>
     getLayoutChildrenItems(cycle)(nodeDef).find((l) => l.i === childDefUuid)
 
 export const isHiddenWhenNotRelevant: CyclePredicate = (cycle) => NodeDefs.isHiddenWhenNotRelevant(cycle)
@@ -314,7 +314,7 @@ export const dissocLayoutProp =
 export const assocIndexChildren = (cycle: string, indexChildren: string[]) =>
   assocLayoutProp(cycle, keys.indexChildren, indexChildren)
 
-export const assocLayoutChildren = (cycle: string, layoutChildren: NodeDefEntityLayoutChildItem[]) =>
+export const assocLayoutChildren = (cycle: string, layoutChildren: ArenaNodeDefEntityLayoutChildItem[]) =>
   assocLayoutProp(cycle, keys.layoutChildren, layoutChildren)
 
 export const dissocLayoutChildren = (cycle: string) => dissocLayoutProp(cycle, keys.layoutChildren)

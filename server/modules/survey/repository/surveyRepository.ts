@@ -1,4 +1,4 @@
-import type { ArenaUser, ArenaSurvey, SurveyDependencyGraph, SurveyProps } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, ArenaSurveyDependencyGraph, ArenaSurveyProps } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import camelize from 'camelize'
 
@@ -53,8 +53,8 @@ export const insertSurvey = (
     appVersion = null,
   }: {
     survey: ArenaSurvey
-    props?: Partial<SurveyProps>
-    propsDraft?: Partial<SurveyProps>
+    props?: Partial<ArenaSurveyProps>
+    propsDraft?: Partial<ArenaSurveyProps>
     appVersion?: string | null
   },
   client: DbClient = db
@@ -339,7 +339,7 @@ export const fetchSurveyAppVersionById = (surveyId: number, client: DbClient = d
  * @param {boolean} [params.draft] - Whether to fetch the draft props.
  * @param {boolean} [params.backup] - Whether to fetch both draft and published props.
  * @param {import('@server/db/db').DbClient} [client] - The database client.
- * @returns {Promise<import('@openforis/arena-core').Survey>} - The survey.
+ * @returns {Promise<import('@openforis/arena-core').ArenaSurvey>} - The survey.
  */
 export const fetchSurveyById = (
   { surveyId, draft = false, backup = false }: { surveyId: number; draft?: boolean; backup?: boolean },
@@ -471,7 +471,7 @@ export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
 
 export const updateSurveyDependencyGraphs = (
   surveyId: number,
-  dependencyGraphs: SurveyDependencyGraph,
+  dependencyGraphs: ArenaSurveyDependencyGraph,
   client: DbClient = db
 ) => {
   const meta = {

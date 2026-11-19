@@ -1,4 +1,4 @@
-import type { Labels, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaLabels, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -11,8 +11,8 @@ type AnyNodeDef = ArenaNodeDef<NodeDefType>
 const getName = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: AnyNodeDef }): string =>
   `${NodeDef.getName(estimatedOfNodeDef)}_ha`
 
-const getLabels = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: AnyNodeDef }): Labels => {
-  const labels: Labels = {}
+const getLabels = ({ estimatedOfNodeDef }: { estimatedOfNodeDef: AnyNodeDef }): ArenaLabels => {
+  const labels: ArenaLabels = {}
   for (const [lang, label] of Object.entries(NodeDef.getLabels(estimatedOfNodeDef))) {
     labels[lang] = `${label} (ha)`
   }

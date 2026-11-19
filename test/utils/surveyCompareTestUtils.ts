@@ -1,4 +1,4 @@
-import type { NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
@@ -52,7 +52,7 @@ export const compare = ({ source, target, sourceItems, targetItems }) =>
   })
 
 export const addAttribute = async ({ survey, parentName, name, type = NodeDef.nodeDefType.text, props = {} }) => {
-  const parent = Survey.getNodeDefByName(parentName)(survey) as NodeDefEntity
+  const parent = Survey.getNodeDefByName(parentName)(survey) as ArenaNodeDefEntity
   const nodeDef = NodeDef.newNodeDef(parent, type, [cycle], { name, ...props })
   delete nodeDef.temporary
   let surveyUpdated = Survey.assocNodeDef({ nodeDef })(survey)

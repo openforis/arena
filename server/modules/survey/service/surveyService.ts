@@ -4,7 +4,7 @@ import {
   NodeDefExpressionEvaluator,
   SurveyDocImages,
   SurveyDocPlace,
-  type SurveyDocImage,
+  type ArenaSurveyDocImage,
   type ArenaUser,
   type ArenaSurvey,
   type ArenaSurveyFile,
@@ -259,7 +259,7 @@ const isSurveyDocImageApplicable = async ({
 }: {
   user: ArenaUser
   survey: ArenaSurvey
-  imageFile: SurveyDocImage
+  imageFile: ArenaSurveyDocImage
 }) => {
   const applyIf = SurveyDocImages.getApplyIf(imageFile)
   if (!applyIf) return true
@@ -301,7 +301,7 @@ const exportSurveyDocument = async ({
     includeDeleted: false,
     includeAnalysis: false,
   })
-  const surveyDocImages = Survey.getSurveyDocImages(survey) as SurveyDocImage[]
+  const surveyDocImages = Survey.getSurveyDocImages(survey) as ArenaSurveyDocImage[]
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   const headerImageFileSummary = await findSurveyDocImageApplicable({

@@ -1,4 +1,4 @@
-import type { ArenaSurvey, NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaNodeDefEntity } from '@openforis/arena-core'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
 import { db, DbClient } from '@server/db/db'
@@ -9,7 +9,7 @@ export const createOlapDataTable = (
     cycle,
     baseUnitDef,
     entityDef,
-  }: { survey: ArenaSurvey; cycle: string; baseUnitDef: NodeDefEntity; entityDef: NodeDefEntity },
+  }: { survey: ArenaSurvey; cycle: string; baseUnitDef: ArenaNodeDefEntity; entityDef: ArenaNodeDefEntity },
   client: DbClient = db
 ) => {
   const table = new TableOlapData({ survey, cycle, baseUnitDef, entityDef })

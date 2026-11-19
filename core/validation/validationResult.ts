@@ -1,4 +1,4 @@
-import { ValidationResult, ValidationResults, ValidationSeverity } from '@openforis/arena-core'
+import { ArenaValidationResult, ValidationResults, ValidationSeverity } from '@openforis/arena-core'
 export { ValidationSeverity as severity } from '@openforis/arena-core'
 
 export const keys = {
@@ -17,8 +17,8 @@ export const newInstance = (
   params: Record<string, unknown> | null = null,
   sev: ValidationSeverity | null = null,
   messages: Record<string, string> | null = null
-): ValidationResult => {
-  const result: ValidationResult = {
+): ArenaValidationResult => {
+  const result: ArenaValidationResult = {
     key,
     valid: false,
   }

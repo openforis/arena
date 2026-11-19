@@ -1,10 +1,10 @@
-import type { AreaOfInterest } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest } from '@openforis/arena-core'
 
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import { SurveyAreaOfInterestValidator } from '@core/survey/surveyAreaOfInterestValidator'
 import * as Validation from '@core/validation/validation'
 
-const square: AreaOfInterest = {
+const square: ArenaAreaOfInterest = {
   type: 'Polygon',
   coordinates: [
     [

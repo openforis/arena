@@ -1,8 +1,8 @@
 import { NodeDefExpressionFactory } from '@openforis/arena-core'
 import type {
-  Labels,
+  ArenaLabels,
   ArenaNodeDefExpression,
-  NodeDefExpressionFactoryParams,
+  ArenaNodeDefExpressionFactoryParams,
   ValidationSeverity,
 } from '@openforis/arena-core'
 
@@ -33,7 +33,7 @@ type CreateExpressionParams = {
   expression?: string
   applyIf?: string
   severity?: Severity
-  messages?: Labels
+  messages?: ArenaLabels
   placeholder?: boolean
 }
 
@@ -51,7 +51,7 @@ export const createExpression = ({
     messages,
     placeholder,
     severity,
-  } as NodeDefExpressionFactoryParams)
+  } as ArenaNodeDefExpressionFactoryParams)
 
 export const createExpressionPlaceholder = (): NodeDefExpression => createExpression({ placeholder: true })
 
@@ -65,7 +65,8 @@ export const getExpression = (expression: NodeDefExpression): string =>
 export const getApplyIf = (expression: NodeDefExpression): string | undefined =>
   A.prop(keys.applyIf)(expression) as string | undefined
 
-export const getMessages = (expression: NodeDefExpression): Labels => A.propOr({}, keys.messages)(expression) as Labels
+export const getMessages = (expression: NodeDefExpression): ArenaLabels =>
+  A.propOr({}, keys.messages)(expression) as ArenaLabels
 
 export const getMessage =
   (lang: string, defaultValue = '') =>
@@ -112,5 +113,5 @@ export const { isEqual } = ObjectUtils
 // UPDATE
 export const assocExpression = (expression: string): ExpressionUpdater => assocProp(keys.expression, expression)
 export const assocApplyIf = (applyIf: string): ExpressionUpdater => assocProp(keys.applyIf, applyIf)
-export const assocMessages = (messages: Labels): ExpressionUpdater => assocProp(keys.messages, messages)
+export const assocMessages = (messages: ArenaLabels): ExpressionUpdater => assocProp(keys.messages, messages)
 export const assocSeverity = (severity: Severity): ExpressionUpdater => assocProp(keys.severity, severity)

@@ -3,15 +3,15 @@ import {
   RecordUpdater as CoreRecordUpdater,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordUpdateResult,
-  NodeValues,
+  RecordNodeValues,
   type ArenaRecord,
   type ArenaRecordNode,
-  type CategoryItemProvider,
+  type ArenaCategoryItemProvider,
   type ArenaNodeDef,
   type NodeDefType,
   type ArenaRecordNodeRefData,
   type ArenaSurvey,
-  type NodeDefEntity,
+  type ArenaNodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -44,7 +44,7 @@ const getKeyValuePairs = ({
   valuesByDefUuid,
 }: {
   survey: ArenaSurvey
-  entityDef: NodeDefEntity
+  entityDef: ArenaNodeDefEntity
   valuesByDefUuid: ValuesByDefUuid
 }): string => {
   const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
@@ -60,7 +60,7 @@ const getKeyValuePairs = ({
 }
 
 // the provider (optional in the evaluation context) is used only for items not found in the survey ref data
-type CategoryItemProviderParams = { survey: ArenaSurvey; categoryItemProvider?: CategoryItemProvider }
+type CategoryItemProviderParams = { survey: ArenaSurvey; categoryItemProvider?: ArenaCategoryItemProvider }
 
 const _getOrFetchCategoryItem = async ({
   survey,
@@ -72,7 +72,7 @@ const _getOrFetchCategoryItem = async ({
     return refDataItem
   }
   const value = Node.getValue(attribute)
-  const itemUuid = NodeValues.getValueItemUuid(value)
+  const itemUuid = RecordNodeValues.getValueItemUuid(value)
   if (!itemUuid) {
     return null
   }
@@ -93,7 +93,7 @@ const _getCodeAttributeCode = async ({
   attribute,
 }: CategoryItemProviderParams & { attribute: ArenaRecordNode }): Promise<string | null> => {
   const value = Node.getValue(attribute)
-  const code = NodeValues.getValueCode(value)
+  const code = RecordNodeValues.getValueCode(value)
   if (Objects.isNotEmpty(code)) {
     return code
   }
@@ -114,11 +114,11 @@ const _findCategoryItemUuidByAttribute = async ({
   attributeDef: AnyNodeDef
   value: any
 }): Promise<string | null> => {
-  const valueItemUuid = NodeValues.getValueItemUuid(value)
+  const valueItemUuid = RecordNodeValues.getValueItemUuid(value)
   if (valueItemUuid) {
     return valueItemUuid
   }
-  const code = NodeValues.getValueCode(value)
+  const code = RecordNodeValues.getValueCode(value)
   if (Objects.isEmpty(code)) {
     return null
   }
@@ -150,7 +150,7 @@ type ValueAdapter = (params: CategoryItemProviderParams & Omit<AttributeValuePar
 
 const _valueAdapterByType: Record<string, ValueAdapter> = {
   [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, record, parentNode, attributeDef, value }) => {
-    if (NodeValues.getValueItemUuid(value)) {
+    if (RecordNodeValues.getValueItemUuid(value)) {
       return value
     }
     const itemUuid = await _findCategoryItemUuidByAttribute({
@@ -165,7 +165,7 @@ const _valueAdapterByType: Record<string, ValueAdapter> = {
       const attributeName = NodeDef.getName(attributeDef)
       throw new SystemError('validationErrors:dataImport.invalidCode', {
         attributeName,
-        code: NodeValues.getValueCode(value),
+        code: RecordNodeValues.getValueCode(value),
       })
     }
     return Node.newNodeValueCode({ itemUuid })
@@ -239,7 +239,7 @@ const _addEntityAndKeyValues =
     sideEffect = false,
   }: {
     context: RecordEvaluationContext
-    entityDef: NodeDefEntity
+    entityDef: ArenaNodeDefEntity
     parentNode: ArenaRecordNode
     keyValuesByDefUuid: ValuesByDefUuid
     sideEffect?: boolean
@@ -318,7 +318,7 @@ const _getOrCreateEntityByKeys =
       return { entity, updateResult: null }
     }
     // entity doesn't exist
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey) as NodeDefEntity
+    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey) as ArenaNodeDefEntity
 
     if (!insertMissingNodes) {
       const keyValuePairs = getKeyValuePairs({ survey, entityDef, valuesByDefUuid })
@@ -416,7 +416,13 @@ const getOrCreateEntityByKeys =
     return { entity, updateResult }
   }
 
-const _canAttributeBeUpdated = ({ entityDef, attributeDef }: { entityDef: NodeDefEntity; attributeDef: AnyNodeDef }) =>
+const _canAttributeBeUpdated = ({
+  entityDef,
+  attributeDef,
+}: {
+  entityDef: ArenaNodeDefEntity
+  attributeDef: AnyNodeDef
+}) =>
   // consider only attributes descendants of the specified entity
   NodeDef.isDescendantOf(entityDef)(attributeDef) &&
   (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
@@ -470,7 +476,7 @@ const updateAttributesInEntityWithValues =
       updateResult.merge(dependentsUpdateResult)
     }
 
-    const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey) as NodeDefEntity
+    const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey) as ArenaNodeDefEntity
 
     for (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)

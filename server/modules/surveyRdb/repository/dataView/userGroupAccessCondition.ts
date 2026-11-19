@@ -1,4 +1,4 @@
-import { NodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import { ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDefUtils from '@core/survey/nodeDef'
@@ -7,7 +7,7 @@ import * as SurveyUtils from '@core/survey/survey'
 import { ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-type QualifierFilter = { nodeDef: NodeDef<NodeDefType>; value: unknown }
+type QualifierFilter = { nodeDef: ArenaNodeDef<NodeDefType>; value: unknown }
 
 // see SurveyManager.fetchUserGroupAccessFilters
 export type UserGroupAccessFilters = {

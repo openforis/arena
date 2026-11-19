@@ -1,4 +1,4 @@
-import { Authorizer, ArenaSurvey, User } from '@openforis/arena-core'
+import { Authorizer, ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import { TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
@@ -44,7 +44,7 @@ const _buildFilterBySurveyAttrs = ({
   }
 }
 
-const _buildRecordAccessFilters = async ({ user, survey }: { user: User; survey: ArenaSurvey }) => {
+const _buildRecordAccessFilters = async ({ user, survey }: { user: ArenaUser; survey: ArenaSurvey }) => {
   const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, Survey.getSurveyInfo(survey))
   const { own, readable } = await SurveyManager.fetchUserGroupAccessFilters({ user, survey })
   return {
@@ -71,7 +71,7 @@ export const resolveValidationReportParams = async ({
   surveyId,
   cycle,
   ...filterParams
-}: ValidationReportFilterParams & { user: User; surveyId: number; cycle: string }) => {
+}: ValidationReportFilterParams & { user: ArenaUser; surveyId: number; cycle: string }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   const rootDataView = new ViewDataNodeDef(survey, Survey.getNodeDefRoot(survey))
   return {

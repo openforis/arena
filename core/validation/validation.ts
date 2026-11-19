@@ -1,4 +1,10 @@
-import { Validation, ValidationFactory, ValidationFields, ValidationResult, Validations } from '@openforis/arena-core'
+import {
+  ArenaValidation,
+  ValidationFactory,
+  ArenaValidationFields,
+  ArenaValidationResult,
+  Validations,
+} from '@openforis/arena-core'
 
 // Const objectInvalid = {
 //   [keys.valid]: false,
@@ -27,9 +33,9 @@ export { ValidatorErrorKeys as messageKeys } from './_validator/validatorErrorKe
 
 export const newInstance = (
   valid: boolean = true,
-  fields: ValidationFields = {},
-  errors: ValidationResult[] = [],
-  warnings: ValidationResult[] = []
+  fields: ArenaValidationFields = {},
+  errors: ArenaValidationResult[] = [],
+  warnings: ArenaValidationResult[] = []
 ) => ValidationFactory.createInstance({ valid, fields, errors, warnings })
 
 export const {
@@ -67,5 +73,5 @@ export const {
 
 export const deleteFieldValidation =
   (field: string) =>
-  (validation: Validation): Validation =>
+  (validation: ArenaValidation): ArenaValidation =>
     Validations.dissocFieldValidation(field, { sideEffect: true })(validation)

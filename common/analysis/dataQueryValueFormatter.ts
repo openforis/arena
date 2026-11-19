@@ -1,5 +1,5 @@
 import { Numbers } from '@openforis/arena-core'
-import type { I18n, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaI18n, ArenaNodeDef, NodeDefType, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -13,7 +13,7 @@ const MAX_AGGREGATE_VALUE_DECIMAL_DIGITS = 3
 type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 type FormatParams = {
-  i18n: I18n
+  i18n: ArenaI18n
   survey: ArenaSurvey
   nodeDef: AnyNodeDef
   value: any
@@ -61,7 +61,7 @@ const formatDataItemKey = ({
   nodeDef,
   dataItem,
 }: {
-  i18n: I18n
+  i18n: ArenaI18n
   survey: ArenaSurvey
   nodeDef: AnyNodeDef
   dataItem: Record<string, any>

@@ -1,11 +1,15 @@
 import * as A from '@core/arena'
 
-import { Nodes, RecordExpressionEvaluator, RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
+import {
+  RecordNodes,
+  RecordExpressionEvaluator,
+  RecordNodesUpdater as CoreRecordNodesUpdater,
+} from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
   ArenaNodeDef,
-  NodeDefExpression,
+  ArenaNodeDefExpression,
   NodeDefType,
   ArenaSurvey,
   ArenaUser,
@@ -48,7 +52,7 @@ const _recomputeBooleanState = async ({
   assocValue,
 }: UserSurveyRecord & {
   nodeDefs: AnyNodeDef[]
-  getExpressions: (nodeDef: AnyNodeDef) => NodeDefExpression[]
+  getExpressions: (nodeDef: AnyNodeDef) => ArenaNodeDefExpression[]
   assocValue: ChildStateUpdater
 }): Promise<ArenaRecord> => {
   const evaluator = new RecordExpressionEvaluator()
@@ -131,7 +135,8 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSur
     record,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getApplicable,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildApplicability(parentNode, nodeDefUuid, value),
+    assocValue: ({ parentNode, nodeDefUuid, value }) =>
+      RecordNodes.assocChildApplicability(parentNode, nodeDefUuid, value),
   })
 
   recordUpdated = await _recomputeBooleanState({
@@ -140,7 +145,7 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSur
     record: recordUpdated,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getVisibleIf,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildVisible(parentNode, nodeDefUuid, value),
+    assocValue: ({ parentNode, nodeDefUuid, value }) => RecordNodes.assocChildVisible(parentNode, nodeDefUuid, value),
   })
 
   recordUpdated = await _recomputeBooleanState({
@@ -149,7 +154,7 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSur
     record: recordUpdated,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getEditableIf,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildEditable(parentNode, nodeDefUuid, value),
+    assocValue: ({ parentNode, nodeDefUuid, value }) => RecordNodes.assocChildEditable(parentNode, nodeDefUuid, value),
   })
 
   // Default values are recomputed last, using the applicability just recomputed above

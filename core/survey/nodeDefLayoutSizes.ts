@@ -1,4 +1,4 @@
-import type { ArenaNodeDef, NodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, ArenaNodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -8,7 +8,7 @@ type GridItemHeightFn = (params: { nodeDef: AnyNodeDef }) => number
 const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE: Partial<Record<string, GridItemHeightFn>> = {
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const minHeight = 2
-    const additionalFieldsNum = NodeDef.getCoordinateAdditionalFields(nodeDef as NodeDefCoordinate).length
+    const additionalFieldsNum = NodeDef.getCoordinateAdditionalFields(nodeDef as ArenaNodeDefCoordinate).length
     if (additionalFieldsNum === 0) return minHeight
     // 1 additional field => height += 1
     // 2 or 3 additional fields => height += 2

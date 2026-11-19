@@ -1,9 +1,9 @@
 import type {
   ArenaNodeDef,
-  NodeDefEntityChildPosition,
+  ArenaNodeDefEntityChildPosition,
   NodeDefType,
   ArenaSurvey,
-  NodeDefEntity,
+  ArenaNodeDefEntity,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -28,7 +28,7 @@ const _calculateChildPagesIndex = ({
 }: {
   survey: ArenaSurvey
   cycle: string
-  nodeDefParent: NodeDefEntity
+  nodeDefParent: ArenaNodeDefEntity
 }): string[] => {
   const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren({ nodeDef: nodeDefParent })(survey).filter(
     (childDef) =>
@@ -214,16 +214,16 @@ const _updateParentLayoutForCycle = ({
   nodeDef,
   cycle,
   updateFn,
-}: ParentLayoutCycleParams & { updateFn: (params: ParentLayoutCycleParams) => LayoutCycle }): NodeDefEntity => {
+}: ParentLayoutCycleParams & { updateFn: (params: ParentLayoutCycleParams) => LayoutCycle }): ArenaNodeDefEntity => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
   return NodeDef.updateLayout((layout) => {
     const layoutCycleUpdated = updateFn({ survey, cycle, nodeDef })
     const layoutUpdated = NodeDefLayout.assocLayoutCycle(cycle, layoutCycleUpdated)(layout)
     return layoutUpdated
-  })(nodeDefParent) as NodeDefEntity
+  })(nodeDefParent) as ArenaNodeDefEntity
 }
 
-type ParentParams = { survey: ArenaSurvey; cycle: string; nodeDefParent: NodeDefEntity }
+type ParentParams = { survey: ArenaSurvey; cycle: string; nodeDefParent: ArenaNodeDefEntity }
 
 const _getOrInitializeChildPagesIndex = ({ survey, cycle, nodeDefParent }: ParentParams): string[] => {
   const childrenFormsIndexPrev = NodeDefLayout.getIndexChildren(cycle)(nodeDefParent)
@@ -274,7 +274,7 @@ const _addNodeDefInParentLayoutCycle = ({
   }
   // render as form in current page (grid layout)
   // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
-  const layoutItemsPrev = layoutChildrenPrev as NodeDefEntityChildPosition[]
+  const layoutItemsPrev = layoutChildrenPrev as ArenaNodeDefEntityChildPosition[]
   const y = layoutItemsPrev.reduce((accY, layoutChild) => A.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
@@ -446,7 +446,7 @@ export const adjustLayoutChildrenHeights = ({
       const layoutCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDef)
       const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDef)
 
-      let prevItem: Pick<NodeDefEntityChildPosition, 'x' | 'y'> = { x: 0, y: 0 }
+      let prevItem: Pick<ArenaNodeDefEntityChildPosition, 'x' | 'y'> = { x: 0, y: 0 }
       let prevRowHeight = 0
       let prevRowMinY = 0
 
@@ -455,49 +455,52 @@ export const adjustLayoutChildrenHeights = ({
       let currentRowStartingY = 0
       let currentRowYOffset = 0
 
-      const layoutChildrenAdjusted = layoutChildren.reduce((layoutChildrenAcc: NodeDefEntityChildPosition[], item) => {
-        const { i: itemNodeDefUuid, h: hOriginal, w, x, y: yOriginal } = item
-        const itemNodeDef = SurveyNodeDefs.getNodeDefByUuid(itemNodeDefUuid)(survey)
+      const layoutChildrenAdjusted = layoutChildren.reduce(
+        (layoutChildrenAcc: ArenaNodeDefEntityChildPosition[], item) => {
+          const { i: itemNodeDefUuid, h: hOriginal, w, x, y: yOriginal } = item
+          const itemNodeDef = SurveyNodeDefs.getNodeDefByUuid(itemNodeDefUuid)(survey)
 
-        const sameRowOfPreviousItem = x > prevItem.x
+          const sameRowOfPreviousItem = x > prevItem.x
 
-        if (!sameRowOfPreviousItem) {
-          prevRowHeight = currentRowHeight
-          prevRowMinY = currentRowStartingY
+          if (!sameRowOfPreviousItem) {
+            prevRowHeight = currentRowHeight
+            prevRowMinY = currentRowStartingY
 
-          const rowHeightDiff = currentRowHeightOriginal - currentRowHeight
-          if (rowHeightDiff > 0) {
-            // prev row has been shrinked
-            currentRowYOffset = currentRowYOffset + rowHeightDiff
+            const rowHeightDiff = currentRowHeightOriginal - currentRowHeight
+            if (rowHeightDiff > 0) {
+              // prev row has been shrinked
+              currentRowYOffset = currentRowYOffset + rowHeightDiff
+            }
+            currentRowHeightOriginal = 0
+            currentRowHeight = 0
+            currentRowStartingY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
           }
-          currentRowHeightOriginal = 0
-          currentRowHeight = 0
-          currentRowStartingY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
-        }
 
-        const hMin = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef: itemNodeDef })
-        const hMax = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: itemNodeDef })
-        let h = hOriginal
-        if (h < hMin) h = hMin
-        if (hMax && h > hMax) h = hMax
+          const hMin = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef: itemNodeDef })
+          const hMax = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: itemNodeDef })
+          let h = hOriginal
+          if (h < hMin) h = hMin
+          if (hMax && h > hMax) h = hMax
 
-        const y =
-          (sameRowOfPreviousItem
-            ? // item can have the same y of the previous one
-              Math.max(yOriginal, prevItem.y)
-            : // item in another row
-              Math.max(yOriginal, prevRowMinY + prevRowHeight)) - currentRowYOffset
+          const y =
+            (sameRowOfPreviousItem
+              ? // item can have the same y of the previous one
+                Math.max(yOriginal, prevItem.y)
+              : // item in another row
+                Math.max(yOriginal, prevRowMinY + prevRowHeight)) - currentRowYOffset
 
-        currentRowHeightOriginal = Math.max(currentRowHeightOriginal, y + hOriginal - currentRowStartingY)
-        currentRowHeight = Math.max(currentRowHeight, y + h - currentRowStartingY)
-        currentRowStartingY = Math.min(currentRowStartingY, y)
+          currentRowHeightOriginal = Math.max(currentRowHeightOriginal, y + hOriginal - currentRowStartingY)
+          currentRowHeight = Math.max(currentRowHeight, y + h - currentRowStartingY)
+          currentRowStartingY = Math.min(currentRowStartingY, y)
 
-        const itemUpdated = { ...item, h, w, x, y }
-        prevItem = itemUpdated
+          const itemUpdated = { ...item, h, w, x, y }
+          prevItem = itemUpdated
 
-        layoutChildrenAcc.push(itemUpdated)
-        return layoutChildrenAcc
-      }, [])
+          layoutChildrenAcc.push(itemUpdated)
+          return layoutChildrenAcc
+        },
+        []
+      )
       acc[cycle] = { ...layoutCycle, [NodeDefLayout.keys.layoutChildren]: layoutChildrenAdjusted }
       return acc
     },

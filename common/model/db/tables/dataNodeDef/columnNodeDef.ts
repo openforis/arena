@@ -1,7 +1,7 @@
 import toSnakeCase from 'to-snake-case'
 
-import { NodeDefs, NodeValues } from '@openforis/arena-core'
-import type { ArenaNodeDef, NodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
+import { NodeDefs, RecordNodeValues } from '@openforis/arena-core'
+import type { ArenaNodeDef, ArenaNodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import { Query } from '../../../query'
@@ -25,13 +25,13 @@ const columnNamesSuffixGetterByType: Partial<Record<string, ByNodeDefGetter>> = 
   [nodeDefType.code]: () => ['', columnSuffixCodeLabel],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const suffixes = ['', '_x', '_y', '_srs']
-    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as NodeDefCoordinate)
+    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as ArenaNodeDefCoordinate)
     suffixes.push(...additionalFields.map((field) => `_${toSnakeCase(field)}`))
     return suffixes
   },
   [nodeDefType.taxon]: ({ nodeDef }) => {
     const colNames = ['', columnSuffixTaxonScientificName]
-    if (NodeDefs.isFieldVisible(NodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
+    if (NodeDefs.isFieldVisible(RecordNodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
       colNames.push(columnSuffixTaxonVernacularName)
     }
     return colNames
@@ -44,7 +44,7 @@ const colTypesGetterByType: Partial<Record<string, ByNodeDefGetter>> = {
   [nodeDefType.code]: () => [SQL.types.varchar, SQL.types.varchar],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const types: string[] = [SQL.types.geometryPoint, SQL.types.decimal, SQL.types.decimal, SQL.types.varchar]
-    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as NodeDefCoordinate)
+    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef as ArenaNodeDefCoordinate)
     types.push(...additionalFields.map(() => SQL.types.decimal)) // additional fields are all numeric
     return types
   },
@@ -56,7 +56,7 @@ const colTypesGetterByType: Partial<Record<string, ByNodeDefGetter>> = {
   [nodeDefType.integer]: () => [SQL.types.bigint],
   [nodeDefType.taxon]: ({ nodeDef }) => {
     const colTypes = [SQL.types.varchar, SQL.types.varchar]
-    if (NodeDefs.isFieldVisible(NodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
+    if (NodeDefs.isFieldVisible(RecordNodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
       colTypes.push(SQL.types.varchar)
     }
     return colTypes

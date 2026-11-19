@@ -4,7 +4,7 @@ import type {
   ArenaCategoryItem,
   ArenaRecordNode,
   ArenaNodeDef,
-  NodeDefTaxon,
+  ArenaNodeDefTaxon,
   NodeDefType,
   ArenaSurvey,
   ArenaTaxon,
@@ -115,7 +115,12 @@ export const getTaxonVernacularNameUuid =
 export const includesTaxonVernacularName =
   (nodeDef: AnyNodeDef, taxonCode: string, vernacularNameUuid: string) =>
   (survey: ArenaSurvey): boolean =>
-    Surveys.includesTaxonVernacularName({ survey, nodeDef: nodeDef as NodeDefTaxon, taxonCode, vernacularNameUuid })
+    Surveys.includesTaxonVernacularName({
+      survey,
+      nodeDef: nodeDef as ArenaNodeDefTaxon,
+      taxonCode,
+      vernacularNameUuid,
+    })
 
 // ====== UPDATE
 

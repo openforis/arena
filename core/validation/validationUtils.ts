@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
 import {
-  I18n as I18nCore,
+  ArenaI18n,
   LanguageCode,
   ValidationSeverity,
   type ArenaSurvey,
@@ -14,7 +14,7 @@ import {
   type ArenaValidationResult,
 } from '@openforis/arena-core'
 
-type I18n = I18nCore & { language: string }
+type I18n = ArenaI18n & { language: string }
 
 const getValidationCountErrorText =
   ({ survey, i18n }: { survey: ArenaSurvey; i18n: I18n }) =>

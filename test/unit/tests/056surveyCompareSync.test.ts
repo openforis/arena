@@ -1,4 +1,4 @@
-import type { NodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
@@ -44,7 +44,7 @@ const moveNodeDef = ({ survey, name, parentName }) => {
   let surveyUpdated = survey
   const oldParent = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesDeleted: cycles })
   surveyUpdated = Survey.mergeNodeDefs({ [NodeDef.getUuid(oldParent)]: oldParent })(surveyUpdated)
-  const newParent = Survey.getNodeDefByName(parentName)(surveyUpdated) as NodeDefEntity
+  const newParent = Survey.getNodeDefByName(parentName)(surveyUpdated) as ArenaNodeDefEntity
   const nodeDefMoved = NodeDef.changeParentEntity({ targetParentNodeDef: newParent })(nodeDef)
   surveyUpdated = Survey.mergeNodeDefs({ [NodeDef.getUuid(nodeDef)]: nodeDefMoved })(surveyUpdated)
   const newParentUpdated = NodeDefLayoutUpdater.updateParentLayout({

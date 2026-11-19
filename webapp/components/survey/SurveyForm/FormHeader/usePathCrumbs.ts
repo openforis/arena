@@ -1,4 +1,4 @@
-import { NodeValueFormatter } from '@openforis/arena-core'
+import { RecordNodeValueFormatter } from '@openforis/arena-core'
 import type { LanguageCode, ArenaRecordNode, ArenaNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -28,7 +28,7 @@ const getNodeValue = ({
   node: ArenaRecordNode
   lang: LanguageCode
 }) =>
-  NodeValueFormatter.format({
+  RecordNodeValueFormatter.format({
     survey,
     cycle,
     nodeDef,

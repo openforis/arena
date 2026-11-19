@@ -2,17 +2,17 @@ import {
   RecordValidator,
   RecordUpdateResult,
   RecordNodesUpdater as CoreRecordNodesUpdater,
-  NodeValues,
+  RecordNodeValues,
 } from '@openforis/arena-core'
 import type {
   ArenaRecord,
   ArenaRecordNode,
-  CategoryItemProvider,
+  ArenaCategoryItemProvider,
   ArenaNodeDef,
   NodeDefType,
-  NodesMap,
+  ArenaRecordNodesMap,
   ArenaSurvey,
-  TaxonProvider,
+  ArenaTaxonProvider,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -40,14 +40,14 @@ const _populateRefDataForCodeNode = async ({
   nodeDef,
   value,
   categoryItemProvider,
-}: PopulateRefDataParams & { categoryItemProvider?: CategoryItemProvider }): Promise<void> => {
+}: PopulateRefDataParams & { categoryItemProvider?: ArenaCategoryItemProvider }): Promise<void> => {
   if (!categoryItemProvider || NodeRefData.getCategoryItem(node)) return
 
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
   if (!category || !Category.isBigCategory(category)) return
 
-  const itemUuid = NodeValues.getValueItemUuid(value)
+  const itemUuid = RecordNodeValues.getValueItemUuid(value)
   if (!itemUuid) return
 
   const item = await categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
@@ -62,14 +62,14 @@ const _populateRefDataForTaxonNode = async ({
   nodeDef,
   value,
   taxonProvider,
-}: PopulateRefDataParams & { taxonProvider?: TaxonProvider }): Promise<void> => {
+}: PopulateRefDataParams & { taxonProvider?: ArenaTaxonProvider }): Promise<void> => {
   if (!taxonProvider || NodeRefData.getTaxon(node)) return
 
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
   if (!taxonomy || !Taxonomy.isBigTaxonomy(taxonomy)) return
 
-  const taxonUuid = NodeValues.getTaxonUuid(value)
+  const taxonUuid = RecordNodeValues.getTaxonUuid(value)
   if (!taxonUuid) return
 
   // draft not specified before: the providers default it to false (published taxa)
@@ -91,9 +91,9 @@ const _populateRefDataForBigNodes = async ({
   taxonProvider,
 }: {
   survey: ArenaSurvey
-  nodes: NodesMap
-  categoryItemProvider?: CategoryItemProvider
-  taxonProvider?: TaxonProvider
+  nodes: ArenaRecordNodesMap
+  categoryItemProvider?: ArenaCategoryItemProvider
+  taxonProvider?: ArenaTaxonProvider
 }): Promise<void> => {
   for (const node of Object.values(nodes)) {
     if (Node.isValueBlank(node)) continue
@@ -125,8 +125,8 @@ export const afterNodesUpdate = async ({
   ...otherParams
 }: {
   record: ArenaRecord
-  nodes: NodesMap
-  passiveNodes?: NodesMap
+  nodes: ArenaRecordNodesMap
+  passiveNodes?: ArenaRecordNodesMap
   sideEffect?: boolean
   [contextParam: string]: unknown
 }): Promise<RecordUpdateResult> => {
