@@ -65,12 +65,15 @@ export const sendAssistantMessage = async (page: Page, text: string): Promise<vo
   const panel = assistantPanel(page)
   const userMessages = panel.getByTestId(TestId.aiAssistant.message('user'))
   const home = panel.getByTestId(TestId.aiAssistant.startScreen)
+  const input = panel.getByTestId(TestId.aiAssistant.input)
+  // the panel may still be loading: the start screen shown a moment later would be missed
+  await expect(home.or(input).first()).toBeVisible()
   if (await home.isVisible()) {
     await home.getByTestId(TestId.aiAssistant.homeNewConversationBtn).click()
-    await expect(panel.getByTestId(TestId.aiAssistant.input)).toBeVisible()
+    await expect(input).toBeVisible()
   }
   const before = await userMessages.count()
-  await panel.getByTestId(TestId.aiAssistant.input).fill(text)
+  await input.fill(text)
   await panel.getByTestId(TestId.aiAssistant.sendBtn).click()
   await expect(userMessages).toHaveCount(before + 1)
 }
