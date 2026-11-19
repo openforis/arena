@@ -99,7 +99,17 @@ const dependsOnMissingCreate = (
   return createdInSet(neededUuid)
 }
 
-const persistGroup = async (group: Group, deps: ApplierDeps): Promise<void> => {
+// why the remaining groups must not be applied, or null
+const getStopReason = (changeSet: ChangeSet, deps: ApplierDeps): string | null => {
+  // another survey was opened meanwhile: the next saves would go to it
+  if (Survey.getId(deps.getSurvey()) !== changeSet.surveyId) return 'surveyChanged'
+  // the user edited the designer while a save was running
+  if (deps.isSurveyDirty()) return 'surveyDirty'
+  return null
+}
+
+// saves the group, then updates the store unless the survey changed or became dirty meanwhile (returned as stop reason)
+const persistGroup = async (group: Group, changeSet: ChangeSet, deps: ApplierDeps): Promise<string | null> => {
   const [first, ...rest] = group.operations
   const isCreate = first.type === 'nodeDef.create'
   const before = isCreate ? null : Survey.getNodeDefByUuid(group.uuid)(deps.getSurvey())
@@ -108,7 +118,6 @@ const persistGroup = async (group: Group, deps: ApplierDeps): Promise<void> => {
   const nodeDef = changes.reduce((acc, op) => applyOperationToNodeDef(acc, op, deps.getSurvey()), base)
   if (isCreate) {
     await deps.postNodeDef(nodeDef)
-    deps.onNodeDefCreated(nodeDef)
   } else {
     const { props, propsAdvanced } = getChangedProps(before, nodeDef)
     await deps.putNodeDefProps({
@@ -117,9 +126,14 @@ const persistGroup = async (group: Group, deps: ApplierDeps): Promise<void> => {
       props,
       propsAdvanced,
     })
-    deps.onNodeDefUpdated(nodeDef, before)
   }
+  // the store dispatches below clear the dirty flag: they would hide the user's edit
+  const stopReason = getStopReason(changeSet, deps)
+  if (stopReason) return stopReason
+  if (isCreate) deps.onNodeDefCreated(nodeDef)
+  else deps.onNodeDefUpdated(nodeDef, before)
   deps.onNodeDefSaved({ nodeDef, nodeDefParent: Survey.getNodeDefParent(nodeDef)(deps.getSurvey()) })
+  return null
 }
 
 const applyGroups = async (
@@ -129,15 +143,11 @@ const applyGroups = async (
   results: Map<string, OperationResult>
 ) => {
   const appliedCreates = new Set<string>()
-  for (const [index, group] of groups.entries()) {
-    // another survey was opened meanwhile: the next saves would go to it
-    if (Survey.getId(deps.getSurvey()) !== changeSet.surveyId) {
-      setGroupStatus(results, group, 'skipped', 'surveyChanged')
-      continue
-    }
-    // the designer may have become dirty while earlier groups were saving
-    if (index > 0 && deps.isSurveyDirty()) {
-      setGroupStatus(results, group, 'skipped', 'surveyDirty')
+  let stopReason: string | null = null
+  for (const group of groups) {
+    stopReason ??= getStopReason(changeSet, deps)
+    if (stopReason) {
+      setGroupStatus(results, group, 'skipped', stopReason)
       continue
     }
     if (dependsOnMissingCreate(group, deps.getSurvey(), appliedCreates, changeSet)) {
@@ -145,12 +155,15 @@ const applyGroups = async (
       continue
     }
     try {
-      await persistGroup(group, deps)
+      // saved on the server even when a stop reason comes back
+      stopReason = await persistGroup(group, changeSet, deps)
       if (group.operations[0].type === 'nodeDef.create') appliedCreates.add(group.uuid)
       setGroupStatus(results, group, 'applied')
     } catch (error) {
       const { message, params } = getRequestFailure(error)
       setGroupStatus(results, group, 'failed', message, params)
+      // later groups may reference it (e.g. an expression naming a definition whose create failed)
+      stopReason = 'dependencyNotApplied'
     }
   }
 }

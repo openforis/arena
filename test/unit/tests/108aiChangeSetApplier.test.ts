@@ -21,9 +21,10 @@ const createFakeDeps = (overrides: Partial<ApplierDeps> = {}) => {
   let survey = initialSurvey
   const calls: [string, any][] = []
   const prevDefs: any[] = []
+  let dirty = false
   const deps: ApplierDeps = {
     getSurvey: () => survey,
-    isSurveyDirty: () => false,
+    isSurveyDirty: () => dirty,
     postNodeDef: async (nodeDef) => {
       calls.push(['post', NodeDef.getName(nodeDef)])
     },
@@ -38,13 +39,22 @@ const createFakeDeps = (overrides: Partial<ApplierDeps> = {}) => {
       calls.push(['updated', NodeDef.getName(nodeDef)])
       prevDefs.push(prevNodeDef)
       survey = Survey.assocNodeDef({ nodeDef })(survey)
+      dirty = false
     },
     onNodeDefSaved: ({ nodeDef, nodeDefParent }) => {
+      dirty = false
       calls.push(['saved', `${NodeDef.getName(nodeDef)} < ${nodeDefParent ? NodeDef.getName(nodeDefParent) : '-'}`])
     },
     ...overrides,
   }
-  return { deps, calls, prevDefs, setSurvey: (value: any) => (survey = value), getSurvey: () => survey }
+  return {
+    deps,
+    calls,
+    prevDefs,
+    setSurvey: (value: any) => (survey = value),
+    getSurvey: () => survey,
+    setDirty: (value: boolean) => (dirty = value),
+  }
 }
 
 const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(initialSurvey, name))
@@ -171,20 +181,21 @@ describe('applyChangeSet', () => {
     expect(prevDefs.map((def) => NodeDef.getName(def))).toEqual(['cluster_notes'])
   })
 
-  test('becoming dirty mid-way skips the remaining groups', async () => {
+  test('becoming dirty during a save keeps the edit dirty and skips the remaining groups', async () => {
     const operations = buildOperations()
-    let dirty = false
-    const { deps } = createFakeDeps({
-      isSurveyDirty: () => dirty,
-      putNodeDefProps: async () => {
-        dirty = true
-      },
-    })
+    const { deps, calls, setDirty } = createFakeDeps()
+    // the user edits the designer while the first PUT runs
+    deps.putNodeDefProps = async (params) => {
+      calls.push(['put', params])
+      setDirty(true)
+    }
     const results = await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['o3', 'o5'], deps })
     expect(results).toEqual([
       { id: 'o3', status: 'applied' },
       { id: 'o5', status: 'skipped', message: 'surveyDirty' },
     ])
+    expect(calls.map(([type]) => type)).toEqual(['put'])
+    expect(deps.isSurveyDirty()).toBe(true)
   })
 
   test('switching to another survey mid-way skips the remaining groups', async () => {
@@ -217,7 +228,7 @@ describe('applyChangeSet', () => {
     expect(calls).toEqual([])
   })
 
-  test('a failed create skips its dependants; other node definitions continue', async () => {
+  test('a failed create skips all the remaining groups', async () => {
     const operations = buildOperations()
     const { deps, calls } = createFakeDeps({
       postNodeDef: async () => {
@@ -228,9 +239,24 @@ describe('applyChangeSet', () => {
     expect(results).toEqual([
       { id: 'o1', status: 'failed', message: 'aiAssistant.card.applyFailed', params: { message: 'Server error' } },
       { id: 'o2', status: 'skipped', message: 'dependencyNotApplied' },
-      { id: 'o3', status: 'applied' },
+      { id: 'o3', status: 'skipped', message: 'dependencyNotApplied' },
     ])
-    expect(calls.map(([type]) => type)).toEqual(['put', 'updated', 'saved'])
+    expect(calls).toEqual([])
+  })
+
+  test('a failed update skips the remaining groups, which may reference it', async () => {
+    const operations = buildOperations()
+    const { deps, calls } = createFakeDeps({
+      putNodeDefProps: async () => {
+        throw new Error('Server error')
+      },
+    })
+    const results = await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['o3', 'o5'], deps })
+    expect(results).toEqual([
+      { id: 'o3', status: 'failed', message: 'aiAssistant.card.applyFailed', params: { message: 'Server error' } },
+      { id: 'o5', status: 'skipped', message: 'dependencyNotApplied' },
+    ])
+    expect(calls).toEqual([])
   })
 
   test('an operation on a new definition whose create is not selected is skipped', async () => {
