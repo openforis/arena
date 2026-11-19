@@ -23,7 +23,6 @@ export default {
   'sourceAdmin-default': 'el valor predeterminado de la plataforma',
   notConfigured:
     'La IA no esta configurada para su cuenta o este despliegue. Configure un proveedor personal a continuacion o contacte al administrador.',
-  featuresDisabled: 'Las funciones de IA estan deshabilitadas en este despliegue.',
   encryptionMissing:
     'En el despliegue falta AI_USER_KEY_ENCRYPTION_SECRET; las claves API personales no se pueden guardar hasta que un administrador lo configure.',
 

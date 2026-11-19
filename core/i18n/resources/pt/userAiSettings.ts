@@ -23,7 +23,6 @@ export default {
   'sourceAdmin-default': 'o padrao da plataforma',
   notConfigured:
     'A IA nao esta configurada para sua conta ou para esta implantacao. Configure um provedor pessoal abaixo ou contate seu administrador.',
-  featuresDisabled: 'Os recursos de IA estao desativados nesta implantacao.',
   encryptionMissing:
     'A implantacao nao possui AI_USER_KEY_ENCRYPTION_SECRET; chaves API pessoais nao podem ser salvas ate que um administrador configure isso.',
 
