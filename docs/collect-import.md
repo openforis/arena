@@ -11,12 +11,12 @@ An ODK importer mirroring this one lives in `server/modules/odkImport/` (design:
 
 | Flow                                                                                                                            | API (handler file)                                                                              | Job                                                                                                   |
 | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| New survey from a Collect file (survey creation form, "Collect" source)                                                         | `POST /survey/collect-import` (`server/modules/collectImport/api/collectImportApi.js`)          | `CollectImportJob` (`server/modules/collectImport/service/collectImport/collectImportJob.js`)         |
-| More records into a survey previously imported from Collect (`webapp/views/App/views/Data/DataImport/DataImportCollectView.js`) | `POST /survey/:surveyId/data-import/collect` (`server/modules/dataImport/api/dataImportApi.js`) | `CollectDataImportJob` (`server/modules/collectImport/service/collectImport/collectDataImportJob.js`) |
+| New survey from a Collect file (survey creation form, "Collect" source)                                                         | `POST /survey/collect-import` (`server/modules/collectImport/api/collectImportApi.ts`)          | `CollectImportJob` (`server/modules/collectImport/service/collectImport/collectImportJob.ts`)         |
+| More records into a survey previously imported from Collect (`webapp/views/App/views/Data/DataImport/DataImportCollectView.js`) | `POST /survey/:surveyId/data-import/collect` (`server/modules/dataImport/api/dataImportApi.ts`) | `CollectDataImportJob` (`server/modules/collectImport/service/collectImport/collectDataImportJob.ts`) |
 
-Both jobs are registered in `server/job/jobCreator.js` (jobs run in a worker thread, re-created from their type).
+Both jobs are registered in `server/job/jobCreator.ts` (jobs run in a worker thread, re-created from their type).
 
-The uploaded file is a zip, read in place (never extracted) with `server/utils/file/fileZip.js`. Entries used:
+The uploaded file is a zip, read in place (never extracted) with `server/utils/file/fileZip.ts`. Entries used:
 
 - `idml.xml`: the survey definition (the only mandatory one)
 - `species/<list name>.csv`: species lists
@@ -25,7 +25,7 @@ The uploaded file is a zip, read in place (never extracted) with `server/utils/f
 - `upload/<Collect node def id>/<file name>`: content of file attributes
 
 `idml.xml` is parsed into an `xml-js` element tree (`elements`/`attributes`), accessed through
-`server/modules/collectImport/service/collectImport/model/collectSurvey.js`; record XML files are parsed in the compact
+`server/modules/collectImport/service/collectImport/model/collectSurvey.ts`; record XML files are parsed in the compact
 format (`_text`/`_attributes`), accessed through `.../model/collectRecord.js`. Don't mix the two helpers.
 
 ## CollectImportJob steps
@@ -48,7 +48,7 @@ flowchart TD
 Inner jobs run in sequence, sharing the parent's context object and its single DB transaction. Unless stated otherwise,
 they are in `server/modules/collectImport/service/collectImport/metaImportJobs/`.
 
-1. **`PrepareImportFileJob`** (`server/modules/file/service/prepareImportFileJob.js`): merges the chunks of a chunked
+1. **`PrepareImportFileJob`** (`server/modules/file/service/prepareImportFileJob.ts`): merges the chunks of a chunked
    upload into a temp file (`filePath`); skipped when the file was uploaded in one piece.
 2. **`CollectSurveyReaderJob`**: opens the zip and parses `idml.xml`.
 3. **`SurveyCreatorJob`**: creates the Arena survey:
@@ -73,11 +73,11 @@ they are in `server/modules/collectImport/service/collectImport/metaImportJobs/`
    - a duplicate code or scientific name makes the job, and so the whole import, fail
 6. **`SamplingPointDataImportJob`**: imports `sampling_design/sampling_design.csv` (if present) into the
    `sampling_point_data` category, reusing the generic CSV category import
-   (`server/modules/category/service/categoryImportJob.js`) with overrides: codes from the `levelN_code` columns, no
+   (`server/modules/category/service/categoryImportJob.ts`) with overrides: codes from the `levelN_code` columns, no
    labels, `x` / `y` / `srs_id` merged into one `location` point extra prop, other columns as extra props, empty levels
    deleted.
 7. **`NodeDefsImportJob`** (`.../metaImportJobs/nodeDefsImportJob/`): see [below](#node-definitions).
-8. **`SurveyDependencyGraphsGenerationJob`** (`server/modules/survey/service/surveyDependencyGraphsGenerationJob.js`):
+8. **`SurveyDependencyGraphsGenerationJob`** (`server/modules/survey/service/surveyDependencyGraphsGenerationJob.ts`):
    builds the dependency graph and stores it in the survey.
 9. **`RecordsImportJob`** + **`RecordCheckJob`**: only when `options.includeData` is set (the server defaults it to
    true, the survey creation form's checkbox starts unchecked). See [Records](#records).
@@ -89,7 +89,7 @@ Categories, taxonomies and sampling point data come before the node defs because
 to them by name when they are created, and the `_specify` attributes depend on the qualifiable codes.
 
 At the end, `CollectImportJob.onEnd` closes the zip, deletes the uploaded file and, through
-`server/modules/survey/service/surveyCreatorJobHelper.js`, removes the survey's `temporary` flag on success or deletes
+`server/modules/survey/service/surveyCreatorJobHelper.ts`, removes the survey's `temporary` flag on success or deletes
 the survey on failure/cancel. This is needed because the survey row and its DB schema are created **outside** the job
 transaction (`SurveyManager.insertSurvey` runs the schema migration on separate connections), so a rollback alone
 would leave an empty survey behind. The job result is `{ surveyId }`.
@@ -139,7 +139,7 @@ sees the node defs inserted so far, so an expression referencing a node def that
 left out (and reported as not resolved) even if the conversion itself was right.
 
 **Import report**: every Collect expression found (applicable, required if, default value, validation rule
-error/warning, code parent) produces a report item (`core/survey/collectImportReportItem.js`), with `resolved` set
+error/warning, code parent) produces a report item (`core/survey/collectImportReportItem.ts`), with `resolved` set
 when it was converted. Items go to the `import_report` table of the survey schema; the survey prop `collectReport`
 gets `issuesTotal` (all items, converted ones included) and `issuesResolved` (starts at 0, changed only when a user
 toggles an item). Users review and export it from `webapp/views/App/views/Home/CollectImportReport/` (linked from
@@ -151,7 +151,7 @@ survives renames done in Arena after the import.
 
 ## Records
 
-`RecordsImportJob` (`server/modules/collectImport/service/collectImport/dataImportJobs/recordsImportJob.js`):
+`RecordsImportJob` (`server/modules/collectImport/service/collectImport/dataImportJobs/recordsImportJob.ts`):
 
 1. Unless `forceImport`, checks that the Collect survey URI matches the survey's `collectUri`
    (`importingDataIntoWrongCollectSurvey`); with `deleteAllRecords`, deletes the records of the target `cycle` first.
@@ -170,7 +170,7 @@ survives renames done in Arena after the import.
    batches of 2500). `onStart` runs `SET CONSTRAINTS ALL DEFERRED`, which applies to the rest of the shared
    transaction.
 
-No default values or validation here: `RecordCheckJob` (`server/modules/survey/service/recordCheckJob.js`, the same
+No default values or validation here: `RecordCheckJob` (`server/modules/survey/service/recordCheckJob.ts`, the same
 job run on survey publish) runs next, limited to the imported `recordUuids` and forced to check every node def. It
 inserts the missing single nodes (node defs with no Collect data, like the `_specify` ones), applies default values and
 applicability, computes "required if" flags and validates the records.
