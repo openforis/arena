@@ -12,6 +12,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 import { AiProvider } from '@common/ai/aiProvider'
 import { providerTypeUsesBaseUrl } from '@common/ai/allowlist'
+import { isPlainHttpBaseUrl } from '@common/ai/localServerAddress'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   createAccountProviderId,
@@ -245,10 +246,14 @@ const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider
  * @param {AiProviderInput} input - Request input.
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
  * @returns {string|null} The base URL.
+ * @throws {SystemError} aiBaseUrlNotAllowed (400) for a URL with credentials, a query or a fragment.
  */
 const pickBaseUrl = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
   if (!providerTypeUsesBaseUrl(type)) return null
-  return input.baseUrl === undefined ? (saved?.baseUrl ?? null) : trimmedOrNull(input.baseUrl)
+  const baseUrl = input.baseUrl === undefined ? (saved?.baseUrl ?? null) : trimmedOrNull(input.baseUrl)
+  // credentials would be logged with the errors of the endpoint: the URL is not echoed in the error either
+  if (baseUrl !== null && !isPlainHttpBaseUrl(baseUrl)) throw badRequest('aiBaseUrlNotAllowed')
+  return baseUrl
 }
 
 /**

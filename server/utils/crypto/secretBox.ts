@@ -81,6 +81,15 @@ export const isLegacyEnvelope = (envelope: unknown): boolean =>
   typeof envelope === 'string' && envelope.startsWith(`${LEGACY_VERSION}:`)
 
 /**
+ * Returns the payload of an old `v1` envelope in one canonical form, so that two spellings of the same envelope compare
+ * equal (base64 decoding ignores whitespace and accepts the URL alphabet and missing padding).
+ * @param {unknown} envelope - The envelope.
+ * @returns {string|null} The canonical payload, or null when the envelope is not a `v1` one.
+ */
+export const getLegacyEnvelopeId = (envelope: unknown): string | null =>
+  isLegacyEnvelope(envelope) ? parseEnvelope(envelope).payload.toString('base64') : null
+
+/**
  * Encrypts a UTF-8 string with AES-256-GCM, bound to the AAD, and returns a versioned envelope.
  * @param {string} plain - The plaintext string to encrypt.
  * @param {string} aad - Names the owner of the secret; the same string is needed to decrypt.

@@ -13,11 +13,19 @@ import {
   type AiPrefsUpdate,
   findEnvelopesOfOtherUsers,
   type Queryable,
+  readAllAiPrefs,
   type StoredAiPrefs,
   updateAiPrefs,
 } from '@server/modules/user/repository/userAiPrefsRepository'
 
-import { getProviderPrefs, type KeyCipher, listUpgradableKeys, upgradeLegacyKeysInAiPrefs } from './aiProviderPrefs'
+import {
+  findCopiedLegacyKeyIds,
+  getProviderPrefs,
+  type KeyCipher,
+  listUpgradableKeys,
+  removeKeysFromAiPrefs,
+  upgradeLegacyKeysInAiPrefs,
+} from './aiProviderPrefs'
 
 export type AiPrefsWriterDeps = {
   updateAiPrefs: (userUuid: string, update: AiPrefsUpdate) => Promise<StoredAiPrefs | null>
@@ -106,4 +114,38 @@ export const changeAiPrefs = async ({
     return upgraded === latest ? null : upgraded
   })
   return withStoredAiPrefs(user, stored)
+}
+
+export type CopiedLegacyKeysDeps = {
+  readAllAiPrefs: () => Promise<{ userUuid: string; aiPrefs: StoredAiPrefs | null }[]>
+  updateAiPrefs: AiPrefsWriterDeps['updateAiPrefs']
+  getKeyId: (envelope: string) => string | null
+}
+
+/**
+ * Removes, from every record that holds it, an old key (no AAD) stored by more than one user. Before the AI prefs were
+ * server-only, a member could read another one's old key in the users list and save it in their own prefs, where it
+ * still decrypts; nobody can prove which record it came from, so the owner enters it again. Run at every start, before
+ * the server serves requests (no route reads or writes the AI prefs of another user, so no new copy can appear).
+ * @param {CopiedLegacyKeysDeps} [deps] - Dependencies (the database by default).
+ * @returns {Promise<number>} How many users lost a key.
+ */
+export const removeCopiedLegacyKeys = async (
+  deps: CopiedLegacyKeysDeps = {
+    readAllAiPrefs: () => readAllAiPrefs(),
+    updateAiPrefs: (userUuid, update) => updateAiPrefs({ userUuid, update }),
+    getKeyId: SecretBox.getLegacyEnvelopeId,
+  }
+): Promise<number> => {
+  const records = await deps.readAllAiPrefs()
+  const keyIds = findCopiedLegacyKeyIds(records, deps.getKeyId)
+  if (keyIds.size === 0) return 0
+  const removeKeys = (aiPrefs: StoredAiPrefs | null) =>
+    removeKeysFromAiPrefs({ aiPrefs, keyIds, getKeyId: deps.getKeyId })
+  const holders = records.filter(({ aiPrefs }) => removeKeys(aiPrefs) !== null)
+  for (const { userUuid } of holders) {
+    // applied to the latest stored prefs, not to the ones read above
+    await deps.updateAiPrefs(userUuid, removeKeys)
+  }
+  return holders.length
 }

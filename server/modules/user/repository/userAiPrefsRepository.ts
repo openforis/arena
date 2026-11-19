@@ -37,6 +37,14 @@ export const readAiPrefs = async (
   )
 
 /**
+ * Reads the stored AI prefs of every user that has some.
+ * @param {object} [client] - Database client.
+ * @returns {Promise<Array<{userUuid: string, aiPrefs: object}>>} The AI prefs and their user.
+ */
+export const readAllAiPrefs = async (client: Queryable = db): Promise<{ userUuid: string; aiPrefs: StoredAiPrefs }[]> =>
+  client.manyOrNone(`SELECT uuid AS "userUuid", prefs -> 'ai' AS "aiPrefs" FROM "user" WHERE prefs -> 'ai' IS NOT NULL`)
+
+/**
  * Replaces the stored AI prefs of a user, atomically: no other pref is read or written.
  * @param {object} params - Parameters.
  * @param {string} params.userUuid - User uuid.

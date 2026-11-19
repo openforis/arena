@@ -90,7 +90,14 @@ describe('AI provider ids and stored list (260)', () => {
     expect(getProviderPrefs(legacySlot).providers[0].id).toBe('acct:legacy')
     expect(getProviderPrefs({ ...legacySlot, enabled: false }).defaultProviderId).toBe('arena-default')
     expect(getProviderPrefs({ ...legacySlot, provider: 'nope' }).providers).toEqual([])
-    expect(getProviderPrefs({ ...legacySlot, model: null }).providers).toEqual([])
+    // a key without a model is kept (model null), so the next write does not drop it; nothing at all is no provider
+    expect(getProviderPrefs({ ...legacySlot, model: null }).providers).toEqual([{ ...legacyProvider, model: null }])
+    expect(getProviderPrefs({ ...legacySlot, model: null, apiKeyEncrypted: null }).providers).toEqual([])
+    const noModel = { ...legacySlot, model: null }
+    expect(getProviderPrefs(withProviderPrefs(noModel, getProviderPrefs(noModel))).providers[0]).toMatchObject({
+      model: null,
+      apiKeyEncrypted: 'v1:abc',
+    })
     expect(
       getProviderPrefs({ ...legacySlot, provider: 'vercel-ai-sdk', model: null, baseUrl: 'https://agent.example.org' })
         .providers[0]

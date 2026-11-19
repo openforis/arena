@@ -165,14 +165,16 @@ const convertLegacySlot = (aiPrefs: Record<string, any>): StoredAiProvider | nul
   if (typeof type !== 'string' || !ACCOUNT_PROVIDER_TYPES.has(type)) return null
   // the Vercel AI SDK endpoint has no model choice: the old settings stored its type as the model
   const model = trimmedOrNull(aiPrefs.model) ?? (type === AiProvider.vercelAiSdk ? AiProvider.vercelAiSdk : null)
-  if (!model) return null
+  const apiKeyEncrypted = trimmedOrNull(aiPrefs.apiKeyEncrypted)
+  // a slot with a key but no model is kept, else the next write would drop the key (calls refuse a missing model)
+  if (!model && !apiKeyEncrypted) return null
   return {
     id: LEGACY_ACCOUNT_PROVIDER_ID,
     type,
     name: getDefaultProviderName(type),
     model,
     baseUrl: providerTypeUsesBaseUrl(type) ? trimmedOrNull(aiPrefs.baseUrl) : null,
-    apiKeyEncrypted: trimmedOrNull(aiPrefs.apiKeyEncrypted),
+    apiKeyEncrypted,
     lastTestOk: typeof aiPrefs.lastTestOk === 'boolean' ? aiPrefs.lastTestOk : null,
     lastTestAt: trimmedOrNull(aiPrefs.lastTestAt),
   }
@@ -494,4 +496,54 @@ export const upgradeLegacyKeysInAiPrefs = ({
   const prefs = getProviderPrefs(aiPrefs)
   const upgraded = upgradeLegacyKeys({ prefs, userUuid, cipher, allowlist, copied })
   return upgraded === prefs ? aiPrefs : withProviderPrefs(aiPrefs, upgraded)
+}
+
+/**
+ * Returns the ids of the old keys (no AAD) found in the providers of more than one user. Envelopes have a random IV, so
+ * one in two records was copied, and nothing tells the owner from the copier.
+ * @param {Array<{userUuid: string, aiPrefs: object|null}>} records - Stored AI prefs of the users.
+ * @param {Function} getKeyId - Returns the canonical id of an old key, null for any other key.
+ * @returns {Set<string>} The ids of the copied old keys.
+ */
+export const findCopiedLegacyKeyIds = (
+  records: { userUuid: string; aiPrefs: Record<string, any> | null }[],
+  getKeyId: (envelope: string) => string | null
+): Set<string> => {
+  const holdersById = new Map<string, Set<string>>()
+  for (const { userUuid, aiPrefs } of records) {
+    for (const { apiKeyEncrypted } of getProviderPrefs(aiPrefs).providers) {
+      const id = apiKeyEncrypted ? getKeyId(apiKeyEncrypted) : null
+      if (id !== null) holdersById.set(id, (holdersById.get(id) ?? new Set()).add(userUuid))
+    }
+  }
+  return new Set([...holdersById].filter(([, holders]) => holders.size > 1).map(([id]) => id))
+}
+
+/**
+ * Returns the AI prefs without the keys whose id is given.
+ * @param {object} params - Parameters.
+ * @param {object|null} params.aiPrefs - Stored `user.prefs.ai`.
+ * @param {ReadonlySet<string>} params.keyIds - Ids of the keys to remove.
+ * @param {Function} params.getKeyId - Returns the canonical id of a key (null when it has none).
+ * @returns {object|null} The AI prefs to store, or null when none of those keys is there.
+ */
+export const removeKeysFromAiPrefs = ({
+  aiPrefs,
+  keyIds,
+  getKeyId,
+}: {
+  aiPrefs: Record<string, any> | null
+  keyIds: ReadonlySet<string>
+  getKeyId: (envelope: string) => string | null
+}): Record<string, any> | null => {
+  const prefs = getProviderPrefs(aiPrefs)
+  const isRemoved = ({ apiKeyEncrypted }: StoredAiProvider): boolean => {
+    const id = apiKeyEncrypted ? getKeyId(apiKeyEncrypted) : null
+    return id !== null && keyIds.has(id)
+  }
+  if (!prefs.providers.some(isRemoved)) return null
+  const providers = prefs.providers.map((provider) =>
+    isRemoved(provider) ? { ...provider, apiKeyEncrypted: null } : provider
+  )
+  return withProviderPrefs(aiPrefs, { ...prefs, providers })
 }

@@ -16,6 +16,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { createUserServiceWithPrefsUpdate } from '@server/modules/user/service/userServicePrefsOverride'
 import { getAiPolicyCeilingErrors } from '@server/modules/ai/service/policyCeilings'
+import { removeCopiedLegacyKeys } from '@server/modules/ai/service/aiPrefsWriter'
 
 import * as apiRouter from './apiRouter'
 import { registerArenaServerServices } from './arenaServerServices'
@@ -126,6 +127,13 @@ export const run = async () => {
   // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info)
   await infoService.updateVersion()
+
+  // ====== AI provider keys copied from another user: removed before any request is served. Every instance runs it
+  // (idempotent): a cluster try-lock would let an instance serve while another one is still removing them
+  const usersWithCopiedAiKeys = await removeCopiedLegacyKeys()
+  if (usersWithCopiedAiKeys > 0) {
+    logger.warn(`removed the AI provider keys copied between users from ${usersWithCopiedAiKeys} user(s)`)
+  }
 
   // ====== Start server
   await ArenaServer.start(arenaApp)

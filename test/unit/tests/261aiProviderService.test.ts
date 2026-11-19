@@ -205,6 +205,29 @@ describe('AI provider service (261)', () => {
     expect(kept.provider).toMatchObject({ model: 'llama-2', hasApiKey: true })
   })
 
+  test.each(['https://user:pass@llm.example.org/v1', 'https://llm.example.org/v1?key=sk', 'ftp://llm.example.org/v1'])(
+    'the base URL %s is refused before any call, without being echoed',
+    async (baseUrl) => {
+      const user = userWithProviders()
+      const { deps, tests, saved, listed } = createDeps({}, user)
+      const input = { type: 'openai-compatible', model: 'llama', baseUrl, apiKey: 'sk-typed' }
+      const calls = [
+        () => AiProviderService.testProvider({ user, input, deps }),
+        () => AiProviderService.listProviderModels({ user, input, deps }),
+        () => AiProviderService.addProvider({ user, input, deps }),
+        () => AiProviderService.updateProvider({ user, id: 'acct:org', input: { baseUrl }, deps }),
+      ]
+      for (const call of calls) {
+        const error: any = await expectSystemErrorKey(call, 'aiBaseUrlNotAllowed')
+        expect(error.statusCode).toBe(400)
+        expect(JSON.stringify(error.params ?? {})).not.toContain('pass')
+      }
+      expect(tests).toEqual([])
+      expect(listed).toEqual([])
+      expect(saved).toEqual([])
+    }
+  )
+
   test("ids that are not the user's are refused, with nothing written or called", async () => {
     const user = userWithProviders()
     const { deps, tests, saved, listed } = createDeps({}, user)

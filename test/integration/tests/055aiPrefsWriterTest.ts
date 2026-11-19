@@ -3,6 +3,7 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
 import { db } from '@server/db/db'
+import { removeCopiedLegacyKeys } from '@server/modules/ai/service/aiPrefsWriter'
 import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
@@ -277,6 +278,20 @@ describe('AI prefs writer (055)', () => {
       expect(shared.apiKeyEncrypted).toBeNull()
       expect(SecretBox.isLegacyEnvelope(own.apiKeyEncrypted)).toBe(false)
       expect(SecretBox.decrypt(own.apiKeyEncrypted, buildKeyAad({ userUuid: uuid(), provider: own }))).toBe('sk-unique')
+    })
+
+    test('the start-up pass removes it from every record that holds it, and keeps the key that is not shared', async () => {
+      const unique = legacyEnvelope('sk-unique')
+      await writeAiPrefs({ userUuid: User.getUuid(other), aiPrefs: { providers: [providerWith(copiedKey)] } })
+      await writeAiPrefs({
+        userUuid: uuid(),
+        aiPrefs: { accessLevel: 1, providers: [providerWith(copiedKey), { ...providerWith(unique), id: 'acct:own' }] },
+      })
+      expect(await removeCopiedLegacyKeys()).toBeGreaterThanOrEqual(2)
+      expect((await readAiPrefs({ userUuid: User.getUuid(other) }))?.providers[0].apiKeyEncrypted).toBeNull()
+      const [shared, own] = (await readAiPrefs({ userUuid: uuid() }))?.providers
+      expect(shared.apiKeyEncrypted).toBeNull()
+      expect(own.apiKeyEncrypted).toBe(unique)
     })
   })
 })
