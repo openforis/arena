@@ -3,11 +3,12 @@
 .sign-in-methods {
   display: grid;
   gap: 0.5rem;
-  // same width as the other sections of the user form
-  width: 40rem;
-  max-width: 100%;
-  justify-self: center;
-  align-self: center;
+}
+
+.sign-in-methods__title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .sign-in-methods__row {
