@@ -1,3 +1,5 @@
+import type { ArenaUserGroup, ArenaUserGroupQualifier } from '@openforis/arena-core'
+
 import * as UserGroup from './userGroup'
 import * as UserGroupQualifier from './userGroupQualifier'
 import * as Validator from '@core/validation/validator'
@@ -25,24 +27,21 @@ import type { ValidatorFn } from '@core/validation/_validator/validatorFunctions
  */
 const _validateItemPropUniquenessByOccurrenceCount =
   (errorKey: string) =>
-  (items: Array<Record<string, unknown>>): ValidatorFn =>
+  (items: object[]): ValidatorFn =>
   (propName: string, item: unknown) => {
     const value = Validator.getProp(propName)(item)
     const occurrences = items?.filter((other) => Validator.getProp(propName)(other) === value).length ?? 0
     return occurrences > 1 ? { key: errorKey, params: { name: value } } : null
   }
 
-const _qualifiersAreValid = async (qualifiers: Array<Record<string, unknown>>): Promise<boolean> => {
+const _qualifiersAreValid = async (qualifiers: ArenaUserGroupQualifier[]): Promise<boolean> => {
   const validations = await Promise.all(
     qualifiers.map((qualifier) => validateUserGroupQualifier({ qualifier, qualifiers }))
   )
   return validations.every((validation) => Validation.isValid(validation))
 }
 
-export const validateUserGroup = async (
-  userGroup: Record<string, unknown>,
-  otherGroupsInSurvey: Array<Record<string, unknown>> = []
-) => {
+export const validateUserGroup = async (userGroup: ArenaUserGroup, otherGroupsInSurvey: ArenaUserGroup[] = []) => {
   const qualifiers = UserGroup.getQualifiers(userGroup)
   const qualifiersValid = await _qualifiersAreValid(qualifiers)
 
@@ -68,8 +67,8 @@ export const validateUserGroupQualifier = async ({
   qualifier,
   qualifiers,
 }: {
-  qualifier: Record<string, unknown>
-  qualifiers: Array<Record<string, unknown>>
+  qualifier: ArenaUserGroupQualifier
+  qualifiers: ArenaUserGroupQualifier[]
 }) =>
   Validator.validate(qualifier, {
     [UserGroupQualifier.keys.name]: [
