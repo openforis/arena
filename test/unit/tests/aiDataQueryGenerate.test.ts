@@ -242,6 +242,11 @@ describe('AI data query generation', () => {
         'filter references unknown column "unknown_column"',
         'cannot sort by "dbh": sort attributes must be among the selected attributes',
       ])
+      // a guessed column gets the close ones
+      expect(convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'species == "x"' }).errors).toEqual([
+        'filter references unknown column "species"; close names: ' +
+          'tree_species, tree_species_scientific_name, tree_species_vernacular_name',
+      ])
       expect(convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'dbh >' }).errors[0]).toMatch(
         /cannot be parsed/
       )

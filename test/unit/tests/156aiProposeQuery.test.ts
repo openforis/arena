@@ -122,6 +122,45 @@ describe('query_propose', () => {
     expect(ctx.analysisQueries.list()).toEqual([])
   })
 
+  test('a count without attribute counts the entity, and a sort without attribute sorts by that count', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const result = await runTool(
+      proposeQueryTool,
+      {
+        ...aggregateInput,
+        filter: null,
+        measures: [{ attribute: null, functions: ['cnt'] }],
+        sort: [{ attribute: null, order: 'desc' }],
+        limit: 5,
+      },
+      ctx
+    )
+    expect(result).toMatchObject({ queryId: 'q1' })
+    const { query } = ctx.analysisQueries.get('q1')
+    expect(Query.getMeasures(query)).toEqual({ [getUuid('cluster/plot/tree')]: ['cnt'] })
+    expect(Query.getSort(query)).toHaveLength(1)
+  })
+
+  test('a sort without attribute and two measures is dropped: the limit then asks for a sort', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const result = await runTool(
+      proposeQueryTool,
+      {
+        ...aggregateInput,
+        measures: [
+          { attribute: 'dbh', functions: ['avg'] },
+          { attribute: null, functions: ['cnt'] },
+        ],
+        sort: [{ attribute: null, order: 'desc' }],
+        limit: 5,
+      },
+      ctx
+    )
+    expect(result.error.issues.map((issue) => issue.message)).toContain(
+      'a limit needs a sort: add the sort that defines the first rows'
+    )
+  })
+
   test('the input schema rejects other modes and converts to JSON schema', () => {
     expect(proposeQueryInputSchema.safeParse({ ...aggregateInput, mode: 'pivot' }).success).toBe(false)
     expect(proposeQueryInputSchema.safeParse({ ...aggregateInput, explanation: undefined }).success).toBe(false)

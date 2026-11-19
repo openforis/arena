@@ -21,17 +21,20 @@ export const proposeQueryInputSchema = z.object({
   attributes: nameList.describe('Raw mode: the attributes to show'),
   dimensions: nameList.describe('Aggregate mode: the attributes to group by; empty for one figure over all rows'),
   measures: z
-    .array(z.object({ attribute: name, functions: z.array(z.string().max(10)).max(6) }))
+    .array(z.object({ attribute: name.nullish(), functions: z.array(z.string().max(10)).max(6) }))
     .max(50)
     .nullish()
-    .describe('Aggregate mode: the aggregated attributes and their functions (avg, cnt, max, med, min, sum)'),
+    .describe(
+      'Aggregate mode: the aggregated attributes and their functions (avg, cnt, max, med, min, sum); to count the ' +
+        'entity instances, the entity name with cnt'
+    ),
   filter: z
     .string()
     .max(1000)
     .nullish()
     .describe('Optional filter in JavaScript syntax, e.g. dbh > 10 && tree_status == "L"'),
   sort: z
-    .array(z.object({ attribute: name, order: z.string().max(10).nullish() }))
+    .array(z.object({ attribute: name.nullish(), order: z.string().max(10).nullish() }))
     .max(10)
     .nullish()
     .describe(
@@ -59,16 +62,29 @@ export type ProposeQueryInput = z.infer<typeof proposeQueryInputSchema>
  * @param {ProposeQueryInput} input - Tool input.
  * @returns {object} The data-query result.
  */
-export const toDataQueryAiResult = (input: ProposeQueryInput) => ({
-  entity: input.entity,
-  mode: input.mode,
-  attributes: input.attributes ?? [],
-  dimensions: input.dimensions ?? [],
-  measures: input.measures ?? [],
-  filter: input.filter ?? null,
-  sort: input.sort ?? [],
-  explanation: input.explanation,
-})
+export const toDataQueryAiResult = (input: ProposeQueryInput) => {
+  // small models leave the attribute of the count empty: it counts the entity
+  const measures = (input.measures ?? []).map((measure) => ({
+    ...measure,
+    attribute: measure.attribute ?? input.entity,
+  }))
+  // a sort without attribute is the sort of the only measure (e.g. the top groups); dropped when it cannot be told
+  const measureAttribute = measures.length === 1 ? measures[0].attribute : null
+  const sort = (input.sort ?? []).flatMap((item) => {
+    const attribute = item.attribute ?? measureAttribute
+    return attribute ? [{ ...item, attribute }] : []
+  })
+  return {
+    entity: input.entity,
+    mode: input.mode,
+    attributes: input.attributes ?? [],
+    dimensions: input.dimensions ?? [],
+    measures,
+    filter: input.filter ?? null,
+    sort,
+    explanation: input.explanation,
+  }
+}
 
 /**
  * Validates the proposed query and shows it to the user as a card.
@@ -83,7 +99,7 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
   const aiResult = toDataQueryAiResult(input)
   const { query, errors } = toQuery({ survey, cycle, lang, aiResult, includeAnalysis })
   // without a sort the first N rows are arbitrary ones
-  if (input.limit && (input.sort ?? []).length === 0)
+  if (input.limit && aiResult.sort.length === 0)
     errors.push('a limit needs a sort: add the sort that defines the first rows')
   if (!query || errors.length > 0) {
     return {

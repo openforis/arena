@@ -104,7 +104,10 @@ const parseFilter = ({ filter, allowedColumnNames, errors }) => {
       // method names (e.g. includes) are member properties, not columns
       const isProperty = parent?.type === Expression.types.MemberExpression && parent.property === node
       if (!isCallee && !isProperty && !allowedColumnNames.has(node.name)) {
-        errors.push(`filter references unknown column "${node.name}"`)
+        const close = closestNames(node.name, [...allowedColumnNames])
+        errors.push(
+          `filter references unknown column "${node.name}"${close.length > 0 ? `; close names: ${close.join(', ')}` : ''}`
+        )
         valid = false
       }
     } else if (node.type === Expression.types.Literal && typeof node.value === 'string') {
