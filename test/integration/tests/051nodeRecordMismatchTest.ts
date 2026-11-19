@@ -5,10 +5,7 @@ import * as Record from '@core/record/record'
 
 import * as RecordApi from '@server/modules/record/api/recordApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import {
-  requireNodeBelongsToRecord,
-  requireNodeUuidBelongsToRecord,
-} from '@server/modules/record/api/recordNodeOwnership'
+import { requireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
 
 import { createFakeResponse } from '../../unit/utils/fakeExpress'
 
@@ -42,31 +39,44 @@ describe('Per-node endpoint: node of another record', () => {
     ).buildAndStore()
   })
 
-  test('the route checks the node record right after the edit permission', () => {
+  // the route handler, run after the permission and qualifier middlewares
+  const runNodeHandler = async ({ query = {}, body = {} }: { query?: object; body?: object }) => {
     const route = collectRoutes(RecordApi.init).find(
       ({ method, path }) => method === 'post' && path === '/survey/:surveyId/record/:recordUuid/node'
     )
-    expect(route).toBeDefined()
-    expect(route?.handlers.indexOf(requireNodeBelongsToRecord)).toBe(1)
-  })
+    const handler = route?.handlers[route.handlers.length - 1]
+    const req: any = {
+      params: { surveyId: String(Survey.getId(survey)), recordUuid: Record.getUuid(recordA) },
+      query,
+      body,
+      user: getContextUser(),
+    }
+    const next = jest.fn()
+    await handler(req, createFakeResponse(), next)
+    return next
+  }
 
-  test('a node of record B sent to the URL of record A is refused and B is unchanged', async () => {
+  test('a node of record B sent to the URL of record A is refused by the route handler and B is unchanged', async () => {
     const surveyId = Survey.getId(survey)
     const nodeB = RecordUtils.findNodeByPath('root/num')(survey, recordB)
-    const req: any = {
-      params: { surveyId: String(surveyId), recordUuid: Record.getUuid(recordA) },
-      query: {},
-      body: { node: JSON.stringify(Node.assocValue(99)(nodeB)) },
-    }
-    const res = createFakeResponse()
-    const next = jest.fn()
 
-    requireNodeBelongsToRecord(req, res, next)
+    const next = await runNodeHandler({ body: { node: JSON.stringify(Node.assocValue(99)(nodeB)) } })
 
-    expect(next).not.toHaveBeenCalled()
-    expect(res.statusCode).toBe(400)
+    expect(next.mock.calls[0][0]).toMatchObject({ name: 'UnauthorizedError' })
     const nodeBDb = await RecordManager.fetchNodeByUuid(surveyId, Node.getUuid(nodeB))
     expect(Node.getValue(nodeBDb)).toBe(2)
+  })
+
+  // the qualifier middleware reads the body only: a node in the query would skip its check
+  test('a node sent only in the query string is refused and not saved', async () => {
+    const surveyId = Survey.getId(survey)
+    const nodeA = RecordUtils.findNodeByPath('root/num')(survey, recordA)
+
+    const next = await runNodeHandler({ query: { node: JSON.stringify(Node.assocValue(99)(nodeA)) } })
+
+    expect(next.mock.calls[0][0]).toMatchObject({ name: 'UnauthorizedError' })
+    const nodeADb = await RecordManager.fetchNodeByUuid(surveyId, Node.getUuid(nodeA))
+    expect(Node.getValue(nodeADb)).toBe(1)
   })
 
   test('the delete route checks the node record right after the edit permission', () => {

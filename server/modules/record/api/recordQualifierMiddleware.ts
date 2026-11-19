@@ -108,11 +108,11 @@ const _determineRecordAccessByUserGroup = async ({
 
 /**
  * Parses the node carried by the body of a write request (a JSON string in multipart bodies). The query string is
- * never read: it is chosen by the client, so it could fake the qualifier value of a record.
+ * never read: the route handler must read the node with this function too, so the checked node is the saved one.
  * @param {ExpressRequest} req - Express request.
  * @returns {ArenaRecordNode|null} The node, or null when the body has none.
  */
-const _getPendingNodeFromBody = (req: ExpressRequest): ArenaRecordNode | null => {
+export const getPendingNodeFromBody = (req: ExpressRequest): ArenaRecordNode | null => {
   const node = req.body?.node
   if (node && typeof node === 'string') return JSON.parse(node)
   return node && typeof node === 'object' ? node : null
@@ -125,7 +125,7 @@ const _requireRecordAccess =
       const { surveyId, recordUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       // a node to be created/updated is checked too, so an edit can't move the record out of the user's group
-      const pendingNode = accessType === 'editable' ? _getPendingNodeFromBody(req) : null
+      const pendingNode = accessType === 'editable' ? getPendingNodeFromBody(req) : null
 
       const access = await _determineRecordAccessByUserGroup({
         user,

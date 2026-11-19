@@ -46,13 +46,14 @@ import {
 } from '../../auth/authApiMiddleware'
 import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
+  getPendingNodeFromBody,
   requireMergeRecordsMatchUserGroupQualifiers,
   requireRecordMatchesUserGroupQualifiers,
   requireRecordReadableByUserGroup,
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
-import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
+import { requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
 import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
 import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
 import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
@@ -116,16 +117,16 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/record/:recordUuid/node',
     requireRecordEditPermission,
-    requireNodeBelongsToRecord,
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, recordUuid, cycle, draft, timezoneOffset, lang, clearNonApplicableValuesConfirmed } =
           Request.getParams(req)
-        const node = Request.getJsonParam(req, 'node')
+        // read like the qualifier middleware (body only), so the saved node is the checked one
+        const node = getPendingNodeFromBody(req)
         // permissions are checked on recordUuid: the node must belong to that record
-        if (Node.getRecordUuid(node) !== recordUuid) {
+        if (!node || Node.getRecordUuid(node) !== recordUuid) {
           throw new UnauthorizedError(User.getName(Request.getUser(req)))
         }
         const file = Request.getFile(req)
