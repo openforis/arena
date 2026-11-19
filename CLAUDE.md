@@ -243,7 +243,7 @@ Give new branches a meaningful, possibly short name describing the change (e.g. 
 Never add a `Co-Authored-By: Claude` trailer, a "Generated with Claude Code" line, a `Claude-Session` line or a session link to commits, pull requests, PR/issue comments, reviews or code comments.
 
 **Assignee:**
-Assign every PR you open to `SteRiccio`.
+Assign every PR you open to the GitHub user you are working for.
 
 After creating a PR, subscribe to its activity and wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
 
