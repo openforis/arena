@@ -185,6 +185,10 @@ $ docker container restart arena-rstudio
 
 Visit http://localhost:8787 in your browser to access the rStudio server instance.
 
+## Install on an Ubuntu server
+
+Step-by-step guide (Docker, PostgreSQL/PostGIS, nginx with HTTPS, updates and backups): [docs/install-ubuntu.md](./docs/install-ubuntu.md).
+
 ## Deploy on Kubernetes
 
 Kustomize manifests and instructions are in [infra/k8s](./infra/k8s/README.md).
