@@ -9,6 +9,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 
 import { createDeltaCoalescer } from './coalesceDeltas'
 import { createLocalServerFetch, type LocalServerFetchImpl } from './localServerErrors'
+import { createThinkCloseSplitter } from './thinkCloseSplitter'
 import type { AiEngine, AiLocalServerCapability } from './types'
 
 /**
@@ -21,6 +22,15 @@ const limitsMiddleware: LanguageModelMiddleware = {
   wrapStream: async ({ doStream }) => {
     const { stream, ...rest } = await doStream()
     return { stream: stream.pipeThrough(createDeltaCoalescer()), ...rest }
+  },
+}
+
+// a tool call or an answer written after a `</think>` text in the reasoning is moved out of it
+const thinkCloseMiddleware: LanguageModelMiddleware = {
+  specificationVersion: 'v4',
+  wrapStream: async ({ doStream }) => {
+    const { stream, ...rest } = await doStream()
+    return { stream: stream.pipeThrough(createThinkCloseSplitter()), ...rest }
   },
 }
 
@@ -54,8 +64,8 @@ export const createLocalServerEngine = ({
   // models whose server doesn't split the thinking out write it inline in <think> tags: move it to reasoning parts
   const reasoning = extractReasoningMiddleware({ tagName: 'think' })
   return {
-    // the reasoning is moved out first, so the limits middleware merges its parts too
+    // the last middleware is the closest to the server: its parts are recovered, then the reasoning moved out, then merged
     createModel: (): LanguageModel =>
-      wrapLanguageModel({ model: provider(modelId), middleware: [limitsMiddleware, reasoning] }),
+      wrapLanguageModel({ model: provider(modelId), middleware: [limitsMiddleware, reasoning, thinkCloseMiddleware] }),
   }
 }
