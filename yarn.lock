@@ -4037,9 +4037,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.18.13, @openforis/arena-core@npm:^2.25.0":
-  version: 2.25.0
-  resolution: "@openforis/arena-core@npm:2.25.0"
+"@openforis/arena-core@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@openforis/arena-core@npm:3.0.0"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.1.0"
     "@turf/bearing": "npm:^7.4.0"
@@ -4055,17 +4055,17 @@ __metadata:
     n2words: "npm:^6.3.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.3"
-  checksum: 10c0/0bb671b0595b13c26b338db933ae80b4cf10a9da4a138ee7ef1ac9c68b4cb007c9d499e84919e09c4d4ff995c0a217cd45007dff5b85cbf276c4402ee9be2306
+  checksum: 10c0/c276cfd13011a29c17642b6a0d9dabee66c46da3177c6aad6a21c56248dfbedc054d400993dd801dde059d18b4d565acd57a6388b4756d8a68eb16ceefdc03da
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.8.18":
-  version: 2.8.18
-  resolution: "@openforis/arena-server@npm:2.8.18"
+"@openforis/arena-server@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@openforis/arena-server@npm:3.0.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1159.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.18.13"
+    "@openforis/arena-core": "npm:^3.0.0"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.2"
     cookie-parser: "npm:^1.4.7"
@@ -4087,7 +4087,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/81340bde17507be796225166252e84fcad11acacce32e74521dda94ec8fded99cb30a1ecde4ab7b91566d7b56041421a566d257a0ce92d2faeb57e2c5c4cc15f
+  checksum: 10c0/0db193f40993993649acf58d03672019f40264e1fe7f075e9b473566e63f6722c72207c76bfb872f07162495fbcac263a92df203179a59e55b25a0bbb384f8a1
   languageName: node
   linkType: hard
 
@@ -15460,8 +15460,8 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9.18.0"
     "@mui/x-tree-view": "npm:^9.18.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
-    "@openforis/arena-core": "npm:^2.25.0"
-    "@openforis/arena-server": "npm:^2.8.18"
+    "@openforis/arena-core": "npm:^3.0.0"
+    "@openforis/arena-server": "npm:^3.0.0"
     "@playwright/test": "npm:1.65.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@react-leaflet/core": "npm:3.0.0"
