@@ -107,13 +107,43 @@ const withStringsAsLists = (input: unknown, issues: z.core.$ZodIssue[]): unknown
   return fixed
 }
 
+// two arguments a small model merged in one key: {"dimensions=[],entity": "tree"}, {"dimensions[],entity": "tree"}
+const mergedKey = /^(\w+)[^\w[]*(\[.*\]),(\w+)$/s
+
+/**
+ * Returns a copy of the input with the keys a small model garbles repaired, at any depth: stray quotes around a
+ * name are dropped, and a key holding two arguments (name=[...],other) is split in the two.
+ * @param {unknown} input - Raw input from the model.
+ * @returns {unknown} The input to validate.
+ */
+const withKeysRepaired = (input: unknown): unknown => {
+  if (Array.isArray(input)) return input.map(withKeysRepaired)
+  if (!input || typeof input !== 'object') return input
+  const fixed: Record<string, unknown> = {}
+  for (const [rawKey, rawValue] of Object.entries(input)) {
+    const key = rawKey.replace(/^"+|"+$/g, '')
+    const value = withKeysRepaired(rawValue)
+    const [, name, json, other] = mergedKey.exec(key) ?? []
+    try {
+      if (name) fixed[name] = JSON.parse(json)
+      fixed[name ? other : key] = value
+    } catch {
+      // not a value that can be read: the key is kept and the validation refuses it
+      fixed[key] = value
+    }
+  }
+  return fixed
+}
+
 /**
  * Validates the input of a tool; small models often send a list as a string, which is read as the list.
  * @param {AiTool} tool - The tool.
- * @param {unknown} input - Raw input from the model.
+ * @param {unknown} given - Raw input from the model.
  * @returns {object} The zod result.
  */
-const parseInput = (tool: AiTool, input: unknown) => {
+const parseInput = (tool: AiTool, given: unknown) => {
+  // first: an unknown key is otherwise dropped without an error
+  const input = withKeysRepaired(given)
   const parsed = tool.inputSchema.safeParse(input)
   if (parsed.success) return parsed
   // validated again with the same schema: its limits hold

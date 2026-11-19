@@ -54,6 +54,19 @@ describe('runTool', () => {
       })
     })
 
+    test('two arguments merged in one key (name=[...],other) are read as the two arguments', async () => {
+      expect(await run({ 'names=["dbh"],filter': 'dbh > 1' })).toEqual({ names: ['dbh'], filter: 'dbh > 1' })
+      expect(await run({ 'names=[],filter': 'dbh > 1' })).toEqual({ names: [], filter: 'dbh > 1' })
+      expect(await run({ 'names[],filter': 'dbh > 1' })).toEqual({ names: [], filter: 'dbh > 1' })
+      // stray quotes around the names, at any depth
+      expect(await run({ 'names"': ['dbh'], measures: [{ '"functions"': ['avg'] }] })).toEqual({
+        names: ['dbh'],
+        measures: [{ functions: ['avg'] }],
+      })
+      // not a value that can be read: the input stays invalid
+      expect((await run({ 'names=[oops,filter': 'dbh > 1', measures: 3 })).error.code).toBe('invalidInput')
+    })
+
     test('the list is still validated: the limits of the schema hold', async () => {
       expect((await run({ names: 'a, b, c, d' })).error.code).toBe('invalidInput')
       expect((await run({ names: 'too_long_name' })).error.code).toBe('invalidInput')
