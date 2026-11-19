@@ -64,6 +64,12 @@ describe('analysis system prompt', () => {
     expect(prompt).not.toContain('propose a raw query with the filter and call query_count')
   })
 
+  test('an attribute the survey does not have is said, a value named in the question is searched', () => {
+    const prompt = build(true)
+    expect(prompt).toContain('never present another attribute as the one asked for')
+    expect(prompt).toContain('call category_findItems with "search" and no attribute')
+  })
+
   test('with data tools: a record is a row of the root entity', () => {
     expect(build(true)).toContain('a record is one row of the root entity')
   })

@@ -14,7 +14,7 @@ import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolRe
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
-import { getCleaningContext, resolveAttributeDefs } from './cleaningContext'
+import { getCleaningContext, describeUnknownAttributes, resolveAttributeDefs } from './cleaningContext'
 import type { CleaningI18n } from './validationRows'
 import { summarizeValidationRows } from './validationSummary'
 import { LIST_ROWS_MAX, pageValidationRows, toValidationListItems } from './validationList'
@@ -59,7 +59,10 @@ const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
 const resolveAttributeDefUuids = ({ survey, attributes = [] }: { survey: any; attributes?: string[] }): string[] => {
   const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: attributes })
   if (unknownNames.length > 0) {
-    throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+    throw new AiToolFailure(
+      'unknownAttribute',
+      `Unknown attributes: ${describeUnknownAttributes({ survey, names: unknownNames })}.`
+    )
   }
   return nodeDefs.map(NodeDef.getUuid)
 }

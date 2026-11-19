@@ -77,6 +77,30 @@ describe('query_listEntities', () => {
     expect(byName.cluster_id).toMatchObject({ dimension: true, measure: false })
   })
 
+  test('rowKeys: the keys of the ancestors and of the entity identify one row', async () => {
+    const result = await runTool(listEntitiesTool, {}, newAnalysisToolContext({ survey }))
+    expect(result.entities.map((entity) => entity.rowKeys)).toEqual([
+      ['cluster_id'],
+      ['cluster_id', 'plot_id'],
+      ['cluster_id', 'plot_id', 'tree_id'],
+    ])
+    expect(listEntitiesTool.description).toContain('rowKeys')
+  })
+
+  test('search: the attributes whose name or label contains the text, with their entity', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const found = await runTool(listEntitiesTool, { search: 'Height' }, ctx)
+    expect(found).toEqual({
+      search: 'Height',
+      attributes: [expect.objectContaining({ entity: 'tree', name: 'tree_height', type: 'integer' })],
+    })
+    // nothing found is said in words: a model otherwise answers with another attribute
+    const none = await runTool(listEntitiesTool, { search: 'crown diameter' }, ctx)
+    expect(none.attributes).toEqual([])
+    expect(none.note).toContain('No attribute')
+    expect(none.note).toContain('do not answer with another attribute')
+  })
+
   test('one entity on request, unknown entity is an error with the valid names', async () => {
     const ctx = newAnalysisToolContext({ survey })
     const result = await runTool(listEntitiesTool, { entity: 'tree' }, ctx)
@@ -144,6 +168,38 @@ describe('category_findItems', () => {
     const tool = createFindCategoryItemsTool({ api: newFakeAnalysisApi().api })
     const result = await runTool(tool, { attribute: 'tree_type' }, newAnalysisToolContext({ survey }))
     expect(result.items.map((item) => item.code).sort()).toEqual(['F', 'L', 'P', 'T'])
+  })
+
+  test('without attribute: every code attribute is searched, the result names the attribute', async () => {
+    const tool = createFindCategoryItemsTool({ api: newFakeAnalysisApi().api })
+    const ctx = newAnalysisToolContext({ survey })
+    expect(await runTool(tool, { search: 'liv' }, ctx)).toEqual({
+      search: 'liv',
+      attributes: [
+        {
+          attribute: 'tree_status',
+          columns: ['tree_status', 'tree_status_label'],
+          items: [{ code: 'L', label: 'Live' }],
+        },
+      ],
+    })
+    const none = await runTool(tool, { search: 'zzz' }, ctx)
+    expect(none.attributes).toEqual([])
+    expect(none.note).toContain('No item')
+    expect((await runTool(tool, {}, ctx)).error.code).toBe('searchRequired')
+  })
+
+  test('nothing found in the attribute: the other attributes that have the text are named', async () => {
+    const tool = createFindCategoryItemsTool({ api: newFakeAnalysisApi().api })
+    const result = await runTool(tool, { attribute: 'tree_type', search: 'live' }, newAnalysisToolContext({ survey }))
+    expect(result.items).toEqual([])
+    expect(result.otherAttributes).toEqual([
+      {
+        attribute: 'tree_status',
+        columns: ['tree_status', 'tree_status_label'],
+        items: [{ code: 'L', label: 'Live' }],
+      },
+    ])
   })
 
   test('only code attributes', async () => {

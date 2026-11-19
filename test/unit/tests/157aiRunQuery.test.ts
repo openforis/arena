@@ -152,6 +152,20 @@ describe('query_run', () => {
     })
   })
 
+  test('no row for a query with a filter: the note says to check the codes', async () => {
+    const filter = 'tree_species == "NOPE"'
+    const grouped = await setUp({ input: { ...aggregateInput, filter }, rows: [] })
+    const result = await runTool(grouped.runQueryTool, { queryId: 'q1' }, grouped.ctx)
+    expect(result.note).toContain('No row matches the filter')
+    expect(result.note).toContain('category_findItems')
+    // one figure over no row is null
+    const input = { ...aggregateInput, dimensions: [], filter }
+    const ungrouped = await setUp({ input, totals: [{ dbh_avg: null }] })
+    const figure = await runTool(ungrouped.runQueryTool, { queryId: 'q1' }, ungrouped.ctx)
+    expect(figure.totals).toEqual({ dbh_avg: null })
+    expect(figure.note).toContain('No row matches the filter')
+  })
+
   test('a 403 becomes noPermission with a hint', async () => {
     const forbidden = Object.assign(new Error('forbidden'), { response: { status: 403 } })
     const { api } = newFakeAnalysisApi({ fetchQueryRows: () => Promise.reject(forbidden) })

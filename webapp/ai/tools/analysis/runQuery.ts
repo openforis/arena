@@ -132,6 +132,21 @@ const fetchTotalsOrNull = async (params: Parameters<typeof fetchTotals>[0]) => {
   }
 }
 
+/**
+ * Says why a filtered query may have found nothing: a label compared with a code column is the usual cause.
+ * @param {object} entry - Proposed query.
+ * @param {boolean} empty - Whether the result has no row (or only empty figures).
+ * @returns {object} The note, or nothing.
+ */
+const getNoRowNote = (entry: { query: any }, empty: boolean): { note?: string } =>
+  empty && Query.getFilter(entry.query)
+    ? {
+        note:
+          'No row matches the filter. Code and taxon attributes hold codes: check the codes with ' +
+          'category_findItems, or compare the label or the name (columns ending in _label, _scientific_name).',
+      }
+    : {}
+
 // an aggregate query without dimensions: one figure per measure, over all the rows
 const isUngrouped = (entry: { mode: string; query: any }) =>
   entry.mode === 'aggregate' && Query.getDimensions(entry.query).length === 0
@@ -147,7 +162,8 @@ const isUngrouped = (entry: { mode: string; query: any }) =>
 const runUngrouped = async ({ api, ctx, entry }: { api: AnalysisApi; ctx: any; entry: any }) => {
   const columns = getQueryResultColumns({ survey: ctx.survey, query: entry.query })
   const totals = await fetchTotals({ api, requestParams: getRequestParams(ctx, entry), columns })
-  return { queryId: entry.id, mode: entry.mode, totals }
+  const empty = Object.values(totals ?? {}).every((value) => value === null || Number(value) === 0)
+  return { queryId: entry.id, mode: entry.mode, ...getNoRowNote(entry, empty), totals }
 }
 
 /**
@@ -228,7 +244,12 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
         const resultRows = toResultRows({ rows, columns })
         // one group is its own total
         const totals = aggregate && total > 1 ? await fetchTotalsOrNull({ api, requestParams, columns }) : null
-        const head = { queryId, mode: entry.mode, columns: columns.map((column) => column.name) }
+        const head = {
+          queryId,
+          mode: entry.mode,
+          columns: columns.map((column) => column.name),
+          ...getNoRowNote(entry, total === 0),
+        }
         const body = {
           ...(totals ? { totals } : {}),
           rows: aggregate ? markEmptyGroups({ rows: resultRows, columns }) : resultRows,

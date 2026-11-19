@@ -1,7 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import { withClosestNames } from '@common/ai/closestNames'
 
-import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
+import { findNodeDefByName, getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
 import type { AiToolContext } from '@webapp/ai/tools/types'
 
 /**
@@ -31,4 +32,16 @@ export const resolveAttributeDefs = ({ survey, names }: { survey: any; names: st
     else unknownNames.push(name)
   }
   return { nodeDefs, unknownNames }
+}
+
+/**
+ * Describes the unknown attribute names with the real names close to each, for a tool error.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - The survey.
+ * @param {string[]} params.names - The unknown names.
+ * @returns {string} E.g. `tree_number (close names: tree_no)`.
+ */
+export const describeUnknownAttributes = ({ survey, names }: { survey: any; names: string[] }): string => {
+  const attributeNames = getCurrentNodeDefs(survey).filter(NodeDef.isAttribute).map(NodeDef.getName)
+  return names.map((name) => withClosestNames(name, attributeNames)).join(', ')
 }

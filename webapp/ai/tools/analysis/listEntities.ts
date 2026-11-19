@@ -17,6 +17,11 @@ const inputSchema = z.object({
     .max(100)
     .nullish()
     .describe('Optional entity name: only that entity is returned (use it when attributes were omitted)'),
+  search: z
+    .string()
+    .max(100)
+    .nullish()
+    .describe('Optional text: only the attributes whose name or label contains it are returned, with their entity'),
 })
 
 type Input = z.infer<typeof inputSchema>
@@ -39,6 +44,8 @@ const toEntityItem = ({ survey, entityDef, cycle, lang, includeAnalysis }: Entit
     parentEntity: parentDef ? NodeDef.getName(parentDef) : null,
     // models count a child entity when asked for the number of records
     ...(parentDef ? {} : { oneRowPerRecord: true }),
+    // a filter on the keys of the entity alone reads the rows of every record
+    rowKeys: Survey.getNodeDefAncestorsKeyAttributes(entityDef, true)(survey).map(NodeDef.getName),
     attributes: QueryNodeDefs.getRawAttributeDefs(params).map((nodeDef) => ({
       name: NodeDef.getName(nodeDef),
       label: NodeDef.getLabel(nodeDef, lang),
@@ -46,6 +53,32 @@ const toEntityItem = ({ survey, entityDef, cycle, lang, includeAnalysis }: Entit
       dimension: dimensionUuids.has(NodeDef.getUuid(nodeDef)),
       measure: measureUuids.has(NodeDef.getUuid(nodeDef)),
     })),
+  }
+}
+
+/**
+ * Finds the attributes whose name or label contains the text, in every entity.
+ * @param {object} params - Parameters.
+ * @param {object[]} params.entities - The entity items.
+ * @param {string} params.search - The text.
+ * @param {number} params.budget - Result size budget.
+ * @returns {object} The attributes found, with a note when there is none.
+ */
+const searchAttributes = ({ entities, search, budget }: { entities: any[]; search: string; budget: number }) => {
+  const text = search.trim().toLowerCase()
+  const attributes = entities.flatMap((entity) =>
+    entity.attributes
+      .filter(({ name, label }) => `${name}\n${label ?? ''}`.toLowerCase().includes(text))
+      .map((attribute: object) => ({ entity: entity.name, ...attribute }))
+  )
+  if (attributes.length > 0) return fitListToBudget({ search, attributes }, 'attributes', budget)
+  return {
+    search,
+    attributes,
+    // without it a model answers with the attribute that looks closest
+    note:
+      `No attribute name or label contains "${search}". Try one other word; when nothing matches, tell the user ` +
+      'the survey has no such attribute: do not answer with another attribute in its place.',
   }
 }
 
@@ -60,6 +93,9 @@ const execute = async (input: Input, ctx: any) => {
   const entityDefs = QueryNodeDefs.getQueryableEntityDefs({ survey, cycle })
   const toItem = (entityDef: any) => toEntityItem({ survey, entityDef, cycle, lang, includeAnalysis })
 
+  if (input.search?.trim()) {
+    return searchAttributes({ entities: entityDefs.map(toItem), search: input.search, budget: getResultBudget(ctx) })
+  }
   if (input.entity) {
     const entityDef = entityDefs.find((nodeDef: any) => NodeDef.getName(nodeDef) === input.entity)
     if (!entityDef) {
@@ -89,7 +125,9 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
   description:
     'Lists the entities that can be queried and their attributes (name, label, type; "dimension" = can group by, ' +
     '"measure" = can be aggregated). An entity can also use the attributes of its ancestor entities. ' +
-    'The root entity (oneRowPerRecord) has one row per record: count it to count records.',
+    'The root entity (oneRowPerRecord) has one row per record: count it to count records. "rowKeys" are the ' +
+    'attributes that together identify one row (the keys of the ancestors and its own): to read one row, filter ' +
+    'on all of them. With "search", returns the attributes matching a text, or says that none does.',
   inputSchema,
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',

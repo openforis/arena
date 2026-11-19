@@ -7,7 +7,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import { Authorizer } from '@openforis/arena-core'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
-import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
+import { findNodeDefByName, getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
 import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
@@ -19,7 +19,11 @@ import { getAnalysisContext, toRequestFailure } from './toolResults'
 export const categoryItemsMax = 20
 
 const inputSchema = z.object({
-  attribute: z.string().max(100).describe('Name of a code attribute'),
+  attribute: z
+    .string()
+    .max(100)
+    .nullish()
+    .describe('Name of a code attribute; leave empty to search every code attribute (then "search" is required)'),
   search: z.string().max(100).nullish().describe('Text contained in the item code or label (empty: all items)'),
 })
 
@@ -35,6 +39,61 @@ const matches = (text: string, lang: string) => (item: any) =>
   !text ||
   CategoryItem.getCode(item).toLowerCase().includes(text) ||
   CategoryItem.getLabel(lang)(item).toLowerCase().includes(text)
+
+const OTHER_ATTRIBUTES_MAX = 10
+const OTHER_ITEMS_MAX = 5
+
+const toResultItem = (lang: string) => (item: any) => ({
+  code: CategoryItem.getCode(item),
+  label: CategoryItem.getLabel(lang)(item),
+})
+
+/**
+ * Finds the code attributes with items containing the text: a value named in a question tells which attribute holds it.
+ * Big categories are left out: their items are not in the survey.
+ * @param {object} params - Parameters.
+ * @param {any} params.ctx - Tool context.
+ * @param {string} params.text - Lower case search text.
+ * @param {string} [params.except] - Attribute name to leave out.
+ * @returns {object[]} The attributes with their filter columns and matching items.
+ */
+const searchCodeAttributes = ({ ctx, text, except }: { ctx: any; text: string; except?: string }) => {
+  const { survey, lang, includeAnalysis } = getAnalysisContext(ctx)
+  const found: object[] = []
+  for (const nodeDef of getCurrentNodeDefs(survey, { includeAnalysis })) {
+    if (found.length >= OTHER_ATTRIBUTES_MAX) break
+    if (!NodeDef.isCode(nodeDef) || NodeDef.getName(nodeDef) === except) continue
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+    if (!category || Category.isBigCategory(category)) continue
+    const items = Survey.getNodeDefCategoryItems(nodeDef)(survey).filter(matches(text, lang))
+    if (items.length === 0) continue
+    found.push({
+      attribute: NodeDef.getName(nodeDef),
+      columns: ColumnNodeDef.getColumnNames(nodeDef),
+      items: items.slice(0, OTHER_ITEMS_MAX).map(toResultItem(lang)),
+    })
+  }
+  return found
+}
+
+/**
+ * Searches every code attribute (no attribute given).
+ * @param {object} params - Parameters.
+ * @param {any} params.ctx - Tool context.
+ * @param {string|null} [params.search] - Search text.
+ * @returns {object} The attributes found, with a note when there is none.
+ */
+const searchAllAttributes = ({ ctx, search }: { ctx: any; search?: string | null }) => {
+  const text = (search ?? '').trim().toLowerCase()
+  if (!text) throw new AiToolFailure('searchRequired', 'Give "attribute", or "search" to search every code attribute.')
+  const attributes = searchCodeAttributes({ ctx, text })
+  const note = `No item of a code attribute contains "${search}". Try one other word, or say that no category has it.`
+  return fitListToBudget(
+    { search, attributes, ...(attributes.length === 0 ? { note } : {}) },
+    'attributes',
+    getResultBudget(ctx)
+  )
+}
 
 /**
  * Creates the category_findItems tool.
@@ -69,6 +128,7 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
    * @returns {Promise<object>} The items or an error.
    */
   const execute = async ({ attribute, search }: Input, ctx: any) => {
+    if (!attribute) return searchAllAttributes({ ctx, search })
     const { survey, lang, includeAnalysis } = getAnalysisContext(ctx)
     const nodeDef = findNodeDefByName(survey, attribute, { includeAnalysis })
     if (!nodeDef || !NodeDef.isCode(nodeDef)) {
@@ -94,22 +154,28 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
     const result = {
       attribute,
       columns: ColumnNodeDef.getColumnNames(nodeDef),
-      items: found
-        .slice(0, categoryItemsMax)
-        .map((item: any) => ({ code: CategoryItem.getCode(item), label: CategoryItem.getLabel(lang)(item) })),
+      items: found.slice(0, categoryItemsMax).map(toResultItem(lang)),
       // total is omitted when the fetch hit its limit
       ...(totalIsLowerBound ? {} : { total: found.length }),
       truncated: totalIsLowerBound || found.length > categoryItemsMax,
     }
     const fitted = fitListToBudget(result, 'items', getResultBudget(ctx))
-    return { ...fitted, truncated: result.truncated || (fitted.truncated ?? false) }
+    // the value may belong to another attribute with a similar name
+    const otherAttributes = text && found.length === 0 ? searchCodeAttributes({ ctx, text, except: attribute }) : []
+    return {
+      ...fitted,
+      truncated: result.truncated || (fitted.truncated ?? false),
+      ...(otherAttributes.length > 0 ? { otherAttributes } : {}),
+    }
   }
 
   return {
     name: 'category_findItems',
     description:
       'Finds the items (code and label) of the category of a code attribute, to write filters such as ' +
-      'tree_status = "L". Returns at most 20 items and the filter columns of the attribute.',
+      'tree_status = "L". Returns at most 20 items and the filter columns of the attribute. When the question ' +
+      'names a value (e.g. "slight damage"), pass it as "search" with no attribute: every code attribute is ' +
+      'searched and the result says which one has that value.',
     inputSchema,
     area: ['analysis'],
     dataClass: 'schema',

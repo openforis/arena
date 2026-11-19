@@ -178,6 +178,9 @@ describe('record_getValues tool', () => {
     expect(await runTool(tool, { recordUuid: uuidv4(), attributes: ['nope'] }, ctx)).toMatchObject({
       error: { code: 'unknownAttribute' },
     })
+    // a guessed name comes back with the real ones close to it
+    const guessed = await runTool(tool, { recordUuid: uuidv4(), attributes: ['tree_heigth'] }, ctx)
+    expect(guessed.error.message).toContain('tree_heigth (close names: tree_height)')
     expect(await runTool(tool, { recordUuid: uuidv4(), attributes: ['dbh'] }, ctx)).toMatchObject({
       error: { code: 'recordNotAvailable' },
     })

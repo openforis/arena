@@ -201,6 +201,36 @@ describe('AI data query generation', () => {
       expect(convert({ mode: Query.modes.raw }).errors).toEqual(['raw mode requires at least one attribute'])
     })
 
+    test('filter: a code attribute compared with a value that is not one of its codes', () => {
+      const errorsOf = (filter: string) => convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter }).errors
+      expect(errorsOf('tree_status == "L"')).toEqual([])
+      expect(errorsOf('tree_status_label == "Live"')).toEqual([])
+      // the label was written: the code to use is given
+      expect(errorsOf('tree_status == "Live"')).toEqual([
+        'filter value "Live" is not a code of "tree_status": use "L" (Live)',
+      ])
+      expect(errorsOf('"dying" != tree_status')).toEqual([
+        'filter value "dying" is not a code of "tree_status": its codes are "L" (Live), "D" (Dead)',
+      ])
+    })
+
+    test('filter: a taxon attribute compared with a name, where its column holds the code', () => {
+      const errorsOf = (filter: string) => convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter }).errors
+      expect(errorsOf('tree_species == "AFZ/QUA"')).toEqual([])
+      expect(errorsOf('tree_species_scientific_name == "Afzelia quanzensis"')).toEqual([])
+      expect(errorsOf('tree_species == "Afzelia quanzensis"')).toEqual([
+        'filter value "Afzelia quanzensis" is not a code of "tree_species": compare the name with tree_species_scientific_name',
+      ])
+    })
+
+    test('an unknown attribute name comes with the close names', () => {
+      const { errors } = convert({ mode: Query.modes.raw, attributes: ['tree_heigth', 'height'] })
+      expect(errors).toEqual([
+        'attribute "tree_heigth" not found; close names: tree_height',
+        'attribute "height" not found; close names: tree_height',
+      ])
+    })
+
     test('invalid filter and sort', () => {
       const { errors } = convert({
         mode: Query.modes.raw,

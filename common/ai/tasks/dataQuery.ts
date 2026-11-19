@@ -8,11 +8,14 @@ import { z } from 'zod'
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as StringUtils from '@core/stringUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { Query, QueryNodeDefs, SortCriteria } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
+import { closestNames } from '../closestNames'
 import type { AiGenerateText } from '../llm'
 import { AiLimits } from '../limits'
 import { safeParseJsonResponse, withOneRetry } from '../parsing'
@@ -151,6 +154,77 @@ const getSortColumn = ({ attribute, sortableDefs, measureSortColumns, lang }) =>
   }
 }
 
+const FILTER_CODES_MAX = 20
+const isCodeOrTaxon = (nodeDef: any): boolean => NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
+const equalityOperators = new Set(['==', '!='])
+
+/**
+ * Describes the codes to use in place of a value that is not a code: the item with that label, or all the codes.
+ * @param {object} params - The parameters.
+ * @param {object[]} params.items - The category items of the attribute.
+ * @param {string} params.value - The value written in the filter.
+ * @param {string} params.lang - The label language.
+ * @returns {string} The hint.
+ */
+const describeCodes = ({ items, value, lang }: { items: any[]; value: string; lang: string }): string => {
+  const describe = (item: any) => `"${CategoryItem.getCode(item)}" (${CategoryItem.getLabel(lang)(item)})`
+  const labelled = items.find((item) => CategoryItem.getLabel(lang)(item).toLowerCase() === value.trim().toLowerCase())
+  return labelled
+    ? `use ${describe(labelled)}`
+    : `its codes are ${items.slice(0, FILTER_CODES_MAX).map(describe).join(', ')}`
+}
+
+/**
+ * Returns the code attribute and the text it is compared with, when the node is such a comparison.
+ * @param {object} node - The expression node.
+ * @param {Map<string, object>} defsByColumn - The code attributes by column name.
+ * @returns {{nodeDef: object, value: string}|null} The comparison, or null.
+ */
+const getCodeComparison = (node: any, defsByColumn: Map<string, any>) => {
+  if (node.type !== Expression.types.BinaryExpression || !equalityOperators.has(node.operator)) return null
+  const sides = [node.left, node.right]
+  const column = sides.find((side) => side.type === Expression.types.Identifier && defsByColumn.has(side.name))
+  const literal = sides.find((side) => side.type === Expression.types.Literal && typeof side.value === 'string')
+  return column && literal ? { nodeDef: defsByColumn.get(column.name), value: literal.value as string } : null
+}
+
+/**
+ * Reports the comparisons of a code attribute with a text that is not one of its codes (models write the label):
+ * such a filter runs and finds nothing.
+ * @param {object} params - The parameters.
+ * @param {object} params.expr - The parsed filter.
+ * @param {object} params.survey - The survey.
+ * @param {string} params.lang - The label language.
+ * @param {object[]} params.codeDefs - The code and taxon attributes the filter can use.
+ * @param {string[]} params.errors - Errors array to populate.
+ * @returns {void}
+ */
+const checkFilterCodes = ({ expr, survey, lang, codeDefs, errors }) => {
+  const defsByColumn = new Map<string, any>(codeDefs.map((nodeDef) => [NodeDef.getName(nodeDef), nodeDef]))
+  visitExpression(expr, (node) => {
+    const comparison = getCodeComparison(node, defsByColumn)
+    if (!comparison) return
+    const { nodeDef, value } = comparison
+    if (NodeDef.isTaxon(nodeDef)) {
+      // shortcut: a taxon code with a space in it is refused, check the codes of the taxonomy if one ever has it
+      if (/\s/.test(value.trim())) {
+        const column = `${NodeDef.getName(nodeDef)}_scientific_name`
+        errors.push(
+          `filter value "${value}" is not a code of "${NodeDef.getName(nodeDef)}": compare the name with ${column}`
+        )
+      }
+      return
+    }
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+    // the items of a big category are not in the survey
+    if (!category || Category.isBigCategory(category)) return
+    const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
+    if (items.length === 0 || items.some((item: any) => CategoryItem.getCode(item) === value)) return
+    const codes = describeCodes({ items, value, lang })
+    errors.push(`filter value "${value}" is not a code of "${NodeDef.getName(nodeDef)}": ${codes}`)
+  })
+}
+
 /**
  * Converts the (already parsed) model answer into a Data Explorer query, validating every node def reference.
  * @param {object} params - The parameters.
@@ -192,9 +266,9 @@ export const toQuery = ({
         if (!acc.includes(nodeDef)) acc.push(nodeDef)
       } else {
         const existing = Survey.findNodeDefByName(name)(survey)
-        errors.push(
-          existing ? `"${name}" cannot be used as ${kind} for entity "${entityName}"` : `attribute "${name}" not found`
-        )
+        const close = closestNames(name, candidates.map(NodeDef.getName))
+        const notFound = `attribute "${name}" not found${close.length > 0 ? `; close names: ${close.join(', ')}` : ''}`
+        errors.push(existing ? `"${name}" cannot be used as ${kind} for entity "${entityName}"` : notFound)
       }
       return acc
     }, [])
@@ -276,7 +350,11 @@ export const toQuery = ({
     }).filter(NodeDef.isSingle)
     const allowedColumnNames = new Set<string>(filterAttributeDefs.flatMap(ColumnNodeDef.getColumnNames))
     const filterExpr = parseFilter({ filter: aiResult.filter, allowedColumnNames, errors })
+    const errorsCountBefore = errors.length
     if (filterExpr) {
+      checkFilterCodes({ expr: filterExpr, survey, lang, codeDefs: filterAttributeDefs.filter(isCodeOrTaxon), errors })
+    }
+    if (filterExpr && errors.length === errorsCountBefore) {
       query = Query.assocFilter(filterExpr)(query)
     }
   }

@@ -15,7 +15,7 @@ import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolRe
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
-import { getCleaningContext, resolveAttributeDefs } from './cleaningContext'
+import { getCleaningContext, describeUnknownAttributes, resolveAttributeDefs } from './cleaningContext'
 import { findRecordUuidByKeys } from './recordLookup'
 import { getRecordValues } from './recordValues'
 import type { CleaningI18n } from './validationRows'
@@ -78,7 +78,10 @@ export const createRecordGetValuesTool = ({
     if (!recordUuid && !recordKeys) throw new AiToolFailure('recordRequired', 'Give recordUuid or recordKeys.')
     const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: [...new Set(attributes)] })
     if (unknownNames.length > 0) {
-      throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+      throw new AiToolFailure(
+        'unknownAttribute',
+        `Unknown attributes: ${describeUnknownAttributes({ survey, names: unknownNames })}.`
+      )
     }
     const { signal } = ctx
     try {

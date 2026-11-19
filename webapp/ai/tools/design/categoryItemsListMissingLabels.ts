@@ -191,15 +191,17 @@ const collectItems = (items: MissingLabelsItem[], state: PageState, params: Page
  * Returns the note telling the model how to go on.
  * @param {string|null} nextCursor - Next cursor.
  * @param {number} pendingCount - Labels of this category and language in pending cards.
+ * @param {string|null} example - An item of the propose tool input, null when nothing is listed.
  * @returns {string} The note.
  */
-const buildNote = (nextCursor: string | null, pendingCount: number): string => {
+const buildNote = (nextCursor: string | null, pendingCount: number, example: string | null): string => {
   const parts = [nextCursor ? 'More items remain: call again with cursor = nextCursor.' : 'No more items.']
   if (pendingCount > 0) parts.push(`${pendingCount} items already in pending cards are not listed.`)
   // the last thing the model reads: without it a small model writes the labels as text
   parts.push(
     'To set labels, call categoryItemLabels_proposeSet with the refs: labels written as text cannot be applied.'
   )
+  if (example) parts.push(`Its "items" are like ${example}, one for each ref.`)
   return parts.join(' ')
 }
 
@@ -300,7 +302,13 @@ export const createCategoryItemsListMissingLabelsTool = ({
       total: Math.max(0, serverTotal - pendingItemUuids.size),
       items: state.items,
       nextCursor,
-      note: buildNote(nextCursor, pendingItemUuids.size),
+      note: buildNote(
+        nextCursor,
+        pendingItemUuids.size,
+        state.items.length > 0
+          ? `{ "categoryName": "${categoryName}", "ref": "${state.items[0].ref}", "lang": "${lang}", "text": "..." }`
+          : null
+      ),
     }
   },
 })
