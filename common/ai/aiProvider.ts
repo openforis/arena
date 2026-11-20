@@ -6,6 +6,7 @@ export const AiProvider = {
   openai: 'openai',
   anthropic: 'anthropic',
   google: 'google',
+  googleVertex: 'google-vertex',
   openaiCompatible: 'openai-compatible',
   vercelAiSdk: 'vercel-ai-sdk',
 }

@@ -77,6 +77,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'Compatível com OpenAI',
     'vercel-ai-sdk': 'Vercel AI SDK',
     mock: 'Simulado (servidor de teste)',
@@ -87,6 +88,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic',
     google: 'Google',
+    'google-vertex': 'Google Vertex AI',
     'openai-compatible': 'Compatível com OpenAI',
     'vercel-ai-sdk': 'Vercel AI SDK',
     mock: 'Simulado',
@@ -94,6 +96,7 @@ export default {
   typeHints: {
     orgServer: 'Um servidor compatível com OpenAI da lista da sua organização.',
     'openai-compatible': 'Azure, OpenRouter, …',
+    'google-vertex': 'Uma chave de API do Vertex AI (modo expresso); digite o modelo, p. ex. gemini-2.5-flash.',
     'vercel-ai-sdk': 'Um endpoint de chat criado com o Vercel AI SDK.',
   },
   dialog: {

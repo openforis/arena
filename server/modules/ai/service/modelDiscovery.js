@@ -182,6 +182,9 @@ export const listForProvider = async ({ provider, baseUrl, apiKey }, guardOption
         return await listAnthropic({ apiKey })
       case ProviderRegistry.providers.google:
         return await listGoogle({ apiKey })
+      case ProviderRegistry.providers.googleVertex:
+        // Vertex AI lists its models only to OAuth credentials, not to an API key: the model id is typed
+        return []
       case ProviderRegistry.providers.openaiCompatible: {
         if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
         await assertBaseUrlAllowed(baseUrl, guardOptions)

@@ -13,6 +13,7 @@
  */
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createVertex } from '@ai-sdk/google-vertex'
 import { createOpenAI } from '@ai-sdk/openai'
 import type { LanguageModelV4 } from '@ai-sdk/provider'
 
@@ -128,6 +129,11 @@ export const buildModel = (cfg: ProviderConfig, { fetchImpl }: { fetchImpl?: Fet
     case providers.google: {
       assertApiKey(provider, apiKey)
       return createGoogleGenerativeAI({ apiKey })(model)
+    }
+    case providers.googleVertex: {
+      assertApiKey(provider, apiKey)
+      // a Vertex AI API key (express mode): the SDK sends it in the x-goog-api-key header to the global endpoint
+      return createVertex({ apiKey })(model)
     }
     case providers.openaiCompatible: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })

@@ -75,6 +75,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'OpenAI-тэй нийцтэй',
     'vercel-ai-sdk': 'Vercel AI SDK',
     mock: 'Туршилтын (туршилтын сервер)',
@@ -85,6 +86,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic',
     google: 'Google',
+    'google-vertex': 'Google Vertex AI',
     'openai-compatible': 'OpenAI-тэй нийцтэй',
     'vercel-ai-sdk': 'Vercel AI SDK',
     mock: 'Туршилтын',
@@ -92,6 +94,7 @@ export default {
   typeHints: {
     orgServer: 'Байгууллагын тань жагсаалтад байгаа OpenAI-тэй нийцтэй сервер.',
     'openai-compatible': 'Azure, OpenRouter, …',
+    'google-vertex': 'Vertex AI-ийн API түлхүүр (экспресс горим); загварын нэрийг бичнэ үү, жишээ нь gemini-2.5-flash.',
     'vercel-ai-sdk': 'Vercel AI SDK-гаар хийсэн чатын төгсгөлийн цэг.',
   },
   dialog: {

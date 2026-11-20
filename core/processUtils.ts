@@ -115,7 +115,7 @@ export const ENV = {
   // {"translation":false,"dataDictionary":false}
   aiFeatureFlags: getJson(process.env.AI_FEATURE_FLAGS),
   // Default provider (used when user has no override)
-  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | openai-compatible | vercel-ai-sdk
+  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | google-vertex | openai-compatible | vercel-ai-sdk
   aiDefaultModel: process.env.AI_DEFAULT_MODEL,
   aiDefaultApiKey: process.env.AI_DEFAULT_API_KEY,
   aiDefaultBaseUrl: process.env.AI_DEFAULT_BASE_URL,

@@ -11,6 +11,7 @@ describe('AI provider registry', () => {
       ['openai', true],
       ['anthropic', true],
       ['google', true],
+      ['google-vertex', true],
       ['openai-compatible', true],
       ['vercel-ai-sdk', true],
       ['', false],
@@ -47,6 +48,12 @@ describe('AI provider registry', () => {
 
     test('throws aiApiKeyMissing for google without key', () => {
       expect(() => ProviderRegistry.buildModel({ provider: 'google', model: 'gemini-2.0-flash-exp' })).toThrow(
+        /aiApiKeyMissing/
+      )
+    })
+
+    test('throws aiApiKeyMissing for google-vertex without key', () => {
+      expect(() => ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash' })).toThrow(
         /aiApiKeyMissing/
       )
     })
@@ -92,6 +99,31 @@ describe('AI provider registry', () => {
       expect(m).toBeDefined()
     })
 
+    test('google-vertex with an API key calls the Vertex AI express endpoint, key in the x-goog-api-key header', async () => {
+      const originalFetch = globalThis.fetch
+      const calls = []
+      globalThis.fetch = async (input, init) => {
+        calls.push({ url: String(input), headers: new Headers(init?.headers) })
+        const body = { candidates: [{ content: { role: 'model', parts: [{ text: 'ok' }] }, finishReason: 'STOP' }] }
+        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      }
+      try {
+        const m = ProviderRegistry.buildModel({
+          provider: 'google-vertex',
+          model: 'gemini-2.5-flash',
+          apiKey: 'vx-key',
+        })
+        await m.doGenerate({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }] })
+      } finally {
+        globalThis.fetch = originalFetch
+      }
+      expect(calls).toHaveLength(1)
+      expect(calls[0].url).toBe(
+        'https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash:generateContent'
+      )
+      expect(calls[0].headers.get('x-goog-api-key')).toBe('vx-key')
+    })
+
     test('returns a model handle for vercel-ai-sdk with only a baseUrl', () => {
       const m = ProviderRegistry.buildModel({
         provider: 'vercel-ai-sdk',
@@ -103,11 +135,12 @@ describe('AI provider registry', () => {
   })
 
   describe('providers constant exposes the supported keys', () => {
-    test('exposes openai, anthropic, google, openaiCompatible, vercelAiSdk', () => {
+    test('exposes openai, anthropic, google, googleVertex, openaiCompatible, vercelAiSdk', () => {
       expect(ProviderRegistry.providers).toEqual({
         openai: 'openai',
         anthropic: 'anthropic',
         google: 'google',
+        googleVertex: 'google-vertex',
         openaiCompatible: 'openai-compatible',
         vercelAiSdk: 'vercel-ai-sdk',
       })
