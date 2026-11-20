@@ -7,6 +7,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
+import { ensureStartsWithLetter } from '@server/modules/collectImport/service/collectImport/model/nodeDefUniqueNameGenerator'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as XForm from '../model/xform'
@@ -30,7 +31,10 @@ export default class SurveyCreatorJob extends Job {
     // Arena survey names must be identifier-shaped (StringUtils.normalizeName is the same sanitizer
     // the survey-create webapp form applies to user-typed names) - the XForm title is free text
     // ("Verify Odk Import"), not already a valid name the way Collect's URI-derived name is.
-    const startingName = StringUtils.normalizeName(newSurveyParam?.name || formTitle || 'odk_form')
+    // a name must also start with a letter (e.g. form titles like "2024 Forest inventory")
+    const startingName = ensureStartsWithLetter(
+      StringUtils.normalizeName(newSurveyParam?.name || formTitle || 'odk_form')
+    )
     const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
     const label = formTitle ?? name
