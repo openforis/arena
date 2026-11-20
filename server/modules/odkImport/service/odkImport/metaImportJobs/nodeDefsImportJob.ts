@@ -473,7 +473,9 @@ export default class NodeDefsImportJob extends Job {
       propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
     }
 
-    if (Object.keys(propsAdvanced).length === 0) return nodeDef
+    const props = this._getPropsForUnconvertedCalculate({ nodeDef, bind, propsAdvanced })
+
+    if (Object.keys(propsAdvanced).length === 0 && Object.keys(props).length === 0) return nodeDef
 
     const nodeDefsUpdated = await NodeDefManager.updateNodeDefProps(
       {
@@ -481,7 +483,7 @@ export default class NodeDefsImportJob extends Job {
         survey: this.survey,
         nodeDefUuid,
         parentUuid: NodeDef.getParentUuid(nodeDef),
-        props: {},
+        props,
         propsAdvanced,
         system: true,
       },
@@ -491,6 +493,22 @@ export default class NodeDefsImportJob extends Job {
     const updatedNodeDef = nodeDefsUpdated[nodeDefUuid]
     this.nodeDefsByXFormPath.set(path, updatedNodeDef)
     return updatedNodeDef
+  }
+
+  // A calculated attribute is read-only only when its `calculate` was converted into a default value: a read-only
+  // attribute without default values cannot be published, so it's left editable (the report lists the expression).
+  _getPropsForUnconvertedCalculate({
+    nodeDef,
+    bind,
+    propsAdvanced,
+  }: {
+    nodeDef: ArenaAnyNodeDef
+    bind: XFormBind
+    propsAdvanced: Record<string, any>
+  }): Record<string, any> {
+    const calculateConverted = Boolean(propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues])
+    if (!bind.calculate || calculateConverted || !NodeDef.isReadOnly(nodeDef)) return {}
+    return { [NodeDef.propKeys.readOnly]: false }
   }
 
   // ODK's `required` is either a literal (-> Arena "required" flag) or an XPath expression (-> Arena "required if"
