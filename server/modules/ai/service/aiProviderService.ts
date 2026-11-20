@@ -103,7 +103,12 @@ const logger = Log.getLogger('AiProviders')
 // the answer to "say ok" is tiny: a connection test reads at most this much, whatever the endpoint sends
 const TEST_MAX_BODY_BYTES = 1024 * 1024
 
-const KEY_REQUIRED_TYPES = new Set<string>([AiProvider.openai, AiProvider.anthropic, AiProvider.google])
+const KEY_REQUIRED_TYPES = new Set<string>([
+  AiProvider.openai,
+  AiProvider.anthropic,
+  AiProvider.google,
+  AiProvider.googleVertex,
+])
 
 /**
  * Builds the 404 of a provider id that is not the user's (or not an id at all).

@@ -80,6 +80,7 @@ export const AI_PROVIDER_TYPE_NAMES: Record<string, string> = {
   [AiProvider.openai]: 'OpenAI',
   [AiProvider.anthropic]: 'Anthropic',
   [AiProvider.google]: 'Google',
+  [AiProvider.googleVertex]: 'Google Vertex AI',
   [AiProvider.openaiCompatible]: 'OpenAI-compatible',
   [AiProvider.vercelAiSdk]: 'Vercel AI SDK',
   [LOCAL_PROVIDER_TYPE]: 'Local server',

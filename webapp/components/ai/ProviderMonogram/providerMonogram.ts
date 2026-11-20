@@ -9,6 +9,7 @@ const MONOGRAMS: Record<string, { text: string; tone: ProviderMonogramTone }> = 
   openai: { text: 'OA', tone: 'openai' },
   anthropic: { text: 'An', tone: 'anthropic' },
   google: { text: 'Go', tone: 'google' },
+  'google-vertex': { text: 'Vx', tone: 'google' },
   'openai-compatible': { text: '≈', tone: 'compatible' },
   'vercel-ai-sdk': { text: 'Ve', tone: 'other' },
   mock: { text: 'Mo', tone: 'other' },

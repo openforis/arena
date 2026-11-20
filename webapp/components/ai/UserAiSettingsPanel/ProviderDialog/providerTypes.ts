@@ -20,11 +20,20 @@ export const MODEL_PLACEHOLDERS: Record<string, string> = {
   [AiProvider.openai]: 'gpt-4o-mini',
   [AiProvider.anthropic]: 'claude-haiku-4-5',
   [AiProvider.google]: 'gemini-2.0-flash',
+  [AiProvider.googleVertex]: 'gemini-2.5-flash',
   [AiProvider.openaiCompatible]: 'llama3.3:70b',
 }
 
 export type ProviderDialogType =
-  'local' | 'orgServer' | 'openai' | 'anthropic' | 'google' | 'openai-compatible' | 'vercel-ai-sdk' | 'mock'
+  | 'local'
+  | 'orgServer'
+  | 'openai'
+  | 'anthropic'
+  | 'google'
+  | 'google-vertex'
+  | 'openai-compatible'
+  | 'vercel-ai-sdk'
+  | 'mock'
 
 export type ProviderTypeSpec = {
   value: ProviderDialogType
@@ -91,6 +100,8 @@ export const PROVIDER_TYPE_SPECS: ProviderTypeSpec[] = [
   typeSpec('openai', AiProvider.openai, KEYED_CLOUD),
   typeSpec('anthropic', AiProvider.anthropic, KEYED_CLOUD),
   typeSpec('google', AiProvider.google, KEYED_CLOUD),
+  // the model list stays empty with an API key: the model id is typed
+  typeSpec('google-vertex', AiProvider.googleVertex, KEYED_CLOUD),
   typeSpec('openai-compatible', AiProvider.openaiCompatible, {
     kind: 'account',
     requiresBaseUrl: true,
@@ -148,7 +159,14 @@ export const getProviderTypeGroups = ({
     return { spec, disabled: spec.requiresApiKey && !encryptionConfigured }
   }
   const localTypes: ProviderDialogType[] = allowlist.length > 0 ? ['local', 'orgServer'] : ['local']
-  const cloudTypes: ProviderDialogType[] = ['openai', 'anthropic', 'google', 'openai-compatible', 'vercel-ai-sdk']
+  const cloudTypes: ProviderDialogType[] = [
+    'openai',
+    'anthropic',
+    'google',
+    'google-vertex',
+    'openai-compatible',
+    'vercel-ai-sdk',
+  ]
   if (mockEnabled) cloudTypes.push('mock')
   return [
     { key: 'local', options: localTypes.map(option) },

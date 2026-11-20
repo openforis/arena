@@ -122,4 +122,9 @@ describe('model discovery SSRF guard (262)', () => {
     expect(fetchCalls[0].url).not.toContain('secret-key')
     expect(fetchCalls[0].init.headers['x-goog-api-key']).toBe('secret-key')
   })
+
+  test('a Vertex AI API key lists no models (the model is typed) and makes no request', async () => {
+    expect(await ModelDiscovery.listForProvider({ provider: 'google-vertex', apiKey: 'secret-key' })).toEqual([])
+    expect(fetchCalls).toEqual([])
+  })
 })

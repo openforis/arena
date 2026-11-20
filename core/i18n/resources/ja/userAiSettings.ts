@@ -75,6 +75,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'OpenAI 互換',
     'vercel-ai-sdk': 'Vercel AI SDK',
     mock: 'モック（テストサーバー）',
@@ -85,6 +86,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic',
     google: 'Google',
+    'google-vertex': 'Google Vertex AI',
     'openai-compatible': 'OpenAI 互換',
     'vercel-ai-sdk': 'Vercel AI SDK',
     mock: 'モック',
@@ -92,6 +94,7 @@ export default {
   typeHints: {
     orgServer: '組織のリストにある OpenAI 互換サーバー。',
     'openai-compatible': 'Azure、OpenRouter など',
+    'google-vertex': 'Vertex AI の API キー（エクスプレスモード）。モデル名を入力します（例: gemini-2.5-flash）。',
     'vercel-ai-sdk': 'Vercel AI SDK で作成したチャットエンドポイント。',
   },
   dialog: {

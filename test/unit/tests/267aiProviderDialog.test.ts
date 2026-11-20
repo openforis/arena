@@ -104,11 +104,11 @@ describe('provider dialog types (267)', () => {
       groupValues(getProviderTypeGroups({ allowlist: [], encryptionConfigured: true, mockEnabled: false }))
     ).toEqual([
       ['local', ['local']],
-      ['cloud', ['openai', 'anthropic', 'google', 'openai-compatible', 'vercel-ai-sdk']],
+      ['cloud', ['openai', 'anthropic', 'google', 'google-vertex', 'openai-compatible', 'vercel-ai-sdk']],
     ])
     expect(groupValues(getProviderTypeGroups({ allowlist, encryptionConfigured: true, mockEnabled: true }))).toEqual([
       ['local', ['local', 'orgServer']],
-      ['cloud', ['openai', 'anthropic', 'google', 'openai-compatible', 'vercel-ai-sdk', 'mock']],
+      ['cloud', ['openai', 'anthropic', 'google', 'google-vertex', 'openai-compatible', 'vercel-ai-sdk', 'mock']],
     ])
   })
 
@@ -118,7 +118,7 @@ describe('provider dialog types (267)', () => {
       .flatMap((group) => group.options)
       .filter((option) => option.disabled)
       .map((option) => option.spec.value)
-    expect(disabled).toEqual(['openai', 'anthropic', 'google'])
+    expect(disabled).toEqual(['openai', 'anthropic', 'google', 'google-vertex'])
   })
 
   test('a saved provider opens with its dialog type; an allowlisted openai-compatible one is an Organisation server', () => {

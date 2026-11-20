@@ -8,6 +8,7 @@ import type { ProviderDialogType, ProviderTypeGroup } from './providerTypes'
 const HINT_KEYS: Partial<Record<ProviderDialogType, string>> = {
   local: 'userAiSettings:localServer.where',
   orgServer: 'userAiSettings:typeHints.orgServer',
+  'google-vertex': 'userAiSettings:typeHints.google-vertex',
   'openai-compatible': 'userAiSettings:typeHints.openai-compatible',
   'vercel-ai-sdk': 'userAiSettings:typeHints.vercel-ai-sdk',
 }

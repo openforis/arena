@@ -15,6 +15,7 @@ const TRANSLATED_TYPES = new Set([
   'openai',
   'anthropic',
   'google',
+  'google-vertex',
   'openai-compatible',
   'vercel-ai-sdk',
   'mock',
