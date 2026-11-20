@@ -19,7 +19,7 @@ const CATEGORY_JOB_TYPES = new Set(['CategoryImportJob', 'CategoriesBatchImportJ
 
 // events sent once the code that dispatched the action finished its dispatches: saving the survey info resets the defs
 // right after, and the event must find the new defs, not the old ones
-const DEFERRED_EVENTS: SuggestionEvent['type'][] = ['surveyInfoSaved']
+const DEFERRED_EVENTS = new Set<SuggestionEvent['type']>(['surveyInfoSaved'])
 
 /**
  * Returns the events of a job update: only a succeeded job is one.
@@ -66,7 +66,7 @@ export const createAiSuggestionsMiddleware =
   (action: any) => {
     const result = next(action)
     for (const event of getEvents(action)) {
-      if (DEFERRED_EVENTS.includes(event.type)) queueMicrotask(() => notify(event))
+      if (DEFERRED_EVENTS.has(event.type)) queueMicrotask(() => notify(event))
       else notify(event)
     }
     return result

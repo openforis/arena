@@ -39,12 +39,12 @@ const unavailable = (area: AssistantArea, reasonKeys: string[]): AssistantAreaSt
 })
 
 // reasons the user fixes by switching provider in the chat; notSetUp stays on the panel (nothing to switch to)
-const SWITCHABLE_REASONS: AiEngineFeatureAvailability['reasons'] = [
+const SWITCHABLE_REASONS = new Set<AiEngineFeatureAvailability['reasons'][number]>([
   'missingOnThisBrowser',
   'notAvailable',
   'policyForbids',
   'invalidAddress',
-]
+])
 
 /**
  * Returns true when every reason belongs to the provider (not to the data class or the setup), so another provider
@@ -53,7 +53,7 @@ const SWITCHABLE_REASONS: AiEngineFeatureAvailability['reasons'] = [
  * @returns {boolean} True when the chat should open for the user to choose a provider.
  */
 const isProviderLevelProblem = (availability: AiEngineFeatureAvailability): boolean =>
-  availability.reasons.length > 0 && availability.reasons.every((reason) => SWITCHABLE_REASONS.includes(reason))
+  availability.reasons.length > 0 && availability.reasons.every((reason) => SWITCHABLE_REASONS.has(reason))
 
 /**
  * Maps the availability of a feature (B) to an area status.

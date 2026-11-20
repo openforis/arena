@@ -148,8 +148,7 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
   }
   // the list shows only once the requested layer is known not to match (selectId null): not before its points load
   if (
-    searchRequest &&
-    searchRequest.selectId === null &&
+    searchRequest?.selectId === null &&
     searchRequest.key !== openedKey &&
     parseMapSearchQuery(searchRequest.text).type !== 'coordinates'
   ) {

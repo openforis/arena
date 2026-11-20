@@ -183,7 +183,7 @@ export const createFakeMissingLabelsServer = ({
     return {
       total: items.filter((item) => isMissing(item, lang)).length,
       items: page.map((item) => ({ ...item, labels: { ...item.labels } })),
-      nextCursor: remaining.length > limit ? page[page.length - 1].uuid : null,
+      nextCursor: remaining.length > limit ? page.at(-1).uuid : null,
     }
   }
 

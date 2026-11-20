@@ -152,7 +152,7 @@ const toListedItem = (item: MissingLabelsItem, lang: string, languages: string[]
   return {
     ref: item.codePath.join('.'),
     levelName: item.levelName,
-    code: item.codePath[item.codePath.length - 1] ?? '',
+    code: item.codePath.at(-1) ?? '',
     sourceLang,
     sourceText: truncated ? fullText.slice(0, CATEGORY_ITEM_LABEL_TEXT_MAX) : fullText,
     ...(truncated ? { sourceTextTruncated: true as const } : {}),

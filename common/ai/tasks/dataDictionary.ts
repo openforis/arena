@@ -42,8 +42,8 @@ export const generateDataDictionaryDescriptions = async ({
   if (!value) throw new SystemError('aiDataDictionaryInvalid', {}, StatusCodes.BAD_GATEWAY)
   // an id the model made up is dropped
   const descriptions = value.descriptions.flatMap(({ id, description }) => {
-    const nodeDef = shortNodeDefs.find((candidate) => candidate.id === id)
-    return nodeDef ? [{ uuid: nodeDefs[Number(id) - 1].uuid, description }] : []
+    const known = shortNodeDefs.some((candidate) => candidate.id === id)
+    return known ? [{ uuid: nodeDefs[Number(id) - 1].uuid, description }] : []
   })
   return { descriptions }
 }

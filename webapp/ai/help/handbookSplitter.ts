@@ -122,7 +122,7 @@ const splitLongText = (text: string, maxChars: number): string[] => {
 }
 
 const buildPath = (stack: TocEntry[], entry: TocEntry): string[] => {
-  while (stack.length > 0 && stack[stack.length - 1].level >= entry.level) stack.pop()
+  while (stack.length > 0 && stack.at(-1).level >= entry.level) stack.pop()
   const path = stack.map((ancestor) => ancestor.heading)
   stack.push(entry)
   return path
@@ -164,7 +164,7 @@ export const splitHandbook = (
  * @returns {string|null} The version.
  */
 export const readHandbookVersion = (raw: string): string | null => {
-  const match = /^ver\.\s*(\S+)\s*$/m.exec(raw.replace(/\r/g, ''))
+  const match = /^ver\.\s*(\S+)\s*$/m.exec(raw.replaceAll('\r', ''))
   return match ? match[1] : null
 }
 

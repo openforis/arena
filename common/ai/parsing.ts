@@ -29,7 +29,7 @@ export const stripCodeFences = (text: string): string => {
  */
 export const extractTaggedValue = (text: string, tag: string): string | null => {
   const name = escapeRegExp(tag)
-  const match = new RegExp(`<${name}>([\\s\\S]*?)</${name}>`, 'i').exec(text ?? '')
+  const match = new RegExp(String.raw`<${name}>([\s\S]*?)</${name}>`, 'i').exec(text ?? '')
   return match ? match[1].trim() : null
 }
 

@@ -22,18 +22,19 @@ import {
   getOperationTargetKey,
 } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
-import { isNodeDefRefProp, type NodeDefRefProp } from './types'
-import { collectValidationIssues } from './validationIssues'
-import type {
-  ChangeSet,
-  ChangeSetIssue,
-  ChangeSetPreview,
-  ExpressionSetOperation,
-  LabelSetOperation,
-  NodeDefCreateOperation,
-  NodeDefOperation,
-  NodeDefUpdateOperation,
+import {
+  isNodeDefRefProp,
+  type ChangeSet,
+  type ChangeSetIssue,
+  type ChangeSetPreview,
+  type ExpressionSetOperation,
+  type LabelSetOperation,
+  type NodeDefCreateOperation,
+  type NodeDefOperation,
+  type NodeDefRefProp,
+  type NodeDefUpdateOperation,
 } from './types'
+import { collectValidationIssues } from './validationIssues'
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
 type FieldIssue = { field: string; message: string }
@@ -273,8 +274,10 @@ export const previewChangeSet = async (
   )
   issues.push(...checkCategoryItemLabels(changeSet, survey, t))
   if (issues.length === 0) {
-    issues.push(...(await validateTouchedNodeDefs(draft, firstOperationByUuid, t)))
-    issues.push(...(await checkOtherExpressions(changeSet, draft, t)))
+    issues.push(
+      ...(await validateTouchedNodeDefs(draft, firstOperationByUuid, t)),
+      ...(await checkOtherExpressions(changeSet, draft, t))
+    )
   }
   return { survey: draft, validation: { valid: issues.length === 0, issues } }
 }

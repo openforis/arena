@@ -73,7 +73,11 @@ export const CATEGORY_COUNTS_THROTTLE_MS = 30000
 
 // frequent triggers: a generation per cycle switch or defs reload, a survey info save, every visit to a category editor
 // (a trigger inside the window is not lost: one fetch follows when the window ends)
-const THROTTLED_EVENTS: SuggestionEvent['type'][] = ['generationStarted', 'surveyInfoSaved', 'categoryEditorLeft']
+const THROTTLED_EVENTS = new Set<SuggestionEvent['type']>([
+  'generationStarted',
+  'surveyInfoSaved',
+  'categoryEditorLeft',
+])
 
 /**
  * Returns the throttle key: user, survey and languages (a save that adds a language is never throttled).
@@ -196,7 +200,7 @@ export const createCategoryItemTranslationsDetector = ({
    * @returns {number} Time left in the window (0 when the trigger may fetch now).
    */
   const getTimeLeft = (event: SuggestionEvent, key: string, time: number): number => {
-    if (!THROTTLED_EVENTS.includes(event.type)) return 0
+    if (!THROTTLED_EVENTS.has(event.type)) return 0
     const last = lastFetchAt.get(key)
     return last === undefined ? 0 : Math.max(0, throttleMs - (time - last.time))
   }

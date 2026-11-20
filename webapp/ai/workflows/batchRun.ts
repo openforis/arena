@@ -159,7 +159,7 @@ type StopCause = Pick<AiBatchStop, 'cause' | 'error'>
 type CallOutcome = { stop?: StopCause; succeeded: boolean; failedSize: number; notRunSize: number }
 
 // the task keys of an answer that could not be used (the model's output was cut off or is not the expected JSON)
-const UNUSABLE_ANSWER_KEYS: readonly string[] = ['aiTranslationInvalid', 'aiDataDictionaryInvalid']
+const UNUSABLE_ANSWER_KEYS: ReadonlySet<string> = new Set(['aiTranslationInvalid', 'aiDataDictionaryInvalid'])
 
 /**
  * Waits for the guard, but not longer than the signal: a stop must not wait for a slow check.
@@ -262,7 +262,7 @@ const afterCallError = ({
   const key = getAiErrorKey(error)
   if (key === 'aiRateLimited' && retries < AI_BATCH_RATE_LIMIT_RETRIES) return 'retry'
   if (isRunStoppingError(error)) return 'stop'
-  if (key !== null && UNUSABLE_ANSWER_KEYS.includes(key) && canSplit) return 'split'
+  if (key !== null && UNUSABLE_ANSWER_KEYS.has(key) && canSplit) return 'split'
   return 'failed'
 }
 

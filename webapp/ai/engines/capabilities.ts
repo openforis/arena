@@ -245,7 +245,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * @returns {Promise<AiCapabilities>} The capabilities.
    */
   const newerRun = (userUuid: string | null): Promise<AiCapabilities> => {
-    if (inflight && inflight.userUuid === userUuid) return inflight.promise
+    if (inflight?.userUuid === userUuid) return inflight.promise
     return Promise.resolve(loadedFor === userUuid ? capabilities : emptyCapabilities())
   }
 
@@ -334,7 +334,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     load: ({ userUuid }) => {
       resetIfOtherUser(userUuid)
       // a run in flight first: a forced one is newer than the stored capabilities
-      if (inflight && inflight.userUuid === userUuid) return inflight.promise
+      if (inflight?.userUuid === userUuid) return inflight.promise
       if (loadedFor === userUuid && complete) return Promise.resolve(capabilities)
       return run({ userUuid, force: false, probe: true })
     },

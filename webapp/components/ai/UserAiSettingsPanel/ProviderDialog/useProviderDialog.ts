@@ -19,7 +19,7 @@ import { useI18nT } from '@webapp/store/system'
 
 import { getApiErrorMessage } from '../aiSettingsForm'
 import { getLocalDraftUrl } from './providerDraft'
-import { buildLocalProviderSave, buildAccountRequest, shouldBecomeDefault } from './providerSave'
+import { buildLocalProviderSave, buildAccountRequest, canSaveDraft, shouldBecomeDefault } from './providerSave'
 import { canListModels } from './providerModels'
 import {
   createInitialState,
@@ -37,7 +37,6 @@ import {
   type ProviderTypeGroup,
   type SavedProvider,
 } from './providerTypes'
-import { canSaveDraft } from './providerSave'
 import { useLatestReducer } from './useLatestReducer'
 
 export type ProviderDialogActions = {

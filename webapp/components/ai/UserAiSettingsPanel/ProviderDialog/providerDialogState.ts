@@ -303,7 +303,7 @@ export const getProviderDialogView = ({
   const { draft, testing, saving } = state
   const spec = getProviderTypeSpec(draft.type)
   const keyParams = { spec, draft, saved }
-  const test = state.test && state.test.key === buildTestKey({ spec, draft }) ? state.test : null
+  const test = state.test?.key === buildTestKey({ spec, draft }) ? state.test : null
   const idle = !testing && !saving
   return {
     spec,

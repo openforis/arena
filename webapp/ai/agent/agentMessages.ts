@@ -126,7 +126,7 @@ export const buildTrimmedHistory = ({
     { role: 'user', content: userMessage },
   ])
   const earlier = all.slice(0, -1)
-  const kept = fitBudget(earlier, all[all.length - 1], budgetChars)
+  const kept = fitBudget(earlier, all.at(-1), budgetChars)
   // kept ends with the new message
   return { messages: kept, droppedCount: earlier.length - (kept.length - 1) }
 }

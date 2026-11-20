@@ -128,7 +128,7 @@ export const fetchItemsMissingLabels = async (
     client
   )
   const pageItems = items.slice(0, size)
-  const nextCursor = items.length > size ? pageItems[pageItems.length - 1].uuid : null
+  const nextCursor = items.length > size ? pageItems.at(-1).uuid : null
   return { total, items: pageItems, nextCursor }
 }
 

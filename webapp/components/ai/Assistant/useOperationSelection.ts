@@ -24,8 +24,11 @@ export const useOperationSelection = ({
   selectableIds: string[]
   getInitialDeselectedIds?: () => string[]
 }): OperationSelection => {
-  const [deselected, setDeselectedIds] = useState<string[]>(getInitialDeselectedIds)
-  const selectedIds = useMemo(() => selectableIds.filter((id) => !deselected.includes(id)), [deselected, selectableIds])
+  const [deselectedIds, setDeselectedIds] = useState<string[]>(getInitialDeselectedIds)
+  const selectedIds = useMemo(
+    () => selectableIds.filter((id) => !deselectedIds.includes(id)),
+    [deselectedIds, selectableIds]
+  )
   const toggle = useCallback((id: string) => setDeselectedIds((previous) => toggleDeselected(previous, id)), [])
   const setSelected = useCallback(
     (ids: string[], selected: boolean) => setDeselectedIds((previous) => setDeselected(previous, ids, selected)),

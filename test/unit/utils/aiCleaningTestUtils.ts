@@ -8,11 +8,9 @@ import type { CleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
 import * as DataTest from '../../utils/dataTest'
 import { getContextUser } from '../../integration/config/context'
 
-import { adminUser, newAnalysisToolContext, newSurveyUser } from './aiAnalysisTestUtils'
+import { newAnalysisToolContext, newSurveyUser } from './aiAnalysisTestUtils'
 
-export { runTool } from './aiAnalysisTestUtils'
-
-export const cleaningAdminUser = adminUser
+export { adminUser as cleaningAdminUser, runTool } from './aiAnalysisTestUtils'
 
 // translator that shows the keys, so tests don't depend on the English texts
 export const fakeI18n = {

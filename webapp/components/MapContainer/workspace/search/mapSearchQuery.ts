@@ -1,10 +1,9 @@
 import { parseMapSearchQuery } from '@core/geo/coordinateQuery'
-import type { MapSearchQuery } from '@core/geo/coordinateQuery'
 
 import type { MapRecordCandidate } from '../mapWorkspaceTypes'
 
 export { parseMapSearchQuery }
-export type { MapSearchQuery }
+export type { MapSearchQuery } from '@core/geo/coordinateQuery'
 
 export type MapSearchResult =
   | { type: 'coordinates'; lat: number; lng: number }

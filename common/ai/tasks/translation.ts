@@ -104,8 +104,8 @@ export const translateItems = async ({
   if (!value) throw new SystemError('aiTranslationInvalid', {}, StatusCodes.BAD_GATEWAY)
   // an id the model made up is dropped
   const translations = value.translations.flatMap(({ id, byLang }) => {
-    const item = shortItems.find((candidate) => candidate.id === id)
-    return item ? [{ id: items[Number(id) - 1].id, byLang }] : []
+    const known = shortItems.some((candidate) => candidate.id === id)
+    return known ? [{ id: items[Number(id) - 1].id, byLang }] : []
   })
   return { translations }
 }

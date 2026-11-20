@@ -33,12 +33,12 @@ export const getPolicyLevelOptions = ({
   readOnly: boolean
   limit?: AiPolicyLevel
 }): PolicyLevelOption[] => {
-  const locked = [...getLevelsAbove(ceiling), ...(limit ? getLevelsAbove(limit) : [])]
+  const locked = new Set([...getLevelsAbove(ceiling), ...(limit ? getLevelsAbove(limit) : [])])
   return aiPolicyLevels.map((level) => ({
     key: level,
     label: `aiPolicy.level.${level}`,
     title: `homeView:surveyInfo.aiPolicy.levelHint.${level}`,
-    disabled: readOnly || locked.includes(level),
+    disabled: readOnly || locked.has(level),
   }))
 }
 

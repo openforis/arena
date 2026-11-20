@@ -59,7 +59,7 @@ export const createDefaultAiPrefsWriterDeps = (): AiPrefsWriterDeps => ({
  * @returns {ArenaUser} The user with those prefs (the other prefs are the user's own).
  */
 export const withStoredAiPrefs = (user: ArenaUser, aiPrefs: StoredAiPrefs | null): ArenaUser =>
-  ({ ...user, prefs: { ...(UserUtils.getPrefs(user) || {}), ai: aiPrefs } }) as ArenaUser
+  ({ ...user, prefs: { ...UserUtils.getPrefs(user), ai: aiPrefs } }) as ArenaUser
 
 /**
  * Encrypts again, with their AAD, the old keys of the AI prefs; an old key that is also stored in the record of

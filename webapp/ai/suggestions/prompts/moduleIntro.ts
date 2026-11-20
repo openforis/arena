@@ -17,7 +17,7 @@ export const MODULE_INTRO_LABELS: Record<IntroModule, string> = {
  * @param {string} module - App module (first route segment after /app).
  * @returns {boolean} True when introduced.
  */
-export const isIntroModule = (module: string): module is IntroModule => INTRO_MODULES.some((item) => item === module)
+export const isIntroModule = (module: string): module is IntroModule => (INTRO_MODULES as string[]).includes(module)
 
 /**
  * Returns the prompt of the introduction of a module.

@@ -107,7 +107,8 @@ export const createThinkCloseSplitter = (): TransformStream<Part, Part> => {
   const onReasoningEnd = (part: Extract<Part, { type: 'reasoning-end' }>, controller: Controller) => {
     const read = tail === null ? null : readTail(tail)
     // nothing to recover: the reasoning is sent as it came
-    const rest = read ? '' : held + (tail === null ? '' : MARKER + tail)
+    const tailText = tail === null ? '' : MARKER + tail
+    const rest = read ? '' : held + tailText
     if (rest) controller.enqueue({ type: 'reasoning-delta', id: part.id, delta: rest })
     controller.enqueue(part)
     if (read) {

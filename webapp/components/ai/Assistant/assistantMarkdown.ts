@@ -39,7 +39,7 @@ const ALLOWED_ATTR = ['href', 'title', 'start', 'align']
 const ALLOWED_URI_REGEXP = /^(?:https?|mailto):/i
 
 const escapeHtml = (text: string): string =>
-  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 
 // a Markdown image becomes a link (the user decides whether to open it), never a request; a single line break is kept
 // (models write one item per line, e.g. the cited manual sections)

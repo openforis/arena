@@ -1,18 +1,10 @@
 /**
  * Helpers shared by the i18n tests of the AI assistant suggestion card texts (namespace aiSuggestions).
  */
-import {
-  CYRILLIC,
-  CYRILLIC_LANGUAGES,
-  flattenTexts,
-  LANGUAGES,
-  PLURAL_SUFFIX,
-  placeholdersOf,
-  pluralFormsOf,
-  RESOURCES,
-} from './i18nParity'
+import { flattenTexts, LANGUAGES, PLURAL_SUFFIX, pluralFormsOf, RESOURCES } from './i18nParity'
 
-export { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, PLURAL_SUFFIX, RESOURCES }
+export { CYRILLIC, CYRILLIC_LANGUAGES, placeholdersOf as placeholders } from './i18nParity'
+export { LANGUAGES, PLURAL_SUFFIX, RESOURCES }
 
 // plural forms each language must have (derived from the language, not listed)
 export const PLURAL_FORMS: Record<string, string[]> = Object.fromEntries(
@@ -37,8 +29,6 @@ export const baseKeys = (lang: string): string[] =>
   [...new Set(Object.keys(flatten(getResource(lang))).map((key) => key.replace(PLURAL_SUFFIX, '')))].sort((a, b) =>
     a.localeCompare(b)
   )
-
-export const placeholders = placeholdersOf
 
 /**
  * Returns the English text of a base key (the _other form of a plural).

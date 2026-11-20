@@ -52,7 +52,7 @@ export const isTestPassed = ({
   spec: ProviderTypeSpec
   draft: ProviderDraft
 }): boolean => {
-  if (!test || test.key !== buildTestKey({ spec, draft })) return false
+  if (test?.key !== buildTestKey({ spec, draft })) return false
   if (spec.kind === 'local') {
     const view = test.local
     return !!view?.reachable && !!draft.model && view.models.includes(draft.model)

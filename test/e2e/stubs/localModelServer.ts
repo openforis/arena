@@ -3,8 +3,8 @@
  * and chat completions answered by the mock provider (the canned answers and the scripted turns).
  * It records every request so a spec can check what reached it.
  */
-import http, { type IncomingMessage, type ServerResponse } from 'http'
-import type { AddressInfo } from 'net'
+import http, { type IncomingMessage, type ServerResponse } from 'node:http'
+import type { AddressInfo } from 'node:net'
 
 import type {
   LanguageModelV4CallOptions,
@@ -166,8 +166,7 @@ export const toChatCompletionChunks = (parts: LanguageModelV4StreamPart[]): obje
       toolCallIndex += 1
     }
   }
-  chunks.push(chunk({}, toolCallIndex > 0 ? 'tool_calls' : 'stop'))
-  chunks.push({ ...chunk({}), choices: [], usage: STUB_USAGE })
+  chunks.push(chunk({}, toolCallIndex > 0 ? 'tool_calls' : 'stop'), { ...chunk({}), choices: [], usage: STUB_USAGE })
   return chunks
 }
 

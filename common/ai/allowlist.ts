@@ -40,7 +40,7 @@ export const parseUrl = (value: string): URL | null => {
 
 const matchesAllowlistEntry = (url: URL, entry: string): boolean => {
   const allowed = parseUrl(entry)
-  if (!allowed || allowed.origin !== url.origin) return false
+  if (allowed?.origin !== url.origin) return false
   const allowedPath = stripTrailingSlashes(allowed.pathname)
   const path = stripTrailingSlashes(url.pathname)
   // path-segment boundary: /v1 allows /v1 and /v1/chat, not /v10

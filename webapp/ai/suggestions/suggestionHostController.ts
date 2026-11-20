@@ -214,7 +214,7 @@ export const createSuggestionHostController = ({
     const ctx = contextOf(input, store, now)
     const generation = ctx?.generation
     // the generation that scheduled the run ended meanwhile: never run against another survey
-    if (disposed || !ctx || !generation || generation.id !== ranGenerationId || generation.signal.aborted) return
+    if (disposed || !ctx || generation?.id !== ranGenerationId || generation.signal.aborted) return
     ranSurvey = ctx.survey
     ranAreas = ctx.availableAreas.join(',')
     for (const detector of stateDetectors) {

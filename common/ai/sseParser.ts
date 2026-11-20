@@ -87,7 +87,7 @@ export const createSseParser = ({
   const drain = (text: string) => {
     let start = 0
     // a delimiter split between two chunks: "\n" ended the pending text, "\n" starts this chunk
-    if (pendingChars > 0 && text.startsWith('\n') && pending[pending.length - 1].endsWith('\n')) {
+    if (pendingChars > 0 && text.startsWith('\n') && pending.at(-1).endsWith('\n')) {
       flushFrame(text, -1)
       start = 1
     }

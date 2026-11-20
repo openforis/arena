@@ -166,7 +166,7 @@ const checkLanguage = (input: MissingTextsInput, languages: string[]): string | 
  * @returns {MissingTextItem} The item.
  */
 const toSourceItem = (slot: Slot, lang: string, languages: string[]): MissingTextItem => {
-  const [sourceLang] = getFilledLanguages(slot.nodeDef, slot.kind, languages).filter((filled) => filled !== lang)
+  const sourceLang = getFilledLanguages(slot.nodeDef, slot.kind, languages).find((filled) => filled !== lang)
   const texts = slot.kind === 'labels' ? NodeDef.getLabels(slot.nodeDef) : NodeDef.getDescriptions(slot.nodeDef)
   const text: string = texts[sourceLang]
   const item: MissingTextItem = {
