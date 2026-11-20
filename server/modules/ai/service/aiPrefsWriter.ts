@@ -147,7 +147,7 @@ export const removeCopiedLegacyKeys = async (
   const holders = records.filter(({ aiPrefs }) => removeKeys(aiPrefs) !== null)
   for (const { userUuid } of holders) {
     // applied to the latest stored prefs, not to the ones read above
-    await deps.updateAiPrefs(userUuid, removeKeys)
+    await deps.updateAiPrefs(userUuid, removeKeys) // NOSONAR: one user at a time, startup clean-up must not burst the DB pool
   }
   return holders.length
 }

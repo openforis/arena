@@ -197,7 +197,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * @returns {void} Nothing.
    */
   const emit = () => {
-    for (const listener of [...listeners]) listener()
+    for (const listener of [...listeners]) listener() // NOSONAR: snapshot, a listener may (un)subscribe meanwhile
   }
 
   /**

@@ -7,6 +7,17 @@ import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import type { CleaningApi } from './cleaningApi'
 
 /**
+ * Returns a key value as text (the tool schema gives strings and numbers).
+ * @param {unknown} value - The key value.
+ * @returns {string} The text.
+ */
+const toKeyText = (value: unknown): string => {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  return JSON.stringify(value) ?? ''
+}
+
+/**
  * Returns true when a records summary item has exactly the given key values.
  * @param {object} params - Parameters.
  * @param {object} params.item - Records summary item (key columns in keysObj).
@@ -17,7 +28,7 @@ import type { CleaningApi } from './cleaningApi'
 const matchesKeys = ({ item, keyDefs, keys }: { item: any; keyDefs: any[]; keys: Record<string, unknown> }) =>
   keyDefs.every((keyDef) => {
     const actual = String(item.keysObj?.[NodeDefTable.getColumnName(keyDef)] ?? '')
-    const wanted = String(keys[NodeDef.getName(keyDef)])
+    const wanted = toKeyText(keys[NodeDef.getName(keyDef)])
     // the server search ignores case, so text keys do too
     return NodeDef.getType(keyDef) === NodeDef.nodeDefType.text
       ? actual.trim().toLowerCase() === wanted.trim().toLowerCase()
@@ -92,7 +103,7 @@ export const findRecordUuidByKeys = async ({
   }
   const { matching, complete } = await collectMatches({
     api,
-    search: { surveyId, cycle, search: String(keys[keyNames[0]]), signal },
+    search: { surveyId, cycle, search: toKeyText(keys[keyNames[0]]), signal },
     isMatch: (item) => matchesKeys({ item, keyDefs, keys }),
   })
   if (matching.length > 1) {

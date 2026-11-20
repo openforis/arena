@@ -38,7 +38,7 @@ export const createConsentRequestQueue = () => {
   const changed = (): void => {
     const first = entries[0]
     pending = first ? { id: first.id, ...first.request } : null
-    for (const listener of [...listeners]) listener()
+    for (const listener of [...listeners]) listener() // NOSONAR: snapshot, a listener may (un)subscribe meanwhile
   }
 
   return {

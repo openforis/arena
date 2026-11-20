@@ -154,7 +154,5 @@ export const mapLayerCard = (page: Page) =>
  */
 export const expectAveragesInTable = async (page: Page): Promise<void> => {
   const rows = page.locator('.data-query__container .table__rows')
-  for (const value of expectedAverages) {
-    await expect(rows).toContainText(value, { timeout: 30_000 })
-  }
+  await Promise.all(expectedAverages.map((value) => expect(rows).toContainText(value, { timeout: 30_000 })))
 }

@@ -166,6 +166,8 @@
 }
 
 .node-defs-translation-modal__failed {
+  // an <output> (status)
+  display: block;
   padding: 0.25rem 0 0.5rem;
   font-weight: 600;
 }

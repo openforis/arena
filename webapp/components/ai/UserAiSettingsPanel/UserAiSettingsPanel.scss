@@ -237,7 +237,12 @@
     gap: 0.5rem;
   }
 
+  // a fieldset
   &__chip-group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;

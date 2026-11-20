@@ -1,4 +1,4 @@
-type PlaceholderI18n = { t: (key: string) => unknown; exists: (key: string) => boolean }
+type PlaceholderI18n = { t: (key: string) => string; exists: (key: string) => boolean }
 
 /**
  * Returns the text of a placeholder: translated when it is an i18n key, else as it is. A URL or a model id would
@@ -10,4 +10,4 @@ type PlaceholderI18n = { t: (key: string) => unknown; exists: (key: string) => b
 export const translatePlaceholder = (
   i18n: PlaceholderI18n,
   placeholder: string | null | undefined
-): string | null | undefined => (placeholder && i18n.exists(placeholder) ? String(i18n.t(placeholder)) : placeholder)
+): string | null | undefined => (placeholder && i18n.exists(placeholder) ? i18n.t(placeholder) : placeholder)

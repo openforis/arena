@@ -336,7 +336,7 @@ describe('Record read routes: user group qualifiers (058)', () => {
       const res = createFakeResponse()
       const req = request({ recordUuid: Record.getUuid(recordSouth), withNode })
       req.query = { ...req.query, recordUuid: Record.getUuid(recordSouth) } as any
-      await runChain(route('get', recordPath), req, res)
+      await runChain(route('get', recordPath), req, res) // NOSONAR: one request after the other, as a user sends them
       expect(res.statusCode).toBe(200)
       expect(res.body).toBeDefined()
     }

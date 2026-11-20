@@ -51,12 +51,21 @@
   }
 }
 
+// a <dialog open> in the popover: its UA box styles are reset
 .ai-provider-chooser {
+  position: static;
   display: flex;
   flex-direction: column;
   gap: 2px;
   width: min(330px, calc(100vw - 32px));
+  max-width: none;
+  height: auto;
+  max-height: none;
+  margin: 0;
   padding: 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
 
   &__title {
     padding: 6px 8px 4px;

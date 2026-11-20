@@ -25,7 +25,7 @@ describe('The prefs of a user stay an object (062)', () => {
   let member: any
   let surveyId: number
 
-  const readPrefs = async (): Promise<any> =>
+  const readPrefs = (): Promise<any> =>
     db.one('SELECT prefs FROM "user" WHERE uuid = $1', [User.getUuid(member)], (row: any) => row.prefs)
 
   const expectPrefsIntact = async () => {
@@ -77,11 +77,11 @@ describe('The prefs of a user stay an object (062)', () => {
 
   test('the user service of the login does not turn the prefs into an array', async () => {
     const service = createUserServiceWithPrefsUpdate(
-      { updateUserPrefs: async (_options: { userToUpdate: unknown }) => ({}) },
+      { updateUserPrefs: (_options: { userToUpdate: unknown }) => Promise.resolve({}) },
       UserManager.updateUserPrefsAndFetchGroups
     )
     for (const prefs of notObjects) {
-      const updated = await service.updateUserPrefs({ userToUpdate: { uuid: User.getUuid(member), prefs } })
+      const updated = await service.updateUserPrefs({ userToUpdate: { uuid: User.getUuid(member), prefs } }) // NOSONAR: each update writes the prefs of the same user
       expect(User.getUuid(updated)).toBe(User.getUuid(member))
     }
     // the server-only prefs are neither written nor returned by that path

@@ -15,7 +15,12 @@
     min-width: 0;
   }
 
+  // a fieldset
   &__type-group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -113,6 +118,12 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+  }
+
+  // live regions (<output>)
+  &__live,
+  &__status {
+    display: block;
   }
 
   &__live:empty {

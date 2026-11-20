@@ -76,11 +76,11 @@ export const withTimeoutError = async <T>(request: () => Promise<T>): Promise<T>
 
 /**
  * Checks the row limit: the server has none, so every query request must carry one.
- * @param {unknown} limit - The limit.
+ * @param {number} limit - The limit (checked at runtime too: JS callers may pass anything).
  * @returns {void}
  */
-const assertLimit = (limit: unknown): void => {
-  if (!Number.isInteger(limit) || (limit as number) <= 0) throw new Error(`invalid query limit: ${String(limit)}`)
+const assertLimit = (limit: number): void => {
+  if (!Number.isInteger(limit) || limit <= 0) throw new Error(`invalid query limit: ${limit}`)
 }
 
 /**

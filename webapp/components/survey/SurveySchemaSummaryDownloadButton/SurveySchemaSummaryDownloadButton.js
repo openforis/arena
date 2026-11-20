@@ -33,14 +33,14 @@ export const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
   return (
     <>
       {aiDescriptionsFailedCount > 0 && (
-        <div className="schema-summary-export__warning" role="status">
+        <output className="schema-summary-export__warning">
           {i18n.t('surveyForm:schemaSummaryAiDescriptionsFailed', { count: aiDescriptionsFailedCount })}
-        </div>
+        </output>
       )}
       {aiDescriptionsNotDoneCount > 0 && (
-        <div className="schema-summary-export__warning" role="status">
+        <output className="schema-summary-export__warning">
           {i18n.t('surveyForm:schemaSummaryAiDescriptionsNotDone', { count: aiDescriptionsNotDoneCount })}
-        </div>
+        </output>
       )}
       <ButtonDownload
         href={`/api/survey/${surveyId}/schema-summary/export/download`}

@@ -54,9 +54,7 @@ export const LocalConsentRevoke = ({ baseUrl }: Props) => {
         testId={TestId.ai.consentRevoke}
         variant="outlined"
       />
-      <span role="status" className="provider-dialog__hint">
-        {revoked ? t('aiEngine.consent.revoked') : ''}
-      </span>
+      <output className="provider-dialog__hint">{revoked ? t('aiEngine.consent.revoked') : ''}</output>
     </div>
   )
 }

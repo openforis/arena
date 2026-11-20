@@ -52,7 +52,7 @@ const LocalTestResult = ({ view }: { view: LocalServerTestView | null }) => {
   const t = useI18nT()
   if (!view) return null
   return (
-    <div className="provider-dialog__result">
+    <span className="provider-dialog__result">
       {view.reachable ? (
         <LocalAnswered view={view} />
       ) : (
@@ -68,7 +68,7 @@ const LocalTestResult = ({ view }: { view: LocalServerTestView | null }) => {
           {t('userAiSettings:localServer.cloudWarning')}
         </span>
       )}
-    </div>
+    </span>
   )
 }
 
@@ -134,9 +134,9 @@ export const LocalProviderFields = ({
         </div>
       )}
       {/* always rendered, so a screen reader announces the result when it appears */}
-      <div role="status" className="provider-dialog__live">
+      <output className="provider-dialog__live">
         <LocalTestResult view={test} />
-      </div>
+      </output>
       <FormItem label="userAiSettings:localServer.model" htmlFor={TestId.ai.providerModel}>
         <select
           id={TestId.ai.providerModel}

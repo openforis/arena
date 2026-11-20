@@ -12,8 +12,8 @@ type Props = { onNewConversation: () => void }
 export const RecordDataNotice = ({ onNewConversation }: Props) => {
   const i18n = useI18n()
   return (
-    <div className="ai-record-data-notice" data-testid={TestId.aiAssistant.recordDataNotice} role="status">
-      <p>{i18n.t('aiAnalysis.recordDataNotice.message')}</p>
+    <div className="ai-record-data-notice" data-testid={TestId.aiAssistant.recordDataNotice}>
+      <output className="ai-record-data-notice__message">{i18n.t('aiAnalysis.recordDataNotice.message')}</output>
       <Button
         className="btn-s"
         label="aiAnalysis.recordDataNotice.newConversation"

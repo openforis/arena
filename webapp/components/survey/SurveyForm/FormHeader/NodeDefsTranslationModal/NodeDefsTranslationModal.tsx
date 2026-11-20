@@ -355,18 +355,14 @@ const NodeDefsTranslationModal = ({
           </div>
         )}
         {failedCount > 0 && (
-          <div
-            className="node-defs-translation-modal__failed"
-            data-testid={TestId.ai.translationFailedNotice}
-            role="status"
-          >
+          <output className="node-defs-translation-modal__failed" data-testid={TestId.ai.translationFailedNotice}>
             {i18n.t('surveyForm:nodeDefsTranslation.failed', { count: failedCount })}
-          </div>
+          </output>
         )}
         {notDoneCount > 0 && (
-          <div className="node-defs-translation-modal__failed" role="status">
+          <output className="node-defs-translation-modal__failed">
             {i18n.t('surveyForm:nodeDefsTranslation.notDone', { count: notDoneCount })}
-          </div>
+          </output>
         )}
         <div className="node-defs-translation-modal__table-wrapper">
           <table className="node-defs-translation-modal__table">

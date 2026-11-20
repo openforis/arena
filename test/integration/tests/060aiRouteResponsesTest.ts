@@ -158,7 +158,7 @@ describe('AI routes: what the real handler chains answer (060)', () => {
       const route = find(aiRoutes, method, path)
       for (const aiEnabled of [true, false]) {
         ENV.aiFeaturesEnabled = aiEnabled
-        const res = await runRouteChain({ route, params: { id: 'acct:x' } })
+        const res = await runRouteChain({ route, params: { id: 'acct:x' } }) // NOSONAR: each request runs with its own value of the shared ENV flag
         expect(res.statusCode).toBe(401)
       }
     })
@@ -210,7 +210,7 @@ describe('AI routes: what the real handler chains answer (060)', () => {
         [groupNames.dataEditor, 'assistantCleaning'],
       ]
       for (const [member, feature] of cases) {
-        const res = await post(withAi(members[member]), callBody({ feature }))
+        const res = await post(withAi(members[member]), callBody({ feature })) // NOSONAR: one request after the other: the user rate limiter is shared
         expect([member, feature, res.statusCode]).toEqual([member, feature, 403])
         expect(errorOf(res)).toMatchObject({ key: expect.stringContaining('userNotAuthorized') })
       }
@@ -224,7 +224,7 @@ describe('AI routes: what the real handler chains answer (060)', () => {
 
     test('a data class that does not exist, or none, is 400 aiCallInvalid (dataClass)', async () => {
       for (const dataClass of ['everything', undefined, 7]) {
-        const res = await post(editor(), callBody({ dataClass }))
+        const res = await post(editor(), callBody({ dataClass })) // NOSONAR: one request after the other: the user rate limiter is shared
         expect(res.statusCode).toBe(400)
         expect(res.body).toMatchObject({ key: 'aiCallInvalid', params: { reason: 'dataClass' } })
       }
@@ -233,7 +233,7 @@ describe('AI routes: what the real handler chains answer (060)', () => {
     test('a survey feature without a surveyId (or with null) is 400 aiCallInvalid (surveyId), whoever asks', async () => {
       for (const user of [editor(), withAi(admin), undefined]) {
         for (const missing of [undefined, null]) {
-          const res = await post(user, callBody({ surveyId: missing }))
+          const res = await post(user, callBody({ surveyId: missing })) // NOSONAR: one request after the other: the user rate limiter is shared
           expect(res.statusCode).toBe(400)
           expect(res.body).toMatchObject({ key: 'aiCallInvalid', params: { reason: 'surveyId' } })
         }

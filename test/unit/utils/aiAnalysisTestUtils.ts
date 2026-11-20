@@ -75,10 +75,11 @@ export const newFakeAnalysisApi = (overrides: Partial<Record<keyof AnalysisApi, 
   const api = Object.fromEntries(
     names.map((name) => [
       name,
-      async (params: any) => {
+      (params: any) => {
         calls.push({ name, params })
         const impl = overrides[name]
-        return impl ? impl(params) : null
+        // like an async function: a throwing implementation rejects
+        return new Promise((resolve) => resolve(impl ? impl(params) : null))
       },
     ])
   ) as unknown as AnalysisApi

@@ -67,12 +67,7 @@ export const SuggestionBatchProgressCard = ({
   const known = !!progress?.total
   const title = t(TITLE_KEYS[kind], { count, lang: name })
   return (
-    <section
-      aria-label={title}
-      className="ai-assistant-card ai-batch-card"
-      data-testid={TestId.ai.batchProgress}
-      role="group"
-    >
+    <fieldset aria-label={title} className="ai-assistant-card ai-batch-card" data-testid={TestId.ai.batchProgress}>
       <strong>{title}</strong>
       <ProgressBar indeterminate={!known} progress={known ? Math.floor((100 * progress.done) / progress.total) : 0} />
       <div className="ai-batch-card__row">
@@ -92,6 +87,6 @@ export const SuggestionBatchProgressCard = ({
           variant="text"
         />
       </div>
-    </section>
+    </fieldset>
   )
 }

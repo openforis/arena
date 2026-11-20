@@ -160,7 +160,7 @@ const runNodesBatch = async (
     results.push(
       ...(Date.now() >= context.deadline
         ? failedResults(recordEdits, NodesBatchMessageKeys.applyTimeout)
-        : await sendRecordEditsSafely(context, recordUuid, recordEdits))
+        : await sendRecordEditsSafely(context, recordUuid, recordEdits)) // NOSONAR: one record at a time, see above; stops at the deadline
     )
   }
   return results.sort((resultA, resultB) => resultA.index - resultB.index)

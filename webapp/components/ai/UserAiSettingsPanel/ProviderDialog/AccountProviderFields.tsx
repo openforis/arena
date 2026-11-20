@@ -135,13 +135,13 @@ const ApiKeyField = (props: ApiKeyFieldProps) => {
           </div>
         )}
         {/* always rendered, so a screen reader announces the text when it appears */}
-        <div role="status" className="provider-dialog__status">
+        <output className="provider-dialog__status">
           {keyRemoved && (
-            <div className="provider-dialog__hint provider-dialog__hint--warning">
+            <span className="provider-dialog__hint provider-dialog__hint--warning">
               {t('userAiSettings:dialog.apiKeyRemoved')}
-            </div>
+            </span>
           )}
-        </div>
+        </output>
         {/* one button for both states, so it keeps the focus */}
         {(canRemoveKey || keyRemoved) && (
           <Button
@@ -238,11 +238,11 @@ const TestRow = ({ result, testing, canTest, onTest }: TestRowProps) => (
       testId={TestId.ai.providerTest}
     />
     {/* always rendered, so a screen reader announces the result when it appears */}
-    <span role="status" className="provider-dialog__live">
+    <output className="provider-dialog__live">
       {result && (
         <StatusPill tone={result.ok ? 'ok' : 'bad'} text={result.text} testId={TestId.ai.providerTestResult} />
       )}
-    </span>
+    </output>
   </div>
 )
 

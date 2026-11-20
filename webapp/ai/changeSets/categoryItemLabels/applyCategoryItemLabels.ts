@@ -162,7 +162,8 @@ export const applyCategoryItemLabels = async ({
   let appliedCount = 0
   for (let start = 0; start < operations.length; start += chunkSize) {
     const chunk = operations.slice(start, start + chunkSize)
-    const answer = await applyChunk({ surveyId: changeSet.surveyId, operations: chunk, deps, results })
+    // one request at a time: bounded server load and progress reported chunk by chunk
+    const answer = await applyChunk({ surveyId: changeSet.surveyId, operations: chunk, deps, results }) // NOSONAR
     for (const category of answer?.categories ?? []) categoriesByUuid.set(category.uuid, category)
     appliedCount += answer?.applied.length ?? 0
     onChunkDone?.(chunk.length)

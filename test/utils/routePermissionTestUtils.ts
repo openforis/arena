@@ -65,7 +65,7 @@ export const createSurveyMember = async ({
  */
 export const deleteUsers = async (users: any[]): Promise<void> => {
   for (const user of users) {
-    await UserRepository.deleteUser(User.getUuid(user))
+    await UserRepository.deleteUser(User.getUuid(user)) // NOSONAR: teardown, one delete at a time: no concurrent writes on the user tables
   }
 }
 
@@ -135,7 +135,7 @@ export const createMembersOfAllGroups = async ({
   // surveyGuest is not created for new surveys
   const groupNames = AuthGroup.surveyGroupNames.filter((name) => name !== AuthGroup.groupNames.surveyGuest)
   for (const groupName of groupNames) {
-    members[groupName] = await createSurveyMember({ admin, surveyId, groupName })
+    members[groupName] = await createSurveyMember({ admin, surveyId, groupName }) // NOSONAR: one member at a time: each invitation writes the user and group tables
   }
   return members
 }
@@ -178,7 +178,7 @@ export const getAccessByUser = async ({
 }): Promise<Record<string, RouteAccess>> => {
   const access: Record<string, RouteAccess> = {}
   for (const [key, user] of Object.entries(members)) {
-    access[key] = await checkRouteAccess({ route, user, surveyId, body, handlerIndex })
+    access[key] = await checkRouteAccess({ route, user, surveyId, body, handlerIndex }) // NOSONAR: one user at a time keeps the DB load of the check predictable
   }
   return access
 }
@@ -217,7 +217,7 @@ export const expectEditPermissionOnly = async ({
     const { groupNames } = AuthGroup
     const allowed = [groupNames.surveyEditor, groupNames.surveyAdmin, systemAdminKey]
     for (const route of routes) {
-      expect(await getAccessByUser({ route, members, surveyId })).toEqual(accessGrantedTo(members, allowed))
+      expect(await getAccessByUser({ route, members, surveyId })).toEqual(accessGrantedTo(members, allowed)) // NOSONAR: one route at a time keeps the DB load of the check predictable
     }
   } finally {
     await deleteMembersOfAllGroups(members)

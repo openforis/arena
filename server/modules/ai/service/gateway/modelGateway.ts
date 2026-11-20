@@ -229,7 +229,7 @@ const pumpStream = async ({
       if (part.type === 'error') outcome.error = part.error
       const wirePart = serializeStreamPart(part, toAiWireError, offeredTools)
       // a client that reads slowly must not make the server buffer the whole answer
-      if (wirePart && !writeEvent(wirePart)) await waitForDrain(res, control.signal)
+      if (wirePart && !writeEvent(wirePart)) await waitForDrain(res, control.signal) // NOSONAR: backpressure: the next part must wait for the client to drain
     }
   } catch (error) {
     outcome.error = error

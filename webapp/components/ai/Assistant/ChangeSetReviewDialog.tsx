@@ -255,7 +255,7 @@ const Segmented = <T extends string>({
   value: T
   onChange: (value: T) => void
 }) => (
-  <div aria-label={label} className="ai-change-review__segmented" role="group">
+  <fieldset aria-label={label} className="ai-change-review__segmented">
     {options.map((option) => (
       <button
         aria-pressed={option.value === value}
@@ -266,7 +266,7 @@ const Segmented = <T extends string>({
         {option.label}
       </button>
     ))}
-  </div>
+  </fieldset>
 )
 
 /**
@@ -296,7 +296,7 @@ export const ChangeSetReviewDialog = ({
   const t = useI18nT({ unescapeHtml: true })
   const titleId = useId()
   // a callback ref (state): the dialog takes the focus when it opens, so its name is announced
-  const [dialog, setDialog] = useState<HTMLDivElement | null>(null)
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
   const nodeDefExists = useNodeDefExists()
@@ -348,14 +348,14 @@ export const ChangeSetReviewDialog = ({
 
   return (
     <Modal className="ai-change-review" onClose={onClose}>
-      {/* the shared Modal forwards no role: the dialog and its name are set here */}
-      <div
+      {/* the shared Modal forwards no role: the dialog and its name are set here (rendered open, inside the Modal) */}
+      <dialog
         aria-labelledby={titleId}
         aria-modal="true"
         className="ai-change-review__content"
         data-testid={TestId.aiAssistant.reviewDialog}
+        open
         ref={setDialog}
-        role="dialog"
         tabIndex={-1}
       >
         <div className="ai-change-review__header">
@@ -363,11 +363,7 @@ export const ChangeSetReviewDialog = ({
           <span className="ai-change-review__summary">{cardState.changeSet.summary}</span>
           <ButtonIconClose onClick={onClose} testId={TestId.aiAssistant.reviewCloseBtn} />
         </div>
-        {conflictIds.length > 0 && (
-          <div className="ai-change-item__stale" role="status">
-            {t('aiAssistant.card.stale')}
-          </div>
-        )}
+        {conflictIds.length > 0 && <output className="ai-change-item__stale">{t('aiAssistant.card.stale')}</output>}
         <div className="ai-change-review__toolbar">
           <input
             aria-label={t('aiAssistant.card.review.search')}
@@ -489,7 +485,7 @@ export const ChangeSetReviewDialog = ({
             />
           )}
         </div>
-      </div>
+      </dialog>
     </Modal>
   )
 }

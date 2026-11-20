@@ -46,14 +46,24 @@ export const isAiAbortError = (error: unknown): boolean =>
  * @returns {string} The message.
  */
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
+  /**
+   * Translates an appErrors message (a plain string: these texts are never objects).
+   * @param {string} key - Translation key.
+   * @param {object} params - Interpolation params.
+   * @returns {string} The message.
+   */
+  const translate = (key: string, params: object): string => {
+    const text = i18n.t(key, params)
+    return typeof text === 'string' ? text : JSON.stringify(text)
+  }
   const aiKey = getAiErrorKey(error)
   // React escapes the text: i18next must not escape it too
   if (aiKey)
-    return String(i18n.t(`appErrors:${aiKey}`, { ...getAiErrorParams(error), interpolation: { escapeValue: false } }))
+    return translate(`appErrors:${aiKey}`, { ...getAiErrorParams(error), interpolation: { escapeValue: false } })
   // an API error (axios) carrying an appErrors-style key, e.g. the activity-log fetch failing
   const data = (error as any)?.response?.data
   const responseKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''
   if (responseKey)
-    return String(i18n.t(`appErrors:${responseKey}`, { ...data.params, interpolation: { escapeValue: false } }))
-  return String(i18n.t('appErrors:aiProviderUnavailable', {}))
+    return translate(`appErrors:${responseKey}`, { ...data.params, interpolation: { escapeValue: false } })
+  return translate('appErrors:aiProviderUnavailable', {})
 }

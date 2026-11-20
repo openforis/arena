@@ -28,7 +28,9 @@ export const subscribeSuggestionEvents = (listener: SuggestionEventListener): ((
  * @returns {void}
  */
 export const notifySuggestionEvent = (event: SuggestionEvent, log: AiLog = logAiWarning): void => {
-  for (const listener of [...listeners]) {
+  // a snapshot: a listener added during the loop (e.g. one that re-subscribes) must not be called now
+  const snapshot = [...listeners]
+  for (const listener of snapshot) {
     try {
       listener(event)
     } catch (error) {

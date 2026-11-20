@@ -34,7 +34,7 @@ const ProgressStatus = ({ progress, stopping }: { progress: AiBatchProgress | nu
   const i18n = useI18n()
   const known = !!progress && progress.total > 0
   return (
-    <div className="ai-batch-progress-dialog__status" data-testid={TestId.ai.batchProgress} role="status">
+    <output className="ai-batch-progress-dialog__status" data-testid={TestId.ai.batchProgress}>
       <ProgressBar indeterminate={!known} progress={known ? toPercent(progress) : 0} showText={false} />
       {/* the live region announces the start and the end, not every step */}
       <span aria-hidden={known && progress.done < progress.total}>
@@ -43,7 +43,7 @@ const ProgressStatus = ({ progress, stopping }: { progress: AiBatchProgress | nu
           : i18n.t('aiBatch.preparing')}
       </span>
       {stopping && <span>{i18n.t('aiBatch.stopping')}</span>}
-    </div>
+    </output>
   )
 }
 

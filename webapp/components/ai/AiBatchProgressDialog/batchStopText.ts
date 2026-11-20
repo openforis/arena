@@ -5,7 +5,8 @@
 import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
 import type { AiBatchStop } from '@webapp/ai/workflows/batchRun'
 
-type I18nLike = { t: (key: any, params?: any) => unknown }
+// i18next's `t` returns a string for these keys (no returnObjects)
+type I18nLike = { t: (key: string, params?: Record<string, unknown>) => string }
 
 /**
  * Returns the text of the notice of a stopped run.
@@ -16,7 +17,7 @@ type I18nLike = { t: (key: any, params?: any) => unknown }
  */
 export const getBatchStopText = ({ stop, i18n }: { stop: AiBatchStop; i18n: I18nLike }): string => {
   const params = { done: stop.done, total: stop.total, interpolation: { escapeValue: false } }
-  if (stop.cause === 'cancelled') return String(i18n.t('aiBatch.stoppedCancelled', params))
+  if (stop.cause === 'cancelled') return i18n.t('aiBatch.stoppedCancelled', params)
   const message = getAiErrorMessage({ error: stop.error, i18n })
-  return String(i18n.t('aiBatch.stoppedError', { ...params, message }))
+  return i18n.t('aiBatch.stoppedError', { ...params, message })
 }

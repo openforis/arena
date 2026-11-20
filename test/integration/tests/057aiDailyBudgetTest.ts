@@ -56,7 +56,9 @@ describe('AI daily budget of the Arena default provider: the conditional update 
   test('the calls limit is reached: the call over it is refused and nothing changes', async () => {
     const userUuid = await createUser()
     for (let calls = 1; calls <= 3; calls += 1) {
-      expect(await chargeAiUsage({ userUuid, chars: 1, ...limits })).toEqual({
+      expect(
+        /* NOSONAR: each call counts on the previous ones */ await chargeAiUsage({ userUuid, chars: 1, ...limits })
+      ).toEqual({
         day: DAY,
         calls,
         chars: calls,
@@ -88,7 +90,7 @@ describe('AI daily budget of the Arena default provider: the conditional update 
 
   test('a new day resets the counters', async () => {
     const userUuid = await createUser()
-    for (let call = 0; call < 3; call += 1) await chargeAiUsage({ userUuid, chars: 30, ...limits })
+    for (let call = 0; call < 3; call += 1) await chargeAiUsage({ userUuid, chars: 30, ...limits }) // NOSONAR: each call counts on the previous ones
     expect(await chargeAiUsage({ userUuid, chars: 1, ...limits })).toBeNull()
     await setStoredDay(userUuid, PAST_DAY)
     expect(await chargeAiUsage({ userUuid, chars: 5, ...limits })).toEqual({ day: DAY, calls: 1, chars: 5 })
@@ -98,7 +100,7 @@ describe('AI daily budget of the Arena default provider: the conditional update 
   test('0 means unlimited for that limit, and the usage is still counted', async () => {
     const userUuid = await createUser()
     for (let call = 0; call < 5; call += 1) {
-      expect(await chargeAiUsage({ userUuid, chars: 1000, callLimit: 0, charLimit: 0 })).not.toBeNull()
+      expect(await chargeAiUsage({ userUuid, chars: 1000, callLimit: 0, charLimit: 0 })).not.toBeNull() // NOSONAR: each call counts on the previous ones
     }
     expect((await readPrefs(userUuid)).aiUsage).toEqual({ day: DAY, calls: 5, chars: 5000 })
     expect(await chargeAiUsage({ userUuid, chars: 1000, callLimit: 5, charLimit: 0 })).toBeNull()

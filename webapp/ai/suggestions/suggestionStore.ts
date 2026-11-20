@@ -155,7 +155,9 @@ export const createSuggestionStore = ({
    * @returns {void}
    */
   const notify = (): void => {
-    for (const listener of [...listeners]) listener()
+    // a snapshot: a listener added during the loop (e.g. one that re-subscribes) must not be called now
+    const snapshot = [...listeners]
+    for (const listener of snapshot) listener()
   }
 
   /**

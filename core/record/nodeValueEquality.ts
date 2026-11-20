@@ -14,13 +14,23 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
 /**
+ * Returns true for a value that String() converts to a meaningful text.
+ * @param {unknown} value - The value.
+ * @returns {boolean} Whether the value is a string, number, boolean or bigint.
+ */
+const isScalar = (value: unknown): value is string | number | boolean | bigint =>
+  ['string', 'number', 'boolean', 'bigint'].includes(typeof value)
+
+/**
  * Normalizes a node value: empty values become null, primitives strings, objects sorted non-empty entries.
  * @param {unknown} value - The node value.
  * @returns {Normalized} The normalized value.
  */
 const normalize = (value: unknown): Normalized => {
   if (value === null || value === undefined || value === '') return null
-  if (!isPlainObject(value)) return String(value)
+  if (isScalar(value)) return String(value)
+  // arrays (not expected in node values) are compared item by item, as text
+  if (!isPlainObject(value)) return Array.isArray(value) ? JSON.stringify(value.map(normalize)) : null
 
   const entries = Object.keys(value)
     .sort((keyA, keyB) => keyA.localeCompare(keyB))
