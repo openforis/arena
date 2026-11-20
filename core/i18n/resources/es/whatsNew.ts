@@ -128,9 +128,15 @@ Puedes elegir la orientación de la página (vertical u horizontal).`,
     },
     odkImport: {
       title: 'Importar encuestas y datos desde ODK',
-      description: `Crea una nueva encuesta a partir de un **formulario ODK (.xml)** e importa los datos recogidos con **ODK Collect**.
+      description: `Cree una nueva encuesta a partir de un **formulario ODK** (XForm, .xml): en **Inicio > Nueva encuesta > Importar**, seleccione **ODK (.xml)** como **Fuente** y haga clic en **Iniciar importación**. Las preguntas del formulario se convierten en atributos, las repeticiones (repeats) en entidades múltiples y las listas de opciones en categorías, con las etiquetas en todos los idiomas del formulario. Antes de publicar, defina los atributos clave de la entidad raíz y corrija los errores indicados por **Publicar**, si los hay.
 
-*Esta función está en fase beta.*`,
+Después, importe los datos recopilados con **ODK Collect** en **Datos > Importación de datos > ODK / ODK Collect**: un archivo .zip con una carpeta por envío (exportación de ODK Briefcase). Los envíos ya importados se omiten.`,
+    },
+    positionTracking: {
+      title: 'Seguimiento de la posición: registrar el recorrido realizado en el campo',
+      description: `Marque **Seguimiento de la posición** en la pestaña **Básico** de un atributo **Geoespacial** simple: en **Arena Mobile**, el valor del atributo es el recorrido realizado por el usuario mientras rellena el registro, registrado siguiendo la posición del dispositivo.
+
+El recorrido no se puede editar manualmente. La opción se aplica solo a Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Enumeración dinámica de entidades',

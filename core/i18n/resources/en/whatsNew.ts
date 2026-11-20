@@ -128,9 +128,15 @@ You can choose the page orientation (portrait or landscape).`,
     },
     odkImport: {
       title: 'Import surveys and data from ODK',
-      description: `Create a new survey from an **ODK form (.xml)** and import the data collected with **ODK Collect**.
+      description: `Create a new survey from an **ODK form** (XForm, .xml): in **Home > New Survey > Import**, select **ODK (.xml)** as **Source**, then click **Start import**. The questions of the form become attributes, the repeats become multiple entities and the choice lists become categories, with the labels in all the languages of the form. Before publishing, define the key attributes of the root entity and fix the errors listed by **Publish**, if any.
 
-*This feature is in beta.*`,
+Then import the data collected with **ODK Collect** in **Data > Data Import > ODK / ODK Collect**: a .zip file with one folder per submission (ODK Briefcase export). Submissions already imported are skipped.`,
+    },
+    positionTracking: {
+      title: 'Position tracking: record the path walked in the field',
+      description: `Check **Position tracking** in the **Basic** tab of a single **Geospatial** attribute: in **Arena Mobile**, the value of the attribute is the path walked by the user while filling in the record, recorded by tracking the position of the device.
+
+The path cannot be edited manually. The option applies only to Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Dynamic enumeration of entities',

@@ -38,6 +38,18 @@ export const whatsNewItems: WhatsNewItem[] = [
     audience: whatsNewAudiences.systemAdmin,
     images: ['/img/whats-new/loginProviders.png', '/img/whats-new/loginProvidersAdmin.png'],
   },
+  {
+    id: 'odkImport',
+    version: '3.0.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    images: ['/img/whats-new/odkImport.png', '/img/whats-new/odkDataImport.png'],
+  },
+  {
+    id: 'positionTracking',
+    version: '3.0.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    images: ['/img/whats-new/positionTracking.png'],
+  },
   { id: 'mobileUploadEmailNotification', version: '2.13.2', audience: whatsNewAudiences.surveyAdmin },
   { id: 'surveyGuestRole', version: '2.13.0', audience: whatsNewAudiences.surveyAdmin },
   {
@@ -141,12 +153,6 @@ export const whatsNewItems: WhatsNewItem[] = [
     version: '2.9.0',
     audience: whatsNewAudiences.surveyAdmin,
     images: ['/img/whats-new/attributeClone.png'],
-  },
-  {
-    id: 'odkImport',
-    version: '3.0.0',
-    audience: whatsNewAudiences.surveyAdmin,
-    images: ['/img/whats-new/odkImport.png'],
   },
   {
     id: 'dynamicEnumerator',

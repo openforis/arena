@@ -127,10 +127,16 @@ Vous pouvez choisir l'orientation de la page (portrait ou paysage).`,
       description: `Dans le **concepteur de formulaires**, utilisez le menu d'un attribut pour le **cloner** dans la même entité ou dans une autre, avec toutes ses propriétés.`,
     },
     odkImport: {
-      title: 'Importer des enquêtes et des données depuis ODK',
-      description: `Créez une nouvelle enquête à partir d'un **formulaire ODK (.xml)** et importez les données collectées avec **ODK Collect**.
+      title: 'Importer des formulaires et des données depuis ODK',
+      description: `Créez un nouveau formulaire à partir d'un **formulaire ODK** (XForm, .xml) : dans **Accueil > Nouveau formulaire > Importer**, sélectionnez **ODK (.xml)** comme **Source**, puis cliquez sur **Démarrer l'importation**. Les questions du formulaire deviennent des attributs, les répétitions (repeats) des entités multiples et les listes de choix des catégories, avec les étiquettes dans toutes les langues du formulaire. Avant de publier, définissez les attributs clés de l'entité racine et corrigez les éventuelles erreurs signalées par **Publier**.
 
-*Cette fonctionnalité est en version bêta.*`,
+Importez ensuite les données collectées avec **ODK Collect** dans **Données > Importation de données > ODK / ODK Collect** : un fichier .zip avec un dossier par soumission (export ODK Briefcase). Les soumissions déjà importées sont ignorées.`,
+    },
+    positionTracking: {
+      title: 'Suivi de la position : enregistrer le trajet parcouru sur le terrain',
+      description: `Cochez **Suivi de la position** dans l'onglet **Basique** d'un attribut **Géospatial** simple : dans **Arena Mobile**, la valeur de l'attribut est le trajet parcouru par l'utilisateur pendant la saisie de l'enregistrement, enregistré en suivant la position de l'appareil.
+
+Le trajet ne peut pas être modifié manuellement. L'option s'applique uniquement à Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Énumération dynamique des entités',

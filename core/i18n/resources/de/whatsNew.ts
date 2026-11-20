@@ -132,9 +132,15 @@ Sie können zwischen Hoch- und Querformat wählen.`,
     },
     odkImport: {
       title: 'Erhebungen und Daten aus ODK importieren',
-      description: `Erstellen Sie eine neue Erhebung aus einem **ODK-Formular (.xml)** und importieren Sie die mit **ODK Collect** erhobenen Daten.
+      description: `Erstellen Sie eine neue Erhebung aus einem **ODK-Formular** (XForm, .xml): Wählen Sie unter **Startseite > Neue Erhebung > Import** als **Quelle** **ODK (.xml)** und klicken Sie auf **Import starten**. Die Fragen des Formulars werden zu Attributen, die Wiederholungen (Repeats) zu mehrfachen Entitäten und die Auswahllisten zu Kategorien, mit den Beschriftungen in allen Sprachen des Formulars. Legen Sie vor der Veröffentlichung die Schlüsselattribute der Stammentität fest und beheben Sie gegebenenfalls die unter **Veröffentlichen** angezeigten Fehler.
 
-*Diese Funktion befindet sich in der Betaphase.*`,
+Importieren Sie anschließend die mit **ODK Collect** erhobenen Daten unter **Daten > Datenimport > ODK / ODK Collect**: eine .zip-Datei mit einem Ordner pro Übermittlung (ODK-Briefcase-Export). Bereits importierte Übermittlungen werden übersprungen.`,
+    },
+    positionTracking: {
+      title: 'Positionsverfolgung: den im Gelände zurückgelegten Weg aufzeichnen',
+      description: `Aktivieren Sie **Positionsverfolgung** auf der Registerkarte **Allgemein** eines einfachen **Geodaten**-Attributs: In **Arena Mobile** ist der Wert des Attributs der Weg, den der Benutzer beim Ausfüllen des Datensatzes zurücklegt, aufgezeichnet durch Verfolgung der Geräteposition.
+
+Der Weg kann nicht manuell bearbeitet werden. Die Option gilt nur für Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Dynamische Aufzählung von Entitäten',
