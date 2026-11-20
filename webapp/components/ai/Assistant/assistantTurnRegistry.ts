@@ -34,7 +34,7 @@ const settleWithin = async (pending: Set<Promise<unknown>>, timeoutMs: number, l
     timer = setTimeout(() => resolve('timeout'), timeoutMs)
   })
   const settled = (async () => {
-    while (pending.size > 0) await Promise.allSettled(pending)
+    while (pending.size > 0) await Promise.allSettled(pending) // NOSONAR: re-awaits the saves tracked meanwhile
     return 'settled' as const
   })()
   try {

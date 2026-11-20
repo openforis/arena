@@ -25,8 +25,12 @@ const assertMaxCount = (count: number, limit: number): void => {
   if (count > limit) throw badRequest('aiTranslationTooManyItems', { count, limit })
 }
 
+// untrusted input: a non-string value is measured as JSON (its size in the prompt)
+const textLength = (value: unknown): number =>
+  typeof value === 'string' ? value.length : (JSON.stringify(value)?.length ?? 0)
+
 const assertMaxLength = (value: unknown, field: string, limit: number): void => {
-  if (value != null && String(value).length > limit) throw badRequest('aiInputTooLong', { field, limit })
+  if (value != null && textLength(value) > limit) throw badRequest('aiInputTooLong', { field, limit })
 }
 
 const isValidLang = (lang: unknown): boolean =>

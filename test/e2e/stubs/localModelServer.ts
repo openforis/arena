@@ -173,7 +173,7 @@ export const toChatCompletionChunks = (parts: LanguageModelV4StreamPart[]): obje
 const readStream = async <T>(stream: ReadableStream<T>): Promise<T[]> => {
   const parts: T[] = []
   const reader = stream.getReader()
-  for (let next = await reader.read(); !next.done; next = await reader.read()) parts.push(next.value)
+  for (let next = await reader.read(); !next.done; next = await reader.read()) parts.push(next.value) // NOSONAR: a stream is read in order
   return parts
 }
 
@@ -232,7 +232,7 @@ const answerChat = async (
   const chunks = toChatCompletionChunks(await readStream(stream))
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' })
   for (const data of chunks) {
-    if (chunkDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, chunkDelayMs))
+    if (chunkDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, chunkDelayMs)) // NOSONAR: chunks are paced one after the other
     res.write(`data: ${JSON.stringify(data)}\n\n`)
   }
   res.end('data: [DONE]\n\n')

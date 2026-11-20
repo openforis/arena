@@ -9,11 +9,21 @@
 }
 
 .ai-change-review {
+  // a <dialog open> in the Modal: its UA box styles are reset
   &__content {
+    position: static;
     display: flex;
     flex-direction: column;
+    width: auto;
+    max-width: none;
     height: 100%;
+    max-height: none;
     min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
 
     // focused by script when the dialog opens (a name announcement, not a control)
     &:focus {
@@ -67,8 +77,13 @@
     border-radius: 0.25rem;
   }
 
+  // a fieldset
   &__segmented {
     display: flex;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
 
     button {
       padding: 0.25rem 0.75rem;
@@ -214,7 +229,6 @@
       white-space: normal;
     }
   }
-
 
   &__badge {
     margin-left: 0.5rem;

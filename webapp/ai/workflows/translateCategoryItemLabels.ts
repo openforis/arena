@@ -133,7 +133,8 @@ export const loadCategoryLabelRows = async ({
     let cursor: string | null = null
     do {
       if (rows.length >= maxItems) return { rows: rows.slice(0, maxItems), skippedCount }
-      const page = await fetchPage({
+      // pages are read one after the other: the next request needs the cursor of the previous answer
+      const page = await /* NOSONAR */ fetchPage({
         surveyId,
         categoryUuid: category.uuid,
         lang,

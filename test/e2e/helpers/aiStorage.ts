@@ -58,7 +58,7 @@ export const waitForSuggestionDetectors = async (page: Page): Promise<void> => {
  * @param {string} userUuid - User uuid.
  * @returns {Promise<SuggestionUserState|null>} The stored state; null while nothing was written.
  */
-export const readSuggestionState = async (page: Page, userUuid: string): Promise<SuggestionUserState | null> =>
+export const readSuggestionState = (page: Page, userUuid: string): Promise<SuggestionUserState | null> =>
   page.evaluate((key): SuggestionUserState | null => {
     try {
       return JSON.parse(window.localStorage.getItem(key) ?? 'null')

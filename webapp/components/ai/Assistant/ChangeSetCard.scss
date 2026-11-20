@@ -1,5 +1,7 @@
 // the change set card of the chat; what it shares with the review dialog is in ChangeItem.scss
 .ai-assistant-card {
+  // a fieldset: margin, padding and border are set here; min-width resets its min-content default
+  min-width: 0;
   margin: 0.5rem 0;
   padding: 0.5rem;
   border: 1px solid var(--color-outline);
@@ -58,7 +60,9 @@
     gap: 0.5rem;
   }
 
+  // also an <output> (status line): block like the <p> hints
   &__hint {
+    display: block;
     width: 100%;
     margin: 0;
     color: var(--color-on-surface-variant);

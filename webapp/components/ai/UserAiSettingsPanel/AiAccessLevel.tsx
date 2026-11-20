@@ -185,12 +185,7 @@ const FeatureChips = ({
   return (
     <div id={id} className="user-ai-settings-panel__chips">
       {FEATURE_GROUPS.map((group) => (
-        <div
-          key={group.id}
-          role="group"
-          className="user-ai-settings-panel__chip-group"
-          aria-labelledby={`${id}-${group.id}`}
-        >
+        <fieldset key={group.id} className="user-ai-settings-panel__chip-group" aria-labelledby={`${id}-${group.id}`}>
           <DataBadge kind={getDataBadgeKind(group)} id={`${id}-${group.id}`} />
           <span className="user-ai-settings-panel__chip-row">
             {group.categories.map((category) => (
@@ -203,7 +198,7 @@ const FeatureChips = ({
               />
             ))}
           </span>
-        </div>
+        </fieldset>
       ))}
       <span className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:access.customizeHint')}</span>
     </div>

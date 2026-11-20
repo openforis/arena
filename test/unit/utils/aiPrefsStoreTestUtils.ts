@@ -17,8 +17,8 @@ export const createAiPrefsStore = (initial: StoredAiPrefs | null = null, copiedE
       current = aiPrefs
     },
     writes,
-    findCopiedEnvelopes: async ({ envelopes }: { envelopes: string[] }): Promise<string[]> =>
-      envelopes.filter((envelope) => copiedEnvelopes.includes(envelope)),
+    findCopiedEnvelopes: ({ envelopes }: { envelopes: string[] }): Promise<string[]> =>
+      Promise.resolve(envelopes.filter((envelope) => copiedEnvelopes.includes(envelope))),
     updateAiPrefs: (_userUuid: string, update: AiPrefsUpdate): Promise<StoredAiPrefs | null> => {
       const run = async () => {
         const next = await update(current, {} as Queryable)

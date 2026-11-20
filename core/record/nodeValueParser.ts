@@ -471,6 +471,24 @@ const isEmptyInput = (input: NodeValueInput): boolean =>
 const headersOf = (nodeDef: any): string[] => [NodeDef.getName(nodeDef)]
 
 /**
+ * Converts an input to text: objects as JSON, so that "[object Object]" never shows up.
+ * @param {NodeValueInput} input - The input.
+ * @returns {string} The text.
+ */
+const inputToText = (input: NodeValueInput): string => {
+  if (input === null) return 'null'
+  return typeof input === 'object' ? JSON.stringify(input) : String(input)
+}
+
+/**
+ * Converts a scalar to text; any other value (object, array, missing) becomes an empty string.
+ * @param {unknown} value - The value.
+ * @returns {string} The text.
+ */
+const scalarToText = (value: unknown): string =>
+  typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
+
+/**
  * Parses a single-prop value (number, boolean, date, time) with layer 1.
  * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
@@ -478,7 +496,7 @@ const headersOf = (nodeDef: any): string[] => [NodeDef.getName(nodeDef)]
 const parseSinglePropInput: InputParser = (params) =>
   parseNodeValueProps({
     ...params,
-    valueProps: { [VALUE_PROP_DEFAULT]: String(params.input).trim() },
+    valueProps: { [VALUE_PROP_DEFAULT]: inputToText(params.input).trim() },
     headers: headersOf(params.nodeDef),
   })
 
@@ -490,10 +508,10 @@ const decimalPattern = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseDecimalInput: InputParser = async (params) => {
-  const text = String(params.input).trim()
+  const text = inputToText(params.input).trim()
   if (!decimalPattern.test(text) || !Number.isFinite(Number(text))) {
     throw new SystemError('validationErrors:dataImport.invalidNumber', {
-      value: String(params.input),
+      value: inputToText(params.input),
       headers: headersOf(params.nodeDef),
     })
   }
@@ -509,7 +527,7 @@ const parseIntegerInput: InputParser = async (params) => {
   const parsed = await parseDecimalInput(params)
   if (!Number.isSafeInteger(parsed.value)) {
     throw new SystemError('validationErrors:dataImport.invalidNumber', {
-      value: String(params.input),
+      value: inputToText(params.input),
       headers: headersOf(params.nodeDef),
     })
   }
@@ -559,7 +577,7 @@ const resolveSrsCode = (survey: any, srs: unknown): string | null => {
   if (Objects.isEmpty(srs)) {
     return srsCodes.length === 1 ? srsCodes[0] : null
   }
-  const code = StringUtils.removePrefix(Srs.idPrefix)(String(srs).trim())
+  const code = StringUtils.removePrefix(Srs.idPrefix)(scalarToText(srs).trim())
   return srsCodes.includes(code) ? code : null
 }
 
@@ -630,7 +648,7 @@ const getAncestorCodes = ({ survey, nodeDef, record, parentNode }: InputParserPa
  */
 const parseCodeInput: InputParser = async (params) => {
   const { survey, nodeDef, input, record, parentNode, categoryItemProvider } = params
-  const code = String(typeof input === 'object' ? (input.code ?? '') : input).trim()
+  const code = scalarToText(typeof input === 'object' ? input?.code : input).trim()
   const invalidCode = () =>
     new SystemError('validationErrors:dataImport.invalidCode', { code, attributeName: NodeDef.getName(nodeDef) })
 
@@ -659,7 +677,7 @@ const parseCodeInput: InputParser = async (params) => {
  * @returns {Promise<ParsedNodeValue>} The node value and the taxon as ref data.
  */
 const parseTaxonInput: InputParser = async ({ survey, nodeDef, input, taxonProvider }) => {
-  const text = String(typeof input === 'object' ? (input.code ?? input.scientificName ?? '') : input).trim()
+  const text = scalarToText(typeof input === 'object' ? (input?.code ?? input?.scientificName) : input).trim()
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   const taxon =
     (await findTaxonByCode({ survey, taxonProvider, nodeDef, taxonCode: text })) ??

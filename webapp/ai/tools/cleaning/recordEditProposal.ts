@@ -256,7 +256,7 @@ const proposeRecordEdits = async ({
   const prepared: PreparedEdit[] = []
   const seenNodeUuids = new Set<string>()
   for (const edit of edits) {
-    const outcome = await prepareEdit({ context, record, edit, seenNodeUuids })
+    const outcome = await prepareEdit({ context, record, edit, seenNodeUuids }) // NOSONAR: seenNodeUuids is shared, edits in order
     if (outcome.refusal) rejected.push(reject(edit, outcome.refusal))
     else prepared.push(outcome.prepared as PreparedEdit)
   }
@@ -281,7 +281,7 @@ export const buildRecordEditProposal = async ({
   const drafts: ChangeOperationDraft[] = []
   const rejected: RecordEditRejection[] = []
   for (const [recordUuid, recordEdits] of groupByRecord(edits)) {
-    const outcome = await proposeRecordEdits({ context, recordUuid, edits: recordEdits })
+    const outcome = await proposeRecordEdits({ context, recordUuid, edits: recordEdits }) // NOSONAR: one record at a time (server load, shared providers)
     drafts.push(...outcome.drafts)
     rejected.push(...outcome.rejected)
   }

@@ -195,7 +195,8 @@ const applyGroups = async (
   const appliedCreates = new Set<string>()
   let stopReason: string | null = null
   for (const group of groups) {
-    stopReason = await applyGroup({ group, changeSet, deps, results, appliedCreates, stopReason })
+    // one save at a time, in proposal order: a group may depend on an earlier one (e.g. a created parent)
+    stopReason = await applyGroup({ group, changeSet, deps, results, appliedCreates, stopReason }) // NOSONAR
     onGroupDone(group)
   }
 }

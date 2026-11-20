@@ -75,7 +75,7 @@ describe('AI prefs writer (055)', () => {
     return { ...user, prefs: { ...User.getPrefs(user), ai: await readAiPrefs({ userUuid: uuid() }) } }
   }
 
-  const readPrefs = async (): Promise<any> =>
+  const readPrefs = (): Promise<any> =>
     db.one('SELECT prefs FROM "user" WHERE uuid = $1', [uuid()], (row: any) => row.prefs)
 
   const providerDeps = (runTest: AiProviderService.AiProviderServiceDeps['runTest']) => ({
@@ -134,9 +134,7 @@ describe('AI prefs writer (055)', () => {
     await expect(
       updateAiPrefs({
         userUuid: uuid(),
-        update: async () => {
-          throw new Error('refused')
-        },
+        update: () => Promise.reject(new Error('refused')),
       })
     ).rejects.toThrow('refused')
     expect(await updateAiPrefs({ userUuid: uuid(), update: () => null })).toEqual(aiPrefs)

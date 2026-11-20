@@ -1622,7 +1622,6 @@ $t(common.cantUndoWarning)`,
     },
     unavailable: {
       noSurvey: 'この領域を使うには調査を開いてください。',
-      noPermission: '調査を編集する権限が必要です。',
       policy: '調査のAIポリシーでは、設定されたAIプロバイダーを利用できません。',
     },
     menu: {

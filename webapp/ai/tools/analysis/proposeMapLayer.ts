@@ -107,9 +107,9 @@ const validate = (input: ProposeMapLayerInput, survey: any): { error: object } |
  * Validates the proposed layer and shows it to the user as a card.
  * @param {ProposeMapLayerInput} input - Tool input.
  * @param {AiToolContext} ctx - Tool context.
- * @returns {Promise<object>} The layer, or the valid layer names.
+ * @returns {object} The layer, or the valid layer names.
  */
-const execute = async (input: ProposeMapLayerInput, ctx: AiToolContext) => {
+const proposeMapLayer = (input: ProposeMapLayerInput, ctx: AiToolContext) => {
   const survey = ctx.getSurvey?.() ?? ctx.survey
   // a blank search is no search
   const search = input.search?.trim() || null
@@ -138,5 +138,6 @@ export const proposeMapLayerTool: AiTool<ProposeMapLayerInput, unknown> = {
   dataClass: 'schema',
   requires: (ctx: AiToolContext) =>
     canViewCurrentSurvey(ctx) && Authorizer.canUseMap(ctx.user, Survey.getSurveyInfo(ctx.survey)),
-  execute,
+  // synchronous work: a throw still becomes a rejection, as with an async function
+  execute: (input, ctx) => Promise.resolve().then(() => proposeMapLayer(input, ctx)),
 }

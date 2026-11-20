@@ -117,7 +117,7 @@ export const getWorkerDataEditor = (parallelIndex: number): TestUser => ({
  * @param {string} [params.groupName] - Survey group name (default surveyEditor).
  * @returns {Promise<void>} - Resolves when done.
  */
-export const insertSurveyEditor = async ({
+export const insertSurveyEditor = ({
   user,
   surveyId,
   groupName = 'surveyEditor',

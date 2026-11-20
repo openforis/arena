@@ -333,7 +333,7 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
 
   for (const edit of edits) {
     assertBeforeDeadline(state)
-    record = await applyEdit({ state, record, edit, t })
+    record = await applyEdit({ state, record, edit, t }) // NOSONAR: each edit applies to the record updated by the previous one
   }
   // the transaction commits when this function returns
   assertBeforeDeadline(state)

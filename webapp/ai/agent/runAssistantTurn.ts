@@ -234,12 +234,28 @@ const loadOutline = async (): Promise<string | null> => {
 }
 
 /**
+ * Message of a thrown value for a tool result: anything can be thrown, not only an Error.
+ * @param {unknown} error - The thrown value.
+ * @returns {string} Its message.
+ */
+export const getThrownMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  try {
+    return JSON.stringify(error) ?? typeof error
+  } catch {
+    // a cyclic object or a bigint
+    return typeof error
+  }
+}
+
+/**
  * Builds the structured result of a tool that threw outside the wrapper.
  * @param {unknown} error - The error.
  * @returns {object} The `{ error: { code, message } }` result.
  */
 const toolFailedOutput = (error: unknown) => ({
-  error: { code: 'toolFailed', message: error instanceof Error ? error.message : String(error) },
+  error: { code: 'toolFailed', message: getThrownMessage(error) },
 })
 
 type StreamOutcome = {

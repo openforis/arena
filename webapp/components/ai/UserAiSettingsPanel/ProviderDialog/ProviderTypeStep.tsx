@@ -33,12 +33,7 @@ export const ProviderTypeStep = ({ groups, onChoose }: Props) => {
   return (
     <div className="provider-dialog__types">
       {groups.map((group) => (
-        <div
-          key={group.key}
-          className="provider-dialog__type-group"
-          role="group"
-          aria-label={t(GROUP_LABELS[group.key])}
-        >
+        <fieldset key={group.key} className="provider-dialog__type-group" aria-label={t(GROUP_LABELS[group.key])}>
           <span className="provider-dialog__group-label">{t(GROUP_LABELS[group.key])}</span>
           <div className="provider-dialog__type-grid">
             {group.options.map(({ spec, disabled }) => {
@@ -61,7 +56,7 @@ export const ProviderTypeStep = ({ groups, onChoose }: Props) => {
               )
             })}
           </div>
-        </div>
+        </fieldset>
       ))}
     </div>
   )

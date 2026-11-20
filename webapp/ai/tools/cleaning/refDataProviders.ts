@@ -95,8 +95,8 @@ export const createRefDataProviders = ({
      * @param {string} params.itemUuid - Item uuid.
      * @returns {Promise<object|null>} The item.
      */
-    getItemByUuid: async ({ survey, itemUuid }: { survey: any; itemUuid: string }) =>
-      Survey.getCategoryItemByUuid(itemUuid)(survey) ?? itemsByUuid.get(itemUuid) ?? null,
+    getItemByUuid: ({ survey, itemUuid }: { survey: any; itemUuid: string }) =>
+      Promise.resolve(Survey.getCategoryItemByUuid(itemUuid)(survey) ?? itemsByUuid.get(itemUuid) ?? null),
     /**
      * Lists the items under a parent (entity enumeration only; not used by attribute edits).
      * @param {object} params - Parameters.
@@ -139,8 +139,8 @@ export const createRefDataProviders = ({
      * @param {string} params.taxonUuid - Taxon uuid.
      * @returns {Promise<object|null>} The taxon.
      */
-    getTaxonByUuid: async ({ survey, taxonUuid }: { survey: any; taxonUuid: string }) =>
-      Survey.getTaxonByUuid(taxonUuid)(survey) ?? taxaByUuid.get(taxonUuid) ?? null,
+    getTaxonByUuid: ({ survey, taxonUuid }: { survey: any; taxonUuid: string }) =>
+      Promise.resolve(Survey.getTaxonByUuid(taxonUuid)(survey) ?? taxaByUuid.get(taxonUuid) ?? null),
   }
 
   return { categoryItemProvider, taxonProvider }

@@ -145,7 +145,7 @@ describe('API key field (440)', () => {
     test('Remove key and Keep key are one toggle button, and the removed hint sits in an always rendered status', () => {
       expect(fields.match(/userAiSettings:dialog\.removeKey/g)).toHaveLength(1)
       expect(fields).toMatch(/aria-pressed=\{keyRemoved\}/)
-      expect(fields).toMatch(/<div role="status" className="provider-dialog__status">\s*\{keyRemoved/)
+      expect(fields).toMatch(/<output className="provider-dialog__status">\s*\{keyRemoved/)
     })
   })
 })

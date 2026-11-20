@@ -130,11 +130,12 @@ const ProviderChooser = ({
     ),
   })
   return (
-    <div
+    // rendered open in the popover, which handles the focus and Escape
+    <dialog
       aria-label={t('aiAssistant.providerChip.answerWith')}
       className="ai-provider-chooser"
       data-testid={TestId.aiAssistant.providerChooser}
-      role="dialog"
+      open
     >
       <span className="ai-provider-chooser__title">{t('aiAssistant.providerChip.answerWith')}</span>
       <div
@@ -172,7 +173,7 @@ const ProviderChooser = ({
           {t('aiAssistant.providerChip.manage')}
         </button>
       </div>
-    </div>
+    </dialog>
   )
 }
 

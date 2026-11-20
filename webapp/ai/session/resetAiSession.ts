@@ -53,7 +53,7 @@ export const createResetAiSession =
     }
     for (const { name, run } of resets) {
       try {
-        await run()
+        await run() // NOSONAR: one at a time, in the declared order (a predictable, tested reset sequence)
       } catch (error) {
         log(`The ${name} could not be reset`, error)
       }

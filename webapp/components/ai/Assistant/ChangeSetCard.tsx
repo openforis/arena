@@ -68,20 +68,19 @@ const ChangeSetFullCard = ({
   }
 
   return (
-    <section
+    <fieldset
       aria-label={t('aiAssistant.card.title')}
       className="ai-assistant-card"
       data-testid={TestId.aiAssistant.changeSetCard}
-      role="group"
     >
       <div className="ai-assistant-card__header">
         <strong>{t('aiAssistant.card.title')}</strong>
         <span>{cardState.changeSet.summary}</span>
       </div>
       {conflictIds.length > 0 && (
-        <div className="ai-change-item__stale" data-testid={TestId.aiAssistant.stale} role="status">
+        <output className="ai-change-item__stale" data-testid={TestId.aiAssistant.stale}>
           {t('aiAssistant.card.stale')}
-        </div>
+        </output>
       )}
       <ul className="ai-assistant-card__rows">{nodeDefItems.map(renderRow)}</ul>
       {categoryGroups.map((group) => (
@@ -94,9 +93,9 @@ const ChangeSetFullCard = ({
           <ul className="ai-assistant-card__rows">{group.items.map(renderRow)}</ul>
         </div>
       ))}
-      <p className="ai-assistant-card__hint" ref={setStatusElement} role="status" tabIndex={-1}>
+      <output className="ai-assistant-card__hint" ref={setStatusElement} tabIndex={-1}>
         {getStatusLineText({ items, discarded: Boolean(cardState.discarded), t })}
-      </p>
+      </output>
       {pendingIds.length > 0 && (
         <div className="ai-assistant-card__footer">
           {selection.progress && (
@@ -121,7 +120,7 @@ const ChangeSetFullCard = ({
           />
         </div>
       )}
-    </section>
+    </fieldset>
   )
 }
 

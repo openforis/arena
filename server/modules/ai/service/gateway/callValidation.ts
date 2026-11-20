@@ -34,7 +34,7 @@ const parseSurveyId = (value: unknown, required: boolean): number | undefined =>
     if (required) throw invalid('surveyId')
     return undefined
   }
-  if (!required) throw invalid('surveyId')
+  if (!required || (typeof value !== 'number' && typeof value !== 'string')) throw invalid('surveyId')
   const surveyId = Number(value)
   if (!Number.isInteger(surveyId) || surveyId <= 0 || String(value) !== String(surveyId)) throw invalid('surveyId')
   return surveyId

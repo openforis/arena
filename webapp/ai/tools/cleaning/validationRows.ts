@@ -61,7 +61,9 @@ export const collectValidationResults = (validation: any): ValidationResultEntry
 export const getRowRecordKeys = ({ survey, row }: { survey: any; row: any }): string => {
   const nodeDef = RecordValidationReportItem.getNodeDef(survey)(row)
   const rootKeys = nodeDef && NodeDef.isRoot(nodeDef) ? row.keysSelf : row.keysHierarchy?.[0]?.keys
-  return Object.values(rootKeys ?? {}).join(', ')
+  // key values are column values (text, numbers or empty)
+  const keyValues: (string | number | null)[] = Object.values(rootKeys ?? {})
+  return keyValues.join(', ')
 }
 
 /**

@@ -111,12 +111,21 @@ const KEY_REQUIRED_TYPES = new Set<string>([
 ])
 
 /**
+ * Returns an untrusted value of a request (parsed JSON) as text for an error message, cut to the given length.
+ * @param {unknown} value - The value.
+ * @param {number} maxLength - Maximum length.
+ * @returns {string} The text.
+ */
+const clipRequestValue = (value: unknown, maxLength: number): string =>
+  (typeof value === 'string' ? value : (JSON.stringify(value) ?? 'undefined')).slice(0, maxLength)
+
+/**
  * Builds the 404 of a provider id that is not the user's (or not an id at all).
  * @param {unknown} providerId - Requested id.
  * @returns {SystemError} The error.
  */
 const notFound = (providerId: unknown): SystemError =>
-  new SystemError('aiProviderNotFound', { providerId: String(providerId).slice(0, 80) }, StatusCodes.NOT_FOUND)
+  new SystemError('aiProviderNotFound', { providerId: clipRequestValue(providerId, 80) }, StatusCodes.NOT_FOUND)
 
 /**
  * Builds a 400 error.
@@ -216,7 +225,7 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
 const assertType = (type: unknown, deps: AiProviderServiceDeps): string => {
   const valid =
     typeof type === 'string' && (ProviderRegistry.isSupported(type) || (type === MOCK_PROVIDER && deps.isMockEnabled()))
-  if (!valid) throw badRequest('aiProviderInvalid', { provider: String(type).slice(0, 64) })
+  if (!valid) throw badRequest('aiProviderInvalid', { provider: clipRequestValue(type, 64) })
   return type
 }
 

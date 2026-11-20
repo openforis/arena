@@ -1616,7 +1616,6 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
     unavailable: {
       noSurvey: 'Open a survey to use this area.',
-      noPermission: 'You need permission to edit the survey.',
       policy: "The survey's AI policy doesn't allow the configured AI provider.",
     },
     menu: {

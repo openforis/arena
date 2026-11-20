@@ -38,7 +38,7 @@ export const createPurgeSurveyAiData =
     ]
     for (const [what, run] of steps) {
       try {
-        await run()
+        await run() // NOSONAR: the steps must run in this order (see above)
       } catch (error) {
         log(
           `The ${what} of survey ${surveyId} could not be ${what === 'running answers' ? 'stopped' : 'deleted from this browser'}`,

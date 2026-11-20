@@ -287,7 +287,7 @@ export const updateItemsLabels = (
     const categories: any[] = []
     for (const categoryUuid of categoryUuids) {
       categories.push(
-        await CategoryRepository.fetchCategoryAndLevelsByUuid(
+        /* NOSONAR: queries of one transaction run one at a time */ await CategoryRepository.fetchCategoryAndLevelsByUuid(
           { surveyId, categoryUuid, draft: true, includeValidation: true },
           tx
         )

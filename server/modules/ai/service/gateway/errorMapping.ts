@@ -54,11 +54,26 @@ export const toAiWireError = (error: unknown): AiWireError => {
   return { key: systemError.key, params: systemError.params ?? {} }
 }
 
-const clip = (value: unknown): string => String(value).slice(0, LOGGED_TEXT_CHARS)
+/**
+ * Converts a logged value to text: a non-string one as JSON (a circular one by its type only).
+ * @param {unknown} value - The value.
+ * @returns {string} The text.
+ */
+const toLogText = (value: unknown): string => {
+  if (typeof value === 'string') return value
+  if (value instanceof Error) return value.toString()
+  try {
+    return JSON.stringify(value) ?? typeof value
+  } catch {
+    return Object.prototype.toString.call(value)
+  }
+}
+
+const clip = (value: unknown): string => toLogText(value).slice(0, LOGGED_TEXT_CHARS)
 
 // the frames of a stack, without its first lines, which repeat the message of the error
 const stackFrames = (stack: unknown): string[] =>
-  String(stack)
+  (typeof stack === 'string' ? stack : '')
     .split('\n')
     .filter((line) => /^\s+at /.test(line))
     .map(clip)

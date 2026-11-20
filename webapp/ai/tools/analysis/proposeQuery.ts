@@ -90,9 +90,9 @@ export const toDataQueryAiResult = (input: ProposeQueryInput) => {
  * Validates the proposed query and shows it to the user as a card.
  * @param {ProposeQueryInput} input - Tool input.
  * @param {object} ctx - Tool context (with the conversation's analysisQueries).
- * @returns {Promise<object>} The query id, or the reasons why the proposal is invalid.
+ * @returns {object} The query id, or the reasons why the proposal is invalid.
  */
-const execute = async (input: ProposeQueryInput, ctx: any) => {
+const proposeQuery = (input: ProposeQueryInput, ctx: any) => {
   const store = ctx.analysisQueries
   if (!store) throw new Error('query_propose needs the conversation query store')
   const { survey, cycle, lang, includeAnalysis } = getAnalysisContext(ctx)
@@ -135,5 +135,6 @@ export const proposeQueryTool: AiTool<ProposeQueryInput, unknown> = {
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',
   requires: canViewCurrentSurvey,
-  execute,
+  // synchronous work: a throw still becomes a rejection, as with an async function
+  execute: (input, ctx) => Promise.resolve().then(() => proposeQuery(input, ctx)),
 }

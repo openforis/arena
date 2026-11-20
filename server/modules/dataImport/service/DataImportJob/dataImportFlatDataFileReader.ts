@@ -152,7 +152,7 @@ const createReaderFromStream = ({
         try {
           const { value: nodeValue, refData } = Objects.isEmpty(valueTemp)
             ? { value: null, refData: null }
-            : await parseNodeValueProps({
+            : /* NOSONAR: the providers may query the import transaction, one at a time */ await parseNodeValueProps({
                 survey,
                 nodeDef,
                 valueProps: valueTemp,

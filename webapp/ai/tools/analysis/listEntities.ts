@@ -86,9 +86,9 @@ const searchAttributes = ({ entities, search, budget }: { entities: any[]; searc
  * Lists the queryable entities and their attributes, or one entity.
  * @param {Input} input - Tool input.
  * @param {object} ctx - Tool context.
- * @returns {Promise<object>} The entities.
+ * @returns {object} The entities.
  */
-const execute = async (input: Input, ctx: any) => {
+const listEntities = (input: Input, ctx: any) => {
   const { survey, cycle, lang, includeAnalysis } = getAnalysisContext(ctx)
   const entityDefs = QueryNodeDefs.getQueryableEntityDefs({ survey, cycle })
   const toItem = (entityDef: any) => toEntityItem({ survey, entityDef, cycle, lang, includeAnalysis })
@@ -132,5 +132,6 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',
   requires: canViewCurrentSurvey,
-  execute,
+  // synchronous work: a throw still becomes a rejection, as with an async function
+  execute: (input, ctx) => Promise.resolve().then(() => listEntities(input, ctx)),
 }

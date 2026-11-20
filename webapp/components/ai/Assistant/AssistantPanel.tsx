@@ -17,7 +17,7 @@ import { AssistantChat } from './AssistantChat'
 import { AssistantHistory } from './AssistantHistory'
 import { AssistantStartScreen } from './AssistantStartScreen'
 import { AssistantSuggestionList } from './AssistantSuggestionList'
-import type { AssistantArea, AssistantAreaStatus } from './assistantAreas'
+import { getTabAreas, isTabBarShown, type AssistantArea, type AssistantAreaStatus } from './assistantAreas'
 import { closeAssistantPanel } from './assistantPanelActions'
 import { assistantPanelStore, type AssistantPanelView } from './assistantPanelStore'
 import { useAssistantConversation, type AssistantConversationApi } from './useAssistantConversation'
@@ -34,7 +34,7 @@ const areaTabLabelKeys: Record<AssistantArea, string> = {
 }
 
 /**
- * Area tabs (disabled while an answer runs); a dot marks the tabs with suggestions.
+ * Area tabs (disabled while an answer runs), not shown for a single area; a dot marks the tabs with suggestions.
  * @param {object} props - Props.
  * @param {AssistantAreaStatus[]} props.statuses - Area statuses.
  * @param {AssistantArea} props.area - Current area.
@@ -54,13 +54,15 @@ const AssistantTabs = ({
   byArea: SuggestionsByArea
 }) => {
   const t = useI18nT()
-  const tabAreas = statuses.filter((status) => status.status !== 'hidden').map((status) => status.area)
+  const tabAreas = getTabAreas(statuses)
   // arrow keys move to the next tab and open it (automatic activation)
   const { onKeyDown, getItemProps } = useRovingFocus({
     count: tabAreas.length,
     activeIndex: Math.max(0, tabAreas.indexOf(area)),
     onMove: (index) => assistantPanelStore.setArea(tabAreas[index], { byUser: true }),
   })
+  // after the hooks: a single area (e.g. only Help) is shown without a tab bar
+  if (!isTabBarShown(tabAreas)) return null
   return (
     <div className="ai-assistant-panel__tabs" onKeyDown={onKeyDown} role="tablist">
       {tabAreas.map((tabArea, index) => (

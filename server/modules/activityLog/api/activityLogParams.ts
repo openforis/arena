@@ -19,6 +19,7 @@ const invalid = (name: string) => new SystemError(INVALID_PARAMS_KEY, { name }, 
  */
 const parseNonNegativeInt = (value: unknown, name: string): number | null => {
   if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' && typeof value !== 'number') throw invalid(name)
   const text = String(value)
   if (!/^\d+$/.test(text)) throw invalid(name)
   const number = Number(text)

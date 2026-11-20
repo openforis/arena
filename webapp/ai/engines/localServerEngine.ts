@@ -18,7 +18,7 @@ import type { AiEngine, AiLocalServerCapability } from './types'
  */
 const limitsMiddleware: LanguageModelMiddleware = {
   specificationVersion: 'v4',
-  transformParams: async ({ params }) => ({ ...params, maxOutputTokens: undefined }),
+  transformParams: ({ params }) => Promise.resolve({ ...params, maxOutputTokens: undefined }),
   wrapStream: async ({ doStream }) => {
     const { stream, ...rest } = await doStream()
     return { stream: stream.pipeThrough(createDeltaCoalescer()), ...rest }

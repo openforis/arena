@@ -60,9 +60,11 @@ export const reconcileInProgress = async ({
       return []
     })
   )
-  for (const conversationId of ids) {
-    if (held.has(getSuggestionTurnLockName(conversationId))) continue
-    const conversation = await loadSafely(load, conversationId, log)
+  const freeIds = ids.filter((conversationId) => !held.has(getSuggestionTurnLockName(conversationId)))
+  // independent reads: loaded in parallel, settled in the order of the ids
+  const conversations = await Promise.all(freeIds.map((conversationId) => loadSafely(load, conversationId, log)))
+  for (const [index, conversationId] of freeIds.entries()) {
+    const conversation = conversations[index]
     // a deleted or unscoped conversation can never settle: its targets show again
     const outcome = conversation?.suggestionScope
       ? getSuggestionSettleOutcome(conversation, { running: false })

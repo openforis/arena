@@ -229,7 +229,8 @@ export const validateTouchedNodeDefs = async (
   const issues: ChangeSetIssue[] = []
   for (const [uuid, operation] of firstOperationByUuid) {
     const nodeDef = Survey.getNodeDefByUuid(uuid)(draft)
-    const validation = await SurveyValidator.validateNodeDef(draft, nodeDef)
+    // sequential, as the core validateNodeDefs: the validations share the survey
+    const validation = await SurveyValidator.validateNodeDef(draft, nodeDef) // NOSONAR
     if (SurveyValidator.isNodeDefValidationValidOrHasOnlyMissingChildrenErrors(nodeDef, validation)) continue
     issues.push(...collectValidationIssues(validation, t).map((fieldIssue) => ({ operation, ...fieldIssue })))
   }
@@ -247,7 +248,8 @@ export const checkOtherExpressions = async (
     const nodeDef = Survey.getNodeDefByUuid(op.nodeDefUuid)(draft)
     if (!nodeDef) continue
     for (const expression of op.to) {
-      const messages = await checkNodeDefExpression({ survey: draft, nodeDef, prop: op.prop, expression, t })
+      // sequential, as the node def validations above: the checks share the survey
+      const messages = await checkNodeDefExpression({ survey: draft, nodeDef, prop: op.prop, expression, t }) // NOSONAR
       issues.push(...messages.map((message) => ({ operation: index, field: op.prop, message })))
     }
   }

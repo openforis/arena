@@ -107,10 +107,11 @@ export const newFakeCleaningApi = (overrides: Partial<Record<keyof CleaningApi, 
   const api = Object.fromEntries(
     cleaningApiNames.map((name) => [
       name,
-      async (params: any) => {
+      (params: any) => {
         calls.push({ name, params })
         const impl = overrides[name]
-        return impl ? impl(params) : null
+        // like an async function: a throwing implementation rejects
+        return Promise.resolve().then(() => (impl ? impl(params) : null))
       },
     ])
   ) as unknown as CleaningApi
@@ -209,13 +210,14 @@ export const asCleaningRecord = ({ survey, record, step = '1', ownerUuid = 'reco
 // ref data providers that only know the survey index (the test surveys have small categories)
 export const surveyIndexProviders = {
   categoryItemProvider: {
-    getItemByCodePaths: async () => null,
-    getItemByUuid: async ({ survey, itemUuid }: any) => Survey.getCategoryItemByUuid(itemUuid)(survey) ?? null,
-    getItems: async () => [],
+    getItemByCodePaths: () => Promise.resolve(null),
+    getItemByUuid: ({ survey, itemUuid }: any) =>
+      Promise.resolve(Survey.getCategoryItemByUuid(itemUuid)(survey) ?? null),
+    getItems: () => Promise.resolve([]),
   },
   taxonProvider: {
-    getTaxonByCode: async () => null,
-    getTaxonByUuid: async ({ survey, taxonUuid }: any) => Survey.getTaxonByUuid(taxonUuid)(survey) ?? null,
+    getTaxonByCode: () => Promise.resolve(null),
+    getTaxonByUuid: ({ survey, taxonUuid }: any) => Promise.resolve(Survey.getTaxonByUuid(taxonUuid)(survey) ?? null),
   },
 }
 

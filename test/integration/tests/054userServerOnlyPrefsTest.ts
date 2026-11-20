@@ -48,7 +48,7 @@ describe('Server-only user prefs (054)', () => {
   let attacker: any
   let surveyId: number
 
-  const readPrefs = async (userUuid: string): Promise<any> =>
+  const readPrefs = (userUuid: string): Promise<any> =>
     db.one('SELECT prefs FROM "user" WHERE uuid = $1', [userUuid], (row: any) => row.prefs)
 
   beforeAll(async () => {

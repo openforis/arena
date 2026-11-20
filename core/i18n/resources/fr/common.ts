@@ -1640,7 +1640,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     },
     unavailable: {
       noSurvey: 'Ouvrez un formulaire pour utiliser cet espace.',
-      noPermission: "Vous devez avoir l'autorisation de modifier le formulaire.",
       policy: "La politique IA du formulaire n'autorise pas le fournisseur IA configuré.",
     },
     menu: {

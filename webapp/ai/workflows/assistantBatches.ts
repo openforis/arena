@@ -206,8 +206,9 @@ const runDescriptions = async ({
   let stop = described.stop
   for (const [index, lang] of otherLangs.entries()) {
     if (stop || sources.length === 0) break
-    const translateModel = await getModel('translation')
-    const result = await translateRowsToLang({
+    // one language at a time: a stop ends the run, the progress goes phase by phase, the provider is not flooded
+    const translateModel = await getModel('translation') // NOSONAR
+    const result = await /* NOSONAR */ translateRowsToLang({
       rows: sources,
       toItem: ({ nodeDefUuid }) => ({ id: nodeDefUuid, kind: 'nodeDefDescription' }),
       lang,

@@ -185,11 +185,10 @@ export const ChangeSetCompactCard = ({
   }
 
   return (
-    <section
+    <fieldset
       aria-label={t('aiAssistant.card.title')}
       className="ai-assistant-card ai-assistant-card--compact"
       data-testid={TestId.aiAssistant.changeSetCard}
-      role="group"
     >
       <div className="ai-assistant-card__header">
         <div className="ai-assistant-card__title-row">
@@ -246,9 +245,9 @@ export const ChangeSetCompactCard = ({
           )}
         </ul>
       )}
-      <p className="ai-assistant-card__hint" ref={setStatusElement} role="status" tabIndex={-1}>
+      <output className="ai-assistant-card__hint" ref={setStatusElement} tabIndex={-1}>
         {getStatusLineText({ items, discarded: Boolean(cardState.discarded), t })}
-      </p>
+      </output>
       {unselectedBehaviourIds.length > 0 && (
         <p className="ai-assistant-card__hint">
           {t('aiAssistant.card.behaviourUnselected', { count: unselectedBehaviourIds.length })}
@@ -302,6 +301,6 @@ export const ChangeSetCompactCard = ({
           </>
         )}
       </div>
-    </section>
+    </fieldset>
   )
 }

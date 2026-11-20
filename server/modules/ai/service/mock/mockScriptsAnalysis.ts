@@ -29,8 +29,9 @@ const proposeAverageByCluster: MockScriptStep = {
  * @returns {string} The formatted value.
  */
 const formatCell = (value: unknown): string => {
+  if (typeof value !== 'string' && typeof value !== 'number') return JSON.stringify(value) ?? 'undefined'
   const number = Number(value)
-  return value !== null && value !== '' && Number.isFinite(number) ? String(number) : String(value)
+  return value !== '' && Number.isFinite(number) ? String(number) : String(value)
 }
 
 /**

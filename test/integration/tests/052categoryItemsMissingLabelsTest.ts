@@ -65,7 +65,7 @@ describe('Category items missing labels (052)', () => {
 
   const setLabels = async (categoryUuid: string, uuids: Map<string, string>, labels: Record<string, any>) => {
     for (const [path, value] of Object.entries(labels)) {
-      await CategoryManager.updateItemProp(
+      /* NOSONAR: labels are written in the given order */ await CategoryManager.updateItemProp(
         user,
         surveyId,
         categoryUuid,

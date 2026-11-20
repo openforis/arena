@@ -24,7 +24,7 @@ import type { resolveBatchModel } from '@webapp/ai/workflows/batchModel'
 import type { AiBatchStop } from '@webapp/ai/workflows/batchRun'
 import { TRANSLATION_BATCH_SIZE } from '@webapp/ai/workflows/translateAllLabels'
 
-import { PROVIDER_ERROR_KEY, type RunAssistantTurnParams } from './runAssistantTurn'
+import { getThrownMessage, PROVIDER_ERROR_KEY, type RunAssistantTurnParams } from './runAssistantTurn'
 import { createTurnState, type TurnState } from './turnState'
 
 const KEYS = 'aiAssistant.missingTextsBatch'
@@ -100,7 +100,7 @@ const failBatch = ({
   signal: AbortSignal
 }): void => {
   const code = error instanceof AiToolFailure ? error.code : 'toolFailed'
-  state.endTool({ toolCallId, output: { error: { code, message: String(error) } } })
+  state.endTool({ toolCallId, output: { error: { code, message: getThrownMessage(error) } } })
   if (signal.aborted || isAiAbortError(error)) {
     state.finish('stopped')
     return

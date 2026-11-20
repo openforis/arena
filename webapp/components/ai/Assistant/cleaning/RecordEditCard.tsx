@@ -109,7 +109,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
   const { selectedIds, toggle } = useOperationSelection({ selectableIds })
   const notifyError = useNotifyError()
   // where the focus goes after an Apply: the actions can unmount (nothing left to apply)
-  const statusRef = useRef<HTMLDivElement>(null)
+  const statusRef = useRef<HTMLOutputElement>(null)
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const resultById = useMemo(() => new Map(results.map((result) => [result.id, result])), [results])
   const counts = countOperationResults(results)
@@ -172,9 +172,9 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
           {t('aiCleaning.card.applying', progress)}
         </div>
       )}
-      <div className="ai-cleaning-card__counts" ref={statusRef} role="status" tabIndex={-1}>
+      <output className="ai-cleaning-card__counts" ref={statusRef} tabIndex={-1}>
         {results.length > 0 && t('aiCleaning.card.counts', counts)}
-      </div>
+      </output>
       <div className="ai-cleaning-card__actions">
         <Button
           primary
