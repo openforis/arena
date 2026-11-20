@@ -61,7 +61,7 @@ export const newDesignSuggestion = ({
  * @param {string} uuid - Node definition uuid.
  * @returns {object|null} The node definition; null when missing, deleted or not a design one.
  */
-export const findDesignNodeDef = (survey: any, uuid: string): any | null => {
+export const findDesignNodeDef = (survey: any, uuid: string): any => {
   const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
   return nodeDef && isCurrentNodeDef(nodeDef) ? nodeDef : null
 }

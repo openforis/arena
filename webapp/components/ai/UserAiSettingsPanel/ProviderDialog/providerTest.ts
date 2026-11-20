@@ -91,7 +91,7 @@ export const getInitialLocalTest = ({
   allowlist: string[]
   pageProtocol: string
 }): DraftTest | null => {
-  if (saved?.kind !== 'local' || !saved.baseUrl || !capability || capability.reachable === null) return null
+  if (saved?.kind !== 'local' || !saved.baseUrl || (capability?.reachable ?? null) === null) return null
   // the probe belongs to the saved address; another address is not its result
   if (!isSameBaseUrl(capability.baseUrl, saved.baseUrl)) return null
   const { reachable, models, contextTokens, error } = capability

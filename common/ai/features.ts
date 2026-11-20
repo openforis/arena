@@ -271,7 +271,7 @@ export const isDeclaredDataClassAllowed = ({
  * @param {string} key - Feature key (untrusted input allowed).
  * @returns {AiDataClass} Schema for variable features, otherwise the feature's class; data (fail closed) for an unknown key.
  */
-export const getAiFeatureMinDataClass = (key: AiFeatureKey | string): AiDataClass => {
+export const getAiFeatureMinDataClass = (key: string): AiDataClass => {
   const featureDef = getAiFeature(key)
   if (!featureDef) return AiDataClass.data
   return featureDef.variableDataClass ? AiDataClass.schema : featureDef.dataClass

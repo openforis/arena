@@ -126,9 +126,9 @@ const getParentPath = (survey: any, nodeDef: any): string => {
  * Loads the entries to describe: the targets of the suggestion (all entries when none) without a description in any
  * language.
  * @param {LoadParams} params - Parameters.
- * @returns {Promise<object>} The rows (at most the limit of a run) and the number left over.
+ * @returns {object} The rows (at most the limit of a run) and the number left over.
  */
-const loadDescriptionRows = async ({ survey, scope }: LoadParams) => {
+const loadDescriptionRows = ({ survey, scope }: LoadParams) => {
   const languages = getSurveyLanguages(survey)
   const nodeDefs =
     scope.targetKeys.length > 0
@@ -278,7 +278,7 @@ const KINDS: Record<SuggestionBatchKind, BatchKindDef> = {
       nothing: 'descriptionsNothing',
     },
     getLangLabel: (survey) => getSurveyLanguages(survey).map(toLangLabel).join(', '),
-    loadRows: loadDescriptionRows,
+    loadRows: (params) => Promise.resolve(loadDescriptionRows(params)),
     run: runDescriptions,
     toDrafts: (survey, _lang, translated) =>
       toTextDrafts(

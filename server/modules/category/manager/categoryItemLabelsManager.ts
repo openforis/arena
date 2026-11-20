@@ -272,7 +272,7 @@ const writeUpdates = async (
  * @param {object} [client] - Database client.
  * @returns {Promise<CategoryItemLabelsUpdateAnswer>} Written labels, conflicts and the touched categories.
  */
-export const updateItemsLabels = async (
+export const updateItemsLabels = (
   { user, surveyId, items }: { user: any; surveyId: number; items: unknown },
   client: any = db
 ): Promise<CategoryItemLabelsUpdateAnswer> =>

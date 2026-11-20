@@ -119,7 +119,7 @@ export const countItemsMissingLabels = async (
  * @param {object} [client] - Database client.
  * @returns {Promise<boolean>} True when it exists.
  */
-export const categoryExists = async (
+export const categoryExists = (
   { surveyId, categoryUuid }: { surveyId: number | string; categoryUuid: string },
   client: any = db
 ): Promise<boolean> =>
@@ -248,7 +248,7 @@ export type ItemLabelsRow = {
  * @param {object} client - Database client (a transaction).
  * @returns {Promise<ItemLabelsRow[]>} The rows of the existing items.
  */
-export const fetchItemsLabelsByUuids = async (
+export const fetchItemsLabelsByUuids = (
   { surveyId, itemUuids }: { surveyId: number | string; itemUuids: string[] },
   client: any
 ): Promise<ItemLabelsRow[]> => {

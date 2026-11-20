@@ -23,7 +23,7 @@ export type CleaningApi = {
   ) => Promise<any[]>
   countValidationReportRows: (params: ValidationReportFilter & WithSignal) => Promise<number>
   // null when the user may not see the record (403, group qualifiers) or it doesn't exist (404)
-  fetchRecordAndNodes: (params: { surveyId: number; recordUuid: string } & WithSignal) => Promise<any | null>
+  fetchRecordAndNodes: (params: { surveyId: number; recordUuid: string } & WithSignal) => Promise<any>
   searchRecordsSummary: (
     params: { surveyId: number; cycle: string; search: string; limit?: number; offset?: number } & WithSignal
   ) => Promise<any[]>

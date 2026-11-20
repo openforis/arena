@@ -133,17 +133,14 @@ export type FakeCategoryItem = {
  * @param {object} [labels] - Labels (default: `{ en: "Item <ref>" }`).
  * @returns {FakeCategoryItem} The item.
  */
-export const fakeCategoryItem = (
-  ref: string,
-  labels: Record<string, string> = { en: `Item ${ref}` }
-): FakeCategoryItem => {
+export const fakeCategoryItem = (ref: string, labels?: Record<string, string>): FakeCategoryItem => {
   const codePath = ref.split('.')
   return {
     uuid: `item-${ref}`,
     levelIndex: codePath.length - 1,
     levelName: codePath.length > 1 ? 'species' : 'genus',
     codePath,
-    labels,
+    labels: labels ?? { en: `Item ${ref}` },
   }
 }
 

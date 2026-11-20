@@ -275,6 +275,8 @@ const buildNodeDefItem = ({
 const fetchSurvey = (surveyId: number): Promise<ArenaSurvey> =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
 
+const DB_DEPS = { fetchSurvey }
+
 /**
  * Returns the default language of the survey (first language, else en).
  * @param {object} surveyInfo - Survey info.
@@ -392,7 +394,7 @@ export const generateSchemaSummaryItems = async (
     stopIfFunction?: (() => boolean) | null
     fileFormat?: string
   },
-  deps: { fetchSurvey: (surveyId: number) => Promise<ArenaSurvey> } = { fetchSurvey }
+  deps: { fetchSurvey: (surveyId: number) => Promise<ArenaSurvey> } = DB_DEPS
 ) => {
   const survey = await deps.fetchSurvey(surveyId)
   if (aiDescriptions) {

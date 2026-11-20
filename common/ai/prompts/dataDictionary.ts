@@ -51,12 +51,13 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape, compact (
     )
     .join('\n')
 
+  const languageRule = language ? ` Write the descriptions in ${pq(language, 64)}.` : ''
   let prompt = `Survey: ${pq(surveyName, 200)}
 
 Fields needing a description:
 ${items}
 
-Produce one description per field.${language ? ` Write the descriptions in ${pq(language, 64)}.` : ''}`
+Produce one description per field.${languageRule}`
 
   if (previousError) {
     prompt += `

@@ -6,7 +6,7 @@ import type { SuggestionStore } from '../suggestionStore'
 import type { AssistantSuggestion, SuggestionKind } from '../types'
 
 export type SuggestionDescribeContext = {
-  survey: any | null
+  survey: any
   t: (key: string, params?: Record<string, unknown>) => string
   lang: string
 }

@@ -40,5 +40,5 @@ export const getCurrentNodeDefs = (survey: any, options: NodeDefLookupOptions = 
  * @param {NodeDefLookupOptions} [options] - Options.
  * @returns {object|null} The node definition.
  */
-export const findNodeDefByName = (survey: any, name: string, options: NodeDefLookupOptions = {}): any | null =>
+export const findNodeDefByName = (survey: any, name: string, options: NodeDefLookupOptions = {}): any =>
   getCurrentNodeDefs(survey, options).find((nodeDef: any) => NodeDef.getName(nodeDef) === name) ?? null

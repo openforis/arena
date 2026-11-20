@@ -23,7 +23,7 @@ export type SuggestionEvent =
 export type DetectorContext = {
   userUuid: string
   generation: SuggestionGeneration | null // null only for survey-independent events (moduleEntered)
-  survey: any | null // the defs in Redux for that generation
+  survey: any // the defs in Redux for that generation
   availableAreas: AssistantArea[]
   store: SuggestionStore
   now: () => Date

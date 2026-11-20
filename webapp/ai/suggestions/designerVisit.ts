@@ -51,7 +51,7 @@ const newSavedUuids = (visit: DesignerVisit, survey: any): string[] => {
  */
 export const nextDesignerVisit = (
   prev: DesignerVisit | null,
-  { module, generation, survey }: { module: string | null; generation: SuggestionGeneration | null; survey: any | null }
+  { module, generation, survey }: { module: string | null; generation: SuggestionGeneration | null; survey: any }
 ): DesignerVisitStep => {
   // the defs are not loaded (yet): wait
   if (!generation || !survey) return { visit: prev, leftUuids: null }

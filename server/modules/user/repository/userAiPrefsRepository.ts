@@ -26,7 +26,7 @@ export type AiPrefsUpdate = (
  * @param {object} [client] - Database client (a transaction when `forUpdate` is true).
  * @returns {Promise<object|null>} The AI prefs, or null when the user has none.
  */
-export const readAiPrefs = async (
+export const readAiPrefs = (
   { userUuid, forUpdate = false }: { userUuid: string; forUpdate?: boolean },
   client: Queryable = db
 ): Promise<StoredAiPrefs | null> =>
@@ -41,7 +41,7 @@ export const readAiPrefs = async (
  * @param {object} [client] - Database client.
  * @returns {Promise<Array<{userUuid: string, aiPrefs: object}>>} The AI prefs and their user.
  */
-export const readAllAiPrefs = async (client: Queryable = db): Promise<{ userUuid: string; aiPrefs: StoredAiPrefs }[]> =>
+export const readAllAiPrefs = (client: Queryable = db): Promise<{ userUuid: string; aiPrefs: StoredAiPrefs }[]> =>
   client.manyOrNone(`SELECT uuid AS "userUuid", prefs -> 'ai' AS "aiPrefs" FROM "user" WHERE prefs -> 'ai' IS NOT NULL`)
 
 /**
@@ -101,7 +101,7 @@ export const findEnvelopesOfOtherUsers = async (
  * @param {object} [client] - Database client.
  * @returns {Promise<object|null>} The AI prefs as stored after the update (null when the user has none).
  */
-export const updateAiPrefs = async (
+export const updateAiPrefs = (
   { userUuid, update }: { userUuid: string; update: AiPrefsUpdate },
   client: Pick<typeof db, 'tx'> = db
 ): Promise<StoredAiPrefs | null> =>

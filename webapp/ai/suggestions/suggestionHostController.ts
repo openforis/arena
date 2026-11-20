@@ -23,7 +23,7 @@ export type SuggestionHostInput = {
   // the open survey, known before its defs are loaded (queued events belong to it)
   surveyId: number | null
   generation: SuggestionGeneration | null
-  survey: any | null
+  survey: any
   availableAreas: AssistantArea[]
 }
 

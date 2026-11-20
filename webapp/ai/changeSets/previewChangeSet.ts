@@ -187,7 +187,7 @@ const isRename = (op: ChangeSet['operations'][number]): boolean => op.type === '
  * @returns {Promise<object>} The survey to apply the operations to.
  */
 export const withDependencyGraphForRenames = async (changeSet: ChangeSet, survey: any): Promise<any> =>
-  changeSet.operations.some(isRename) ? Survey.buildAndAssocDependencyGraph(survey) : survey
+  changeSet.operations.some(isRename) ? await Survey.buildAndAssocDependencyGraph(survey) : survey
 
 /**
  * Applies the operations in order to a copy of the survey, skipping (and reporting) those with structural issues.

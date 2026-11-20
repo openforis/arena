@@ -7,8 +7,11 @@ import type { OperationResult } from './types'
  * @param {OperationResult[]} next - New results.
  * @returns {OperationResult[]} The merged results.
  */
-export const mergeOperationResults = (previous: OperationResult[] = [], next: OperationResult[]): OperationResult[] => {
-  const byId = new Map(previous.map((result) => [result.id, result]))
+export const mergeOperationResults = (
+  previous: OperationResult[] | undefined,
+  next: OperationResult[]
+): OperationResult[] => {
+  const byId = new Map((previous ?? []).map((result) => [result.id, result]))
   for (const result of next) byId.set(result.id, result)
   return [...byId.values()]
 }

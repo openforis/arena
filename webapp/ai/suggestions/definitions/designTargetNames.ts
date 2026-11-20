@@ -12,7 +12,7 @@ import type { AssistantSuggestion } from '../types'
  * @param {object|null} survey - Survey.
  * @returns {object[]} The node definitions, in target order.
  */
-export const getTargetNodeDefs = (suggestion: AssistantSuggestion, survey: any | null): any[] => {
+export const getTargetNodeDefs = (suggestion: AssistantSuggestion, survey: any): any[] => {
   if (!survey) return []
   return suggestion.targets
     .map((target) => findDesignNodeDef(survey, getTargetNodeDefUuid(target.key)))
@@ -25,5 +25,5 @@ export const getTargetNodeDefs = (suggestion: AssistantSuggestion, survey: any |
  * @param {object|null} survey - Survey.
  * @returns {string[]} The names.
  */
-export const getTargetNodeDefNames = (suggestion: AssistantSuggestion, survey: any | null): string[] =>
+export const getTargetNodeDefNames = (suggestion: AssistantSuggestion, survey: any): string[] =>
   getTargetNodeDefs(suggestion, survey).map((nodeDef) => NodeDef.getName(nodeDef))

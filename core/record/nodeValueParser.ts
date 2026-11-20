@@ -20,17 +20,13 @@ import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 
 export type CategoryItemProvider = {
-  getItemByCodePaths: (params: { survey: any; categoryUuid: string; codePaths: string[] }) => Promise<any | null>
+  getItemByCodePaths: (params: { survey: any; categoryUuid: string; codePaths: string[] }) => Promise<any>
 }
 
 export type TaxonProvider = {
-  getTaxonByCode: (params: { survey: any; taxonomyUuid: string; taxonCode: string }) => Promise<any | null>
+  getTaxonByCode: (params: { survey: any; taxonomyUuid: string; taxonCode: string }) => Promise<any>
   // optional: only the browser provider can search taxa by scientific name
-  findTaxonByScientificName?: (params: {
-    survey: any
-    taxonomyUuid: string
-    scientificName: string
-  }) => Promise<any | null>
+  findTaxonByScientificName?: (params: { survey: any; taxonomyUuid: string; scientificName: string }) => Promise<any>
 }
 
 export type ParsedNodeValue = { value: any; refData: Record<string, unknown> | null }

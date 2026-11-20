@@ -373,7 +373,7 @@ export const init = (app: Router) => {
   // schema summary export (start job); aiDescriptions: AI descriptions generated in the browser. The request only
   // checks their shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid,
   // reported in its status), not this request, which answers 200 with the started job.
-  app.post('/survey/:surveyId/schema-summary/export', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+  app.post('/survey/:surveyId/schema-summary/export', AuthMiddleware.requireSurveyViewPermission, (req, res) => {
     try {
       const params = Request.getParams(req)
       assertNoLegacyIncludeAiDescriptions(params)

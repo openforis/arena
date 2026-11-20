@@ -267,12 +267,12 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
       if (byId.get(id)?.userUuid === userUuid) byId.delete(id)
     },
     clearUser: async (userUuid) => {
-      for (const item of [...byId.values()]) {
+      for (const item of byId.values()) {
         if (item.userUuid === userUuid) byId.delete(item.id)
       }
     },
     removeSurvey: async (surveyId) => {
-      for (const item of [...byId.values()]) {
+      for (const item of byId.values()) {
         if (item.surveyKey === toSurveyKey(surveyId)) byId.delete(item.id)
       }
     },

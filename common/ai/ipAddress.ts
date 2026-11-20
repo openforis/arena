@@ -93,43 +93,43 @@ const ipv6Range = (network: string, prefix: number, ipClass: IpAddressClass): Ra
 // the first range that matches wins: the narrow ranges come before the ones that contain them
 const IPV4_RANGES: Range[] = [
   ipv4Range('0.0.0.0', 8, 'unspecified'),
-  ipv4Range('10.0.0.0', 8, 'private'), // NOSONAR: range table used to classify addresses
-  ipv4Range('100.64.0.0', 10, 'private'), // carrier-grade NAT // NOSONAR: range table used to classify addresses
+  ipv4Range('10.0.0.0', 8, 'private'), // NOSONAR: classification table
+  ipv4Range('100.64.0.0', 10, 'private'), // NOSONAR: classification table: carrier-grade NAT
   ipv4Range('127.0.0.0', 8, 'loopback'),
-  ipv4Range('169.254.0.0', 16, 'private'), // link-local (cloud metadata) // NOSONAR: range table used to classify addresses
-  ipv4Range('172.16.0.0', 12, 'private'), // NOSONAR: range table used to classify addresses
-  ipv4Range('192.0.0.0', 24, 'reserved'), // IETF protocol assignments // NOSONAR: range table used to classify addresses
-  ipv4Range('192.0.2.0', 24, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
-  ipv4Range('192.168.0.0', 16, 'private'), // NOSONAR: range table used to classify addresses
-  ipv4Range('198.18.0.0', 15, 'reserved'), // benchmarking // NOSONAR: range table used to classify addresses
-  ipv4Range('198.51.100.0', 24, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
-  ipv4Range('203.0.113.0', 24, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
-  ipv4Range('224.0.0.0', 4, 'reserved'), // multicast // NOSONAR: range table used to classify addresses
-  ipv4Range('240.0.0.0', 4, 'reserved'), // reserved and broadcast // NOSONAR: range table used to classify addresses
+  ipv4Range('169.254.0.0', 16, 'private'), // NOSONAR: classification table: link-local, cloud metadata
+  ipv4Range('172.16.0.0', 12, 'private'), // NOSONAR: classification table
+  ipv4Range('192.0.0.0', 24, 'reserved'), // NOSONAR: classification table: IETF protocol assignments
+  ipv4Range('192.0.2.0', 24, 'reserved'), // NOSONAR: classification table: documentation
+  ipv4Range('192.168.0.0', 16, 'private'), // NOSONAR: classification table
+  ipv4Range('198.18.0.0', 15, 'reserved'), // NOSONAR: classification table: benchmarking
+  ipv4Range('198.51.100.0', 24, 'reserved'), // NOSONAR: classification table: documentation
+  ipv4Range('203.0.113.0', 24, 'reserved'), // NOSONAR: classification table: documentation
+  ipv4Range('224.0.0.0', 4, 'reserved'), // NOSONAR: classification table: multicast
+  ipv4Range('240.0.0.0', 4, 'reserved'), // NOSONAR: classification table: reserved and broadcast
 ]
 
 const IPV6_RANGES: Range[] = [
   ipv6Range('::', 128, 'unspecified'),
   ipv6Range('::1', 128, 'loopback'),
   ipv6Range('::', 96, 'reserved'), // IPv4-compatible
-  ipv6Range('64:ff9b::', 96, 'reserved'), // NAT64 (can reach internal IPv4) // NOSONAR: range table used to classify addresses
-  ipv6Range('64:ff9b:1::', 48, 'reserved'), // local-use NAT64 // NOSONAR: range table used to classify addresses
-  ipv6Range('100::', 64, 'reserved'), // discard // NOSONAR: range table used to classify addresses
-  ipv6Range('2002::', 16, 'reserved'), // 6to4 (embeds an IPv4) // NOSONAR: range table used to classify addresses
+  ipv6Range('64:ff9b::', 96, 'reserved'), // NOSONAR: classification table: NAT64 (can reach internal IPv4)
+  ipv6Range('64:ff9b:1::', 48, 'reserved'), // NOSONAR: classification table: local-use NAT64
+  ipv6Range('100::', 64, 'reserved'), // NOSONAR: classification table: discard
+  ipv6Range('2002::', 16, 'reserved'), // NOSONAR: classification table: 6to4 (embeds an IPv4)
   // IETF protocol assignments, Teredo (embeds an IPv4), benchmarking and ORCHID included
-  ipv6Range('2001::', 23, 'reserved'), // NOSONAR: range table used to classify addresses
-  ipv6Range('2001:db8::', 32, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
-  ipv6Range('3ffe::', 16, 'reserved'), // former 6bone // NOSONAR: range table used to classify addresses
-  ipv6Range('3fff::', 20, 'reserved'), // documentation // NOSONAR: range table used to classify addresses
-  ipv6Range('::ffff:0:0:0', 96, 'reserved'), // IPv4-translated (SIIT) // NOSONAR: range table used to classify addresses
-  ipv6Range('fc00::', 7, 'private'), // unique local // NOSONAR: range table used to classify addresses
-  ipv6Range('fe80::', 10, 'private'), // link-local // NOSONAR: range table used to classify addresses
-  ipv6Range('fec0::', 10, 'private'), // deprecated site-local // NOSONAR: range table used to classify addresses
-  ipv6Range('ff00::', 8, 'reserved'), // multicast // NOSONAR: range table used to classify addresses
+  ipv6Range('2001::', 23, 'reserved'), // NOSONAR: classification table
+  ipv6Range('2001:db8::', 32, 'reserved'), // NOSONAR: classification table: documentation
+  ipv6Range('3ffe::', 16, 'reserved'), // NOSONAR: classification table: former 6bone
+  ipv6Range('3fff::', 20, 'reserved'), // NOSONAR: classification table: documentation
+  ipv6Range('::ffff:0:0:0', 96, 'reserved'), // NOSONAR: classification table: IPv4-translated (SIIT)
+  ipv6Range('fc00::', 7, 'private'), // NOSONAR: classification table: unique local
+  ipv6Range('fe80::', 10, 'private'), // NOSONAR: classification table: link-local
+  ipv6Range('fec0::', 10, 'private'), // NOSONAR: classification table: deprecated site-local
+  ipv6Range('ff00::', 8, 'reserved'), // NOSONAR: classification table: multicast
   // outside 2000::/3, the only block allocated to global unicast: unrouted or special-purpose
-  ipv6Range('::', 3, 'reserved'), // NOSONAR: range table used to classify addresses
-  ipv6Range('4000::', 2, 'reserved'), // NOSONAR: range table used to classify addresses
-  ipv6Range('8000::', 1, 'reserved'), // NOSONAR: range table used to classify addresses
+  ipv6Range('::', 3, 'reserved'), // NOSONAR: classification table
+  ipv6Range('4000::', 2, 'reserved'), // NOSONAR: classification table
+  ipv6Range('8000::', 1, 'reserved'), // NOSONAR: classification table
 ]
 
 /**

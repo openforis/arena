@@ -22,7 +22,7 @@ export const useDesignerVisit = ({
   module,
 }: {
   generation: SuggestionGeneration | null
-  survey: any | null
+  survey: any
   module: string | null
 }): void => {
   const visitRef = useRef<DesignerVisit | null>(null)

@@ -15,7 +15,7 @@ export type MockScriptParams = { lastUserMessage: string; lastToolOutput: unknow
 
 // a text may be computed from the last tool output, and so may a tool call input
 export type MockScriptStep =
-  | { toolCall: { toolName: string; input: unknown | ((params: MockScriptParams) => unknown) } }
+  | { toolCall: { toolName: string; input: unknown /* or (params: MockScriptParams) => unknown */ } }
   | { text: string | ((params: MockScriptParams) => string) }
 
 // a step as played by the model: texts resolved

@@ -122,6 +122,12 @@ export type CopiedLegacyKeysDeps = {
   getKeyId: (envelope: string) => string | null
 }
 
+const DB_COPIED_LEGACY_KEYS_DEPS: CopiedLegacyKeysDeps = {
+  readAllAiPrefs: () => readAllAiPrefs(),
+  updateAiPrefs: (userUuid, update) => updateAiPrefs({ userUuid, update }),
+  getKeyId: SecretBox.getLegacyEnvelopeId,
+}
+
 /**
  * Removes, from every record that holds it, an old key (no AAD) stored by more than one user. Before the AI prefs were
  * server-only, a member could read another one's old key in the users list and save it in their own prefs, where it
@@ -131,11 +137,7 @@ export type CopiedLegacyKeysDeps = {
  * @returns {Promise<number>} How many users lost a key.
  */
 export const removeCopiedLegacyKeys = async (
-  deps: CopiedLegacyKeysDeps = {
-    readAllAiPrefs: () => readAllAiPrefs(),
-    updateAiPrefs: (userUuid, update) => updateAiPrefs({ userUuid, update }),
-    getKeyId: SecretBox.getLegacyEnvelopeId,
-  }
+  deps: CopiedLegacyKeysDeps = DB_COPIED_LEGACY_KEYS_DEPS
 ): Promise<number> => {
   const records = await deps.readAllAiPrefs()
   const keyIds = findCopiedLegacyKeyIds(records, deps.getKeyId)

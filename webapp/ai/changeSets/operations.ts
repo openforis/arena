@@ -84,7 +84,7 @@ export const canUpdateNodeDefRef = (survey: any, nodeDef: any, prop: NodeDefRefP
  * @param {string} uuid - Category or taxonomy uuid.
  * @returns {object|null} The category or taxonomy; null when it is not in the survey.
  */
-export const findNodeDefRef = (survey: any, prop: NodeDefRefProp, uuid: string): any | null =>
+export const findNodeDefRef = (survey: any, prop: NodeDefRefProp, uuid: string): any =>
   (prop === 'categoryUuid' ? Survey.getCategoryByUuid(uuid)(survey) : Survey.getTaxonomyByUuid(uuid)(survey)) ?? null
 
 /**

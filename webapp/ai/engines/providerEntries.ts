@@ -66,7 +66,7 @@ export const getAccountProviderStatus = ({
  * @returns {AiProviderStatus} The status.
  */
 export const getLocalProviderStatus = (capability: AiLocalServerCapability | null): AiProviderStatus => {
-  if (!capability || capability.reachable === null) return 'notTested'
+  if ((capability?.reachable ?? null) === null) return 'notTested'
   const { reachable, modelId, models } = capability
   return reachable && !!modelId && models.includes(modelId) ? 'ready' : 'notAvailable'
 }

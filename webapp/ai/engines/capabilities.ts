@@ -266,7 +266,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    */
   const storedProbe = (provider: LocalProvider, userUuid: string | null): LocalServerProbeResult | null => {
     const stored = loadedFor === userUuid ? capabilities.local[provider.id] : undefined
-    if (!stored || stored.reachable === null) return null
+    if ((stored?.reachable ?? null) === null) return null
     if (stored.baseUrl !== provider.baseUrl || stored.modelId !== provider.modelId) return null
     const { reachable, models, contextTokens, error } = stored
     return { reachable, models, contextTokens, error }

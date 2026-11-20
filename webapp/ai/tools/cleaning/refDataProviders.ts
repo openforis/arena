@@ -12,7 +12,7 @@ import type { CleaningApi } from './cleaningApi'
  * @param {boolean} [ignoreCase] - Whether the comparison ignores case.
  * @returns {object|null} The item.
  */
-const findExact = (items: any[], getText: (item: any) => string, text: string, ignoreCase = false): any | null => {
+const findExact = (items: any[], getText: (item: any) => string, text: string, ignoreCase = false): any => {
   const normalize = (value: string) => (ignoreCase ? value.trim().toLowerCase() : value.trim())
   return items.find((item) => normalize(getText(item) ?? '') === normalize(text)) ?? null
 }
