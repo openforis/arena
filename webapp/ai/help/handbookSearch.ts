@@ -1,6 +1,8 @@
 /**
  * BM25 search over the handbook sections (title and text) and the outline for the Help system prompt. No
- * embeddings, no server: the handbook is small (about 130 sections).
+ * embeddings, no server: the handbook is small (about 150 sections).
+ * shortcut: English stop words and plurals only (BM25 already gives little weight to frequent words), add the
+ * French and Spanish ones if searches in those manuals rank badly.
  */
 import { AiLimits } from '@common/ai/limits'
 

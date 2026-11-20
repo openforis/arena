@@ -1,5 +1,5 @@
 /**
- * Turns the manual references of an assistant answer into links to the manual PDF: section citations ("§5.2 Publish
+ * Turns the manual references of an assistant answer into links to the manual: section citations ("§5.2 Publish
  * a survey") and the placeholders the model may use as link targets ("[user manual](manual)", "[text](§5.2)").
  * The links come from the handbook, never from the model, so a small model can't write a broken one.
  */
@@ -7,7 +7,8 @@ import type { Handbook } from './handbookSplitter'
 
 type ManualSection = { title: string; url: string }
 
-export type ManualLinks = { manualUrl: string; sections: Map<string, ManualSection> }
+// manualUrl: the Word file; pdfUrl: the PDF, which a section link opens at its heading
+export type ManualLinks = { manualUrl: string; pdfUrl: string; sections: Map<string, ManualSection> }
 
 const PART_SUFFIX = / \(\d+\/\d+\)$/
 
@@ -20,17 +21,17 @@ const SECTION_TARGET = /^§ ?(A\d+|\d+(?:\.\d+)*)\.?$/
 /**
  * Prepares the links of the manual sections (the first part of each section id).
  * @param {Handbook} handbook - Handbook.
- * @returns {ManualLinks} The manual URL and the section links by id.
+ * @returns {ManualLinks} The manual URLs and the section links by id.
  */
 export const createManualLinks = (handbook: Handbook): ManualLinks => {
-  const manualUrl = handbook.source
+  const { source: manualUrl, pdf: pdfUrl } = handbook
   const sections = new Map<string, ManualSection>()
   for (const { id, title, anchor } of handbook.sections) {
     if (sections.has(id)) continue
-    const url = anchor ? `${manualUrl}#${anchor}` : manualUrl
+    const url = anchor ? `${pdfUrl}#${anchor}` : pdfUrl
     sections.set(id, { title: title.replace(PART_SUFFIX, ''), url })
   }
-  return { manualUrl, sections }
+  return { manualUrl, pdfUrl, sections }
 }
 
 // length of the section title at the start of rest (after one space), 0 when it isn't there

@@ -1,5 +1,6 @@
 /**
- * Lazy loading of the committed handbook: its own webpack chunk, fetched the first time the Help area searches.
+ * Lazy loading of the committed handbooks (one per manual language): each one is its own webpack chunk, fetched
+ * the first time the Help area searches.
  */
 import { buildHandbookIndex, type HandbookIndex } from './handbookSearch'
 import type { Handbook } from './handbookSplitter'
@@ -30,8 +31,18 @@ export const createHandbookLoader = (importer: HandbookImporter): (() => Promise
   }
 }
 
+// one loader per language of the manual (HANDBOOK_LANGS)
+const loaders: Record<string, () => Promise<LoadedHandbook>> = {
+  en: createHandbookLoader(() => import(/* webpackChunkName: "ai-handbook-en" */ './handbook-en.json')),
+  fr: createHandbookLoader(() => import(/* webpackChunkName: "ai-handbook-fr" */ './handbook-fr.json')),
+  es: createHandbookLoader(() => import(/* webpackChunkName: "ai-handbook-es" */ './handbook-es.json')),
+}
+
 /**
- * Loads the handbook and builds its index once.
+ * Loads the handbook in the interface language (in English when the manual isn't translated into it) and builds
+ * its index once.
+ * @param {string} uiLang - Interface language (e.g. "fr").
  * @returns {Promise<LoadedHandbook>} The handbook and its index.
  */
-export const loadHandbook = createHandbookLoader(() => import(/* webpackChunkName: "ai-handbook" */ './handbook.json'))
+export const loadHandbook = (uiLang: string): Promise<LoadedHandbook> =>
+  (loaders[uiLang?.split('-')[0]] ?? loaders.en)()

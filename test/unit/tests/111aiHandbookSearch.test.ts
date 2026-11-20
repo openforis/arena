@@ -12,8 +12,7 @@ const section = (id: string, title: string, text: string) => ({ id, title, path:
 
 const handbook: Handbook = {
   source: 'test',
-  version: '1',
-  fetchedAt: '2026-10-06',
+  pdf: 'test',
   sections: [
     section('1', 'Introduction', 'Arena is a platform. Tables are mentioned here once.'),
     section('7.2', 'Form Design', 'Add attributes and entities to the form.'),
@@ -65,11 +64,13 @@ describe('handbook search', () => {
 })
 
 describe('docs_search', () => {
-  const tool = createDocsSearchTool({ loadIndex: async () => index })
+  const loadIndex = jest.fn(async (_uiLang: string) => index)
+  const tool = createDocsSearchTool({ loadIndex })
 
   test('returns the best sections; offered in Help and Design without a survey', async () => {
     const result: any = await runTool(tool, { query: 'table' }, createToolContext())
     expect(result.results[0]).toMatchObject({ id: '7.2.3', title: 'Tables' })
+    expect(loadIndex).toHaveBeenCalledWith(createToolContext().uiLang)
     expect(tool.area).toEqual(['help', 'design', 'analysis', 'cleaning'])
     expect(tool.requires(createToolContext())).toBe(true)
   })
@@ -93,12 +94,20 @@ describe('docs_search', () => {
 
 describe('the committed handbook', () => {
   test('loads lazily and answers', async () => {
-    const loaded = await loadHandbook()
+    const loaded = await loadHandbook('en')
     expect(new Set(loaded.handbook.sections.map((item) => item.id)).size).toBeGreaterThanOrEqual(50)
     expect(searchHandbook(loaded.index, 'publish survey')[0].title).toMatch(/Publish a survey/)
     expect(searchHandbook(loaded.index, 'branding logo')[0].title).toMatch(/Branding/)
     expect(getHandbookOutline(loaded.handbook).length).toBeLessThanOrEqual(3000)
-    expect(await loadHandbook()).toBe(loaded)
+    expect(await loadHandbook('en')).toBe(loaded)
+  })
+
+  test('the interface language picks the manual, English when it is not translated', async () => {
+    const french = await loadHandbook('fr')
+    expect(french.handbook.source).toMatch(/arena-user-manual-fr\.docx$/)
+    expect(searchHandbook(french.index, 'publier formulaire')[0].title).toMatch(/Publier/)
+    expect((await loadHandbook('es-ES')).handbook.source).toMatch(/arena-user-manual-es\.docx$/)
+    expect((await loadHandbook('ru')).handbook.source).toMatch(/arena-user-manual-en\.docx$/)
   })
 })
 
@@ -114,7 +123,7 @@ describe('handbook loader', () => {
   })
 
   test('empty sections never take a result slot', async () => {
-    const loaded = await loadHandbook()
+    const loaded = await loadHandbook('en')
     expect(loaded.handbook.sections.some((item) => item.text === '')).toBe(true)
     for (const query of ['analysis', 'data', 'survey']) {
       const results = searchHandbook(loaded.index, query)

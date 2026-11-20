@@ -40,6 +40,8 @@ Update the manual in the same pull request as every user-facing change, in all t
 - Keep the documents in `.docx` format (in LibreOffice: **Keep current format** when saving).
 - The PDFs are generated with LibreOffice: use fonts available on Linux or metric-compatible with them (Calibri and Cambria are replaced by Carlito and Caladea), and check the PDF artifact of the pull request.
 - Add new sections at the end of the related chapter, so that the numbering of the existing ones does not change (section numbers are plain text).
+- Give headings a heading style (**Heading 1** to **Heading 4**) and a bookmark (**Insert > Bookmark**, the same name in the three languages): the Help assistant splits the manual at the headings and links to their bookmarks in the PDF (a heading without a bookmark links to its parent section).
+- Run `yarn ai:docs:update` and commit `webapp/ai/help/handbook-*.json`: the copy of the manual the Help assistant searches, in the three languages (a unit test fails when it is out of date).
 - Start a new page only before a chapter, with **Page break before** (paragraph properties) instead of an empty paragraph with a page break, which gives a blank page when it falls at the top of a page. Avoid empty or almost empty pages (e.g. shrink a screenshot so that it fits in the previous page), and keep screenshots within the margins.
 - UI labels in bold, as they appear in the app in the language of the manual (see `core/i18n/resources/<lang>`).
 - Screenshots: light theme, English UI (also in the French and Spanish manuals), realistic data (no test names), cropped to the part of the page being described; replace the ones that no longer match the UI.

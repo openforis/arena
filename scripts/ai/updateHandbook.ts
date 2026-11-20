@@ -1,44 +1,23 @@
 /**
- * yarn ai:docs:update — downloads the Arena user manual (the English PDF published on GitHub Pages), extracts its
- * text with pdftotext (poppler-utils, must be installed) and writes the sections the Help assistant searches to
- * webapp/ai/help/handbook.json. Commit the result when the manual changes.
+ * yarn ai:docs:update — reads the Arena user manual (the Word files in docs/user-manual) and writes the sections the
+ * Help assistant searches to webapp/ai/help/handbook-<lang>.json. Run it and commit the result when the manual changes.
  */
-import { execFileSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { buildHandbook, checkHandbook, countHeadings } from '../../webapp/ai/help/handbookSplitter.ts'
+import AdmZip from 'adm-zip'
 
-const SOURCE = 'https://openforis.github.io/arena/arena-user-manual-en.pdf'
-const OUTPUT_PATH = resolve(import.meta.dirname, '..', '..', 'webapp', 'ai', 'help', 'handbook.json')
+import { buildHandbook, checkHandbook, HANDBOOK_LANGS } from '../../webapp/ai/help/handbookSplitter.ts'
 
-const download = async (): Promise<Buffer> => {
-  const response = await fetch(SOURCE)
-  if (!response.ok) throw new Error(`Download failed: HTTP ${response.status}`)
-  return Buffer.from(await response.arrayBuffer())
-}
+const ROOT = resolve(import.meta.dirname, '..', '..')
 
-// -layout keeps a list item or a table row on one line
-const toText = (pdf: Buffer): string => {
-  const options = { input: pdf, encoding: 'utf8' as const, maxBuffer: 64 * 1024 * 1024 }
-  return execFileSync('pdftotext', ['-layout', '-', '-'], options) // NOSONAR: developer script, pdftotext from the PATH
-}
-
-const main = async (): Promise<void> => {
-  const raw = toText(await download())
-  const handbook = buildHandbook({ raw, source: SOURCE, fetchedAt: new Date().toISOString() })
+for (const lang of HANDBOOK_LANGS) {
+  const docx = resolve(ROOT, 'docs', 'user-manual', `arena-user-manual-${lang}.docx`)
+  const handbook = buildHandbook({ xml: new AdmZip(docx).readAsText('word/document.xml'), lang })
   const problem = checkHandbook(handbook)
-  if (problem) throw new Error(problem)
-  writeFileSync(OUTPUT_PATH, `${JSON.stringify(handbook, null, 2)}\n`)
-  const { toc, found } = countHeadings(raw)
+  if (problem) throw new Error(`${docx}: ${problem}`)
+  const output = resolve(ROOT, 'webapp', 'ai', 'help', `handbook-${lang}.json`)
+  writeFileSync(output, `${JSON.stringify(handbook, null, 2)}\n`)
   const ids = new Set(handbook.sections.map((section) => section.id)).size
-  process.stdout.write(
-    `Handbook ver. ${handbook.version ?? '?'}: ${found} of ${toc} table-of-contents entries found in the body, ` +
-      `${handbook.sections.length} sections (${ids} ids) written to ${OUTPUT_PATH}\n`
-  )
+  process.stdout.write(`${handbook.sections.length} sections (${ids} ids) written to ${output}\n`)
 }
-
-main().catch((error: Error) => {
-  process.stderr.write(`${error.message}\n`)
-  process.exitCode = 1
-})

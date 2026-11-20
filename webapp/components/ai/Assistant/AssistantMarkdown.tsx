@@ -9,21 +9,24 @@ import {
   type ManualLinks,
 } from '@webapp/ai/help/handbookLinks'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
+import { useI18n } from '@webapp/store/system'
 
 import { type AssistantLinkPolicy, renderAssistantMarkdown } from './assistantMarkdown'
 
 /**
- * Loads the manual links once the text refers to the manual (null until then, or when the handbook can't be loaded).
+ * Loads the links of the manual in the interface language once the text refers to the manual (null until then, or
+ * when the handbook can't be loaded).
  * @param {string} text - Markdown text.
  * @returns {ManualLinks|null} The manual links.
  */
 const useManualLinks = (text: string): ManualLinks | null => {
+  const { language } = useI18n()
   const [links, setLinks] = useState<ManualLinks | null>(null)
   const needed = hasManualReferences(text)
   useEffect(() => {
-    if (!needed || links) return undefined
+    if (!needed) return undefined
     let active = true
-    loadHandbook()
+    loadHandbook(language)
       .then(({ handbook }) => {
         if (active) setLinks(createManualLinks(handbook))
       })
@@ -33,18 +36,18 @@ const useManualLinks = (text: string): ManualLinks | null => {
     return () => {
       active = false
     }
-  }, [needed, links])
+  }, [needed, language])
   return links
 }
 
 /**
- * The links that keep their query string: Arena itself and the manual (its PDF, not the whole host).
+ * The links that keep their query string: Arena itself and the manual (its Word file and its PDF, not the whole host).
  * @param {ManualLinks|null} links - Manual links, once loaded.
  * @returns {AssistantLinkPolicy} The policy.
  */
 const getLinkPolicy = (links: ManualLinks | null): AssistantLinkPolicy => ({
   trustedOrigins: [globalThis.location.origin],
-  trustedPages: links ? [links.manualUrl] : [],
+  trustedPages: links ? [links.manualUrl, links.pdfUrl] : [],
 })
 
 /**

@@ -222,11 +222,12 @@ export type RunAssistantTurnParams = {
 
 /**
  * Loads the handbook outline for the Help prompt (null when the handbook can't be loaded: the turn still runs).
+ * @param {string} uiLang - Interface language.
  * @returns {Promise<string|null>} The outline.
  */
-const loadOutline = async (): Promise<string | null> => {
+const loadOutline = async (uiLang: string): Promise<string | null> => {
   try {
-    const { handbook } = await loadHandbook()
+    const { handbook } = await loadHandbook(uiLang)
     return getHandbookOutline(handbook, AiLimits.handbookOutlineMaxChars)
   } catch {
     return null
@@ -543,7 +544,7 @@ export const runAssistantTurn = async ({
       hostingClass: turn.access.hostingClass,
       tools,
     })
-    const outline = area === 'help' && !systemPrompt ? await loadOutline() : null
+    const outline = area === 'help' && !systemPrompt ? await loadOutline(turnCtx.uiLang) : null
     const system =
       systemPrompt ??
       buildAssistantSystemPrompt({
