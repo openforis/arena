@@ -38,13 +38,13 @@ const useManualLinks = (text: string): ManualLinks | null => {
 }
 
 /**
- * The links that keep their query string: Arena itself and the manual (its document, not the whole host).
+ * The links that keep their query string: Arena itself and the manual (its PDF, not the whole host).
  * @param {ManualLinks|null} links - Manual links, once loaded.
  * @returns {AssistantLinkPolicy} The policy.
  */
 const getLinkPolicy = (links: ManualLinks | null): AssistantLinkPolicy => ({
   trustedOrigins: [globalThis.location.origin],
-  trustedPages: links ? [links.manualUrl.replace(/\/edit$/, '')] : [],
+  trustedPages: links ? [links.manualUrl] : [],
 })
 
 /**

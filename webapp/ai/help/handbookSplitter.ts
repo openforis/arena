@@ -1,8 +1,8 @@
 /**
- * Splits the text export of the Arena handbook (Google Doc) into sections, using its numbered table of contents.
+ * Splits the text of the Arena handbook PDF (pdftotext -layout) into sections, using its numbered table of contents.
  * No imports and erasable TypeScript only: scripts/ai/updateHandbook.ts runs it with node --experimental-strip-types.
  */
-// anchor: id of the heading in the Google Doc ("h.xxxx"), null when the HTML export has no matching heading
+// anchor: URL fragment of the section in the PDF ("page=33")
 export type HandbookSection = { id: string; title: string; path: string[]; text: string; anchor?: string | null }
 
 export type Handbook = { source: string; version: string | null; fetchedAt: string; sections: HandbookSection[] }
@@ -14,10 +14,12 @@ export const SECTION_MAX_CHARS = 4000
 // fewer section ids than this means the export format changed
 export const HANDBOOK_MIN_IDS = 50
 
-// "6.1.2. Branding        18", "Annex 1. System architecture   150"
+// "6.1.2. Branding.........18", "Annex 1. System architecture.........150"
 const TOC_NUMBER = /^((?:\d+\.)+|Annex \d+\.)\s/
-const UNNUMBERED_TOC_LINE = /^(Acknowledgements)\s{2,}\d+\s*$/
-const PAGE_BREAK = /^_{8,}\s*$/
+const UNNUMBERED_TOC_LINE = /^(Acknowledgements)[\s.]{2,}\d+\s*$/
+// header and page number of each PDF page
+// shortcut: a body line with only digits is dropped too, tell the footer by its position if that loses content
+const PAGE_NOISE = /^\s*(?:Open Foris Arena - Handbook|\d+)\s*$/
 
 /**
  * Normalizes the export: no BOM, LF line ends.
@@ -31,7 +33,7 @@ export const toLines = (raw: string): string[] =>
     .split('\n')
 
 /**
- * Returns the title of a table of contents entry without the page number: two or more spaces and the digits at its end.
+ * Returns the title of a table of contents entry without the page number: the dot leader and the digits at its end.
  * @param {string} text - The entry after its number.
  * @returns {string|null} The title, or null when the entry has no page number.
  */
@@ -40,7 +42,7 @@ const readTocTitle = (text: string): string | null => {
   while (digitsStart > 0 && text[digitsStart - 1] >= '0' && text[digitsStart - 1] <= '9') digitsStart -= 1
   if (digitsStart === text.length) return null
   let titleEnd = digitsStart
-  while (titleEnd > 0 && /\s/.test(text[titleEnd - 1])) titleEnd -= 1
+  while (titleEnd > 0 && /[\s.]/.test(text[titleEnd - 1])) titleEnd -= 1
   return titleEnd > 0 && digitsStart - titleEnd >= 2 ? text.slice(0, titleEnd) : null
 }
 
@@ -60,7 +62,7 @@ const toTocEntry = (line: string): TocEntry | null => {
 }
 
 /**
- * Reads the table of contents (the lines after "Content" up to the first line that is not an entry).
+ * Reads the table of contents (the lines after "Content" up to the first text line that is not an entry).
  * @param {string[]} lines - Export lines.
  * @returns {{entries: TocEntry[], end: number}} The entries and the index of the first line after the table.
  */
@@ -70,33 +72,51 @@ export const readToc = (lines: string[]): { entries: TocEntry[]; end: number } =
   let index = start + 1
   while (start >= 0 && index < lines.length) {
     const entry = toTocEntry(lines[index])
-    if (!entry) break
-    entries.push(entry)
+    if (entry) entries.push(entry)
+    else if (lines[index].trim() && !PAGE_NOISE.test(lines[index])) break
     index += 1
   }
   return { entries, end: index }
 }
 
+type Heading = { entry: TocEntry; line: number; textLine: number }
+
+// the layout export pads with spaces and wraps long headings: headings are compared without white space
+const squash = (text: string): string => text.replace(/\s+/g, '')
+
+// lines the heading takes at index (a long one wraps onto a second line), 0 when it isn't there
+const countHeadingLines = (lines: string[], index: number, heading: string): number => {
+  const first = squash(lines[index])
+  if (first === heading) return 1
+  return first && first + squash(lines[index + 1] ?? '') === heading ? 2 : 0
+}
+
 // body line of each entry's heading, searched forward; an entry without a body heading is dropped (its text stays
 // in the previous section)
-const findHeadings = (lines: string[], entries: TocEntry[], from: number): { entry: TocEntry; line: number }[] => {
-  const found: { entry: TocEntry; line: number }[] = []
+const findHeadings = (lines: string[], entries: TocEntry[], from: number): Heading[] => {
+  const found: Heading[] = []
   let position = from
   for (const entry of entries) {
+    const heading = squash(entry.heading)
     let index = position
-    while (index < lines.length && lines[index].trim() !== entry.heading) index += 1
+    while (index < lines.length && countHeadingLines(lines, index, heading) === 0) index += 1
     if (index < lines.length) {
-      found.push({ entry, line: index })
-      position = index + 1
+      const textLine = index + countHeadingLines(lines, index, heading)
+      found.push({ entry, line: index, textLine })
+      position = textLine
     }
   }
   return found
 }
 
+// pdftotext starts every page after the first with a form feed
+const getPage = (lines: string[], index: number): number =>
+  lines.slice(0, index + 1).filter((line) => line.includes('\f')).length + 1
+
 const cleanText = (lines: string[]): string =>
   lines
-    .filter((line) => !PAGE_BREAK.test(line))
-    .map((line) => line.trimEnd())
+    .filter((line) => !PAGE_NOISE.test(line))
+    .map((line) => line.trim().replace(/\s{2,}/g, '  '))
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
@@ -132,24 +152,19 @@ const buildPath = (stack: TocEntry[], entry: TocEntry): string[] => {
  * Splits the export into sections.
  * @param {string} raw - Export text.
  * @param {number} [maxChars] - Longer sections are split into parts (" (2/3)" title suffix, same id).
- * @param {Record<string, string>} [anchors] - Heading anchor ids by heading text (see handbookAnchors).
  * @returns {HandbookSection[]} The sections, in document order.
  */
-export const splitHandbook = (
-  raw: string,
-  maxChars: number = SECTION_MAX_CHARS,
-  anchors: Record<string, string> = {}
-): HandbookSection[] => {
+export const splitHandbook = (raw: string, maxChars: number = SECTION_MAX_CHARS): HandbookSection[] => {
   const lines = toLines(raw)
   const { entries, end } = readToc(lines)
   const headings = findHeadings(lines, entries, end)
   const sections: HandbookSection[] = []
   const stack: TocEntry[] = []
-  for (const [index, { entry, line }] of headings.entries()) {
+  for (const [index, { entry, line, textLine }] of headings.entries()) {
     const nextLine = index + 1 < headings.length ? headings[index + 1].line : lines.length
     const path = buildPath(stack, entry)
-    const parts = splitLongText(cleanText(lines.slice(line + 1, nextLine)), maxChars)
-    const anchor = anchors[entry.heading.replace(/\s+/g, ' ')] ?? null
+    const parts = splitLongText(cleanText(lines.slice(textLine, nextLine)), maxChars)
+    const anchor = `page=${getPage(lines, line)}`
     for (const [partIndex, text] of parts.entries()) {
       const suffix = parts.length > 1 ? ` (${partIndex + 1}/${parts.length})` : ''
       sections.push({ id: entry.id, title: `${entry.title}${suffix}`, path, text, anchor })
@@ -164,7 +179,7 @@ export const splitHandbook = (
  * @returns {string|null} The version.
  */
 export const readHandbookVersion = (raw: string): string | null => {
-  const match = /^ver\.\s*(\S+)\s*$/m.exec(raw.replaceAll('\r', ''))
+  const match = /^[ \t\f]*ver\.\s*(\S+)\s*$/m.exec(raw.replaceAll('\r', ''))
   return match ? match[1] : null
 }
 
@@ -185,24 +200,21 @@ export const countHeadings = (raw: string): { toc: number; found: number } => {
  * @param {string} params.raw - Export text.
  * @param {string} params.source - URL of the document.
  * @param {string} params.fetchedAt - Download date (ISO).
- * @param {Record<string, string>} [params.anchors] - Heading anchor ids by heading text.
  * @returns {Handbook} The handbook.
  */
 export const buildHandbook = ({
   raw,
   source,
   fetchedAt,
-  anchors = {},
 }: {
   raw: string
   source: string
   fetchedAt: string
-  anchors?: Record<string, string>
 }): Handbook => ({
   source,
   version: readHandbookVersion(raw),
   fetchedAt,
-  sections: splitHandbook(raw, SECTION_MAX_CHARS, anchors),
+  sections: splitHandbook(raw),
 })
 
 /**

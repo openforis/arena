@@ -1,5 +1,5 @@
 /**
- * Turns the manual references of an assistant answer into links to the Google Doc: section citations ("§5.2 Publish
+ * Turns the manual references of an assistant answer into links to the manual PDF: section citations ("§5.2 Publish
  * a survey") and the placeholders the model may use as link targets ("[user manual](manual)", "[text](§5.2)").
  * The links come from the handbook, never from the model, so a small model can't write a broken one.
  */
@@ -23,11 +23,11 @@ const SECTION_TARGET = /^§ ?(A\d+|\d+(?:\.\d+)*)\.?$/
  * @returns {ManualLinks} The manual URL and the section links by id.
  */
 export const createManualLinks = (handbook: Handbook): ManualLinks => {
-  const manualUrl = `${handbook.source}/edit`
+  const manualUrl = handbook.source
   const sections = new Map<string, ManualSection>()
   for (const { id, title, anchor } of handbook.sections) {
     if (sections.has(id)) continue
-    const url = anchor ? `${manualUrl}#heading=${anchor}` : manualUrl
+    const url = anchor ? `${manualUrl}#${anchor}` : manualUrl
     sections.set(id, { title: title.replace(PART_SUFFIX, ''), url })
   }
   return { manualUrl, sections }

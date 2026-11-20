@@ -36,7 +36,7 @@ describe('handbook splitter', () => {
     expect(byTitle('Typical working process').text).toBe('Steps:\n1. Open the Details section.\n2. Save.')
   })
 
-  test('removes the BOM, CRLF, page breaks, trailing spaces and blank runs', () => {
+  test('removes the BOM, CRLF, page headers and numbers, indentation and blank runs', () => {
     expect(byTitle('Introduction').text).toBe('Arena is a cloud platform.')
     expect(byTitle('Create a survey').text).toBe('Click New.')
   })
@@ -45,16 +45,17 @@ describe('handbook splitter', () => {
     expect(byTitle('Survey details').text).toBe('Fill the name.\nText of the missing section.')
   })
 
-  test('paths, annexes and the unnumbered Acknowledgements', () => {
+  test('paths, a heading wrapped onto two lines, pages and the unnumbered Acknowledgements', () => {
     expect(byTitle('Survey details').path).toEqual(['2. Typical working process', '2.1. Create a survey'])
     expect(byTitle('Long section (1/2)').path).toEqual([])
-    expect(byTitle('System architecture')).toEqual({
+    expect(byTitle('System architecture of the platform')).toEqual({
       id: 'A1',
-      title: 'System architecture',
+      title: 'System architecture of the platform',
       path: [],
       text: 'Arena runs on Node.js.',
-      anchor: null,
+      anchor: 'page=5',
     })
+    expect(byTitle('Introduction').anchor).toBe('page=4')
     expect(byTitle('Acknowledgements').id).toBe('Acknowledgements')
   })
 
