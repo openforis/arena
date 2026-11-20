@@ -125,6 +125,16 @@ describe('ODK import - publishable node defs', () => {
     expect(NodeDef.getName(getNodeDefByOdkPath(survey, '/data/_7'))).toBe('n__7')
   }, 30000)
 
+  test('survey name from a form title starting with a number', async () => {
+    const survey = await importXForm(
+      xformXml.replace('<h:title>publishable_test</h:title>', '<h:title>2024 Forest inventory</h:title>')
+    )
+
+    const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+    expect(surveyName).toMatch(validNameRegex)
+    expect(surveyName.startsWith('n_2024_forest_inventory')).toBe(true)
+  }, 30000)
+
   test('real form (transportation) with long duplicate names', async () => {
     const survey = await importXForm(transportationXml)
 

@@ -1,7 +1,7 @@
 import * as Validator from '@core/validation/validator'
 
 // a node def name must start with a letter and be at most 40 characters long (see Validator.validateName)
-const nameMaxLength = 40
+export const nameMaxLength = 40
 const namePrefixIfNotStartingWithLetter = 'n_'
 
 /**
@@ -13,11 +13,11 @@ const namePrefixIfNotStartingWithLetter = 'n_'
 const fitName = (name: string, suffix = ''): string => name.slice(0, nameMaxLength - suffix.length) + suffix
 
 /**
- * Prefixes the name when it doesn't start with a letter (e.g. ODK names like "_7" or "__version__").
+ * Prefixes the name when it doesn't start with a letter (e.g. ODK names like "_7" or form titles like "2024 survey").
  * @param {string} name - The name.
  * @returns {string} - A name starting with a letter.
  */
-const ensureStartsWithLetter = (name: string): string =>
+export const ensureStartsWithLetter = (name: string): string =>
   /^[a-z]/.test(name) ? name : `${namePrefixIfNotStartingWithLetter}${name}`
 
 export default class NodeDefUniqueNameGenerator {
