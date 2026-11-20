@@ -1,12 +1,11 @@
 /**
- * Do it of the "category labels missing in <language>" suggestion, run as a browser batch: the items missing the
- * label are read from the server, translated with the calls of "AI: Translate labels", reviewed, then written through
- * the Apply path of the assistant's category label cards (server checks, compare and set, per-request limit).
+ * The category item labels missing in a language (the "category labels missing in <language>" suggestion), read from
+ * the server and translated with the calls of "AI: Translate labels": the chat batch of its Do it proposes them as one
+ * change set.
  */
 import * as StringUtils from '@core/stringUtils'
 import {
   CATEGORY_ITEM_LABEL_TEXT_MAX,
-  CATEGORY_ITEM_LABELS_UPDATE_MAX,
   MISSING_LABELS_SERVER_PAGE_MAX,
   type MissingLabelsItem,
 } from '@common/ai/categoryItemLabels'
@@ -15,22 +14,17 @@ import type { AiGenerateText } from '@common/ai/llm'
 import { translateItems } from '@common/ai/tasks/translation'
 
 import {
-  applyCategoryItemLabels,
-  type CategoryLabelsApplierDeps,
-} from '../changeSets/categoryItemLabels/applyCategoryItemLabels'
-import {
   fetchMissingLabelsPage,
   type FetchMissingLabelsPage,
 } from '../changeSets/categoryItemLabels/categoryItemLabelsApi'
-import { CATEGORY_ITEM_LABEL_SET, type CategoryItemLabelSetOperation } from '../changeSets/categoryItemLabels/types'
+import { CATEGORY_ITEM_LABEL_SET } from '../changeSets/categoryItemLabels/types'
 import { findTranslationSource, type TranslationSource } from '../changeSets/translationSource'
-import type { OperationResult } from '../changeSets/types'
-import { resolveBatchModel } from './batchModel'
-import { type AiBatchGuard, type AiBatchProgress, type AiBatchStop, chunkArray, runAiBatchCalls } from './batchRun'
-import { buildTranslationCalls, TRANSLATION_BATCH_SIZE, type NodeDefsTranslationItem } from './translateAllLabels'
+import type { ChangeOperationDraft } from '../changeSets/types'
+import type { AiBatchGuard, AiBatchProgress, AiBatchStop } from './batchRun'
+import { TRANSLATION_BATCH_SIZE, translateRowsToLang } from './translateAllLabels'
 
-// shortcut: one run takes at most this many items (the review table renders every row); the suggestion shows again
-// with the rest. Raise it when the review table is virtualised.
+// shortcut: one run takes at most this many items (the review dialog of the card renders every change); the
+// suggestion shows again with the rest. Raise it when the review dialog is virtualised.
 export const CATEGORY_LABELS_RUN_MAX_ITEMS = 1000
 
 export type CategoryLabelsCategory = { uuid: string; name: string }
@@ -191,189 +185,41 @@ export const runTranslateCategoryItemLabels = async ({
   translate?: typeof translateItems
   batchSize?: number
 }): Promise<CategoryLabelsTranslationResult> => {
-  const sourceLangs = [...new Set(rows.map((row) => row.source.lang))]
-  const calls = sourceLangs.flatMap((sourceLang) =>
-    buildTranslationCalls({
-      items: rows
-        .filter((row) => row.source.lang === sourceLang)
-        .map((row) => ({ id: row.itemUuid, text: row.source.text, kind: 'categoryItemLabel' })),
-      sourceLang,
-      otherLangs: [lang],
-      generateText,
-      translate,
-      batchSize,
-      maxTargetLangs: 1,
-    })
-  )
-  const aiTextByItem = new Map<string, string>()
-  const { stop, notRunCount } = await runAiBatchCalls({
-    calls,
+  const { translated, failedCount, notDoneCount, stop } = await translateRowsToLang({
+    rows,
+    toItem: (row) => ({ id: row.itemUuid, kind: 'categoryItemLabel' }),
+    lang,
+    maxLength: CATEGORY_ITEM_LABEL_TEXT_MAX,
+    generateText,
     guard,
     signal,
     onProgress,
-    onResult: ({ translations, itemIds }) => {
-      for (const { id, byLang } of translations) {
-        const text = (byLang[lang] ?? '').trim()
-        // the model may return ids it was not asked for; a text the server would refuse counts as not produced
-        if (itemIds.includes(id) && text !== '' && text.length <= CATEGORY_ITEM_LABEL_TEXT_MAX) {
-          aiTextByItem.set(id, text)
-        }
-      }
-    },
+    translate,
+    batchSize,
   })
-  const translated = rows.flatMap((row) => {
-    const aiText = aiTextByItem.get(row.itemUuid)
-    return aiText === undefined ? [] : [{ ...row, aiText }]
-  })
-  const notDoneCount = Math.min(notRunCount, rows.length - translated.length)
-  const failedCount = rows.length - translated.length - notDoneCount + skippedCount
-  const result = { lang, rows: translated, failedCount }
+  const result = { lang, rows: translated, failedCount: failedCount + skippedCount }
   return stop ? { ...result, notDoneCount, stop } : result
 }
 
 /**
- * Translates the missing category item labels of a language with the model of the translation feature.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {CategoryLabelsCategory[]} params.categories - Categories of the suggestion.
- * @param {string} params.lang - Target language.
- * @param {string[]} params.languages - Survey languages, default first.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
- * @param {Function} [params.onProgress] - Progress listener.
- * @returns {Promise<CategoryLabelsTranslationResult>} The review data.
+ * Builds the drafts of the translated labels: proposed over a missing label, so a label added meanwhile is a conflict
+ * at Apply, not overwritten.
+ * @param {object[]} rows - Translated rows.
+ * @param {string} lang - Target language.
+ * @returns {ChangeOperationDraft[]} The drafts.
  */
-export const translateCategoryItemLabelsWorkflow = async ({
-  surveyId,
-  categories,
-  lang,
-  languages,
-  signal,
-  onProgress,
-}: {
-  surveyId: number
-  categories: CategoryLabelsCategory[]
+export const toCategoryLabelDrafts = (
+  rows: (CategoryLabelRow & { aiText: string })[],
   lang: string
-  languages: string[]
-  signal?: AbortSignal
-  onProgress?: (progress: AiBatchProgress) => void
-}): Promise<CategoryLabelsTranslationResult> => {
-  const { rows, skippedCount } = await loadCategoryLabelRows({ surveyId, categories, lang, languages, signal })
-  // nothing to send: no model, no consent dialog
-  if (rows.length === 0) return { lang, rows: [], failedCount: skippedCount }
-  const { generateText, guard } = await resolveBatchModel({ feature: 'translation', surveyId, signal })
-  return runTranslateCategoryItemLabels({ rows, lang, skippedCount, generateText, guard, signal, onProgress })
-}
-
-/**
- * Converts the translated rows to the items of the translation review modal (one row per category item).
- * @param {CategoryLabelsTranslationResult} result - Result of the run.
- * @returns {NodeDefsTranslationItem[]} The items; nodeDefUuid holds the category item uuid.
- */
-export const toCategoryLabelReviewItems = ({
-  lang,
-  rows,
-}: CategoryLabelsTranslationResult): NodeDefsTranslationItem[] =>
-  rows.map((row) => ({
-    nodeDefUuid: row.itemUuid,
-    path: `${row.categoryName} / ${row.ref}`,
-    defaultLangLabel: row.source.text,
-    defaultLangDescription: '',
-    existingLabelsByLang: {},
-    existingDescriptionsByLang: {},
-    aiLabelsByLang: { [lang]: row.aiText },
-    aiDescriptionsByLang: {},
+): ChangeOperationDraft[] =>
+  rows.map(({ categoryUuid, itemUuid, ref, levelName, source, aiText }) => ({
+    type: CATEGORY_ITEM_LABEL_SET,
+    categoryUuid,
+    itemUuid,
+    ref,
+    levelName,
+    lang,
+    text: aiText,
+    expectedText: null,
+    source,
   }))
-
-/**
- * Builds the label operations of the reviewed rows. A row left blank is not written; a text longer than the server
- * accepts is counted, not sent (it would fail its whole request).
- * @param {object} params - Parameters.
- * @param {CategoryLabelRow[]} params.rows - Rows of the run.
- * @param {string} params.lang - Target language.
- * @param {Record<string, string>} params.textByItemUuid - Reviewed text of each row.
- * @returns {object} The operations, and the number of texts too long.
- */
-export const buildCategoryLabelOperations = ({
-  rows,
-  lang,
-  textByItemUuid,
-}: {
-  rows: CategoryLabelRow[]
-  lang: string
-  textByItemUuid: Record<string, string | undefined>
-}): { operations: CategoryItemLabelSetOperation[]; tooLongCount: number } => {
-  const operations: CategoryItemLabelSetOperation[] = []
-  let tooLongCount = 0
-  for (const { categoryUuid, itemUuid, ref, levelName, source } of rows) {
-    const text = (textByItemUuid[itemUuid] ?? '').trim()
-    if (text === '') continue
-    if (text.length > CATEGORY_ITEM_LABEL_TEXT_MAX) {
-      tooLongCount += 1
-      continue
-    }
-    operations.push({
-      id: itemUuid,
-      type: CATEGORY_ITEM_LABEL_SET,
-      categoryUuid,
-      itemUuid,
-      ref,
-      levelName,
-      lang,
-      text,
-      // the label was missing when the item was listed: a label added meanwhile is a conflict, not overwritten
-      expectedText: null,
-      source,
-    })
-  }
-  return { operations, tooLongCount }
-}
-
-/**
- * Writes the operations through the Apply path of the category label cards, one request per chunk (the server
- * limit). The store is refreshed and the suggestion event sent once, after the last chunk.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {CategoryItemLabelSetOperation[]} params.operations - Operations to write.
- * @param {Function} params.getSurvey - Returns the open survey.
- * @param {CategoryLabelsApplierDeps} params.deps - Server call and store updates.
- * @param {number} [params.chunkSize] - Labels per request.
- * @returns {Promise<object>} How many labels were written and how many were not (conflict, failed or skipped).
- */
-export const applyCategoryLabelOperations = async ({
-  surveyId,
-  operations,
-  getSurvey,
-  deps,
-  chunkSize = CATEGORY_ITEM_LABELS_UPDATE_MAX,
-}: {
-  surveyId: number
-  operations: CategoryItemLabelSetOperation[]
-  getSurvey: () => any
-  deps: CategoryLabelsApplierDeps
-  chunkSize?: number
-}): Promise<{ appliedCount: number; notAppliedCount: number }> => {
-  const results = new Map<string, OperationResult>()
-  const categoriesByUuid = new Map<string, any>()
-  // a defs reload per chunk would reload the survey under the next chunk
-  const chunkDeps: CategoryLabelsApplierDeps = {
-    putCategoryItemLabels: deps.putCategoryItemLabels,
-    onCategoriesUpdated: (categories) => {
-      for (const category of categories) categoriesByUuid.set(category.uuid, category)
-    },
-    onCategoryLabelsApplied: () => undefined,
-  }
-  const changeSet = {
-    id: 'categoryLabelsBatch',
-    surveyId,
-    summary: '',
-    operations,
-    createdAt: new Date().toISOString(),
-  }
-  for (const chunk of chunkArray(operations, chunkSize)) {
-    await applyCategoryItemLabels({ changeSet, operations: chunk, getSurvey, deps: chunkDeps, results })
-  }
-  const appliedCount = [...results.values()].filter(({ status }) => status === 'applied').length
-  if (categoriesByUuid.size > 0) deps.onCategoriesUpdated([...categoriesByUuid.values()])
-  if (appliedCount > 0) deps.onCategoryLabelsApplied()
-  return { appliedCount, notAppliedCount: operations.length - appliedCount }
-}

@@ -11,6 +11,7 @@ import type {
   ConversationToolPart,
 } from '@webapp/ai/conversations/types'
 import { getAiEngineErrorView, isProviderChoiceError } from '@webapp/ai/engines/engineUi'
+import { getSuggestionBatchToolKind } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import { Button } from '@webapp/components/buttons'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
@@ -26,6 +27,7 @@ import { MapLayerCard } from './analysis/MapLayerCard'
 import { QueryCard } from './analysis/QueryCard'
 import { RecordEditCard } from './cleaning/RecordEditCard'
 import { ChangeSetCard } from './ChangeSetCard'
+import { SuggestionBatchProgressCard } from './SuggestionBatchProgressCard'
 import type { AssistantConversationApi } from './useAssistantConversation'
 
 type ChangeSets = Record<string, ChangeSetCardState>
@@ -111,11 +113,14 @@ const AnswerPart = ({
   const queryId = getProposedQueryId({ toolName: part.toolName, output: part.output })
   const mapLayer = getProposedMapLayer({ toolName: part.toolName, output: part.output })
   const queryEntry = queryId ? (queries[queryId] ?? null) : undefined
+  // a batch run in the chat: its progress card until the change set card replaces it
+  const batchKind = part.state === 'running' && streaming ? getSuggestionBatchToolKind(part.toolName) : null
   return (
     <>
       <ToolRow interrupted={part.state === 'running' && !streaming} part={part} />
       {/* the cards are controls, not text: they stay out of what the screen reader reads aloud as the answer streams */}
       <div aria-live="off" className="ai-assistant-message__cards">
+        {batchKind && <SuggestionBatchProgressCard kind={batchKind} onStop={api.stop} part={part} />}
         {cardState &&
           (isRecordEditChangeSet(cardState.changeSet) ? (
             <RecordEditCard

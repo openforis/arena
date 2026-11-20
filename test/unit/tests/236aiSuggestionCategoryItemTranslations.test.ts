@@ -88,20 +88,19 @@ describe('category item translations suggestion (236)', () => {
     expect(SUGGESTION_DEFINITIONS.categoryItemTranslations).toBe(categoryItemTranslationsDefinition)
   })
 
-  test('Do it starts no chat turn: the definition has no prompt, so no request is built', () => {
+  test('Do it builds the request of the chat batch: the language as the scope key, the categories as targets', () => {
     const [suggestion] = detectCategoryItemTranslations({ [speciesUuid]: { fr: 3 } }, survey, {
       surveyId: 7,
       now: TEST_NOW,
     })
-    expect(categoryItemTranslationsDefinition.prompt).toBeUndefined()
-    expect(
-      buildSuggestionRequest({
-        suggestion,
-        userUuid: 'u1',
-        surveyId: 7,
-        cycle: '0',
-        describeContext: describeContext(survey),
-      })
-    ).toBeNull()
+    const request = buildSuggestionRequest({
+      suggestion,
+      userUuid: 'u1',
+      surveyId: 7,
+      cycle: '0',
+      describeContext: describeContext(survey),
+    })
+    expect(request?.scope).toEqual({ kind: 'categoryItemTranslations', key: 'fr', targetKeys: [speciesUuid] })
+    expect(request?.prompt).toBe('Translate the category item labels that are missing in French (fr).')
   })
 })

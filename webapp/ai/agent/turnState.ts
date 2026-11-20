@@ -23,6 +23,8 @@ export type TurnState = {
   appendReasoning: (text: string) => void
   startTool: (call: { toolCallId: string; toolName: string; input: unknown }) => void
   endTool: (result: { toolCallId: string; output: unknown }) => void
+  // the output of a call still running (the progress of a batch)
+  setToolOutput: (result: { toolCallId: string; output: unknown }) => void
   addChangeSet: (changeSet: ChangeSet) => void
   escalateDataClass: (dataClass: AiDataClass) => void
   setQueries: (queries: Record<string, AnalysisQueryEntry>) => void
@@ -120,6 +122,13 @@ export const createTurnState = ({
           part.type === 'tool' && part.toolCallId === toolCallId
             ? { ...part, output, state: isToolErrorOutput(output) ? 'failed' : 'done' }
             : part
+        ),
+      })),
+    setToolOutput: ({ toolCallId, output }) =>
+      updateAnswer((message) => ({
+        ...message,
+        parts: message.parts.map((part) =>
+          part.type === 'tool' && part.toolCallId === toolCallId ? { ...part, output } : part
         ),
       })),
     addChangeSet: (changeSet) =>

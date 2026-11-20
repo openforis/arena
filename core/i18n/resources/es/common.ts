@@ -1370,15 +1370,6 @@ $t(common.appNameFull)
   aiBatch: {
     translateTitle: 'IA: Traducir etiquetas',
     dataDictionaryTitle: 'IA: Descripciones de campos',
-    categoryLabelsTitle: 'IA: Traducir etiquetas de categorías',
-    categoryLabelsNothing:
-      'No hay etiquetas de categorías para traducir: los elementos no tienen etiqueta en otro idioma.',
-    categoryLabelsSaved_one: '{{count}} etiqueta de categoría guardada.',
-    categoryLabelsSaved_other: '{{count}} etiquetas de categorías guardadas.',
-    categoryLabelsNotSaved_one:
-      '{{count}} etiqueta de categoría no se pudo guardar (cambió entretanto o no fue aceptada); {{saved}} guardadas.',
-    categoryLabelsNotSaved_other:
-      '{{count}} etiquetas de categorías no se pudieron guardar (cambiaron entretanto o no fueron aceptadas); {{saved}} guardadas.',
     preparing: 'Preparando…',
     progress: '{{done}} de {{total}} solicitudes a la IA completadas',
     stop: 'Detener',
@@ -1591,6 +1582,37 @@ $t(common.appNameFull)
       nearLimit: 'Cerca del límite.',
       trimmed: 'Los mensajes más antiguos ya no se envían al modelo.',
     },
+    missingTextsBatch: {
+      start_one:
+        'Falta {{count}} texto en {{lang}}. Lo estoy traduciendo: revisará la traducción antes de que se guarde nada.',
+      start_other:
+        'Faltan {{count}} textos en {{lang}}. Los estoy traduciendo en lotes de {{size}}: esto puede tardar unos minutos. Revisará las traducciones antes de que se guarde nada.',
+      start_many:
+        'Faltan {{count}} textos en {{lang}}. Los estoy traduciendo en lotes de {{size}}: esto puede tardar unos minutos. Revisará las traducciones antes de que se guarde nada.',
+      summary: 'Traducciones de los textos que faltan en {{lang}}',
+      done_one: '{{count}} texto traducido: revíselo en la tarjeta y luego aplíquelo.',
+      done_other: '{{count}} textos traducidos: revíselos en la tarjeta y luego aplíquelos.',
+      done_many: '{{count}} textos traducidos: revíselos en la tarjeta y luego aplíquelos.',
+      failed_one: 'No se pudo traducir {{count}} texto.',
+      failed_other: 'No se pudieron traducir {{count}} textos.',
+      failed_many: 'No se pudieron traducir {{count}} textos.',
+      nothing: 'No hay textos para traducir: los textos que faltan no están completados en ningún otro idioma.',
+      categoryStart_one:
+        'Falta {{count}} etiqueta de categoría en {{lang}}. La estoy traduciendo: revisará la traducción antes de que se guarde nada.',
+      categoryStart_other:
+        'Faltan {{count}} etiquetas de categoría en {{lang}}. Las estoy traduciendo en lotes de {{size}}: esto puede tardar unos minutos. Revisará las traducciones antes de que se guarde nada.',
+      categorySummary: 'Traducciones de las etiquetas de categoría que faltan en {{lang}}',
+      categoryStart_many:
+        'Faltan {{count}} etiquetas de categoría en {{lang}}. Las estoy traduciendo en lotes de {{size}}: esto puede tardar unos minutos. Revisará las traducciones antes de que se guarde nada.',
+      progressTitle_one: 'Traduciendo {{count}} texto al {{lang}}',
+      progressTitle_other: 'Traduciendo {{count}} textos al {{lang}}',
+      categoryProgressTitle_one: 'Traduciendo {{count}} etiqueta de categoría al {{lang}}',
+      categoryProgressTitle_other: 'Traduciendo {{count}} etiquetas de categoría al {{lang}}',
+      minutesLeft: 'quedan unos {{minutes}} min',
+      lessThanMinuteLeft: 'queda menos de un minuto',
+      progressTitle_many: 'Traduciendo {{count}} textos al {{lang}}',
+      categoryProgressTitle_many: 'Traduciendo {{count}} etiquetas de categoría al {{lang}}',
+    },
     tools: {
       survey_getOverview: 'Leyó la estructura de la encuesta',
       nodeDef_get: 'Consultó {{name}}',
@@ -1602,6 +1624,10 @@ $t(common.appNameFull)
       nodeDef_proposeCreate: 'Preparó nuevos elementos',
       nodeDef_proposeUpdate: 'Preparó cambios de propiedades',
       labels_proposeSet: 'Preparó etiquetas',
+      missingTexts_translate: 'Tradujo los textos que faltan en {{name}}',
+      missingTexts_translateRunning: 'Traduciendo los textos que faltan en {{name}}',
+      categoryItemLabels_translate: 'Tradujo las etiquetas de categoría que faltan en {{name}}',
+      categoryItemLabels_translateRunning: 'Traduciendo las etiquetas de categoría que faltan en {{name}}',
       expressions_proposeSet: 'Preparó expresiones',
       survey_listMissingTexts: 'Listó los textos que faltan',
       categories_list: 'Listó las categorías',

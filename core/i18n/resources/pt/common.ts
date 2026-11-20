@@ -1493,14 +1493,6 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
   aiBatch: {
     translateTitle: 'IA: Traduzir rótulos',
     dataDictionaryTitle: 'IA: Descrições dos campos',
-    categoryLabelsTitle: 'IA: Traduzir rótulos de categorias',
-    categoryLabelsNothing: 'Nenhum rótulo de categoria para traduzir: os itens não têm rótulo em outro idioma.',
-    categoryLabelsSaved_one: '{{count}} rótulo de categoria salvo.',
-    categoryLabelsSaved_other: '{{count}} rótulos de categorias salvos.',
-    categoryLabelsNotSaved_one:
-      '{{count}} rótulo de categoria não pôde ser salvo (alterado entretanto ou não aceito); {{saved}} salvos.',
-    categoryLabelsNotSaved_other:
-      '{{count}} rótulos de categorias não puderam ser salvos (alterados entretanto ou não aceitos); {{saved}} salvos.',
     preparing: 'Preparando…',
     progress: '{{done}} de {{total}} pedidos à IA concluídos',
     stop: 'Parar',
@@ -1713,6 +1705,37 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       nearLimit: 'Perto do limite.',
       trimmed: 'As mensagens mais antigas não são mais enviadas ao modelo.',
     },
+    missingTextsBatch: {
+      start_one:
+        'Falta {{count}} texto em {{lang}}. Estou traduzindo: você revisará a tradução antes que algo seja salvo.',
+      start_other:
+        'Faltam {{count}} textos em {{lang}}. Estou traduzindo em lotes de {{size}}: isso pode levar alguns minutos. Você revisará as traduções antes que algo seja salvo.',
+      start_many:
+        'Faltam {{count}} textos em {{lang}}. Estou traduzindo em lotes de {{size}}: isso pode levar alguns minutos. Você revisará as traduções antes que algo seja salvo.',
+      summary: 'Traduções dos textos que faltam em {{lang}}',
+      done_one: '{{count}} texto traduzido: revise-o no cartão e depois aplique-o.',
+      done_other: '{{count}} textos traduzidos: revise-os no cartão e depois aplique-os.',
+      done_many: '{{count}} textos traduzidos: revise-os no cartão e depois aplique-os.',
+      failed_one: 'Não foi possível traduzir {{count}} texto.',
+      failed_other: 'Não foi possível traduzir {{count}} textos.',
+      failed_many: 'Não foi possível traduzir {{count}} textos.',
+      nothing: 'Nenhum texto para traduzir: os textos que faltam não estão preenchidos em nenhum outro idioma.',
+      categoryStart_one:
+        'Falta {{count}} rótulo de categoria em {{lang}}. Estou traduzindo: você revisará a tradução antes que algo seja salvo.',
+      categoryStart_other:
+        'Faltam {{count}} rótulos de categoria em {{lang}}. Estou traduzindo em lotes de {{size}}: isso pode levar alguns minutos. Você revisará as traduções antes que algo seja salvo.',
+      categorySummary: 'Traduções dos rótulos de categoria que faltam em {{lang}}',
+      categoryStart_many:
+        'Faltam {{count}} rótulos de categoria em {{lang}}. Estou traduzindo em lotes de {{size}}: isso pode levar alguns minutos. Você revisará as traduções antes que algo seja salvo.',
+      progressTitle_one: 'Traduzindo {{count}} texto para {{lang}}',
+      progressTitle_other: 'Traduzindo {{count}} textos para {{lang}}',
+      categoryProgressTitle_one: 'Traduzindo {{count}} rótulo de categoria para {{lang}}',
+      categoryProgressTitle_other: 'Traduzindo {{count}} rótulos de categoria para {{lang}}',
+      minutesLeft: 'faltam cerca de {{minutes}} min',
+      lessThanMinuteLeft: 'falta menos de um minuto',
+      progressTitle_many: 'Traduzindo {{count}} textos para {{lang}}',
+      categoryProgressTitle_many: 'Traduzindo {{count}} rótulos de categoria para {{lang}}',
+    },
     tools: {
       survey_getOverview: 'Leu a estrutura do inventário',
       nodeDef_get: 'Consultou {{name}}',
@@ -1724,6 +1747,10 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       nodeDef_proposeCreate: 'Preparou novos itens',
       nodeDef_proposeUpdate: 'Preparou alterações de propriedades',
       labels_proposeSet: 'Preparou rótulos',
+      missingTexts_translate: 'Traduziu os textos que faltam em {{name}}',
+      missingTexts_translateRunning: 'Traduzindo os textos que faltam em {{name}}',
+      categoryItemLabels_translate: 'Traduziu os rótulos de categoria que faltam em {{name}}',
+      categoryItemLabels_translateRunning: 'Traduzindo os rótulos de categoria que faltam em {{name}}',
       expressions_proposeSet: 'Preparou expressões',
       survey_listMissingTexts: 'Listou os textos em falta',
       categories_list: 'Listou as categorias',

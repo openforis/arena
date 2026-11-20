@@ -1,14 +1,14 @@
 // test/unit/tests/259aiTranslateCategoryItemLabels.test.ts
 import type { MissingLabelsItem } from '@common/ai/categoryItemLabels'
 
+import { applyCategoryItemLabels } from '@webapp/ai/changeSets/categoryItemLabels/applyCategoryItemLabels'
 import { CATEGORY_ITEM_LABEL_SET } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import type { OperationResult } from '@webapp/ai/changeSets/types'
 import {
-  applyCategoryLabelOperations,
-  buildCategoryLabelOperations,
   buildCategoryLabelRows,
   loadCategoryLabelRows,
   runTranslateCategoryItemLabels,
-  toCategoryLabelReviewItems,
+  toCategoryLabelDrafts,
 } from '@webapp/ai/workflows/translateCategoryItemLabels'
 
 const generateText = async () => ''
@@ -129,15 +129,17 @@ describe('category item labels batch (259)', () => {
     expect(result.failedCount).toBe(3)
     expect(result.stop).toBeUndefined()
 
-    expect(toCategoryLabelReviewItems(result)[0]).toEqual({
-      nodeDefUuid: 'item-1',
-      path: 'species / 1',
-      defaultLangLabel: 'Oak',
-      defaultLangDescription: '',
-      existingLabelsByLang: {},
-      existingDescriptionsByLang: {},
-      aiLabelsByLang: { fr: 'fr:Oak' },
-      aiDescriptionsByLang: {},
+    expect(toCategoryLabelDrafts(result.rows, 'fr')[0]).toEqual({
+      type: CATEGORY_ITEM_LABEL_SET,
+      categoryUuid: species.uuid,
+      itemUuid: 'item-1',
+      ref: '1',
+      levelName: 'genus',
+      lang: 'fr',
+      text: 'fr:Oak',
+      // proposed over a missing label: one added meanwhile is a conflict at Apply
+      expectedText: null,
+      source: { lang: 'en', text: 'Oak' },
     })
   })
 
@@ -169,35 +171,6 @@ describe('category item labels batch (259)', () => {
     expect(result.stop).toMatchObject({ cause: 'cancelled', done: 1, total: 3 })
   })
 
-  test('operations: the reviewed text of each row, blank rows left out, texts too long counted', () => {
-    const { rows } = buildCategoryLabelRows({
-      items: [item('1', { en: 'Oak' }), item('2', { en: 'Pine' }), item('3', { en: 'Fir' }), item('4', { en: 'Elm' })],
-      category: species,
-      lang: 'fr',
-      languages,
-    })
-    const { operations, tooLongCount } = buildCategoryLabelOperations({
-      rows,
-      lang: 'fr',
-      textByItemUuid: { 'item-1': ' Chêne ', 'item-2': '  ', 'item-3': 'x'.repeat(2001) },
-    })
-    expect(operations).toEqual([
-      {
-        id: 'item-1',
-        type: CATEGORY_ITEM_LABEL_SET,
-        categoryUuid: species.uuid,
-        itemUuid: 'item-1',
-        ref: '1',
-        levelName: 'genus',
-        lang: 'fr',
-        text: 'Chêne',
-        expectedText: null,
-        source: { lang: 'en', text: 'Oak' },
-      },
-    ])
-    expect(tooLongCount).toBe(1)
-  })
-
   test('apply: one request per chunk, the store refreshed and the event sent once at the end', async () => {
     const { rows } = buildCategoryLabelRows({
       items: ['1', '2', '3', '4', '5'].map((ref) => item(ref, { en: `Item ${ref}` })),
@@ -205,14 +178,16 @@ describe('category item labels batch (259)', () => {
       lang: 'fr',
       languages,
     })
-    const textByItemUuid = Object.fromEntries(rows.map((row) => [row.itemUuid, `fr ${row.ref}`]))
-    const { operations } = buildCategoryLabelOperations({ rows, lang: 'fr', textByItemUuid })
+    const translated = rows.map((row) => ({ ...row, aiText: `fr ${row.ref}` }))
+    const operations = toCategoryLabelDrafts(translated, 'fr').map((draft: any) => ({ ...draft, id: draft.itemUuid }))
     const requests: any[] = []
     const events: string[] = []
-    const result = await applyCategoryLabelOperations({
-      surveyId: 7,
+    const results = new Map<string, OperationResult>()
+    await applyCategoryItemLabels({
+      changeSet: { id: 'cs', surveyId: 7, summary: '', operations, createdAt: '' },
       operations,
       getSurvey: () => ({ id: 7 }),
+      results,
       chunkSize: 2,
       deps: {
         putCategoryItemLabels: async ({ surveyId, items }) => {
@@ -243,7 +218,13 @@ describe('category item labels batch (259)', () => {
       ['item-5'],
     ])
     expect(requests[0].items[0]).toEqual({ itemUuid: 'item-1', lang: 'fr', text: 'fr 1', expectedText: null })
-    expect(result).toEqual({ appliedCount: 2, notAppliedCount: 3 })
+    expect([...results.values()].map(({ id, status }) => [id, status])).toEqual([
+      ['item-1', 'applied'],
+      ['item-2', 'applied'],
+      ['item-3', 'failed'],
+      ['item-4', 'failed'],
+      ['item-5', 'conflict'],
+    ])
     expect(events).toEqual(['categories:1', 'applied'])
   })
 })

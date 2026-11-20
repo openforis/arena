@@ -41,7 +41,8 @@ export type AssistantSuggestion = {
 }
 
 // what the turn's tools may list for an accepted suggestion
-export type SuggestionScope = { kind: SuggestionKind; targetKeys: string[] }
+// key: the scope key of the suggestion (the language of missing translations); absent on conversations saved before it
+export type SuggestionScope = { kind: SuggestionKind; key?: string; targetKeys: string[] }
 
 export type SuggestionRequest = {
   requestId: string

@@ -57,7 +57,7 @@ export const assistantAreaFeatures: Record<AssistantPromptArea, AiFeatureKey> = 
   cleaning: 'assistantCleaning',
 }
 
-const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
+export const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
 // the turn ended without an answer: with room left in the context, or because the context filled up
 export const NO_ANSWER_ERROR_KEY = 'aiAssistantNoAnswer'
 export const CONTEXT_FULL_ERROR_KEY = 'aiAssistantContextFull'

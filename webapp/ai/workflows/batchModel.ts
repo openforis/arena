@@ -18,19 +18,22 @@ export type AiBatchModel = { generateText: AiGenerateText; guard: AiBatchGuard }
  * @param {object} params - Parameters.
  * @param {AiFeatureKey} params.feature - Feature key (translation, dataDictionary).
  * @param {number} params.surveyId - Survey id.
+ * @param {string} [params.providerId] - Provider picked in the chat (the default when absent or removed).
  * @param {AbortSignal} [params.signal] - Cancellation signal (closes a pending consent dialog).
  * @returns {Promise<AiBatchModel>} The text generator and the guard.
  */
 export const resolveBatchModel = async ({
   feature,
   surveyId,
+  providerId,
   signal,
 }: {
   feature: AiFeatureKey
   surveyId: number
+  providerId?: string
   signal?: AbortSignal
 }): Promise<AiBatchModel> => {
-  const { model, engine } = await resolveModel({ feature, surveyId, signal })
+  const { model, engine } = await resolveModel({ feature, surveyId, providerId, signal })
   // loaded lazily like the resolver's app wiring: it pulls in the HTTP client
   const { appBatchGuardDeps } = await import('./appBatchGuardDeps')
   const guard = createAiBatchGuard({

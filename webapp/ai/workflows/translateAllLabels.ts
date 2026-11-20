@@ -10,6 +10,7 @@ import { AiLimits } from '@common/ai/limits'
 import type { AiGenerateText } from '@common/ai/llm'
 import { type AiTranslationItem, type AiTranslationResult, translateItems } from '@common/ai/tasks/translation'
 
+import type { TranslationSource } from '../changeSets/translationSource'
 import { resolveBatchModel } from './batchModel'
 import {
   type AiBatchCall,
@@ -170,6 +171,90 @@ export const buildTranslationCalls = ({
         : undefined,
   })
   return chunkArray(items, batchSize).flatMap((batch) => langGroups.map((targetLangs) => buildCall(batch, targetLangs)))
+}
+
+export type TranslatedRows<R> = {
+  // the rows the AI translated, in row order
+  translated: (R & { aiText: string })[]
+  // texts the AI did not produce
+  failedCount: number
+  // texts a stop kept the run from asking for (not failures)
+  notDoneCount: number
+  stop?: AiBatchStop
+}
+
+/**
+ * Translates texts into one language, the calls grouped by the language of each text's source.
+ * @param {object} params - Parameters.
+ * @param {object[]} params.rows - Texts to translate, each with its source.
+ * @param {Function} params.toItem - Id (unique among the rows) and kind (prompt hint) of a row.
+ * @param {string} params.lang - Target language.
+ * @param {number} [params.maxLength] - Longest text kept: a longer one counts as not produced.
+ * @param {AiGenerateText} params.generateText - Text generator.
+ * @param {AiBatchGuard} params.guard - Check run before each call.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @param {Function} [params.onProgress] - Progress listener.
+ * @param {Function} [params.translate] - The translation task (tests).
+ * @param {number} [params.batchSize] - Items per call.
+ * @returns {Promise<TranslatedRows>} The translated rows and the counts of the others.
+ */
+export const translateRowsToLang = async <R extends { source: TranslationSource }>({
+  rows,
+  toItem,
+  lang,
+  maxLength = Number.POSITIVE_INFINITY,
+  generateText,
+  guard,
+  signal,
+  onProgress,
+  translate = translateItems,
+  batchSize = TRANSLATION_BATCH_SIZE,
+}: {
+  rows: R[]
+  toItem: (row: R) => { id: string; kind: string }
+  lang: string
+  maxLength?: number
+  generateText: AiGenerateText
+  guard: AiBatchGuard
+  signal?: AbortSignal
+  onProgress?: ProgressListener
+  translate?: typeof translateItems
+  batchSize?: number
+}): Promise<TranslatedRows<R>> => {
+  const sourceLangs = [...new Set(rows.map((row) => row.source.lang))]
+  const calls = sourceLangs.flatMap((sourceLang) =>
+    buildTranslationCalls({
+      items: rows
+        .filter((row) => row.source.lang === sourceLang)
+        .map((row) => ({ ...toItem(row), text: row.source.text })),
+      sourceLang,
+      otherLangs: [lang],
+      generateText,
+      translate,
+      batchSize,
+      maxTargetLangs: 1,
+    })
+  )
+  const aiTextById = new Map<string, string>()
+  const { stop, notRunCount } = await runAiBatchCalls({
+    calls,
+    guard,
+    signal,
+    onProgress,
+    onResult: ({ translations, itemIds }) => {
+      for (const { id, byLang } of translations) {
+        const text = (byLang[lang] ?? '').trim()
+        // the model may return ids it was not asked for; a text the server would refuse counts as not produced
+        if (itemIds.includes(id) && text !== '' && text.length <= maxLength) aiTextById.set(id, text)
+      }
+    },
+  })
+  const translated = rows.flatMap((row) => {
+    const aiText = aiTextById.get(toItem(row).id)
+    return aiText === undefined ? [] : [{ ...row, aiText }]
+  })
+  const notDoneCount = Math.min(notRunCount, rows.length - translated.length)
+  return { translated, failedCount: rows.length - translated.length - notDoneCount, notDoneCount, stop }
 }
 
 /**

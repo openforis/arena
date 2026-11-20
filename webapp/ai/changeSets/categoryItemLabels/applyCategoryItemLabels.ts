@@ -1,10 +1,15 @@
 /**
- * Category part of Apply: the selected category item label operations go to the server in one request (one
- * transaction, compare and set on the label each one was proposed over). Their conflicts come from the answer.
+ * Category part of Apply: the selected category item label operations go to the server in requests of at most
+ * CATEGORY_ITEM_LABELS_UPDATE_MAX (each one transaction, compare and set on the label each one was proposed over).
+ * Their conflicts come from the answers.
  */
 import * as Survey from '@core/survey/survey'
 
-import type { CategoryItemLabelsUpdateAnswer, CategoryItemLabelUpdate } from '@common/ai/categoryItemLabels'
+import {
+  CATEGORY_ITEM_LABELS_UPDATE_MAX,
+  type CategoryItemLabelsUpdateAnswer,
+  type CategoryItemLabelUpdate,
+} from '@common/ai/categoryItemLabels'
 
 import type { ChangeSet, OperationResult, OperationStatus } from '../types'
 import { getRequestFailure } from '../requestFailure'
@@ -83,13 +88,46 @@ const setAnswerResults = (
 }
 
 /**
- * Applies category item label operations with one server request.
+ * Sends one chunk of operations and sets their results.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - Survey id.
+ * @param {CategoryItemLabelSetOperation[]} params.operations - Operations of the chunk.
+ * @param {CategoryLabelsApplierDeps} params.deps - Server call.
+ * @param {Map<string, OperationResult>} params.results - Results (updated).
+ * @returns {Promise<CategoryItemLabelsUpdateAnswer|null>} The answer; null when the request failed.
+ */
+const applyChunk = async ({
+  surveyId,
+  operations,
+  deps,
+  results,
+}: {
+  surveyId: number
+  operations: CategoryItemLabelSetOperation[]
+  deps: CategoryLabelsApplierDeps
+  results: Map<string, OperationResult>
+}): Promise<CategoryItemLabelsUpdateAnswer | null> => {
+  try {
+    const answer = await deps.putCategoryItemLabels({ surveyId, items: operations.map(toUpdate) })
+    setAnswerResults(answer, operations, results)
+    return answer
+  } catch (error) {
+    const { message, params } = getRequestFailure(error)
+    setAll(results, operations, 'failed', message, params)
+    return null
+  }
+}
+
+/**
+ * Applies category item label operations, one server request per chunk; the store is updated once, at the end (a
+ * reload per chunk would reload the survey under the next one).
  * @param {object} params - Parameters.
  * @param {ChangeSet} params.changeSet - Change set.
  * @param {CategoryItemLabelSetOperation[]} params.operations - Selected category operations without a result yet.
  * @param {Function} params.getSurvey - Returns the open survey.
  * @param {CategoryLabelsApplierDeps} [params.deps] - Server call and store updates (none: not supported here).
  * @param {Map<string, OperationResult>} params.results - Results (updated).
+ * @param {number} [params.chunkSize] - Labels per request (the server limit).
  * @returns {Promise<void>} Resolves when every operation has a result.
  */
 export const applyCategoryItemLabels = async ({
@@ -98,12 +136,14 @@ export const applyCategoryItemLabels = async ({
   getSurvey,
   deps,
   results,
+  chunkSize = CATEGORY_ITEM_LABELS_UPDATE_MAX,
 }: {
   changeSet: ChangeSet
   operations: CategoryItemLabelSetOperation[]
   getSurvey: () => any
   deps?: CategoryLabelsApplierDeps
   results: Map<string, OperationResult>
+  chunkSize?: number
 }): Promise<void> => {
   if (operations.length === 0) return
   if (!deps) {
@@ -115,15 +155,14 @@ export const applyCategoryItemLabels = async ({
     setAll(results, operations, 'skipped', 'surveyChanged')
     return
   }
-  let answer: CategoryItemLabelsUpdateAnswer
-  try {
-    answer = await deps.putCategoryItemLabels({ surveyId: changeSet.surveyId, items: operations.map(toUpdate) })
-  } catch (error) {
-    const { message, params } = getRequestFailure(error)
-    setAll(results, operations, 'failed', message, params)
-    return
+  const categoriesByUuid = new Map<string, any>()
+  let appliedCount = 0
+  for (let start = 0; start < operations.length; start += chunkSize) {
+    const chunk = operations.slice(start, start + chunkSize)
+    const answer = await applyChunk({ surveyId: changeSet.surveyId, operations: chunk, deps, results })
+    for (const category of answer?.categories ?? []) categoriesByUuid.set(category.uuid, category)
+    appliedCount += answer?.applied.length ?? 0
   }
-  setAnswerResults(answer, operations, results)
-  if (answer.categories.length > 0) deps.onCategoriesUpdated(answer.categories)
-  if (answer.applied.length > 0) deps.onCategoryLabelsApplied()
+  if (categoriesByUuid.size > 0) deps.onCategoriesUpdated([...categoriesByUuid.values()])
+  if (appliedCount > 0) deps.onCategoryLabelsApplied()
 }

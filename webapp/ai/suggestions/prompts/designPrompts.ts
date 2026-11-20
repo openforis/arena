@@ -20,6 +20,17 @@ export const buildMissingTranslationsPrompt = ({ lang, langLabel }: { lang: stri
   `codes or units. Then say how many remain. ${CONTINUE_TAIL}`
 
 /**
+ * Builds the request of the category item translations suggestion (the chat translates them in a batch: the model
+ * reads it in the history of the follow-ups).
+ * @param {object} params - Parameters.
+ * @param {string} params.lang - Target language code.
+ * @param {string} params.langLabel - Its name.
+ * @returns {string} The prompt.
+ */
+export const buildCategoryItemTranslationsPrompt = ({ lang, langLabel }: { lang: string; langLabel: string }): string =>
+  `Translate the category item labels that are missing in ${langLabel} (${lang}).`
+
+/**
  * Formats survey languages for a prompt: "en (English), fr (French)".
  * @param {string[]} languages - Language codes.
  * @returns {string} The list.

@@ -1506,15 +1506,6 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
   aiBatch: {
     translateTitle: 'KI: Bezeichnungen übersetzen',
     dataDictionaryTitle: 'KI: Feldbeschreibungen',
-    categoryLabelsTitle: 'KI: Kategoriebezeichnungen übersetzen',
-    categoryLabelsNothing:
-      'Keine Kategoriebezeichnung zu übersetzen: Die Elemente haben keine Bezeichnung in einer anderen Sprache.',
-    categoryLabelsSaved_one: '{{count}} Kategoriebezeichnung gespeichert.',
-    categoryLabelsSaved_other: '{{count}} Kategoriebezeichnungen gespeichert.',
-    categoryLabelsNotSaved_one:
-      '{{count}} Kategoriebezeichnung konnte nicht gespeichert werden (inzwischen geändert oder nicht akzeptiert); {{saved}} gespeichert.',
-    categoryLabelsNotSaved_other:
-      '{{count}} Kategoriebezeichnungen konnten nicht gespeichert werden (inzwischen geändert oder nicht akzeptiert); {{saved}} gespeichert.',
     preparing: 'Wird vorbereitet …',
     progress: '{{done}} von {{total}} KI-Anfragen erledigt',
     stop: 'Anhalten',
@@ -1722,6 +1713,29 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
       nearLimit: 'Nahe am Limit.',
       trimmed: 'Ältere Nachrichten werden nicht mehr an das Modell gesendet.',
     },
+    missingTextsBatch: {
+      start_one:
+        '{{count}} Text fehlt in {{lang}}. Ich übersetze ihn: Sie prüfen die Übersetzung, bevor etwas gespeichert wird.',
+      start_other:
+        '{{count}} Texte fehlen in {{lang}}. Ich übersetze sie in Stapeln von {{size}}: Das kann einige Minuten dauern. Sie prüfen die Übersetzungen, bevor etwas gespeichert wird.',
+      summary: 'Übersetzungen der in {{lang}} fehlenden Texte',
+      done_one: '{{count}} Text übersetzt: Prüfen Sie ihn auf der Karte und wenden Sie ihn dann an.',
+      done_other: '{{count}} Texte übersetzt: Prüfen Sie sie auf der Karte und wenden Sie sie dann an.',
+      failed_one: '{{count}} Text konnte nicht übersetzt werden.',
+      failed_other: '{{count}} Texte konnten nicht übersetzt werden.',
+      nothing: 'Kein Text zu übersetzen: Die fehlenden Texte sind in keiner anderen Sprache ausgefüllt.',
+      categoryStart_one:
+        '{{count}} Kategoriebezeichnung fehlt in {{lang}}. Ich übersetze sie: Sie prüfen die Übersetzung, bevor etwas gespeichert wird.',
+      categoryStart_other:
+        '{{count}} Kategoriebezeichnungen fehlen in {{lang}}. Ich übersetze sie in Stapeln von {{size}}: Das kann einige Minuten dauern. Sie prüfen die Übersetzungen, bevor etwas gespeichert wird.',
+      categorySummary: 'Übersetzungen der in {{lang}} fehlenden Kategoriebezeichnungen',
+      progressTitle_one: '{{count}} Text wird in {{lang}} übersetzt',
+      progressTitle_other: '{{count}} Texte werden in {{lang}} übersetzt',
+      categoryProgressTitle_one: '{{count}} Kategoriebezeichnung wird in {{lang}} übersetzt',
+      categoryProgressTitle_other: '{{count}} Kategoriebezeichnungen werden in {{lang}} übersetzt',
+      minutesLeft: 'noch etwa {{minutes}} Min.',
+      lessThanMinuteLeft: 'noch weniger als eine Minute',
+    },
     tools: {
       survey_getOverview: 'Erhebungsstruktur gelesen',
       nodeDef_get: '{{name}} nachgeschlagen',
@@ -1733,6 +1747,10 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
       nodeDef_proposeCreate: 'Neue Elemente vorbereitet',
       nodeDef_proposeUpdate: 'Eigenschaftsänderungen vorbereitet',
       labels_proposeSet: 'Bezeichnungen vorbereitet',
+      missingTexts_translate: 'Fehlende Texte in {{name}} übersetzt',
+      missingTexts_translateRunning: 'Fehlende Texte in {{name}} werden übersetzt',
+      categoryItemLabels_translate: 'Fehlende Kategoriebezeichnungen in {{name}} übersetzt',
+      categoryItemLabels_translateRunning: 'Fehlende Kategoriebezeichnungen in {{name}} werden übersetzt',
       expressions_proposeSet: 'Ausdrücke vorbereitet',
       survey_listMissingTexts: 'Fehlende Texte aufgelistet',
       categories_list: 'Kategorien aufgelistet',

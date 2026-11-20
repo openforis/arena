@@ -1503,15 +1503,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
   aiBatch: {
     translateTitle: 'IA : Traduire les étiquettes',
     dataDictionaryTitle: 'IA : Descriptions des champs',
-    categoryLabelsTitle: 'IA : Traduire les libellés de catégories',
-    categoryLabelsNothing:
-      "Aucun libellé de catégorie à traduire : les éléments n'ont de libellé dans aucune autre langue.",
-    categoryLabelsSaved_one: '{{count}} libellé de catégorie enregistré.',
-    categoryLabelsSaved_other: '{{count}} libellés de catégories enregistrés.',
-    categoryLabelsNotSaved_one:
-      "{{count}} libellé de catégorie n'a pas pu être enregistré (modifié entre-temps ou refusé) ; {{saved}} enregistrés.",
-    categoryLabelsNotSaved_other:
-      "{{count}} libellés de catégories n'ont pas pu être enregistrés (modifiés entre-temps ou refusés) ; {{saved}} enregistrés.",
     preparing: 'Préparation…',
     progress: '{{done}} requêtes IA terminées sur {{total}}',
     stop: 'Arrêter',
@@ -1726,6 +1717,37 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       nearLimit: 'Proche de la limite.',
       trimmed: 'Les messages les plus anciens ne sont plus envoyés au modèle.',
     },
+    missingTextsBatch: {
+      start_one:
+        '{{count}} texte manque en {{lang}}. Je le traduis : vous relirez la traduction avant tout enregistrement.',
+      start_other:
+        '{{count}} textes manquent en {{lang}}. Je les traduis par lots de {{size}} : cela peut prendre quelques minutes. Vous relirez les traductions avant tout enregistrement.',
+      start_many:
+        '{{count}} textes manquent en {{lang}}. Je les traduis par lots de {{size}} : cela peut prendre quelques minutes. Vous relirez les traductions avant tout enregistrement.',
+      summary: 'Traductions des textes manquants en {{lang}}',
+      done_one: '{{count}} texte traduit : relisez-le sur la carte, puis appliquez-le.',
+      done_other: '{{count}} textes traduits : relisez-les sur la carte, puis appliquez-les.',
+      done_many: '{{count}} textes traduits : relisez-les sur la carte, puis appliquez-les.',
+      failed_one: "{{count}} texte n'a pas pu être traduit.",
+      failed_other: "{{count}} textes n'ont pas pu être traduits.",
+      failed_many: "{{count}} textes n'ont pas pu être traduits.",
+      nothing: 'Aucun texte à traduire : les textes manquants ne sont renseignés dans aucune autre langue.',
+      categoryStart_one:
+        '{{count}} libellé de catégorie manque en {{lang}}. Je le traduis : vous relirez la traduction avant tout enregistrement.',
+      categoryStart_other:
+        '{{count}} libellés de catégorie manquent en {{lang}}. Je les traduis par lots de {{size}} : cela peut prendre quelques minutes. Vous relirez les traductions avant tout enregistrement.',
+      categorySummary: 'Traductions des libellés de catégorie manquants en {{lang}}',
+      categoryStart_many:
+        '{{count}} libellés de catégorie manquent en {{lang}}. Je les traduis par lots de {{size}} : cela peut prendre quelques minutes. Vous relirez les traductions avant tout enregistrement.',
+      progressTitle_one: 'Traduction de {{count}} texte en {{lang}}',
+      progressTitle_other: 'Traduction de {{count}} textes en {{lang}}',
+      categoryProgressTitle_one: 'Traduction de {{count}} libellé de catégorie en {{lang}}',
+      categoryProgressTitle_other: 'Traduction de {{count}} libellés de catégorie en {{lang}}',
+      minutesLeft: 'environ {{minutes}} min restantes',
+      lessThanMinuteLeft: "moins d'une minute restante",
+      progressTitle_many: 'Traduction de {{count}} textes en {{lang}}',
+      categoryProgressTitle_many: 'Traduction de {{count}} libellés de catégorie en {{lang}}',
+    },
     tools: {
       survey_getOverview: 'A lu la structure du formulaire',
       nodeDef_get: 'A consulté {{name}}',
@@ -1737,6 +1759,10 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       nodeDef_proposeCreate: 'A préparé de nouveaux éléments',
       nodeDef_proposeUpdate: 'A préparé des modifications de propriétés',
       labels_proposeSet: 'A préparé des libellés',
+      missingTexts_translate: 'A traduit les textes manquants en {{name}}',
+      missingTexts_translateRunning: 'Traduction des textes manquants en {{name}}',
+      categoryItemLabels_translate: 'A traduit les libellés de catégorie manquants en {{name}}',
+      categoryItemLabels_translateRunning: 'Traduction des libellés de catégorie manquants en {{name}}',
       expressions_proposeSet: 'A préparé des expressions',
       survey_listMissingTexts: 'A listé les textes manquants',
       categories_list: 'A listé les catégories',

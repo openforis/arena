@@ -175,7 +175,7 @@ describe('module introduction and suggestion actions (217)', () => {
       cycle: '0',
       area: 'design',
       suggestionId: 'missingTranslations:fr',
-      scope: { kind: 'missingTranslations', targetKeys: ['b:labels'] },
+      scope: { kind: 'missingTranslations', key: 'fr', targetKeys: ['b:labels'] },
       prompt: 'Translate b:labels',
       displayText: 'aiSuggestions:missingTranslations.request',
     })

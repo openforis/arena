@@ -3,6 +3,8 @@
  * the suggestion store.
  */
 import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
+import { runSuggestionBatchTurn } from '@webapp/ai/agent/runSuggestionBatchTurn'
+import { getSuggestionBatchKind } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { browserOpenConversations } from '@webapp/ai/conversations/openConversations'
@@ -37,7 +39,11 @@ export const createBrowserAssistantController = (reduxStore: {
     getStore: getConversationStore,
     panel: assistantPanelStore,
     registry: assistantTurnRegistry,
-    runTurn: runAssistantTurn,
+    // the Do it of a translation suggestion runs as a batch in the chat, not as a model turn
+    runTurn: (params) => {
+      const kind = getSuggestionBatchKind(params.conversation)
+      return kind ? runSuggestionBatchTurn({ ...params, kind }) : runAssistantTurn(params)
+    },
     clearUserData: async ({ conversationStore, userUuid }) => {
       // the open conversations of every area and the suggestions pointing to them go too
       await clearUserConversations({

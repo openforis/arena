@@ -1,9 +1,12 @@
 /**
  * Card of the category item translations suggestion (category item labels missing in a survey language). Do it runs
- * a browser batch (CategoryLabelsBatchHost), not a chat turn: the definition has no prompt.
+ * as a batch in the chat (runSuggestionBatchTurn), not as a model turn.
  */
+import { getLanguageLabel } from '@core/app/languages'
+
 import { CATEGORY_ITEM_TRANSLATIONS_KIND } from '../detectors/categoryItemTranslations'
 import { getSuggestionScopeKey } from '../detectors/designTargets'
+import { buildCategoryItemTranslationsPrompt } from '../prompts/designPrompts'
 import { getLanguageDisplayName } from './missingTranslations'
 import type { SuggestionDefinition } from './types'
 
@@ -16,4 +19,8 @@ export const categoryItemTranslationsDefinition: SuggestionDefinition = {
       language: getLanguageDisplayName(getSuggestionScopeKey(suggestion.id), ctx.lang),
     },
   }),
+  prompt: (suggestion) => {
+    const lang = getSuggestionScopeKey(suggestion.id)
+    return buildCategoryItemTranslationsPrompt({ lang, langLabel: getLanguageLabel(lang) || lang })
+  },
 }

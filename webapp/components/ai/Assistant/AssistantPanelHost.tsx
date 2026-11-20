@@ -14,7 +14,6 @@ import { assistantPanelStore } from './assistantPanelStore'
 import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { useAssistantAreas } from './useAssistantAreas'
 import { useAssistantPanel } from './useAssistantPanel'
-import { CategoryLabelsBatchHost } from './suggestions/CategoryLabelsBatchHost'
 import { SuggestionsHost } from './suggestions/SuggestionsHost'
 
 // the panel, the agent and the AI SDK load on the first open
@@ -65,7 +64,6 @@ export const AssistantPanelHost = () => {
   return (
     <>
       <SuggestionsHost module={module} statuses={statuses} />
-      <CategoryLabelsBatchHost />
       {mounted && shown && (
         <Suspense fallback={null}>
           <AssistantPanel statuses={statuses} />

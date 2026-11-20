@@ -19,6 +19,8 @@ const labels: Record<string, string> = {
   'aiAssistant.tools.nodeDef_get': 'Looked up {{name}}',
   'aiAssistant.tools.docs_search': 'Searched the manual for "{{query}}"',
   'aiAssistant.tools.view_getCurrent': 'Checked the current view',
+  'aiAssistant.tools.missingTexts_translate': 'Translated the texts missing in {{name}}',
+  'aiAssistant.tools.missingTexts_translateRunning': 'Translating the texts missing in {{name}}',
   'aiAssistant.tools.default': 'Used a tool',
 }
 
@@ -64,6 +66,13 @@ describe('assistant panel model', () => {
     )
     expect(getToolRowLabel(toolPart('view_getCurrent', {}), t)).toBe('Checked the current view')
     expect(getToolRowLabel(toolPart('data_runQuery', { name: 'x' }), t)).toBe('Used a tool')
+    // a tool with a running label says what it is doing until it is done
+    expect(getToolRowLabel(toolPart('missingTexts_translate', { name: 'Spanish' }), t)).toBe(
+      'Translating the texts missing in Spanish'
+    )
+    expect(getToolRowLabel(toolPart('missingTexts_translate', { name: 'Spanish' }, {}), t)).toBe(
+      'Translated the texts missing in Spanish'
+    )
   })
 
   test('proposed change set of a tool row', () => {

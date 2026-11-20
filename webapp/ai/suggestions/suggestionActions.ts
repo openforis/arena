@@ -7,6 +7,7 @@ import { uuidv4 } from '@core/uuid'
 import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
+import { getSuggestionScopeKey } from './detectors/designTargets'
 import type { SuggestionDefinition, SuggestionDefinitions, SuggestionDescribeContext } from './definitions'
 import { SUGGESTION_DEFINITIONS } from './registry'
 import { suggestionStore, type SuggestionStore } from './suggestionStore'
@@ -109,7 +110,11 @@ export const buildSuggestionRequest = ({
     cycle,
     area: suggestion.area,
     suggestionId: suggestion.id,
-    scope: { kind: suggestion.kind, targetKeys: suggestion.targets.map((target) => target.key) },
+    scope: {
+      kind: suggestion.kind,
+      key: getSuggestionScopeKey(suggestion.id),
+      targetKeys: suggestion.targets.map((target) => target.key),
+    },
     prompt,
     displayText,
   }

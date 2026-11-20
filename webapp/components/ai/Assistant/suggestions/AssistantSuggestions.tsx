@@ -2,8 +2,6 @@ import { useState } from 'react'
 
 import * as User from '@core/user/user'
 
-import { requestCategoryLabelsBatch } from '@webapp/ai/suggestions/categoryLabelsBatchRequest'
-import { CATEGORY_ITEM_TRANSLATIONS_KIND } from '@webapp/ai/suggestions/detectors/categoryItemTranslations'
 import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { buildSuggestionRequest, dismissSuggestion } from '@webapp/ai/suggestions/suggestionActions'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
@@ -122,17 +120,11 @@ export const AssistantSuggestions = ({
   const { shown, total } = startScreen ? getStartScreenSuggestions(cards) : { shown: cards, total: cards.length }
 
   /**
-   * Opens the suggestion's area in a new conversation; the chat of that area claims and sends the request. The
-   * category labels suggestion starts its batch instead.
+   * Opens the suggestion's area in a new conversation; the chat of that area claims and sends the request.
    * @param {AssistantSuggestion} suggestion - Visible suggestion.
    * @returns {void}
    */
   const onDoIt = (suggestion: AssistantSuggestion): void => {
-    // a batch with a review, not a chat turn: the model would list the items one tool call at a time
-    if (suggestion.kind === CATEGORY_ITEM_TRANSLATIONS_KIND) {
-      requestCategoryLabelsBatch(suggestion)
-      return
-    }
     const request = buildSuggestionRequest({ suggestion, userUuid, surveyId, cycle, describeContext })
     if (request) assistantPanelStore.startWithPrompt(request)
   }
