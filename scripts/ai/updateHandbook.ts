@@ -19,8 +19,10 @@ const download = async (): Promise<Buffer> => {
 }
 
 // -layout keeps a list item or a table row on one line
-const toText = (pdf: Buffer): string =>
-  execFileSync('pdftotext', ['-layout', '-', '-'], { input: pdf, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+const toText = (pdf: Buffer): string => {
+  const options = { input: pdf, encoding: 'utf8' as const, maxBuffer: 64 * 1024 * 1024 }
+  return execFileSync('pdftotext', ['-layout', '-', '-'], options) // NOSONAR: developer script, pdftotext from the PATH
+}
 
 const main = async (): Promise<void> => {
   const raw = toText(await download())
