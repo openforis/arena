@@ -161,9 +161,9 @@ test.describe('AI cleaning assistant (mock model on the stub local server)', () 
 
       await page.goto(Urls.records)
       await openAssistantPanel(page)
-      const areaTabs = assistantPanel(page).getByRole('tab')
-      // the exact list is the positive control: Design stays (unavailable), Analysis and Cleaning are hidden
-      await expect(areaTabs).toHaveText(['Design', 'Help'])
+      // Design, Analysis and Cleaning are hidden: Help is the only area, shown without a tab bar
+      await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.startScreen)).toBeVisible()
+      await expect(assistantPanel(page).getByRole('tablist')).toHaveCount(0)
 
       // the report is not even routed without the permission: wait for the app to boot, then check its absence
       await Promise.all([
