@@ -5,6 +5,7 @@ import { analysisTools } from './analysis'
 import { cleaningTools } from './cleaning'
 import { conversationSetTitleTool } from './common/conversationSetTitle'
 import { viewGetCurrentTool } from './common/viewGetCurrent'
+import { batchTools } from './design/batchTools'
 import { expressionCheckTool } from './design/expressionCheck'
 import { expressionsProposeSetTool } from './design/expressionsProposeSet'
 import { labelsProposeSetTool } from './design/labelsProposeSet'
@@ -38,6 +39,7 @@ export const ALL_TOOLS: AiTool[] = [
   taxonomiesListTool,
   categoryItemsListMissingLabelsTool,
   categoryItemLabelsProposeSetTool,
+  ...batchTools,
   docsSearchTool,
   ...analysisTools,
   ...cleaningTools,

@@ -14,6 +14,7 @@ const KEYS = 'aiAssistant.missingTextsBatch'
 const TITLE_KEYS: Record<SuggestionBatchKind, string> = {
   missingTranslations: `${KEYS}.progressTitle`,
   categoryItemTranslations: `${KEYS}.categoryProgressTitle`,
+  newEntriesDescriptions: `${KEYS}.descriptionsProgressTitle`,
 }
 
 const MINUTE_MS = 60_000
@@ -45,7 +46,7 @@ const getStatusText = (progress: SuggestionBatchProgress | undefined, t: ReturnT
  * The progress of a batch run in the chat, until the change set card replaces it.
  * @param {object} props - Props.
  * @param {SuggestionBatchKind} props.kind - Batch.
- * @param {ConversationToolPart} props.part - Tool row of the batch (input: language name and count; output: progress).
+ * @param {ConversationToolPart} props.part - Tool row of the batch (language name and count; output: progress).
  * @param {Function} props.onStop - Stops the turn.
  * @returns {React.ReactElement} The card.
  */
@@ -60,8 +61,9 @@ export const SuggestionBatchProgressCard = ({
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   const [stopping, setStopping] = useState(false)
-  const { name, count } = (part.input ?? {}) as { name?: string; count?: number }
   const progress = part.output as SuggestionBatchProgress | undefined
+  // a Do it puts the language and the count in the input; a batch tool of the model, in its progress
+  const { name, count } = { ...progress, ...(part.input as object) } as { name?: string; count?: number }
   const known = !!progress?.total
   const title = t(TITLE_KEYS[kind], { count, lang: name })
   return (

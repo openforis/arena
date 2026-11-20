@@ -121,6 +121,25 @@ describe('applyChangeSet', () => {
     ])
   })
 
+  test('reports the operations done after each node definition saved', async () => {
+    const operations = buildOperations()
+    const { deps } = createFakeDeps()
+    const progress: [number, number][] = []
+    await applyChangeSet({
+      changeSet: changeSetOf(operations),
+      operationIds: allIds(operations),
+      deps,
+      onProgress: (done, total) => progress.push([done, total]),
+    })
+    // cluster_notes has two operations, saved together
+    expect(progress).toEqual([
+      [1, 5],
+      [2, 5],
+      [3, 5],
+      [5, 5],
+    ])
+  })
+
   test('only the changed keys are sent; labels and validations whole', async () => {
     const operations = buildOperations()
     const { deps, calls } = createFakeDeps()

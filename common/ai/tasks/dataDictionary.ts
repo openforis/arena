@@ -21,6 +21,7 @@ const DescriptionsSchema = z.object({
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {string} params.surveyName - Survey name (context for the model).
  * @param {AiDataDictionaryNodeDef[]} params.nodeDefs - The batch of node defs.
+ * @param {string} [params.language] - Language of the descriptions (English when absent).
  * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{descriptions: {uuid: string, description: string}[]}>} The descriptions.
  */
@@ -28,16 +29,18 @@ export const generateDataDictionaryDescriptions = async ({
   generateText,
   surveyName,
   nodeDefs,
+  language,
   signal,
 }: {
   generateText: AiGenerateText
   surveyName: string
   nodeDefs: AiDataDictionaryNodeDef[]
+  language?: string
   signal?: AbortSignal
 }): Promise<{ descriptions: { uuid: string; description: string }[] }> => {
   // short ids keep the prompt and the answer small; the answer is mapped back to the uuids
   const shortNodeDefs = nodeDefs.map((nodeDef, index) => ({ ...nodeDef, id: String(index + 1) }))
-  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: shortNodeDefs })
+  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: shortNodeDefs, language })
   const { value } = safeParseJsonResponse(await generateText({ system, prompt, signal }), DescriptionsSchema)
   if (!value) throw new SystemError('aiDataDictionaryInvalid', {}, StatusCodes.BAD_GATEWAY)
   // an id the model made up is dropped

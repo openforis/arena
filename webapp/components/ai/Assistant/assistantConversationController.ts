@@ -65,7 +65,11 @@ export type CardApplyOutcome = { results: OperationResult[]; note: string }
 // what the controller asks the app to do for a card (the hook binds them to the redux store)
 export type AssistantCardAppliers = {
   // null: the designer is not ready (an unsaved edit), nothing was applied
-  applyOperations: (params: { changeSet: ChangeSet; operationIds: string[] }) => Promise<CardApplyOutcome | null>
+  applyOperations: (params: {
+    changeSet: ChangeSet
+    operationIds: string[]
+    onProgress?: (done: number, total: number) => void
+  }) => Promise<CardApplyOutcome | null>
   // failures of the batch request come back as failed results
   applyRecordEdits: (params: {
     changeSet: ChangeSet
@@ -667,11 +671,11 @@ export const createAssistantConversationController = (
     if (current) await saveShown(withApplyResults({ conversation: current, changeSetId, ...outcome }), generation)
   }
 
-  const apply = (changeSetId: string, operationIds: string[]) =>
+  const apply = (changeSetId: string, operationIds: string[], onProgress?: (done: number, total: number) => void) =>
     runCardAction(async (id, generation) => {
       const cardState = (await readConversation(id))?.changeSets[changeSetId]
       if (!cardState) return
-      const outcome = await cards.applyOperations({ changeSet: cardState.changeSet, operationIds })
+      const outcome = await cards.applyOperations({ changeSet: cardState.changeSet, operationIds, onProgress })
       if (outcome) await writeOutcome({ id, changeSetId, outcome, generation })
     })
 

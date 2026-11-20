@@ -135,7 +135,7 @@ const AnswerPart = ({
             <ChangeSetCard
               busy={api.busy || api.applying}
               cardState={cardState}
-              onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
+              onApply={(operationIds, onProgress) => api.apply(cardState.changeSet.id, operationIds, onProgress)}
               onDiscard={() => api.discard(cardState.changeSet.id)}
             />
           ))}

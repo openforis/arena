@@ -266,6 +266,11 @@ export const ChangeSetCompactCard = ({
         />
       )}
       <div className="ai-assistant-card__footer">
+        {selection.progress && (
+          <p className="ai-assistant-card__hint" data-testid={TestId.aiAssistant.applyProgress}>
+            {t('aiAssistant.card.applying', selection.progress)}
+          </p>
+        )}
         {pendingIds.length > 0 && dirty && (
           <p className="ai-assistant-card__hint">{t('aiAssistant.card.saveCurrentEditFirst')}</p>
         )}

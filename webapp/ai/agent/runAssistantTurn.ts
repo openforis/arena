@@ -484,6 +484,8 @@ export const runAssistantTurn = async ({
     },
     // the model names the conversation on its first message (the later turns keep the title)
     setConversationTitle: conversation.messages.length === 0 ? state.setTitle : undefined,
+    providerId: conversation.providerId,
+    onToolProgress: (toolCallId, output) => state.setToolOutput({ toolCallId, output }),
   }
   const outcome: StreamOutcome = {
     aborted: false,

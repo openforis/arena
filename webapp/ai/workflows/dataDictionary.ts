@@ -63,6 +63,7 @@ export const cleanAiDescription = (
  * @param {SchemaSummaryAiItems} params.items - Survey name and node defs to describe.
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {AiBatchGuard} params.guard - Check run before each call.
+ * @param {string} [params.language] - Language of the descriptions (English when absent).
  * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener ({ done, total } calls).
  * @param {Function} [params.describe] - The data dictionary task (tests).
@@ -74,6 +75,7 @@ export const runDataDictionaryDescriptions = async ({
   items,
   generateText,
   guard,
+  language,
   signal,
   onProgress,
   describe = generateDataDictionaryDescriptions,
@@ -82,6 +84,7 @@ export const runDataDictionaryDescriptions = async ({
   items: SchemaSummaryAiItems
   generateText: AiGenerateText
   guard: AiBatchGuard
+  language?: string
   signal?: AbortSignal
   onProgress?: ProgressListener
   describe?: typeof generateDataDictionaryDescriptions
@@ -94,7 +97,7 @@ export const runDataDictionaryDescriptions = async ({
   const buildCall = (batch: AiDataDictionaryNodeDef[]): AiBatchCall<Awaited<ReturnType<typeof describe>>> => ({
     size: batch.length,
     run: (callSignal?: AbortSignal) =>
-      describe({ generateText, surveyName: items.surveyName, nodeDefs: batch, signal: callSignal }),
+      describe({ generateText, surveyName: items.surveyName, nodeDefs: batch, language, signal: callSignal }),
     split:
       batch.length > 1
         ? () => {

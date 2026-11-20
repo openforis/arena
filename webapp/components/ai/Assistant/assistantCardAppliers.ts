@@ -25,11 +25,11 @@ type ReduxStore = { dispatch: (action: any) => any; getState: () => any }
  * @returns {AssistantCardAppliers} The appliers.
  */
 export const createCardAppliers = (reduxStore: ReduxStore): AssistantCardAppliers => ({
-  applyOperations: async ({ changeSet, operationIds }) => {
+  applyOperations: async ({ changeSet, operationIds, onProgress }) => {
     const deps = createApplierDeps({ dispatch: reduxStore.dispatch, getState: reduxStore.getState })
     // the card disables Apply while the designer has an unsaved edit; checked again here
     if (!applierDepsReady(deps)) return null
-    const results = await applyChangeSet({ changeSet, operationIds, deps })
+    const results = await applyChangeSet({ changeSet, operationIds, deps, onProgress })
     return { results, note: summarizeResults({ changeSet, results, survey: deps.getSurvey() }) }
   },
   applyRecordEdits: async ({ changeSet, operationIds, cycle, lang, onProgress }) => {

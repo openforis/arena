@@ -6,11 +6,14 @@ import type { AssistantMessage, ConversationToolPart } from '@webapp/ai/conversa
 import { detectMissingTranslations } from '@webapp/ai/suggestions/detectors/missingTranslations'
 import {
   MISSING_TRANSLATIONS_CHAT_MAX,
+  NEW_ENTRIES_DESCRIPTIONS_CHAT_MAX,
   SUGGESTION_BATCH_TOOL_NAMES,
   getSuggestionBatchKind,
   getSuggestionBatchToolKind,
   withRemainingTime,
+  type SuggestionBatchKind,
 } from '@webapp/ai/suggestions/suggestionBatchTurn'
+import { missingTextsTranslateTool, runBatchTool } from '@webapp/ai/tools/design/batchTools'
 import { buildMissingTextRows, runTranslateMissingTexts } from '@webapp/ai/workflows/translateMissingTexts'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
@@ -46,6 +49,18 @@ beforeAll(async () => {
 })
 
 const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(survey, name))
+
+/**
+ * Fake data dictionary task: "About <name>" for every node definition; records the language asked.
+ * @param {string[]} languages - Receives the language of each call.
+ * @returns {Function} The task.
+ */
+const describeAll =
+  (languages: (string | undefined)[] = []) =>
+  async ({ nodeDefs, language }: any) => {
+    languages.push(language)
+    return { descriptions: nodeDefs.map(({ uuid, name }: any) => ({ uuid, description: `About ${name}` })) }
+  }
 
 describe('missing texts batch (611)', () => {
   test('rows: the texts of the suggestion, each with its source (the default language first)', () => {
@@ -108,14 +123,16 @@ describe('missing texts batch (611)', () => {
     controller = new AbortController(),
     translate = translateAllBut(['Plot']),
     fetchPage,
+    describe,
   }: {
-    kind?: 'missingTranslations' | 'categoryItemTranslations'
+    kind?: SuggestionBatchKind
     batchSurvey?: any
     ctxSurvey?: any
     targetKeys?: string[]
     controller?: AbortController
     translate?: any
     fetchPage?: any
+    describe?: any
   } = {}) => {
     const ctx = createToolContext({ survey: batchSurvey, getSurvey: () => ctxSurvey })
     const conversation = {
@@ -138,6 +155,7 @@ describe('missing texts batch (611)', () => {
       resolveBatch,
       translate,
       fetchPage,
+      describe,
     })
     const answer = final.messages.at(-1) as AssistantMessage
     const tool = answer.parts.find((p) => p.type === 'tool') as ConversationToolPart
@@ -224,6 +242,62 @@ describe('missing texts batch (611)', () => {
     ])
   })
 
+  test('batch turn of the descriptions: written in the default language, then translated, on one card', async () => {
+    const languages: (string | undefined)[] = []
+    const targets = ['cluster', 'plot', 'plot_id', 'tree_dec_1']
+    const { answer, tool, ctx, progress } = await runBatch({
+      kind: 'newEntriesDescriptions',
+      targetKeys: targets.map(uuidOf),
+      translate: translateAllBut(),
+      describe: describeAll(languages),
+    })
+    expect(languages).toEqual(['English'])
+    expect(answer.status).toBe('done')
+    expect((answer.parts[0] as any).text).toBe(
+      `aiAssistant.missingTextsBatch.descriptionsStart ${JSON.stringify({ count: 3, lang: 'English, French, Spanish', size: 20 })}`
+    )
+    expect(tool).toMatchObject({ toolName: 'descriptions_write', state: 'done', input: { count: 3 } })
+    // one request to write them, one per other language to translate them
+    expect(progress.at(-1)).toEqual({ done: 3, total: 3 })
+    const operations = ctx.changeSets[0].operations as any[]
+    // tree_dec_1 has a description already
+    expect(operations).toHaveLength(9)
+    expect(operations.every((op) => op.type === 'label.set' && op.kind === 'descriptions' && op.from === null)).toBe(
+      true
+    )
+    expect(operations.find((op) => op.nodeDefUuid === uuidOf('plot') && op.lang === 'fr')?.to).toBe('fr:About plot')
+  })
+
+  test('batch tool of the model: validates the language, reports its progress under its row, proposes one card', async () => {
+    const ctx = createToolContext({ survey })
+    await expect(missingTextsTranslateTool.execute({ lang: 'de' }, ctx)).rejects.toMatchObject({
+      code: 'languageNotInSurvey',
+    })
+    const reported: [string, any][] = []
+    const toolCtx = createToolContext({
+      survey,
+      toolCallId: 'call-1',
+      onToolProgress: (id, output) => reported.push([id, output]),
+    })
+    const { rows } = buildMissingTextRows({ survey, lang: 'fr' })
+    const output: any = await runBatchTool({
+      kind: 'missingTranslations',
+      lang: 'fr',
+      targetKeys: [],
+      ctx: toolCtx,
+      resolveBatch,
+      deps: { translate: translateAllBut(['Plot']) },
+    })
+    expect(reported[0]).toEqual(['call-1', { name: 'French', count: rows.length }])
+    expect(reported.at(-1)).toEqual(['call-1', { done: 2, total: 2, name: 'French', count: rows.length }])
+    expect(output).toMatchObject({
+      changeSetId: toolCtx.changeSets[0].id,
+      name: 'French',
+      count: rows.length,
+      failed: 1,
+    })
+  })
+
   test('Do it runs as a batch: the category labels always, the missing texts above one call; first message only', () => {
     const conversation = (kind: any, count: number, messages: any[] = []) => ({
       ...createConversation({ userUuid: 'u', surveyId: 7, area: 'design' }),
@@ -241,6 +315,12 @@ describe('missing texts batch (611)', () => {
     expect(getSuggestionBatchKind(conversation('categoryItemTranslations', 1))).toBe('categoryItemTranslations')
     expect(getSuggestionBatchKind(conversation('categoryItemTranslations', 1, [{ role: 'user' }]))).toBeNull()
     expect(getSuggestionBatchKind(conversation('validationErrors', 100))).toBeNull()
+    expect(getSuggestionBatchKind(conversation('newEntriesDescriptions', NEW_ENTRIES_DESCRIPTIONS_CHAT_MAX))).toBeNull()
+    const descriptions = conversation('newEntriesDescriptions', NEW_ENTRIES_DESCRIPTIONS_CHAT_MAX + 1)
+    // the descriptions need no language
+    expect(
+      getSuggestionBatchKind({ ...descriptions, suggestionScope: { ...descriptions.suggestionScope, key: '' } })
+    ).toBe('newEntriesDescriptions')
     const keyless = conversation('categoryItemTranslations', 1)
     expect(getSuggestionBatchKind({ ...keyless, suggestionScope: { ...keyless.suggestionScope, key: '' } })).toBeNull()
   })
@@ -254,6 +334,7 @@ describe('missing texts batch (611)', () => {
   test('tool rows of the batches: their kind; a tool of the model has none', () => {
     expect(getSuggestionBatchToolKind('missingTexts_translate')).toBe('missingTranslations')
     expect(getSuggestionBatchToolKind('categoryItemLabels_translate')).toBe('categoryItemTranslations')
+    expect(getSuggestionBatchToolKind('descriptions_write')).toBe('newEntriesDescriptions')
     expect(getSuggestionBatchToolKind('labels_proposeSet')).toBeNull()
   })
 })

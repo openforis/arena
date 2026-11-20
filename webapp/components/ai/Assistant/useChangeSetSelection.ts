@@ -22,6 +22,8 @@ export type ChangeSetSelection = {
   setSelected: (ids: string[], selected: boolean) => void
   // the card's status line: gets the focus once Apply or Discard succeeded, as the footer with the button unmounts
   setStatusElement: (element: HTMLElement | null) => void
+  // operations saved while Apply runs (a long change set takes a while); null otherwise
+  progress: { done: number; total: number } | null
   apply: () => Promise<boolean>
   // asks first: a discarded proposal can't be brought back
   discard: () => void
@@ -48,7 +50,7 @@ export const useChangeSetSelection = ({
   cardState: ChangeSetCardState
   compact: boolean
   survey: any
-  onApply: (operationIds: string[]) => Promise<void>
+  onApply: (operationIds: string[], onProgress: (done: number, total: number) => void) => Promise<void>
   onDiscard: () => Promise<void> | void
 }): ChangeSetSelection => {
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
@@ -63,6 +65,7 @@ export const useChangeSetSelection = ({
   const notifyError = useNotifyError()
   // state, not a ref: the status line is always mounted, and the lint rule forbids refs in the returned object
   const [statusElement, setStatusElement] = useState<HTMLElement | null>(null)
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
 
   const unselectedBehaviourIds = useMemo(
     () =>
@@ -88,12 +91,17 @@ export const useChangeSetSelection = ({
     setSelected,
     // a rejection (designer or store error) is shown, not left unhandled
     setStatusElement,
-    apply: () =>
-      runWithFailureNotice({
-        action: () => onApply(selectedIds),
+    progress,
+    apply: () => {
+      setProgress({ done: 0, total: selectedIds.length })
+      return runWithFailureNotice({
+        action: () => onApply(selectedIds, (done, total) => setProgress({ done, total })),
         notifyError,
         key: 'aiAssistant.card.applyFailed',
-      }).then(focusStatusOnSuccess),
+      })
+        .finally(() => setProgress(null))
+        .then(focusStatusOnSuccess)
+    },
     // onCancel is required by useConfirm's inferred (untyped) parameter
     discard: () =>
       confirm({

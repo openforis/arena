@@ -49,7 +49,12 @@ export type AssistantConversationApi = {
   clearConversations: () => Promise<void>
   // deletes one conversation of the list (rejects when the store fails); the open one leaves the chat on the start screen
   deleteConversation: (id: string) => Promise<void>
-  apply: (changeSetId: string, operationIds: string[]) => Promise<void>
+  // onProgress: operations done, operations total
+  apply: (
+    changeSetId: string,
+    operationIds: string[],
+    onProgress?: (done: number, total: number) => void
+  ) => Promise<void>
   // record-edit card: sends the edits to the batch endpoint (onProgress: chunks done, chunks total) and stores the results
   applyRecordEdits: (
     changeSetId: string,

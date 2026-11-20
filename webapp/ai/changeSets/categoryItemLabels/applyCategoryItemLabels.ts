@@ -128,6 +128,7 @@ const applyChunk = async ({
  * @param {CategoryLabelsApplierDeps} [params.deps] - Server call and store updates (none: not supported here).
  * @param {Map<string, OperationResult>} params.results - Results (updated).
  * @param {number} [params.chunkSize] - Labels per request (the server limit).
+ * @param {Function} [params.onChunkDone] - Labels of each request sent.
  * @returns {Promise<void>} Resolves when every operation has a result.
  */
 export const applyCategoryItemLabels = async ({
@@ -137,6 +138,7 @@ export const applyCategoryItemLabels = async ({
   deps,
   results,
   chunkSize = CATEGORY_ITEM_LABELS_UPDATE_MAX,
+  onChunkDone,
 }: {
   changeSet: ChangeSet
   operations: CategoryItemLabelSetOperation[]
@@ -144,6 +146,7 @@ export const applyCategoryItemLabels = async ({
   deps?: CategoryLabelsApplierDeps
   results: Map<string, OperationResult>
   chunkSize?: number
+  onChunkDone?: (count: number) => void
 }): Promise<void> => {
   if (operations.length === 0) return
   if (!deps) {
@@ -162,6 +165,7 @@ export const applyCategoryItemLabels = async ({
     const answer = await applyChunk({ surveyId: changeSet.surveyId, operations: chunk, deps, results })
     for (const category of answer?.categories ?? []) categoriesByUuid.set(category.uuid, category)
     appliedCount += answer?.applied.length ?? 0
+    onChunkDone?.(chunk.length)
   }
   if (categoriesByUuid.size > 0) deps.onCategoriesUpdated([...categoriesByUuid.values()])
   if (appliedCount > 0) deps.onCategoryLabelsApplied()

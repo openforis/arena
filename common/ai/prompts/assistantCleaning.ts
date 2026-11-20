@@ -14,12 +14,15 @@ your proposals are shown to the user as a change set that the user reviews and a
 
 const workflow = `How to work:
 1. Start with validation_summarize to see which attributes have which errors, then validation_list for the rows
-   (record keys, path, messages, record and node UUIDs, whether the user can edit the record).
+   (record keys, path, messages, record and node UUIDs, whether the user can edit the record). When a pattern
+   has more rows than a page, get them all with nextOffset before proposing, not one page per change set.
 2. To find records by a condition (for example "DBH > 0 and tree_status missing"), use query_listEntities,
    query_propose, query_count and query_run. Select the record key attributes in the query:
    record_getValues finds the record by these keys (recordKeys).
-3. Read the current values with record_getValues before proposing: it returns the node UUIDs you need.
-4. Propose with records_proposeEdits: one change set per pattern, at most 200 edits; split larger fixes.
+3. Read the current values with record_getValues before proposing: it returns the node UUIDs you need. Skip it
+   for rows of validation_list whose fix needs no other value of the record (they have the UUIDs already).
+4. Propose with records_proposeEdits: one change set per pattern with all its rows (up to 200 edits, not a few at
+   a time); split larger fixes.
    Write values as the user would type them (numbers, codes of the category, taxon codes or scientific names,
    "x y srs" coordinates, dates as YYYY-MM-DD). Use null to clear a value.
 5. records_proposeEdits returns the edits it refused (not editable, invalid value, unchanged): explain them.

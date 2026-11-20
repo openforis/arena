@@ -222,7 +222,8 @@ export const toAiSdkTools = (
     result[tool.name] = {
       description: tool.description,
       inputSchema: jsonSchema(toToolJsonSchema(tool) as any),
-      execute: (input: unknown) => runTool(tool, input, ctx, maxResultChars),
+      execute: (input: unknown, options?: { toolCallId?: string }) =>
+        runTool(tool, input, { ...ctx, toolCallId: options?.toolCallId }, maxResultChars),
     }
   }
   return result as ToolSet

@@ -99,6 +99,11 @@ const ChangeSetFullCard = ({
       </p>
       {pendingIds.length > 0 && (
         <div className="ai-assistant-card__footer">
+          {selection.progress && (
+            <p className="ai-assistant-card__hint" data-testid={TestId.aiAssistant.applyProgress}>
+              {t('aiAssistant.card.applying', selection.progress)}
+            </p>
+          )}
           {dirty && <p className="ai-assistant-card__hint">{t('aiAssistant.card.saveCurrentEditFirst')}</p>}
           <Button
             disabled={busy || dirty || selectedIds.length === 0}
@@ -138,7 +143,7 @@ export const ChangeSetCard = ({
 }: {
   cardState: ChangeSetCardState
   busy: boolean
-  onApply: (operationIds: string[]) => Promise<void>
+  onApply: (operationIds: string[], onProgress: (done: number, total: number) => void) => Promise<void>
   onDiscard: () => Promise<void> | void
 }) => {
   const survey = useSurvey()

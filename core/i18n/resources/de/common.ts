@@ -1735,6 +1735,20 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
       categoryProgressTitle_other: '{{count}} Kategoriebezeichnungen werden in {{lang}} übersetzt',
       minutesLeft: 'noch etwa {{minutes}} Min.',
       lessThanMinuteLeft: 'noch weniger als eine Minute',
+      descriptionsStart_one:
+        '{{count}} Eintrag hat keine Beschreibung. Ich schreibe sie in {{lang}}: Sie prüfen sie, bevor etwas gespeichert wird.',
+      descriptionsStart_other:
+        '{{count}} Einträge haben keine Beschreibung. Ich schreibe sie in {{lang}}, in Stapeln: Das kann einige Minuten dauern. Sie prüfen die Beschreibungen, bevor etwas gespeichert wird.',
+      descriptionsDone_one:
+        '{{count}} Beschreibung geschrieben: Prüfen Sie sie auf der Karte und wenden Sie sie dann an.',
+      descriptionsDone_other:
+        '{{count}} Beschreibungen geschrieben: Prüfen Sie sie auf der Karte und wenden Sie sie dann an.',
+      descriptionsFailed_one: '{{count}} Beschreibung konnte nicht geschrieben werden.',
+      descriptionsFailed_other: '{{count}} Beschreibungen konnten nicht geschrieben werden.',
+      descriptionsProgressTitle_one: 'Beschreibung von {{count}} Eintrag wird geschrieben',
+      descriptionsProgressTitle_other: 'Beschreibungen von {{count}} Einträgen werden geschrieben',
+      descriptionsSummary: 'Beschreibungen der Einträge ohne Beschreibung',
+      descriptionsNothing: 'Kein Eintrag zu beschreiben: Alle haben eine Beschreibung.',
     },
     tools: {
       survey_getOverview: 'Erhebungsstruktur gelesen',
@@ -1751,6 +1765,8 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
       missingTexts_translateRunning: 'Fehlende Texte in {{name}} werden übersetzt',
       categoryItemLabels_translate: 'Fehlende Kategoriebezeichnungen in {{name}} übersetzt',
       categoryItemLabels_translateRunning: 'Fehlende Kategoriebezeichnungen in {{name}} werden übersetzt',
+      descriptions_write: 'Fehlende Beschreibungen geschrieben ({{name}})',
+      descriptions_writeRunning: 'Fehlende Beschreibungen werden geschrieben ({{name}})',
       expressions_proposeSet: 'Ausdrücke vorbereitet',
       survey_listMissingTexts: 'Fehlende Texte aufgelistet',
       categories_list: 'Kategorien aufgelistet',
@@ -1792,6 +1808,7 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
         missingResult: 'Der Server hat für diese Änderung nicht geantwortet.',
       },
       applySelected: 'Ausgewählte übernehmen',
+      applying: 'Wird übernommen … {{done}} von {{total}}',
       discard: 'Verwerfen',
       discarded: 'Verworfen.',
       applyFailed: 'Die Änderungen konnten nicht übernommen werden: {{message}}',

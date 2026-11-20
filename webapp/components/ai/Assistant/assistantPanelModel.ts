@@ -45,7 +45,8 @@ export const isHiddenToolPart = (part: ConversationToolPart): boolean => part.to
  */
 export const getToolRowLabel = (part: ConversationToolPart, t: AiTranslate): string => {
   const key = `aiAssistant.tools.${part.toolName}`
-  const params = toLabelParams(part.input)
+  // the output completes the input: a batch tool of the model gives the language name in its result
+  const params = { ...toLabelParams(part.output), ...toLabelParams(part.input) }
   // a long tool says what it is doing while it runs ("Translating…"), when it has such a label
   const runningKey = `${key}Running`
   const runningLabel = part.state === 'running' ? t(runningKey, params) : runningKey

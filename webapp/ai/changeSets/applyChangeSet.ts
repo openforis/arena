@@ -136,35 +136,67 @@ const persistGroup = async (group: Group, changeSet: ChangeSet, deps: ApplierDep
   return null
 }
 
+/**
+ * Applies the operations of one node definition, unless an earlier failure or stop skips them.
+ * @param {object} params - Parameters.
+ * @param {Group} params.group - Operations of the node definition.
+ * @param {ChangeSet} params.changeSet - Change set.
+ * @param {ApplierDeps} params.deps - Store access and save actions.
+ * @param {Map} params.results - Results by operation.
+ * @param {Set<string>} params.appliedCreates - Node definitions created so far.
+ * @param {string|null} params.stopReason - Why the earlier groups stopped the run.
+ * @returns {Promise<string|null>} The stop reason for the next groups.
+ */
+const applyGroup = async ({
+  group,
+  changeSet,
+  deps,
+  results,
+  appliedCreates,
+  stopReason,
+}: {
+  group: Group
+  changeSet: ChangeSet
+  deps: ApplierDeps
+  results: Map<string, OperationResult>
+  appliedCreates: Set<string>
+  stopReason: string | null
+}): Promise<string | null> => {
+  const reason = stopReason ?? getStopReason(changeSet, deps)
+  if (reason) {
+    setGroupStatus(results, group, 'skipped', reason)
+    return reason
+  }
+  if (dependsOnMissingCreate(group, deps.getSurvey(), appliedCreates, changeSet)) {
+    setGroupStatus(results, group, 'skipped', 'dependencyNotApplied')
+    return null
+  }
+  try {
+    // saved on the server even when a stop reason comes back
+    const nextReason = await persistGroup(group, changeSet, deps)
+    if (group.operations[0].type === 'nodeDef.create') appliedCreates.add(group.uuid)
+    setGroupStatus(results, group, 'applied')
+    return nextReason
+  } catch (error) {
+    const { message, params } = getRequestFailure(error)
+    setGroupStatus(results, group, 'failed', message, params)
+    // later groups may reference it (e.g. an expression naming a definition whose create failed)
+    return 'dependencyNotApplied'
+  }
+}
+
 const applyGroups = async (
   groups: Group[],
   changeSet: ChangeSet,
   deps: ApplierDeps,
-  results: Map<string, OperationResult>
+  results: Map<string, OperationResult>,
+  onGroupDone: (group: Group) => void
 ) => {
   const appliedCreates = new Set<string>()
   let stopReason: string | null = null
   for (const group of groups) {
-    stopReason ??= getStopReason(changeSet, deps)
-    if (stopReason) {
-      setGroupStatus(results, group, 'skipped', stopReason)
-      continue
-    }
-    if (dependsOnMissingCreate(group, deps.getSurvey(), appliedCreates, changeSet)) {
-      setGroupStatus(results, group, 'skipped', 'dependencyNotApplied')
-      continue
-    }
-    try {
-      // saved on the server even when a stop reason comes back
-      stopReason = await persistGroup(group, changeSet, deps)
-      if (group.operations[0].type === 'nodeDef.create') appliedCreates.add(group.uuid)
-      setGroupStatus(results, group, 'applied')
-    } catch (error) {
-      const { message, params } = getRequestFailure(error)
-      setGroupStatus(results, group, 'failed', message, params)
-      // later groups may reference it (e.g. an expression naming a definition whose create failed)
-      stopReason = 'dependencyNotApplied'
-    }
+    stopReason = await applyGroup({ group, changeSet, deps, results, appliedCreates, stopReason })
+    onGroupDone(group)
   }
 }
 
@@ -175,16 +207,19 @@ const applyGroups = async (
  * @param {ChangeSet} params.changeSet - Change set.
  * @param {string[]} params.operationIds - Selected operations.
  * @param {ApplierDeps} params.deps - Store access and the designer's save actions.
+ * @param {Function} [params.onProgress] - Operations done and total, after each save.
  * @returns {Promise<OperationResult[]>} One result per selected operation, in operation order.
  */
 export const applyChangeSet = async ({
   changeSet,
   operationIds,
   deps,
+  onProgress,
 }: {
   changeSet: ChangeSet
   operationIds: string[]
   deps: ApplierDeps
+  onProgress?: (done: number, total: number) => void
 }): Promise<OperationResult[]> => {
   // the record-edit card has its own applier
   const selected = changeSet.operations.filter((op) => operationIds.includes(op.id) && !isRecordEditOperation(op))
@@ -206,13 +241,23 @@ export const applyChangeSet = async ({
   const nodeDefOperations = toApply
     .filter((op) => !isCategoryItemLabelOperation(op))
     .filter((op) => !results.has(op.id))
-  await applyGroups(groupByNodeDef(nodeDefOperations), changeSet, deps, results)
+  const categoryLabelOperations = toApply.filter((op) => isCategoryItemLabelOperation(op))
+  const total = nodeDefOperations.length + categoryLabelOperations.length
+  let done = 0
+  const advance = (count: number) => {
+    done += count
+    onProgress?.(done, total)
+  }
+  await applyGroups(groupByNodeDef(nodeDefOperations), changeSet, deps, results, (group) =>
+    advance(group.operations.length)
+  )
   await applyCategoryItemLabels({
     changeSet,
-    operations: toApply.filter((op) => isCategoryItemLabelOperation(op)),
+    operations: categoryLabelOperations,
     getSurvey: deps.getSurvey,
     deps: deps.categoryLabels,
     results,
+    onChunkDone: advance,
   })
   return selected.map((op) => results.get(op.id) as OperationResult)
 }

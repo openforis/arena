@@ -18,7 +18,7 @@ import { pq } from './promptSafety'
  * @param {{message: string}} [args.previousError] - Parser/validator error from a prior attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The prompt pair.
  */
-export const buildDataDictionaryPrompt = ({ surveyName, nodeDefs, previousError = null }) => {
+export const buildDataDictionaryPrompt = ({ surveyName, nodeDefs, language = null, previousError = null }) => {
   const system = `You write concise field descriptions for an Open Foris Arena (FAO) survey
 data dictionary. The survey is used for forest, agricultural, or
 biodiversity data collection.
@@ -56,7 +56,7 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape, compact (
 Fields needing a description:
 ${items}
 
-Produce one description per field.`
+Produce one description per field.${language ? ` Write the descriptions in ${pq(language, 64)}.` : ''}`
 
   if (previousError) {
     prompt += `

@@ -53,6 +53,11 @@ export type AiToolContext = {
   categoryItemRefs?: CategoryItemRefs
   // cap of a result in this turn (set by the registry on every call; read with getResultBudget)
   resultCapChars?: number
+  // provider picked in the chat: the batch tools send their requests to it
+  providerId?: string
+  // the call being run (set by the registry): a long tool reports its progress under its row with onToolProgress
+  toolCallId?: string
+  onToolProgress?: (toolCallId: string, output: unknown) => void
 }
 
 export type AiTool<I = any, O = unknown> = {

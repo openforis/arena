@@ -26,6 +26,9 @@ const DESIGN_RULES = [
     'nodeDef_search and nodeDef_get give the names and the current values.',
   '- To find, translate or complete missing labels or descriptions, list them with survey_listMissingTexts and propose ' +
     'them in batches with labels_proposeSet; pass nextCursor to get the next page.',
+  '- For many texts call one batch tool instead, once: missingTexts_translate (more than 20 missing texts in a ' +
+    'language), categoryItemLabels_translate (more than 20 category labels), descriptions_write (more than 10 ' +
+    'descriptions). It makes all of them and proposes one card: do not propose those texts again.',
   '- To give a code attribute a category or a taxon attribute a taxonomy, list them with categories_list or ' +
     'taxonomies_list, then propose nodeDef_proposeUpdate with prop categoryName or taxonomyName.',
   '- Check every expression with expression_check before proposing it.',
