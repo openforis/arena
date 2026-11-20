@@ -104,9 +104,7 @@ const expectNodeDefsPublishable = (survey: any) => {
 
 describe('ODK import - publishable node defs', () => {
   afterAll(async () => {
-    for (const surveyId of surveyIds) {
-      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
-    }
+    await Promise.all(surveyIds.map((surveyId) => SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })))
   })
 
   test('valid unique names and no read-only attributes without default values', async () => {
