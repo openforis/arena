@@ -162,7 +162,6 @@ const ExpressionEditor = (props) => {
       {aiOpen && (
         <AiExpressionPopup
           excludeCurrentNodeDef={excludeCurrentNodeDef}
-          isContextParent={isContextParent}
           qualifier={qualifier}
           nodeDefUuid={nodeDefUuidCurrent}
           onCancel={onAiCancel}

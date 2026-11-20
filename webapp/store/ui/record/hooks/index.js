@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react'
 import { useSelector } from 'react-redux'
 
-import { NodeDefs, Nodes, Objects, Records, Surveys } from '@openforis/arena-core'
+import { NodeDefs, RecordNodes, Objects, Records, Surveys } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
@@ -94,7 +94,7 @@ const useNodesCount = ({ parentNodeUuid, nodeDefUuid, countType }) =>
       const record = RecordState.getRecord(state)
       if (!record) return undefined
       const parentNode = Records.getNodeByUuid(parentNodeUuid)(record)
-      return Nodes.getChildrenMinOrMaxCount({ parentNode, nodeDef, countType })
+      return RecordNodes.getChildrenMinOrMaxCount({ parentNode, nodeDef, countType })
     }
     // count is constant value (backward compatibility)
     return Number(count)

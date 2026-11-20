@@ -1,11 +1,11 @@
-import { ArenaRecord, Authorizer, NodeDef, NodeDefType, User } from '@openforis/arena-core'
+import { ArenaRecord, Authorizer, ArenaUser, type ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 // see SurveyManager.fetchUserQualifierFilters
-type QualifierFilter = { nodeDef: NodeDef<NodeDefType>; value: unknown }
+type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 
 /**
  * Determines whether the user can update an existing record with a data import, with the same rules used
@@ -25,8 +25,8 @@ const canUpdateRecord = ({
   updateRecordsInAnalysis,
   userQualifierFilters,
 }: {
-  user: User
-  survey: any
+  user: ArenaUser
+  survey: ArenaSurvey
   record: ArenaRecord
   updateRecordsInAnalysis: boolean
   userQualifierFilters: QualifierFilter[]

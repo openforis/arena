@@ -1,23 +1,27 @@
-import { NodeDefExpressionValidator, ValidationResult } from '@openforis/arena-core'
-
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
-import { SurveyDocImages, surveyDocImagePropKeys as propKeys, type SurveyDocImage } from '@openforis/arena-core'
-import { ValidationResultInstance } from '@core/validation/validationResult'
+import {
+  NodeDefExpressionValidator,
+  SurveyDocImages,
+  surveyDocImagePropKeys as propKeys,
+  ArenaValidationResult,
+  type ArenaSurveyDocImage,
+  type ArenaSurvey,
+} from '@openforis/arena-core'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 
 const validateExpression =
-  (survey: unknown) =>
-  async (_propName: string, surveyDocImage: SurveyDocImage): Promise<ValidationResult> => {
+  (survey: ArenaSurvey) =>
+  async (_propName: string, surveyDocImage: ArenaSurveyDocImage): Promise<ArenaValidationResult> => {
     if (!survey) return null
     const applyIf = SurveyDocImages.getApplyIf(surveyDocImage)
     if (!applyIf) return null
 
-    const nodeDefCurrent = Survey.getNodeDefRoot(survey as object) as any
+    const nodeDefCurrent = Survey.getNodeDefRoot(survey) as any
     if (!nodeDefCurrent) return null
 
     const { validationResult } = await nodeDefExpressionValidator.validate({
@@ -27,7 +31,7 @@ const validateExpression =
       selfReferenceAllowed: true,
     })
     return validationResult && !validationResult.valid
-      ? (Validation.newInstance(false, {}, [validationResult as ValidationResultInstance]) as any)
+      ? (Validation.newInstance(false, {}, [validationResult as ArenaValidationResult]) as any)
       : null
   }
 
@@ -36,9 +40,9 @@ const validate = async ({
   surveyDocImages,
   surveyDocImage,
 }: {
-  survey?: unknown
-  surveyDocImages: SurveyDocImage[]
-  surveyDocImage: SurveyDocImage
+  survey?: ArenaSurvey | null
+  surveyDocImages: ArenaSurveyDocImage[]
+  surveyDocImage: ArenaSurveyDocImage
 }) =>
   Validator.validate(surveyDocImage, {
     [`${SurveyFile.keys.props}.${SurveyFile.propKeys.name}`]: [

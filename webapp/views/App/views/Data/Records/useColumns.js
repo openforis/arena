@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,7 +9,7 @@ import { Authorizer } from '@openforis/arena-core'
 
 import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import { Button } from '@webapp/components'
+import { ButtonIconEditOrView } from '@webapp/components'
 import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
@@ -31,16 +31,6 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
   const nodeDefKeys = useNodeDefRootKeys()
   const summaryDefs = useRootSummaryDefs()
   const hasFileAttributes = useSurveyHasFileAttributes()
-
-  const onRecordEditButtonClick = useCallback(
-    (record) => (event) => {
-      event.stopPropagation()
-      event.preventDefault()
-
-      navigateToRecord(record)
-    },
-    [navigateToRecord]
-  )
 
   return useMemo(() => {
     if (categoryItemsByCodeDefUuid === null) return null
@@ -157,11 +147,10 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
           const canDelete = !readOnly && Authorizer.canDeleteRecord(user, record)
           return (
             <>
-              <Button
-                iconClassName={`icon-16px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}
+              <ButtonIconEditOrView
+                canEdit={canEdit}
                 title={`dataView:records.${canEdit ? 'editRecord' : 'viewRecord'}`}
-                onClick={onRecordEditButtonClick(record)}
-                variant="text"
+                onClick={() => navigateToRecord(record)}
               />
               {canDelete && (
                 <RecordDeleteButton
@@ -182,7 +171,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
     hasFileAttributes,
     lang,
     nodeDefKeys,
-    onRecordEditButtonClick,
+    navigateToRecord,
     onRecordsUpdate,
     srsIndex,
     summaryDefs,

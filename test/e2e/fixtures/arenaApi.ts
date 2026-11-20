@@ -375,4 +375,22 @@ export class ArenaApi {
   async deleteMessageIfExists(messageUuid: string): Promise<void> {
     await this.requestContext.delete(`/api/message/${messageUuid}`, { headers: this.headers })
   }
+
+  /**
+   * Creates an external login provider (the user must be a system administrator).
+   * @param {object} provider - The provider: id, type, props and clientSecret.
+   * @returns {Promise<void>} - Resolves when the provider has been created.
+   */
+  async createAuthProvider(provider: {
+    id: string
+    type: string
+    props: Record<string, unknown>
+    clientSecret: string
+  }): Promise<void> {
+    await this.post('/api/admin/auth-providers', provider)
+  }
+
+  async deleteAuthProviderIfExists(id: string): Promise<void> {
+    await this.requestContext.delete(`/api/admin/auth-providers/${id}`, { headers: this.headers })
+  }
 }

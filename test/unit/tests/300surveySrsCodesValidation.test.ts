@@ -3,7 +3,13 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 
 const newSurveyInfo = (srs: unknown) =>
-  Survey.newSurvey({ ownerUuid: 'owner-uuid', name: 'survey_test', languages: ['en'], srs })
+  // srs can be invalid on purpose
+  Survey.newSurvey({
+    ownerUuid: 'owner-uuid',
+    name: 'survey_test',
+    languages: ['en'],
+    srs: srs as Record<string, unknown>[],
+  })
 
 const getSrsErrors = async (srs: unknown) => {
   const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo(srs))

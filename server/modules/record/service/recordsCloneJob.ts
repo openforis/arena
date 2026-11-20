@@ -1,0 +1,153 @@
+import { Objects, RecordCloner, SystemError } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as Node from '@core/record/node'
+
+import Job from '@server/job/job'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
+
+import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
+
+export default class RecordsCloneJob extends Job {
+  nodesInsertBatchPersister: any
+
+  static readonly type: string = 'RecordsCloneJob'
+
+  constructor(params?: any) {
+    super(RecordsCloneJob.type, params)
+  }
+
+  async onStart() {
+    await super.onStart()
+
+    const { context, user, tx } = this
+    const { surveyId } = context
+
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, advanced: true }, tx)
+    this.setContext({ survey })
+
+    this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
+  }
+
+  async execute() {
+    const recordsToClone = await this.findRecordsToClone()
+
+    this.total = recordsToClone.length
+
+    for (const recordSummary of recordsToClone) {
+      await this.cloneRecord({ recordSummary }) // NOSONAR
+    }
+  }
+
+  async beforeSuccess() {
+    await super.beforeSuccess()
+    await this.nodesInsertBatchPersister.flush()
+  }
+
+  async findRecordsToClone() {
+    const { context } = this
+    const { surveyId, cycleFrom, cycleTo, recordsUuids } = context
+
+    const { nodeDefKeys: nodeDefKeysCycleFrom, list: recordsCycleFrom } =
+      await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, cycle: cycleFrom })
+    const { nodeDefKeys: nodeDefKeysCycleTo, list: recordsCycleTo } = await RecordManager.fetchRecordsSummaryBySurveyId(
+      { surveyId, cycle: cycleTo }
+    )
+
+    if (!Objects.isEqual(nodeDefKeysCycleFrom, nodeDefKeysCycleTo)) {
+      throw new SystemError('validationErrors:recordClone.differentKeyAttributes')
+    }
+
+    const keys = nodeDefKeysCycleFrom.map((nodeDefKey) => A.camelize(NodeDef.getName(nodeDefKey)))
+    const getKeyValues = (recordSummary) => keys.map((key) => recordSummary[key])
+
+    const recordsToClone = recordsCycleFrom.filter((recordCycleFrom) => {
+      if (!Objects.isEmpty(recordsUuids) && !recordsUuids.includes(Record.getUuid(recordCycleFrom))) {
+        return false
+      }
+      const keyValuesRecordCycleFrom = getKeyValues(recordCycleFrom)
+      return !recordsCycleTo.some((recordCycleTo) =>
+        Objects.isEqual(keyValuesRecordCycleFrom, getKeyValues(recordCycleTo))
+      )
+    })
+    return recordsToClone
+  }
+
+  async cloneRecord({ recordSummary }) {
+    const { context, tx, user } = this
+    const { surveyId, survey, cycleTo } = context
+
+    const recordUuid = recordSummary.uuid
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+
+    // assign new UUIDs with side effect on record and nodes, faster when record is big
+    const {
+      record: recordCloned,
+      newNodeUuidsByOldUuid,
+      newFileUuidsByOldUuid,
+    } = RecordCloner.cloneRecord({ survey, record, cycleTo })
+
+    const newRecordUuid = Record.getUuid(recordCloned)
+    const nodes = Record.getNodes(recordCloned)
+    const nodesArray = Object.values(nodes)
+
+    // insert record
+    await RecordManager.insertRecord(user, surveyId, recordCloned, true, tx)
+
+    // insert nodes (add them to batch persister)
+
+    for (const node of nodesArray) {
+      // check that the node definition associated to the node has not been deleted from the survey
+      if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
+        await this.nodesInsertBatchPersister.addItem(node) // NOSONAR
+      }
+    }
+
+    // update RDB
+    await DataTableUpdateRepository.updateTables({ survey, record: recordCloned, nodes }, tx)
+
+    await this.cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid })
+
+    this.incrementProcessedItems()
+  }
+
+  async cloneFiles({
+    newFileUuidsByOldUuid,
+    newNodeUuidsByOldUuid,
+    newRecordUuid,
+  }: {
+    newFileUuidsByOldUuid: { [oldUuid: string]: string }
+    newNodeUuidsByOldUuid: { [oldUuid: string]: string }
+    newRecordUuid: string
+  }) {
+    const { context, tx } = this
+    const { surveyId } = context
+
+    for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx) // NOSONAR
+      if (fileSummary) {
+        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary }, tx) // NOSONAR
+        const oldNodeUuid = SurveyFile.getNodeUuid(fileSummary)
+        const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
+        const newFile = SurveyFile.createFile({
+          content,
+          name: SurveyFile.getName(fileSummary),
+          nodeUuid: newNodeUuid,
+          recordUuid: newRecordUuid,
+          size: SurveyFile.getSize(fileSummary),
+          type: SurveyFile.SurveyFileType.recordAttachment,
+          uuid: newFileUuid,
+        })
+        await SurveyFileService.insertFile(surveyId, newFile, tx) // NOSONAR
+      }
+    }
+  }
+}

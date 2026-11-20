@@ -30,6 +30,7 @@ import {
   type ScreenshotPlotCandidate,
   type ScreenshotTarget,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import type { LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
 import { useMapLayersPanel } from '@webapp/views/App/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type { ScreenshotStamp } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
 
@@ -74,6 +75,18 @@ const readCenter = (map: L.Map | null): LatLngLiteral | null => {
 }
 
 /**
+ * Reads the map view when the dialog opens (only the plots inside it are listed), before a capture moves the map.
+ * @param {L.Map|null} map - The map.
+ * @returns {LatLngBoundsLiteral|null} The bounds.
+ */
+const readBounds = (map: L.Map | null): LatLngBoundsLiteral | null => {
+  const bounds = map?.getBounds()
+  return bounds
+    ? { south: bounds.getSouth(), west: bounds.getWest(), north: bounds.getNorth(), east: bounds.getEast() }
+    : null
+}
+
+/**
  * Holds the choices of the screenshot dialog and derives the plot list, the attribute options, the file name, the
  * stamp and the fit-to-plot zoom.
  * @returns {ScreenshotDialogState} The dialog state.
@@ -89,16 +102,22 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
 
   const [openedAt] = useState(() => new Date())
   const [openCenter] = useState(() => readCenter(map))
+  const [openBounds] = useState(() => readBounds(map))
   const [optionsChoice, setOptionsChoice] = useState<OptionsChoice>(DEFAULT_OPTIONS)
   const [targetChoice, setTargetChoice] = useState<ScreenshotTarget | null>(null)
   const [plotKey, setPlotKey] = useState<string | null>(null)
   const [attributeUuid, setAttributeUuid] = useState<string | null>(null)
   const [fileNameInput, setFileNameInput] = useState<string | null>(null)
 
-  // the plots are the points of the location layers listed in the Records tab (empty outside Data › Map)
+  // the plots are the points in view of the location layers listed in the Records tab (empty outside Data › Map)
   const candidates = useMemo(
-    () => buildPlotCandidates({ layers: toPlotLayers({ activeLayers, survey, lang }), center: openCenter }),
-    [activeLayers, survey, lang, openCenter]
+    () =>
+      buildPlotCandidates({
+        layers: toPlotLayers({ activeLayers, survey, lang }),
+        center: openCenter,
+        bounds: openBounds,
+      }),
+    [activeLayers, survey, lang, openCenter, openBounds]
   )
   const plot = candidates.find((candidate) => candidate.key === plotKey) ?? candidates[0] ?? null
   const target: ScreenshotTarget = targetChoice ?? (candidates.length > 0 ? 'record' : 'file')

@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -11,11 +13,11 @@ const logger = Log.getLogger('NodeFilesRemover')
 
 export type FileToRemove = { fileUuid: string; recordUuid: string }
 
-const _isFileAttribute = ({ survey, node }: { survey: any; node: any }): boolean =>
+const _isFileAttribute = ({ survey, node }: { survey: ArenaSurvey; node: ArenaRecordNode }): boolean =>
   NodeDef.isFile(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
 
 // the value of a node deleted because it became not applicable is cleared before the deletion: use the stored one
-const _getFileUuidToRemove = ({ record, node }: { record: any; node: any }): string | null => {
+const _getFileUuidToRemove = ({ record, node }: { record: ArenaRecord; node: ArenaRecordNode }): string | null => {
   const nodeStored = Record.getNodeByUuid(Node.getUuid(node))(record)
   const fileUuidStored = nodeStored ? Node.getFileUuid(nodeStored) : null
   const fileUuid = Node.getFileUuid(node)
@@ -38,9 +40,9 @@ export const findFilesToRemove = ({
   record,
   nodes,
 }: {
-  survey: any
-  record: any
-  nodes: any[]
+  survey: ArenaSurvey
+  record: ArenaRecord
+  nodes: ArenaRecordNode[]
 }): FileToRemove[] => {
   const files: FileToRemove[] = []
   for (const node of nodes) {
@@ -81,7 +83,7 @@ const _deleteFileContentSafely = async ({ surveyId, fileUuid, recordUuid }: File
  */
 export const removeFiles = async (
   { surveyId, files, isPreview = false }: { surveyId: number; files: FileToRemove[]; isPreview?: boolean },
-  tx: any
+  tx: DbClient
 ): Promise<void> => {
   const fileUuids = [...new Set(files.map(({ fileUuid }) => fileUuid))]
   if (fileUuids.length === 0) return

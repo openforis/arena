@@ -1,0 +1,289 @@
+export default {
+  dashboard: {
+    activeSurveyNotSelected: `<title>Aucun formulaire actif sélectionné</title>
+      <p><label>Veuillez en sélectionner un depuis la</label><linkToSurveys>Liste des formulaires</linkToSurveys> ou <linkToNewSurvey>en créer un nouveau</linkToNewSurvey></p>`,
+    activeUsers: 'Utilisateurs actifs',
+    activityLog: {
+      title: "Journal d'activité",
+      size: '$t(homeView:dashboard.activityLog.title) taille : {{size}}',
+      loadError: "Impossible de charger l'activité.",
+      empty: 'Aucune activité pour le moment.',
+    },
+    exportWithData: 'Exporter + données (Sauvegarde)',
+    exportWithDataNoActivityLog: "Exporter + données (SANS Journal d'activité)",
+    exportWithDataNoResultAttributes: 'Exporter + données (SANS attributs de résultats)',
+    surveyPropUpdate: {
+      main: `<title>Bienvenue dans Arena</title>
+  
+        <p>Vous devez d'abord définir le <strong>nom</strong> et <strong>l'étiquette</strong> du formulaire.</p>
+        
+        <p>Cliquez ci-dessous sur <linkWithIcon> $t(homeView:surveyInfo.editInfo)</linkWithIcon>ou sur le nom du formulaire :<basicLink>{{surveyName}}</basicLink></p>
+        `,
+      secondary: `
+        <p>Si le nom et l'étiquette sont corrects, créez le premier attribut
+        <linkWithIcon>Formulaire \u003E Concepteur de formulaire</linkWithIcon>
+        </p>
+        `,
+    },
+    nodeDefCreate: {
+      main: `<title>Créons le premier attribut de {{surveyName}} </title>
+        
+        <p>Allez dans <linkWithIcon>Formulaire \u003E Concepteur de formulaire</linkWithIcon></p>
+        <br />
+        `,
+    },
+    storageSummary: {
+      title: 'Utilisation du stockage',
+      availableSpace: 'Disponible ({{size}})',
+      usedSpace: 'Utilisé ({{size}})',
+      usedSpaceOutOf: `Utilisé {{percent}}% ({{used}} sur {{total}})`,
+    },
+    storageSummaryDb: {
+      title: 'Utilisation du stockage (Base de données)',
+    },
+    storageSummaryFiles: {
+      title: 'Utilisation du stockage (fichiers)',
+    },
+    samplingPointDataCompletion: {
+      title: "Complétude des données de points d'échantillonnage",
+      totalItems: 'Total des éléments : {{totalItems}}',
+      remainingItems: 'Éléments restants',
+    },
+    kpi: {
+      records: 'Enregistrements',
+      contributors: 'Contributeurs',
+      storage: 'Stockage',
+      expandDetails: 'Afficher les détails',
+      collapseDetails: 'Masquer les détails',
+    },
+    recordsCard: {
+      total: 'Enregistrements ajoutés sur la période sélectionnée',
+      byStep: 'Par étape du flux de travail (tout le temps)',
+    },
+    contributorsCard: {
+      active: 'Contributeurs actifs sur la période sélectionnée : {{count}}',
+    },
+    map: {
+      title: 'Carte',
+      allOwners: 'Tous les propriétaires',
+    },
+    step: {
+      entry: 'Saisie de données',
+      cleansing: 'Nettoyage de données',
+      analysis: 'Analyse de données',
+    },
+    // résumé des enregistrements
+    recordsByUser: 'Enregistrements par utilisateur',
+    recordsAddedPerUserWithCount: 'Enregistrements ajoutés par utilisateur (Total de {{totalCount}})',
+    dailyRecordsByUser: 'Enregistrements quotidiens par utilisateur',
+    totalRecords: 'Total des enregistrements',
+    selectUsers: 'Sélectionner des utilisateurs...',
+    noRecordsAddedInSelectedPeriod: 'Aucun enregistrement ajouté dans la période sélectionnée',
+  },
+  surveyDeleted: 'Le formulaire {{surveyName}} a été supprimé',
+  landing: {
+    openDashboard: 'Ouvrir le tableau de bord',
+  },
+  surveyInfo: {
+    basic: 'Informations de base',
+    branding: {
+      title: 'Image de marque',
+      primaryColor: 'Couleur principale',
+      titleFontSize: 'Taille de police du titre',
+      descriptionFontSize: 'Taille de police de la description',
+      fontSizePreset: {
+        small: 'Petite',
+        default: 'Par défaut',
+        large: 'Grande',
+      },
+      surveyLogo1: 'Logo du formulaire 1',
+      surveyLogo2: 'Logo du formulaire 2',
+      surveyLogo3: 'Logo du formulaire 3',
+      landingBackground: "Image d'arrière-plan de la page d'accueil",
+      uploadLogo: 'Téléverser le logo',
+      logoFileFormatHint: 'PNG, JPEG, WebP ou SVG (max. {{maxMb}} Mo)',
+      logoFileTooLarge: "L'image du logo ne doit pas dépasser {{maxMb}} Mo",
+      preview: 'Aperçu',
+      backgroundFileTooLarge: "L'image d'arrière-plan ne doit pas dépasser {{maxMb}} Mo",
+      invalidPrimaryColor: 'Saisissez une couleur #RRGGBB valide ou laissez vide',
+      invalidSaveBlocked:
+        "Corrigez les champs d'image de marque invalides avant d'enregistrer les informations du formulaire",
+      imageLoadError: 'Impossible de charger l\'image "{{name}}". Supprimez-la et téléversez-en une nouvelle.',
+      imageLoadErrorReadOnly: 'Impossible de charger l\'image "{{name}}"',
+      downloadImage: "Cliquez pour télécharger l'image",
+    },
+    configuration: {
+      title: 'Configuration',
+      filesTotalSpace: 'Espace total des fichiers (Go)',
+    },
+    confirmDeleteCycleHeader: 'Supprimer ce cycle ?',
+    confirmDeleteCycle: `Êtes-vous sûr(e) de vouloir supprimer le cycle {{cycle}} ?\n\n$t(common.cantUndoWarning)\n\n
+Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
+    cycleForArenaMobile: 'Cycle pour Arena Mobile',
+    keepNonApplicableValues: `Conserver les valeurs des attributs non pertinents`,
+    keepNonApplicableValuesInfo: `Si la case n'est pas cochée (par défaut), lors de la saisie des données, les valeurs des attributs qui ne sont plus pertinents sont effacées (après confirmation de l'utilisateur).
+Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même si les attributs ne sont plus pertinents.`,
+    deleteActivityLog: "Effacer le journal d'activité",
+    deleteActivityLogConfirm: {
+      headerText: "Effacer TOUTES les données du journal d'activité pour ce formulaire ?",
+      message: `
+  - TOUTES les données du journal d'activité pour le formulaire **{{surveyName}}** seront supprimées ;\n\n
+  - l'espace occupé dans la BD par le formulaire sera réduit ;\n\n
+  - cela n'affectera pas les données de saisie du formulaire ;\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Entrez le nom de ce formulaire pour confirmer :',
+    },
+    fieldManualLink: 'Lien vers le manuel de terrain',
+    map: 'Carte',
+    editInfo: 'Modifier les infos',
+    viewInfo: 'Voir les infos',
+
+    areasOfInterest: {
+      title: "Zones d'intérêt",
+      info: "Polygones (GeoJSON, coordonnées WGS84) utilisés par les fonctions d'expression geoDistanceToAOIBoundary (distance à la limite d'une zone) et geoAOIContaining (zone contenant un emplacement), également hors ligne dans Arena Mobile. Le nom d'une zone est utilisé dans les expressions.",
+      name: 'Nom',
+      polygons: 'Polygones',
+      vertices: 'Sommets',
+      invalidFile: 'Le fichier ne contient pas de polygone valide au format GeoJSON avec des coordonnées WGS84',
+      confirmDelete: "Êtes-vous sûr de vouloir supprimer cette zone d'intérêt ?",
+      showAllOnMap: 'Tout afficher sur la carte',
+      editor: {
+        title: "Zone d'intérêt",
+      },
+    },
+
+    preloadedMapLayers: {
+      enabledMessage: 'Couches de carte préchargées activées',
+      title: 'Couches de carte préchargées',
+      confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette couche de carte préchargée ?',
+      editor: {
+        title: 'Couche de carte préchargée',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Mise en page du document',
+      title: 'Images du document',
+      layoutOptions: {
+        title: 'Options de mise en page',
+        headerOnFirstPageOnly: 'En-tête sur la première page uniquement',
+        pageNumbering: 'Numérotation des pages',
+      },
+      documentPlace: 'Emplacement',
+      documentPlaceValues: {
+        header: 'En-tête',
+        footer: 'Pied de page',
+      },
+      applyIf: 'Appliquer si condition',
+      confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette image du document ?',
+      editor: {
+        title: 'Image du document',
+      },
+    },
+
+    preferredLanguage: 'Langue préférée',
+    sampleBasedImageInterpretation: "Interprétation d'images basée sur des échantillons",
+    sampleBasedImageInterpretationEnabled: "Interprétation d'images basée sur des échantillons activée",
+    aiPolicy: {
+      title: "Politique d'IA",
+      intro:
+        "Choisissez où l'IA peut traiter le contenu de ce formulaire. Le plus strict entre cette politique et les limites de cette instance d'Arena s'applique.",
+      schemaLabel: 'Conception du formulaire (schéma)',
+      schemaHint: 'Définitions de nœuds, libellés et expressions.',
+      dataLabel: 'Données des enregistrements',
+      dataHint: 'Valeurs collectées et activité des utilisateurs.',
+      levelHint: {
+        off: "L'IA n'est jamais utilisée pour ce contenu.",
+        onDevice: "Traité uniquement par un moteur d'IA qui s'exécute sur l'appareil de l'utilisateur.",
+        orgHosted: "Traité par un serveur d'IA géré par votre organisation.",
+        cloud: "Peut être traité par un fournisseur d'IA dans le cloud.",
+      },
+      notAllowedOnInstance: "Non autorisé sur cette instance d'Arena : {{levels}}",
+      dataLimitedBySchema:
+        'Les données des enregistrements ne peuvent pas être plus permissives que la conception du formulaire. Non disponible : {{levels}}',
+      onDeviceNote: "Sur cet appareil : les utilisateurs ont besoin d'un serveur d'IA local (par exemple LM Studio).",
+      readOnly: "Seuls les administrateurs du formulaire peuvent modifier la politique d'IA.",
+      saved: "Politique d'IA enregistrée",
+      savedDataLowered:
+        "Politique d'IA enregistrée. Les données des enregistrements ont aussi été abaissées : elles ne peuvent pas être plus permissives que la conception du formulaire.",
+      saveError: "Impossible d'enregistrer la politique d'IA : {{message}}",
+      loadError: "Impossible de charger la politique d'IA",
+    },
+    security: {
+      title: 'Sécurité',
+      publishToApply: 'Les modifications de ces options prennent effet une fois le formulaire publié.',
+      dataEditorViewNotOwnedRecordsAllowed:
+        "L'éditeur de données peut voir les enregistrements qui ne lui appartiennent pas",
+      dataAnalystViewNotOwnedRecordsAllowed:
+        "L'analyste de données peut voir les enregistrements qui ne lui appartiennent pas",
+      visibleInMobile: 'Visible dans Arena Mobile',
+      allowRecordsDownloadInMobile: 'Autoriser le téléchargement des enregistrements du serveur vers Arena Mobile',
+      allowRecordsUploadFromMobile:
+        'Autoriser le téléversement des enregistrements depuis Arena Mobile vers le serveur',
+      allowRecordsWithErrorsUploadFromMobile:
+        'Autoriser le téléversement des enregistrements avec des erreurs de validation depuis Arena Mobile vers le serveur',
+      notifyAdminsOnRecordsUploadFromMobile:
+        "Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile",
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Si cochée, chaque administrateur de formulaire reçoit un e-mail listant les enregistrements téléversés depuis Arena Mobile (valeurs des clés, créateur, dates, validation et UUID).',
+      formPreviewForDataEntryUsers:
+        "Autoriser les utilisateurs de saisie à afficher l'aperçu du formulaire brouillon (non publié)",
+      formPreviewForDataEntryUsersInfo:
+        "Les utilisateurs pouvant saisir des données mais pas modifier le formulaire verront un bouton Aperçu du formulaire dans la liste des enregistrements, pour tester le formulaire avec les dernières modifications non publiées (par ex. pour les tests de recette). Les données saisies dans l'aperçu ne sont pas enregistrées.",
+      allowRecordsMergeWithSameKeys:
+        'Autoriser la fusion des enregistrements avec les mêmes clés (ex. enregistrements créés sur différents appareils Arena Mobile)',
+    },
+    srsPlaceholder: "Tapez le code ou l'étiquette",
+    unpublish: 'Dépublier et supprimer les données',
+    unpublishSurveyDialog: {
+      confirmUnpublish: 'Êtes-vous sûr(e) de vouloir dépublier ce formulaire ?',
+      unpublishWarning: `La dépublication du formulaire **{{surveyName}}** supprimera toutes ses données.\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Entrez le nom de ce formulaire pour confirmer :',
+    },
+    userExtraProps: {
+      title: 'Propriétés supplémentaires des utilisateurs',
+      info: `Propriétés supplémentaires pouvant être assignées à chaque utilisateur associé au formulaire.  
+Ces propriétés peuvent être utilisées dans les valeurs par défaut, les règles de validation et les expressions d'applicabilité.  
+Ex. : *userProp('nom_propriété') == 'une_valeur'*`,
+    },
+  },
+  deleteSurveyDialog: {
+    confirmDelete: 'Êtes-vous sûr(e) de vouloir supprimer ce formulaire ?',
+    deleteWarning: `La suppression du formulaire **{{surveyName}}** supprimera toutes ses données.\n\n
+
+$t(common.cantUndoWarning)`,
+    confirmName: 'Entrez le nom de ce formulaire pour confirmer :',
+  },
+  surveyList: {
+    active: '$t(common.active)',
+    activate: 'Activer',
+  },
+  collectImportReport: {
+    excludeResolvedItems: 'Exclure les éléments résolus',
+    expression: 'Expression',
+    resolved: 'Résolu',
+    exprType: {
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
+      codeParent: 'Code parent',
+      defaultValue: 'Valeur par défaut',
+      requiredIf: 'Obligatoire si',
+      validationRule: 'Règle de validation',
+    },
+    title: "Rapport d'importation Collect",
+  },
+  recordsSummary: {
+    recordsAddedInTheLast: 'Enregistrements ajoutés au cours des derniers :',
+    fromToPeriod: 'de {{from}} à {{to}}',
+    record: '{{count}} Enregistrement',
+    record_other: '{{count}} Enregistrements',
+    week: '{{count}} Semaine',
+    week_other: '{{count}} Semaines',
+    month: '{{count}} Mois',
+    month_other: '{{count}} Mois',
+    year: '{{count}} An',
+    year_other: '{{count}} Ans',
+  },
+}

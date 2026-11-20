@@ -6,6 +6,7 @@ import axios from 'axios'
 
 import SystemError from '@core/systemError'
 import { Query } from '@common/model/query'
+import type { QueryItem } from '@common/model/query/query/query'
 
 import { getEntityViewDataCountRequest } from '@webapp/service/api/surveyRdb'
 
@@ -19,7 +20,7 @@ export type AnalysisHttp = {
 }
 
 type SurveyParams = { surveyId: number; cycle: string; signal?: AbortSignal }
-type QueryParams = SurveyParams & { query: object }
+type QueryParams = SurveyParams & { query: QueryItem }
 
 export type AnalysisApi = {
   fetchQueryRows: (params: QueryParams & { limit: number; offset?: number }) => Promise<Record<string, unknown>[]>

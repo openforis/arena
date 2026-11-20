@@ -1,10 +1,11 @@
 import i18next, { i18n, TFunction } from 'i18next'
 
-import { I18n } from '@openforis/arena-core'
+import { ArenaI18n } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
 
 import enTranslation from './resources/en'
+import deTranslation from './resources/de'
 import esTranslation from './resources/es'
 import frTranslation from './resources/fr'
 import jaTranslation from './resources/ja'
@@ -15,6 +16,7 @@ import srTranslation from './resources/sr'
 
 // every language of the app (the unit tests derive the languages they check from it)
 export const resources = {
+  de: deTranslation,
   en: enTranslation,
   es: esTranslation,
   fr: frTranslation,
@@ -48,7 +50,7 @@ const createParams = (lang: string = defaultLanguage) => ({
   supportedLngs: supportedLanguages,
 })
 
-export const createI18nAsync = (lang: string = defaultLanguage): Promise<I18n & { lang: string }> => {
+export const createI18nAsync = (lang: string = defaultLanguage): Promise<ArenaI18n & { lang: string }> => {
   const createInstance = i18next.createInstance || (i18next as any).default.createInstance
 
   return new Promise((resolve, reject) => {

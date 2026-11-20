@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Objects, Validation as ArenaValidation } from '@openforis/arena-core'
+import { Objects, ArenaValidation } from '@openforis/arena-core'
 
 import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
@@ -57,15 +57,11 @@ export const validateRequired =
 
 export const validateItemPropUniqueness =
   (errorKey: string) =>
-  (items: Record<string, unknown>[]): ValidatorFn =>
-  (propName, item: Record<string, unknown>) => {
+  (items: object[]): ValidatorFn =>
+  (propName, item: object) => {
     const hasDuplicates =
       items &&
-      A.any(
-        (i: Record<string, unknown>) =>
-          !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
-        items
-      )
+      A.any((i: object) => !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item), items)
     return hasDuplicates ? { key: errorKey } : null
   }
 

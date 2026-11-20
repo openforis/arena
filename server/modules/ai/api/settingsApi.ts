@@ -13,7 +13,7 @@
  *
  * The routes that connect to the endpoint of a provider (test, models, add, edit) are rate limited per user.
  */
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -47,7 +47,6 @@ export const buildResponseBody = (user: SettingsUser) => ({
   maxPromptChars: ENV.aiMaxPromptChars,
 })
 
-type ArenaUser = User
 type SettingsUser = { uuid: string; prefs?: Record<string, any> }
 type RouteHandler = (args: {
   user: ArenaUser

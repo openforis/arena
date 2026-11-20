@@ -1,0 +1,562 @@
+import type { ArenaUser, ArenaSurvey, ArenaSurveyDependencyGraph, ArenaSurveyProps } from '@openforis/arena-core'
+import * as A from '@core/arena'
+import camelize from 'camelize'
+
+import { db, type DbClient } from '@server/db/db'
+import * as DB from '@server/db'
+
+import { now as dbNow, newQueryParams, normalizeLimit, normalizeOffset, selectDate } from '@server/db/dbUtils'
+
+import * as StringUtils from '@core/stringUtils'
+import * as User from '@core/user/user'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import { Schemata } from '@common/model/db'
+
+const _getLabelColumn = (tableAlias?: string) => {
+  const prefix = tableAlias ? `${tableAlias}.` : ''
+  return `COALESCE(${prefix}preferred_label, ${prefix}default_label)`
+}
+
+const _getSurveySelectFields = (alias = '') => {
+  const prefix = alias ? `${alias}.` : ''
+  // 'app_version' requires a migration from the separate `@openforis/arena-server` package to exist on the DB.
+  const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template', 'app_version']
+  return [
+    ...columns.map((c) => `${prefix}${c}`),
+    selectDate(`${prefix}date_created`, 'date_created'),
+    selectDate(`${prefix}date_modified`, 'date_modified'),
+    selectDate(`${prefix}date_published`, 'date_published'),
+  ].join(', ')
+}
+
+// ============== CREATE
+
+/**
+ * Inserts a new survey row.
+ * @param {object} params - The insert parameters.
+ * @param {object} params.survey - The survey (or survey info) being inserted.
+ * @param {object} [params.props] - The survey published props.
+ * @param {object} [params.propsDraft] - The survey draft props.
+ * @param {string} [params.appVersion] - The app version to stamp the new survey with. A brand-new survey has no
+ *   legacy file paths to migrate, so callers should pass the "current fully-migrated" stamp value (see
+ *   `getCurrentAppVersionStamp` in `surveyDataMigrationSteps.js`) rather than leaving this unset, otherwise the
+ *   survey would be treated as pending a data migration and become unavailable (503) until the next migration run.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<object>} - The newly inserted survey row.
+ */
+export const insertSurvey = (
+  {
+    survey,
+    props = {},
+    propsDraft = {},
+    appVersion = null,
+  }: {
+    survey: ArenaSurvey
+    props?: Partial<ArenaSurveyProps>
+    propsDraft?: Partial<ArenaSurveyProps>
+    appVersion?: string | null
+  },
+  client: DbClient = db
+) =>
+  client.one(
+    `
+      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template, app_version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING ${_getSurveySelectFields()}
+    `,
+    [
+      Survey.getUuid(survey),
+      props,
+      propsDraft,
+      survey.ownerUuid,
+      Survey.isPublished(survey),
+      Survey.isDraft(survey),
+      Survey.isTemplate(survey),
+      appVersion,
+    ],
+    (def) => DB.transformCallback(def, true)
+  )
+
+// ============== READ
+
+export const fetchAllSurveyIds = (client: DbClient = db) => client.map('SELECT id FROM survey', [], A.prop('id'))
+
+const _getSelectWhereCondition = ({ draft, search }: { draft: boolean; search: string | null }) => {
+  const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
+  const labelCol = _getLabelColumn('s')
+
+  return `${propsCol} ->> 'temporary' IS NULL 
+      AND s.template = $/template/
+      ${
+        StringUtils.isNotBlank(search)
+          ? `
+          AND (
+          s.name LIKE $/search/
+          OR lower(${labelCol}) LIKE $/search/
+          OR lower(s.owner_name) LIKE $/search/
+      )`
+          : ''
+      }`
+}
+
+// lang, offset and limit are query params
+const _getSurveysSelectQuery = ({
+  user,
+  draft = false,
+  template = false,
+  search = null,
+  sortBy = Survey.sortableKeys.dateModified,
+  sortOrder = 'DESC',
+  includeOwnerEmailAddress = false,
+  onlyOwn = false,
+}: {
+  user: ArenaUser
+  draft?: boolean
+  template?: boolean
+  search?: string | null
+  sortBy?: string | null
+  sortOrder?: string | null
+  includeOwnerEmailAddress?: boolean
+  onlyOwn?: boolean
+}) => {
+  const checkAccess = (!template || draft) && !User.isSystemAdmin(user)
+  const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
+  const labelCol = _getLabelColumn('s')
+
+  const sortFieldBySortBy = {
+    [Survey.sortableKeys.dateCreated]: 's.date_created',
+    [Survey.sortableKeys.dateModified]: 's.date_modified',
+    [Survey.sortableKeys.datePublished]: 's.date_published',
+    [Survey.sortableKeys.name]: 's.name',
+    [Survey.sortableKeys.ownerName]: 's.owner_name',
+    [Survey.sortableKeys.label]: labelCol,
+    [Survey.sortableKeys.status]: 's.status',
+  }
+  const sortByField = sortFieldBySortBy[sortBy] || Survey.sortableKeys.dateModified
+
+  return `
+    WITH default_lang as (
+      SELECT s.id, jsonb_array_elements(${propsCol} -> '${Survey.infoKeys.languages}') ->> 0 as lang 
+      FROM survey s
+    ),
+    survey_view AS (
+      SELECT s.*, 
+        ${propsCol} ->> 'name' AS name, 
+        ${propsCol} #>> ARRAY['${Survey.infoKeys.labels}', $/lang/] AS preferred_label, 
+        (${propsCol} -> '${Survey.infoKeys.labels}') ->> 
+            (SELECT lang FROM default_lang WHERE default_lang.id = s.id LIMIT 1) as default_label,
+        -- STATUS
+        CASE
+          WHEN s.published AND s.draft 
+            THEN '${Survey.status.publishedDraft}'
+          WHEN s.published 
+            THEN '${Survey.status.published}'
+          WHEN s.draft 
+            THEN '${Survey.status.draft}'
+          ELSE 
+            NULL
+        END AS status,
+        u.name AS owner_name
+        ${includeOwnerEmailAddress ? `, u.email AS owner_email` : ''}
+        ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
+      FROM survey s
+        JOIN "user" u 
+          ON u.uuid = s.owner_uuid
+      ${
+        checkAccess
+          ? `
+        JOIN auth_group g
+          ON s.uuid = g.survey_uuid
+        JOIN auth_group_user gu
+          ON gu.group_uuid = g.uuid AND gu.user_uuid = $/userUuid/`
+          : ''
+      }
+    )
+    SELECT ${_getSurveySelectFields('s')}
+      , s.name
+      , s.default_label
+      , s.preferred_label
+      , ${labelCol} AS label
+      , s.owner_name
+      , s.status
+      , ${labelCol} AS label
+      , s.owner_name
+      ${includeOwnerEmailAddress ? `, s.owner_email AS owner_email` : ''}
+      ${checkAccess ? ', s.auth_groups' : ''}
+    FROM survey_view s
+    WHERE 
+      -- if draft is false, fetch only published surveys
+      ${draft ? '' : `s.props <> '{}'::jsonb AND `}
+      ${_getSelectWhereCondition({ draft, search })}
+      ${onlyOwn ? ' AND s.owner_uuid = $/userUuid/' : ''}
+    ORDER BY ${sortByField} ${DB.DbOrder.normalize(sortOrder, DB.DbOrder.desc).toUpperCase()}
+    LIMIT $/limit/
+    OFFSET $/offset/
+    `
+}
+
+export const fetchUserSurveys = (
+  {
+    user,
+    draft = false,
+    template = false,
+    offset = 0,
+    limit = null,
+    lang, // survey label preferred language
+    search: searchParam = null,
+    sortBy = Survey.sortableKeys.dateModified,
+    sortOrder = 'DESC',
+    includeOwnerEmailAddress = false,
+    onlyOwn = false,
+  }: {
+    user: ArenaUser
+    draft?: boolean
+    template?: boolean
+    offset?: number
+    limit?: number | null
+    lang?: string
+    search?: string | null
+    sortBy?: string | null
+    sortOrder?: string | null
+    includeOwnerEmailAddress?: boolean
+    onlyOwn?: boolean
+  },
+  client: DbClient = db
+) => {
+  const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
+
+  return client.map(
+    _getSurveysSelectQuery({
+      user,
+      draft,
+      template,
+      search,
+      sortBy,
+      sortOrder,
+      includeOwnerEmailAddress,
+      onlyOwn,
+    }),
+    {
+      userUuid: User.getUuid(user),
+      template,
+      search,
+      lang,
+      limit: normalizeLimit(limit),
+      offset: normalizeOffset(offset),
+    },
+    (def) => DB.transformCallback(def, true)
+  )
+}
+
+export const countUserSurveys = (
+  {
+    user,
+    draft = false,
+    template = false,
+    search: searchParam = null,
+    lang = null,
+    onlyOwn = false,
+  }: { user: ArenaUser; draft?: boolean; template?: boolean; search?: string | null; lang?: string; onlyOwn?: boolean },
+  client: DbClient = db
+) => {
+  const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
+
+  return client.one(
+    `
+    SELECT COUNT(*)
+    FROM (${_getSurveysSelectQuery({ user, draft, template, search, onlyOwn })}) AS s`,
+    { search, template, lang, limit: null, offset: 0, userUuid: User.getUuid(user) },
+    (row) => Number(row.count)
+  )
+}
+
+export const countOwnedSurveys = ({ user }: { user: ArenaUser }, client: DbClient = db) =>
+  client.one(
+    `
+    SELECT COUNT(*)
+    FROM survey s
+    WHERE s.owner_uuid = $1
+    `,
+    [User.getUuid(user)],
+    (row) => Number(row.count)
+  )
+
+export const fetchSurveysByName = (surveyName: string, client: DbClient = db) =>
+  client.map(
+    `SELECT ${_getSurveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
+    [surveyName],
+    (def) => DB.transformCallback(def)
+  )
+
+export const fetchSurveyIdsAndNames = (client: DbClient = db) =>
+  client.map(
+    `SELECT 
+      id, 
+      published,
+      props->>'${Survey.infoKeys.name}' AS name, 
+      props->>'${Survey.infoKeys.collectUri}' AS collect_uri
+    FROM survey 
+    WHERE 
+      props->>'${Survey.infoKeys.name}' IS NOT NULL
+    UNION
+    SELECT 
+      id, 
+      published,
+      props_draft->>'${Survey.infoKeys.name}' AS name, 
+      props_draft->>'${Survey.infoKeys.collectUri}' AS collect_uri
+    FROM survey 
+    WHERE 
+      props_draft->>'${Survey.infoKeys.name}' IS NOT NULL`,
+    [],
+    camelize
+  )
+
+/**
+ * Fetches the id and app version of every survey, most recently modified first.
+ * Used to prioritize the startup data migration: surveys ordered this way have their more
+ * recently active (and therefore more likely to be opened again soon) surveys migrated first,
+ * reducing the window in which any given survey is temporarily unavailable while migrating.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
+ */
+export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
+  client.map('SELECT id, app_version FROM survey ORDER BY date_modified DESC', [], camelize)
+
+/**
+ * Fetches the app version a survey was last migrated to.
+ * @param {!number} surveyId - The survey ID.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<{ appVersion: string|null }|null>} - The app version, or null if the survey doesn't exist.
+ */
+export const fetchSurveyAppVersionById = (surveyId: number, client: DbClient = db) =>
+  client.oneOrNone('SELECT app_version FROM survey WHERE id = $1', [surveyId], camelize)
+
+/**
+ * Fetches a survey by id.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey ID.
+ * @param {boolean} [params.draft] - Whether to fetch the draft props.
+ * @param {boolean} [params.backup] - Whether to fetch both draft and published props.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<import('@openforis/arena-core').ArenaSurvey>} - The survey.
+ */
+export const fetchSurveyById = (
+  { surveyId, draft = false, backup = false }: { surveyId: number; draft?: boolean; backup?: boolean },
+  client: DbClient = db
+) =>
+  client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
+    DB.transformCallback(def, draft, false, backup)
+  )
+
+export const fetchDependencies = (surveyId: number, client: DbClient = db) =>
+  client.oneOrNone(
+    "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
+    [surveyId],
+    A.prop('dependencies')
+  )
+
+export const fetchFilesTotalSpace = (surveyId: number, client: DbClient = db) =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.filesTotalSpace}}' AS value
+     FROM survey 
+     WHERE id = $1`,
+    [surveyId],
+    A.prop('value')
+  )
+
+/**
+ * Fetches the raw AI policy stored in the survey configuration (one-column select by primary key).
+ * @param {number} surveyId - The survey id.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<object|null>} The stored value (untrusted JSON), or null when not set.
+ */
+export const fetchSurveyAiPolicy = (surveyId: number, client: DbClient = db): Promise<unknown> =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.aiPolicy}}' AS value
+     FROM survey
+     WHERE id = $1`,
+    [surveyId],
+    (row: { value?: unknown } | null) => row?.value ?? null
+  )
+
+export const fetchTemporarySurveyIds = (
+  { olderThan24Hours = false }: { olderThan24Hours?: boolean } = {},
+  client: DbClient = db
+) =>
+  client.map(
+    `SELECT id 
+     FROM survey 
+     WHERE (props || props_draft) ->> 'temporary' = 'true'
+     ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
+    `,
+    [],
+    A.prop('id')
+  )
+
+// ============== UPDATE
+/**
+ * Marks the survey as draft (it has unpublished changes).
+ * @param {number} surveyId - The survey ID.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const markSurveyDraft = (surveyId: number, client: DbClient = db) =>
+  client.none(`UPDATE survey SET draft = true, date_modified = ${dbNow} WHERE id = $1`, [surveyId])
+
+export const updateSurveyProp = (surveyId: number, key: string, value: unknown, client: DbClient = db) => {
+  const prop = { [key]: value }
+
+  return client.one(
+    `
+    UPDATE survey
+    SET props_draft = props_draft || $1,
+    draft = true
+    WHERE id = $2
+    RETURNING ${_getSurveySelectFields()}
+  `,
+    [JSON.stringify(prop), surveyId],
+    (def) => DB.transformCallback(def, true)
+  )
+}
+
+export const updateSurveyOwner = (
+  { surveyId, ownerUuid }: { surveyId: number; ownerUuid: string },
+  client: DbClient = db
+) =>
+  client.none(
+    `UPDATE survey 
+    SET owner_uuid = $/ownerUuid/
+    WHERE id = $/surveyId/`,
+    { surveyId, ownerUuid }
+  )
+
+/**
+ * Updates the app version associated to the specified survey.
+ * @param {object} params - The update parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.version - The app version to associate to the survey.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const updateSurveyAppVersion = (
+  { surveyId, version }: { surveyId: number; version: string },
+  client: DbClient = db
+) =>
+  client.none(
+    `UPDATE survey
+    SET app_version = $/version/
+    WHERE id = $/surveyId/`,
+    { surveyId, version }
+  )
+
+export const publishSurveyProps = (surveyId: number, client: DbClient = db) =>
+  client.none(
+    `
+    UPDATE
+        survey
+    SET
+        props = props || props_draft,
+        props_draft = '{}'::jsonb,
+        draft = false,
+        published = true,
+        date_published = ${DB.now}
+    WHERE
+        id = $1
+    `,
+    [surveyId]
+  )
+
+export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
+  client.none(
+    `
+  UPDATE
+      survey
+  SET
+      props_draft = props || props_draft,
+      props = '{}'::jsonb,
+      draft = true,
+      published = false,
+      date_published = null
+  WHERE
+      id = $1
+  `,
+    [surveyId]
+  )
+
+export const updateSurveyDependencyGraphs = (
+  surveyId: number,
+  dependencyGraphs: ArenaSurveyDependencyGraph,
+  client: DbClient = db
+) => {
+  const meta = {
+    dependencyGraphs,
+  }
+  return client.one(
+    `
+    UPDATE survey
+    SET meta = meta || $1::jsonb
+    WHERE id = $2
+    RETURNING ${_getSurveySelectFields()}
+    `,
+    [meta, surveyId]
+  )
+}
+
+export const removeSurveyTemporaryFlag = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
+  client.none(
+    `
+    UPDATE survey 
+    SET 
+       props = props - 'temporary',
+       props_draft = props_draft - 'temporary'
+    WHERE id = $1
+    `,
+    [surveyId]
+  )
+
+export const updateSurveyConfigurationProp = (
+  { surveyId, key, value }: { surveyId: number; key: string; value: unknown },
+  client: DbClient = db
+) =>
+  client.none(
+    `UPDATE survey
+    SET config = jsonb_set(coalesce(config, '{}'), $/path/::text[], $/value/)
+    WHERE id = $/surveyId/`,
+    { surveyId, path: [key], value }
+  )
+
+// removes only one key: the other keys (e.g. mapCustomLayers) must survive
+export const deleteSurveyConfigurationProp = (
+  { surveyId, key }: { surveyId: number; key: string },
+  client: DbClient = db
+) => client.none(`UPDATE survey SET config = config - $/key/::text WHERE id = $/surveyId/`, { surveyId, key })
+
+// ============== DELETE
+// the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,
+// otherwise the whole delete transaction (dropping the survey schemas) would be rolled back
+export const deleteSurvey = (id: number, client: DbClient = db) =>
+  client.oneOrNone('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
+
+export const deleteSurveyLabelsAndDescriptions = async (id: number, langCodes: string[], client: DbClient = db) => {
+  // one "#-" operator per path, with the path passed as a parameter
+  const params = newQueryParams([id])
+  const propsUpdateCond = langCodes
+    .flatMap((langCode) => [
+      `#- ${params.add([NodeDef.propKeys.labels, langCode])}::text[]`,
+      `#- ${params.add([NodeDef.propKeys.descriptions, langCode])}::text[]`,
+    ])
+    .join(' ')
+
+  await client.none(
+    `
+    UPDATE survey
+    SET props = props ${propsUpdateCond}
+    WHERE id = $1
+  `,
+    params.values
+  )
+}
+
+export const dropSurveySchema = (id: number, client: DbClient = db) =>
+  client.query(`DROP SCHEMA IF EXISTS ${Schemata.getSchemaSurvey(id)} CASCADE`)

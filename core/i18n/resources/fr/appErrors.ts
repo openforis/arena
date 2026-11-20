@@ -1,0 +1,256 @@
+export default {
+  authProvider: {
+    notFound: 'Fournisseur de connexion introuvable',
+    readOnly: 'Ce fournisseur est défini dans la configuration du serveur et ne peut pas être modifié ici',
+    idAlreadyUsed: "L'identifiant « {{id}} » est déjà utilisé par un autre fournisseur",
+    encryptionKeyMissing:
+      "La clé de chiffrement des secrets client (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY) n'est pas configurée",
+    validation: 'Certains champs ne sont pas valides',
+    iconInvalid: 'Icône non valide : utilisez un fichier PNG ou SVG de 100 Ko au maximum',
+    identityNotFound: 'Compte lié introuvable',
+    lastSignInMethod:
+      "C'est la dernière méthode de connexion : définissez d'abord un mot de passe ou liez un autre fournisseur",
+    idInvalid:
+      'Identifiant non valide : utilisez des lettres minuscules, des chiffres et des tirets (64 caractères au maximum)',
+    typeInvalid: 'Type de fournisseur non valide',
+    labelInvalid: 'Le libellé du bouton est obligatoire (64 caractères au maximum)',
+    issuerInvalid: "URL de l'émetteur non valide (https est requis)",
+    tenantInvalid: 'Locataire non valide',
+    clientIdRequired: "L'ID client est obligatoire",
+    scopesMissingOpenid: 'Les portées doivent inclure « openid »',
+    emailDomainInvalid: 'Domaine e-mail non valide',
+    clientSecretRequired: 'Le secret client est obligatoire',
+  },
+  mapCustomLayers: {
+    urlInvalid: 'L’URL du service n’est pas valide',
+    urlNotAllowed: 'Seules les adresses http et https publiques peuvent être utilisées',
+    hostNotFound: 'Hôte introuvable : {{host}}',
+    redirectNotFollowed: 'Le service redirige vers {{location}} : utilisez plutôt cette URL',
+    responseTooLarge: 'La réponse du service dépasse {{limitMb}} Mo',
+    timeout: 'Le service n’a pas répondu en {{seconds}} secondes',
+    fetchFailed: 'Le service a répondu avec le statut HTTP {{status}}',
+    unreachable: 'Le service est injoignable',
+    notCapabilities: 'Aucune capabilities WMS ou WMTS trouvée à cette URL',
+    noLayers: 'Le service n’a aucune couche affichable',
+    invalidLayers: 'Les couches cartographiques ne sont pas valides',
+    tooManyLayers: 'Au plus {{max}} couches cartographiques personnalisées peuvent être ajoutées',
+    busy: 'Le serveur est occupé à charger d’autres services : réessayez dans un instant',
+  },
+  aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
+  aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
+  aiAssistantNoAnswer: "L'assistant s'est arrêté sans rédiger de réponse. Réessayez ou posez une question plus ciblée.",
+  aiAssistantContextFull:
+    "Le contexte du modèle s'est rempli avant que l'assistant puisse répondre. Démarrez une nouvelle conversation, posez une question plus ciblée ou utilisez un modèle avec un contexte plus grand.",
+  aiAssistantToolCallText:
+    "Le modèle a écrit un appel d'outil sous forme de texte au lieu d'appeler l'outil. Réessayez ou utilisez un modèle plus grand.",
+  aiLocalServerUnreachable:
+    "Le serveur d'IA à l'adresse {{baseUrl}} est injoignable. Est-il démarré, avec CORS activé ? Le navigateur a-t-il bloqué l'accès aux appareils du réseau local ?",
+  aiLocalServerModelMissing:
+    "Le modèle « {{modelId}} » n'est pas disponible sur le serveur d'IA local. Chargez-le dans LM Studio ou choisissez un autre modèle dans vos paramètres d'IA.",
+  aiLocalServerContextExceeded:
+    'La requête est trop longue pour la taille de contexte du modèle local. Chargez le modèle avec un contexte plus grand dans LM Studio ou raccourcissez la requête.',
+  aiLocalServerError: "Le serveur d'IA local a renvoyé une erreur (HTTP {{status}}).",
+  aiNoEngineAvailable: "Aucun moteur d'IA ne peut être utilisé pour cette requête.",
+  aiLocalServerConsentCancelled: 'La requête a été annulée.',
+  aiProviderChooseAnother: "La requête n'a pas été envoyée. Choisissez un autre fournisseur d'IA.",
+  aiDataQueryInvalid: "L'IA n'a pas pu générer une requête valide pour cette demande : {{errors}}",
+  aiDataQueryNoEntities: 'Ce formulaire ne contient aucune entité pouvant être interrogée.',
+  aiDataQuerySummaryInvalid:
+    "L'IA n'a pas pu suggérer un nom et une description pour cette requête. Veuillez réessayer.",
+  aiApplyTimeout:
+    "Le serveur n'a pas répondu à temps. Certaines modifications ont peut-être été appliquées : rechargez pour vérifier.",
+  userCannotDeleteHasMessages:
+    "Cet utilisateur ne peut pas être supprimé : il est l'auteur de {{count}} message(s) ; supprimez-les ou réattribuez-les d'abord",
+  userCannotDeleteLastSystemAdmin:
+    'Cet utilisateur ne peut pas être supprimé : il est le dernier administrateur système',
+  userCannotDeleteOwnsSurveys:
+    "Cet utilisateur ne peut pas être supprimé : il est propriétaire de {{count}} formulaire(s) ; transférez-en d'abord la propriété",
+  userCannotDeleteSelf: 'Vous ne pouvez pas supprimer votre propre compte utilisateur',
+  userEmailInvalid:
+    "L'e-mail d'invitation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
+  aggregateFunctionInvalid: `La fonction d'agrégation personnalisée "{{name}}" n'est pas valide : modifiez-la pour la corriger`,
+  cannotGetChild: `Impossible d'obtenir l'enfant '{{childName}}' depuis l'attribut {{name}}`,
+  cannotImportFilesExceedingQuota:
+    "Impossible d'importer les fichiers d'enregistrement : le quota de stockage serait dépassé",
+  cannotInsertFileExceedingQuota: "Impossible d'insérer le fichier : le quota de stockage serait dépassé",
+  cannotOverridePublishedTaxa: "Impossible d'écraser les taxons publiés",
+  cantUpdateStep: `Impossible de mettre à jour l'étape`,
+  categoryItemLabelsInvalid: 'Requête de libellés de catégories invalide ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Cette catégorie est trop grande pour vérifier les libellés manquants ; réessayez plus tard ou utilisez une catégorie plus petite.',
+  chainCannotBeSaved: 'La chaîne est invalide et ne peut pas être sauvegardée',
+  csv: {
+    emptyHeaderFound: 'En-tête vide trouvé à la colonne {{columnPosition}}',
+    emptyHeaders: 'En-têtes vides trouvés',
+  },
+  dataExport: {
+    excelMaxCellsLimitExceeded:
+      "Erreur lors de l'export des données (trop d'éléments). Essayez d'exporter en format CSV.",
+    noRecordsMatchingSearchCriteria: 'Aucun enregistrement ne correspond aux critères de recherche',
+  },
+  dataImport: {
+    importFromMobileNotAllawed: "L'importation de données depuis Arena Mobile n'est pas autorisée",
+    invalidNodeInRecord:
+      'Nœud invalide dans l\'enregistrement "{{recordUuid}}", nœud "{{nodeUuid}}" avec la définition de nœud "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
+    noRecordsFound: "Aucun enregistrement trouvé dans le fichier d'importation ou format de fichier incorrect",
+    pendingImportFileNotFoundOrExpired:
+      'Le fichier précédemment téléchargé est introuvable ; il a peut-être expiré. Veuillez le télécharger à nouveau.',
+    recordMergeWithSameKeysNotAllowed:
+      'Impossible d’importer l’enregistrement "{{recordKeyValues}}" : un autre enregistrement avec les mêmes clés existe déjà et la fusion des enregistrements avec les mêmes clés n’est pas autorisée dans cette enquête',
+    recordOfAnotherUserGroup:
+      'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre groupe d’utilisateurs',
+    recordOwnedByAnotherUser:
+      'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre utilisateur',
+  },
+  entryDataNotFound: "Données d'entrée non trouvées : {{entryName}}",
+  expression: {
+    identifierNotFound: '$t(expression.identifierNotFound)',
+    undefinedFunction: '$t(expression.undefinedFunction)',
+  },
+  forbidden: "Vous n'êtes pas autorisé à effectuer cette action.",
+  functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
+  functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
+  generic: 'Erreur inattendue : {{text}}',
+  unexpectedServerError: "Une erreur inattendue s'est produite sur le serveur.",
+  geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
+  geoWhispSamplingPointDataCategoryMissing: "Catégorie de données de points d'échantillonnage introuvable.",
+  geoWhispSamplingPointDataLocationsMissing:
+    "Aucun élément de données de points d'échantillonnage avec une localisation valide n'a été trouvé.",
+  importingDataIntoWrongCollectSurvey:
+    'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
+  invalidParams: 'Paramètres de requête invalides.',
+  invalidType: 'Type invalide {{type}}',
+  jobCanceledOrErrorsFound: 'Tâche annulée ou erreurs trouvées ; annulation de la transaction',
+  jobOrphanedOnRestart: 'La tâche a été interrompue par un redémarrage du serveur. Veuillez réessayer.',
+  mobileAppVersionNotSupported:
+    "Cette version d'Arena Mobile n'est pas prise en charge par le serveur : mettez-la à jour vers la version {{minVersion}} ou ultérieure",
+  paramIsRequired: 'Le paramètre {{param}} est requis',
+  paramMustBeInteger: 'Le paramètre {{param}} doit être un nombre entier',
+  propUpdateNotAllowed: 'La propriété "{{key}}" ne peut pas être modifiée',
+  unableToFindParent: 'Impossible de trouver le parent de {{name}}',
+  unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',
+  unableToFindSibling: 'Impossible de trouver le sibling avec le nom {{name}}',
+  undefinedFunction: `Fonction '{{fnName}}' non définie ou types de paramètres incorrects`,
+  invalidSyntax: "La syntaxe de l'expression est invalide",
+  networkError: 'Erreur de communication avec le serveur',
+  nodeDefConversionNotAllowed: `'{{name}}' ne peut pas être converti en {{toType}}`,
+  nodeDefTypeInvalid: 'Type de définition de nœud non valide : {{type}}',
+  record: {
+    errorUpdating: "Erreur lors de la mise à jour de l'enregistrement",
+    entityNotFound: 'Entité "{{entityName}}" avec les clés "{{keyValues}}" introuvable',
+    updateSelfAndDependentsDefaultValues:
+      "$t(appErrors:record.errorUpdating) ; erreur lors de l'évaluation de l'expression dans le nœud {{nodeDefName}} : {{details}}",
+    lockTimeout: "L'enregistrement est occupé ; réessayez dans quelques secondes.",
+    nodeNotInRecord: "Le nœud n'appartient pas à l'enregistrement {{recordUuid}}.",
+    nodesBatchInvalid: 'Requête de modification groupée invalide ({{reason}}).',
+    nodesBatchBusy: 'Une autre modification groupée est en cours ; réessayez dans quelques secondes.',
+    nodesBatchInvalidValue: "La nouvelle valeur de « {{attributeName}} » n'est pas valide pour cet attribut.",
+    nodesBatchWouldClearValues:
+      "Cette modification effacerait d'autres valeurs qui ne sont plus applicables ; modifiez cette valeur dans le formulaire pour confirmer.",
+    nodesBatchUnexpected: "La modification n'a pas pu être appliquée à cause d'une erreur inattendue du serveur.",
+    nodesBatchRolledBack:
+      "La modification n'a pas été appliquée car une autre modification du même enregistrement a échoué.",
+  },
+  recordPrintableExport: {
+    missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",
+    entityNotFound: "Entité introuvable pour l'export spécifié",
+    missingServerUrl: "L'URL publique du serveur est requise lors de l'export avec un code QR",
+    qrTokenMismatch: "Impossible de finaliser l'export avec code QR ; veuillez réessayer",
+  },
+  sessionExpiredRefreshPage: `La session a peut-être expiré.
+Essayez de rafraîchir la page.`,
+  survey: {
+    nodeDefNameNotFound: 'Définition de nœud introuvable : {{name}}',
+    dataMigrationInProgress: 'Ce formulaire est en cours de mise à niveau ; veuillez réessayer sous peu.',
+    fileNotFound: 'Fichier introuvable',
+    nodeDefRefLocked: '{{name}} ne peut pas changer de catégorie ni de taxonomie : il est publié.',
+    languageCodeInvalid: "Le code de langue n'est pas valide : {{lang}}",
+    cycleKeysInvalid: 'Les cycles doivent être numérotés de façon consécutive, à partir de 1',
+    srsCodeInvalid: "Le code du système de référence spatiale n'est pas valide : {{code}}",
+  },
+  unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
+  aiSessionExpired: 'Votre session a expiré. Veuillez vous reconnecter.',
+  aiNotAuthorized: "Vous n'êtes pas autorisé à utiliser cette fonction IA ici.",
+  aiNotConfigured:
+    "L'IA n'est pas configurée. Définissez un fournisseur personnel dans les paramètres IA ou demandez à votre administrateur de configurer un fournisseur par défaut.",
+  aiPolicyRefused:
+    "La politique d'IA de ce formulaire ne permet pas d'envoyer $t(common:aiPolicy.dataClass.{{dataClass}}) vers $t(common:aiPolicy.hostingClass.{{hostingClass}}).",
+  aiPolicyDataAboveSchema:
+    'Les données des enregistrements ne peuvent pas être plus permissives que la conception du formulaire (conception : « $t(common:aiPolicy.level.{{schema}}) », données : « $t(common:aiPolicy.level.{{data}}) »).',
+  aiPolicyInvalid:
+    "La politique d'IA n'est pas valide : choisissez un niveau pour la conception du formulaire et un pour les données des enregistrements.",
+  aiPolicyAboveCeiling:
+    "« $t(common:aiPolicy.level.{{level}}) » n'est pas autorisé pour $t(common:aiPolicy.dataClass.{{dataClass}}) sur cette instance d'Arena (maximum : « $t(common:aiPolicy.level.{{ceiling}}) »).",
+  aiFeaturesDisabled: 'Les fonctionnalités IA sont désactivées sur ce déploiement.',
+  aiFeatureDisabled: 'La fonctionnalité IA "{{feature}}" est désactivée.',
+  aiPromptTooLarge: 'Le prompt IA est trop volumineux ({{size}} caractères ; limite {{limit}}).',
+  aiInputTooLong: 'Le champ de saisie IA "{{field}}" dépasse la limite de {{limit}} caractères.',
+  aiFeatureUnknown: 'Fonction IA inconnue « {{feature}} ».',
+  aiCallInvalid: "La requête IA n'est pas valide ({{reason}}).",
+  aiRateLimited: 'Trop de requêtes IA. Patientez une minute puis réessayez.',
+  aiDailyBudgetExceeded:
+    "Vous avez atteint la limite du jour du fournisseur IA par défaut d'Arena. Elle est réinitialisée à minuit UTC. Vous pouvez continuer avec votre propre fournisseur dans les paramètres IA.",
+  aiRequestTimeout: "L'IA a mis trop de temps à répondre. Veuillez réessayer.",
+  aiToolNotOffered:
+    "L'IA a demandé un outil qu'elle n'avait pas le droit d'utiliser ; sa réponse a été écartée. Veuillez réessayer.",
+  aiProviderAuth:
+    "Le fournisseur d'IA a refusé les identifiants. Vérifiez la clé API dans les paramètres IA ou contactez votre administrateur.",
+  aiProviderRateLimited: "Le fournisseur d'IA limite les requêtes. Réessayez dans un instant.",
+  aiProviderRejected: "Le fournisseur d'IA a refusé la requête (vérifiez le nom du modèle dans les paramètres IA).",
+  aiDataDictionaryInvalid: "L'IA n'a pas renvoyé de descriptions de champs exploitables.",
+  aiDescriptionsInvalid: "Les descriptions de champs de l'IA envoyées avec l'export ne sont pas valides.",
+  aiIncludeAiDescriptionsRemoved: "Cette page n'est plus à jour. Rechargez-la et exportez à nouveau.",
+  aiProviderInvalid: 'Fournisseur IA non pris en charge : {{provider}}.',
+  aiModelMissing: "L'identifiant du modèle IA est requis.",
+  aiApiKeyMissing: 'Une clé API est requise pour le fournisseur {{provider}}.',
+  aiBaseUrlMissing: 'Une URL de base est requise pour le fournisseur compatible OpenAI.',
+  aiBaseUrlNotAllowed:
+    "Cette URL de base pointe vers une adresse interne, que le serveur Arena n'appelle pas. Pour un modèle sur votre ordinateur, utilisez le Serveur d'IA local. Pour un serveur de votre organisation, demandez à votre administrateur de l'ajouter aux serveurs de modèles de l'organisation.",
+  aiProviderUnavailable: "Le fournisseur d'IA est injoignable. Veuillez réessayer plus tard.",
+  aiProviderResponseTooLarge:
+    'Le fournisseur IA a envoyé une réponse trop volumineuse, qui a été interrompue. Veuillez réessayer ou choisir un autre fournisseur.',
+  aiSurveyChanged:
+    "L'enquête a changé pendant que l'assistant travaillait. Posez à nouveau votre question pour utiliser l'enquête actuelle.",
+  aiModelListFailed: 'Impossible de lister les modèles du fournisseur.',
+  aiProviderNotFound: "Ce fournisseur d'IA n'existe pas ou ne vous appartient pas. Choisissez un autre fournisseur.",
+  aiProviderNotGateway:
+    'Un fournisseur enregistré dans ce navigateur est appelé depuis le navigateur, jamais via le serveur Arena.',
+  aiApiKeyUnreadable:
+    'La clé API enregistrée de ce fournisseur ne peut plus être lue (le secret de chiffrement du serveur a changé). Modifiez le fournisseur dans vos paramètres IA et saisissez de nouveau la clé.',
+  aiEncryptionMissing:
+    "Les clés API ne peuvent pas être enregistrées : le serveur n'a pas de secret de chiffrement. Demandez à votre administrateur de définir AI_USER_KEY_ENCRYPTION_SECRET.",
+  aiProviderChanged:
+    "Ce fournisseur d'IA a été modifié ou supprimé pendant sa vérification. Rechargez les paramètres d'IA et réessayez.",
+  aiProviderFieldTooLong:
+    'Une valeur du fournisseur est trop longue : $t(appErrors:aiProviderFieldNames.{{field}}) peut avoir {{max}} caractères au plus.',
+  aiProviderFieldNames: { model: 'Modèle', baseUrl: 'URL de base', apiKey: 'Clé API' },
+  aiProviderLimitReached:
+    "Vous pouvez enregistrer au plus {{max}} fournisseurs d'IA. Supprimez-en un pour en ajouter un autre.",
+  aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
+  aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
+  aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',
+  aiExpressionNodeDefNotFound: 'Champ cible introuvable (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: "Impossible d'expliquer une expression vide.",
+  aiTranslationSourceLangMissing: 'La langue source est requise pour la traduction.',
+  aiTranslationTargetLangsMissing: 'Au moins une langue cible est requise pour la traduction.',
+  aiTranslationItemsMissing: 'Rien à traduire.',
+  aiTranslationInvalid: "L'IA n'a pas renvoyé de traduction exploitable. Veuillez réessayer.",
+  aiTranslationTooManyItems: "Trop d'éléments dans un seul lot ({{count}}) ; la limite est de {{limit}}.",
+  userHasPendingInvitation: `Il existe déjà une invitation en attente pour l'utilisateur avec l'email '{{email}}' ; il/elle ne peut pas être invité(e) à ce formulaire jusqu'à ce qu'elle soit acceptée`,
+  userHasRole: "L'utilisateur a déjà un rôle dans ce formulaire",
+  userHasRole_other: 'Les utilisateurs ont déjà un rôle dans ce formulaire',
+  userInvalid: 'Utilisateur invalide',
+  userInvitationLinkNotAvailable:
+    "Seul un administrateur système peut copier le lien d'invitation de cet utilisateur, car l'utilisateur a des rôles ou des invitations en dehors de ce formulaire",
+  surveyCompareFileTooLarge:
+    'Le fichier du formulaire est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
+  userIsAdmin: "L'utilisateur est déjà administrateur système",
+  userNotAllowedToChangePref: 'Utilisateur non autorisé à modifier les préférences',
+  userPrefsInvalid: "Les préférences de l'utilisateur ne sont pas valides",
+  userNotAuthorized: 'Utilisateur {{userName}} non autorisé',
+  userNotFound: 'Utilisateur introuvable : {{userUuid}}',
+  userNotInvitedToSurvey: "L'utilisateur n'a aucune invitation en attente pour ce formulaire",
+  usersBackupImport: {
+    invalidFile: "Le fichier n'est pas une sauvegarde d'utilisateurs Arena valide",
+  },
+}

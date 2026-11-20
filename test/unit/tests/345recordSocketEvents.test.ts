@@ -9,7 +9,7 @@ import {
 } from '@server/modules/record/service/update/recordSocketEvents'
 
 describe('record socket events shared by the records update thread and the batch processor (345)', () => {
-  const record = { uuid: 'record-uuid', nodes: {} }
+  const record = { uuid: 'record-uuid', nodes: {}, ownerName: 'owner', ownerUuid: 'owner-uuid', step: '1' }
 
   test('the nodesUpdate event carries the record and the updated nodes', () => {
     const updatedNodes = { n1: { uuid: 'n1' } }

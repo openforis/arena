@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Dates } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode } from '@openforis/arena-core'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Node from '@core/record/node'
@@ -46,7 +47,7 @@ export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({
  */
 export const createRecordFetcher =
   ({ surveyId }: { surveyId: number }) =>
-  async (recordUuid: string): Promise<unknown> =>
+  async (recordUuid: string): Promise<ArenaRecord | null> =>
     API.fetchRecordAndNodes({ surveyId, recordUuid, errorHandledLocally: true })
 
 /**
@@ -74,7 +75,7 @@ export const createRecordCheckOut =
  */
 export const createNodeDeleter =
   ({ surveyId, lang, fallbackCycle }: { surveyId: number; lang: string; fallbackCycle: string }) =>
-  async ({ record, nodeUuid }: { record: unknown; nodeUuid: string }): Promise<void> => {
+  async ({ record, nodeUuid }: { record: ArenaRecord; nodeUuid: string }): Promise<void> => {
     await axios.delete(`/api/survey/${surveyId}/record/${Record.getUuid(record)}/node/${nodeUuid}`, {
       data: {
         cycle: Record.getCycle(record) ?? fallbackCycle,
@@ -103,8 +104,8 @@ export const createNodePoster =
     blob,
     fileName,
   }: {
-    record: unknown
-    node: unknown
+    record: ArenaRecord
+    node: ArenaRecordNode
     blob?: Blob | null
     fileName?: string
   }) => {

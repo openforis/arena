@@ -97,8 +97,8 @@ const FormHeader = (props) => {
         <FormEntryActions
           disableLockUnlock={disableLockUnlock}
           disableValidationReport={disableValidationReport}
-          preview={preview}
           entry={entry}
+          preview={preview}
         />
       )}
     </div>

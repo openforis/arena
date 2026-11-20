@@ -17,7 +17,6 @@ import ValidationTooltip from '../validationTooltip'
 const Checkbox = (props) => {
   const {
     alignWithLabelledControls = false,
-    allowClickEventBubbling = false,
     className,
     checked = false,
     controlStyle = null,
@@ -39,12 +38,10 @@ const Checkbox = (props) => {
 
   const onChange = useCallback(
     (event) => {
-      if (!allowClickEventBubbling) {
-        event.stopPropagation()
-      }
+      event.stopPropagation()
       onChangeProp?.(!checked, event)
     },
-    [allowClickEventBubbling, onChangeProp, checked]
+    [onChangeProp, checked]
   )
 
   const control = radio ? (
@@ -94,7 +91,6 @@ const Checkbox = (props) => {
 Checkbox.propTypes = {
   // when displayed without label, aligns the checkbox with labelled checkboxes or radio buttons in the same column
   alignWithLabelledControls: PropTypes.bool,
-  allowClickEventBubbling: PropTypes.bool,
   className: PropTypes.string,
   id: PropTypes.string,
   checked: PropTypes.bool,

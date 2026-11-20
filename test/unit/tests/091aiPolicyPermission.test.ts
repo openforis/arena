@@ -1,3 +1,5 @@
+import { SurveyFactory } from '@openforis/arena-core'
+
 import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import * as AuthGroup from '@core/auth/authGroup'
 
@@ -6,7 +8,7 @@ import { createRequireSurveyAiPolicyEditPermission } from '@server/modules/auth/
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const surveyUuid = 'survey-1'
-const surveyInfo = { uuid: surveyUuid }
+const surveyInfo = { ...SurveyFactory.createInstance({ ownerUuid: 'owner-uuid', name: 'survey' }), uuid: surveyUuid }
 
 const userWithGroup = (groupName: string, uuid = 'u-1') =>
   ({ uuid, name: `user ${groupName}`, authGroups: [{ name: groupName, surveyUuid }] }) as any

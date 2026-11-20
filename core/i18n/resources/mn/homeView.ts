@@ -1,0 +1,284 @@
+export default {
+  dashboard: {
+    activeSurveyNotSelected: `<title>Идэвхтэй судалгаа сонгогдоогүй</title>
+      <p><label>Судалгааны жагсаалтаас</label><linkToSurveys>Сонгох</linkToSurveys> эсвэл <linkToNewSurvey>Шинэ судалгаа үүсгэх</linkToNewSurvey></p>`,
+    activeUsers: 'Идэвхтэй хэрэглэгчид',
+    activityLog: {
+      title: 'Үйл ажиллагааны бүртгэл',
+      size: '$t(homeView:dashboard.activityLog.title) хэмжээ: {{size}}',
+      loadError: 'Үйл ажиллагааг ачаалж чадсангүй.',
+      empty: 'Одоогоор үйл ажиллагаа байхгүй.',
+    },
+    exportWithData: 'Экспорт + өгөгдөл (Нөөц)',
+    exportWithDataNoActivityLog: 'Экспорт + өгөгдөл (ҮЙЛ АЖИЛЛАГААНЫ БҮРТГЭЛГҮЙ)',
+    exportWithDataNoResultAttributes: 'Экспорт + өгөгдөл (Үр дүнгийн Атрибут ҮГҮЙ)',
+    surveyPropUpdate: {
+      main: `<title>Аренад тавтай морилно уу</title>
+  
+        <p>Эхлээд та судалгааны <strong>нэр</strong> болон <strong>шошгыг</strong> тохируулах хэрэгтэй.</p>
+        
+        <p><linkWithIcon> $t(homeView:surveyInfo.editInfo)</linkWithIcon> эсвэл судалгааны нэр дээр дарна уу: <basicLink>{{surveyName}}</basicLink></p>
+        `,
+      secondary: `
+        <p>Хэрэв нэр, шошго зөв байвал эхний шинж чанарыг үүсгэнэ үү
+        <linkWithIcon>Судалгаа \u003E Маягтын дизайнер</linkWithIcon>
+        </p>
+        `,
+    },
+    nodeDefCreate: {
+      main: `<title>{{surveyName}}-ийн эхний шинж чанарыг үүсгэцгээе</title>
+        
+        <p> <linkWithIcon>Судалгаа \u003E Маягтын дизайнер</linkWithIcon> руу орно уу</p>
+        <br />
+        `,
+    },
+    storageSummary: {
+      title: 'Хадгалалтын ашиглалт',
+      availableSpace: 'Боломжтой ({{size}})',
+      usedSpace: 'Ашиглагдсан ({{size}})',
+      usedSpaceOutOf: `{{percent}}%-ийг ашигласан (нийт {{total}}-ээс {{used}})`,
+    },
+    storageSummaryDb: {
+      title: 'Хадгалалтын ашиглалт (Өгөгдлийн сан)',
+    },
+    storageSummaryFiles: {
+      title: 'Хадгалалтын ашиглалт (файлууд)',
+    },
+    samplingPointDataCompletion: {
+      title: 'Түүвэрлэлтийн цэгийн өгөгдлийн гүйцэтгэл',
+      totalItems: 'Нийт элемент: {{totalItems}}',
+      remainingItems: 'Үлдсэн элемент',
+    },
+    kpi: {
+      records: 'Бичлэг',
+      contributors: 'Оролцогчид',
+      storage: 'Хадгалалт',
+      expandDetails: 'Дэлгэрэнгүй харуулах',
+      collapseDetails: 'Дэлгэрэнгүйг нуух',
+    },
+    recordsCard: {
+      total: 'Сонгосон хугацаанд нэмэгдсэн бичлэг',
+      byStep: 'Ажлын урсгалын шатаар (бүх хугацаа)',
+    },
+    contributorsCard: {
+      active: 'Сонгосон хугацааны идэвхтэй оролцогчид: {{count}}',
+    },
+    map: {
+      title: 'Газрын зураг',
+      allOwners: 'Бүх эзэмшигчид',
+    },
+    step: {
+      entry: 'Өгөгдөл оруулах',
+      cleansing: 'Өгөгдөл цэвэрлэх',
+      analysis: 'Өгөгдөл шинжилгээ',
+    },
+    // records' summary
+    recordsByUser: 'Хэрэглэгчээр бичлэгүүд',
+    recordsAddedPerUserWithCount: 'Хэрэглэгчээр нэмэгдсэн бичлэгүүд (Нийт {{totalCount}})',
+    dailyRecordsByUser: 'Хэрэглэгчээр өдөр тутмын бичлэгүүд',
+    totalRecords: 'Нийт бичлэг',
+    selectUsers: 'Хэрэглэгч сонгох...',
+    noRecordsAddedInSelectedPeriod: 'Сонгогдсон хугацаанд бичлэг нэмэгдээгүй',
+  },
+  surveyDeleted: 'Судалгаа {{surveyName}} устгагдсан',
+  landing: {
+    openDashboard: 'Хяналтын самбар нээх',
+  },
+  surveyInfo: {
+    basic: 'Үндсэн мэдээлэл',
+    branding: {
+      title: 'Брэнд',
+      primaryColor: 'Үндсэн өнгө',
+      titleFontSize: 'Гарчгийн фонтын хэмжээ',
+      descriptionFontSize: 'Тайлбарын фонтын хэмжээ',
+      fontSizePreset: {
+        small: 'Жижиг',
+        default: 'Өгөгдмөл',
+        large: 'Том',
+      },
+      surveyLogo1: 'Судалгааны лого 1',
+      surveyLogo2: 'Судалгааны лого 2',
+      surveyLogo3: 'Судалгааны лого 3',
+      landingBackground: 'Нүүр хуудасны дэвсгэр зураг',
+      uploadLogo: 'Лого байршуулах',
+      logoFileFormatHint: 'PNG, JPEG, WebP эсвэл SVG (дээд тал нь {{maxMb}} MB)',
+      logoFileTooLarge: 'Логоны зураг {{maxMb}} MB буюу түүнээс бага байх ёстой',
+      preview: 'Урьдчилан харах',
+      backgroundFileTooLarge: 'Дэвсгэр зураг {{maxMb}} MB буюу түүнээс бага байх ёстой',
+      invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
+      invalidSaveBlocked: 'Судалгааны мэдээллийг хадгалахын өмнө брэндийн хүчингүй талбаруудыг засна уу',
+      imageLoadError: '"{{name}}" зургийг ачаалж чадсангүй. Үүнийг устгаад шинээр байршуулна уу.',
+      imageLoadErrorReadOnly: '"{{name}}" зургийг ачаалж чадсангүй',
+      downloadImage: 'Зургийг татахын тулд дарна уу',
+    },
+    configuration: {
+      title: 'Тохиргоо',
+      filesTotalSpace: 'Файлуудын нийт зай (ГБ)',
+    },
+    confirmDeleteCycleHeader: 'Энэ мөчлөгийг устгах уу?',
+    confirmDeleteCycle: `Та мөчлөг {{cycle}}-г устгахдаа итгэлтэй байна уу?\n\n$t(common.cantUndoWarning)\n\n
+Хэрэв энэ мөчлөгтэй холбоотой бичлэгүүд байвал тэдгээр нь устгагдана.`,
+    cycleForArenaMobile: 'Арена Мобайл-д зориулсан мөчлөг',
+    keepNonApplicableValues: `Хамааралгүй шинж чанаруудын утгыг хадгалах`,
+    keepNonApplicableValuesInfo: `Сонгоогүй үед (анхдагч), өгөгдөл оруулах явцад хамааралгүй болсон шинж чанаруудын утгыг (хэрэглэгч баталгаажуулсны дараа) устгана.
+Сонгосон үед шинж чанарууд хамааралгүй болсон ч эдгээр утгыг бичлэгт хадгална.`,
+    deleteActivityLog: 'Үйлдлийн түүхийг цэвэрлэх',
+    deleteActivityLogConfirm: {
+      headerText: 'Энэхүү судалгааны үйлдлийн түүхийн БҮХ өгөгдлийг цэвэрлэх үү?',
+      message: `
+  - **{{surveyName}}** судалгааны үйлдлийн түүхийн БҮХ өгөгдөл устгагдана;\n\n
+  - судалгааны Мэдээллийн санд (DB) эзэлж буй зай багасна;\n\n
+  - энэ нь судалгааны оруулсан өгөгдөлд нөлөөлөхгүй;\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Баталгаажуулахын тулд энэхүү судалгааны нэрийг оруулна уу:',
+    },
+    fieldManualLink: 'Талбайн гарын авлагын холбоос',
+    map: 'Газрын зураг',
+    editInfo: 'Мэдээллийг засах',
+    viewInfo: 'Мэдээллийг харах',
+
+    areasOfInterest: {
+      title: 'Сонирхсон бүсүүд',
+      info: 'geoDistanceToAOIBoundary (бүсийн хил хүртэлх зай) болон geoAOIContaining (байршлыг агуулсан бүс) илэрхийллийн функцүүдэд ашиглах олон өнцөгтүүд (GeoJSON, WGS84 координат), Arena Mobile-д офлайн үед ч ажиллана. Бүсийн нэрийг илэрхийлэлд ашиглана.',
+      name: 'Нэр',
+      polygons: 'Олон өнцөгтүүд',
+      vertices: 'Оройнууд',
+      invalidFile: 'Файлд WGS84 координаттай GeoJSON форматын хүчинтэй олон өнцөгт алга',
+      confirmDelete: 'Энэ сонирхсон бүсийг устгахдаа итгэлтэй байна уу?',
+      showAllOnMap: 'Бүгдийг газрын зураг дээр харуулах',
+      editor: {
+        title: 'Сонирхсон бүс',
+      },
+    },
+
+    preloadedMapLayers: {
+      enabledMessage: 'Урьдчилан ачаалсан газрын зургийн давхаргууд идэвхжсэн',
+      title: 'Урьдчилан ачаалсан газрын зургийн давхаргууд',
+      confirmDelete: 'Энэ урьдчилан ачаалсан газрын зургийн давхаргыг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Урьдчилан ачаалсан газрын зургийн давхарга',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Баримт бичгийн загвар',
+      title: 'Баримт бичгийн зургууд',
+      layoutOptions: {
+        title: 'Загварын тохиргоо',
+        headerOnFirstPageOnly: 'Толгой хэсгийг зөвхөн эхний хуудсанд харуулах',
+        pageNumbering: 'Хуудасны дугаарлалт',
+      },
+      documentPlace: 'Байршил',
+      documentPlaceValues: {
+        header: 'Толгой хэсэг',
+        footer: 'Хөл хэсэг',
+      },
+      applyIf: 'Нөхцөл байвал хэрэглэх',
+      confirmDelete: 'Энэ баримт бичгийн зургийг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Баримт бичгийн зураг',
+      },
+    },
+
+    preferredLanguage: 'Хүссэн хэл',
+    sampleBasedImageInterpretation: 'Дээж дээр суурилсан зураг тайлбарлах',
+    sampleBasedImageInterpretationEnabled: 'Дээж дээр суурилсан зураг тайлбарлах идэвхжсэн',
+    aiPolicy: {
+      title: 'AI бодлого',
+      intro:
+        'Энэ судалгааны агуулгыг AI хаана боловсруулж болохыг сонгоно уу. Энэ бодлого болон энэ Arena суулгацын хязгаараас илүү хатуу нь үйлчилнэ.',
+      schemaLabel: 'Судалгааны бүтэц (схем)',
+      schemaHint: 'Зангилааны тодорхойлолт, шошго, илэрхийлэл.',
+      dataLabel: 'Бичлэгийн өгөгдөл',
+      dataHint: 'Цуглуулсан утга болон хэрэглэгчийн үйл ажиллагаа.',
+      levelHint: {
+        off: 'Энэ агуулгад AI хэзээ ч ашиглагдахгүй.',
+        onDevice: 'Зөвхөн хэрэглэгчийн төхөөрөмж дээр ажилладаг AI хөдөлгүүр боловсруулна.',
+        orgHosted: 'Танай байгууллагын AI сервер боловсруулна.',
+        cloud: 'Үүлэн AI үйлчилгээ үзүүлэгч боловсруулж болно.',
+      },
+      notAllowedOnInstance: 'Энэ Arena суулгацад зөвшөөрөгдөөгүй: {{levels}}',
+      dataLimitedBySchema:
+        'Бичлэгийн өгөгдөл судалгааны бүтцээс илүү зөвшөөрөмтгий байж болохгүй. Боломжгүй: {{levels}}',
+      onDeviceNote: 'Энэ төхөөрөмж дээр: хэрэглэгчдэд дотоод AI сервер (жишээ нь LM Studio) хэрэгтэй.',
+      readOnly: 'Зөвхөн судалгааны администраторууд AI бодлогыг өөрчлөх боломжтой.',
+      saved: 'AI бодлогыг хадгаллаа',
+      savedDataLowered:
+        'AI бодлогыг хадгаллаа. Бичлэгийн өгөгдлийн түвшинг мөн бууруулсан: судалгааны бүтцээс илүү зөвшөөрөмтгий байж болохгүй.',
+      saveError: 'AI бодлогыг хадгалж чадсангүй: {{message}}',
+      loadError: 'AI бодлогыг ачаалж чадсангүй',
+    },
+    security: {
+      title: 'Аюулгүй байдал',
+      publishToApply: 'Эдгээр тохиргооны өөрчлөлт судалгааг нийтэлсний дараа хүчин төгөлдөр болно.',
+      dataEditorViewNotOwnedRecordsAllowed: 'Өгөгдөл засварлагч өөрийн бус бичлэгүүдийг үзэх боломжтой',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Өгөгдөл шинжилэгч өөрийн бус бичлэгүүдийг үзэх боломжтой',
+      visibleInMobile: 'Арена Мобайл-д харагдана',
+      allowRecordsDownloadInMobile: 'Серверээс Арена Мобайл руу бичлэг татахыг зөвшөөрөх',
+      allowRecordsUploadFromMobile: 'Арена Мобайл-аас сервер руу бичлэг байршуулахыг зөвшөөрөх',
+      allowRecordsWithErrorsUploadFromMobile:
+        'Баталгаажуулалтын алдаатай бичлэгийг Арена Мобайл-аас сервер руу байршуулахыг зөвшөөрөх',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Arena Mobile-аас бичлэг байршуулах үед судалгааны админуудад и-мэйлээр мэдэгдэх',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Тэмдэглэсэн үед судалгааны админ бүр Arena Mobile-аас байршуулсан бичлэгүүдийн жагсаалт (түлхүүр утга, үүсгэгч, огноо, баталгаажуулалт, UUID) бүхий и-мэйл хүлээн авна.',
+      formPreviewForDataEntryUsers: 'Өгөгдөл оруулагчдад ноорог (нийтлээгүй) маягтыг урьдчилан харахыг зөвшөөрөх',
+      formPreviewForDataEntryUsersInfo:
+        'Өгөгдөл оруулах боломжтой ч судалгааг засах эрхгүй хэрэглэгчид бичлэгийн жагсаалтад "Маягтыг урьдчилан харах" товчийг харж, нийтлээгүй сүүлийн өөрчлөлтүүдтэй маягтыг турших боломжтой (жишээ нь хэрэглэгчийн хүлээн авах туршилт). Урьдчилан харахад оруулсан өгөгдөл хадгалагдахгүй.',
+      allowRecordsMergeWithSameKeys:
+        'Ижил түлхүүртэй бичлэгүүдийг нэгтгэхийг зөвшөөрөх (жишээ нь, өөр өөр Арена Мобайл төхөөрөмж дээр үүсгэсэн бичлэгүүд)',
+    },
+    srsPlaceholder: 'Код эсвэл шошго бичих',
+    unpublish: 'Нийтлэлээ болих ба өгөгдлийг устгах',
+    unpublishSurveyDialog: {
+      confirmUnpublish: 'Та энэ судалгааг нийтлэлээ болиход итгэлтэй байна уу?',
+      unpublishWarning: `**{{surveyName}}** судалгааг нийтлэлээ болисноор бүх өгөгдөл нь устгагдана.\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Баталгаажуулахын тулд энэ судалгааны нэрийг оруулна уу:',
+    },
+    userExtraProps: {
+      title: 'Хэрэглэгчийн нэмэлт шинж чанарууд',
+      info: `Судалгаатай холбоотой хэрэглэгч бүрд хуваарилж болох нэмэлт шинж чанарууд.
+Эдгээр шинж чанаруудыг үндсэн утгууд, баталгаажуулалтын дүрмүүд болон хэрэглээний илэрхийлэлд ашиглаж болно.
+Жишээ нь: *userProp('property_name') == 'some_value'*`,
+    },
+  },
+  deleteSurveyDialog: {
+    confirmDelete: 'Та энэ судалгааг устгахдаа итгэлтэй байна уу?',
+    deleteWarning: `**{{surveyName}}** судалгааг устгаснаар бүх өгөгдөл нь устгагдана.\n\n
+
+$t(common.cantUndoWarning)`,
+    confirmName: 'Баталгаажуулахын тулд энэ судалгааны нэрийг оруулна уу:',
+  },
+  surveyList: {
+    active: '$t(common.active)',
+    activate: 'Идэвхжүүлэх',
+  },
+  collectImportReport: {
+    excludeResolvedItems: 'Шийдэгдсэн элементүүдийг хасах',
+    expression: 'Илэрхийлэл',
+    resolved: 'Шийдэгдсэн',
+    exprType: {
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
+      codeParent: 'Эх код',
+      defaultValue: 'Үндсэн утга',
+      requiredIf: 'Заавал бөглөх нөхцөл',
+      validationRule: 'Баталгаажуулалтын дүрэм',
+    },
+    title: 'Цуглуулгын импортын тайлан',
+  },
+  recordsSummary: {
+    recordsAddedInTheLast: 'Сүүлийн хугацаанд нэмэгдсэн бичлэгүүд:',
+    fromToPeriod: '{{from}}-аас {{to}} хүртэл',
+    record: '{{count}} Бичлэг',
+    record_other: '{{count}} Бичлэг',
+    week: '{{count}} Долоо хоног',
+    week_other: '{{count}} Долоо хоног',
+    month: '{{count}} Сар',
+    month_other: '{{count}} Сар',
+    year: '{{count}} Жил',
+    year_other: '{{count}} Жил',
+  },
+}

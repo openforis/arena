@@ -1,0 +1,61 @@
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
+import * as ApiRoutes from '@common/apiRoutes'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import DfResults from './dfResults'
+
+import { writeCsv, arenaPutFile, zipr, arenaWaitForJobToComplete, setVar } from '../../rFunctions'
+import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
+
+const persistScriptJobVar = 'persistScriptJob'
+
+const getSendResultsToServerScripts = ({
+  rChain,
+  entity,
+  dfResults,
+}: {
+  rChain: any
+  entity: ArenaNodeDefEntity
+  dfResults: any
+}) => {
+  const { chainUuid, surveyId, cycle, dirResults } = rChain
+  const { name: dfResultName, dfSourceName } = dfResults
+  const scripts = []
+
+  // csv file
+  const fileResults = `${dirResults}/${dfSourceName}.csv`
+  // zip file
+  const fileZip = `${dirResults}/${dfSourceName}.zip`
+  scripts.push(
+    writeCsv(dfResultName, fileResults),
+    zipr(fileZip, fileResults),
+    // put request
+    setVar(
+      persistScriptJobVar,
+      arenaPutFile(
+        ApiRoutes.rChain.entityData({ surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }),
+        fileZip
+      )
+    ),
+    arenaWaitForJobToComplete(persistScriptJobVar)
+  )
+  return scripts
+}
+
+export default class RFilePersistResults extends RFilePersistScriptsGeneric {
+  constructor(rChain) {
+    super(rChain, 'persist-results')
+  }
+
+  async appendPersistScripts() {
+    const { entitiesWithActiveQuantitativeVariables } = this.rChain
+
+    for (const entity of entitiesWithActiveQuantitativeVariables) {
+      const dfResults = new DfResults(this.rChain, entity)
+
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`) // NOSONAR
+      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults })) // NOSONAR
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`) // NOSONAR
+    }
+  }
+}

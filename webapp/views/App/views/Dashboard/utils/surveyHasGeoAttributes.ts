@@ -1,3 +1,4 @@
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
@@ -7,8 +8,8 @@ import * as Survey from '@core/survey/survey'
  * @param {unknown} survey - The survey.
  * @returns {boolean} True if at least one node def is of type geo.
  */
-export const surveyHasGeoAttributes = (survey: unknown): boolean => {
-  const nodeDefs: unknown[] = Survey.getNodeDefsArray(survey) ?? []
+export const surveyHasGeoAttributes = (survey: ArenaSurvey): boolean => {
+  const nodeDefs: ArenaAnyNodeDef[] = Survey.getNodeDefsArray(survey) ?? []
   for (const nodeDef of nodeDefs) {
     if (NodeDef.isGeo(nodeDef)) {
       return true

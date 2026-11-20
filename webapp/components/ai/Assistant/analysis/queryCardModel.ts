@@ -59,7 +59,7 @@ export const buildQueryCardModel = ({
     filter: filter ? Expression.toString(filter, Expression.modes.sql) : null,
     sort: (Query.getSort(query) ?? []).map((criteria: any) => ({
       attribute: SortCriteria.getLabel(criteria) || SortCriteria.getVariable(criteria),
-      order: SortCriteria.getOrder(criteria),
+      order: SortCriteria.isOrderDesc(criteria) ? 'desc' : 'asc',
     })),
     chartType: getQueryChartType({ query, survey }),
   }

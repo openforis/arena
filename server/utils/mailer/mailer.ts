@@ -1,0 +1,105 @@
+import { ArrayUtils } from '@core/arrayUtils'
+import * as ProcessUtils from '@core/processUtils'
+import * as i18nFactory from '@core/i18n/i18nFactory'
+
+import * as Log from '@server/log/log'
+import * as MailerAmazonSES from '@server/utils/mailer/mailerAmazonSES'
+import * as MailerOffice365 from '@server/utils/mailer/mailerOffice365'
+import * as MailerSendgrid from '@server/utils/mailer/mailerSendgrid'
+
+const logger = Log.getLogger('Mailer')
+
+const emailServices = {
+  sendgrid: 'sendgrid',
+  office365: 'office365',
+  amazonSES: 'amazonSES',
+}
+
+const emailService = ProcessUtils.ENV.emailService
+const from = ProcessUtils.ENV.emailFromResolved
+
+type EmailSendResult = { accepted?: string[]; rejected?: string[] }
+
+// functions exported by the email provider modules
+type EmailProvider = {
+  validateEnv: (params: { from: string }) => void
+  init?: () => void
+  logTransportOptionsType?: () => string
+  sendEmail: (params: {
+    to?: string | string[] | null
+    bcc?: string | string[] | null
+    from: string
+    subject: string
+    html: string
+    text?: string | null
+  }) => Promise<unknown>
+}
+
+const emailProviders: Record<string, EmailProvider> = {
+  [emailServices.sendgrid]: MailerSendgrid,
+  [emailServices.office365]: MailerOffice365,
+  [emailServices.amazonSES]: MailerAmazonSES,
+}
+
+const emailProvider = emailProviders[emailService]
+
+if (!emailProvider) {
+  throw new Error(`Invalid email service specified: ${emailService}`)
+}
+
+logger.debug(`using ${emailService} email service`)
+
+if (typeof emailProvider.logTransportOptionsType === 'function') {
+  logger.debug(`using ${emailProvider.logTransportOptionsType()} email transport options`)
+}
+
+emailProvider.validateEnv({ from })
+emailProvider.init?.()
+
+export const sendCustomEmail = async ({
+  to = null,
+  bcc = null,
+  subject,
+  html,
+  log = true,
+}): Promise<EmailSendResult> => {
+  const toRecipients = ArrayUtils.toArray(to)
+  const bccRecipients = ArrayUtils.toArray(bcc)
+  const recipientsCount = toRecipients.length + bccRecipients.length
+  const subjectTruncationLength = 20
+  let logMessageCommonPart = 'message'
+  if (log) {
+    const subjectTruncated =
+      subject?.length > subjectTruncationLength ? subject.substring(0, subjectTruncationLength) + '...' : subject
+    logMessageCommonPart = `email to ${recipientsCount} recipient(s) with subject ${subjectTruncated}`
+  }
+  if (log) {
+    logger.debug(`sending ${logMessageCommonPart}`)
+  }
+  try {
+    const result = await emailProvider.sendEmail({ to, bcc, from, subject, html })
+    if (log) {
+      logger.debug(`sent ${logMessageCommonPart}`)
+    }
+    return (result as EmailSendResult | undefined) ?? { accepted: [...toRecipients, ...bccRecipients], rejected: [] }
+  } catch (error) {
+    logger.error(`error sending ${logMessageCommonPart}: ${error.message}`)
+    throw error
+  }
+}
+
+export const sendEmail = async ({
+  to = null,
+  bcc = null,
+  msgKey,
+  msgParams = {},
+  i18n: i18nParam = null,
+  lang = 'en',
+}) => {
+  const i18n = i18nParam ?? (await i18nFactory.createI18nAsync(lang))
+
+  const subject = i18n.t(`${msgKey}.subject`, msgParams)
+  const html = i18n.t(`${msgKey}.body`, msgParams)
+
+  return sendCustomEmail({ to, bcc, subject, html })
+}

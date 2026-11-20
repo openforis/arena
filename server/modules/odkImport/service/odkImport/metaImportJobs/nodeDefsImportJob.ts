@@ -1,3 +1,4 @@
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -151,7 +152,7 @@ export default class NodeDefsImportJob extends Job {
     parentPath,
     instanceElement,
   }: {
-    parentNodeDef: any
+    parentNodeDef: ArenaNodeDefEntity
     parentPath: string | null
     instanceElement: XmlElement
   }): Promise<any> {
@@ -245,7 +246,7 @@ export default class NodeDefsImportJob extends Job {
     labels,
     categoriesByKey,
   }: {
-    parentNodeDef: any
+    parentNodeDef: ArenaNodeDefEntity
     path: string
     nodeName: string
     bind: XFormBind | null
@@ -369,7 +370,7 @@ export default class NodeDefsImportJob extends Job {
     bodyControl,
     categoryMissing,
   }: {
-    nodeDef: any
+    nodeDef: ArenaAnyNodeDef
     type: string
     path: string
     bodyControl: XFormBodyControl | null
@@ -401,7 +402,7 @@ export default class NodeDefsImportJob extends Job {
     path,
     bind,
   }: {
-    nodeDef: any
+    nodeDef: ArenaAnyNodeDef
     path: string
     bind: XFormBind | null
   }): Promise<any> {
@@ -501,7 +502,7 @@ export default class NodeDefsImportJob extends Job {
     validations,
     convertAndReport,
   }: {
-    nodeDef: any
+    nodeDef: ArenaAnyNodeDef
     requiredRaw: string | null | undefined
     validations: Record<string, any>
     convertAndReport: (params: { itemType: string; expression: string }) => Promise<string | null>

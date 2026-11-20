@@ -1,0 +1,78 @@
+diff --git a/dist/chunk-CUP5Y2ZG.js b/dist/chunk-CUP5Y2ZG.js
+index 23399caefebeefb2038279331382aa20e5932bc1..885a42558bffa4f793fa5eaffa0077ee1a4503fc 100644
+--- a/dist/chunk-CUP5Y2ZG.js
++++ b/dist/chunk-CUP5Y2ZG.js
+@@ -125,6 +125,8 @@ function GridItemInner(props) {
+   } = props;
+   const [dragging, setDragging] = React2.useState(false);
+   const [resizing, setResizing] = React2.useState(false);
++  // patch (upstream #2304): refs alone do not re-render the memoized item between snapped grid steps
++  const [, setInteractionRevision] = React2.useState(0);
+   const elementRef = React2.useRef(null);
+   const dragPositionRef = React2.useRef({ left: 0, top: 0 });
+   const resizePositionRef = React2.useRef({
+@@ -334,6 +336,7 @@ function GridItemInner(props) {
+       }
+       const newPosition = { top, left };
+       dragPositionRef.current = newPosition;
++      setInteractionRevision((revision) => revision + 1);
+       const rawPos = chunkVJJIA3HC_js.calcXYRaw(positionParams, top, left);
+       const { x: newX, y: newY } = chunkQAIA5KAO_js.applyPositionConstraints(
+         constraints,
+@@ -430,6 +433,9 @@ function GridItemInner(props) {
+         };
+       }
+       resizePositionRef.current = updatedSize;
++      if (handlerName === "onResize" && resizing) {
++        setInteractionRevision((revision) => revision + 1);
++      }
+       const containerHeight = node?.offsetParent?.clientHeight ?? 0;
+       const rawSize = chunkVJJIA3HC_js.calcWHRaw(
+         positionParams,
+@@ -459,6 +465,7 @@ function GridItemInner(props) {
+       onResizeStartProp,
+       onResizeProp,
+       onResizeStopProp,
++      resizing,
+       containerWidth,
+       positionParams,
+       i,
+diff --git a/dist/chunk-Z6CWRR74.mjs b/dist/chunk-Z6CWRR74.mjs
+index 5d3ee00ad7b14cfe15445fcf7bfdbee04408236e..3f641e2af81045a60955ceb413837822397a6185 100644
+--- a/dist/chunk-Z6CWRR74.mjs
++++ b/dist/chunk-Z6CWRR74.mjs
+@@ -118,6 +118,8 @@ function GridItemInner(props) {
+   } = props;
+   const [dragging, setDragging] = useState(false);
+   const [resizing, setResizing] = useState(false);
++  // patch (upstream #2304): refs alone do not re-render the memoized item between snapped grid steps
++  const [, setInteractionRevision] = useState(0);
+   const elementRef = useRef(null);
+   const dragPositionRef = useRef({ left: 0, top: 0 });
+   const resizePositionRef = useRef({
+@@ -327,6 +329,7 @@ function GridItemInner(props) {
+       }
+       const newPosition = { top, left };
+       dragPositionRef.current = newPosition;
++      setInteractionRevision((revision) => revision + 1);
+       const rawPos = calcXYRaw(positionParams, top, left);
+       const { x: newX, y: newY } = applyPositionConstraints(
+         constraints,
+@@ -423,6 +426,9 @@ function GridItemInner(props) {
+         };
+       }
+       resizePositionRef.current = updatedSize;
++      if (handlerName === "onResize" && resizing) {
++        setInteractionRevision((revision) => revision + 1);
++      }
+       const containerHeight = node?.offsetParent?.clientHeight ?? 0;
+       const rawSize = calcWHRaw(
+         positionParams,
+@@ -452,6 +458,7 @@ function GridItemInner(props) {
+       onResizeStartProp,
+       onResizeProp,
+       onResizeStopProp,
++      resizing,
+       containerWidth,
+       positionParams,
+       i,

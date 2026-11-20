@@ -1,3 +1,5 @@
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -160,7 +162,10 @@ describe('AI prefs writer (055)', () => {
       `UPDATE "user" SET prefs = jsonb_set(prefs, '{aiUsage}', $2::jsonb, true) WHERE uuid = $1`,
       [uuid(), JSON.stringify({ ...usage, calls: 4 })]
     )
-    const languageWrite = UserManager.updateUserPrefs({ uuid: uuid(), prefs: { language: 'fr' } })
+    const languageWrite = UserManager.updateUserPrefs({
+      uuid: uuid(),
+      prefs: { language: 'fr' },
+    } as unknown as ArenaUser)
     gate.open()
     await Promise.all([writing, usageWrite, languageWrite])
     const prefs = await readPrefs()

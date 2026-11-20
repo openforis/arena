@@ -1,3 +1,4 @@
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as Survey from '@core/survey/survey'
@@ -100,7 +101,7 @@ describe('Survey compare: apply changes made in another environment', () => {
 
     // changes in Dev: new attribute, validation expression, new category item
     let dev = await fetchSurvey(devSurveyId)
-    const treeDef = Survey.getNodeDefByName('tree')(dev)
+    const treeDef = Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity
     await NodeDefService.insertNodeDef({
       user,
       surveyId: devSurveyId,
@@ -163,7 +164,7 @@ describe('Survey compare: apply changes made in another environment', () => {
     expect(NodeDef.isPublished(qaHeight)).toBe(false)
 
     const qaTree = Survey.getNodeDefByName('tree')(qa)
-    const qaTreeChildrenInLayout = NodeDefLayout.getLayoutChildren(cycle)(qaTree).map((child) => child.i)
+    const qaTreeChildrenInLayout = NodeDefLayout.getLayoutChildrenUuids(cycle)(qaTree)
     expect(qaTreeChildrenInLayout).toContain(NodeDef.getUuid(qaHeight))
 
     const qaDbhExpressions = NodeDefValidations.getExpressions(
@@ -231,10 +232,15 @@ describe('Survey compare: apply changes made in another environment', () => {
       user,
       surveyId: devSurveyId,
       cycle,
-      nodeDef: NodeDef.newNodeDef(Survey.getNodeDefByName('tree')(dev), NodeDef.nodeDefType.taxon, [cycle], {
-        name: 'tree_taxon',
-        [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy),
-      }),
+      nodeDef: NodeDef.newNodeDef(
+        Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity,
+        NodeDef.nodeDefType.taxon,
+        [cycle],
+        {
+          name: 'tree_taxon',
+          [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy),
+        }
+      ),
     })
 
     const { result, sourceFileId } = await runCompare({
@@ -285,9 +291,14 @@ describe('Survey compare: apply changes made in another environment', () => {
       user,
       surveyId: devSurveyId,
       cycle,
-      nodeDef: NodeDef.newNodeDef(Survey.getNodeDefByName('tree')(dev), NodeDef.nodeDefType.text, [cycle], {
-        name: 'notes',
-      }),
+      nodeDef: NodeDef.newNodeDef(
+        Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity,
+        NodeDef.nodeDefType.text,
+        [cycle],
+        {
+          name: 'notes',
+        }
+      ),
     })
     const { result, sourceFileId } = await runCompare({ user, surveyId: qaSurveyId, sourceSurveyId: devSurveyId })
     expect(sourceFileId).toBeUndefined()
@@ -324,9 +335,14 @@ describe('Survey compare: apply changes made in another environment', () => {
       user,
       surveyId: devSurveyId,
       cycle,
-      nodeDef: NodeDef.newNodeDef(Survey.getNodeDefByName('tree')(dev), NodeDef.nodeDefType.text, [cycle], {
-        name: 'remarks',
-      }),
+      nodeDef: NodeDef.newNodeDef(
+        Survey.getNodeDefByName('tree')(dev) as ArenaNodeDefEntity,
+        NodeDef.nodeDefType.text,
+        [cycle],
+        {
+          name: 'remarks',
+        }
+      ),
     })
     const fingerprintAfter = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
     expect(fingerprintAfter.strict).not.toBe(fingerprintBefore.strict)

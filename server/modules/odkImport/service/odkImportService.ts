@@ -1,3 +1,4 @@
+import type { ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 import * as OdkImportReportManager from '../manager/odkImportReportManager'
 import OdkImportJob from './odkImport/odkImportJob'
@@ -21,7 +22,7 @@ export const startOdkImportJob = ({
   totalFileSize,
   newSurvey,
 }: {
-  user: any
+  user: ArenaUser
   filePath?: string
   fileId?: string
   totalChunks?: number

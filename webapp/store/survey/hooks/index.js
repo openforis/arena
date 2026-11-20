@@ -16,6 +16,10 @@ import { SurveyStatusState } from '../status'
 // ==== Survey
 export const useSurveyDefsFetched = ({ draft, includeAnalysis, validate }) =>
   useSelector(SurveyStatusState.isFetchedWithSameParams({ draft, includeAnalysis, validate }))
+/**
+ * Returns the survey currently loaded in the store.
+ * @returns {import('@openforis/arena-core').ArenaSurvey} The survey.
+ */
 export const useSurvey = () => useSelector(SurveyState.getSurvey)
 export const useSurveyId = () => useSelector(SurveyState.getSurveyId)
 export const useSurveyName = () => useSelector(SurveyState.getSurveyName)

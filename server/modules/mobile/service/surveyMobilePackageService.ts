@@ -1,6 +1,6 @@
 import { Writable } from 'node:stream'
 
-import { ArenaExportInfoFactory, ArenaExportType } from '@openforis/arena-core'
+import { ArenaExportInfoFactory, ArenaExportType, type ArenaUser, type ArenaSurvey } from '@openforis/arena-core'
 import { ZipArchive } from 'archiver'
 
 import { AppInfo } from '@core/app/appInfo'
@@ -14,7 +14,7 @@ import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFi
 
 const logger = Log.getLogger('SurveyMobilePackageService')
 
-const createInfo = ({ user, survey }: { user: any; survey: any }) =>
+const createInfo = ({ user, survey }: { user: ArenaUser; survey: ArenaSurvey }) =>
   ArenaExportInfoFactory.createInstance({
     appInfo: AppInfo.currentAppInfo,
     exportedByUserUuid: User.getUuid(user),
@@ -60,8 +60,8 @@ export const writeSurveyMobilePackage = async ({
   survey,
   outputStream,
 }: {
-  user: any
-  survey: any
+  user: ArenaUser
+  survey: ArenaSurvey
   outputStream: Writable
 }): Promise<void> => {
   const surveyId = Survey.getId(survey)

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
@@ -8,7 +8,7 @@ import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
 type Props = {
-  otherGroups: UserGroupType[]
+  otherGroups: ArenaUserGroup[]
   readableGroupUuids: string[]
   onChange: (readableGroupUuids: string[]) => void
   readOnly?: boolean
@@ -16,7 +16,7 @@ type Props = {
 
 type GroupItem = { value: string; label: string }
 
-const toItem = (group: UserGroupType): GroupItem => ({
+const toItem = (group: ArenaUserGroup): GroupItem => ({
   value: UserGroup.getUuid(group) as string,
   label: UserGroup.getName(group),
 })

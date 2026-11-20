@@ -20,7 +20,8 @@ const withItemsCount = (target: any, name: string, count: number) =>
 // the ref survey has one taxonomy
 const withTaxaCount = (target: any, count: unknown) => {
   const taxonomy = Survey.getTaxonomyByName('trees')(target)
-  return Survey.assocTaxonomies({ [Taxonomy.getUuid(taxonomy)]: { ...taxonomy, taxaCount: count } })(target)
+  const withCount = { ...taxonomy, taxaCount: count }
+  return Survey.assocTaxonomies({ [Taxonomy.getUuid(taxonomy)]: withCount })(target)
 }
 
 const run = (tool: any, target: any): Promise<any> => runTool(tool, {}, createToolContext({ survey: target }))

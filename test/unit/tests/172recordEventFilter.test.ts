@@ -1,3 +1,5 @@
+import { UserFactory } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
@@ -10,7 +12,7 @@ import {
 } from '@webapp/store/ui/record/recordEventFilter'
 import * as RecordState from '@webapp/store/ui/record/state'
 
-const user = { uuid: 'user-uuid' }
+const user = { ...UserFactory.createInstance({ email: 'user@arena.test', name: 'user' }), uuid: 'user-uuid' }
 
 const buildSlice = () => {
   const record = Record.newRecord(user, '0')

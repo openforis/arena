@@ -88,7 +88,6 @@ const AdvancedExpressionEditorPopup = (props) => {
               survey,
               nodeDefCurrent,
               exprString: value,
-              isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
               includeAnalysis,
             })
@@ -96,7 +95,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       const valid = !newErrorMessage
       return valid
     },
-    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey]
+    [excludeCurrentNodeDef, includeAnalysis, nodeDefCurrent, survey]
   )
 
   const onEditorChange = useCallback(

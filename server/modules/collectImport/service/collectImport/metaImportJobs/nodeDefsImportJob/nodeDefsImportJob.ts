@@ -1,0 +1,767 @@
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
+import * as A from '@core/arena'
+
+import { uuidv4 } from '@core/uuid'
+import * as StringUtils from '@core/stringUtils'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+
+import Job from '@server/job/job'
+
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
+import * as CollectSurvey from '../../model/collectSurvey'
+import NodeDefUniqueNameGenerator from '../../model/nodeDefUniqueNameGenerator'
+import { CollectExpressionConverter } from './collectExpressionConverter'
+import { parseValidationRules } from './validationRuleParser'
+import { parseDefaultValues } from './defaultValueParser'
+
+const specifyAttributeNameSuffix = '_specify'
+const specifyAttributeLabelSuffix = ' (Specify)'
+
+const arenaFileTypeByCollectFileType = {
+  AUDIO: NodeDef.fileTypeValues.audio,
+  DOCUMENT: NodeDef.fileTypeValues.other,
+  IMAGE: NodeDef.fileTypeValues.image,
+  VIDEO: NodeDef.fileTypeValues.video,
+}
+
+// coordinate specific props: allowOnlyDeviceCoordinate, accuracy and altitude
+const _extractCoordinateProps = (collectNodeDef: CollectSurvey.CollectNodeDef) => {
+  const props = {}
+  for (const [uiAttributeName, propKey] of [
+    ['allowOnlyDeviceCoordinate', NodeDef.propKeys.allowOnlyDeviceCoordinate],
+    ['includeAccuracy', NodeDef.propKeys.includeAccuracy],
+    ['includeAltitude', NodeDef.propKeys.includeAltitude],
+  ]) {
+    if (CollectSurvey.getUiAttribute(uiAttributeName, false)(collectNodeDef)) {
+      props[propKey] = true
+    }
+  }
+  return props
+}
+
+// text input type (short/memo => singleLine/multiLine)
+const _extractTextProps = (collectNodeDef: CollectSurvey.CollectNodeDef) =>
+  CollectSurvey.getAttribute('type', 'short')(collectNodeDef) === 'memo'
+    ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
+    : {}
+
+const _updateVisibilityLayoutProps = ({
+  collectNodeDef,
+  updateLayoutProp,
+}: {
+  collectNodeDef: CollectSurvey.CollectNodeDef
+  updateLayoutProp: any
+}) => {
+  const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
+  if (hiddenWhenNotRelevant) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
+  }
+  const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
+  const hiddenInMobile =
+    StringUtils.isNotBlank(relevantExpr) &&
+    ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
+  if (hiddenInMobile) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
+  }
+}
+
+const _addNodeDefInfoToCache = ({
+  nodeDefsInfoByCollectPath,
+  collectNodeDefPath,
+  nodeDefUuid,
+  field,
+}: {
+  nodeDefsInfoByCollectPath: Record<string, any>
+  collectNodeDefPath: string
+  nodeDefUuid: string
+  field: any
+}) => {
+  let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+  if (!nodeDefsInfo) {
+    nodeDefsInfo = []
+    nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
+  }
+  nodeDefsInfo.push({
+    uuid: nodeDefUuid,
+    ...(field ? { field } : {}),
+  })
+}
+
+export default class NodeDefsImportJob extends Job {
+  static readonly type = 'NodeDefsImportJob'
+  importIssues: any
+  nodeDefUniqueNameGenerator: any
+  nodeDefs: { [nodeDefUuid: string]: ArenaAnyNodeDef }
+  nodeDefsInfoByCollectPath: Record<string, any>
+
+  constructor(params?: any) {
+    super(NodeDefsImportJob.type, params)
+
+    this.nodeDefs = {} // Node definitions by uuid
+    this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator() // to avoid naming collision
+    this.nodeDefsInfoByCollectPath = {} // Used by following jobs
+    this.importIssues = []
+  }
+
+  async execute() {
+    const { collectSurvey, surveyId, user } = this.context
+
+    this._calculateTotal()
+
+    // Insert root entity and descendants recursively
+    const collectRootDef = CollectSurvey.getNodeDefRoot(collectSurvey)
+
+    await this.insertNodeDef(null, '', collectRootDef, NodeDef.nodeDefType.entity)
+
+    // insert import issues and write report into survey props
+    await CollectImportReportManager.insertItems({ surveyId: this.surveyId, items: this.importIssues }, this.tx)
+
+    const collectReport = {
+      [Survey.collectReportKeys.issuesTotal]: this.importIssues.length,
+      [Survey.collectReportKeys.issuesResolved]: 0,
+    }
+    await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, true, this.tx)
+    await SurveyManager.updateSurveyProp(
+      user,
+      surveyId,
+      Survey.infoKeys.collectNodeDefsInfoByPath,
+      this.nodeDefsInfoByCollectPath,
+      true,
+      this.tx
+    )
+
+    // Fetch survey and store it in context
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, cycle: Survey.cycleOneKey, draft: true, advanced: true },
+      this.tx
+    )
+
+    this.setContext({
+      nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
+      [Job.keysContext.survey]: survey,
+    })
+  }
+
+  _buildNodeDefProps({
+    parentNodeDef,
+    collectNodeDef,
+    type,
+    field,
+    multiple,
+    tableLayout,
+  }: {
+    parentNodeDef: ArenaNodeDefEntity
+    collectNodeDef: CollectSurvey.CollectNodeDef
+    type: any
+    field: string | null
+    multiple: any
+    tableLayout: any
+  }) {
+    const { defaultLanguage } = this.context
+    const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
+    const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
+    const key = CollectSurvey.getAttributeBoolean('key')(collectNodeDef)
+    const nodeDefNameSuffix = field ? `_${field}` : ''
+
+    const props = {
+      [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
+        parentNodeDefName: NodeDef.getName(parentNodeDef),
+        nodeDefName: collectNodeDefName + nodeDefNameSuffix,
+      }),
+      [NodeDef.propKeys.multiple]: multiple,
+      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
+      [NodeDef.propKeys.labels]: this.extractLabels(collectNodeDef, type, field, defaultLanguage),
+      [NodeDef.propKeys.descriptions]: CollectSurvey.toLabels('description', defaultLanguage)(collectNodeDef),
+      // Extra props
+      ...this.extractNodeDefSpecificProps(type, collectNodeDef),
+    }
+    if (type === NodeDef.nodeDefType.entity) {
+      // Layout props (render)
+      props[NodeDefLayout.keys.layout] = NodeDefLayout.newLayout(
+        Survey.cycleOneKey,
+        tableLayout ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form,
+        determineNodeDefPageUuid(type, collectNodeDef)
+      )
+    } else if (calculated) {
+      // Calculated attribute
+      props[NodeDef.propKeys.readOnly] = true
+      const hidden = CollectSurvey.getUiAttribute('hide')(collectNodeDef)
+      if (hidden) {
+        props[NodeDef.propKeys.hidden] = true
+      }
+    }
+
+    return props
+  }
+
+  /**
+   * Inserts a node definition and all its descendants (if any).
+   *
+   * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
+   * (used to import Collect composite attribute definitions like Range).
+   * @param {NodeDef} parentNodeDef - Parent node def definition.
+   * @param {!string} parentPath - Parent node path.
+   * @param {!object} collectNodeDef - Collect node definition.
+   * @param {!string} type - Node definition type.
+   * @param {string} field - Node sub-field.
+   * @returns {Promise<object>} - Inserted node definitions.
+   */
+  async insertNodeDef(
+    parentNodeDef: ArenaNodeDefEntity | null,
+    parentPath: string,
+    collectNodeDef: CollectSurvey.CollectNodeDef,
+    type: string,
+    field: string | null = null
+  ) {
+    const nodeDefsUpdated = {}
+    const nodeDefsInserted = {}
+
+    // 1. determine basic props
+    const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
+
+    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
+
+    const tableLayout =
+      multiple &&
+      CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) ===
+        CollectSurvey.layoutTypes.table
+
+    const props = this._buildNodeDefProps({ parentNodeDef, collectNodeDef, type, field, multiple, tableLayout })
+
+    // 2. insert node def into db
+    const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
+    const nodeDefUuid = NodeDef.getUuid(nodeDefParam)
+
+    Object.assign(
+      nodeDefsUpdated,
+      await NodeDefManager.insertNodeDef(
+        { user: this.user, survey: this.survey, nodeDef: nodeDefParam, system: true },
+        this.tx
+      )
+    )
+    Object.assign(this.nodeDefs, nodeDefsUpdated)
+
+    let nodeDef = nodeDefsUpdated[nodeDefUuid]
+
+    // 2a. increment processed items before recursive call to insertNodeDef
+    this.incrementProcessedItems()
+
+    // 3. insert children and updated layout props
+    const propsUpdated = {}
+
+    const _updateLayoutProp = ({ propName, value }) => {
+      const layout = propsUpdated[NodeDefLayout.keys.layout] || NodeDef.getLayout(nodeDef)
+      const layoutUpdated = A.assocPath([Survey.cycleOneKey, propName], value)(layout)
+      propsUpdated[NodeDefLayout.keys.layout] = layoutUpdated
+    }
+
+    // 3 update node type specific props
+    if (type === NodeDef.nodeDefType.entity) {
+      // 3a. insert child definitions
+      const childrenUuids = await this.insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout)
+      // current node def layout could have been modified during children insert; keep the latest version of it
+      nodeDef = this.nodeDefs[nodeDefUuid]
+
+      if (tableLayout) {
+        _updateLayoutProp({ propName: NodeDefLayout.keys.layoutChildren, value: childrenUuids })
+      }
+    } else if (type === NodeDef.nodeDefType.code) {
+      // 3b. Add parent code def uuid
+      const parentCodeDefUuid = this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
+      if (parentCodeDefUuid) {
+        propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
+      }
+
+      // 3c. show code prop
+      const codeShown = CollectSurvey.getUiAttribute('showCode', true)(collectNodeDef)
+      if (!codeShown) {
+        // code shown is true by default
+        _updateLayoutProp({ propName: NodeDefLayout.keys.codeShown, value: codeShown })
+      }
+
+      // 3d. add specify text attribute def
+      const { nodeDefsUpdated: qualifierNodeDefsUpdated, nodeDefsInserted: qualifierNodeDefsInserted } =
+        await this.addSpecifyTextAttribute(parentNodeDef, nodeDef)
+
+      Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
+      Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
+    } else if (type === NodeDef.nodeDefType.coordinate) {
+      Object.assign(propsUpdated, _extractCoordinateProps(collectNodeDef))
+    } else if (type === NodeDef.nodeDefType.text) {
+      Object.assign(propsUpdated, _extractTextProps(collectNodeDef))
+    }
+
+    // 4. update visibility layout props
+    _updateVisibilityLayoutProps({ collectNodeDef, updateLayoutProp: _updateLayoutProp })
+
+    Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
+
+    // 5. update node def with other props
+    const propsAdvanced = await this.extractNodeDefAdvancedProps({ nodeDef, type, collectNodeDef })
+
+    Object.assign(
+      nodeDefsUpdated,
+      await NodeDefManager.updateNodeDefProps(
+        {
+          user: this.user,
+          survey: this.survey,
+          nodeDefUuid,
+          parentUuid: NodeDef.getParentUuid(nodeDef),
+          props: propsUpdated,
+          propsAdvanced,
+          system: true,
+        },
+        this.tx
+      )
+    )
+    nodeDef = nodeDefsUpdated[nodeDefUuid]
+
+    // 6. store nodeDef in cache
+    _addNodeDefInfoToCache({
+      nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
+      collectNodeDefPath,
+      nodeDefUuid,
+      field,
+    })
+
+    nodeDefsInserted[nodeDefUuid] = nodeDef
+
+    Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
+
+    return nodeDefsInserted
+  }
+
+  async insertNodeDefChildren(nodeDef, collectNodeDefPath, collectNodeDef, tableLayout) {
+    const childrenUuids = []
+    for (const collectChild of collectNodeDef.elements) {
+      if (this.isCanceled()) break
+
+      const childDefFields = CollectSurvey.getNodeDefFieldsByCollectNodeDef(collectChild)
+
+      if (childDefFields) {
+        for (const childDefField of childDefFields) {
+          const { type: childType, field = null } = childDefField
+
+          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field) // NOSONAR
+          // sort inserted node defs by id
+          const insertedUuids = A.pipe(A.values, A.sortBy(NodeDef.getId), A.map(NodeDef.getUuid))(nodeDefsInserted)
+          if (tableLayout) {
+            childrenUuids.push(...insertedUuids)
+          }
+        }
+      }
+    }
+
+    return childrenUuids
+  }
+
+  extractLabels(collectNodeDef: CollectSurvey.CollectNodeDef, type: string, field: string | null, defaultLang: string) {
+    let suffix = field ? ` (${field})` : ''
+    if (type === NodeDef.nodeDefType.integer || type === NodeDef.nodeDefType.decimal) {
+      // Add unit suffix to every label, if specified
+      const elPrecision = CollectSurvey.getElementByName('precision')(collectNodeDef)
+      if (elPrecision) {
+        const unit = CollectSurvey.getAttribute('unit')(elPrecision)
+        if (StringUtils.isNotBlank(unit)) {
+          suffix += ` [${unit}]`
+        }
+      }
+    }
+    return CollectSurvey.toLabels('label', defaultLang, ['instance', 'heading'], suffix)(collectNodeDef)
+  }
+
+  async extractNodeDefAdvancedProps({
+    nodeDef,
+    type,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaAnyNodeDef
+    type: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
+
+    const propsAdvanced = {}
+
+    // 1. default values
+    const defaultValues = await this.parseDefaultValues({ nodeDef, collectNodeDef })
+
+    if (!A.isEmpty(defaultValues)) {
+      propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = defaultValues
+    }
+
+    // 2. validations
+    const validations = {
+      ...(multiple
+        ? {
+            [NodeDefValidations.keys.count]: {
+              [NodeDefValidations.keys.min]: CollectSurvey.getAttribute('minCount')(collectNodeDef),
+              [NodeDefValidations.keys.max]: CollectSurvey.getAttribute('maxCount')(collectNodeDef),
+            },
+          }
+        : {
+            [NodeDefValidations.keys.required]: CollectSurvey.getAttribute('required')(collectNodeDef),
+          }),
+    }
+    const requiredIf = await this.parseRequiredIf({ nodeDef, type, multiple, collectNodeDef })
+    if (requiredIf) {
+      validations[NodeDefValidations.keys.requiredIf] = requiredIf
+    }
+
+    if (type !== NodeDef.nodeDefType.entity) {
+      const { validationRules, unique } = await this.parseValidationRules({ nodeDef, collectNodeDef })
+      validations[NodeDefValidations.keys.expressions] = validationRules
+      if (unique) {
+        validations[NodeDefValidations.keys.unique] = true
+      }
+    }
+    propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
+
+    // 3. applicable
+    const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
+    if (StringUtils.isNotBlank(relevantExpr)) {
+      const relevantExprConverted = await CollectExpressionConverter.convert({
+        survey: this.survey,
+        nodeDefCurrent: nodeDef,
+        expression: relevantExpr,
+      })
+      const success = relevantExprConverted !== null
+
+      this.importIssues.push(
+        CollectImportReportItem.newReportItem({
+          nodeDefUuid,
+          expressionType: CollectImportReportItem.exprTypes.applicable,
+          expression: relevantExpr,
+          resolved: success,
+        })
+      )
+
+      if (success) {
+        propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
+          NodeDefExpression.createExpression({ expression: relevantExprConverted }),
+        ]
+      }
+    }
+    if (type === NodeDef.nodeDefType.file) {
+      const fileNameExpression = CollectSurvey.getCollectAttribute('fileNameExpression')(collectNodeDef)
+      if (fileNameExpression) {
+        propsAdvanced[NodeDef.keysPropsAdvanced.fileNameExpression] = fileNameExpression
+      }
+    }
+    return propsAdvanced
+  }
+
+  // Collect "requiredIf" (attribute required when a condition is met) -> Arena "required if" (single non-key attributes
+  // not always required only)
+  async parseRequiredIf({
+    nodeDef,
+    type,
+    multiple,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaAnyNodeDef
+    type: any
+    multiple: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
+    const requiredIfExpr = CollectSurvey.getAttribute('requiredIf')(collectNodeDef)
+    if (
+      StringUtils.isBlank(requiredIfExpr) ||
+      type === NodeDef.nodeDefType.entity ||
+      multiple ||
+      NodeDef.isKey(nodeDef) ||
+      CollectSurvey.getAttributeBoolean('required')(collectNodeDef)
+    ) {
+      return null
+    }
+    const requiredIfExprConverted = await CollectExpressionConverter.convert({
+      survey: this.survey,
+      nodeDefCurrent: nodeDef,
+      expression: requiredIfExpr,
+    })
+    const success = requiredIfExprConverted !== null
+    this.importIssues.push(
+      CollectImportReportItem.newReportItem({
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        expressionType: CollectImportReportItem.exprTypes.requiredIf,
+        expression: requiredIfExpr,
+        resolved: success,
+      })
+    )
+    return success ? [NodeDefExpression.createExpression({ expression: requiredIfExprConverted })] : null
+  }
+
+  extractNodeDefSpecificProps(type, collectNodeDef) {
+    switch (type) {
+      case NodeDef.nodeDefType.code: {
+        const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
+        const categoryName = A.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
+          ? Category.samplingPointDataCategoryName
+          : listName
+        const category = Survey.getCategoryByName(categoryName)(this.survey)
+
+        const layoutCollect = CollectSurvey.getUiAttribute('layoutType')(collectNodeDef)
+        const renderType =
+          layoutCollect === 'radio' ? NodeDefLayout.renderType.checkbox : NodeDefLayout.renderType.dropdown
+
+        return {
+          [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
+          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, renderType),
+        }
+      }
+      case NodeDef.nodeDefType.entity: {
+        const enumerate = CollectSurvey.getCollectAttribute('enumerate')(collectNodeDef)
+        return enumerate ? { [NodeDef.propKeys.enumerate]: enumerate } : {}
+      }
+      case NodeDef.nodeDefType.file: {
+        const collectMaxSize = CollectSurvey.getAttribute('maxSize')(collectNodeDef)
+        // in Collect max size is in bytes; convert it into MB
+        const maxSize = collectMaxSize ? Math.ceil(collectMaxSize / (1024 * 1024)) : null
+        const collectFileType = CollectSurvey.getAttribute('n0:fileType', 'IMAGE')(collectNodeDef)
+        const fileType = arenaFileTypeByCollectFileType[collectFileType]
+        return {
+          [NodeDef.propKeys.maxFileSize]: maxSize,
+          [NodeDef.propKeys.fileType]: fileType,
+        }
+      }
+      case NodeDef.nodeDefType.taxon: {
+        const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
+        const taxonomy = Survey.getTaxonomyByName(taxonomyName)(this.survey)
+
+        return {
+          [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy),
+        }
+      }
+
+      default:
+        return {}
+    }
+  }
+
+  async parseDefaultValues({
+    nodeDef,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaAnyNodeDef
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
+    const { defaultLanguage } = this.context
+
+    const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
+
+    const { defaultValues, importIssues } = await parseDefaultValues({
+      survey: this.survey,
+      nodeDef,
+      collectDefaultValues,
+      defaultLanguage,
+    })
+
+    this.importIssues.push(...importIssues)
+
+    return defaultValues
+  }
+
+  async parseValidationRules({
+    nodeDef,
+    collectNodeDef,
+  }: {
+    nodeDef: ArenaAnyNodeDef
+    collectNodeDef: CollectSurvey.CollectNodeDef
+  }) {
+    const { defaultLanguage } = this.context
+
+    const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
+
+    const { validationRules, importIssues, unique } = await parseValidationRules({
+      survey: this.survey,
+      nodeDef,
+      collectValidationRules,
+      defaultLanguage,
+    })
+
+    this.importIssues.push(...importIssues)
+
+    return { validationRules, unique }
+  }
+
+  /**.
+   * Adds a text attribute with name ${nodeDefName}_${qualifiableCode} (for each 'qualifiable' code list item in the list)
+   *
+   * @param parentNodeDef
+   * @param nodeDef
+   */
+  async addSpecifyTextAttribute(parentNodeDef, nodeDef) {
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
+    const categoryName = Category.getName(category)
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
+
+    const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
+    const qualifiableItemCodes = A.pathOr(
+      [],
+      [categoryName, String(levelIndex)],
+      qualifiableItemCodesByCategoryAndLevel
+    )
+
+    const nodeDefsUpdated = {} //all updated and inserted node defs
+    const nodeDefsInserted = {} // only newly inserted node defs
+
+    for (const itemCode of qualifiableItemCodes) {
+      const nodeDefName = NodeDef.getName(nodeDef)
+      const props = {
+        [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
+          parentNodeDefName: NodeDef.getName(parentNodeDef),
+          nodeDefName: `${nodeDefName}${specifyAttributeNameSuffix}`,
+        }),
+        [NodeDef.propKeys.labels]: A.pipe(
+          NodeDef.getLabels,
+          A.mapObjIndexed((label) => `${label}${specifyAttributeLabelSuffix}`)
+        )(nodeDef),
+        // hidden when not relevant
+        [NodeDef.propKeys.layout]: {
+          [Survey.cycleOneKey]: {
+            [NodeDefLayout.keys.hiddenWhenNotRelevant]: true,
+          },
+        },
+      }
+
+      const applicableIfExpr = NodeDef.isSingle(nodeDef)
+        ? `${nodeDefName} == "${itemCode}"`
+        : `includes(${nodeDefName}, "${itemCode}")
+        `
+
+      const propsAdvanced = {
+        [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression({ expression: applicableIfExpr })],
+      }
+      const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
+      const qualifierNodeDefAndOthersUpdated = /* NOSONAR */ await NodeDefManager.insertNodeDef(
+        {
+          user: this.user,
+          survey: this.survey,
+          nodeDef: qualifierNodeDefParam,
+          system: true,
+        },
+        this.tx
+      )
+
+      const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)
+      nodeDefsInserted[qualifierNodeDefUuid] = qualifierNodeDefAndOthersUpdated[qualifierNodeDefUuid]
+      Object.assign(nodeDefsUpdated, A.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
+    }
+    return { nodeDefsInserted, nodeDefsUpdated }
+  }
+
+  _calculateTotal() {
+    const { collectSurvey } = this.context
+    let count = 0
+
+    const collectNodeDefRoot = CollectSurvey.getNodeDefRoot(collectSurvey)
+
+    const stack = []
+    stack.push(collectNodeDefRoot)
+
+    while (stack.length > 0) {
+      const collectNodeDef = stack.pop()
+
+      count++
+
+      if (CollectSurvey.getElementName(collectNodeDef) === NodeDef.nodeDefType.entity) {
+        for (const collectNodeDefChild of CollectSurvey.getElements(collectNodeDef)) {
+          if (this.isCanceled()) {
+            break
+          }
+
+          const childDefFields = CollectSurvey.getNodeDefFieldsByCollectNodeDef(collectNodeDefChild)
+
+          if (childDefFields) {
+            stack.push(collectNodeDefChild)
+          }
+        }
+      }
+    }
+
+    this.total = count
+  }
+
+  _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
+    const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
+    if (collectCodeParentExpr) {
+      // starting from the node def parent path, find the path of the node referenced by collectCodeParentExpr
+      // e.g. parentPath = /cluster/plot, collectCodeParentExpr = parent()/cluster_id, result is /cluster/cluster_id
+
+      const collectNodeDefParentPathParts = parentPath.split('/')
+      const codeParentExprParts = collectCodeParentExpr.split('/')
+
+      // count the calls to parent() function
+      const countOfParentCalls = codeParentExprParts.findIndex((part) => part !== 'parent()')
+
+      // referenced node path will be the concatenation of:
+      // - parentPath moved up "countOfParentCalls" levels
+      // - last part of collectCodeParentExpr
+      const referecedNodeDefPath = [
+        ...collectNodeDefParentPathParts.slice(0, collectNodeDefParentPathParts.length - countOfParentCalls),
+        ...codeParentExprParts.slice(countOfParentCalls),
+      ].join('/')
+
+      const nodeDefsInfo = this.nodeDefsInfoByCollectPath[referecedNodeDefPath]
+
+      const success = Boolean(nodeDefsInfo)
+
+      this.importIssues.push(
+        CollectImportReportItem.newReportItem({
+          nodeDefUuid: NodeDef.getUuid(nodeDef),
+          expressionType: CollectImportReportItem.exprTypes.codeParent,
+          expression: collectCodeParentExpr,
+          resolved: success,
+        })
+      )
+
+      return success ? A.propOr(null, 'uuid', A.head(nodeDefsInfo)) : null
+    }
+
+    return null
+  }
+
+  get survey() {
+    const { survey } = this.context
+    // dependency graph generation not necessary
+    return Survey.assocNodeDefsSimple({ nodeDefs: this.nodeDefs })(survey)
+  }
+}
+
+const _createNodeDef = (parentNodeDef: ArenaNodeDefEntity, type: any, props: Record<string, any>, propsAdvanced = {}) =>
+  NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
+
+const determineNodeDefPageUuid = (type: any, collectNodeDef: CollectSurvey.CollectNodeDef) => {
+  if (type === NodeDef.nodeDefType.entity) {
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
+    if (multiple) {
+      const tab = CollectSurvey.getUiAttribute('tab')(collectNodeDef)
+
+      if (tab) {
+        // Multiple entity own tab => own page
+        return uuidv4()
+      }
+
+      // Multiple entity w/o tab => parent page
+      return null
+    }
+
+    // Single entity => own page
+    return uuidv4()
+  }
+
+  // Attribute => parent page
+  return null
+}

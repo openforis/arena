@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { ArenaSurvey, ArenaChain, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as Survey from '@core/survey/survey'
@@ -22,7 +24,13 @@ const oldSamplingDesignPhasePropKeys = {
  * Mirrors the filter used by the Phase2JoinEntitySelector component in the webapp: only the root
  * entity, the base unit entity itself, or one of the base unit's ancestors are selectable.
  */
-const _isSelectableAsPhase2JoinEntity = ({ nodeDef, baseUnitNodeDef }: { nodeDef: any; baseUnitNodeDef?: any }) =>
+const _isSelectableAsPhase2JoinEntity = ({
+  nodeDef,
+  baseUnitNodeDef,
+}: {
+  nodeDef: ArenaAnyNodeDef
+  baseUnitNodeDef?: any
+}) =>
   NodeDef.isRoot(nodeDef) ||
   (Boolean(baseUnitNodeDef) &&
     (NodeDef.getUuid(nodeDef) === NodeDef.getUuid(baseUnitNodeDef) || NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef)))
@@ -41,7 +49,7 @@ const _findPhase2JoinEntity = ({
 }: {
   attributeNodeDef: any
   baseUnitNodeDef?: any
-  survey: any
+  survey: ArenaSurvey
 }): any => {
   let candidate = Survey.getNodeDefParent(attributeNodeDef)(survey)
   while (candidate) {
@@ -56,7 +64,7 @@ const _migrateSamplingDesignPhaseProps = ({
   survey,
 }: {
   samplingDesign: Record<string, any>
-  survey: any
+  survey: ArenaSurvey
 }): Record<string, any> => {
   const migrated = { ...samplingDesign }
 
@@ -77,10 +85,7 @@ const _migrateSamplingDesignPhaseProps = ({
 
     const attributeNodeDef = Survey.getNodeDefByUuid(attributeUuid)(survey)
     // base unit node def uuid is not touched by this migration: read it from the original sampling design
-    // (cast needed: TS's inference of this Ramda-backed getter from the untyped JS module resolves to `{}`)
-    const baseUnitNodeDefUuid = (ChainSamplingDesign.getBaseUnitNodeDefUuid as (samplingDesign: any) => string)(
-      samplingDesign
-    )
+    const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
     const baseUnitNodeDef = baseUnitNodeDefUuid ? Survey.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) : null
     const joinEntity = attributeNodeDef ? _findPhase2JoinEntity({ attributeNodeDef, baseUnitNodeDef, survey }) : null
     if (joinEntity) {
@@ -102,11 +107,11 @@ const _migrateSamplingDesignPhaseProps = ({
  */
 export const migrateSamplingDesignPhaseProps = async (
   { surveyId }: { surveyId: number },
-  client: any = DB.client
+  client: DbClient = DB.client
 ): Promise<void> => {
   const chains = await ChainRepository.fetchChains({ surveyId }, client)
 
-  const chainsToMigrate = chains.filter((chain: any) => {
+  const chainsToMigrate = chains.filter((chain: ArenaChain) => {
     const samplingDesign = Chain.getSamplingDesign(chain)
     return Object.values(oldSamplingDesignPhasePropKeys).some((oldKey) => oldKey in samplingDesign)
   })

@@ -61,7 +61,7 @@ const isAbortError = (error: unknown): boolean => (error as { name?: string })?.
 const toCallContext = (ctx: AiToolContext): AiToolContext => {
   if (!ctx.getSurvey) return ctx
   const survey = ctx.getSurvey()
-  const surveyId = (value: unknown) => (value ? Survey.getId(value) : null)
+  const surveyId = (value: AiToolContext['survey']) => (value ? Survey.getId(value) : null)
   if (surveyId(survey) !== surveyId(ctx.survey)) {
     throw new AiToolFailure(
       'surveyChanged',

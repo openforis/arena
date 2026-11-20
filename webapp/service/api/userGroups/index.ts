@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { UserGroup } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 type UserGroupMember = Record<string, unknown>
 
@@ -8,7 +8,7 @@ const getUserGroupApiPath = ({ surveyId, groupUuid }: { surveyId: string; groupU
   `${getUserGroupsApiPath(surveyId)}/${groupUuid}`
 
 // READ
-export const fetchUserGroups = async ({ surveyId }: { surveyId: string }): Promise<UserGroup[]> => {
+export const fetchUserGroups = async ({ surveyId }: { surveyId: string }): Promise<ArenaUserGroup[]> => {
   const {
     data: { list },
   } = await axios.get(getUserGroupsApiPath(surveyId))
@@ -21,7 +21,7 @@ export const fetchUserGroup = async ({
 }: {
   surveyId: string
   groupUuid: string
-}): Promise<UserGroup> => {
+}): Promise<ArenaUserGroup> => {
   const { data: userGroup } = await axios.get(getUserGroupApiPath({ surveyId, groupUuid }))
   return userGroup
 }
@@ -46,7 +46,7 @@ export const createUserGroup = async ({
 }: {
   surveyId: string
   props: Record<string, unknown>
-}): Promise<UserGroup> => {
+}): Promise<ArenaUserGroup> => {
   const { data: userGroup } = await axios.post(getUserGroupsApiPath(surveyId), { props })
   return userGroup
 }
@@ -60,7 +60,7 @@ export const updateUserGroup = async ({
   surveyId: string
   groupUuid: string
   props: Record<string, unknown>
-}): Promise<UserGroup> => {
+}): Promise<ArenaUserGroup> => {
   const { data: userGroup } = await axios.put(getUserGroupApiPath({ surveyId, groupUuid }), { props })
   return userGroup
 }
@@ -72,7 +72,7 @@ export const deleteUserGroup = async ({
 }: {
   surveyId: string
   groupUuid: string
-}): Promise<UserGroup> => {
+}): Promise<ArenaUserGroup> => {
   const { data: userGroup } = await axios.delete(getUserGroupApiPath({ surveyId, groupUuid }))
   return userGroup
 }

@@ -144,9 +144,9 @@ const CategoryList = (props) => {
   columns.push({
     key: 'details',
     renderItem: ({ item: category }) => (
-      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} size="small" />
+      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} />
     ),
-    width: '75px',
+    width: '50px',
   })
 
   if (canEdit) {
@@ -170,6 +170,7 @@ const CategoryList = (props) => {
       headerLeftComponent={TableHeaderLeft}
       headerProps={{ state, setState }}
       columns={columns}
+      onRowOpen={(category) => Actions.edit({ category })}
     />
   )
 }

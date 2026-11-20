@@ -4,7 +4,7 @@
  * disconnect abort, maps errors to stable keys and records telemetry exactly once per call.
  */
 import type { LanguageModelV4, LanguageModelV4StreamPart } from '@ai-sdk/provider'
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -38,7 +38,7 @@ type TelemetryContext = { feature: string; source: string; provider: string; mod
 
 export type ModelGatewayDeps = {
   resolveModel: (args: {
-    user: User
+    user: ArenaUser
     feature: string
     providerId?: string
   }) => Promise<{ model: LanguageModelV4; meta: ProviderMeta }>
@@ -134,11 +134,11 @@ const sendJsonError = (res: any, error: SystemError) => {
  * Validates the request, applies the gates and resolves the model (nothing reaches the provider yet).
  * @param {object} params - Parameters.
  * @param {object} params.req - Express request.
- * @param {User} params.user - Logged-in user.
+ * @param {ArenaUser} params.user - Logged-in user.
  * @param {ModelGatewayDeps} params.deps - Dependencies.
  * @returns {Promise<object>} Request, sanitized call, model and telemetry context.
  */
-const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: ModelGatewayDeps }) => {
+const prepareCall = async ({ req, user, deps }: { req: any; user: ArenaUser; deps: ModelGatewayDeps }) => {
   const request = parseGatewayRequest(req.body)
   assertFeatureEnabled(request.feature, user, deps.gateEnv ?? ENV)
   if (!deps.rateLimiter.take(user.uuid)) {
@@ -303,7 +303,7 @@ const runStream = async ({
  * @param {object} params - Parameters.
  * @param {object} params.req - Express request (body: AiGatewayRequest).
  * @param {object} params.res - Express response.
- * @param {User} params.user - Logged-in user (permission already checked by the route middleware).
+ * @param {ArenaUser} params.user - Logged-in user (permission already checked by the route middleware).
  * @param {ModelGatewayDeps} params.deps - Dependencies.
  * @returns {Promise<void>} Resolves when the response is complete.
  */
@@ -315,7 +315,7 @@ export const handleModelRequest = async ({
 }: {
   req: any
   res: any
-  user: User
+  user: ArenaUser
   deps: ModelGatewayDeps
 }): Promise<void> => {
   let prepared: Awaited<ReturnType<typeof prepareCall>>

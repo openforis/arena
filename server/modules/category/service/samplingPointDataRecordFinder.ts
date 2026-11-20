@@ -1,3 +1,4 @@
+import type { ArenaCategoryItem, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -6,10 +7,10 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-type RootEntityKeyDef = Record<string, any>
+type RootEntityKeyDef = ArenaAnyNodeDef
 type RecordSummary = Record<string, any>
-type SamplingPointDataItem = Record<string, any>
-type SurveyWithNodeDefs = Record<string, any>
+type SamplingPointDataItem = ArenaCategoryItem
+type SurveyWithNodeDefs = ArenaSurvey
 
 type SamplingPointDataRecordFinder = (samplingPointDataItem: SamplingPointDataItem) => RecordSummary | undefined
 

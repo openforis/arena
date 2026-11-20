@@ -3,6 +3,7 @@ import { domToCanvas } from 'modern-screenshot'
 
 import {
   createImageFailureCounter,
+  getPlotCaptureView,
   isMapAtCaptureView,
   shouldExcludeFromCapture,
   waitUntil,
@@ -17,7 +18,7 @@ export type MapCaptureResult = {
   failedImages: number
   center: LatLngLiteral
   zoom: number
-  atPlot: boolean // the map was centred on the plot (fit to plot)
+  plotPixel: { x: number; y: number } | null // where the plot of a fit-to-plot capture is in the image
 }
 
 const CAPTURE_BACKGROUND = '#dfe3e8'
@@ -123,11 +124,12 @@ export const captureMapView = async ({
       ),
     fetch: { placeholderImage: failures.placeholderImage },
   })
-  return { canvas, failedImages: failures.getCount(), center: { lat, lng }, zoom, atPlot: false }
+  return { canvas, failedImages: failures.getCount(), center: { lat, lng }, zoom, plotPixel: null }
 }
 
 /**
- * Centres the map on a plot, captures it, then restores the previous view.
+ * Captures a plot: in the current view when the user is already looking at it, else centred on it (at the current
+ * zoom, or the fit-to-plot zoom when zoomed out), then restores the previous view.
  * @param {object} params - The parameters.
  * @param {L.Map} params.map - The map.
  * @param {boolean} params.includeData - Whether markers and measurements are captured.
@@ -146,13 +148,30 @@ export const captureMapAtPlot = async ({
   plot: ScreenshotPlotCandidate
   zoom: number
 }): Promise<MapCaptureResult> => {
+  const plotLatLng = L.latLng(plot.lat, plot.lng)
+  const view = getPlotCaptureView({
+    currentZoom: map.getZoom(),
+    fitZoom: zoom,
+    plotPixel: map.latLngToContainerPoint(plotLatLng),
+    size: map.getSize(),
+  })
+  /**
+   * Captures the current view and locates the plot in it.
+   * @returns {Promise<MapCaptureResult>} The capture.
+   */
+  const capturePlot = async (): Promise<MapCaptureResult> => {
+    const capture = await captureMapView({ map, includeData })
+    const { x, y } = map.latLngToContainerPoint(plotLatLng)
+    return { ...capture, plotPixel: { x, y } }
+  }
+  if (view.keepView) return capturePlot()
   const previousCenter = map.getCenter()
   const previousZoom = map.getZoom()
-  map.setView([plot.lat, plot.lng], zoom, { animate: false })
+  map.setView(plotLatLng, view.zoom, { animate: false })
   const setCenter = map.getCenter()
   const setZoom = map.getZoom()
   try {
-    return { ...(await captureMapView({ map, includeData })), atPlot: true }
+    return await capturePlot()
   } finally {
     // the user may have moved the map meanwhile (dialog closed during a slow capture): then leave it alone
     if (isMapAtCaptureView({ current: map.getCenter(), currentZoom: map.getZoom(), set: setCenter, setZoom })) {

@@ -115,4 +115,11 @@ describe('model discovery SSRF guard (262)', () => {
     )
     expect(fetchCalls).toEqual([])
   })
+
+  test('the Gemini key goes in the x-goog-api-key header, never in the URL', async () => {
+    await ModelDiscovery.listForProvider({ provider: 'google', apiKey: 'secret-key' })
+    expect(fetchCalls).toHaveLength(1)
+    expect(fetchCalls[0].url).not.toContain('secret-key')
+    expect(fetchCalls[0].init.headers['x-goog-api-key']).toBe('secret-key')
+  })
 })

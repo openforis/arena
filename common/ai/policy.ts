@@ -6,7 +6,7 @@
  * record data also carries design content (survey name, labels). `normalizeAiPolicy` and `getEffectiveAiPolicy`
  * clamp to it and `getAllowedLevel` applies it to a policy that was not clamped.
  */
-import { Authorizer, type Survey as ArenaSurvey, type User as ArenaUser } from '@openforis/arena-core'
+import { Authorizer, type ArenaSurvey, type ArenaUser } from '@openforis/arena-core'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 

@@ -1,3 +1,5 @@
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -100,7 +102,10 @@ describe('Server-only user prefs (054)', () => {
   })
 
   test('the user returned by a prefs update has no server-only prefs', async () => {
-    const updated = await UserManager.updateUserPrefs({ uuid: User.getUuid(victim), prefs: { language: 'fr' } })
+    const updated = await UserManager.updateUserPrefs({
+      uuid: User.getUuid(victim),
+      prefs: { language: 'fr' },
+    } as unknown as ArenaUser)
     expectNoServerOnlyPrefs(updated)
     expect(updated.prefs.language).toBe('fr')
   })
@@ -111,7 +116,7 @@ describe('Server-only user prefs (054)', () => {
       ai: { providers: [{ id: 'acct:x', type: 'openai-compatible', apiKeyEncrypted: VICTIM_CIPHERTEXT }] },
       aiUsage: { day: '2026-10-15', calls: 0, chars: 0 },
     }
-    await UserManager.updateUserPrefs({ uuid: User.getUuid(victim), prefs: forged })
+    await UserManager.updateUserPrefs({ uuid: User.getUuid(victim), prefs: forged } as unknown as ArenaUser)
     expect(await readAiPrefs({ userUuid: User.getUuid(victim) })).toEqual(victimAi)
     const stored = await readPrefs(User.getUuid(victim))
     expect(stored.aiUsage).toEqual(victimUsage)
@@ -145,14 +150,14 @@ describe('Server-only user prefs (054)', () => {
     // the key is removed by the AI writer ...
     await writeAiPrefs({ userUuid: victimUuid, aiPrefs: { ...victimAi, providers: [] } })
     // ... then the browser posts the prefs it loaded before (for example on a language change)
-    await UserManager.updateUserPrefs({ uuid: victimUuid, prefs: stale })
+    await UserManager.updateUserPrefs({ uuid: victimUuid, prefs: stale } as unknown as ArenaUser)
     expect((await readAiPrefs({ userUuid: victimUuid }))?.providers).toEqual([])
     expect((await readPrefs(victimUuid)).language).toBe('pt')
   })
 
   test('a prefs update without prefs does not erase the stored ones', async () => {
     const victimUuid = User.getUuid(victim)
-    await UserManager.updateUserPrefs({ uuid: victimUuid })
+    await UserManager.updateUserPrefs({ uuid: victimUuid } as unknown as ArenaUser)
     expect((await readPrefs(victimUuid)).language).toBe('pt')
     expect((await readPrefs(victimUuid)).aiUsage).toEqual(victimUsage)
   })

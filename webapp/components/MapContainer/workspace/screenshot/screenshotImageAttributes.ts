@@ -1,10 +1,11 @@
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import type { ScreenshotImageAttributeOption } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 
 /**
- * Creates a filter for the attributes that can hold a screenshot: image file attributes, editable, in the cycle.
+ * Creates a filter for the attributes that can hold a screenshot: image file attributes allowing it, editable, in the cycle.
  * @param {string} cycle - The survey cycle key.
  * @returns {Function} A predicate taking a node definition.
  */
@@ -13,6 +14,7 @@ export const isImageAttributeDefForScreenshot =
   (def: any): boolean =>
     NodeDef.isFile(def) &&
     NodeDef.getFileType(def) === NodeDef.fileTypeValues.image &&
+    NodeDef.isScreenCaptureInMapAllowed(def) &&
     !NodeDef.isReadOnly(def) &&
     !NodeDef.isAnalysis(def) &&
     NodeDef.isInCycle(cycle)(def)
@@ -36,7 +38,7 @@ export const filterImageAttributeDefs = (defs: any[], cycle: string): any[] =>
 export const toImageAttributeOptions = (
   defs: any[],
   lang: string,
-  rowEntityDef: any = null
+  rowEntityDef: ArenaNodeDefEntity | null = null
 ): ScreenshotImageAttributeOption[] =>
   defs.map((def) => ({
     uuid: NodeDef.getUuid(def),
@@ -91,7 +93,7 @@ export const getImageAttributeOptions = ({
     sorted: true,
     cycle,
   })(survey)
-  const rowOptions = rowEntityDefs.flatMap((rowEntityDef: any) =>
+  const rowOptions = rowEntityDefs.flatMap((rowEntityDef: ArenaNodeDefEntity) =>
     toImageAttributeOptions(
       filterImageAttributeDefs(Survey.getNodeDefChildrenSorted({ nodeDef: rowEntityDef, cycle })(survey), cycle),
       lang,

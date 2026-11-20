@@ -9,7 +9,11 @@ import { ProviderList } from './ProviderList'
 import { useUserAiSettings } from './useUserAiSettings'
 
 type UserAiSettingsPanelProps = {
+  // legend of the panel; null when the panel is already inside a titled container
+  legend?: string | null
   onDirtyChange?: ((dirty: boolean) => void) | null
+  // called once the settings are loaded: false when AI features are disabled on the server (the panel renders nothing)
+  onAvailableChange?: ((available: boolean) => void) | null
 }
 
 /**
@@ -17,7 +21,7 @@ type UserAiSettingsPanelProps = {
  * the ref) and the providers (saved by their own dialog and menu).
  */
 const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettingsPanelProps>(
-  ({ onDirtyChange = null }, ref) => {
+  ({ legend = 'userAiSettings:section', onDirtyChange = null, onAvailableChange = null }, ref) => {
     const panel = useUserAiSettings()
     const { i18n, loading, settings, form, dirty, onSave } = panel
 
@@ -27,20 +31,16 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onDirtyChange?.(dirty)
     }, [dirty, onDirtyChange])
 
-    if (loading || !settings) return null
+    const available = Boolean(settings) && !settings?.aiFeaturesDisabled
 
-    if (settings.aiFeaturesDisabled) {
-      return (
-        <Fieldset className="user-ai-settings-panel" legend="userAiSettings:section">
-          <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
-            {i18n.t('userAiSettings:featuresDisabled')}
-          </div>
-        </Fieldset>
-      )
-    }
+    useEffect(() => {
+      if (!loading) onAvailableChange?.(available)
+    }, [available, loading, onAvailableChange])
+
+    if (loading || !settings || !available) return null
 
     return (
-      <Fieldset className="user-ai-settings-panel" legend="userAiSettings:section">
+      <Fieldset className="user-ai-settings-panel" legend={legend ?? undefined}>
         {!settings.encryptionConfigured && (
           <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
             {i18n.t('userAiSettings:encryptionMissing')}

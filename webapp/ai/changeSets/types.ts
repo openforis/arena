@@ -1,7 +1,7 @@
 /**
  * Change sets: what the Design assistant proposes. Built and validated in the browser, applied only by the user.
  */
-import type { NodeDef as ArenaNodeDef, NodeDefExpression, NodeDefType } from '@openforis/arena-core'
+import type { ArenaNodeDef, ArenaNodeDefExpression, NodeDefType } from '@openforis/arena-core'
 
 import type { RecordAttributeUpdateOperation } from './recordEdits/types'
 import type { CategoryItemLabelSetOperation } from './categoryItemLabels/types'
@@ -70,8 +70,8 @@ export type ExpressionSetOperation = {
   type: 'expression.set'
   nodeDefUuid: string
   prop: NodeDefExpressionProp
-  from: NodeDefExpression[]
-  to: NodeDefExpression[]
+  from: ArenaNodeDefExpression[]
+  to: ArenaNodeDefExpression[]
 }
 
 export type ChangeOperation =

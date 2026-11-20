@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, Navigate } from 'react-router'
+import { Link, Navigate, useSearchParams } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
@@ -13,6 +13,7 @@ import { EmailInput, PasswordInput, VerificationCodeInput } from '@webapp/compon
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 import Error from '@webapp/views/Guest/Error'
+import { ExternalLoginButtons } from '@webapp/views/Guest/components/ExternalLoginButtons'
 import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import { useI18n } from '@webapp/store/system'
@@ -27,6 +28,46 @@ const FormFields = {
   twoFactorToken: 'twoFactorToken',
 }
 
+// handles the redirect back from an external login provider: error or 2FA step
+const useExternalLoginRedirect = () => {
+  const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    const errorKey = searchParams.get('externalLoginError')
+    const step = searchParams.get('externalLoginStep')
+    if (!errorKey && !step) return
+    if (errorKey) {
+      dispatch(LoginActions.setLoginError(LoginActions.toExternalLoginErrorMessageKey(errorKey)))
+    }
+    if (step === '2fa') {
+      dispatch(LoginActions.setExternalLogin(true))
+      dispatch(LoginActions.setViewState(ViewState.ask2FAToken))
+    }
+    // the params are consumed: a page reload does not show them again
+    setSearchParams({}, { replace: true })
+  }, [dispatch, searchParams, setSearchParams])
+}
+
+/**
+ * Shown first, so that new users request access before trying to log in (e.g. with an external provider).
+ * @returns {React.ReactElement} The banner element.
+ */
+const RequestAccessBanner = () => {
+  const i18n = useI18n()
+  return (
+    <div className="guest-login__request-access" data-testid="login-request-access-banner">
+      <div className="guest-login__request-access-text">
+        <strong>{i18n.t('guest:loginView.newToArena')}</strong>
+        <span>{i18n.t('guest:loginView.registerBeforeLoggingIn')}</span>
+      </div>
+      <Link className="guest-login__request-access-button" to={appModuleUri(guestModules.accessRequest)}>
+        {i18n.t('guest:loginView.requestAccess')}
+      </Link>
+    </div>
+  )
+}
+
 const Login = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -35,11 +76,14 @@ const Login = () => {
   const viewState = useSelector(LoginState.getViewState)
   const is2FAViewState = useSelector(LoginState.is2FAViewState)
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
+  const externalLogin = useSelector(LoginState.isExternalLogin)
   const user = useUser()
 
+  useExternalLoginRedirect()
+
   const validatorFn = useCallback(
-    (obj) => LoginValidator.validateLoginObj({ requireTwoFactorToken: is2FAViewState })(obj),
-    [is2FAViewState]
+    (obj) => LoginValidator.validateLoginObj({ requireTwoFactorToken: is2FAViewState, externalLogin })(obj),
+    [is2FAViewState, externalLogin]
   )
 
   const {
@@ -64,6 +108,7 @@ const Login = () => {
   const onClickBack = useCallback(() => {
     setObjectField(FormFields.twoFactorToken, '')
     dispatch(LoginActions.setLoginError(null))
+    dispatch(LoginActions.setExternalLogin(false))
     dispatch(LoginActions.setViewState(ViewState.askUsernameAndPassword))
   }, [dispatch, setObjectField])
 
@@ -143,6 +188,7 @@ const Login = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+      {allowAccessRequest && <RequestAccessBanner />}
       <GuestViewHeader description="guest:loginView.subtitle" title="guest:loginView.title" />
       <Error error={error} />
       <EmailInput
@@ -163,17 +209,7 @@ const Login = () => {
         {i18n.t('guest:loginView.forgotPassword')}
       </Link>
       <Button className="guest__submit" label="guest:loginView.login" onClick={onClickLogin} type="submit" />
-      {allowAccessRequest && (
-        <>
-          <div className="guest__divider">{i18n.t('guest:loginView.or')}</div>
-          <p className="guest__footnote">
-            {i18n.t('guest:loginView.newToArena')}{' '}
-            <Link className="guest__link" to={appModuleUri(guestModules.accessRequest)}>
-              {i18n.t('guest:loginView.requestAccess')}
-            </Link>
-          </p>
-        </>
-      )}
+      <ExternalLoginButtons captionKey="guest:externalLogin.registeredUsersOnly" />
     </form>
   )
 }

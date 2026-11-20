@@ -123,8 +123,9 @@ const listAnthropic = async ({ apiKey }) => {
 const listGoogle = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.google })
   const json = await fetchJson(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
-    { headers: { Accept: 'application/json' } }
+    'https://generativelanguage.googleapis.com/v1beta/models',
+    // the key goes in a header, so it stays out of URLs (and logs)
+    { headers: { Accept: 'application/json', 'x-goog-api-key': apiKey } }
   )
   const models = Array.isArray(json?.models) ? json.models : []
   return models

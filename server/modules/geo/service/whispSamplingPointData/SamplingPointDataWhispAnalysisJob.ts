@@ -1,14 +1,14 @@
 import * as readline from 'node:readline'
 import { Readable } from 'node:stream'
 
-import { Points } from '@openforis/arena-core'
+import { Points, type ArenaSurvey, type ArenaCategory } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import SystemError from '@core/systemError'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
-import { ExtraPropDef as ExtraPropDefUntyped } from '@core/survey/extraPropDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -28,9 +28,6 @@ const pollingPeriod = 10000
 const locationColumnNames = CategoryExportFile.geometryPointColumnsSuffixes.map(
   (suffix: string) => `${Category.locationItemExtraDefName}${suffix}`
 )
-
-// point-free Ramda getters in extraPropDef.js are not inferred as callable by allowJs
-const ExtraPropDef: any = ExtraPropDefUntyped
 
 type FlatRow = Record<string, any>
 
@@ -112,7 +109,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     columnsCollector,
     whispValuesFilePath,
   }: {
-    category: any
+    category: ArenaCategory
     headers: string[]
     samplingPointDataFilePath: string
     columnsCollector: WhispColumnsCollector
@@ -136,8 +133,8 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     })
     // keep the data type of the numeric sampling point data extra props too
     const numericExtraPropNames = Category.getItemExtraDefsArray(category)
-      .filter((extraDef: any) => ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.number)
-      .map((extraDef: any) => ExtraPropDef.getName(extraDef))
+      .filter((extraDef) => ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.number)
+      .map((extraDef) => ExtraPropDef.getName(extraDef))
     this.setContext({
       whispCategoryFilePath,
       numericColumns: [...numericExtraPropNames, ...columnsCollector.getNumericColumns(whispColumns)],
@@ -154,7 +151,15 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     return category
   }
 
-  async exportSamplingPointData({ survey, category, filePath }: { survey: any; category: any; filePath: string }) {
+  async exportSamplingPointData({
+    survey,
+    category,
+    filePath,
+  }: {
+    survey: ArenaSurvey
+    category: ArenaCategory
+    filePath: string
+  }) {
     await CategoryManager.exportCategoryToStream(
       {
         survey,

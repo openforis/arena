@@ -44,6 +44,11 @@
   width: 100%;
   height: calc(100% - #{$formTableRowHeaderHeight});
   overflow: hidden;
+  // same look as the data grids (see `dataGridStyleOverrides` in `webapp/theme/createArenaTheme.ts`)
+  background-color: $colorSurface;
+  border: $tableRowBorder;
+  border-radius: $tableBorderRadius;
+  font-size: 0.9rem;
 
   &.edit {
     overflow-x: auto;
@@ -65,9 +70,10 @@
 .survey-form__node-def-entity-table-row-header {
   position: absolute;
   display: flex;
+  // header background and accent line span the whole table width, like in the data grids
+  min-width: 100%;
   min-height: $formTableRowHeaderHeight;
-  background-color: with-alpha($colorPrimaryContainer, 0.3);
-  border-right: 1px solid transparent;
+  background: $tableHeaderAccent bottom / 100% 2px no-repeat, $colorPrimaryContainerLow;
 
   &.drag-in-progress .draggable-item * {
     pointer-events: none;
@@ -88,15 +94,11 @@
   .survey-form__node-def-entity-table-row-header {
     .react-grid-item {
       display: grid;
-      border-right: $formBorder;
-      border-top: 1px solid $colorOnSurface;
+      // leaves the accent line below the header visible
+      padding-bottom: 2px;
 
-      &:first-child {
-        border-left: 1px solid $colorOnSurface;
-      }
-
-      &:last-child {
-        border-right: 1px solid $colorOnSurface;
+      &:not(:last-child) {
+        border-right: $tableRowBorder;
       }
     }
   }
@@ -121,18 +123,8 @@
   }
 
   .react-grid-item {
-    border-right: $formBorder;
-    border-bottom: $formBorder;
-
-    &:first-child {
-      border-left: $formBorder;
-    }
-  }
-
-  &:first-child {
-    .react-grid-item {
-      border-top: $formBorder;
-    }
+    border-right: $tableRowBorder;
+    border-bottom: $tableRowBorder;
   }
 }
 

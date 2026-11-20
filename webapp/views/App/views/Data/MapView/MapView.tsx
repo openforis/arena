@@ -121,7 +121,7 @@ type MapWrapperState = {
 const MapWrapper = () => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
-  const survey = useSurvey() as any
+  const survey = useSurvey()
 
   // the assistant asks for a layer through the router state; the key changes on every navigation, so each ask counts
   const { state: locationState, key: locationKey } = useLocation()

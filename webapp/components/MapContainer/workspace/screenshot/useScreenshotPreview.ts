@@ -59,7 +59,7 @@ type ComposedImage = { blob: Blob | null; url: string | null; composing: boolean
 type ComposeRequest = {
   capture: MapCaptureResult
   format: ScreenshotFormat
-  markCenter: boolean
+  markPoint: { x: number; y: number } | null
   includeScale: boolean
   includeStamp: boolean
   stamp: ScreenshotStamp
@@ -161,7 +161,7 @@ const useMapCapture = ({
 const composePreviewImage = ({
   capture,
   format,
-  markCenter,
+  markPoint,
   includeScale,
   includeStamp,
   stamp,
@@ -177,7 +177,7 @@ const composePreviewImage = ({
   return canvasToBlob(
     composeScreenshot({
       source: capture.canvas,
-      markCenter,
+      markPoint,
       includeScale,
       includeStamp,
       scaleBar,
@@ -218,7 +218,14 @@ const useComposedImage = ({
   const request = useMemo<ComposeRequest | null>(
     () =>
       capture
-        ? { capture, format, markCenter: capture.atPlot && includeData, includeScale, includeStamp, stamp }
+        ? {
+            capture,
+            format,
+            markPoint: includeData ? capture.plotPixel : null,
+            includeScale,
+            includeStamp,
+            stamp,
+          }
         : null,
     [capture, format, includeData, includeScale, includeStamp, stamp]
   )

@@ -2,7 +2,7 @@
  * Batch record edit (assistant record-edit change sets): one nodesBatchPersist message per record to the records
  * update thread, which checks and applies the edits inside the record lock, waiting for the replies.
  */
-import type { User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
 import * as User from '@core/user/user'

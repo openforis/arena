@@ -67,7 +67,7 @@ ExpressionResult.propTypes = {
 }
 
 const AiExpressionPopup = (props) => {
-  const { excludeCurrentNodeDef = true, isContextParent = false, qualifier, nodeDefUuid, onCancel, onApply } = props
+  const { excludeCurrentNodeDef = true, qualifier, nodeDefUuid, onCancel, onApply } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -111,7 +111,6 @@ const AiExpressionPopup = (props) => {
           survey,
           nodeDefCurrent,
           exprString: res.expression,
-          isContextParent,
           selfReferenceAllowed: !excludeCurrentNodeDef,
         })
         setValidationError(validatorError)
@@ -195,7 +194,6 @@ const AiExpressionPopup = (props) => {
 
 AiExpressionPopup.propTypes = {
   excludeCurrentNodeDef: PropTypes.bool,
-  isContextParent: PropTypes.bool,
   qualifier: PropTypes.string,
   nodeDefUuid: PropTypes.string,
   onCancel: PropTypes.func.isRequired,

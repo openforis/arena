@@ -1,0 +1,279 @@
+import * as A from '@core/arena'
+
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as Validation from '@core/validation/validation'
+import { languageCodesISO639part2 } from '@core/app/languages'
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
+
+import Job from '@server/job/job'
+
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+import TaxonomyImportManager from '@server/modules/taxonomy/manager/taxonomyImportManager'
+
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
+
+const SPECIES_FILES_PATH = 'species/'
+const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
+
+const fixedColumns = new Set(['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name', 'synonyms'])
+
+/**
+ * Inserts a taxonomy for each taxonomy in the Collect survey.
+ * Saves the list of inserted taxonomies in the "taxonomies" context property.
+ */
+export default class TaxonomiesImportJob extends Job {
+  currentRow: any
+  extraPropsDefs: Record<string, { originalHeader: string } & Record<string, unknown>>
+  rowById: Record<string, any>
+  rowNumberByCode: Record<string, any>
+  rowNumberByScientificName: Record<string, any>
+  taxonomyCurrent: any
+  taxonomyImportManager: any
+  vernacularLangCodes: any
+
+  constructor(params?: any) {
+    super('TaxonomiesImportJob', params)
+
+    this.taxonomyCurrent = null // Current taxonomy being imported
+    this.taxonomyImportManager = null // Import manager associated to the current taxonomy
+    this.rowById = {} // Rows cache: used to get family name
+    this.rowNumberByCode = {} // Used to detect duplicate codes
+    this.rowNumberByScientificName = {} // Used to detect duplicate scientific names
+    this.currentRow = 0 // Current file row number
+  }
+
+  async execute() {
+    const { collectSurveyFileZip, survey } = this.context
+
+    const taxonomies = []
+
+    const speciesFileNames = collectSurveyFileZip.getEntryNames({ path: SPECIES_FILES_PATH })
+
+    for (const speciesFileName of speciesFileNames) {
+      if (this.isCanceled()) {
+        break
+      }
+
+      await this.importTaxonomyFromSpeciesFile({ speciesFileName })
+
+      if (!this.isRunning()) {
+        break
+      }
+
+      taxonomies.push(this.taxonomyCurrent)
+      this.taxonomyCurrent = null
+      this.taxonomyImportManager = null
+
+      this.incrementProcessedItems()
+    }
+
+    this.setContext({
+      survey: Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))(survey),
+    })
+  }
+
+  async importTaxonomyFromSpeciesFile({ speciesFileName }) {
+    const { context, tx } = this
+    const { collectSurveyFileZip, fileFormat = FileFormats.csv, surveyId } = context
+
+    this.logDebug(`importing file ${speciesFileName}`)
+
+    // 1. reset duplicate values indexes
+    this.rowNumberByCode = {}
+    this.rowNumberByScientificName = {}
+
+    // 2. insert taxonomy
+    const taxonomyName = speciesFileName.slice(0, -4)
+
+    const taxonomyParam = Taxonomy.newTaxonomy({
+      [Taxonomy.keysProps.name]: taxonomyName,
+    })
+    this.taxonomyCurrent = await TaxonomyManager.insertTaxonomy(
+      { user: this.user, surveyId, taxonomy: taxonomyParam, system: true },
+      tx
+    )
+    const taxonomyUuid = Taxonomy.getUuid(this.taxonomyCurrent)
+
+    // 3. parse CSV file
+    const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${SPECIES_FILES_PATH}${speciesFileName}`)
+
+    const totalPrevious = this.total
+
+    const flatDataReader = FlatDataReader.createReaderFromStream({
+      stream: speciesFileStream,
+      fileFormat,
+      onHeaders: (headers) => this.onHeaders(headers),
+      onRow: async (row) => {
+        if (this.isCanceled()) {
+          flatDataReader.cancel()
+          return
+        }
+        await this.onRow(speciesFileName, taxonomyUuid, row)
+      },
+      onTotalChange: (total) => {
+        this.total = totalPrevious + total
+      },
+    })
+    await flatDataReader.start()
+
+    if (this.isRunning()) {
+      this.logDebug(`file ${speciesFileName} read correctly`)
+    }
+
+    if (this.hasErrors()) {
+      await this.setStatusFailed()
+    } else {
+      await this.taxonomyImportManager.finalizeImport()
+    }
+  }
+
+  async onHeaders(headers) {
+    this.vernacularLangCodes = A.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+    // extra prop names normalized like in the taxonomy import (validated before saving)
+    this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
+      if (!fixedColumns.has(header) && !languageCodesISO639part2.includes(header)) {
+        const extraPropName = StringUtils.normalizeName(header)
+        extraPropsAcc[extraPropName] = { key: extraPropName, originalHeader: header }
+      }
+      return extraPropsAcc
+    }, {})
+
+    this.taxonomyImportManager = new TaxonomyImportManager({
+      user: this.user,
+      surveyId: this.surveyId,
+      taxonomy: this.taxonomyCurrent,
+      vernacularLanguageCodes: this.vernacularLangCodes,
+      extraPropsDefs: this.extraPropsDefs,
+      tx: this.tx,
+    })
+    await this.taxonomyImportManager.init()
+
+    this.currentRow = 1
+    this.incrementProcessedItems()
+  }
+
+  async onRow(speciesFileName, taxonomyUuid, row) {
+    const { id, parent_id: parentId, code, rank, scientific_name: scientificName } = row
+    this.rowById[id] = { id, parent_id: parentId, rank, scientific_name: scientificName } // skip vernacular names in rows cache
+
+    if (this.validateRow(speciesFileName, row)) {
+      const genus = A.pipe(A.split(' '), A.head)(scientificName)
+      const family = this.extractFamily({ row })
+
+      const vernacularNames = A.reduce(
+        (accVernacularNames, lang) => {
+          const vernacularNames = this.extractVernacularNames({ row, lang })
+          const vernacularNamesObjects = vernacularNames.map((name) =>
+            TaxonVernacularName.newTaxonVernacularName(lang, name)
+          )
+          if (vernacularNamesObjects.length === 0) return accVernacularNames
+          return { ...accVernacularNames, [lang]: vernacularNamesObjects }
+        },
+        {},
+        this.vernacularLangCodes
+      )
+
+      const extra = Object.entries(this.extraPropsDefs).reduce((accExtraProps, [extraPropName, { originalHeader }]) => {
+        const value = row[originalHeader]
+        if (StringUtils.isBlank(value)) {
+          return accExtraProps
+        }
+        return { ...accExtraProps, [extraPropName]: value }
+      }, {})
+
+      const taxon = Taxon.newTaxon({ taxonomyUuid, code, family, genus, scientificName, vernacularNames, extra })
+
+      await this.taxonomyImportManager.addTaxonToUpdateBuffer(taxon)
+    }
+
+    this.currentRow++
+    this.incrementProcessedItems()
+  }
+
+  validateRow(speciesFileName, row) {
+    // Do not try to insert taxa with empty or duplicate code or duplicate scientific name (DB constraints)
+    const { code, scientific_name: scientificName } = row
+
+    if (!code) {
+      // ignore rows with blank code (auto-generated by Collect)
+      return false
+    }
+
+    // Check if code is duplicate
+    const rowDuplicateCode = this.rowNumberByCode[code]
+    if (rowDuplicateCode) {
+      this.addError(
+        {
+          [Taxon.propKeys.code]: {
+            valid: false,
+            errors: [
+              {
+                key: Validation.messageKeys.taxonomyEdit.codeDuplicate,
+                params: {
+                  value: code,
+                  row: this.currentRow,
+                  duplicateRow: rowDuplicateCode,
+                },
+              },
+            ],
+          },
+        },
+        speciesFileName
+      )
+    } else {
+      this.rowNumberByCode[code] = this.currentRow
+    }
+
+    // Check if scientific name is duplicate
+    const rowDuplicateScientificName = this.rowNumberByScientificName[scientificName]
+    if (rowDuplicateScientificName) {
+      this.addError(
+        {
+          [Taxon.propKeys.scientificName]: {
+            valid: false,
+            errors: [
+              {
+                key: Validation.messageKeys.taxonomyEdit.scientificNameDuplicate,
+                params: {
+                  value: scientificName,
+                  row: this.currentRow,
+                  duplicateRow: rowDuplicateScientificName,
+                },
+              },
+            ],
+          },
+        },
+        speciesFileName
+      )
+    } else {
+      this.rowNumberByScientificName[scientificName] = this.currentRow
+    }
+
+    return !rowDuplicateCode && !rowDuplicateScientificName
+  }
+
+  extractFamily({ row }) {
+    if (row.rank === 'family') {
+      return row.scientific_name
+    }
+
+    // find ancestor row with rank 'family'
+    let currentRow = row
+    while (currentRow && currentRow.rank !== 'family') {
+      currentRow = this.rowById[currentRow.parent_id]
+    }
+    return currentRow?.scientific_name
+  }
+
+  extractVernacularNames({ row, lang }) {
+    const vernacularNamesStr = row[lang] || ''
+    const vernacularNames = vernacularNamesStr.split(VERNACULAR_NAMES_SEPARATOR_REGEX)
+    const vernacularNamesTrimmed = vernacularNames.map((vernacularName) => StringUtils.trim(vernacularName))
+    return A.uniq(vernacularNamesTrimmed)
+  }
+}

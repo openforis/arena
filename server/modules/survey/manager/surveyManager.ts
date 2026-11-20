@@ -1,0 +1,897 @@
+import * as A from '@core/arena'
+
+import { Numbers, Objects, type ArenaUser, type ArenaSurvey, type ArenaSurveyProps } from '@openforis/arena-core'
+import { DBMigrator, Schemata } from '@openforis/arena-server'
+
+import * as ActivityLog from '@common/activityLog/activityLog'
+
+import { uuidv4 } from '@core/uuid'
+
+import * as ObjectUtils from '@core/objectUtils'
+import { SortOrder } from '@core/sortOrder'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
+import * as SurveyBranding from '@core/survey/surveyBranding'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as SurveyValidator from '@core/survey/surveyValidator'
+import SystemError, { StatusCodes } from '@core/systemError'
+import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
+
+import { db, DbClient } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
+import * as Log from '@server/log/log'
+
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
+import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import {
+  getCurrentAppVersionStamp,
+  isSurveyDataMigrationPending,
+} from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
+import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
+import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
+import * as UserManager from '@server/modules/user/manager/userManager'
+import * as UserRepository from '@server/modules/user/repository/userRepository'
+import * as SurveyRepository from '../repository/surveyRepository'
+
+const Logger = Log.getLogger('SurveyManager')
+
+const assocSurveyInfo = <T>(survey: T): T => survey
+
+const _fetchAndAssocSrss = async ({ surveyInfo }: { surveyInfo: ArenaSurvey }, client: DbClient) => {
+  const srsCodes = Survey.getSRSCodes(surveyInfo)
+  if (srsCodes.length === 0) return surveyInfo
+
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
+  return Survey.assocSrs(srss)(surveyInfo)
+}
+
+const _fetchAndAssocRdbInitialized = async ({ surveyInfo }: { surveyInfo: ArenaSurvey }, client: DbClient) => {
+  const surveyId = Survey.getId(surveyInfo)
+  const rdbInitialized = await SchemaRdbRepository.selectSchemaExists(surveyId, client)
+  return Survey.assocRDBInitilized(rdbInitialized)(surveyInfo)
+}
+
+const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }: { surveyInfo: ArenaSurvey }, client: DbClient) => {
+  const surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
+  return _fetchAndAssocRdbInitialized({ surveyInfo: surveyInfoUpdated }, client)
+}
+
+// ====== VALIDATION
+
+export const validateNewSurvey = async ({ newSurvey }: { newSurvey: Record<string, any> }) => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
+  return SurveyValidator.validateNewSurvey({ newSurvey, surveyInfos })
+}
+
+export const validateSurveyClone = async ({ newSurvey }: { newSurvey: Record<string, any> }) => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
+  return SurveyValidator.validateSurveyClone({ newSurvey, surveyInfos })
+}
+
+export const validateSurveyImportFromCollect = async ({ newSurvey }: { newSurvey: Record<string, any> }) => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
+  return SurveyValidator.validateSurveyImportFromCollect({ newSurvey, surveyInfos })
+}
+
+const validateSurveyInfo = async (surveyInfo: ArenaSurvey) =>
+  SurveyValidator.validateSurveyInfo(surveyInfo, await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo)))
+
+// ====== CREATE
+
+const _addUserToSurveyAdmins = async (
+  { user, surveyInfo }: { user: ArenaUser; surveyInfo: ArenaSurvey },
+  client: DbClient = db
+) => {
+  if (!User.isSystemAdmin(user)) {
+    const surveyAdminsGroup = Survey.getAuthGroupAdmin(surveyInfo)
+    await UserManager.addUserToGroup({ user, surveyInfo, group: surveyAdminsGroup, userToAdd: user }, client)
+  }
+}
+
+// language codes and cycle keys are used as JSON keys and export column names, SRS codes in queries:
+// imported surveys must have valid ones
+const _checkSurveyProps = (props: Partial<ArenaSurveyProps>) => {
+  const langsInvalid = SurveyValidator.getInvalidLanguageCodes(props?.[Survey.infoKeys.languages] ?? [])
+  if (langsInvalid.length > 0) {
+    throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
+  }
+  if (!SurveyValidator.areCycleKeysValid(props?.[Survey.infoKeys.cycles])) {
+    throw new SystemError('survey.cycleKeysInvalid', {}, StatusCodes.BAD_REQUEST)
+  }
+  const srsCodesInvalid = SurveyValidator.getInvalidSrsCodes(props?.[Survey.infoKeys.srs] ?? [])
+  if (srsCodesInvalid.length > 0) {
+    throw new SystemError('survey.srsCodeInvalid', { code: srsCodesInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
+  }
+}
+
+/**
+ * Creates a new survey given the specified parameters.
+ * @param {!object} params - The survey creation parameters.
+ * @param {!object} params.user - The user creating the survey.
+ * @param {!object} params.surveyInfo - The survey info to insert.
+ * @param {boolean} [params.createRootEntityDef] - Whether to create the root entity definition.
+ * @param {boolean} [params.system] - Whether the creation comes from a real user or it's a system activity (survey import).
+ * @param {boolean} [params.updateUserPrefs] - Whether to update the user preferred survey after the creation.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<Survey>} - The newly created survey object.
+ */
+export const insertSurvey = async (
+  params: {
+    user: ArenaUser
+    surveyInfo: ArenaSurvey
+    createRootEntityDef?: boolean
+    system?: boolean
+    updateUserPrefs?: boolean
+    temporary?: boolean
+  },
+  client: DbClient = db
+) => {
+  const {
+    user,
+    surveyInfo: surveyInfoParam,
+    createRootEntityDef = true,
+    system = false,
+    updateUserPrefs = true,
+    temporary = false,
+  } = params
+
+  // Insert survey row on its own (not wrapped in a held-open transaction): DBMigrator.migrateSurveySchema
+  // below opens its own separate db connections (CREATE SCHEMA + db-migrate), so if it ran inside an open
+  // transaction here, that transaction's connection would sit idle while a second connection is acquired
+  // from the same pool. Under concurrent survey creation this starves the pool (no connectionTimeoutMillis
+  // is configured) and can hang the whole server, since every other request also needs a pool connection.
+  const surveyProps = { ...Survey.getProps(surveyInfoParam) }
+  _checkSurveyProps(surveyProps)
+  if (temporary) {
+    surveyProps.temporary = true
+  }
+  // a brand-new survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
+  const appVersion = getCurrentAppVersionStamp()
+  const surveyInfo = await SurveyRepository.insertSurvey(
+    { survey: surveyInfoParam, propsDraft: surveyProps, appVersion },
+    client
+  )
+  const survey = assocSurveyInfo(surveyInfo)
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+
+  try {
+    // Create survey data schema (runs outside of any transaction held by this function; see comment above)
+    await DBMigrator.migrateSurveySchema(surveyId)
+
+    return await client.tx(async (t) => {
+      // Log survey create activity
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
+
+      if (createRootEntityDef) {
+        // Insert root entity def
+        const rootEntityDef = NodeDef.newNodeDef(
+          null,
+          NodeDef.nodeDefType.entity,
+          [Survey.cycleOneKey], // Use first (and only) cycle
+          {
+            [NodeDef.propKeys.name]: 'root_entity',
+            [NodeDef.propKeys.multiple]: false,
+            [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+              Survey.cycleOneKey,
+              NodeDefLayout.renderType.form,
+              uuidv4()
+            ),
+          }
+        )
+        await NodeDefManager.insertNodeDef({ user, survey, nodeDef: rootEntityDef, system: true }, t)
+      }
+
+      if (updateUserPrefs) {
+        const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+        await UserRepository.updateUserPrefs(userUpdated, t)
+      }
+
+      // Create default groups for this survey
+      surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
+
+      await _addUserToSurveyAdmins({ user, surveyInfo }, t)
+
+      return assocSurveyInfo(surveyInfo)
+    })
+  } catch (error) {
+    // Survey row (and possibly the schema) were already created outside of this failed step;
+    // clean them up so a failed creation doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error creating survey ${surveyId}, cleaning up: ${error.stack || error}`)
+    await deleteSurvey(surveyId, { deleteUserPrefs: true }, client).catch((cleanupError) => {
+      Logger.error(`error cleaning up survey ${surveyId} after failed creation: ${cleanupError.stack || cleanupError}`)
+    })
+    throw error
+  }
+}
+
+export const importSurvey = async (
+  params: { user: ArenaUser; surveyInfo: ArenaSurvey; backup?: boolean },
+  client: DbClient = db
+) => {
+  const { user, surveyInfo: surveyInfoParam, backup } = params
+  _checkSurveyProps(Survey.getProps(surveyInfoParam))
+  _checkSurveyProps(Survey.getPropsDraft(surveyInfoParam))
+
+  // See insertSurvey above: migrateSurveySchema opens its own separate db connections, so it must not
+  // run inside a transaction held open by this function (same connection-pool starvation risk).
+  // Insert survey into db
+  // a brand-new (imported or cloned) survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
+  const appVersion = getCurrentAppVersionStamp()
+  const surveyInfo = await SurveyRepository.insertSurvey(
+    {
+      survey: surveyInfoParam,
+      props: backup ? Survey.getProps(surveyInfoParam) : {},
+      propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
+      appVersion,
+    },
+    client
+  )
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+
+  try {
+    // Create survey data schema (runs outside of any transaction held by this function; see insertSurvey above)
+    await DBMigrator.migrateSurveySchema(surveyId)
+
+    return await client.tx(async (t) => {
+      // Create default groups for this survey: groups in the imported file are ignored (they can't be trusted
+      // and could miss roles introduced after the export, e.g. survey guest)
+      let surveyInfoUpdated = Survey.assocAuthGroups(
+        await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
+      )(surveyInfo)
+
+      surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, t)
+
+      await _addUserToSurveyAdmins({ user, surveyInfo: surveyInfoUpdated }, t)
+
+      return assocSurveyInfo(surveyInfoUpdated)
+    })
+  } catch (error) {
+    // Survey row (and possibly the schema) were already created outside of this failed step;
+    // clean them up so a failed import doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error importing survey ${surveyId}, cleaning up: ${error.stack || error}`)
+    await deleteSurvey(surveyId, { deleteUserPrefs: true }, client).catch((cleanupError) => {
+      Logger.error(`error cleaning up survey ${surveyId} after failed import: ${cleanupError.stack || cleanupError}`)
+    })
+    throw error
+  }
+}
+
+// ====== READ
+export const {
+  countOwnedSurveys,
+  countUserSurveys,
+  fetchAllSurveyIds,
+  fetchSurveysByName,
+  fetchSurveyIdsAndNames,
+  fetchDependencies,
+  fetchFilesTotalSpace,
+  fetchSurveyAiPolicy,
+  fetchUserSurveys,
+} = SurveyRepository
+
+/**
+ * Fetches the id and app version of every survey.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
+ */
+export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
+  SurveyRepository.fetchSurveyIdsAndAppVersions(client)
+
+/**
+ * Returns true if the per-survey data migration of the given survey hasn't completed yet.
+ * @param {!number} surveyId - The survey ID.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<boolean>} - False if the survey doesn't exist.
+ */
+export const isSurveyDataMigrationPendingById = async (surveyId: number, client: DbClient = db) => {
+  const surveyAppVersion = await SurveyRepository.fetchSurveyAppVersionById(surveyId, client)
+  return surveyAppVersion ? isSurveyDataMigrationPending({ appVersion: surveyAppVersion.appVersion }) : false
+}
+
+/**
+ * Throws a service-unavailable SystemError if the given survey's per-survey data migration hasn't
+ * completed yet, i.e. its stored app version is older than the latest survey data migration version.
+ * @param {object} surveyInfo - The survey info object.
+ * @returns {void}
+ */
+const assertSurveyDataMigrated = (surveyInfo: ArenaSurvey) => {
+  const surveyId = Survey.getId(surveyInfo)
+  const appVersion = Survey.getAppVersion(surveyInfo)
+  if (isSurveyDataMigrationPending({ appVersion })) {
+    throw new SystemError('survey.dataMigrationInProgress', { surveyId }, StatusCodes.SERVICE_UNAVAILABLE)
+  }
+}
+
+// skipMigrationCheck: for internal callers that run DURING a survey's own pending per-survey data
+// migration (i.e. the migration steps themselves) -- everyone else should leave this false, since it
+// bypasses the assertSurveyDataMigrated guard below.
+export const fetchSurveyById = async (
+  {
+    surveyId,
+    draft = false,
+    validate = false,
+    backup = false,
+    skipMigrationCheck = false,
+  }: { surveyId: number; draft?: boolean; validate?: boolean; backup?: boolean; skipMigrationCheck?: boolean },
+  client: DbClient = db
+) => {
+  const [surveyInfo, authGroups] = await DbUtils.runQueries(client, [
+    () => SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
+    () => AuthGroupRepository.fetchSurveyGroups(surveyId, client),
+  ])
+  if (!skipMigrationCheck) {
+    assertSurveyDataMigrated(surveyInfo)
+  }
+
+  let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
+  surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, client)
+
+  const validation = validate ? await validateSurveyInfo(surveyInfoUpdated) : null
+
+  return assocSurveyInfo({
+    ...surveyInfoUpdated,
+    validation,
+  })
+}
+
+export const fetchSurveyAndNodeDefsBySurveyId = async (
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    backup = false,
+    includeAnalysis = true,
+    skipMigrationCheck = false,
+  }: {
+    surveyId: number
+    cycle?: string
+    draft?: boolean
+    advanced?: boolean
+    validate?: boolean
+    includeDeleted?: boolean
+    backup?: boolean
+    includeAnalysis?: boolean
+    skipMigrationCheck?: boolean
+  },
+  client: DbClient = db
+) => {
+  const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup, skipMigrationCheck }, client)
+  const surveyCycles = Survey.getCycleKeys(
+    backup ? { ...surveyDb, props: ObjectUtils.getPropsAndPropsDraftCombined(surveyDb) } : surveyDb
+  )
+  const [nodeDefs, dependencies, categories, taxonomies] = await DbUtils.runQueries(client, [
+    () =>
+      NodeDefManager.fetchNodeDefsBySurveyId(
+        { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
+        client
+      ),
+    () => fetchDependencies(surveyId, client),
+    () => CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
+    () => TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
+  ])
+
+  let survey = A.pipe(
+    Survey.assocNodeDefsSimple({ nodeDefs }),
+    Survey.assocCategories(categories),
+    Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
+  )(surveyDb)
+
+  if (Objects.isEmpty(dependencies)) {
+    survey = await Survey.buildAndAssocDependencyGraph(survey)
+  } else {
+    survey = Survey.assocDependencyGraph(dependencies)(survey)
+  }
+  if (validate) {
+    const validation = await SurveyValidator.validateNodeDefs(survey)
+    survey = Survey.assocNodeDefsValidation(validation)(survey)
+  }
+  return survey
+}
+
+export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    includeAnalysis = true,
+    backup = false,
+    includeBigCategories = false,
+    includeBigTaxonomies = false,
+  }: {
+    surveyId: number
+    cycle?: string
+    draft?: boolean
+    advanced?: boolean
+    validate?: boolean
+    includeDeleted?: boolean
+    includeAnalysis?: boolean
+    backup?: boolean
+    includeBigCategories?: boolean
+    includeBigTaxonomies?: boolean
+  },
+  client: DbClient = db
+) => {
+  const survey = await fetchSurveyAndNodeDefsBySurveyId(
+    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup },
+    client
+  )
+  const categoryItemsRefData = await CategoryRepository.fetchIndex({ surveyId, draft, includeBigCategories }, client)
+  const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames(
+    { surveyId, draft, includeBigTaxonomies },
+    client
+  )
+
+  return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
+}
+
+const calculateFilesMissing = async ({ surveyId }: { surveyId: number }) => {
+  const nodeDefFileUuids = await NodeDefRepository.fetchFileNodeDefUuidsBySurveyId({ surveyId })
+  if (Objects.isEmpty(nodeDefFileUuids)) {
+    return 0
+  }
+  return NodeRepository.countNodesWithMissingFile({ surveyId, nodeDefFileUuids })
+}
+
+const _validateFetchUserSurveysInfoSortParams = ({
+  sortBy,
+  sortOrder,
+}: {
+  sortBy: string | null
+  sortOrder: string | null
+}) => {
+  // check sortBy is valid
+  if (sortBy && !(Object.values(Survey.sortableKeys) as string[]).includes(sortBy)) {
+    throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
+  }
+  // check sortOrder is valid
+  if (sortOrder) {
+    const sortOrderStr = typeof sortOrder === 'string' ? sortOrder.toLowerCase() : null
+    if (!sortOrderStr || !(Object.values(SortOrder) as string[]).includes(sortOrderStr))
+      throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
+  }
+}
+
+const _filterSurveysWithChains = async (surveys: ArenaSurvey[]) => {
+  const surveysWithChains = []
+  for (const survey of surveys) {
+    const surveyId = Survey.getId(survey)
+    try {
+      const count = await ChainRepository.countChains({ surveyId }) // NOSONAR
+      if (count > 0) surveysWithChains.push(survey)
+    } catch (error) {
+      Logger.error(`fetchUserSurveysInfo: error counting chains for survey ${surveyId}: ${error}`)
+    }
+  }
+  return surveysWithChains
+}
+
+const _fetchSurveyWithCounts = async ({
+  survey,
+  draft,
+  includeDbSize = false,
+}: {
+  survey: ArenaSurvey
+  draft: boolean
+  includeDbSize?: boolean
+}) => {
+  const surveyId = Survey.getId(survey)
+  const surveyWithCounts = {
+    ...survey,
+    cycles: Survey.getCycleKeys(survey).length,
+    languages: (Survey.getLanguages(survey) as string[]).join('|'),
+  }
+  try {
+    const canHaveData = Survey.canHaveData(survey)
+
+    const [
+      { count: filesCount, total: filesSize },
+      nodeDefsCount,
+      recordsCount,
+      recordsCountByApp,
+      chainsCount,
+      filesMissing,
+    ] = await Promise.all([
+      SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId }),
+      NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
+      canHaveData ? RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
+      canHaveData ? RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
+      ChainRepository.countChains({ surveyId }),
+      calculateFilesMissing({ surveyId }),
+    ])
+
+    Object.assign(surveyWithCounts, {
+      nodeDefsCount,
+      recordsCount,
+      recordsCountByApp,
+      chainsCount,
+      filesCount,
+      filesSize,
+      filesMissing,
+    })
+
+    if (includeDbSize) {
+      const [dbSize, dbDataSize] = await Promise.all([
+        DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurvey(surveyId) }),
+        DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurveyRdb(surveyId) }),
+      ])
+      Object.assign(surveyWithCounts, { dbSize, dbDataSize })
+    }
+  } catch (error) {
+    Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)
+  }
+  return surveyWithCounts
+}
+
+// Max number of surveys to fetch counts for concurrently, to avoid exhausting the DB connection pool
+// (each survey can issue up to ~6 concurrent queries via _fetchSurveyWithCounts).
+const _fetchSurveysWithCountsConcurrency = 3
+
+const _fetchSurveysWithCounts = async ({
+  surveys,
+  draft,
+  includeDbSize,
+  onProgress,
+  stopIfFunction,
+}: {
+  surveys: ArenaSurvey[]
+  draft: boolean
+  includeDbSize: boolean
+  onProgress?: ((progress: Record<string, any>) => void) | null
+  stopIfFunction?: (() => boolean) | null
+}) => {
+  const surveysWithCounts = []
+  for (let i = 0; i < surveys.length; i += _fetchSurveysWithCountsConcurrency) {
+    if (stopIfFunction?.()) {
+      break
+    }
+    const batch = surveys.slice(i, i + _fetchSurveysWithCountsConcurrency)
+    const batchWithCounts = /* NOSONAR */ await Promise.all(
+      batch.map((survey) => _fetchSurveyWithCounts({ survey, draft, includeDbSize }))
+    )
+    surveysWithCounts.push(...batchWithCounts)
+    onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
+  }
+  return surveysWithCounts
+}
+
+/**
+ * Fetches the info of the surveys visible to the specified user.
+ * @param {object} params - The parameters.
+ * @param {import('@openforis/arena-core').ArenaUser} params.user - The user.
+ * @param {boolean} [params.draft] - Whether to fetch the draft props.
+ * @param {boolean} [params.template] - Whether to fetch templates instead of surveys.
+ * @param {number} [params.offset] - The offset.
+ * @param {number} [params.limit] - The max number of surveys to fetch.
+ * @param {string} [params.lang] - The language used to sort by label.
+ * @param {string} [params.search] - The text to search.
+ * @param {string} [params.sortBy] - The field to sort by.
+ * @param {string} [params.sortOrder] - The sort order (asc or desc).
+ * @param {boolean} [params.includeCounts] - Whether to include the counts (records, nodes, ...).
+ * @param {boolean} [params.includeDbSize] - Whether to include the db size.
+ * @param {boolean} [params.includeOwnerEmailAddress] - Whether to include the email address of the owner.
+ * @param {boolean} [params.onlyOwn] - Whether to fetch only the surveys owned by the user.
+ * @param {boolean} [params.withChains] - Whether to fetch only the surveys with processing chains.
+ * @param {Function} [params.onProgress] - Called with the progress while fetching the counts.
+ * @param {Function} [params.stopIfFunction] - Returns true when the fetch must stop.
+ * @returns {Promise<import('@openforis/arena-core').ArenaSurvey[]>} - The surveys info.
+ */
+export const fetchUserSurveysInfo = async ({
+  user,
+  draft = true,
+  template = false,
+  offset,
+  limit,
+  lang,
+  search,
+  sortBy,
+  sortOrder,
+  includeCounts = false,
+  includeDbSize = false,
+  includeOwnerEmailAddress = false,
+  onlyOwn = false,
+  withChains = false,
+  onProgress = null,
+  stopIfFunction = null,
+}: {
+  user: ArenaUser
+  draft?: boolean
+  template?: boolean
+  offset?: number
+  limit?: number | null
+  lang?: string
+  search?: string | null
+  sortBy?: string | null
+  sortOrder?: string | null
+  includeCounts?: boolean
+  includeDbSize?: boolean
+  includeOwnerEmailAddress?: boolean
+  onlyOwn?: boolean
+  withChains?: boolean
+  onProgress?: ((progress: Record<string, any>) => void) | null
+  stopIfFunction?: (() => boolean) | null
+}) => {
+  _validateFetchUserSurveysInfoSortParams({ sortBy, sortOrder })
+
+  const surveys = (
+    await SurveyRepository.fetchUserSurveys({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeOwnerEmailAddress,
+      onlyOwn,
+    })
+  ).map((survey) => assocSurveyInfo(survey))
+
+  if (withChains) {
+    return _filterSurveysWithChains(surveys)
+  }
+
+  onProgress?.({ total: surveys.length, processed: 0 })
+
+  if (!includeCounts) {
+    return surveys
+  }
+  return _fetchSurveysWithCounts({ surveys, draft, includeDbSize, onProgress, stopIfFunction })
+}
+
+// ====== UPDATE
+export const updateSurveyProp = (
+  user: ArenaUser,
+  surveyId: number,
+  key: string,
+  value: unknown,
+  system = false,
+  client: DbClient = db
+) =>
+  client.tx(async (t) => {
+    await DbUtils.runQueries(t, [
+      () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+      () => SurveyRepository.markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
+    ])
+
+    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+  })
+
+const updateSurveyCyclesProp = async (
+  {
+    surveyId,
+    value,
+    valuePrev,
+  }: { surveyId: number; value: ArenaSurveyProps['cycles']; valuePrev: ArenaSurveyProps['cycles'] },
+  client: DbClient = db
+) => {
+  const cycles = Object.keys(value)
+  const cyclesPrev = Object.keys(valuePrev)
+  // Add new cycles to nodeDefs
+  const cyclesAdded = A.difference(cycles, cyclesPrev)
+  if (!A.isEmpty(cyclesAdded)) {
+    await NodeDefManager.addNodeDefsCycles(surveyId, A.last(cyclesPrev), cyclesAdded, client)
+  }
+
+  // Remove delete cycles from nodeDefs
+  const cyclesRemoved = A.difference(cyclesPrev, cycles)
+  if (!A.isEmpty(cyclesRemoved)) {
+    await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, client)
+  }
+}
+
+export const updateSurveyProps = (
+  user: ArenaUser,
+  surveyId: number,
+  props: Partial<ArenaSurveyProps>,
+  client: DbClient = db
+) =>
+  client.tx(async (t) => {
+    // only the props are validated
+    const validation = await validateSurveyInfo({ id: surveyId, props } as ArenaSurvey)
+    if (!Validation.isValid(validation)) {
+      return assocSurveyInfo({ validation })
+    }
+    const surveyPrev = await fetchSurveyById({ surveyId, draft: true }, t)
+    const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
+    const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
+
+    for (const [key, value] of Object.entries(props)) {
+      const valuePrev = propsPrev[key]
+
+      if (!A.equals(value, valuePrev)) {
+        /* NOSONAR */ await DbUtils.runQueries(t, [
+          () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+          () => SurveyRepository.markSurveyDraft(surveyId, t),
+          () =>
+            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+        ])
+
+        if (key === Survey.infoKeys.cycles) {
+          const cycles = value as ArenaSurveyProps['cycles']
+          const cyclesPrev = valuePrev as ArenaSurveyProps['cycles']
+          await updateSurveyCyclesProp({ surveyId, value: cycles, valuePrev: cyclesPrev }, t) // NOSONAR
+        }
+      }
+    }
+    const surveyUpdated = await fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+    const surveyInfoUpdated = Survey.getSurveyInfo(surveyUpdated)
+    const preloadedMapLayersUpdated = Survey.getPreloadedMapLayers(surveyInfoUpdated)
+    for (const preloadedMapLayer of preloadedMapLayersUpdated) {
+      const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
+    }
+    const surveyDocImagesUpdated = Survey.getSurveyDocImages(surveyInfoUpdated)
+    for (const surveyDocImage of surveyDocImagesUpdated) {
+      const fileUuid = SurveyFile.getUuid(surveyDocImage)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
+    }
+    const branding = SurveyBranding.getBranding(surveyInfoUpdated)
+    for (const fileUuid of SurveyBranding.getBrandingFileUuids(branding)) {
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
+    }
+    for (const fileUuid of SurveyAreaOfInterest.getAreaOfInterestFileUuids(surveyInfoUpdated)) {
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
+    }
+    await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
+
+    return surveyUpdated
+  })
+
+const deleteUnusedSurveyFilesByType = async (
+  { surveyId, type, usedFileUuids }: { surveyId: number; type: string; usedFileUuids: Set<string> },
+  client: DbClient
+) => {
+  const fileSummaries = await SurveyFileManager.fetchFileSummariesByType({ surveyId, type }, client)
+  const fileSummariesToDelete = fileSummaries.filter(
+    (fileSummary) => !usedFileUuids.has(SurveyFile.getUuid(fileSummary))
+  )
+  if (fileSummariesToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContent({ surveyId, fileSummaries: fileSummariesToDelete }, client)
+    Logger.debug(`Deleted ${fileSummariesToDelete.length} unused ${type} files of survey ${surveyId}`)
+  }
+}
+
+export const deleteUnusedSurveyFiles = async (surveyId: number, client: DbClient = db) => {
+  const survey = await fetchSurveyById({ surveyId, draft: true }, client)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const preloadedMapLayers = Survey.getPreloadedMapLayers(surveyInfo)
+  await deleteUnusedSurveyFilesByType(
+    {
+      surveyId,
+      type: SurveyFile.SurveyFileType.preloadedMapLayer,
+      usedFileUuids: new Set(preloadedMapLayers.map(SurveyFile.getUuid)),
+    },
+    client
+  )
+  // an area of interest file is replaced (not updated) when a new one is uploaded
+  await deleteUnusedSurveyFilesByType(
+    {
+      surveyId,
+      type: SurveyFile.SurveyFileType.areaOfInterest,
+      usedFileUuids: new Set(SurveyAreaOfInterest.getAreaOfInterestFileUuids(surveyInfo)),
+    },
+    client
+  )
+}
+
+export const publishSurveyProps = (surveyId: number, langsDeleted: string[], client: DbClient = db) =>
+  client.tx(async (t) => {
+    await SurveyRepository.publishSurveyProps(surveyId, t)
+    if (!A.isEmpty(langsDeleted)) {
+      await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
+    }
+  })
+
+export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
+  SurveyRepository.unpublishSurveyProps(surveyId, client)
+
+/**
+ * Updates the app version associated to the specified survey.
+ * @param {object} params - The update parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.version - The app version to associate to the survey.
+ * @param {DbClient} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const updateSurveyAppVersion = (
+  { surveyId, version }: { surveyId: number; version: string },
+  client: DbClient = db
+) => SurveyRepository.updateSurveyAppVersion({ surveyId, version }, client)
+
+export const updateSurveyConfigurationProp = async (
+  { surveyId, key, value }: { surveyId: number; key: string; value: number },
+  client: DbClient = db
+) => {
+  if (key !== Survey.configKeys.filesTotalSpace) {
+    throw new Error(`Configuration key update not supported: ${key}`)
+  }
+  const valueLimited = Numbers.limit({
+    minValue: SurveyFileManager.defaultSurveyFilesTotalSpaceMB,
+    maxValue: SurveyFileManager.maxSurveyFilesTotalSpaceMB,
+  })(value)
+  if (valueLimited === SurveyFileManager.defaultSurveyFilesTotalSpaceMB) {
+    await SurveyRepository.deleteSurveyConfigurationProp({ surveyId, key }, client)
+  } else {
+    await SurveyRepository.updateSurveyConfigurationProp({ surveyId, key, value: String(valueLimited) }, client)
+  }
+  return fetchSurveyById({ surveyId, draft: true, validate: true }, client)
+}
+
+export const updateSurveyOwner = (
+  {
+    user,
+    surveyId,
+    ownerUuid,
+    system = false,
+  }: { user: ArenaUser; surveyId: number; ownerUuid: string; system?: boolean },
+  client: DbClient = db
+) =>
+  client.tx(async (t) => {
+    await SurveyRepository.updateSurveyOwner({ surveyId, ownerUuid }, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyOwnerUpdate, { ownerUuid }, system, t)
+  })
+
+export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
+
+// ====== DELETE
+export const deleteSurvey = async (
+  surveyId: number,
+  { deleteUserPrefs = true }: { deleteUserPrefs?: boolean } = {},
+  client: DbClient = db
+) => {
+  // fetch file summaries to delete before survey schema is dropped
+  const filesToDelete = SurveyFileManager.isFileContentStoredInDB()
+    ? []
+    : await SurveyFileManager.fetchFileSummariesBySurveyId(surveyId, client)
+
+  await client.tx(async (t) => {
+    // Drop the schemas first: the survey tables reference the "user" table, so dropping them locks it exclusively.
+    // Updating the user prefs before that would lock some user rows first, and a concurrent user prefs update
+    // (holding a lock on the "user" table and waiting for those rows) would cause a deadlock.
+    await SurveyRepository.dropSurveySchema(surveyId, t)
+    await SchemaRdbRepository.dropSchema(surveyId, t)
+    await SurveyRepository.deleteSurvey(surveyId, t)
+    if (deleteUserPrefs) {
+      await UserRepository.deleteUsersPrefsSurvey(surveyId, t)
+    }
+  })
+  if (filesToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileSummaries: filesToDelete })
+  }
+}
+
+export const deleteTemporarySurveys = ({ olderThan24Hours }: { olderThan24Hours?: boolean }, client: DbClient = db) =>
+  client.tx(async (t) => {
+    const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
+    for (const surveyId of surveyIds) {
+      await deleteSurvey(surveyId, { deleteUserPrefs: true }, t) // NOSONAR
+    }
+    return surveyIds.length
+  })
+
+export const deleteAllActivityLog = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
+  ActivityLogRepository.deleteAll({ surveyId }, client)
+
+export const { dropSurveySchema } = SurveyRepository
+
+export { fetchUserGroupAccessFilters, fetchUserQualifierFilters } from './surveyUserGroupQualifierFilters'

@@ -1,0 +1,744 @@
+import type { Router } from 'express'
+import * as Request from '@server/utils/request'
+import { parseItemsLimit } from './categoryItemsLimit'
+import * as Response from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
+
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as ObjectUtils from '@core/objectUtils'
+import { FileFormats } from '@core/fileFormats'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
+import * as CategoryService from '../service/categoryService'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
+
+// props edited by the category editor: the other ones have dedicated routes (e.g. extradef, with validation)
+const categoryUpdatablePropKeys = [
+  Category.keysProps.name,
+  Category.keysProps.designerNotes,
+  Category.keysProps.reportingData,
+]
+const levelUpdatablePropKeys = [CategoryLevel.keysProps.name]
+
+export const init = (app: Router) => {
+  // ==== CREATE
+  app.post('/survey/:surveyId/categories', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const categoryReq = Request.getBody(req)
+
+      const category = await CategoryService.insertCategory({ user, surveyId, category: categoryReq })
+      res.json({ category })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post(
+    '/survey/:surveyId/categories/clone-from-survey',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceCategoryUuid = Request.getRequiredParam(req, 'sourceCategoryUuid')
+
+        const category = await CategoryService.cloneCategoryFromSurvey({
+          user,
+          sourceSurveyId,
+          sourceCategoryUuid,
+          targetSurveyId: surveyId,
+        })
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/upload',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, fileFormat } = Request.getParams(req)
+        const filePath = Request.getFilePath(req)
+
+        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath, fileFormat })
+
+        res.json({ summary, error })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/import',
+    AuthMiddleware.requireSurveyEditPermission,
+    (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const summary = Request.getBody(req)
+
+        const job = CategoryService.importCategory({ user, surveyId, categoryUuid, summary })
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post('/survey/:surveyId/categories/import', AuthMiddleware.requireSurveyEditPermission, (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId } = Request.getParams(req)
+      const filePath = Request.getFilePath(req)
+
+      const job = CategoryService.createBatchImportJob({ user, surveyId, filePath })
+
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/levels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const level = Request.getBody(req)
+
+        const { category } = await CategoryService.insertLevel({ user, surveyId, level })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/items',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const itemReq = Request.getBody(req)
+
+        const { category, item } = await CategoryService.insertItem(user, surveyId, categoryUuid, itemReq)
+
+        res.json({ category, item })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // categories export (start job)
+  app.post('/survey/:surveyId/categories/export', AuthMiddleware.requireSurveyEditPermission, (req, res, next) => {
+    try {
+      const { surveyId, fileFormat, draft = false } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const job = CategoryService.exportAllCategories({ user, surveyId, fileFormat, draft })
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // categories export (download generated zip file)
+  app.get(
+    '/survey/:surveyId/categories/export/download',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, draft = false, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const name = `${Survey.getName(surveyInfo)}_categories.zip`
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+
+        Response.sendFile({
+          res,
+          path: exportedFilePath,
+          name,
+          contentType: Response.contentTypes.zip,
+        })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // ==== READ
+  // assistant suggestion 6: edit permission, the labels are only read to be written
+  app.get(
+    '/survey/:surveyId/categories/items/missing-labels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        res.json(await CategoryService.countItemsMissingLabels({ surveyId }))
+      } catch (error) {
+        // Response.sendErr (not next(error)): see convertToSamplingPointData, the error key would be lost
+        sendRouteError({ res, error, context: 'category items missing labels count' })
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items/missing-labels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId, categoryUuid, lang, cursor, limit } = Request.getParams(req)
+        res.json(await CategoryService.fetchItemsMissingLabels({ surveyId, categoryUuid, lang, cursor, limit }))
+      } catch (error) {
+        sendRouteError({ res, error, context: 'category items missing labels page' })
+      }
+    }
+  )
+
+  app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft, validate, offset = 0, limit = null, search = '' } = Request.getParams(req)
+
+      const categoriesByUuid = await CategoryService.fetchCategoriesAndLevelsBySurveyId({
+        surveyId,
+        draft,
+        includeValidation: validate,
+        offset,
+        limit,
+        search,
+      })
+
+      // sort by name
+      const categoriesSorted = Object.values(categoriesByUuid).sort((category1, category2) => {
+        const name1 = Category.getName(category1)
+        const name2 = Category.getName(category2)
+        if (name1 > name2) return 1
+        if (name1 < name2) return -1
+        return 0
+      })
+      res.json({ list: categoriesSorted })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/categories/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+
+      const count = await CategoryService.countCategories({ surveyId, draft })
+
+      res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get(
+    '/survey/:surveyId/categories/items-count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, draft } = Request.getParams(req)
+
+        const countsByCategoryUuid = await CategoryService.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
+        res.json(countsByCategoryUuid)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // Fetch category by uuid
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft, validate } = Request.getParams(req)
+
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({
+          surveyId,
+          categoryUuid,
+          draft,
+          includeValidation: validate,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+
+        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const job = CategoryService.exportCategoryToGeoPackage({ user, surveyId, categoryUuid, draft })
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage/download',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+        const name = `${Survey.getName(surveyInfo)}_${Category.getName(category)}.gpkg`
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+
+        Response.sendFile({
+          res,
+          path: exportedFilePath,
+          name,
+          contentType: Response.contentTypes.gpkg,
+        })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/import-template/',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const {
+          surveyId,
+          categoryUuid,
+          draft = true,
+          generic = false,
+          samplingPointData = false,
+          fileFormat = FileFormats.csv,
+        } = Request.getParams(req)
+
+        if (generic) {
+          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res, fileFormat })
+        } else if (samplingPointData) {
+          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res, fileFormat })
+        } else {
+          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res, fileFormat })
+        }
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // Fetch items by parent item uuid
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
+        const limit = parseItemsLimit(Request.getNumericParam(req, 'limit'))
+
+        const items = ObjectUtils.toUuidIndexedObj(
+          await CategoryService.fetchItemsByParentUuid({
+            surveyId,
+            categoryUuid,
+            parentUuid,
+            draft,
+            search,
+            lang,
+            limit,
+          })
+        )
+
+        res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
+
+        const count = await CategoryService.countItemsByParentUuid({
+          surveyId,
+          categoryUuid,
+          parentUuid,
+          draft,
+          search,
+          lang,
+        })
+
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // Fetch items by level uuid
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/levels/:levelIndex/items',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, levelIndex, draft } = Request.getParams(req)
+
+        const items = await CategoryService.fetchItemsByLevelIndex({
+          surveyId,
+          categoryUuid,
+          levelIndex: Number(levelIndex),
+          draft,
+        })
+
+        res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/sampling-point-data/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, levelIndex = 0 } = Request.getParams(req)
+
+        const count = await CategoryService.countSamplingPointData({ surveyId, levelIndex: Number(levelIndex) })
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/sampling-point-data',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, levelIndex = 0, limit = null, offset = null } = Request.getParams(req)
+
+        const items = await CategoryService.fetchSamplingPointData({
+          surveyId,
+          levelIndex: Number(levelIndex),
+          limit,
+          offset,
+        })
+        res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // ==== UPDATE
+
+  // assistant suggestion 6: compare-and-set of category item labels, one language per item
+  app.put('/survey/:surveyId/categories/items/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    try {
+      const user = Request.getUser(req)
+      // the labels come from the assistant: the AI switches (server and user) apply, as for the gateway
+      assertFeatureEnabled('assistantDesign', user)
+      const { surveyId } = Request.getParams(req)
+      const { items } = Request.getBody(req) ?? {}
+      res.json(await CategoryService.updateItemsLabels({ user, surveyId, items }))
+    } catch (error) {
+      sendRouteError({ res, error, context: 'category item labels update' })
+    }
+  })
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, categoryUpdatablePropKeys)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.updateCategoryProp({ user, surveyId, categoryUuid, key, value })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/extradef',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, name, deleted } = Request.getParams(req)
+        const itemExtraDef = Request.getJsonParam(req, 'itemExtraDef')
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.updateCategoryItemExtraDefItem({
+          user,
+          surveyId,
+          categoryUuid,
+          name,
+          itemExtraDef,
+          deleted,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, levelUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, levelUpdatablePropKeys)
+        const user = Request.getUser(req)
+
+        const { category } = await CategoryService.updateLevelProp(user, surveyId, categoryUuid, levelUuid, key, value)
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/items/:itemUuid',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, itemUuid, key, value } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const { category } = await CategoryService.updateItemProp(user, surveyId, categoryUuid, itemUuid, key, value)
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/item-indexes',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, indexByUuid, parentUuid = null } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        await CategoryService.updateItemsIndex({
+          user,
+          surveyId,
+          categoryUuid,
+          indexByUuid,
+          parentUuid,
+        })
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/cleanup',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const { deleted = false, updated = false } = await CategoryService.cleanupCategory({
+          user,
+          surveyId,
+          categoryUuid,
+        })
+
+        res.json({ deleted, updated })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToReportingData',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToReportingData({
+          user,
+          surveyId,
+          categoryUuid,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToSamplingPointData',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToSamplingPointData({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
+        // before these routes in the Express stack, so next(error) never reaches it and the specific
+        // error key/params would be lost (the client would get a generic HTML error page instead).
+        sendRouteError({ res, error, context: 'category conversion to sampling point data' })
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToGeoPackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToGeoPackage({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // ==== DELETE
+
+  app.delete(
+    '/survey/:surveyId/categories/:categoryUuid',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        await CategoryService.deleteCategory(user, surveyId, categoryUuid)
+
+        res.json({})
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.delete(
+    '/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, levelUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.deleteLevel(user, surveyId, categoryUuid, levelUuid)
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.delete(
+    '/survey/:surveyId/categories/:categoryUuid/items/:itemUuid',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, itemUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.deleteItem(user, surveyId, categoryUuid, itemUuid)
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+}

@@ -36,8 +36,10 @@ export const keys = {
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
   fieldManualLinks: 'fieldManualLinks',
+  formPreviewForDataEntryUsers: 'formPreviewForDataEntryUsers',
   keepNonApplicableValues: 'keepNonApplicableValues',
   name: 'name',
+  notifyAdminsOnRecordsUploadFromMobile: 'notifyAdminsOnRecordsUploadFromMobile',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
   preloadedMapLayers: 'preloadedMapLayers',
@@ -126,9 +128,9 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
 
 export const isPreloadedMapLayersEnabled = ObjectUtils.isPropTrue(keys.preloadedMapLayersEnabled)
 
-export const getPreloadedMapLayers = ObjectUtils.getProp(keys.preloadedMapLayers, [])
+export const getPreloadedMapLayers = ObjectUtils.getProp<Record<string, any>[]>(keys.preloadedMapLayers, [])
 
-export const getSurveyDocImages = ObjectUtils.getProp(keys.surveyDocImages, [])
+export const getSurveyDocImages = ObjectUtils.getProp<Record<string, any>[]>(keys.surveyDocImages, [])
 
 export const getSurveyDocOptions = ObjectUtils.getProp(keys.surveyDocOptions, {})
 
@@ -140,6 +142,14 @@ export const isDocPageNumberingEnabled = (surveyInfo: any): boolean =>
 
 // when false (default), values of attributes becoming non-applicable are cleared during data entry
 export const isKeepNonApplicableValues = ObjectUtils.isPropTrue(keys.keepNonApplicableValues)
+
+// when true, survey admins receive an email when records are uploaded from Arena Mobile
+export const isNotifyAdminsOnRecordsUploadFromMobile = ObjectUtils.isPropTrue(
+  keys.notifyAdminsOnRecordsUploadFromMobile
+)
+
+// when true, users who cannot edit the survey but can enter data can preview the draft (not published) form
+export const isFormPreviewForDataEntryUsers = ObjectUtils.isPropTrue(keys.formPreviewForDataEntryUsers)
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
@@ -194,7 +204,7 @@ export const getDatePublished = ObjectUtils.getDate(keys.datePublished)
 
 export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
-export const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
+export const getCollectReport = ObjectUtils.getProp<Record<string, any>>(keys.collectReport, {})
 
 export const hasCollectReportIssues = A.pipe(
   getCollectReport,

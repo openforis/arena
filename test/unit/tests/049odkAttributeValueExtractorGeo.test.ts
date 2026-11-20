@@ -1,10 +1,11 @@
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { extractAttributeValue } from '@server/modules/odkImport/service/odkImport/dataImportJobs/odkAttributeValueExtractor'
 
-const geoNodeDef = { type: 'geo' }
+const geoNodeDef = { type: 'geo' } as ArenaAnyNodeDef
 
 const extractGeo = (rawText: string) =>
   extractAttributeValue({
-    survey: {},
+    survey: {} as ArenaSurvey,
     nodeDef: geoNodeDef,
     categoryItemProvider: { getItemByCode: async () => null },
     rawText,

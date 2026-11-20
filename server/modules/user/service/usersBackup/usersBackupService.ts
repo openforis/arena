@@ -1,3 +1,4 @@
+import type { ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -11,13 +12,19 @@ import { UsersBackupPreview, UsersBackupUserAction } from './usersBackupModel'
 const startExportJob = ({
   user,
   includePasswords = true,
+  emails = null,
   serverUrl,
 }: {
-  user: any
+  user: ArenaUser
   includePasswords?: boolean
+  // when null, all the users are exported
+  emails?: string[] | null
   serverUrl: string
 }) => {
-  const job = new UsersBackupExportJob({ user, includePasswords, serverUrl })
+  if (emails !== null && (!Array.isArray(emails) || emails.some((email) => typeof email !== 'string'))) {
+    throw new Error('Invalid emails parameter')
+  }
+  const job = new UsersBackupExportJob({ user, includePasswords, emails, serverUrl })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }
@@ -53,7 +60,7 @@ const startImportJob = ({
   actionsByEmail = {},
   restorePasswordEmails = null,
 }: {
-  user: any
+  user: ArenaUser
   tempFileName: string
   actionsByEmail?: Record<string, UsersBackupUserAction>
   // when null, all the passwords in the backup are restored

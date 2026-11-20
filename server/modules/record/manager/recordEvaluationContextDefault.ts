@@ -1,4 +1,4 @@
-import type { LanguageCode } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, LanguageCode } from '@openforis/arena-core'
 
 import type { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 
@@ -16,8 +16,8 @@ export const RecordProvidersDefault = {
 }
 
 type CreateParams = {
-  user: any
-  survey: any
+  user: ArenaUser
+  survey: ArenaSurvey
   timezoneOffset?: number | null
   lang?: string | null
 }

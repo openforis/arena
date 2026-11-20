@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useEffect, useCallback, useLayoutEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -16,9 +16,7 @@ export const useTable = ({
   moduleApiUri,
   module,
   restParams,
-  onRowClick: onRowClickProp,
-  selectable,
-  selectOnClick,
+  keepSelectionOnSearch = false,
 }) => {
   const dispatch = useDispatch()
 
@@ -72,13 +70,18 @@ export const useTable = ({
     },
   })
 
-  const initData = () => {
-    fetchData()
-    fetchCount()
-  }
+  // stable function (passed to every row) calling the latest fetch functions
+  const fetchAllRef = useRef(null)
+  useLayoutEffect(() => {
+    fetchAllRef.current = () => {
+      fetchData()
+      fetchCount()
+    }
+  })
+  const initData = useCallback(() => fetchAllRef.current(), [])
 
   // init data on mount and on restParams and search update
-  useEffect(initData, [JSON.stringify(restParams), search])
+  useEffect(initData, [initData, JSON.stringify(restParams), search])
 
   if (totalCount < count) {
     setTotalCount(count)
@@ -141,23 +144,18 @@ export const useTable = ({
   // reset selected items when filter, search or page size change, or data is refreshed (e.g. records update)
   useOnUpdate(() => {
     deselectAllItems()
-  }, [JSON.stringify(restParams), search, limit])
+  }, [JSON.stringify(restParams), keepSelectionOnSearch ? null : search, limit])
 
-  const onRowClick = useCallback(
-    async (item) => {
-      if (onRowClickProp) {
-        await onRowClickProp(item)
-      }
-      if (selectable && selectOnClick) {
-        const key = keyExtractor({ item })
-        const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
-          item,
-          compareFn: (_item) => keyExtractor({ item: _item }) === key,
-        })
-        setSelectedItems(selectedItemsUpdated)
-      }
+  const toggleItemSelection = useCallback(
+    (item) => {
+      const key = keyExtractor({ item })
+      const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
+        item,
+        compareFn: (_item) => keyExtractor({ item: _item }) === key,
+      })
+      setSelectedItems(selectedItemsUpdated)
     },
-    [keyExtractor, onRowClickProp, selectOnClick, selectable]
+    [keyExtractor]
   )
 
   const onVisibleColumnsChange = useCallback(
@@ -180,8 +178,8 @@ export const useTable = ({
     count: Number(count),
     totalCount: Number(totalCount),
     initData,
-    onRowClick,
     onVisibleColumnsChange,
+    toggleItemSelection,
     selectedItems,
     selectAllItems,
     deselectAllItems,

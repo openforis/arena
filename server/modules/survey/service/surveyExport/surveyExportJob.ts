@@ -1,0 +1,85 @@
+import * as User from '@core/user/user'
+
+import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
+import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
+
+import ActivityLogExportJob from './jobs/activityLogExportJob'
+import CategoriesExportJob from './jobs/categoriesExportJob'
+import ChainExportJob from './jobs/chainExportJob'
+import RecordFilesExportJob from './jobs/recordFilesExportJob'
+import RecordsExportJob from './jobs/recordsExportJob'
+import SurveyFilesExportJob from './jobs/surveyFilesExportJob'
+import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
+import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
+import UsersExportJob from './jobs/usersExportJob'
+import InfoExportJob from './jobs/infoExportJob'
+
+const createInnerJobs = ({
+  backup,
+  includeResultAttributes,
+  includeActivityLog,
+}: {
+  backup: boolean
+  includeResultAttributes: boolean
+  includeActivityLog: boolean
+}) => {
+  // records, files, activity log are included only if exporting survey as backup (not cloning)
+  return [
+    new SurveyInfoExportJob(),
+    new CategoriesExportJob(),
+    new TaxonomiesExportJob(),
+    new SurveyFilesExportJob(),
+    ...(backup ? [new RecordsExportJob({ includeResultAttributes }), new RecordFilesExportJob()] : []),
+    new ChainExportJob(),
+    ...(backup && includeActivityLog ? [new UsersExportJob(), new ActivityLogExportJob()] : []),
+    new InfoExportJob(),
+  ]
+}
+
+export default class SurveyExportJob extends ZipFileCreatorBaseJob {
+  static readonly type: string = 'SurveyExportJob'
+
+  /**
+   * It creates a survey export job that exports a survey including node definitions, categories, taxonomies, chains and users.
+   * If the export is for a backup, it includes also records, files and activity log.
+   * @param {!object} params - The export parameters.
+   * @param {!number} [params.surveyId] - The id of the survey to export.
+   * @param {!object} [params.user] - The user performing the export.
+   * @param {string} [params.outputFileName] - If specified, it will be used to generate the name of the export file, otherwise the file name will be automatically generated.
+   * @param {boolean} [params.backup] - If true, includes also published and draft props, records, files and activity log.
+   * @param {boolean} [params.includeResultAttributes] - If true, includes result attributes data in the export.
+   * @param {boolean} [params.includeActivityLog] - If true, includes the activity log in the export.
+   * @returns {SurveyExportJob} - The export job.
+   */
+  constructor(params?: any) {
+    const { backup = true, includeResultAttributes = true, includeActivityLog = true } = params
+    super(
+      SurveyExportJob.type,
+      { ...params, backup, includeResultAttributes, includeActivityLog },
+      createInnerJobs({ backup, includeResultAttributes, includeActivityLog })
+    )
+  }
+
+  async generateResult() {
+    const result = await super.generateResult()
+
+    const { token: downloadToken } = this.generateDownloadToken()
+
+    return { ...result, downloadToken }
+  }
+
+  async beforeSuccess() {
+    await super.beforeSuccess()
+    // cleanup job context
+    this.deleteContextProps('survey', 'surveyId')
+  }
+
+  generateDownloadToken() {
+    this.logDebug('Generating download token')
+    const { user, outputFileName } = this.context
+
+    const userUuid = User.getUuid(user)
+
+    return DownloadAuthTokenUtils.generateToken({ userUuid, fileName: outputFileName })
+  }
+}

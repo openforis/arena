@@ -1,4 +1,4 @@
-import { I18n } from '@openforis/arena-core'
+import { ArenaI18n } from '@openforis/arena-core'
 
 type DeletedSurvey = { name: string; label?: string }
 
@@ -6,7 +6,7 @@ type MsgParams = { accountRemovedMsg: string; requestAccessAgainMsg: string }
 
 const msgKey = 'emails:userRegistrationExpired'
 
-const getAccountRemovedMsg = ({ i18n, surveys }: { i18n: I18n; surveys: DeletedSurvey[] }): string => {
+const getAccountRemovedMsg = ({ i18n, surveys }: { i18n: ArenaI18n; surveys: DeletedSurvey[] }): string => {
   if (surveys.length === 0) {
     return i18n.t(`${msgKey}.accountRemoved`)
   }
@@ -25,7 +25,7 @@ const getAccountRemovedMsg = ({ i18n, surveys }: { i18n: I18n; surveys: DeletedS
  * @param params.serverUrl - The public URL of the server (the link to it is omitted when empty).
  * @returns The message params.
  */
-const getMsgParams = (params: { i18n: I18n; surveys: DeletedSurvey[]; serverUrl?: string }): MsgParams => {
+const getMsgParams = (params: { i18n: ArenaI18n; surveys: DeletedSurvey[]; serverUrl?: string }): MsgParams => {
   const { i18n, surveys, serverUrl } = params
   return {
     accountRemovedMsg: getAccountRemovedMsg({ i18n, surveys }),

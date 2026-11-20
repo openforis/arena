@@ -2,6 +2,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import { toKeyText } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
+import { isPointInBounds, type LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
 
 import type {
   ActiveLayer,
@@ -101,20 +102,25 @@ export const planarDistance = (a: LatLngLiteral, b: LatLngLiteral): number => {
  * @param {object} params - The parameters.
  * @param {Array<PlotLayer>} params.layers - The plot layers.
  * @param {LatLngLiteral|null} params.center - The map centre; null sorts by label.
+ * @param {LatLngBoundsLiteral|null} [params.bounds] - The map view: plots outside it are left out; null keeps them all.
  * @returns {Array<ScreenshotPlotCandidate>} One candidate per plot, nearest first.
  */
 export const buildPlotCandidates = ({
   layers,
   center,
+  bounds = null,
 }: {
   layers: PlotLayer[]
   center: LatLngLiteral | null
+  bounds?: LatLngBoundsLiteral | null
 }): ScreenshotPlotCandidate[] => {
   const byKey = new Map<string, ScreenshotPlotCandidate>()
   for (const layer of layers) {
     for (const point of layer.points) {
       const candidate = toCandidate(layer, point)
-      if (candidate && !byKey.has(candidate.key)) byKey.set(candidate.key, candidate)
+      if (candidate && !byKey.has(candidate.key) && (!bounds || isPointInBounds(candidate, bounds))) {
+        byKey.set(candidate.key, candidate)
+      }
     }
   }
   const candidates = [...byKey.values()]

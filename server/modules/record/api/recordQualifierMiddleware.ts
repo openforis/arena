@@ -1,6 +1,13 @@
 import type { NextFunction, Request as ExpressRequest, Response } from 'express'
 
-import { ArenaRecord, ArenaRecordNode, Authorizer, NodeDef, NodeDefType, Survey, User } from '@openforis/arena-core'
+import {
+  ArenaRecord,
+  ArenaRecordNode,
+  Authorizer,
+  ArenaSurvey,
+  ArenaUser,
+  ArenaAnyNodeDef,
+} from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
@@ -14,7 +21,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-type QualifierFilter = { nodeDef: NodeDef<NodeDefType>; value: unknown }
+type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 
 // see SurveyManager.fetchUserGroupAccessFilters
 type UserGroupAccessFilters = {
@@ -22,7 +29,7 @@ type UserGroupAccessFilters = {
   readable: QualifierFilter[][]
 }
 
-type SurveyAndAccessFilters = { survey: Survey; accessFilters: UserGroupAccessFilters }
+type SurveyAndAccessFilters = { survey: ArenaSurvey; accessFilters: UserGroupAccessFilters }
 
 type FetchSurveyAndAccessFiltersByCycle = (cycle: string) => Promise<SurveyAndAccessFilters>
 
@@ -43,7 +50,7 @@ const _fetchSurveyAndAccessFiltersByCycleCached = ({
   user,
 }: {
   surveyId: number
-  user: User
+  user: ArenaUser
 }): FetchSurveyAndAccessFiltersByCycle => {
   const cacheByCycle = new Map<string, SurveyAndAccessFilters>()
   return async (cycle) => {
@@ -65,7 +72,7 @@ const _determineRecordAccessByUserGroup = async ({
   pendingNode = null,
   fetchSurveyAndAccessFiltersByCycle,
 }: {
-  user: User
+  user: ArenaUser
   surveyId: number
   recordUuid: string
   pendingNode?: ArenaRecordNode | null

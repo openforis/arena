@@ -9,13 +9,13 @@ import User2FADeviceHeaderLeft from './HeaderLeft'
 
 export const User2FADeviceList = () => {
   const navigate = useNavigate()
-  const columns = useUser2FADeviceColumns()
-  const onRowClick = useCallback(
+  const onRowOpen = useCallback(
     (item) => {
       navigate(`${appModuleUri(user2FADeviceModules.user2FADevice)}${item.uuid}`)
     },
     [navigate]
   )
+  const columns = useUser2FADeviceColumns({ onRowOpen })
 
   return (
     <Table
@@ -23,8 +23,7 @@ export const User2FADeviceList = () => {
       moduleApiUri="/api/2fa/devices"
       columns={columns}
       headerLeftComponent={User2FADeviceHeaderLeft}
-      onRowClick={onRowClick}
-      selectable={false}
+      onRowOpen={onRowOpen}
       visibleColumnsSelectionEnabled
     />
   )

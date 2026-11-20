@@ -21,7 +21,7 @@ describe('survey config keys', () => {
 describe('fetchSurveyAiPolicy', () => {
   test('selects only config.aiPolicy of the survey', async () => {
     const client = newFakeClient({ value: { schema: 'off', data: 'cloud' } })
-    const value = await SurveyRepository.fetchSurveyAiPolicy(12, client)
+    const value = await SurveyRepository.fetchSurveyAiPolicy(12, client as never)
     expect(value).toEqual({ schema: 'off', data: 'cloud' })
     expect(client.calls).toHaveLength(1)
     expect(client.calls[0].query).toContain(`config#>'{aiPolicy}'`)
@@ -30,7 +30,7 @@ describe('fetchSurveyAiPolicy', () => {
 
   test('returns null when the survey has no policy', async () => {
     const client = newFakeClient({ value: null })
-    expect(await SurveyRepository.fetchSurveyAiPolicy(12, client)).toBeNull()
+    expect(await SurveyRepository.fetchSurveyAiPolicy(12, client as never)).toBeNull()
   })
 })
 

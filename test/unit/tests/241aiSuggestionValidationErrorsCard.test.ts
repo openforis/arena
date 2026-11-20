@@ -64,7 +64,7 @@ describe('validation errors suggestion card and prompt (241)', () => {
     expect(SUGGESTION_DEFINITIONS.validationErrors).toBe(validationErrorsDefinition)
   })
 
-  test('the card text exists in the 7 languages, with the count', () => {
+  test('the card text exists in every language, with the count', () => {
     for (const lang of LANGUAGES) {
       const text = getText(lang, 'validationErrors.card')
       expect(typeof text).toBe('string')

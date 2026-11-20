@@ -114,7 +114,7 @@ describe('Data Explorer user group access', () => {
     })
     const filePath = FileUtils.tempFilePath(tempFileName)
     const content = await FileUtils.readFile(filePath)
-    await FileUtils.deleteFile(filePath)
+    await FileUtils.deleteFileAsync(filePath)
 
     const lines = content.split(/\r?\n/).filter((line: string) => line.length > 0)
     // header + 2 records

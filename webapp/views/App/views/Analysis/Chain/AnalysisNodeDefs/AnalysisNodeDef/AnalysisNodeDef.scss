@@ -19,10 +19,11 @@
   margin-top: 16px;
   height: 32px;
   padding: unset;
-  background-color: v.$colorInverseSurface;
-  color: v.$colorInverseOnSurface;
-  text-transform: uppercase;
-  font-size: 0.8rem;
+  // same look as the table headers
+  background: v.$tableHeaderAccent bottom / 100% 2px no-repeat, v.$colorPrimaryContainerLow;
+  color: v.$colorOnPrimaryContainer;
+  border-radius: v.$tableBorderRadius v.$tableBorderRadius 0 0;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 

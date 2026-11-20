@@ -1,7 +1,7 @@
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
-import type { ArenaRecordNode, ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { Authorizer } from '@openforis/arena-core'

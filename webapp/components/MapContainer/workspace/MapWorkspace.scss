@@ -1,4 +1,5 @@
 @use '~@webapp/style/vars' as *;
+@use '~@webapp/style/layoutMixins' as *;
 
 .map-workspace {
   display: flex;
@@ -261,6 +262,7 @@
   }
 
   &__panel {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -293,6 +295,16 @@
     flex-direction: column;
     min-height: 0;
     overflow-y: auto;
+  }
+
+  // drag the right edge (or use the arrow keys) to change the panel width; centered on the rail border
+  &__panel-resize-handle {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: calc(-#{$paneResizeHandleWidth} / 2 - 0.5px);
+    height: 100%;
+    @extend %pane-resize-handle;
   }
 }
 

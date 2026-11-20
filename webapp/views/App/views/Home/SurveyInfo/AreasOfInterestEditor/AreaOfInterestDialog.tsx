@@ -2,14 +2,13 @@ import './AreaOfInterestDialog.scss'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest, ArenaAreaOfInterestDescriptor, ArenaValidation } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import { SurveyAreaOfInterestValidator } from '@core/survey/surveyAreaOfInterestValidator'
 import * as StringUtils from '@core/stringUtils'
 import * as SurveyFile from '@core/survey/surveyFile'
-import type { ValidationInstance } from '@core/validation/validation'
 import * as Validation from '@core/validation/validation'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
@@ -28,17 +27,23 @@ const accept = {
 }
 
 // geometry dropped and normalized, uploaded on OK
-type Upload = { surveyFile: any; content: File; areaOfInterest: AreaOfInterest }
+type Upload = { surveyFile: any; content: File; areaOfInterest: ArenaAreaOfInterest }
 
 type Props = {
   // the other areas of interest of the survey (the edited one excluded)
-  areasOfInterest: AreaOfInterestDescriptor[]
-  editedAreaOfInterest: AreaOfInterestDescriptor | null
+  areasOfInterest: ArenaAreaOfInterestDescriptor[]
+  editedAreaOfInterest: ArenaAreaOfInterestDescriptor | null
   onClose: () => void
-  onOk: (areaOfInterest: AreaOfInterestDescriptor) => void
+  onOk: (areaOfInterest: ArenaAreaOfInterestDescriptor) => void
 }
 
-const createUpload = ({ fileName, areaOfInterest }: { fileName: string; areaOfInterest: AreaOfInterest }): Upload => {
+const createUpload = ({
+  fileName,
+  areaOfInterest,
+}: {
+  fileName: string
+  areaOfInterest: ArenaAreaOfInterest
+}): Upload => {
   // only the geometry is stored (feature properties and other geometries are dropped)
   const content = new File([JSON.stringify(areaOfInterest)], fileName, { type: contentTypes.geojson })
   const surveyFile = SurveyFile.createFile({
@@ -56,11 +61,11 @@ const buildDraft = ({
   labels,
   upload,
 }: {
-  editedAreaOfInterest: AreaOfInterestDescriptor | null
+  editedAreaOfInterest: ArenaAreaOfInterestDescriptor | null
   name: string
   labels: Record<string, string>
   upload: Upload | null
-}): Partial<AreaOfInterestDescriptor> => {
+}): Partial<ArenaAreaOfInterestDescriptor> => {
   if (upload) {
     const { surveyFile, content, areaOfInterest } = upload
     return SurveyAreaOfInterest.newAreaOfInterestDescriptor({
@@ -84,7 +89,7 @@ export const AreaOfInterestDialog = (props: Props) => {
   const [name, setName] = useState(editedAreaOfInterest?.name ?? '')
   const [labels, setLabels] = useState<Record<string, string>>(editedAreaOfInterest?.labels ?? {})
   const [upload, setUpload] = useState<Upload | null>(null)
-  const [validation, setValidation] = useState<ValidationInstance | null>(null)
+  const [validation, setValidation] = useState<ArenaValidation | null>(null)
   const [uploading, setUploading] = useState(false)
 
   const draft = buildDraft({ editedAreaOfInterest, name, labels, upload })
@@ -125,7 +130,7 @@ export const AreaOfInterestDialog = (props: Props) => {
         setUploading(false)
       }
     }
-    onOk(draft as AreaOfInterestDescriptor)
+    onOk(draft as ArenaAreaOfInterestDescriptor)
   }, [draft, onOk, surveyId, upload])
 
   return (

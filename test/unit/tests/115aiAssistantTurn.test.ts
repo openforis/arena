@@ -1,6 +1,8 @@
 import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
 import { z } from 'zod'
 
+import { Query } from '@common/model/query'
+
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
 import {
@@ -318,7 +320,7 @@ describe('runAssistantTurn', () => {
 
   const queryOnlyTurn = (conversation?: Conversation) => {
     const addQuery = makeTool('test_query', async (_input, ctx) => {
-      ctx.analysisQueries?.add({ query: { a: 1 }, explanation: 'E', entityName: 'tree', mode: 'raw' } as any)
+      ctx.analysisQueries?.add({ query: Query.create(), explanation: 'E', entityName: 'tree', mode: 'raw' })
       return { ok: true }
     })
     const model = scriptedModel(
@@ -335,7 +337,7 @@ describe('runAssistantTurn', () => {
   })
 
   test('a turn that only repeats an earlier query, without a written answer, is an error', async () => {
-    const entry = { query: { a: 1 }, explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
+    const entry = { query: Query.create(), explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
     const conversation = {
       ...createConversation({ userUuid: 'user-1', surveyId: 7, area: 'analysis' }),
       queries: { q1: { ...entry, id: 'q1' } },
@@ -552,7 +554,7 @@ describe('runAssistantTurn', () => {
 
     test('a card without a word is asked for too: the words of the answer follow the card', async () => {
       const addQuery = makeTool('test_query', async (_input, ctx) => {
-        ctx.analysisQueries?.add({ query: { a: 1 }, explanation: 'E', entityName: 'tree', mode: 'raw' } as any)
+        ctx.analysisQueries?.add({ query: Query.create(), explanation: 'E', entityName: 'tree', mode: 'raw' })
         return { ok: true }
       })
       const model = scriptedModel(
@@ -632,14 +634,19 @@ describe('runAssistantTurn', () => {
   })
 
   test('the turn query store continues the conversation queries and they survive an abort', async () => {
-    const entry = { query: {}, explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
+    const entry = { query: Query.create(), explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
     const conversation = {
       ...createConversation({ userUuid: 'user-1', surveyId: 7, area: 'design' }),
       queries: { q1: { ...entry, id: 'q1' }, q2: { ...entry, id: 'q2' } },
     }
     const controller = new AbortController()
     const propose = makeTool('test_query', async (_input, ctx) => {
-      const added = ctx.analysisQueries?.add({ query: {}, explanation: 'E', entityName: 'tree', mode: 'raw' })
+      const added = ctx.analysisQueries?.add({
+        query: Query.create(),
+        explanation: 'E',
+        entityName: 'tree',
+        mode: 'raw',
+      })
       controller.abort()
       return { queryId: added?.id }
     })

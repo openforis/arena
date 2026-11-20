@@ -1,0 +1,457 @@
+import * as A from '@core/arena'
+
+import {
+  Points,
+  type ArenaCategoryItem,
+  type ArenaCategoryLevel,
+  type ArenaValidation,
+  type ArenaCategory,
+  type ArenaSurvey,
+} from '@openforis/arena-core'
+
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as Validator from '@core/validation/validator'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
+
+const keys = {
+  children: 'children',
+  items: 'items',
+  levels: 'levels',
+}
+
+// ====== LEVELS
+
+const validateNotEmptyFirstLevelItems =
+  ({ itemsCache }) =>
+  (_propName, level) =>
+    CategoryLevel.getIndex(level) === 0 && A.isEmpty(itemsCache?.getFirstLevelItems())
+      ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
+      : null
+
+const levelValidators = ({
+  levels,
+  itemsCache,
+  bigCategory,
+}: {
+  levels: ArenaCategoryLevel[]
+  itemsCache: any
+  bigCategory: any
+}) => ({
+  [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
+    Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
+    Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+    Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels),
+  ],
+  ...(!bigCategory ? { [keys.items]: [validateNotEmptyFirstLevelItems({ itemsCache })] } : {}),
+})
+
+const validateLevel =
+  ({ levels, itemsCache, bigCategory }) =>
+  (level) =>
+    Validator.validate(level, levelValidators({ levels, itemsCache, bigCategory }))
+
+const validateLevels = async ({
+  category,
+  itemsCache,
+  bigCategory,
+}: {
+  category: ArenaCategory
+  itemsCache: any
+  bigCategory: any
+}) => {
+  const levels = Category.getLevelsArray(category)
+
+  const validations = await Promise.all(levels.map(validateLevel({ levels, itemsCache, bigCategory })))
+
+  const valid = A.all(Validation.isValid, validations)
+
+  return valid
+    ? null
+    : Validation.newInstance(
+        false,
+        Object.fromEntries(validations.map((validation, index) => [String(index), validation])),
+        [ValidationResult.newInstance(Validation.messageKeys.categoryEdit.levelsInvalid)]
+      )
+}
+
+// ====== ITEMS
+
+const codeToKey = (code: string) => (code ?? '').toLocaleLowerCase()
+
+const groupItemsByParentAndCode = (items: ArenaCategoryItem[]) =>
+  ObjectUtils.groupByProps(CategoryItem.getParentUuid, (item) => codeToKey(CategoryItem.getCode(item)))(items)
+
+const getSiblingItems = ({ itemsByParentAndCode, item }: { itemsByParentAndCode: any; item: ArenaCategoryItem }) =>
+  A.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
+
+const validateItemCodeUniqueness = (itemsByParentAndCode: any) => (_propName, item) => {
+  const siblingItems = getSiblingItems({ itemsByParentAndCode, item })
+  const isUnique = siblingItems?.length === 1
+  return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
+}
+
+const validateNotEmptyChildrenItems =
+  ({ isLeaf, childrenCount }) =>
+  () =>
+    !isLeaf && childrenCount === 0
+      ? { key: Validation.messageKeys.categoryEdit.childrenEmpty, severity: ValidationResult.severity.warning }
+      : null
+
+const itemValidators = ({
+  isLeaf,
+  itemsByParentAndCode,
+  childrenCount = 0,
+}: {
+  isLeaf: any
+  itemsByParentAndCode: any
+  childrenCount?: any
+}) => ({
+  [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
+    Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
+    Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
+    validateItemCodeUniqueness(itemsByParentAndCode),
+  ],
+  [keys.children]: [validateNotEmptyChildrenItems({ isLeaf, childrenCount })],
+})
+
+const _extraPropValidators = {
+  [ExtraPropDef.dataTypes.number]: ({ key, extra }) =>
+    Validator.validateNumber(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, { key })(key, extra),
+  [ExtraPropDef.dataTypes.geometryPoint]: ({ key, extra, srsIndex }) => {
+    const point = Points.parse(extra[key])
+    if (point && Points.isValid(point, srsIndex)) {
+      return null
+    }
+    return ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
+  },
+  [ExtraPropDef.dataTypes.text]: () => null,
+}
+
+const _validateItemExtraProps =
+  ({ extraDefs, validation, srsIndex }) =>
+  (item) => {
+    const _validateItemExtraProp = ({ key, extra }) => {
+      const extraDef = extraDefs[key]
+      if (!extraDef || StringUtils.isBlank(extra[key])) {
+        return null
+      }
+      const extraDefType = extraDef[ExtraPropDef.keys.dataType]
+      return _extraPropValidators[extraDefType]({ key, extra, srsIndex })
+    }
+
+    const extra = CategoryItem.getExtra(item)
+    return extra
+      ? A.pipe(
+          A.keys,
+          A.reduce((accValidation, key) => {
+            const validationResult = _validateItemExtraProp({ key, extra })
+            return A.unless(
+              A.always(A.isNil(validationResult)),
+              Validation.assocFieldValidation(
+                `${CategoryItem.keysProps.extra}_${key}`,
+                Validation.newInstance(false, {}, [validationResult])
+              )
+            )(accValidation)
+          }, validation)
+        )(extra)
+      : validation
+  }
+
+const validateAllItems = ({
+  survey,
+  category,
+  itemsCache,
+  onProgress = null,
+  stopIfFn = null,
+}: {
+  survey: ArenaSurvey
+  category: ArenaCategory
+  itemsCache: any
+  onProgress?: any
+  stopIfFn?: any
+}) => {
+  const itemsToValidate = itemsCache.getFirstLevelItems()
+  return validateItemsAndDescendants({ survey, category, itemsCache, itemsToValidate, onProgress, stopIfFn })
+}
+
+const _addChildrenValidation = ({
+  itemsValidationsByUuid,
+  itemChildren,
+  validation,
+}: {
+  itemsValidationsByUuid: Record<string, any>
+  itemChildren: any
+  validation: ArenaValidation
+}) => {
+  const childrenValid = A.all((itemChild) =>
+    Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)])
+  )(itemChildren)
+
+  if (!childrenValid) {
+    const childrenHasErrors = itemChildren.some((itemChild) => {
+      const childValidation = itemsValidationsByUuid[CategoryItem.getUuid(itemChild)]
+      return Validation.isError(childValidation)
+    })
+    const validationResult = ValidationResult.newInstance(Validation.messageKeys.categoryEdit.childrenInvalid)
+    validation = A.pipe(
+      A.defaultTo(Validation.newInstance()),
+      Validation.setValid(false),
+      childrenHasErrors ? Validation.setErrors([validationResult]) : Validation.setWarnings([validationResult])
+    )(validation)
+  }
+  return validation
+}
+
+const _createItemsInvalidValidationResult = ({
+  errorsFound,
+  warningsFound,
+  itemsValidationsByUuid,
+}: {
+  errorsFound: any
+  warningsFound: any
+  itemsValidationsByUuid: Record<string, any>
+}) => {
+  const validationResult = ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemsInvalid)
+  const errors = errorsFound ? [validationResult] : []
+  const warnings = warningsFound ? [validationResult] : []
+  const valid = !errorsFound && !warningsFound
+  return Validation.newInstance(valid, { ...itemsValidationsByUuid }, errors, warnings)
+}
+
+const validateItemsAndDescendants = async ({
+  survey,
+  category,
+  itemsCache,
+  itemsToValidate,
+  onProgress = null,
+  stopIfFn = null,
+}: {
+  survey: ArenaSurvey
+  category: ArenaCategory
+  itemsCache: any
+  itemsToValidate: any
+  onProgress?: any
+  stopIfFn?: any
+}) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const srsIndex = Survey.getSRSIndex(surveyInfo)
+  const extraDefs = Category.getItemExtraDef(category)
+
+  const itemsValidationsByUuid = {}
+  let errorsFound = false
+  let warningsFound = false
+
+  // Visit the items from the first to the lowest level (DFS)
+  // validate first the leaf items, then up to the first level
+  const stack = []
+
+  // Keep track of already visited items: if not leaf, they will be validated only when already visited
+  const visitedUuids = {}
+
+  const total = itemsCache.items.length
+  let processed = 0
+
+  const pushItems = (items) => {
+    // Group sibling items by code to optimize item code uniqueness check
+    // do it only one time for every sibling
+    const itemsByParentAndCode = groupItemsByParentAndCode(items)
+    items.forEach((item) => {
+      item.itemsByParentAndCode = itemsByParentAndCode
+      stack.push(item)
+    })
+  }
+
+  const popItem = (item) => {
+    delete item['itemsByParentAndCode']
+    stack.pop()
+    processed++
+    onProgress?.({ total, processed })
+  }
+
+  pushItems(itemsToValidate)
+
+  while (!A.isEmpty(stack) && !stopIfFn?.()) {
+    const item = stack.at(-1) // Do not pop item: it can be visited again
+    const { itemsByParentAndCode } = item
+    const itemUuid = CategoryItem.getUuid(item)
+    const isLeaf = Category.isItemLeaf(item)(category)
+    const itemChildren = itemsCache.getItemChildren(itemUuid)
+    const childrenCount = itemChildren.length
+    const visited = !!visitedUuids[itemUuid]
+
+    let validation = null
+
+    if (visited || childrenCount === 0) {
+      // Validate leaf items or items without children or items already visited (all descendants have been already visited)
+      validation = /* NOSONAR */ await Validator.validate(
+        item,
+        itemValidators({ isLeaf, itemsByParentAndCode, childrenCount }),
+        false
+      )
+      validation = _validateItemExtraProps({ extraDefs, validation, srsIndex })(item)
+
+      // It won't be visited again, remove it from stack
+      popItem(item)
+    }
+
+    if (childrenCount > 0) {
+      if (visited) {
+        // All descendants have been validated, add children validation to the item validation
+        validation = _addChildrenValidation({ itemsValidationsByUuid, itemChildren, validation })
+      } else {
+        // Keep the item in the stack, postpone item validation, validate descendant items first
+        pushItems(itemChildren)
+      }
+    }
+    itemsValidationsByUuid[itemUuid] = validation
+
+    errorsFound = errorsFound || (Validation.isNotValid(validation) && Validation.isError(validation))
+    warningsFound = warningsFound || (Validation.isNotValid(validation) && Validation.isWarning(validation))
+
+    visitedUuids[itemUuid] = true
+  }
+  return _createItemsInvalidValidationResult({ errorsFound, warningsFound, itemsValidationsByUuid })
+}
+
+// ====== CATEGORY
+
+const categoryValidators = (categories: ArenaCategory[]) => ({
+  [`${Category.keys.props}.${Category.keysProps.name}`]: [
+    Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
+    Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+    Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(categories),
+  ],
+})
+
+const validateCategoryProps = (categories: ArenaCategory[], category: ArenaCategory) =>
+  Validator.validate(category, categoryValidators(categories))
+
+export const validateCategory = async ({
+  survey,
+  categories,
+  category,
+  items,
+  bigCategory = false,
+  validateLevels: _validateLevels = true,
+  validateItems: _validateItems = true,
+  onProgress = null,
+  stopIfFn = null,
+}: {
+  survey: ArenaSurvey
+  categories: ArenaCategory[]
+  category: ArenaCategory
+  items: ArenaCategoryItem[]
+  bigCategory?: any
+  validateLevels?: any
+  validateItems?: any
+  onProgress?: any
+  stopIfFn?: any
+}) => {
+  const itemsCache = !bigCategory && items && (_validateLevels || _validateItems) ? new ItemsCache(items) : null
+  const categoryValidation = await validateCategoryProps(categories, category)
+  const prevValidation = Category.getValidation(category)
+
+  const levelsValidation = _validateLevels
+    ? await validateLevels({ category, itemsCache, bigCategory })
+    : Validation.getFieldValidation(keys.levels)(prevValidation)
+
+  const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
+  let nextItemsValidation = null
+  if (_validateItems && itemsCache) {
+    nextItemsValidation = await validateAllItems({ survey, category, itemsCache, onProgress, stopIfFn })
+  } else if (bigCategory) {
+    // cannot calculate items validation (too many items): consider them as always valid
+    nextItemsValidation = Validation.newInstance()
+  }
+  const itemsValidation = nextItemsValidation ?? prevItemsValidation
+
+  return A.pipe(
+    Validation.setValid(A.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),
+    Validation.setField(keys.levels, levelsValidation),
+    Validation.setField(keys.items, itemsValidation),
+    Validation.cleanup
+  )(categoryValidation)
+}
+
+export const validateItems = async ({
+  category,
+  itemsToValidate,
+  itemsCountByItemUuid,
+}: {
+  category: ArenaCategory
+  itemsToValidate: any
+  itemsCountByItemUuid: Record<string, number>
+}) => {
+  const prevValidation = Category.getValidation(category)
+  const itemsByParentAndCode = groupItemsByParentAndCode(itemsToValidate)
+  const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
+  let itemsValidationUpdated = prevItemsValidation
+
+  const _validateItem = async (item) => {
+    const itemUuid = CategoryItem.getUuid(item)
+    const isLeaf = Category.isItemLeaf(item)(category)
+    const childrenCount = itemsCountByItemUuid[itemUuid] ?? 0
+
+    const itemValidation = await Validator.validate(
+      item,
+      itemValidators({ isLeaf, itemsByParentAndCode, childrenCount })
+    )
+    itemsValidationUpdated = Validation.assocFieldValidation(itemUuid, itemValidation)(itemsValidationUpdated)
+  }
+  for (const item of itemsToValidate) {
+    await _validateItem(item) // NOSONAR sequential: each call updates the shared validation
+  }
+  const categoryValidationUpdated = Validation.assocFieldValidation(keys.items, itemsValidationUpdated)(prevValidation)
+  return Validation.cleanup(categoryValidationUpdated)
+}
+
+class ItemsCache {
+  items: ArenaCategoryItem[]
+  itemsByParentUuid: Record<string, any>
+  itemsByUuid: Record<string, any>
+
+  constructor(items) {
+    this.items = items
+    this.itemsByParentUuid = {}
+    this.itemsByUuid = {}
+    items.forEach((item) => {
+      this.itemsByUuid[CategoryItem.getUuid(item)] = item
+      const parentUuid = CategoryItem.getParentUuid(item)
+      let siblingItems = this.itemsByParentUuid[parentUuid]
+      if (!siblingItems) {
+        siblingItems = []
+        this.itemsByParentUuid[parentUuid] = siblingItems
+      }
+      siblingItems.push(item)
+    })
+  }
+
+  getItemByUuid(itemUuid) {
+    return this.itemsByUuid[itemUuid]
+  }
+
+  getParentItem(item) {
+    return this.getItemByUuid(CategoryItem.getParentUuid(item))
+  }
+
+  getItemChildren(itemUuid) {
+    return this.itemsByParentUuid[itemUuid] ?? []
+  }
+
+  getFirstLevelItems() {
+    return this.getItemChildren(null)
+  }
+
+  getSiblingItems(item) {
+    return this.getItemChildren(CategoryItem.getParentUuid(item))
+  }
+}

@@ -1,0 +1,532 @@
+import * as A from '@core/arena'
+
+import {
+  Authorizer,
+  type ArenaUser,
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type ArenaSurvey,
+  ArenaAnyNodeDef,
+} from '@openforis/arena-core'
+
+import * as ActivityLog from '@common/activityLog/activityLog'
+
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
+import * as User from '@core/user/user'
+import * as ObjectUtils from '@core/objectUtils'
+
+import { db, DbClient } from '@server/db/db'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
+import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
+import * as UserManager from '@server/modules/user/manager/userManager'
+import * as RecordRepository from '../repository/recordRepository'
+import * as FileRepository from '../repository/fileRepository'
+import * as NodeRepository from '../repository/nodeRepository'
+import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
+import { NodeRdbManager } from './_recordManager/nodeRDBManager'
+import * as DbUtils from '@server/db/dbUtils'
+
+// ==== CREATE
+
+export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordManager/recordCreationManager'
+export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
+
+export const { insertNode } = RecordUpdateManager
+export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
+
+// ==== READ
+
+export const fetchRecordsSummaryBySurveyId = async (
+  {
+    surveyId,
+    offset = 0,
+    limit = undefined,
+    sortBy = undefined,
+    sortOrder = undefined,
+    cycle: cycleParam = null,
+    search = null,
+    step = null,
+    recordUuid = null,
+    ownerUuid = null,
+    includeRootKeyValues = true,
+    includePreview = false,
+    includeCounts = false,
+    user = null,
+  }: {
+    surveyId: number
+    offset?: number
+    limit?: number | null
+    sortBy?: string | null
+    sortOrder?: string | null
+    cycle?: string
+    search?: string | null
+    step?: string
+    recordUuid?: string
+    ownerUuid?: string
+    includeRootKeyValues?: boolean
+    includePreview?: boolean
+    includeCounts?: boolean
+    user?: ArenaUser
+  },
+  client: DbClient = db
+) => {
+  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
+
+  const nodeDefRoot = includeRootKeyValues
+    ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
+    : null
+
+  let nodeDefKeys = null
+  let summaryDefs = null
+  let survey = null
+  let qualifierNodeDefFilters = []
+  let readableQualifierNodeDefFilterSets = []
+  if (includeRootKeyValues) {
+    // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
+    const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
+    survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
+    summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+    nodeDefKeys = Survey.getNodeDefRootKeysSorted({ cycle })(survey)
+    if (user) {
+      const { own, readable } = await SurveyManager.fetchUserGroupAccessFilters({ user, survey }, client)
+      qualifierNodeDefFilters = own
+      readableQualifierNodeDefFilterSets = readable
+    }
+  }
+
+  const listFetched = await RecordRepository.fetchRecordsSummaryBySurveyId(
+    {
+      surveyId,
+      cycle: cycleParam,
+      nodeDefRoot,
+      nodeDefKeys,
+      summaryDefs,
+      offset,
+      limit,
+      sortBy,
+      sortOrder,
+      search,
+      step,
+      ownerUuid,
+      recordUuids: recordUuid ? [recordUuid] : null,
+      includePreview,
+      qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
+    },
+    client
+  )
+  // e.g. survey guests: all the records are read-only (also in Arena Mobile)
+  const list =
+    user && !Authorizer.canEditRecords(user, surveyInfo)
+      ? listFetched.map((recordSummary) => Record.assocReadOnly(true)(recordSummary))
+      : listFetched
+
+  if (!includeCounts) {
+    return {
+      nodeDefKeys,
+      list,
+    }
+  }
+
+  const nodeDefFiles = survey ? Survey.getNodeDefsArray(survey).filter(NodeDef.isFile) : []
+  const nodeDefFileUuids = nodeDefFiles.map(NodeDef.getUuid)
+
+  // one query per counter for all the records (not one per record)
+  const recordUuids = list.map(Record.getUuid)
+  const filesCountAndSizeByRecordUuid = await FileRepository.fetchCountAndTotalFilesSizeByRecordUuids(
+    { surveyId, recordUuids },
+    client
+  )
+  const filesMissingByRecordUuid = await NodeRepository.countNodesWithMissingFileByRecordUuids(
+    { surveyId, nodeDefFileUuids, recordUuids },
+    client
+  )
+  const listWithCounts = list.map((recordSummary) => {
+    const recordUuid = Record.getUuid(recordSummary)
+    const { count: filesCount = 0, total: filesSize = 0 } = filesCountAndSizeByRecordUuid[recordUuid] ?? {}
+    return {
+      ...recordSummary,
+      filesCount,
+      filesSize,
+      filesMissing: filesMissingByRecordUuid[recordUuid] ?? 0,
+    }
+  })
+  return {
+    nodeDefKeys,
+    list: listWithCounts,
+  }
+}
+
+export const fetchRecordSummary = async (
+  {
+    surveyId,
+    recordUuid,
+    includeRootKeyValues = true,
+    includePreview = false,
+  }: { surveyId: number; recordUuid: string; includeRootKeyValues?: boolean; includePreview?: boolean },
+  client: DbClient = db
+) => {
+  const { list } = await fetchRecordsSummaryBySurveyId(
+    { surveyId, recordUuid, includeRootKeyValues, includePreview },
+    client
+  )
+  return list[0]
+}
+
+export const countRecordsBySurveyId = async (
+  {
+    surveyId,
+    cycle: cycleParam,
+    search,
+    ownerUuid,
+    user = null,
+  }: { surveyId: number; cycle: string; search: string | null; ownerUuid: string; user?: ArenaUser },
+  client: DbClient = db
+) => {
+  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
+
+  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
+  const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  const summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+  const { own: qualifierNodeDefFilters, readable: readableQualifierNodeDefFilterSets } = user
+    ? await SurveyManager.fetchUserGroupAccessFilters({ user, survey }, client)
+    : { own: [], readable: [] }
+
+  return RecordRepository.countRecordsBySurveyId(
+    {
+      surveyId,
+      cycle,
+      search,
+      nodeDefKeys,
+      summaryDefs,
+      nodeDefRoot,
+      ownerUuid,
+      qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
+    },
+    client
+  )
+}
+
+// Cheap existence/count check across all cycles, without the survey/root-node-def/summary-defs
+// lookups the search-aware countRecordsBySurveyId above needs - used where only "does this survey
+// have any records at all" matters (e.g. the publish record-values-update warning check).
+export const countAllRecordsBySurveyId = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
+  RecordRepository.countRecordsBySurveyId({ surveyId }, client)
+
+export {
+  countRecordsBySurveyIdGroupedByStep,
+  fetchRecordByUuid,
+  fetchRecordDateModified,
+  fetchRecordStepAndOwner,
+  fetchRecordsByUuids,
+  fetchRecordsUuidAndCycle,
+  fetchRecordCreatedCountsByDates,
+  fetchRecordCreatedCountsByDatesAndUser,
+  fetchRecordCreatedCountsByUser,
+  fetchRecordCountsByStep,
+  insertRecordsInBatch,
+  updateRecordDateModifiedFromValues,
+  updateRecordMergedInto,
+} from '../repository/recordRepository'
+
+const _fetchAndSetRecordOwner = async (
+  { ownerUuid, record }: { ownerUuid: string; record: ArenaRecord },
+  client: DbClient = db
+) => {
+  const owner = await UserManager.fetchUserByUuid(ownerUuid, client)
+  record[Record.keys.ownerName] = User.getName(owner)
+  record[Record.keys.ownerEmail] = User.getEmail(owner)
+  const surveyUuid = Record.getSurveyUuid(record)
+  const ownerAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(owner)
+  record[Record.keys.ownerRole] = AuthGroup.getName(ownerAuthGroup)
+}
+
+// Re-evaluates applicability/relevance, visibility, editability and default values for node
+// defs whose expressions depend on the given user (e.g. userProp), without persisting
+// anything: the DB keeps whatever was computed by the last editing user, and each fetch (for
+// a given user) recomputes it fresh in memory for that user. The pure recompute algorithm
+// lives in core (Record.recomputeUserDependentNodeState) - this only handles the DB-dependent
+// parts: the cheap gate to skip survey-wide expression scanning, and loading node defs.
+const _recomputeUserDependentNodeState = async (
+  { user, surveyId, draft, record }: { user: ArenaUser; surveyId: number; draft: boolean; record: ArenaRecord },
+  client: DbClient
+) => {
+  const hasUserDependentExpressions = await NodeDefRepository.fetchSurveyHasUserDependentExpressions(
+    { surveyId, draft },
+    client
+  )
+  if (!hasUserDependentExpressions) return record
+
+  const cycle = Record.getCycle(record)
+  const surveyWithDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    { surveyId, cycle, draft, advanced: true },
+    client
+  )
+
+  return Record.recomputeUserDependentNodeState({ user, survey: surveyWithDefs, record })
+}
+
+export const fetchRecordAndNodesByUuid = async (
+  {
+    surveyId,
+    recordUuid,
+    draft = false,
+    fetchForUpdate = true,
+    includeRefData = true,
+    includeSurveyUuid = true,
+    includeRecordUuid = true,
+    user = null,
+  }: {
+    surveyId: number
+    recordUuid: string
+    draft?: boolean
+    fetchForUpdate?: boolean
+    includeRefData?: boolean
+    includeSurveyUuid?: boolean
+    includeRecordUuid?: boolean
+    user?: ArenaUser
+  },
+  client: DbClient = db
+) => {
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  if (!record) return null
+
+  const ownerUuid = Record.getOwnerUuid(record)
+  if (ownerUuid) {
+    await _fetchAndSetRecordOwner({ ownerUuid, record }, client)
+  }
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(
+    {
+      surveyId,
+      recordUuid,
+      includeRefData: fetchForUpdate || includeRefData,
+      includeSurveyUuid,
+      includeRecordUuid,
+      draft,
+    },
+    client
+  )
+  const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
+  let recordWithNodes = Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(
+    record
+  )
+
+  // Preview records are always initialized from scratch with the requesting user's context,
+  // so their applicability is already up to date and doesn't need recomputing here.
+  if (user && !A.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
+    recordWithNodes = await _recomputeUserDependentNodeState({ user, surveyId, draft, record: recordWithNodes }, client)
+  }
+
+  return recordWithNodes
+}
+
+export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+
+export { recordMatchesQualifierFilters } from './_recordManager/recordQualifierMatcher'
+
+const fetchNodeRefData = async (
+  { survey, node, isCode }: { survey: ArenaSurvey; node: ArenaRecordNode; isCode: boolean },
+  client: DbClient
+) => {
+  const surveyId = Survey.getId(survey)
+  if (isCode) {
+    const categoryItemUuid = Node.getCategoryItemUuid(node)
+    const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: categoryItemUuid }, client)
+    if (!categoryItem) {
+      return null
+    }
+    return { [NodeRefData.keys.categoryItem]: categoryItem }
+  } else {
+    const taxonUuid = Node.getTaxonUuid(node)
+    const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, taxonUuid, false, client)
+    if (!taxon) {
+      return null
+    }
+    const vernacularNameUuid = Node.getVernacularNameUuid(node)
+    const vernacularName = vernacularNameUuid
+      ? await TaxonomyRepository.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, false, client)
+      : null
+    if (vernacularName) {
+      taxon[Taxon.keys.vernacularNameUuid] = vernacularNameUuid
+      taxon[Taxon.keys.vernacularName] = TaxonVernacularName.getName(vernacularName)
+      taxon[Taxon.keys.vernacularLanguage] = TaxonVernacularName.getLang(vernacularName)
+    }
+    return { [NodeRefData.keys.taxon]: taxon }
+  }
+}
+
+const isRefDataSourceBig = ({
+  survey,
+  nodeDef,
+  isCode,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaAnyNodeDef
+  isCode: boolean
+}) => {
+  if (isCode) {
+    const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+    const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
+    return Category.isBigCategory(category)
+  }
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
+  return Taxonomy.isBigTaxonomy(taxonomy)
+}
+
+export const assocRefDataToNodes = async (
+  {
+    survey,
+    nodes,
+    onlyForBigCategoriesTaxonomies = true,
+  }: { survey: ArenaSurvey; nodes: ArenaRecordNode[]; onlyForBigCategoriesTaxonomies?: boolean },
+  client: DbClient = db
+) => {
+  for (const node of nodes) {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    const isCode = NodeDef.isCode(nodeDef)
+    const isTaxon = NodeDef.isTaxon(nodeDef)
+    if (
+      (isCode || isTaxon) &&
+      !Node.isValueBlank(node) &&
+      (!onlyForBigCategoriesTaxonomies || isRefDataSourceBig({ survey, nodeDef, isCode }))
+    ) {
+      const refData = await fetchNodeRefData({ survey, node, isCode }, client) // NOSONAR
+      if (refData) {
+        node[NodeRefData.keys.refData] = refData
+      }
+    }
+  }
+  return nodes
+}
+
+// ==== UPDATE
+
+export {
+  initNewRecord,
+  updateRecordStepInTransaction,
+  persistNode,
+  updateNode,
+  updateNodesDependents,
+  updateRequiredFlags,
+} from './_recordManager/recordUpdateManager'
+
+export {
+  findNodeDefUuidsToClearOnNodeDelete,
+  findNodeDefUuidsToClearOnNodePersist,
+} from './_recordManager/nonApplicableValuesClearPreview'
+
+export const updateRecordsStep = (
+  {
+    user,
+    surveyId,
+    cycle,
+    stepFrom,
+    stepTo,
+    recordUuids,
+  }: { user: ArenaUser; surveyId: number; cycle: string; stepFrom: any; stepTo: any; recordUuids: string[] },
+  client: DbClient = db
+) =>
+  client.tx(async (t) => {
+    const recordsSummaryToMove = await RecordRepository.fetchRecordsSummaryBySurveyId(
+      {
+        surveyId,
+        cycle,
+        step: stepFrom,
+        recordUuids,
+      },
+      client
+    )
+    await DbUtils.runQueries(
+      t,
+      recordsSummaryToMove.map(
+        (record) => () => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
+      )
+    )
+    return { count: recordsSummaryToMove.length }
+  })
+
+export const updateNodes = (
+  { user, surveyId, nodes }: { user: ArenaUser; surveyId: number; nodes: ArenaRecordNode[] },
+  client: DbClient = db
+) =>
+  client.tx(async (t) => {
+    const activities = nodes.map((node) => {
+      const logContent = A.pick([
+        Node.keys.uuid,
+        Node.keys.recordUuid,
+        Node.keys.parentUuid,
+        Node.keys.nodeDefUuid,
+        Node.keys.meta,
+        Node.keys.value,
+      ])(node)
+      return ActivityLog.newActivity(ActivityLog.type.nodeValueUpdate, logContent, true)
+    })
+    await ActivityLogRepository.insertMany(user, surveyId, activities, t)
+    await NodeRepository.updateNodes({ surveyId, nodes }, t)
+  })
+
+export { updateRecordDateModified, updateRecordsOwner } from '../repository/recordRepository'
+
+export const updateRecordOwner = (
+  {
+    user,
+    surveyId,
+    recordUuid,
+    ownerUuid,
+  }: { user: ArenaUser; surveyId: number; recordUuid: string; ownerUuid: string },
+  client: DbClient = db
+) =>
+  client.tx(async (t) => {
+    const logContent = { recordUuid, ownerUuid }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordOwnerUpdate, logContent, false, t)
+    await RecordRepository.updateRecordOwner({ surveyId, recordUuid, ownerUuid }, t)
+  })
+
+// ==== DELETE
+
+export {
+  deleteRecord,
+  deleteRecordPreview,
+  deleteRecordsPreview,
+  deleteRecordsByCycles,
+  deleteNode,
+  deleteNodesByNodeDefUuids,
+  deleteNodesByUuids,
+} from './_recordManager/recordUpdateManager'
+
+// ==== VALIDATION
+export {
+  persistValidation,
+  mergeAndPersistValidation,
+  updateRecordValidationsFromValues,
+  validateNodesAndPersistValidation,
+  validateSortedNodesAndPersistValidation,
+} from './_recordManager/recordValidationManager'
+
+export {
+  getValidationReportAsStream,
+  fetchValidationReport,
+  countValidationReportItems,
+} from './_recordManager/validationReportManager'

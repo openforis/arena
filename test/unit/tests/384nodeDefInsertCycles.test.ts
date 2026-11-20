@@ -1,3 +1,5 @@
+import { UserFactory } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
@@ -29,7 +31,13 @@ describe('NodeDefManager.insertNodeDef lists the new node definition in the pare
     }
     const client: any = { tx: async (fn: (t: unknown) => unknown) => fn(tx) }
     await insertNodeDef(
-      { user: { uuid: 'u' }, survey: target, nodeDef, addLogs: false, ...(cycle ? { cycle } : {}) },
+      {
+        user: { ...UserFactory.createInstance({ email: 'u@arena.test', name: 'u' }), uuid: 'u' },
+        survey: target,
+        nodeDef,
+        addLogs: false,
+        ...(cycle ? { cycle } : {}),
+      },
       client
     )
     return { params: updates[0], parentLayout: NodeDef.getLayout(parent) }

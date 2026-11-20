@@ -26,6 +26,13 @@ export type WhatsNewItem = {
 
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
+  {
+    id: 'loginProviders',
+    version: '2.14.0',
+    audience: whatsNewAudiences.systemAdmin,
+    images: ['/img/whats-new/loginProviders.png', '/img/whats-new/loginProvidersAdmin.png'],
+  },
+  { id: 'mobileUploadEmailNotification', version: '2.13.2', audience: whatsNewAudiences.surveyAdmin },
   { id: 'surveyGuestRole', version: '2.13.0', audience: whatsNewAudiences.surveyAdmin },
   {
     id: 'areaOfInterest',

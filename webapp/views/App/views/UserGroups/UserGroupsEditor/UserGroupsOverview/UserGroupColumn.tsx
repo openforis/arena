@@ -1,6 +1,6 @@
 import React from 'react'
 
-import type { UserGroup as UserGroupType } from '@openforis/arena-core'
+import type { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
@@ -12,7 +12,7 @@ import type { SurveyUserType } from './useUserGroupsOverview'
 import UserCard from './UserCard'
 
 type Props = {
-  group: UserGroupType | null
+  group: ArenaUserGroup | null
   groupKey: string
   members: SurveyUserType[]
   draggable: boolean

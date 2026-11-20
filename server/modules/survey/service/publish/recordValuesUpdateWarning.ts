@@ -1,3 +1,4 @@
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -28,7 +29,7 @@ const _findTransitiveValueUpdateDependentUuids = ({
   survey,
   nodeDefUuids,
 }: {
-  survey: any
+  survey: ArenaSurvey
   nodeDefUuids: string[]
 }): Set<string> => {
   const visitedUuids = new Set(nodeDefUuids)
@@ -60,7 +61,7 @@ const _toAtRiskNodeDefNames = ({
   nodeDefUuids,
   transitiveDependentUuids,
 }: {
-  survey: any
+  survey: ArenaSurvey
   nodeDefUuids: string[]
   transitiveDependentUuids: Set<string>
 }): string[] =>
@@ -101,7 +102,7 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({
   })
   const nodeDefUuidsWithAdvancedPropsRisk = Survey.getNodeDefsArray(survey)
     .filter(
-      (nodeDef: any) =>
+      (nodeDef: ArenaAnyNodeDef) =>
         NodeDef.isPublished(nodeDef) &&
         !NodeDef.isDeleted(nodeDef) &&
         NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)

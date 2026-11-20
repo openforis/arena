@@ -1,5 +1,26 @@
+@use '~@webapp/style/vars' as *;
+
 .users-surveys-fieldset {
-  height: 100%;
+  // the table has its own border: no box around it
+  border: none;
+  margin: 0;
+  padding: 0;
+
+  legend {
+    padding: 0 0 0.25rem;
+    font-size: 0.8rem;
+    color: $colorOnSurfaceVariant;
+  }
+
+  // static list shown in the expanded row: as tall as its rows
+  .table__content {
+    height: auto;
+  }
+
+  .table__rows {
+    position: static;
+    height: auto;
+  }
 }
 
 .users__header-left {

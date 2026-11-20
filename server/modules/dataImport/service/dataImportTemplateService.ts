@@ -1,0 +1,169 @@
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import { FlatDataExportModel, PointFactory } from '@openforis/arena-core'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as DateUtils from '@core/dateUtils'
+import * as StringUtils from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid'
+
+import { contentTypes, setContentTypeFile } from '@server/utils/response'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import { ZipArchiver } from '@server/utils/file/zipArchiver'
+
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+let templateFileValue = null
+{
+  const fileUuid = uuidv4()
+  const fileName = `${fileUuid}.bin`
+  templateFileValue = Node.newNodeValueFile({ fileUuid, fileName })
+}
+
+/**
+ * Generates a sample time value for the data import template, based on the current time.
+ * @param {object} params - The function parameters.
+ * @param {object} params.nodeDef - The time node definition to generate the sample value for.
+ * @returns {string} The formatted current time, including seconds if the node definition includes them.
+ */
+export const getTimeTemplateValue = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
+  const now = new Date()
+  return DateUtils.formatTime(
+    now.getHours(),
+    now.getMinutes(),
+    NodeDef.isSecondsIncluded(nodeDef) ? now.getSeconds() : undefined
+  )
+}
+
+const valuesByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: () => true,
+  [NodeDef.nodeDefType.code]: () => 'CATEGORY_CODE',
+  [NodeDef.nodeDefType.coordinate]: ({ valueProp }) => {
+    const coordinate = PointFactory.createInstance({ x: 41.8830209, y: 12.4879562 })
+    return coordinate[valueProp]
+  },
+  [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(new Date()),
+  [NodeDef.nodeDefType.decimal]: () => 123.45,
+  [NodeDef.nodeDefType.file]: ({ valueProp }) => templateFileValue[valueProp],
+  [NodeDef.nodeDefType.integer]: () => 123,
+  [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
+  [NodeDef.nodeDefType.text]: () => 'Text',
+  [NodeDef.nodeDefType.time]: getTimeTemplateValue,
+}
+
+const extractDataImportTemplate = ({
+  survey,
+  cycle,
+  nodeDefUuid,
+  includeFiles,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  nodeDefUuid: string
+  includeFiles: boolean
+}) => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  const exportModel = new FlatDataExportModel({
+    survey,
+    cycle,
+    nodeDefContext: nodeDef,
+    options: {
+      includeAnalysis: false,
+      includeCategoryItemsLabels: false,
+      includeFiles,
+      includeReadOnlyAttributes: false,
+    },
+  })
+  const template = exportModel.columns.reduce((acc, column) => {
+    const { header, nodeDef, valueProp } = column
+    const value = nodeDef ? valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp, nodeDef }) : ''
+    return { ...acc, [header]: value }
+  }, {})
+
+  return { template, nodeDef }
+}
+
+const exportDataImportTemplate = async ({
+  surveyId,
+  cycle,
+  nodeDefUuid,
+  includeFiles,
+  fileFormat,
+  res,
+}: {
+  surveyId: number
+  cycle: string
+  nodeDefUuid: string
+  includeFiles: boolean
+  fileFormat: string
+  res: any
+}) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+
+  const { template, nodeDef } = extractDataImportTemplate({ survey, cycle, nodeDefUuid, includeFiles })
+
+  setContentTypeFile({ res, fileName: `data_import_template_${NodeDef.getName(nodeDef)}.${fileFormat}`, fileFormat })
+
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: [template] })
+}
+
+const exportAllDataImportTemplates = async ({
+  surveyId,
+  cycle,
+  includeFiles,
+  fileFormat,
+  res,
+}: {
+  surveyId: number
+  cycle: string
+  includeFiles: boolean
+  fileFormat: string
+  res: any
+}) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+
+  const archiver = new ZipArchiver(res)
+
+  setContentTypeFile({
+    res,
+    fileName: `data_import_templates_${Survey.getName(survey)}.zip`,
+    contentType: contentTypes.zip,
+  })
+
+  const multipleNodeDefUuids = Survey.findDescendants({
+    filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+  })(survey).map(NodeDef.getUuid)
+
+  const tempFilePaths = []
+
+  for (let idx = 0; idx < multipleNodeDefUuids.length; idx++) {
+    const nodeDefUuid = multipleNodeDefUuids[idx]
+    const { template, nodeDef } = extractDataImportTemplate({
+      survey,
+      cycle,
+      nodeDefUuid,
+      includeFiles,
+    })
+    const prefix = `data_import_template_${StringUtils.padStart(2, '0')(String(idx + 1))}`
+    const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.${fileFormat}`
+    const tempFilePath = FileUtils.newTempFilePath()
+
+    /* NOSONAR */ await FlatDataWriter.writeItemsToStream({
+      outputStream: FileUtils.createWriteStream(tempFilePath),
+      fileFormat,
+      items: [template],
+    })
+
+    archiver.addFile(tempFilePath, zipEntryName)
+    tempFilePaths.push(tempFilePath)
+  }
+
+  await archiver.finalize()
+
+  // delete temp files
+  await Promise.all(tempFilePaths.map(FileUtils.deleteFileAsync))
+}
+
+export const DataImportTemplateService = { exportDataImportTemplate, exportAllDataImportTemplates }

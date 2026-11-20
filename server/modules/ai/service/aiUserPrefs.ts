@@ -1,7 +1,7 @@
 /**
  * Pure readers of the AI preferences stored in `user.prefs.ai` (no database access, so they can be unit tested).
  */
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import * as UserUtils from '@core/user/user'
 import { type AiAccessLevel, isCategoryWithinAccessLevel, resolveAiAccessLevel } from '@common/ai/accessLevel'
@@ -13,10 +13,10 @@ export type AiFeatureToggles = Record<AiFeatureCategory, boolean>
 
 /**
  * Returns the raw `prefs.ai` object of the user.
- * @param {User} user - Arena user.
+ * @param {ArenaUser} user - Arena user.
  * @returns {object|null} The persisted AI prefs, or null.
  */
-export const getAiPrefs = (user: User): Record<string, any> | null => {
+export const getAiPrefs = (user: ArenaUser): Record<string, any> | null => {
   const prefs = UserUtils.getPrefs(user) || {}
   return prefs[PREFS_KEY] || null
 }
@@ -46,10 +46,10 @@ export const sanitiseFeatureToggles = (input: unknown): AiFeatureToggles => {
 
 /**
  * Returns the user's access level: the stored one, else the one derived from the old master switch and toggles.
- * @param {User} user - Arena user.
+ * @param {ArenaUser} user - Arena user.
  * @returns {AiAccessLevel} The level (0 when nothing is stored).
  */
-export const getAccessLevelForUser = (user: User): AiAccessLevel => {
+export const getAccessLevelForUser = (user: ArenaUser): AiAccessLevel => {
   const raw = getAiPrefs(user)
   if (!raw) return 0
   return resolveAiAccessLevel({
@@ -61,18 +61,18 @@ export const getAccessLevelForUser = (user: User): AiAccessLevel => {
 
 /**
  * Returns true when the user has switched AI features on (access level above Off).
- * @param {User} user - Arena user.
+ * @param {ArenaUser} user - Arena user.
  * @returns {boolean} The master switch state (default false).
  */
-export const areFeaturesEnabledForUser = (user: User): boolean => getAccessLevelForUser(user) > 0
+export const areFeaturesEnabledForUser = (user: ArenaUser): boolean => getAccessLevelForUser(user) > 0
 
 /**
  * Returns true when the access level covers the category and its toggle is on.
- * @param {User} user - Arena user.
+ * @param {ArenaUser} user - Arena user.
  * @param {string} category - Feature category.
  * @returns {boolean} Whether the category is enabled.
  */
-export const isCategoryEnabledForUser = (user: User, category: string): boolean => {
+export const isCategoryEnabledForUser = (user: ArenaUser, category: string): boolean => {
   const level = getAccessLevelForUser(user)
   if (!isCategoryWithinAccessLevel(category, level)) return false
   return !!sanitiseFeatureToggles(getAiPrefs(user)?.featureToggles)[category]

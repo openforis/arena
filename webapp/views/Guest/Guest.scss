@@ -346,6 +346,49 @@ $guestMobileBreakpoint: 900px;
   }
 }
 
+// external login providers (official logos keep their colors; the buttons use the theme)
+.guest-external-login {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.guest-external-login__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid $colorOutline;
+  border-radius: 0.5rem;
+  background-color: $colorSurface;
+  color: $colorOnSurface;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    background-color: with-alpha($colorPrimary, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $colorPrimary;
+    outline-offset: 2px;
+  }
+}
+
+.guest-external-login__label {
+  display: grid;
+  gap: 0.15rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.guest-external-login__caption {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: $colorOnSurfaceVariant;
+}
+
 @media screen and (max-width: $guestMobileBreakpoint) {
   .guest__header {
     padding: 0.75rem 1rem;
@@ -407,6 +450,53 @@ $guestMobileBreakpoint: 900px;
 
   .guest__footer {
     justify-content: center;
+  }
+}
+
+// login: invite new users to request access before logging in
+.guest-login__request-access {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid with-alpha($colorSuccess, 0.45);
+  background-color: $colorSuccessContainer;
+  font-size: 0.85rem;
+}
+
+.guest-login__request-access-text {
+  display: grid;
+  gap: 0.1rem;
+  color: $colorOnSurfaceVariant;
+
+  strong {
+    font-size: 0.9rem;
+    color: $colorOnSurface;
+  }
+}
+
+.guest-login__request-access-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: 6px;
+  background-color: $colorSuccess;
+  color: $colorOnSuccess;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover {
+    background-color: shade($colorSuccess, 10%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $colorPrimary;
+    outline-offset: 2px;
   }
 }
 

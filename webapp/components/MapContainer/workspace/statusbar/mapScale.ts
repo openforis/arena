@@ -58,6 +58,15 @@ export const isLngInRange = (lng: number, west: number, east: number): boolean =
 }
 
 /**
+ * Tells whether a point is inside the given bounds, also when they cross the antimeridian.
+ * @param {{lat: number, lng: number}} point - Point.
+ * @param {LatLngBoundsLiteral} bounds - Bounds (Leaflet's map.getBounds() values).
+ * @returns {boolean} True when inside.
+ */
+export const isPointInBounds = ({ lat, lng }: { lat: number; lng: number }, bounds: LatLngBoundsLiteral): boolean =>
+  lat >= bounds.south && lat <= bounds.north && isLngInRange(lng, bounds.west, bounds.east)
+
+/**
  * Counts the points inside the given bounds.
  * @param {Array<{lat: number, lng: number}>} points - Points.
  * @param {LatLngBoundsLiteral} bounds - Bounds (Leaflet's map.getBounds() values).
@@ -68,8 +77,8 @@ export const countPointsInBounds = (
   bounds: LatLngBoundsLiteral
 ): number => {
   let count = 0
-  for (const { lat, lng } of points) {
-    if (lat >= bounds.south && lat <= bounds.north && isLngInRange(lng, bounds.west, bounds.east)) count += 1
+  for (const point of points) {
+    if (isPointInBounds(point, bounds)) count += 1
   }
   return count
 }

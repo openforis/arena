@@ -1,0 +1,887 @@
+import {
+  Dates,
+  Objects,
+  type ArenaValidation,
+  type ArenaNodeDefEntity,
+  type ArenaRecord,
+  ArenaAnyNodeDef,
+} from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+import { db, DbClient } from '@server/db/db'
+import { DbOrder } from '@server/db'
+import * as DbUtils from '@server/db/dbUtils'
+import * as StringUtils from '@core/stringUtils'
+
+import { AppInfo } from '@core/app/appInfo'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
+import * as Validation from '@core/validation/validation'
+
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import { getSchemaSurvey } from '@common/model/db/schemata'
+import { ColumnNodeDef } from '@common/model/db'
+
+import { buildQualifierFiltersSqlConditions } from './qualifierFiltersSqlConditions'
+
+const tableName = 'record'
+const tableColumns = [
+  Record.keys.uuid,
+  Record.keys.step,
+  Record.keys.cycle,
+  Record.keys.preview,
+  'owner_uuid',
+  'date_created',
+  'date_modified',
+  'validation',
+  'info',
+  'merged_into_record_uuid',
+]
+const dateColumns = ['date_created', 'date_modified']
+
+const recordSelectFieldsArray = [
+  ...tableColumns.filter((col) => !dateColumns.includes(col)),
+  ...dateColumns.map((dateCol) => DbUtils.selectDate(dateCol)),
+]
+const recordSelectFields = recordSelectFieldsArray.join(', ')
+
+const recordKeysObjAlias = 'keys_obj'
+const recordSummaryAttributesObjAlias = 'summary_attributes_obj'
+
+const dbTransformCallback =
+  (surveyId, includeValidationFields = true) =>
+  (record) => {
+    if (!record) return null
+    const validation = Record.getValidation(record)
+    return A.pipe(
+      A.dissoc(Validation.keys.validation),
+      A.camelizePartial({ limitToLevel: 1 }),
+      A.assoc('surveyId', surveyId),
+      A.assoc(
+        Validation.keys.validation,
+        includeValidationFields
+          ? validation
+          : {
+              ...Validation.newInstance(Validation.isValid(validation)),
+              [Validation.keys.counts]: Validation.getCounts(validation),
+            }
+      )
+    )(record)
+  }
+
+// ============== CREATE
+
+export const insertRecord = (surveyId: number, record: ArenaRecord, client: DbClient = db) => {
+  const now = new Date()
+  return client.one(
+    `
+    INSERT INTO ${getSchemaSurvey(surveyId)}.record 
+    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified, info, merged_into_record_uuid)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $11)
+    `,
+    [
+      Record.getOwnerUuid(record),
+      Record.getUuid(record),
+      Record.getStep(record),
+      Record.getCycle(record),
+      Record.isPreview(record),
+      Validation.isValid(Record.getValidation(record)) ? {} : Record.getValidation(record),
+      Dates.formatForStorage(Record.getDateCreated(record) || now),
+      Dates.formatForStorage(Record.getDateModified(record) || now),
+      Record.getInfo(record),
+      Record.getMergedIntoRecordUuid(record),
+      surveyId,
+    ],
+    dbTransformCallback(surveyId)
+  )
+}
+
+export const insertRecordsInBatch = (
+  { surveyId, records, userUuid }: { surveyId: number; records: ArenaRecord[]; userUuid: string },
+  client: DbClient = db
+) =>
+  client.none(
+    DbUtils.insertAllQueryBatch(
+      `${getSchemaSurvey(surveyId)}`,
+      tableName,
+      tableColumns,
+      records.map((record) => ({
+        ...record,
+        owner_uuid: userUuid || Record.getOwnerUuid(record),
+        date_created: Record.getDateCreated(record),
+        date_modified: Record.getDateModified(record),
+        validation: JSON.stringify(
+          Validation.isValid(Record.getValidation(record)) ? {} : Record.getValidation(record)
+        ),
+        info: Record.getInfo(record),
+        merged_into_record_uuid: Record.getMergedIntoRecordUuid(record),
+      }))
+    )
+  )
+
+// ============== READ
+
+/**
+ * Counts the records of a survey.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} [params.cycle] - The survey cycle.
+ * @param {object} [params.nodeDefRoot] - The root node def (needed only with search or qualifier filters).
+ * @param {object[]} [params.nodeDefKeys] - The root key node defs (needed only with search or qualifier filters).
+ * @param {object[]} [params.summaryDefs] - The summary node defs (needed only with search or qualifier filters).
+ * @param {string} [params.search] - The search value.
+ * @param {string} [params.ownerUuid] - The records owner UUID.
+ * @param {boolean} [params.includeMerged] - Whether to count the merged records.
+ * @param {object[]} [params.qualifierNodeDefFilters] - The qualifier node def filters.
+ * @param {object[]} [params.readableQualifierNodeDefFilterSets] - The readable qualifier node def filter sets.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<number>} - The count of records.
+ */
+export const countRecordsBySurveyId = async (
+  {
+    surveyId,
+    cycle = null,
+    nodeDefRoot,
+    nodeDefKeys,
+    summaryDefs,
+    search = null,
+    ownerUuid = null,
+    includeMerged = false,
+    qualifierNodeDefFilters = [],
+    readableQualifierNodeDefFilterSets = [],
+  }: {
+    surveyId: number
+    cycle?: string
+    nodeDefRoot?: ArenaNodeDefEntity
+    nodeDefKeys?: ArenaAnyNodeDef[]
+    summaryDefs?: ArenaAnyNodeDef[]
+    search?: string | null
+    ownerUuid?: string
+    includeMerged?: boolean
+    qualifierNodeDefFilters?: any
+    readableQualifierNodeDefFilterSets?: any
+  },
+  client: DbClient = db
+) => {
+  if (!A.isEmpty(search) || !A.isEmpty(qualifierNodeDefFilters)) {
+    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({
+      surveyId,
+      cycle,
+      nodeDefRoot,
+      nodeDefKeys,
+      summaryDefs,
+      search,
+      ownerUuid,
+      qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
+    })
+    return recordsWithSearch.length
+  }
+  const whereConditions = ['preview = FALSE']
+  if (cycle !== null) whereConditions.push('cycle = $/cycle/')
+  if (ownerUuid) whereConditions.push('owner_uuid = $/ownerUuid/')
+  whereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+
+  const whereConditionsJoint = whereConditions.map((condition) => `(${condition})`).join(' AND ')
+
+  return client.one(
+    `SELECT count(*) 
+     FROM ${getSchemaSurvey(surveyId)}.record 
+     WHERE ${whereConditionsJoint}`,
+    { cycle, ownerUuid },
+    (row) => Number(row.count)
+  )
+}
+
+export const countRecordsGroupedByApp = async (
+  { surveyId, cycle = null }: { surveyId: number; cycle?: string },
+  client: DbClient = db
+) => {
+  const counts = await client.any(
+    `
+        SELECT COALESCE(info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}', '${AppInfo.arenaAppId}') AS created_with, count(*)
+        FROM ${getSchemaSurvey(surveyId)}.record 
+        WHERE 
+          preview = FALSE 
+          AND merged_into_record_uuid IS NULL
+          ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
+        GROUP BY created_with
+      `,
+    { cycle }
+  )
+  return counts.reduce((acc, { created_with, count }) => {
+    acc[created_with] = Number(count)
+    return acc
+  }, {})
+}
+
+export const countRecordsBySurveyIdGroupedByStep = async (
+  { surveyId, cycle }: { surveyId: number; cycle: string },
+  client: DbClient = db
+) => {
+  const counts = await client.manyOrNone(
+    `SELECT step, count(*)
+    FROM ${getSchemaSurvey(surveyId)}.record 
+    WHERE 
+      preview = FALSE 
+      AND merged_into_record_uuid IS NULL 
+      AND cycle = $1
+    GROUP BY step`,
+    [cycle]
+  )
+  return RecordStep.steps.reduce(
+    (acc, step) => ({
+      ...acc,
+      [step.id]: counts.find((count) => count.step === step.id)?.count || 0,
+    }),
+    {}
+  )
+}
+
+const determineOrderBy = ({
+  nodeDefKeys,
+  summaryDefs,
+  sortBy,
+}: {
+  nodeDefKeys: ArenaAnyNodeDef[]
+  summaryDefs: ArenaAnyNodeDef[]
+  sortBy: string | null
+}) => {
+  const getColumnName = (nodeDef) =>
+    NodeDef.isCode(nodeDef)
+      ? // consider label for sorting if nodeDef is code
+        ColumnNodeDef.getCodeLabelColumnName(nodeDef)
+      : NodeDefTable.getColumnName(nodeDef)
+
+  const getKeyOrSummaryDefCondition = ({ nodeDefs, objAlias }) => {
+    const nodeDefNames = nodeDefs?.map(NodeDef.getName)
+    if (nodeDefNames?.includes(sortBy)) {
+      const nodeDef = nodeDefs.find((nodeDef) => NodeDef.getName(nodeDef) === sortBy)
+      if (nodeDef) {
+        const colName = getColumnName(nodeDef)
+        return `${objAlias} -> '${colName}'`
+      }
+    }
+    return null
+  }
+  const keyCondition = getKeyOrSummaryDefCondition({ nodeDefs: nodeDefKeys, objAlias: recordKeysObjAlias })
+  if (keyCondition) {
+    return keyCondition
+  }
+  const summaryDefCondition = getKeyOrSummaryDefCondition({
+    nodeDefs: summaryDefs,
+    objAlias: recordSummaryAttributesObjAlias,
+  })
+  if (summaryDefCondition) {
+    return summaryDefCondition
+  }
+  if (sortBy === Record.keys.ownerName) {
+    return 'owner_name'
+  }
+  // fallbacks to table columns
+  return StringUtils.toSnakeCase(sortBy)
+}
+
+const nodeDefsToJsonb = ({
+  nodeDefs,
+  tableAlias,
+  alias,
+}: {
+  nodeDefs: ArenaAnyNodeDef[]
+  tableAlias: string
+  alias: string
+}) => {
+  if (!nodeDefs) return null
+  return `jsonb_build_object(${nodeDefs
+    .flatMap((nodeDef) => {
+      const colNames = NodeDefTable.getColumnNames(nodeDef)
+      return colNames.map((colName) => {
+        const qualifiedColName = `${StringUtils.quoteDouble(tableAlias)}.${StringUtils.quoteDouble(colName)}`
+        if (NodeDef.isCoordinate(nodeDef) && colName === NodeDef.getName(nodeDef)) {
+          return `'${colName}', ${DbUtils.geometryPointColumnAsText({ qualifiedColName })}`
+        } else {
+          return `'${colName}', ${qualifiedColName}`
+        }
+      })
+    })
+    .join(', ')}) AS ${alias}`
+}
+
+const buildRecordsSummarySearchCondition = ({
+  nodeDefKeysWhereConditions,
+  summaryDefsWhereConditions,
+}: {
+  nodeDefKeysWhereConditions: any
+  summaryDefsWhereConditions: any
+}) => {
+  const searchConditions = []
+  if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
+  if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
+  searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
+  return searchConditions.join(' OR ')
+}
+
+const buildRecordsSummarySelectWhereConditions = ({
+  cycle,
+  step,
+  search,
+  ownerUuid,
+  recordUuids,
+  includePreview,
+  includeMerged,
+  nodeDefKeysWhereConditions,
+  summaryDefsWhereConditions,
+}: {
+  cycle: string
+  step: string
+  search: string | null
+  ownerUuid: string
+  recordUuids: string[]
+  includePreview: boolean
+  includeMerged: boolean
+  nodeDefKeysWhereConditions: any
+  summaryDefsWhereConditions: any
+}) => {
+  const conditions = []
+  if (!includePreview) conditions.push('preview = FALSE')
+  conditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+  if (!A.isNull(cycle)) conditions.push('cycle = $/cycle/')
+  if (!A.isNull(step)) conditions.push('step = $/step/')
+  if (!A.isNull(recordUuids)) conditions.push('uuid IN ($/recordUuids:csv/)')
+  if (!A.isEmpty(search)) {
+    conditions.push(buildRecordsSummarySearchCondition({ nodeDefKeysWhereConditions, summaryDefsWhereConditions }))
+  }
+  if (!A.isNull(ownerUuid)) conditions.push('owner_uuid = $/ownerUuid/')
+  return conditions
+}
+
+export const fetchRecordsSummaryBySurveyId = (
+  {
+    surveyId,
+    nodeDefRoot = null,
+    nodeDefKeys = null,
+    summaryDefs = null,
+    cycle = null,
+    step = null,
+    offset = 0,
+    limit = null,
+    sortBy = 'date_created',
+    sortOrder = 'DESC',
+    search = null,
+    ownerUuid = null,
+    recordUuids = null,
+    includePreview = false,
+    includeMerged = false,
+    qualifierNodeDefFilters = [],
+    readableQualifierNodeDefFilterSets = [],
+  }: {
+    surveyId: number
+    nodeDefRoot?: ArenaNodeDefEntity
+    nodeDefKeys?: ArenaAnyNodeDef[]
+    summaryDefs?: ArenaAnyNodeDef[]
+    cycle?: string
+    step?: string
+    offset?: number
+    limit?: number | null
+    sortBy?: string | null
+    sortOrder?: string | null
+    search?: string | null
+    ownerUuid?: string
+    recordUuids?: string[]
+    includePreview?: boolean
+    includeMerged?: boolean
+    qualifierNodeDefFilters?: any
+    readableQualifierNodeDefFilterSets?: any
+  },
+  client: DbClient = db
+) => {
+  const rootEntityTableAlias = 'n0'
+  // readable groups' filters are relevant only when the user is restricted to its own group
+  const readableFilterSets = qualifierNodeDefFilters.length > 0 ? readableQualifierNodeDefFilterSets : []
+
+  const nodeDefKeysSelect = nodeDefKeys
+    ?.flatMap((nodeDefKey) => {
+      const colNames = NodeDefTable.getColumnNames(nodeDefKey)
+      return colNames.map((keyColName) => `${rootEntityTableAlias}.${keyColName} AS ${keyColName}`)
+    })
+    .join(', ')
+
+  const nodeDefKeysColumnNames = new Set(
+    (nodeDefKeys ?? []).flatMap((nodeDefKey) => NodeDefTable.getColumnNames(nodeDefKey))
+  )
+  const qualifierColumnNames = [
+    ...new Set(
+      [qualifierNodeDefFilters, ...readableFilterSets]
+        .flat()
+        .map(({ nodeDef }) => NodeDefTable.getColumnName(nodeDef))
+        .filter((colName) => !nodeDefKeysColumnNames.has(colName))
+    ),
+  ]
+  const qualifierNodeDefsSelect = qualifierColumnNames
+    .map((colName) => `${rootEntityTableAlias}.${colName} AS ${colName}`)
+    .join(', ')
+
+  const nodeDefKeysJsonSelect = nodeDefsToJsonb({
+    nodeDefs: nodeDefKeys,
+    tableAlias: rootEntityTableAlias,
+    alias: recordKeysObjAlias,
+  })
+
+  const summaryAttributesJsonSelect = nodeDefsToJsonb({
+    nodeDefs: summaryDefs,
+    tableAlias: rootEntityTableAlias,
+    alias: recordSummaryAttributesObjAlias,
+  })
+
+  const getWhereConditionsByKeysOrSummaryDefs = ({ nodeDefs, objAlias }) =>
+    nodeDefs
+      ?.flatMap((nodeDef) =>
+        NodeDefTable.getColumnNames(nodeDef).map(
+          (colName) => ` (${objAlias} ->> '${colName}') ilike '%$/search:value/%'`
+        )
+      )
+      .join(' OR ')
+
+  const nodeDefKeysWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
+    nodeDefs: nodeDefKeys,
+    objAlias: recordKeysObjAlias,
+  })
+  const summaryDefsWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
+    nodeDefs: summaryDefs,
+    objAlias: recordSummaryAttributesObjAlias,
+  })
+
+  const recordsSelectWhereConditions = buildRecordsSummarySelectWhereConditions({
+    cycle,
+    step,
+    search,
+    ownerUuid,
+    recordUuids,
+    includePreview,
+    includeMerged,
+    nodeDefKeysWhereConditions,
+    summaryDefsWhereConditions,
+  })
+
+  // note: qualifier columns are selected (unqualified) in the "records" CTE below, since the
+  // WHERE clause here applies to the outer query, where the root entity table alias is out of scope
+  const {
+    ownCondition: ownQualifiersCondition,
+    readableConditions: readableQualifiersConditions,
+    condition: qualifiersCondition,
+    params: qualifierFilterParams,
+  } = buildQualifierFiltersSqlConditions({
+    qualifierNodeDefFilters,
+    readableQualifierNodeDefFilterSets: readableFilterSets,
+  })
+  if (qualifiersCondition) {
+    recordsSelectWhereConditions.push(qualifiersCondition)
+  }
+  // records of the readable groups only (not matching the user's own group) can be read but not edited
+  const readOnlySelect =
+    readableQualifiersConditions.length > 0 ? `, NOT COALESCE((${ownQualifiersCondition}), FALSE) AS read_only` : ''
+
+  const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
+  const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
+
+  return client.map(
+    `WITH records AS (
+      SELECT 
+        r.uuid, 
+        r.owner_uuid, 
+        r.cycle,
+        r.step, 
+        r.preview, 
+        r.merged_into_record_uuid, 
+        ${DbUtils.selectDate('r.date_created', 'date_created')}, 
+        ${DbUtils.selectDate('r.date_modified', 'date_modified')},
+        r.validation,
+        r.info,
+        s.uuid AS survey_uuid,
+        u.name as owner_name
+        ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
+        ${nodeDefKeysJsonSelect ? `, ${nodeDefKeysJsonSelect}` : ''}
+        ${summaryAttributesJsonSelect ? `, ${summaryAttributesJsonSelect}` : ''}
+        ${qualifierNodeDefsSelect ? `, ${qualifierNodeDefsSelect}` : ''}
+      FROM ${getSchemaSurvey(surveyId)}.record r
+      -- GET SURVEY UUID
+      JOIN survey s
+        ON s.id = $/surveyId/
+      -- GET OWNER NAME
+      JOIN "user" u
+        ON r.owner_uuid = u.uuid
+        ${
+          nodeDefRoot && (nodeDefKeys?.length > 0 || qualifierNodeDefFilters.length > 0)
+            ? `-- join with root entity table to get node key values
+        LEFT OUTER JOIN
+          ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+        ON r.uuid = ${rootEntityTableAlias}.record_uuid`
+            : ''
+        }
+    )
+    SELECT *${readOnlySelect} FROM records
+    
+    ${whereCondition}
+
+    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()}
+
+    LIMIT $/limit/
+
+    OFFSET $/offset/
+  `,
+    {
+      surveyId,
+      cycle,
+      step,
+      search,
+      limit: DbUtils.normalizeLimit(limit),
+      offset: DbUtils.normalizeOffset(offset),
+      recordUuids,
+      ownerUuid,
+      ...qualifierFilterParams,
+    },
+    dbTransformCallback(surveyId, false)
+  )
+}
+
+export const fetchRecordCountsByStep = async (surveyId: number, cycle: string, client: DbClient = db) => {
+  const countsArray = await client.any(
+    `
+    SELECT
+      step,
+      COUNT(*) as count
+    FROM
+      ${getSchemaSurvey(surveyId)}.record
+    WHERE
+      cycle = $1
+    GROUP BY
+      step
+    `,
+    [String(cycle)]
+  )
+  return Object.values(RecordStep.steps).reduce((acc, step) => {
+    const stepId = RecordStep.getId(step)
+    const count = Number(countsArray.find((countRow) => countRow.step === stepId)?.count ?? 0)
+    acc[stepId] = count
+    return acc
+  }, {})
+}
+
+export const fetchRecordByUuid = (surveyId: number, recordUuid: string, client: DbClient = db) =>
+  client.oneOrNone(
+    `SELECT 
+      ${recordSelectFields}, 
+      (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid, surveyId],
+    dbTransformCallback(surveyId)
+  )
+
+export const fetchRecordsByUuids = (surveyId: number, recordUuids: string[], client: DbClient = db) =>
+  client.map(
+    `SELECT 
+     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
+     FROM ${getSchemaSurvey(surveyId)}.record 
+     WHERE uuid IN ($1:csv)`,
+    [recordUuids, surveyId],
+    dbTransformCallback(surveyId)
+  )
+
+export const fetchRecordsUuidAndCycle = (
+  {
+    surveyId,
+    recordUuidsIncluded = null,
+    ownerUuid = null,
+  }: { surveyId: number; recordUuidsIncluded?: string[] | null; ownerUuid?: string },
+  client: DbClient = db
+) =>
+  client.any(
+    `
+    SELECT uuid, cycle 
+    FROM ${getSchemaSurvey(surveyId)}.record 
+    WHERE preview = FALSE
+    ${Objects.isEmpty(recordUuidsIncluded) ? '' : `AND uuid IN ($/recordUuidsIncluded:csv/)`}
+    ${ownerUuid ? 'AND owner_uuid = $/ownerUuid/' : ''}
+    ORDER BY cycle
+  `,
+    { recordUuidsIncluded, ownerUuid }
+  )
+
+export const fetchRecordCreatedCountsByDates = (
+  surveyId: number,
+  cycle: string,
+  from: string,
+  to: string,
+  client: DbClient = db
+) =>
+  client.any(
+    `
+    SELECT
+      COUNT(r.uuid),
+      to_char(date_trunc('day', r.date_created), 'YYYY-MM-DD') AS date
+    FROM
+      ${getSchemaSurvey(surveyId)}.record r
+    WHERE
+      r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+    AND 
+      r.cycle = $3     
+    AND 
+      r.preview = FALSE
+      AND r.merged_into_record_uuid IS NULL
+    GROUP BY
+      date_trunc('day', r.date_created)
+    ORDER BY
+      date_trunc('day', r.date_created)
+  `,
+    [from, to, cycle]
+  )
+
+export const fetchRecordCreatedCountsByDatesAndUser = (
+  surveyId: number,
+  cycle: string,
+  from: string,
+  to: string,
+  client: DbClient = db
+) =>
+  client.any(
+    `
+    SELECT
+      COUNT(r.uuid),
+      to_char(date_trunc('day', r.date_created), 'YYYY-MM-DD') AS date,
+      r.owner_uuid,
+      u.name AS owner_name,
+      u.email AS owner_email
+    FROM
+      ${getSchemaSurvey(surveyId)}.record r
+    JOIN public.user u ON r.owner_uuid = u.uuid
+    WHERE
+      r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+      AND 
+        r.cycle = $3     
+      AND 
+        r.preview = FALSE
+      AND 
+        r.merged_into_record_uuid IS NULL
+    GROUP BY
+      date_trunc('day', r.date_created),
+      r.owner_uuid,
+      u.name,
+      u.email
+    ORDER BY
+      date_trunc('day', r.date_created)
+  `,
+    [from, to, cycle]
+  )
+
+export const fetchRecordCreatedCountsByUser = (
+  surveyId: number,
+  cycle: string,
+  from: string,
+  to: string,
+  client: DbClient = db
+) =>
+  client.any(
+    `
+    SELECT
+      COUNT(r.uuid),
+      r.owner_uuid,
+      u.name AS owner_name,
+      u.email AS owner_email  
+    FROM
+      ${getSchemaSurvey(surveyId)}.record r
+    JOIN public.user u ON r.owner_uuid = u.uuid
+    WHERE
+      r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+      AND 
+        r.cycle = $3     
+      AND 
+        r.preview = FALSE
+      AND 
+        r.merged_into_record_uuid IS NULL  
+    GROUP BY
+      r.owner_uuid,
+      u.name,
+      u.email
+    ORDER BY
+      COUNT(r.uuid) DESC
+  `,
+    [from, to, cycle]
+  )
+
+// ============== UPDATE
+
+export const updateRecordDateModified = (
+  {
+    surveyId,
+    recordUuid,
+    dateModified = new Date(),
+  }: { surveyId: number; recordUuid: string; dateModified?: Date | string },
+  client: DbClient = db
+) =>
+  client.one(
+    `UPDATE ${getSchemaSurvey(surveyId)}.record
+     SET date_modified = $2
+     WHERE uuid = $1
+    RETURNING ${recordSelectFields}`,
+    [recordUuid, Dates.formatForStorage(dateModified)]
+  )
+
+export const fetchRecordDateModified = async (
+  { surveyId, recordUuid }: { surveyId: number; recordUuid: string },
+  client: DbClient = db
+) => {
+  const row = await client.oneOrNone(
+    `SELECT ${DbUtils.selectDate('date_modified')}
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid]
+  )
+  return row?.date_modified ? Dates.parseISO(row.date_modified) : null
+}
+
+export const fetchRecordStepAndOwner = (
+  { surveyId, recordUuid }: { surveyId: number; recordUuid: string },
+  client: DbClient = db
+): Promise<{ step: string; ownerUuid: string } | null> =>
+  client.oneOrNone(
+    `SELECT step, owner_uuid
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid],
+    (row) => (row ? { step: row.step, ownerUuid: row.owner_uuid } : null)
+  )
+
+export const updateValidation = (
+  surveyId: number,
+  recordUuid: string,
+  validation: ArenaValidation,
+  client: DbClient = db
+) =>
+  client.one(
+    `UPDATE ${getSchemaSurvey(surveyId)}.record 
+     SET validation = $1::jsonb
+     WHERE uuid = $2
+     RETURNING ${recordSelectFields}`,
+    [validation, recordUuid]
+  )
+
+export const updateRecordStep = (surveyId: number, recordUuid: string, step: string, client: DbClient = db) =>
+  client.none(
+    `
+      UPDATE ${getSchemaSurvey(surveyId)}.record
+      SET step = $1
+      WHERE uuid = $2`,
+    [step, recordUuid]
+  )
+
+export const updateRecordOwner = (
+  { surveyId, recordUuid, ownerUuid }: { surveyId: number; recordUuid: string; ownerUuid: string },
+  client: DbClient = db
+) =>
+  client.none(
+    `
+      UPDATE ${getSchemaSurvey(surveyId)}.record
+      SET owner_uuid = $/ownerUuid/
+      WHERE uuid = $/recordUuid/`,
+    { recordUuid, ownerUuid }
+  )
+
+export const updateRecordMergedInto = (
+  {
+    surveyId,
+    recordUuid,
+    mergedIntoRecordUuid,
+  }: { surveyId: number; recordUuid: string; mergedIntoRecordUuid: string },
+  client: DbClient = db
+) =>
+  client.one(
+    `
+      UPDATE ${getSchemaSurvey(surveyId)}.record
+      SET merged_into_record_uuid = $/mergedIntoRecordUuid/
+      WHERE uuid = $/recordUuid/
+      RETURNING ${recordSelectFields}`,
+    { recordUuid, mergedIntoRecordUuid }
+  )
+
+export const updateRecordsOwner = (
+  { surveyId, fromOwnerUuid, toOwnerUuid }: { surveyId: number; fromOwnerUuid: string; toOwnerUuid: string },
+  client: DbClient = db
+) =>
+  client.none(
+    `
+    UPDATE ${getSchemaSurvey(surveyId)}.record
+    SET owner_uuid = $1
+    WHERE owner_uuid = $2`,
+    [toOwnerUuid, fromOwnerUuid]
+  )
+
+export const updateRecordValidationsFromValues = (
+  surveyId: number,
+  recordUuidAndValidationValues: any,
+  client: DbClient = db
+) =>
+  client.none(
+    DbUtils.updateAllQuery(
+      getSchemaSurvey(surveyId),
+      'record',
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'validation', cast: 'jsonb' }],
+      recordUuidAndValidationValues
+    )
+  )
+
+export const updateRecordDateModifiedFromValues = (
+  surveyId: number,
+  recordUuidAndDateModifiedValues: any,
+  client: DbClient = db
+) =>
+  client.none(
+    DbUtils.updateAllQuery(
+      getSchemaSurvey(surveyId),
+      'record',
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'date_modified', cast: 'timestamp' }],
+      recordUuidAndDateModifiedValues
+    )
+  )
+
+// ============== DELETE
+
+export const deleteRecord = (surveyId: number, recordUuid: string, client: DbClient = db) =>
+  client.query(
+    `
+    DELETE FROM ${getSchemaSurvey(surveyId)}.record
+    WHERE uuid = $1
+    `,
+    [recordUuid]
+  )
+
+export const deleteRecordsPreview = (surveyId: number, olderThan24Hours = false, client: DbClient = db) =>
+  client.map(
+    `
+    DELETE FROM ${getSchemaSurvey(surveyId)}.record
+    WHERE preview = $1
+    ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
+    RETURNING uuid
+    `,
+    [true],
+    A.prop('uuid')
+  )
+
+export const deleteRecordsByCycles = (surveyId: number, cycles: string[], client: DbClient = db) =>
+  client.map(
+    `
+    DELETE FROM ${getSchemaSurvey(surveyId)}.record
+    WHERE cycle IN ($1:csv)
+    RETURNING uuid
+  `,
+    [cycles],
+    A.prop('uuid')
+  )
+
+export const deleteRecordsBySurvey = (surveyId: number, client: DbClient = db) =>
+  client.none(`DELETE FROM ${getSchemaSurvey(surveyId)}.record`)

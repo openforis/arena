@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaValidation, type ArenaValidationResult } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -11,27 +11,26 @@ import * as ValidatorFunctions from './_validator/validatorFunctions'
 import type { ValidatorFn, ValidatorResult } from './_validator/validatorFunctions'
 
 const extractNestedErrorsOrWarnings = (
-  validationResultOrValidation: ValidatorResult | Validation.ValidationInstance
-): { errors: ValidationResult.ValidationResultInstance[]; warnings: ValidationResult.ValidationResultInstance[] } => {
-  const errors: ValidationResult.ValidationResultInstance[] = []
-  const warnings: ValidationResult.ValidationResultInstance[] = []
+  validationResultOrValidation: ValidatorResult | ArenaValidation
+): { errors: ArenaValidationResult[]; warnings: ArenaValidationResult[] } => {
+  const errors: ArenaValidationResult[] = []
+  const warnings: ArenaValidationResult[] = []
   const stack: unknown[] = [validationResultOrValidation]
-  const addUniqueItems =
-    (items: ValidationResult.ValidationResultInstance[]) => (arr: ValidationResult.ValidationResultInstance[]) =>
-      ArrayUtils.addItems({ items, avoidDuplicates: true, compareFn: Objects.isEqual, sideEffect: true })(arr)
+  const addUniqueItems = (items: ArenaValidationResult[]) => (arr: ArenaValidationResult[]) =>
+    ArrayUtils.addItems({ items, avoidDuplicates: true, compareFn: Objects.isEqual, sideEffect: true })(arr)
 
   while (stack.length > 0) {
     const currentItem = stack.pop()
     if (currentItem) {
       if (typeof currentItem === 'string') {
-        errors.push(currentItem as unknown as ValidationResult.ValidationResultInstance)
+        errors.push(currentItem as unknown as ArenaValidationResult)
       } else if ((currentItem as Record<string, unknown>).key) {
-        const item = currentItem as ValidationResult.ValidationResultInstance
+        const item = currentItem as ArenaValidationResult
         const arr = ValidationResult.isError(item) ? errors : warnings
         const itemToAdd = A.omit([ValidationResult.keys.severity], item)
-        addUniqueItems([itemToAdd as ValidationResult.ValidationResultInstance])(arr)
+        addUniqueItems([itemToAdd as ArenaValidationResult])(arr)
       } else {
-        const validation = currentItem as Validation.ValidationInstance
+        const validation = currentItem as ArenaValidation
         addUniqueItems(Validation.getErrors(validation))(errors)
         addUniqueItems(Validation.getWarnings(validation))(warnings)
         const fieldValidations = Validation.getFieldValidations(validation)
@@ -42,14 +41,10 @@ const extractNestedErrorsOrWarnings = (
   return { errors, warnings }
 }
 
-const validateProp = async (
-  obj: unknown,
-  prop: string,
-  validations: ValidatorFn[] = []
-): Promise<Validation.ValidationInstance> => {
+const validateProp = async (obj: unknown, prop: string, validations: ValidatorFn[] = []): Promise<ArenaValidation> => {
   const validationsEvaluated = await Promise.all(validations.map((validationFn) => validationFn(prop, obj)))
-  const errors: ValidationResult.ValidationResultInstance[] = []
-  const warnings: ValidationResult.ValidationResultInstance[] = []
+  const errors: ArenaValidationResult[] = []
+  const warnings: ArenaValidationResult[] = []
   validationsEvaluated.forEach((validationResult) => {
     const { errors: errorsCurrent, warnings: warningsCurrent } = extractNestedErrorsOrWarnings(validationResult)
     errors.push(...errorsCurrent)
@@ -62,7 +57,7 @@ export const validate = async (
   obj: unknown,
   propsValidations: Record<string, ValidatorFn[]>,
   removeValidFields = true
-): Promise<Validation.ValidationInstance> => {
+): Promise<ArenaValidation> => {
   const validation = Validation.newInstance()
 
   for (const [prop, propValidations] of Object.entries(propsValidations)) {

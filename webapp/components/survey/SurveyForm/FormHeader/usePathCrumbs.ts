@@ -1,10 +1,5 @@
-import { NodeValueFormatter } from '@openforis/arena-core'
-import type {
-  LanguageCode,
-  Node as ArenaNode,
-  NodeDef as ArenaNodeDef,
-  Survey as ArenaSurvey,
-} from '@openforis/arena-core'
+import { RecordNodeValueFormatter } from '@openforis/arena-core'
+import type { LanguageCode, ArenaRecordNode, ArenaNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -30,10 +25,10 @@ const getNodeValue = ({
   survey: ArenaSurvey
   cycle: string
   nodeDef: ArenaNodeDef<any>
-  node: ArenaNode
+  node: ArenaRecordNode
   lang: LanguageCode
 }) =>
-  NodeValueFormatter.format({
+  RecordNodeValueFormatter.format({
     survey,
     cycle,
     nodeDef,
@@ -51,7 +46,7 @@ const getNodeValue = ({
  * @returns Ordered breadcrumb items from root to the active page
  */
 export const usePathCrumbs = (entry: boolean): FormPathCrumb[] => {
-  const survey = useSurvey() as ArenaSurvey
+  const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   let nodeDefCurrent = useNodeDefPage()
   const pagesUuidMap = usePagesUuidMap()

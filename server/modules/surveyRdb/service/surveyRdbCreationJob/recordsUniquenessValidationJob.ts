@@ -1,0 +1,139 @@
+import type { ArenaValidation } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import * as Node from '@core/record/node'
+import * as RecordValidation from '@core/record/recordValidation'
+import * as Validation from '@core/validation/validation'
+
+import Job from '@server/job/job'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+
+const recordValidationUpdateBatchSize = 1000
+
+const _updateNodeValidation = (
+  validationRecord: ArenaValidation,
+  nodeUuid: string,
+  validationNode: ArenaValidation
+): ArenaValidation => {
+  const validationNodeOld = Validation.getFieldValidation(nodeUuid)(validationRecord)
+
+  // Merge new validation with node validation
+  const nodeValidationUpdated = A.mergeDeepRight(validationNodeOld, validationNode)
+
+  // Replace node validation in record validation
+  return A.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
+}
+
+export default class RecordsUniquenessValidationJob extends Job {
+  static readonly type = 'RecordsUniquenessValidationJob'
+
+  // Cache of record validations
+  validationByRecordUuid: Record<string, ArenaValidation>
+
+  constructor(params?: any) {
+    super(RecordsUniquenessValidationJob.type, params)
+
+    this.validationByRecordUuid = {}
+  }
+
+  async execute() {
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
+    const cycleKeys = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
+
+    this.total = A.length(cycleKeys) * 2
+
+    // one cycle at a time: the validation runs queries in the job transaction
+    for (const cycle of cycleKeys) {
+      await this.validateRecordsUniquenessByCycle(cycle) // NOSONAR
+    }
+  }
+
+  async validateRecordsUniquenessByCycle(cycle: string): Promise<void> {
+    // 1. fetch survey and node defs
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId: this.surveyId, cycle, draft: true, advanced: true },
+      this.tx
+    )
+    this.incrementProcessedItems()
+
+    const nodeDefRoot = Survey.getNodeDefRoot(survey)
+    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
+    if (A.isEmpty(nodeDefKeys)) {
+      return
+    }
+
+    // 2. find duplicate records
+    const rowsRecordsDuplicate = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(
+      survey,
+      cycle,
+      nodeDefRoot,
+      nodeDefKeys,
+      this.tx
+    )
+
+    if (!A.isEmpty(rowsRecordsDuplicate)) {
+      // 3. update records validation
+      const validationDuplicate = RecordValidation.newValidationRecordDuplicate()
+
+      for (const rowRecordDuplicate of rowsRecordsDuplicate) {
+        if (this.isCanceled()) {
+          break
+        }
+
+        // 2. for each duplicate node entity, update record validation
+        const { uuid: recordUuid, validation, node_duplicate_uuids: nodeDuplicateUuids } = rowRecordDuplicate
+        const nodeRootUuid = nodeDuplicateUuids[0]
+        const nodesKeyDuplicate = /* NOSONAR */ await RecordManager.fetchChildNodesByNodeDefUuids(
+          this.surveyId,
+          recordUuid,
+          nodeRootUuid,
+          nodeDefKeys.map((nd) => NodeDef.getUuid(nd)),
+          this.tx
+        )
+        const validationRecord = this.validationByRecordUuid[recordUuid] || validation
+
+        const validationRecordUpdated = A.pipe(
+          A.reduce(
+            (validationRecordAccumulator, nodeKeyDuplicate) =>
+              _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
+            validationRecord
+          ),
+          Validation.updateCounts
+        )(nodesKeyDuplicate)
+
+        // 3. add record validation to batch update
+        await this.addRecordValidationToBatchUpdate(recordUuid, validationRecordUpdated) // NOSONAR
+      }
+    }
+
+    this.incrementProcessedItems()
+  }
+
+  async addRecordValidationToBatchUpdate(recordUuid: string, validation: ArenaValidation): Promise<void> {
+    this.validationByRecordUuid[recordUuid] = validation
+
+    if (Object.keys(this.validationByRecordUuid).length === recordValidationUpdateBatchSize) {
+      await this.flushRecordValidationBatchUpdate()
+    }
+  }
+
+  async flushRecordValidationBatchUpdate() {
+    if (Object.keys(this.validationByRecordUuid).length > 0) {
+      const recordAndValidationValues = Object.entries(this.validationByRecordUuid)
+      await RecordManager.updateRecordValidationsFromValues(this.surveyId, recordAndValidationValues, this.tx)
+      this.validationByRecordUuid = {}
+    }
+  }
+
+  async beforeEnd() {
+    await super.beforeEnd()
+
+    await this.flushRecordValidationBatchUpdate()
+  }
+}

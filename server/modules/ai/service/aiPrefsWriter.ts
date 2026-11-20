@@ -4,7 +4,7 @@
  * never refreshed after a save, and a provider test or a model list can take many seconds, so a copy is always stale
  * by the time it is written. Old provider keys (no AAD) are encrypted again with their AAD on every write.
  */
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import * as UserUtils from '@core/user/user'
 import * as SecretBox from '@server/utils/crypto/secretBox'
@@ -54,19 +54,19 @@ export const createDefaultAiPrefsWriterDeps = (): AiPrefsWriterDeps => ({
 
 /**
  * Returns the user with the AI prefs as stored.
- * @param {User} user - The user.
+ * @param {ArenaUser} user - The user.
  * @param {object|null} aiPrefs - Stored AI prefs.
- * @returns {User} The user with those prefs (the other prefs are the user's own).
+ * @returns {ArenaUser} The user with those prefs (the other prefs are the user's own).
  */
-export const withStoredAiPrefs = (user: User, aiPrefs: StoredAiPrefs | null): User =>
-  ({ ...user, prefs: { ...(UserUtils.getPrefs(user) || {}), ai: aiPrefs } }) as User
+export const withStoredAiPrefs = (user: ArenaUser, aiPrefs: StoredAiPrefs | null): ArenaUser =>
+  ({ ...user, prefs: { ...(UserUtils.getPrefs(user) || {}), ai: aiPrefs } }) as ArenaUser
 
 /**
  * Encrypts again, with their AAD, the old keys of the AI prefs; an old key that is also stored in the record of
  * another user was copied and is removed instead (one query, only when there are old keys to upgrade).
  * @param {object} params - Parameters.
  * @param {object|null} params.aiPrefs - The AI prefs about to be stored.
- * @param {User} params.user - The user.
+ * @param {ArenaUser} params.user - The user.
  * @param {Queryable} params.client - The transaction.
  * @param {AiPrefsWriterDeps} params.deps - Dependencies.
  * @returns {Promise<object|null>} The AI prefs to store; the same object when no key changed.
@@ -78,7 +78,7 @@ const upgradeOldKeys = async ({
   deps,
 }: {
   aiPrefs: StoredAiPrefs | null
-  user: User
+  user: ArenaUser
   client: Queryable
   deps: AiPrefsWriterDeps
 }): Promise<StoredAiPrefs | null> => {
@@ -94,20 +94,20 @@ const upgradeOldKeys = async ({
  * the user row is locked, so it must not wait for the network; it may throw to refuse the write (nothing is stored).
  * Nothing is written when the change returns null and no old key needs to be encrypted again.
  * @param {object} params - Parameters.
- * @param {User} params.user - The user.
+ * @param {ArenaUser} params.user - The user.
  * @param {AiPrefsChange} params.change - Receives the latest stored AI prefs, returns the ones to store (or null).
  * @param {AiPrefsWriterDeps} [params.deps] - Dependencies.
- * @returns {Promise<User>} The user with the AI prefs as stored.
+ * @returns {Promise<ArenaUser>} The user with the AI prefs as stored.
  */
 export const changeAiPrefs = async ({
   user,
   change,
   deps = createDefaultAiPrefsWriterDeps(),
 }: {
-  user: User
+  user: ArenaUser
   change: AiPrefsChange
   deps?: AiPrefsWriterDeps
-}): Promise<User> => {
+}): Promise<ArenaUser> => {
   const stored = await deps.updateAiPrefs(user.uuid, async (latest, client) => {
     const next = change(latest) ?? latest
     const upgraded = deps.isEncryptionConfigured() ? await upgradeOldKeys({ aiPrefs: next, user, client, deps }) : next

@@ -8,7 +8,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
-import { Button } from '@webapp/components'
+import { ButtonIconExpandToggle } from '@webapp/components'
 import { ButtonGroup, Checkbox, TextInput } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
@@ -176,13 +176,7 @@ const UserRow = ({
     <>
       <TableRow className={classNames({ expanded })} hover>
         <TableCell padding="checkbox">
-          <Button
-            disabled={!expandable}
-            iconClassName={expanded ? 'icon-circle-up' : 'icon-circle-down'}
-            onClick={() => setExpanded(!expanded)}
-            title="common.expandCollapse"
-            variant="text"
-          />
+          {expandable && <ButtonIconExpandToggle expanded={expanded} onClick={() => setExpanded(!expanded)} />}
         </TableCell>
         <TableCell className="users-backup-import-users-table__email-cell" title={email}>
           {email}

@@ -14,18 +14,18 @@ to the browser(s) through the **WebSocket**. The webapp never computes dependent
 | Piece                                 | Location                                                                                                                                                                                                                                                               |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Data entry form, Redux actions        | `webapp/components/survey/Record/store/useLocalState.js`, `webapp/store/ui/record/actions/` (`checkIn.js`, `update.js`, `delete.js`, `nodeRequestsQueue.js`)                                                                                                           |
-| REST endpoints                        | `server/modules/record/api/recordApi.js` (`.../checkin`, `.../checkout`, `POST`/`DELETE .../node`)                                                                                                                                                                     |
-| Service                               | `server/modules/record/service/recordService.js` (`checkIn`, `checkOut`, `persistNode`, `deleteNode`)                                                                                                                                                                  |
+| REST endpoints                        | `server/modules/record/api/recordApi.ts` (`.../checkin`, `.../checkout`, `POST`/`DELETE .../node`)                                                                                                                                                                     |
+| Service                               | `server/modules/record/service/recordService.ts` (`checkIn`, `checkOut`, `persistNode`, `deleteNode`)                                                                                                                                                                  |
 | Records update thread                 | `server/modules/record/service/update/`: `surveyRecordsThreadService.js` (main thread side), `thread/recordsUpdateThread.js` (the worker)                                                                                                                              |
 | Persistence orchestration             | `server/modules/record/manager/_recordManager/`: `recordUpdateManager.js`, `nodeUpdateManager.js`, `nodeCreationManager.js`, `recordValidationManager.js`, `recordUniquenessValidator.js`, `nodeRDBManager.js`                                                         |
-| Record domain logic                   | arena-core `RecordNodesUpdater` (`src/record/recordNodesUpdater/`), `RecordValidator` (`src/record/recordValidator/`), `RecordExpressionEvaluator` (`src/record/recordExpressionEvaluator/`); wrapped by `core/record/record.js` (e.g. `Record.updateNodesDependents`) |
+| Record domain logic                   | arena-core `RecordNodesUpdater` (`src/record/recordNodesUpdater/`), `RecordValidator` (`src/record/recordValidator/`), `RecordExpressionEvaluator` (`src/record/recordExpressionEvaluator/`); wrapped by `core/record/record.ts` (e.g. `Record.updateNodesDependents`) |
 | WebSocket and multi-instance plumbing | arena-server `WebSocketServer` (`src/webSocket/server.ts`), `ClusterBus` (`src/clusterBus/`), `RecordSocketAssociationRepository` (`src/repository/recordSocketAssociation/`)                                                                                          |
 
 ## The records update thread
 
 There is **one** worker thread per server instance, shared by all surveys and records
 (`SurveyRecordsThreadMap.getKey` is a constant). `RecordsUpdateThreadService.getOrCreatedThread` starts
-it lazily (through `server/threads/threadManager.js`, a `node:worker_threads` `Worker`) and kills it after
+it lazily (through `server/threads/threadManager.ts`, a `node:worker_threads` `Worker`) and kills it after
 10 minutes of inactivity.
 
 The worker keeps expression evaluation and record writes off the Express event loop, and its queue
@@ -104,6 +104,11 @@ record view, whose check-in triggers `recordInit`. The thread runs `RecordManage
 persists the root entity through the same `persistNode` pipeline described below (so descendants and
 default values are created as for any node) and then applies the values of the user's group
 qualifiers. The new nodes reach the form via `nodesUpdate` events.
+
+A **preview record** (`preview: true`, checked in with the draft survey) can be created only by survey
+editors or, when `formPreviewForDataEntryUsers` is enabled in the published survey info, by data entry
+users: see `RecordService.canCreateRecordPreview`. It is opened from the Form Designer (editors only) or from
+Data > Records > Preview form (`FormPreview` view, which loads the draft survey definitions).
 
 Check-in doesn't lock the record: several users can have it open and edit it at the same time.
 
@@ -232,5 +237,5 @@ They skip the records update thread: Arena Mobile updates and validates records 
 `RecordUpdater`) and uploads them to `POST /api/mobile/survey/:surveyId`, which starts
 `ArenaMobileDataImportJob` (`server/modules/mobile/service/arenaMobileDataImport/`). Its
 `RecordsImportJob` inserts new records as uploaded, or updates existing ones with
-`Record.replaceUpdatedNodes` / `Record.mergeRecords` (`core/record/_record/recordsCombiner.js`, which
+`Record.replaceUpdatedNodes` / `Record.mergeRecords` (`core/record/_record/recordsCombiner.ts`, which
 rerun dependents and validation), writing nodes and RDB rows in batches.

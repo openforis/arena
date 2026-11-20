@@ -8,6 +8,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { useMapWorkspace, WorkspaceLeafletProvider } from '../MapWorkspaceContext'
 import type { MapRailTab } from '../mapWorkspaceTypes'
+import { RAIL_PANEL_MAX_WIDTH, RAIL_PANEL_MIN_WIDTH, useRailPanelResize } from './useRailPanelResize'
 
 const DEFAULT_PANEL_WIDTH = 288
 const KEY_STEPS: Record<string, number> = { ArrowDown: 1, ArrowUp: -1 }
@@ -24,6 +25,7 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
   const { railTab, dispatch } = useMapWorkspace()
   const baseId = useId()
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const panelResize = useRailPanelResize()
   // roving tab index: the selected tab (or the first one when the rail is collapsed) is the tab stop
   const tabStopIndex = Math.max(
     tabs.findIndex((tab) => tab.key === railTab),
@@ -78,32 +80,48 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
           )
         })}
       </div>
-      {tabs.map((tab) => (
-        <section
-          key={tab.key}
-          id={`${baseId}-panel-${tab.key}`}
-          role="tabpanel"
-          aria-labelledby={`${baseId}-tab-${tab.key}`}
-          hidden={tab.key !== railTab}
-          className="map-rail__panel"
-          style={{ width: tab.width ?? DEFAULT_PANEL_WIDTH }}
-          data-testid={TestId.mapWorkspace.railPanel(tab.key)}
-        >
-          <header className="map-rail__panel-header">
-            <h2 className="map-rail__panel-title">{t(tab.titleKey ?? tab.labelKey)}</h2>
-            <IconButton
-              size="small"
-              aria-label={t('mapWorkspace.rail.close')}
-              onClick={() => dispatch({ type: 'closeRail' })}
-            >
-              <span className="icon icon-12px icon-arrow-left" aria-hidden="true" />
-            </IconButton>
-          </header>
-          <div className="map-rail__panel-body">
-            <WorkspaceLeafletProvider>{tab.content}</WorkspaceLeafletProvider>
-          </div>
-        </section>
-      ))}
+      {tabs.map((tab) => {
+        const width = panelResize.getWidth(tab.key, tab.width ?? DEFAULT_PANEL_WIDTH)
+        return (
+          <section
+            key={tab.key}
+            id={`${baseId}-panel-${tab.key}`}
+            role="tabpanel"
+            aria-labelledby={`${baseId}-tab-${tab.key}`}
+            hidden={tab.key !== railTab}
+            className="map-rail__panel"
+            style={{ width }}
+            data-testid={TestId.mapWorkspace.railPanel(tab.key)}
+          >
+            <header className="map-rail__panel-header">
+              <h2 className="map-rail__panel-title">{t(tab.titleKey ?? tab.labelKey)}</h2>
+              <IconButton
+                size="small"
+                aria-label={t('mapWorkspace.rail.close')}
+                onClick={() => dispatch({ type: 'closeRail' })}
+              >
+                <span className="icon icon-12px icon-arrow-left" aria-hidden="true" />
+              </IconButton>
+            </header>
+            <div className="map-rail__panel-body">
+              <WorkspaceLeafletProvider>{tab.content}</WorkspaceLeafletProvider>
+            </div>
+            <div // NOSONAR: a focusable separator is the accessible pattern for a resize handle
+              className="map-rail__panel-resize-handle"
+              role="separator"
+              tabIndex={0}
+              aria-orientation="vertical"
+              aria-label={t('mapWorkspace.rail.resize')}
+              aria-valuenow={width}
+              aria-valuemin={RAIL_PANEL_MIN_WIDTH}
+              aria-valuemax={RAIL_PANEL_MAX_WIDTH}
+              data-testid={TestId.mapWorkspace.railPanelResizeHandle(tab.key)}
+              onPointerDown={panelResize.onPointerDown(tab.key, width)}
+              onKeyDown={panelResize.onKeyDown(tab.key, width)}
+            />
+          </section>
+        )
+      })}
     </div>
   )
 }

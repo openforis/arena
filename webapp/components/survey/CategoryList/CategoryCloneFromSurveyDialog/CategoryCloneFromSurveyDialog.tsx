@@ -2,7 +2,7 @@ import '../../cloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Category as ArenaCategory } from '@openforis/arena-core'
+import { ArenaCategory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -34,7 +34,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
   const { surveys, surveysLoading } = useOtherSurveysList()
   const [sourceSurvey, setSourceSurvey] = useState<object | null>(null)
 
-  const [categoriesBySurveyId, setCategoriesBySurveyId] = useState<Record<string, object[]>>({})
+  const [categoriesBySurveyId, setCategoriesBySurveyId] = useState<Record<string, ArenaCategory[]>>({})
   const [loadingSurveyId, setLoadingSurveyId] = useState<string | number | null>(null)
   const [sourceCategory, setSourceCategory] = useState<ArenaCategory | null>(null)
 
@@ -62,7 +62,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
 
       setLoadingSurveyId(surveyId)
       API.fetchCategories({ surveyId, draft: true })
-        .then((categoriesFetched: object[]) => {
+        .then((categoriesFetched: ArenaCategory[]) => {
           setCategoriesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: categoriesFetched }))
         })
         .catch(() => {
@@ -136,8 +136,8 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
           <Dropdown
             disabled={!sourceSurvey}
             items={categories ?? []}
-            itemLabel={(category: object) => Category.getName(category)}
-            itemValue={(category: object) => Category.getUuid(category)}
+            itemLabel={(category: ArenaCategory) => Category.getName(category)}
+            itemValue={(category: ArenaCategory) => Category.getUuid(category)}
             loading={categoriesLoading}
             onChange={setSourceCategory}
             placeholder={categoryDropdownPlaceholder}

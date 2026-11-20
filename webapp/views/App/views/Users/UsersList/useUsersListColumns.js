@@ -1,28 +1,22 @@
-import { useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router'
+import { useMemo } from 'react'
 
 import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
 
-import { appModuleUri, userModules } from '@webapp/app/appModules'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { ButtonIconEdit } from '@webapp/components'
+import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
 import { CopyPasswordResetLinkButton } from '../UsersListSurvey/Row/CopyResetPasswordLinkButton'
 
-export const useUsersListColumns = () => {
-  const navigate = useNavigate()
+export const useUsersListColumns = ({ isRowOpenable, onRowOpen, selectable = false }) => {
   const i18n = useI18n()
-
-  const goToUserDetails = useCallback(
-    (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
-    [navigate]
-  )
 
   return useMemo(
     () => [
+      ...(selectable ? [TableSelectionColumn()] : []),
       {
         key: 'profile-picture',
         width: '40px',
@@ -112,11 +106,9 @@ export const useUsersListColumns = () => {
       {
         key: 'user-edit',
         width: '40px',
-        renderItem: ({ item }) => (
-          <ButtonIconEdit disabled={!User.hasAccepted(item)} onClick={() => goToUserDetails(item)} />
-        ),
+        renderItem: ({ item }) => <ButtonIconEdit disabled={!isRowOpenable(item)} onClick={() => onRowOpen(item)} />,
       },
     ],
-    [goToUserDetails, i18n]
+    [i18n, isRowOpenable, onRowOpen, selectable]
   )
 }

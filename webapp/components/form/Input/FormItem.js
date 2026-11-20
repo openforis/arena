@@ -72,7 +72,12 @@ export const FormItem = (props) => {
 FormItem.propTypes = {
   appendColonToLabel: PropTypes.bool,
   className: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.element,
+    PropTypes.arrayOf(PropTypes.element),
+  ]).isRequired,
   hideLabelInMobile: PropTypes.bool,
   // id of the labelled input
   htmlFor: PropTypes.string,

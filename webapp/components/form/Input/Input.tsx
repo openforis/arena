@@ -5,8 +5,7 @@ import { NumericFormat, OnValueChange } from 'react-number-format'
 import classNames from 'classnames'
 import { TextField } from '@mui/material'
 
-import { Objects } from '@openforis/arena-core'
-import type { ValidationInstance } from '@core/validation/validation'
+import { Objects, type ArenaValidation } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconCancel } from '@webapp/components/buttons'
@@ -27,6 +26,8 @@ type NumberFormatProps = {
 
 type Props = {
   allowClear?: boolean
+  // 'new-password' keeps browsers from filling a password field with the user's login password ('off' is ignored there)
+  autoComplete?: string
   autoFocus?: boolean
   className?: string
   disabled?: boolean
@@ -45,13 +46,14 @@ type Props = {
   textTransformFunction?: (value: string) => string
   title?: string | number
   type?: 'text' | 'number' | 'password'
-  validation?: ValidationInstance | null
+  validation?: ArenaValidation | null
   value?: string | number
 }
 
 export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const {
     allowClear = false,
+    autoComplete = 'off',
     autoFocus,
     className: classNameProp = null,
     disabled = false,
@@ -86,7 +88,6 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const valueTextOrUndefined = Objects.isEmpty(value) ? undefined : String(value)
   const valueText = valueTextOrUndefined ?? ''
   const title = getInputTitle({ title: titleProp, value, type })
-  const autoComplete = type === 'password' ? 'new-password' : 'off'
 
   const handleValueChange = useCallback(
     (newValue: string) => {

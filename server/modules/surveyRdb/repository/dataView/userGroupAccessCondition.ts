@@ -1,4 +1,4 @@
-import { NodeDef, NodeDefType, Survey } from '@openforis/arena-core'
+import { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDefUtils from '@core/survey/nodeDef'
@@ -7,7 +7,7 @@ import * as SurveyUtils from '@core/survey/survey'
 import { ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-type QualifierFilter = { nodeDef: NodeDef<NodeDefType>; value: unknown }
+type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 
 // see SurveyManager.fetchUserGroupAccessFilters
 export type UserGroupAccessFilters = {
@@ -53,7 +53,7 @@ export const getUserGroupAccessCondition = ({
   accessFilters,
   recordUuidColumn,
 }: {
-  survey: Survey
+  survey: ArenaSurvey
   accessFilters: UserGroupAccessFilters | null
   recordUuidColumn: string
 }): SqlCondition | null => {

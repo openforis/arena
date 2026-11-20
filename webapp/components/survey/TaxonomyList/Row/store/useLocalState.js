@@ -5,10 +5,10 @@ import { State } from './state'
 import { useOnValueChange } from '@webapp/components/hooks'
 
 export const useLocalState = (props) => {
-  const { selectedItemUuid, item: taxonomy, canDelete, onTaxonomySelect, canSelect, initData, onTaxonomyOpen } = props
+  const { selectedItemUuid, item: taxonomy, canDelete, onTaxonomySelect, canSelect, initData } = props
 
   const [state, setState] = useState(() =>
-    State.create({ taxonomy, canDelete, selectedItemUuid, onTaxonomySelect, canSelect, initData, onTaxonomyOpen })
+    State.create({ taxonomy, canDelete, selectedItemUuid, onTaxonomySelect, canSelect, initData })
   )
 
   useOnValueChange(selectedItemUuid, (uuid) => setState(State.assocSelectedItemUuid(uuid)))

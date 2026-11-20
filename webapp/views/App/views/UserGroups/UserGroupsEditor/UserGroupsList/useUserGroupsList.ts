@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 
-export type UserGroupListRow = UserGroupType & { membersCount: number }
+export type UserGroupListRow = ArenaUserGroup & { membersCount: number }
 
 interface UseUserGroupsListResult {
   rows: UserGroupListRow[]

@@ -3,7 +3,7 @@
  * input), so the tools can be registered with navigator.modelContext later.
  */
 import type { z } from 'zod'
-import type { Survey as ArenaSurvey, User as ArenaUser } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 
 import type { AiDataClass } from '@common/ai/features'
 

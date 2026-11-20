@@ -1,4 +1,4 @@
-import { ServiceRegistry, ServiceType } from '@openforis/arena-core'
+import { ServiceRegistry, ServiceType, SurveyFactory } from '@openforis/arena-core'
 import { UnauthorizedError } from '@openforis/arena-server'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -14,7 +14,7 @@ import * as Response from '@server/utils/response'
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const surveyUuid = 'survey-1'
-const surveyInfo = { uuid: surveyUuid }
+const surveyInfo = { ...SurveyFactory.createInstance({ ownerUuid: 'owner-uuid', name: 'survey' }), uuid: surveyUuid }
 const groupUser = (name: string) => ({ uuid: `u-${name}`, name, authGroups: [{ name, surveyUuid }] }) as any
 const users = {
   outsider: { uuid: 'u-outsider', name: 'outsider', authGroups: [] } as any,

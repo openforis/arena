@@ -17,10 +17,12 @@ $tableFooterHeight: 30px;
 
   .table__content {
     position: relative;
-    padding: 10px;
     background-color: $colorSurface;
     height: calc(100% - #{$tableHeaderHeight});
     border: $tableRowBorder;
+    border-radius: $tableBorderRadius;
+    // clips the header background to the rounded corners
+    overflow: hidden;
   }
 
   .table__footer {
@@ -37,15 +39,16 @@ $tableFooterHeight: 30px;
     font-style: italic;
     text-align: center;
     margin-top: 2rem;
+    color: $colorOnSurfaceVariant;
   }
 
   .table__rows {
     position: absolute;
     overflow-y: auto;
     scrollbar-gutter: stable;
-    height: calc(100% - 50px);
-    right: 10px;
-    left: 10px;
+    height: calc(100% - #{$tableRowHeight});
+    right: 0;
+    left: 0;
   }
 
   .table__row {
@@ -87,42 +90,52 @@ $tableFooterHeight: 30px;
     }
 
     &:hover {
-      background-color: with-alpha($colorPrimaryContainer, 0.3);
+      background-color: $tableRowHoverBackground;
 
       .icon-action {
-        color: $colorWarning;
+        color: $colorPrimary;
       }
     }
   }
 
+  .table__row.selected {
+    background-color: $tableRowSelectedBackground;
+  }
+
   .table__row.active {
-    background-color: $colorHighlightContainer;
+    background-color: $tableRowSelectedBackground;
+    box-shadow: inset 3px 0 0 $colorPrimary;
 
     .icon-action {
-      color: $colorWarning;
+      color: $colorPrimary;
     }
   }
 
   .table__row.expanded {
-    align-items: baseline;
+    // first line: the row cells; second line: the expanded panel, as tall as its content
+    height: auto;
+    grid-template-rows: $tableRowHeight auto;
   }
 
   .table__row-header {
     @extend .table__row;
     border-bottom: none;
-    background-color: $colorInverseSurface;
-    color: $colorInverseOnSurface;
+    background: $tableHeaderAccent bottom / 100% 2px no-repeat, $colorPrimaryContainerLow;
+    color: $colorOnPrimaryContainer;
     font-weight: 600;
     overflow: hidden;
+    // aligns the columns with the rows, which always reserve the scrollbar space
     padding-right: 16px;
   }
 
-  .table__row-expanded-panel-wrapper {
-    position: absolute;
-    top: 35px;
-    left: 0;
-    bottom: 0;
-    width: 100%;
+  .table__row > .table__row-expanded-panel-wrapper {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    max-height: 300px;
+    overflow: auto;
+    white-space: normal;
+    // aligned with the cells after the expand/collapse toggle column
+    padding: 0 1rem 1rem 40px;
   }
 
   .table__paginator {

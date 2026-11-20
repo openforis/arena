@@ -21,16 +21,10 @@ const UsersListSurvey = () => {
   const [requestedAt, setRequestedAt] = useState(() => Date.now())
   const [surveyExtraPropsEditorUser, setSurveyExtraPropsEditorUser] = useState(null)
 
-  const onRowClick = useCallback(
+  const onRowOpen = useCallback(
     (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}?showSurveyGroup=true`),
     [navigate]
   )
-
-  const onEditSurveyUserExtraProps = useCallback(({ event, userListItem }) => {
-    event.stopPropagation()
-    event.preventDefault()
-    setSurveyExtraPropsEditorUser(userListItem)
-  }, [])
 
   return (
     <>
@@ -39,12 +33,12 @@ const UsersListSurvey = () => {
         moduleApiUri={`/api/survey/${surveyId}/users`}
         restParams={{ requestedAt }}
         className="users-list"
-        gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 10rem 50px 40px`}
+        gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 10rem 40px 50px`}
         headerLeftComponent={HeaderLeft}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
-        rowProps={{ onEditSurveyUserExtraProps }}
-        onRowClick={onRowClick}
+        rowProps={{ onEditSurveyUserExtraProps: setSurveyExtraPropsEditorUser, onRowOpen }}
+        onRowOpen={onRowOpen}
       />
       {surveyExtraPropsEditorUser && (
         <SurveyUserExtraPropsEditor

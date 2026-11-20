@@ -8,7 +8,7 @@ Open Foris Arena is a cloud-based platform for storing and processing data colle
 
 **Key technologies:**
 
-- Node.js 24.22.1
+- Node.js 24.22.3
 - React 19 (frontend)
 - Express (backend)
 - PostgreSQL with PostGIS
@@ -194,7 +194,7 @@ jest dist/__tests__/bundle.unit.js
 
 When adding a new node definition type or modifying the survey schema:
 
-1. Update domain model in `core/survey/nodeDef*.js`
+1. Update domain model in `core/survey/nodeDef*` (`nodeDef.ts`, `nodeDefLayout.js`, ...)
 2. Update database repository in `server/modules/nodeDef/repository/`
 3. Update API endpoints in `server/modules/nodeDef/api/`
 4. Update React components in `webapp/views/App/views/Designer/`
@@ -213,7 +213,7 @@ New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When s
 TypeScript 7 (native) is used for `tsc`, installed as the `@typescript/native` alias; the `typescript` package is an alias of `@typescript/typescript6` because typescript-eslint still needs the TypeScript 6 JavaScript API. In `.js` files, JSDoc `object` is a real type and parameters are required unless marked optional.
 
 **Types from `@openforis/arena-core`:**
-Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `Survey`, `NodeDef`, `ArenaRecord`, `Node`, `Category`, `Taxonomy`, `User`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate.
+Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `ArenaSurvey`, `ArenaNodeDef`, `ArenaRecord`, `ArenaRecordNode`, `ArenaCategory`, `ArenaTaxonomy`, `ArenaUser`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate. All arena-core types are `Arena`-prefixed (`ArenaSurvey`, `ArenaNodeDef`, `ArenaNodeDefEntity`, `ArenaRecord`, `ArenaRecordNode`, `ArenaValidation`, ...), so they don't clash with the `core/` module namespaces: import them without `as` renames. Use `ArenaAnyNodeDef` for a node def of any type.
 
 **Single `@openforis/arena-core` version:**
 `@openforis/arena-core` is a direct dependency and a dependency of `@openforis/arena-server`: both must resolve to the same version (one copy), otherwise the services registered by arena-server in the `ServiceRegistry` singleton are not visible to arena. When updating either package, align the arena-core version range with the one required by arena-server and run `yarn dedupe @openforis/arena-core`; the CI `build` job fails if `yarn.lock` resolves more than one arena-core version.
@@ -240,13 +240,17 @@ Keep comments short and to the point (JSDoc descriptions included): one line whe
 Give new branches a meaningful, possibly short name describing the change (e.g. `dashboard-activity-log-env-visibility`).
 
 **No Claude attribution:**
-Never add a `Co-Authored-By: Claude` trailer, a "Generated with Claude Code" line or a session link to commits and pull requests.
+Never add a `Co-Authored-By: Claude` trailer, a "Generated with Claude Code" line, a `Claude-Session` line or a session link to commits, pull requests, PR/issue comments, reviews or code comments.
 
-After creating a PR, wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
+**Assignee:**
+Assign every PR you open to the GitHub user you are working for.
+
+After creating a PR, subscribe to its activity and wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
 
 - Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the checks status).
 - Fix every finding that can reasonably be solved, and push the fixes to the PR branch.
 - Reply to each finding on GitHub: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
+- Keep watching until the checks are green.
 
 ## Important Notes
 

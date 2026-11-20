@@ -9,7 +9,7 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { UsersBackupButtons } from './UsersBackup'
 
 export const TableHeaderLeft = (props) => {
-  const { search, handleSearch, onUsersRestored } = props
+  const { search, handleSearch, onUsersRestored, selectedItems = [] } = props
 
   const canCreateUsers = useAuthCanCreateUsers()
   const isSystemAdmin = useUserIsSystemAdmin()
@@ -24,7 +24,7 @@ export const TableHeaderLeft = (props) => {
         onChange={handleSearch}
       />
       <ButtonDownload label="common.exportToExcel" href="/api/users/export" />
-      {isSystemAdmin && <UsersBackupButtons onUsersRestored={onUsersRestored} />}
+      {isSystemAdmin && <UsersBackupButtons onUsersRestored={onUsersRestored} selectedUsers={selectedItems} />}
       {canCreateUsers && (
         <Button label="appModules.userNew" onClick={() => navigate(appModuleUri(userModules.userNew))} />
       )}
@@ -37,4 +37,5 @@ TableHeaderLeft.propTypes = {
   search: PropTypes.string,
   handleSearch: PropTypes.func.isRequired,
   onUsersRestored: PropTypes.func,
+  selectedItems: PropTypes.array,
 }

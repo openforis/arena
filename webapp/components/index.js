@@ -11,6 +11,7 @@ export {
   ButtonIconDelete,
   ButtonIconEdit,
   ButtonIconEditOrView,
+  ButtonIconExpandToggle,
   ButtonIconFilter,
   ButtonIconGear,
   ButtonIconInfo,

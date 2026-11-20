@@ -1,0 +1,94 @@
+import * as DateUtils from '@core/dateUtils'
+import { FileFormats } from '@core/fileFormats'
+
+import Job from '@server/job/job'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as SurveyManager from '../manager/surveyManager'
+
+export default class SurveysListExportJob extends Job {
+  static readonly type: string = 'SurveysListExportJob'
+
+  constructor(params?: any) {
+    super(SurveysListExportJob.type, params)
+  }
+
+  async execute() {
+    const { user, draft, template, fileFormat = FileFormats.xlsx } = this.context
+
+    const items = await SurveyManager.fetchUserSurveysInfo({
+      user,
+      draft,
+      template,
+      includeCounts: true,
+      includeDbSize: true,
+      includeOwnerEmailAddress: true,
+      onProgress: ({ total, processed }) => {
+        this.total = total
+        this.processed = processed
+      },
+      stopIfFunction: () => this.isCanceled(),
+    })
+
+    this.total = items.length
+
+    const fields = [
+      'id',
+      'uuid',
+      'name',
+      'label',
+      'status',
+      'dateCreated',
+      'dateModified',
+      'datePublished',
+      'cycles',
+      'languages',
+      'ownerName',
+      'ownerEmail',
+      'nodeDefsCount',
+      'recordsCount',
+      'chainsCount',
+      'filesCount',
+      'filesSize',
+      'dbSize',
+      'dbDataSize',
+      'filesMissing',
+    ]
+
+    const objectTransformer = (surveySummary) => {
+      const transformedSurveySummary = {}
+      for (const [key, value] of Object.entries(surveySummary)) {
+        const valueTransformed =
+          key.startsWith('date') && typeof value === 'string'
+            ? DateUtils.convertDate({
+                dateStr: value,
+                formatFrom: DateUtils.formats.datetimeISO,
+                formatTo: DateUtils.formats.datetimeExport,
+              })
+            : value
+        transformedSurveySummary[key] = valueTransformed
+      }
+      return transformedSurveySummary
+    }
+
+    const outputTempFileName = FileUtils.newTempFileName()
+    const outputFilePath = FileUtils.tempFilePath(outputTempFileName)
+    const outputStream = FileUtils.createWriteStream(outputFilePath)
+
+    await FlatDataWriter.writeItemsToStream({
+      outputStream,
+      items,
+      fields,
+      options: { objectTransformer, removeNewLines: false },
+      fileFormat,
+    })
+
+    this.setContext({ outputTempFileName })
+  }
+
+  beforeSuccess() {
+    const { outputTempFileName } = this.context
+    this.setResult({ outputTempFileName })
+    return Promise.resolve()
+  }
+}

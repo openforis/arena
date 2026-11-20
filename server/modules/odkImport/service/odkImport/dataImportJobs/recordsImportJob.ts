@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import { isUuid } from '@core/uuid'
@@ -181,12 +183,12 @@ export default class RecordsImportJob extends Job {
     submissionFileZip,
     submissionDir,
   }: {
-    survey: any
+    survey: ArenaSurvey
     nodeDefsInfoByPath: { [path: string]: string }
-    parentNode: any
+    parentNode: ArenaRecordNode
     parentPath: string
     submissionElement: XmlElement
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -238,14 +240,14 @@ export default class RecordsImportJob extends Job {
     submissionFileZip,
     submissionDir,
   }: {
-    survey: any
+    survey: ArenaSurvey
     nodeDefsInfoByPath: { [path: string]: string }
-    nodeDef: any
+    nodeDef: ArenaAnyNodeDef
     nodeDefUuid: string
-    parentNode: any
+    parentNode: ArenaRecordNode
     childPath: string
     childElement: XmlElement
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -289,12 +291,12 @@ export default class RecordsImportJob extends Job {
     submissionFileZip,
     submissionDir,
   }: {
-    survey: any
-    nodeDef: any
+    survey: ArenaSurvey
+    nodeDef: ArenaAnyNodeDef
     nodeDefUuid: string
-    parentNode: any
+    parentNode: ArenaRecordNode
     rawText: string | null
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -330,9 +332,9 @@ export default class RecordsImportJob extends Job {
     submissionDir,
   }: {
     nodeDefUuid: string
-    parentNode: any
+    parentNode: ArenaRecordNode
     fileName: string | null
-    record: any
+    record: ArenaRecord
     submissionFileZip: any
     submissionDir: string
   }): Promise<any> {
@@ -365,13 +367,13 @@ export default class RecordsImportJob extends Job {
     return Record.assocNode(nodeWithValue, { sideEffect: true })(record)
   }
 
-  async _insertRecordNodes(record: any) {
+  async _insertRecordNodes(record: ArenaRecord) {
     for (const node of Record.getNodesArray(record)) {
       await this.batchPersister.addItem(node, this.tx) // NOSONAR
     }
   }
 
-  async nodesBatchInsertHandler(nodesArray: any[], tx: any) {
+  async nodesBatchInsertHandler(nodesArray: any[], tx: DbClient) {
     await RecordManager.insertNodesInBulk(
       { user: this.user, surveyId: this.surveyId, nodesArray, systemActivity: true },
       tx

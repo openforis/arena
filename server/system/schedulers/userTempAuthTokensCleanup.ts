@@ -1,0 +1,40 @@
+import * as schedule from 'node-schedule'
+
+import { ServiceRegistry } from '@openforis/arena-core'
+
+import * as Log from '@server/log/log'
+
+import { ServerServiceType, runWithClusterLock } from '@openforis/arena-server'
+
+const Logger = Log.getLogger('UserTempAuthTokensCleanup')
+
+const lockName = 'scheduler-user-temp-auth-tokens-cleanup'
+const items = 'expired temporary user auth tokens'
+const task = `deleting ${items}`
+
+const deleteExpiredUserTempAuthTokens = async () => {
+  try {
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
+        Logger.debug(task)
+
+        const serviceRegistry = ServiceRegistry.getInstance()
+        const userTempAuthTokenService = serviceRegistry.getService(ServerServiceType.userTempAuthToken) as unknown as {
+          cleanupExpired: () => Promise<number>
+        }
+        const count = await userTempAuthTokenService.cleanupExpired()
+        Logger.debug(`${count} ${items} deleted`)
+      },
+    })
+  } catch (error) {
+    Logger.error(`Error ${task}: ${error.toString()}`)
+  }
+}
+
+export const init = async () => {
+  await deleteExpiredUserTempAuthTokens()
+
+  Logger.debug('Schedule job to be executed every day at 01:00')
+  schedule.scheduleJob('0 1 * * *', async () => deleteExpiredUserTempAuthTokens())
+}

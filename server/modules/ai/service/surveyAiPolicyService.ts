@@ -1,7 +1,7 @@
 /**
  * Read and update the survey AI policy (stored in survey.config.aiPolicy, not versioned).
  */
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Survey from '@core/survey/survey'
@@ -28,7 +28,7 @@ export type SurveyAiPolicyState = { policy: AiPolicy; ceilings: AiPolicy; effect
 export type SurveyAiPolicyDeps = {
   fetchRawPolicy: (surveyId: number, client?: unknown) => Promise<unknown>
   storePolicy: (params: { surveyId: number; policy: AiPolicy }, client: unknown) => Promise<void>
-  insertActivityLog: (params: { user: User; surveyId: number; content: object }, client: unknown) => Promise<void>
+  insertActivityLog: (params: { user: ArenaUser; surveyId: number; content: object }, client: unknown) => Promise<void>
   getCeilings: () => AiPolicy
   runInTransaction: <T>(fn: (client: unknown) => Promise<T>) => Promise<T>
 }
@@ -38,7 +38,7 @@ export type SurveyAiPolicyDeps = {
  * @returns {SurveyAiPolicyDeps} The dependencies.
  */
 export const createDefaultSurveyAiPolicyDeps = (): SurveyAiPolicyDeps => ({
-  fetchRawPolicy: (surveyId, client = db) => SurveyRepository.fetchSurveyAiPolicy(surveyId, client),
+  fetchRawPolicy: (surveyId, client = db) => SurveyRepository.fetchSurveyAiPolicy(surveyId, client as typeof db),
   storePolicy: async ({ surveyId, policy }, client) => {
     await SurveyRepository.updateSurveyConfigurationProp(
       { surveyId, key: Survey.configKeys.aiPolicy, value: JSON.stringify(policy) },
@@ -132,14 +132,14 @@ const assertChangesWithinCeilings = ({
 /**
  * Validates and stores the survey AI policy; logs the change in the survey activity log.
  * @param {object} params - Parameters.
- * @param {User} params.user - Acting user (permission checked by the route).
+ * @param {ArenaUser} params.user - Acting user (permission checked by the route).
  * @param {number} params.surveyId - Survey id.
  * @param {unknown} params.policy - Requested policy (request body).
  * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
  * @returns {Promise<SurveyAiPolicyState>} The new policy state.
  */
 export const updateSurveyAiPolicy = async (
-  { user, surveyId, policy }: { user: User; surveyId: number; policy: unknown },
+  { user, surveyId, policy }: { user: ArenaUser; surveyId: number; policy: unknown },
   deps: SurveyAiPolicyDeps = createDefaultSurveyAiPolicyDeps()
 ): Promise<SurveyAiPolicyState> => {
   const requested = parseAiPolicyBody(policy)

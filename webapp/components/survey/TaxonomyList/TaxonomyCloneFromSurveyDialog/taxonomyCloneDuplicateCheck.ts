@@ -1,4 +1,4 @@
-import { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+import { ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import {

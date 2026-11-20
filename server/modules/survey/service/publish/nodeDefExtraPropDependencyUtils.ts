@@ -1,3 +1,4 @@
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -5,7 +6,7 @@ import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as DbUtils from '@server/db/dbUtils'
@@ -71,7 +72,7 @@ const _findChangedCategories = ({
   categoriesPublishedByUuid,
   categoryValueChangedPropNamesByUuid,
 }: {
-  survey: any
+  survey: ArenaSurvey
   categoriesPublishedByUuid: Record<string, any>
   categoryValueChangedPropNamesByUuid: Map<string, Set<string>>
 }): ChangedEntity[] => {
@@ -99,7 +100,7 @@ const _findChangedTaxonomies = ({
   taxonomiesPublishedByUuid,
   taxonomyValueChangedPropNamesByUuid,
 }: {
-  survey: any
+  survey: ArenaSurvey
   taxonomiesPublishedByUuid: Record<string, any>
   taxonomyValueChangedPropNamesByUuid: Map<string, Set<string>>
 }): ChangedEntity[] => {
@@ -128,7 +129,7 @@ const _referencesChangedEntityValue = ({
   changedCategories,
   changedTaxonomies,
 }: {
-  nodeDef: any
+  nodeDef: ArenaAnyNodeDef
   changedCategories: ChangedEntity[]
   changedTaxonomies: ChangedEntity[]
 }): boolean =>
@@ -145,7 +146,7 @@ const _referencesChangedEntityInValidations = ({
   changedCategories,
   changedTaxonomies,
 }: {
-  nodeDef: any
+  nodeDef: ArenaAnyNodeDef
   changedCategories: ChangedEntity[]
   changedTaxonomies: ChangedEntity[]
 }): boolean =>
@@ -165,7 +166,7 @@ const _findAffectedNodeDefUuids = ({
   changedCategories,
   changedTaxonomies,
 }: {
-  survey: any
+  survey: ArenaSurvey
   changedCategories: ChangedEntity[]
   changedTaxonomies: ChangedEntity[]
 }): { valueAffectedNodeDefUuids: Set<string>; validationAffectedNodeDefUuids: Set<string> } => {
@@ -203,8 +204,8 @@ const _findAffectedNodeDefUuids = ({
 // cheap queries: the published-only state of categories/taxonomies (to diff definitions against), and
 // any item/taxon rows with a pending extra-value draft change (to diff values against).
 export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = async (
-  { surveyId, survey }: { surveyId: number; survey: any },
-  client: any = db
+  { surveyId, survey }: { surveyId: number; survey: ArenaSurvey },
+  client: DbClient = db
 ): Promise<{ valueAffectedNodeDefUuids: Set<string>; validationAffectedNodeDefUuids: Set<string> }> => {
   const [categoriesPublishedByUuid, taxonomiesPublishedArray, categoryItemsChangedRows, taxaChangedRows] =
     await DbUtils.runQueries(client, [

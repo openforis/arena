@@ -39,11 +39,11 @@ Things to keep in mind:
 
 ## Server runtime
 
-Entry point: `server/server.js` → `server/system/appCluster.js`, which:
+Entry point: `server/server.ts` → `server/system/appCluster.ts`, which:
 
 1. creates the Express app with `ArenaServer.init` (arena-server); this also migrates the `public` DB
    schema;
-2. registers the arena API routes (`server/system/apiRouter.js`), the static webapp bundle and Swagger
+2. registers the arena API routes (`server/system/apiRouter.ts`), the static webapp bundle and Swagger
    (`/api-docs`, built from the `@swagger` comments in [api/](api/));
 3. starts listening, then the schedulers (`server/system/schedulers/`) and the background job that
    migrates every survey's schema and data (`AllSurveysDataMigrationJob`).
@@ -54,13 +54,30 @@ Work that doesn't fit in a request runs elsewhere:
   `JobQueue` runs them in worker threads with limited concurrency, persists their status in the `job`
   table and pushes progress to the client through the WebSocket.
 - **Record updates** from the data entry form run in a single worker thread per server instance,
-  shared by all surveys (`server/modules/record/service/update/surveyRecordsThreadService.js`); see
+  shared by all surveys (`server/modules/record/service/update/surveyRecordsThreadService.ts`); see
   [record-editing.md](record-editing.md).
 
 **Multiple instances.** Several server instances can run against the same DB: they exchange events
 through Postgres `LISTEN/NOTIFY` (`ClusterBus` in arena-server) and serialize boot-time and scheduled
 work with advisory locks (`runWithClusterLock`). This needs S3 file storage and sticky sessions for
 socket.io; see [infra/k8s/README.md](../infra/k8s/README.md).
+
+## Authentication
+
+Implemented in arena-server (Passport, `src/api/auth/`, `src/service/authProvider/`, `src/service/externalLogin/`):
+
+- **Password login** (`POST /auth/login`), with optional 2FA (TOTP devices).
+- **External login providers** (OpenID Connect: Google, Microsoft, any OIDC provider), configured by system
+  admins in _System administration > Login providers_ (`auth_provider` table, client secrets encrypted with
+  `AUTH_PROVIDER_SECRET_ENCRYPTION_KEY`) or read-only from `AUTH_PROVIDERS_CONFIG`. A sign-in starts at
+  `GET /auth/oidc/:id`; the callback matches the provider account (`user_external_identity`, by issuer and
+  subject) or links it to an existing or invited user by verified email; there is no self sign-up. Users can
+  link, unlink and see their sign-in methods in their profile (arena API in `server/modules/authProvider/`).
+- **Tokens:** both logins end with the same short-lived access token (Bearer) and a refresh token in an
+  `httpOnly` cookie (`POST /auth/token/refresh`); after an external sign-in the webapp gets its access token
+  through the refresh, as after a page reload.
+
+Design and decisions: [superpowers/plans/2026-11-17-oidc-authentication.md](superpowers/plans/2026-11-17-oidc-authentication.md).
 
 ## Database
 
@@ -76,7 +93,7 @@ PostgreSQL with PostGIS, accessed with pg-promise. Schemas:
   not yet published). The designer works on the draft; `SurveyPublishJob`
   (`server/modules/survey/service/publish/`) validates the survey, moves the draft props into `props`
   and regenerates the RDB schema. Repositories read one or the other with `mergeProps({ draft })`
-  (`server/db/utils/mergeProps.js`).
+  (`server/db/utils/mergeProps.ts`).
 - **Migrations** live in arena-server (`src/db/dbMigrator/migration/public` and `.../survey`); the
   survey ones run for every `survey_<id>` schema.
 - **Files** (record attachments) are stored in the DB, on the file system or in S3, depending on the

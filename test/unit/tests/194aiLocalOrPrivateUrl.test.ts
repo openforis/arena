@@ -74,6 +74,7 @@ describe('isOrgHostedUrl', () => {
 describe('aiBaseUrlNotAllowed points to the local AI server', () => {
   const errorsByLang = namespaceByLanguage('appErrors')
   const localServerNames: Record<string, string> = {
+    de: 'lokalen KI-Server',
     en: 'Local AI server',
     es: 'Servidor de IA local',
     fr: "Serveur d'IA local",

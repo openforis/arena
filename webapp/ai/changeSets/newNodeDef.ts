@@ -2,6 +2,8 @@
  * New node definitions proposed by the assistant, with the form designer's default props (duplicated
  * from NodeDefUIProps, whose module loads React components).
  */
+import type { NodeDefType } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
@@ -99,5 +101,5 @@ export const createProposedNodeDef = ({
     ...(readOnly ? { [propKeys.readOnly]: true } : {}),
     ...getDefaultPropsByType({ type, cycles, multiple }),
   }
-  return NodeDef.dissocTemporary(NodeDef.newNodeDef(parent, type, cycles, props))
+  return NodeDef.dissocTemporary(NodeDef.newNodeDef(parent, type as NodeDefType, cycles, props))
 }

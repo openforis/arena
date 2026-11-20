@@ -1,4 +1,4 @@
-import { SystemError as ArenaSystemError, type User } from '@openforis/arena-core'
+import { SystemError as ArenaSystemError, type ArenaUser } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -15,8 +15,8 @@ import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 
-const user = { uuid: 'user-uuid', authGroups: [{ name: 'systemAdmin' }] } as unknown as User
-const nobody = { uuid: 'nobody-uuid', authGroups: [] } as unknown as User
+const user = { uuid: 'user-uuid', authGroups: [{ name: 'systemAdmin' }] } as unknown as ArenaUser
+const nobody = { uuid: 'nobody-uuid', authGroups: [] } as unknown as ArenaUser
 
 describe('processNodesBatch', () => {
   let survey: any
@@ -327,7 +327,7 @@ describe('processNodesBatch', () => {
           authGroups: [
             { surveyUuid: surveyUuidOfSurvey(), name: 'dataEditor', recordSteps: { '1': 'own', '2': 'own' } },
           ],
-        }) as unknown as User
+        }) as unknown as ArenaUser
       const ownedRecord = () => ({ ...record, surveyUuid: surveyUuidOfSurvey(), ownerUuid: 'owner-uuid' })
 
       test('edits the record they own', async () => {

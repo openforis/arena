@@ -1,3 +1,4 @@
+import type { ArenaSurvey } from '@openforis/arena-core'
 import { createHash } from 'node:crypto'
 
 import {
@@ -7,7 +8,7 @@ import {
   buildSurveyFingerprintContent,
 } from '@core/survey/surveyCompare'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 
 import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
 
@@ -31,7 +32,7 @@ export const computeSurveyFingerprint = ({
   itemsByCategoryUuid,
   taxaByTaxonomyUuid,
 }: {
-  survey: any
+  survey: ArenaSurvey
   itemsByCategoryUuid: CategoryItemsByCategoryUuid
   taxaByTaxonomyUuid: TaxaByTaxonomyUuid
 }): SurveyFingerprint => {
@@ -53,7 +54,7 @@ export const computeSurveyFingerprint = ({
  */
 export const fetchSurveyFingerprint = async (
   { surveyId, draft = true }: { surveyId: number; draft?: boolean },
-  client: any = db
+  client: DbClient = db
 ): Promise<SurveyFingerprint> => {
   const { survey, itemsByCategoryUuid, taxaByTaxonomyUuid } = await fetchSurveyFromDb({ surveyId, draft }, client)
   return computeSurveyFingerprint({ survey, itemsByCategoryUuid, taxaByTaxonomyUuid })

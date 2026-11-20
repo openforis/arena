@@ -1,3 +1,4 @@
+import type { ArenaUser } from '@openforis/arena-core'
 import type { MapCustomLayer } from '@core/map/customLayers/mapCustomLayer'
 import {
   MapCustomLayersRepository,
@@ -147,7 +148,7 @@ describe('map custom layers storage (271)', () => {
 
   test('a prefs update sent by the client cannot overwrite the user layers', async () => {
     const { client, calls } = fakeClient({})
-    const user = { uuid: 'u1', prefs: { language: 'en', mapCustomLayers: {} } }
+    const user = { uuid: 'u1', prefs: { language: 'en', mapCustomLayers: {} } } as unknown as ArenaUser
     await updateUserPrefs(user, client as never)
     // the prefs are sent as JSON text and the layers key is removed by the query
     expect(calls[0].query).toContain("- 'mapCustomLayers')")

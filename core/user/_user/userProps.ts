@@ -59,8 +59,10 @@ export const assocMapApiKey =
 export const assocMaxSurveys = assocProp(keysProps.maxSurveys)
 export const assocExtra = assocProp(keysProps.extra)
 
-const dissocListOfProps = (propsArray: string[]) => (user: Record<string, unknown>) =>
-  propsArray.reduce((acc, propKey) => A.dissocPath([userKeys.props, propKey])(acc), user)
+const dissocListOfProps =
+  (propsArray: string[]) =>
+  <T extends object>(user: T): T =>
+    propsArray.reduce((acc: T, propKey) => A.dissocPath([userKeys.props, propKey])(acc) as T, user)
 
 export const dissocPrivateProps = dissocListOfProps(privateProps)
 export const dissocRestrictedProps = dissocListOfProps(restrictedProps)

@@ -9,7 +9,7 @@ API. This document explains the pieces of a chain, that round trip, and where ea
 ## What a chain is made of
 
 - **The chain**: a row of the `survey_<id>.chain` table (`TableChain` in `common/model/db/tables/chain/`),
-  modelled by `common/analysis/chain.js`. Besides labels and descriptions it holds:
+  modelled by `common/analysis/chain.ts`. Besides labels and descriptions it holds:
   - the RStudio options: send only records in the analysis step (`submitOnlyAnalysisStepDataIntoR`),
     only some records (`submitOnlySelectedRecordsIntoR` + `selectedRecordUuids`), include entities without
     data (`includeEntitiesWithoutData`), import the results back (`resultsBackFromRStudio`, default on);
@@ -24,10 +24,10 @@ API. This document explains the pieces of a chain, that round trip, and where ea
   `RScriptEditor`, area-based estimate toggle in `webapp/components/survey/NodeDefDetails/`). They sit in
   the survey hierarchy under the entity they are computed for and belong to one chain through their
   advanced props: `chainUuid`, `script` (the R code), `index` (execution order in the chain) and `active`
-  (inactive ones are not computed). `core/survey/_survey/surveyAnalysis.js` has the selectors:
+  (inactive ones are not computed). `core/survey/_survey/surveyAnalysis.ts` has the selectors:
   `Survey.getAnalysisNodeDefs`, `Survey.getAnalysisEntities`, `Survey.getBaseUnitNodeDef`.
 - **Sampling design** (optional, `hasSamplingDesign`; the UI allows it on one chain per survey,
-  `ChainBasicProps`). Its props are in `common/analysis/chainSamplingDesign.js`:
+  `ChainBasicProps`). Its props are in `common/analysis/chainSamplingDesign.ts`:
   - the **base unit** entity (e.g. the plot), the unit the sampling design and the weights refer to;
   - the sampling strategy: simple random, systematic, stratified random, stratified systematic, two-phase;
   - the stratum attribute (stratified strategies only), post-stratification attribute, clustering
@@ -36,7 +36,7 @@ API. This document explains the pieces of a chain, that round trip, and where ea
   - the reporting data category, with an attribute for each of its levels.
 
   `cleanupSamplingDesign` drops the props the selected strategy doesn't use. The statistical analysis
-  settings (`common/analysis/chainStatisticalAnalysis.js`: reporting entity, dimensions, filter, p-value,
+  settings (`common/analysis/chainStatisticalAnalysis.ts`: reporting entity, dimensions, filter, p-value,
   reporting method and area, non-response bias correction, clustering-only variances) are only used by
   the statistical analysis step. The base unit also drives the auto-generated `weight` and plot area
   attributes: see [sampling-plot-area-node-defs.md](sampling-plot-area-node-defs.md).
@@ -48,7 +48,7 @@ API. This document explains the pieces of a chain, that round trip, and where ea
 ## Chains and survey publishing
 
 Analysis attributes are node defs, so creating or editing them marks the survey as draft; changing the
-base unit does too (`Chain.checkChangeRequiresSurveyPublish`, `server/modules/analysis/service/update.js`).
+base unit does too (`Chain.checkChangeRequiresSurveyPublish`, `server/modules/analysis/service/update.ts`).
 RStudio can only be opened on a published survey (`checkCanOpenRStudio` in
 `webapp/store/ui/chain/actions/openRStudio.js`): R reads the data from the RDB, which is rebuilt on
 publish. `SurveyPublishJob` runs three chain jobs (`server/modules/survey/service/publish/jobs/`) before
@@ -57,7 +57,7 @@ the RDB is regenerated:
 - `ChainsCyclesCheckJob`: assigns all survey cycles to every analysis attribute;
 - `ChainsSamplingNodeDefsCheckJob`: creates or deletes the `weight` and plot area attributes;
 - `ChainsValidationJob`: fails the publish if a chain has no label in the default language or no
-  analysis attribute (`common/analysis/chainValidator.js`).
+  analysis attribute (`common/analysis/chainValidator.ts`).
 
 ## Running a chain in RStudio
 
@@ -83,14 +83,14 @@ sequenceDiagram
 ```
 
 The RStudio buttons of the chain page (`ChainRStudioPanel`) dispatch `openRStudio`, which calls
-`POST .../chain/:chainUuid/script` (`server/modules/analysis/api/chainApi.js`): it creates a chain
+`POST .../chain/:chainUuid/script` (`server/modules/analysis/api/chainApi.ts`): it creates a chain
 token, generates the project and returns the token. The UI then shows an R snippet (copied to the
 clipboard on OK) that downloads the project from the public `GET /api/public/.../script` route. That
 route regenerates the project and sends it as a zip; the server URL written into the scripts
 (`arena.host`) is the one of this download request (`Request.getServerUrl`, switched to https except
 for localhost), so R calls back the URL it downloaded from.
 
-- **RStudio (cloud)**: `POST /api/rstudio` (`server/modules/rstudio/api/rstudioApi.js`) asks the RStudio
+- **RStudio (cloud)**: `POST /api/rstudio` (`server/modules/rstudio/api/rstudioApi.ts`) asks the RStudio
   pool service (`RSTUDIO_POOL_SERVER_URL`, `RSTUDIO_POOL_SERVICE_KEY`) for an instance for the current
   user, and the UI opens `<rStudioProxyUrl><instanceId>_<userUuid>`. Without a pool service the API
   returns nothing and the UI opens `/rstudio/` on Arena's own host: one RStudio shared by all users
@@ -104,7 +104,7 @@ for localhost), so R calls back the URL it downloaded from.
 
 ## The generated R project
 
-`RChain.init` (`server/modules/analysis/service/rChain/rChain.js`) deletes and rewrites the project in
+`RChain.init` (`server/modules/analysis/service/rChain/rChain.ts`) deletes and rewrites the project in
 `ANALYSIS_OUTPUT_DIR/<survey name>/<chain folder>/`. The chain folder name (`rChain/rChainDir.ts`) is the
 chain label in the survey default language normalized like a node definition name (lowercase letters,
 digits and underscores) plus the first 8 characters of the chain uuid, e.g. `volume_calc_3f2a9b1c` (only
@@ -155,7 +155,7 @@ then don't run (`checkGlobalErrors`).
 
 Every call from R carries two credentials:
 
-- **The chain token.** `generateRStudioToken` (`server/modules/analysis/service/rStudio/index.js`)
+- **The chain token.** `generateRStudioToken` (`server/modules/analysis/service/rStudio/index.ts`)
   creates a random token bound to the chain, valid for 48 hours. The scripts send it as the `token`
   query parameter (`arena.prepareQueryParams` in `init-api.R`) and every `rChainApi.js` route checks it
   with `checkRStudioToken`. The project download route is under `/api/public/` (no login) and relies on
@@ -173,7 +173,7 @@ Every call from R carries two credentials:
 ## Where the results go
 
 `PUT .../entities/:entityDefUuid/data` starts a `PersistResultsJob`
-(`server/modules/analysis/service/rChain/PersistResultsJob.js`), a `FlatDataImportJob`: for every CSV
+(`server/modules/analysis/service/rChain/PersistResultsJob.ts`), a `FlatDataImportJob`: for every CSV
 row it finds the record by `record_uuid` and the entity by `parent_uuid`, sets the analysis attribute
 values and persists them like any data import, as nodes in `survey_<id>.node` and in the entity's RDB
 table `survey_<id>_data.data_<entity>`, which has a column for each analysis attribute. Results are
@@ -187,4 +187,4 @@ Two other outputs exist but are not written by the flow above:
   (`SurveyRdbOlapDataTablesCreationJob`); no script generated by Arena calls it.
 - A MAU zip (produced by the statistical analysis for the Arenalytics Shiny tool) can be uploaded by hand
   from the chain page's advanced functions menu; it is stored as a survey file per chain and cycle
-  (`server/modules/analysis/service/chainMauFile.js`).
+  (`server/modules/analysis/service/chainMauFile.ts`).

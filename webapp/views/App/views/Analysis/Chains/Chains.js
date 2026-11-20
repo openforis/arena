@@ -7,6 +7,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { ButtonIconEdit } from '@webapp/components'
 import Table from '@webapp/components/Table'
 import ErrorBadge from '@webapp/components/errorBadge'
 
@@ -18,14 +19,14 @@ const ChainsView = () => {
   const navigate = useNavigate()
   const lang = useSurveyPreferredLang()
 
-  const onRowClick = (chain) => navigate(`${appModuleUri(analysisModules.chain)}${Chain.getUuid(chain)}`)
+  const onRowOpen = (chain) => navigate(`${appModuleUri(analysisModules.chain)}${Chain.getUuid(chain)}`)
 
   return (
     <Table
       className="chains"
       headerLeftComponent={HeaderLeft}
       module="processing-chains"
-      onRowClick={onRowClick}
+      onRowOpen={onRowOpen}
       columns={[
         {
           key: 'validation',
@@ -72,11 +73,7 @@ const ChainsView = () => {
         {
           key: 'edit',
           width: '50px',
-          renderItem: () => (
-            <div>
-              <span className="icon icon-12px icon-action icon-pencil2" />
-            </div>
-          ),
+          renderItem: ({ item }) => <ButtonIconEdit onClick={() => onRowOpen(item)} />,
         },
       ]}
     />

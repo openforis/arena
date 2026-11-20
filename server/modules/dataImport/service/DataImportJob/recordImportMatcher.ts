@@ -1,4 +1,4 @@
-import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
+import { Dates, Objects, Records, Surveys, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
@@ -22,8 +22,8 @@ const formatKeyValue = async ({
   keyDef,
   value,
 }: {
-  survey: any
-  cycle: any
+  survey: ArenaSurvey
+  cycle: string
   keyDef: any
   value: any
 }): Promise<any> => {
@@ -49,8 +49,8 @@ export const getRecordFormattedKeyValuesByDefUuid = async ({
   survey,
   record,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
 }): Promise<{ [nodeDefUuid: string]: any }> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
@@ -69,23 +69,28 @@ export const getRecordFormattedKeyValuesByDefUuid = async ({
 /**
  * Same as getRecordFormattedKeyValuesByDefUuid, but returns the values as an array, in node def key order.
  */
-export const getRecordFormattedKeyValues = async ({ survey, record }: { survey: any; record: any }): Promise<any[]> =>
-  Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
+export const getRecordFormattedKeyValues = async ({
+  survey,
+  record,
+}: {
+  survey: ArenaSurvey
+  record: ArenaRecord
+}): Promise<any[]> => Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
 
 const findExistingRecordSummaryWithSameKeys = async ({
   survey,
   record,
   existingRecordsSummary,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   existingRecordsSummary: any[]
 }): Promise<any> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const recordSummaryKeyProps = keyDefs.map((keyDef: any) => A.camelize(NodeDef.getName(keyDef)))
   const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
-  return existingRecordsSummary.find((recordSummary: any) => {
+  return existingRecordsSummary.find((recordSummary: ArenaRecord) => {
     const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])
     return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
   })
@@ -101,14 +106,14 @@ export const findExistingRecordSummary = async ({
   existingRecordsSummary,
   conflictResolutionStrategy,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   existingRecordsSummary: any[]
   conflictResolutionStrategy: string
 }): Promise<any> => {
   const recordUuid = Record.getUuid(record)
   const existingRecordWithSameUuid = existingRecordsSummary.find(
-    (recordSummary: any) => Record.getUuid(recordSummary) === recordUuid
+    (recordSummary: ArenaRecord) => Record.getUuid(recordSummary) === recordUuid
   )
   if (existingRecordWithSameUuid) {
     return existingRecordWithSameUuid
@@ -132,8 +137,8 @@ export const determineRecordAction = async ({
   existingRecordSummary,
   conflictResolutionStrategy,
 }: {
-  survey: any
-  record: any
+  survey: ArenaSurvey
+  record: ArenaRecord
   existingRecordSummary: any
   conflictResolutionStrategy: string
 }): Promise<{ action: RecordImportActionType; existingRecordUuid: string | null }> => {

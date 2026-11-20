@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
-import { UserGroup as UserGroupType } from '@openforis/arena-core'
+import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
@@ -18,13 +18,13 @@ interface SurveyUsersResponse {
 }
 
 interface FetchedData {
-  groups: UserGroupType[]
+  groups: ArenaUserGroup[]
   users: SurveyUserType[]
   groupUuidByUserUuid: Record<string, string>
 }
 
 interface UseUserGroupsOverviewResult {
-  groups: UserGroupType[]
+  groups: ArenaUserGroup[]
   users: SurveyUserType[]
   groupUuidByUserUuid: Record<string, string>
   onChangeUserGroup: (userUuid: string, groupUuidNew: string | null) => Promise<void>
@@ -51,7 +51,7 @@ export const useUserGroupsOverview = (): UseUserGroupsOverviewResult => {
   // `string` shape the API service functions declare, following the useEditUserGroup.ts precedent.
   const surveyId = useSurveyId() as string
 
-  const [groups, setGroups] = useState<UserGroupType[]>([])
+  const [groups, setGroups] = useState<ArenaUserGroup[]>([])
   const [users, setUsers] = useState<SurveyUserType[]>([])
   const [groupUuidByUserUuid, setGroupUuidByUserUuid] = useState<Record<string, string>>({})
   // Users with a group change currently in flight; used to keep their cards from being dragged

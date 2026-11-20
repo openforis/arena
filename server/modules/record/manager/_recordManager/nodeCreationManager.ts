@@ -1,0 +1,178 @@
+import type { DbClient } from '@server/db/db'
+import {
+  Objects,
+  RecordNodesUpdater,
+  type ArenaUser,
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type ArenaSurvey,
+} from '@openforis/arena-core'
+
+import * as ActivityLog from '@common/activityLog/activityLog'
+
+import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
+import * as NodeRepository from '../../repository/nodeRepository'
+
+type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
+
+const _createUpdateResult = ({
+  record,
+  node = null,
+  nodes = {},
+  sideEffect = false,
+}: {
+  record: ArenaRecord
+  node?: ArenaRecordNode
+  nodes?: NodesByUuid
+  sideEffect?: boolean
+}) => {
+  if (!node && Objects.isEmpty(nodes)) {
+    return { record, nodes: {} }
+  }
+  const recordUpdated = Objects.isEmpty(nodes) ? record : Record.mergeNodes(nodes, { sideEffect })(record)
+
+  const parentNode = Record.getParentNode(node)(recordUpdated)
+
+  return {
+    record: recordUpdated,
+    nodes: {
+      [Node.getUuid(node)]: node,
+      // Always assoc parentNode, used in surveyRdbManager.updateTableNodes
+      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
+      ...nodes,
+    },
+  }
+}
+
+export const insertNodesInBulk = async (
+  {
+    user,
+    surveyId,
+    nodesArray,
+    systemActivity = false,
+  }: { user: ArenaUser; surveyId: number; nodesArray: ArenaRecordNode[]; systemActivity?: boolean },
+  tx: DbClient
+) => {
+  const nodeValues = nodesArray.map((node) => [
+    Node.getUuid(node),
+    Node.getDateCreated(node),
+    Node.getDateModified(node),
+    Node.getRecordUuid(node),
+    Node.getParentUuid(node),
+    Node.getNodeDefUuid(node),
+    JSON.stringify(Node.getValue(node, null)),
+    Node.compactMeta(Node.getMeta(node)),
+  ])
+
+  await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
+
+  const activities = nodesArray.map((node) =>
+    ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity)
+  )
+  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+}
+
+export const insertNodesInBatch = async (
+  {
+    user,
+    surveyId,
+    nodes,
+    systemActivity = false,
+  }: { user: ArenaUser; surveyId: number; nodes: ArenaRecordNode[]; systemActivity?: boolean },
+  tx: DbClient
+) => {
+  const nodesInserted = await NodeRepository.insertNodesInBatch({ surveyId, nodes }, tx)
+  const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
+  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+  return nodesInserted
+}
+
+/**
+ * Inserts a node and updates its dependents.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing the insert.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.record - The record.
+ * @param {!object} params.node - The node to insert.
+ * @param {boolean} [params.system] - Whether the insert is a system activity.
+ * @param {number} [params.timezoneOffset] - The client timezone offset.
+ * @param {string} [params.lang] - The language used to evaluate the expressions.
+ * @param {boolean} [params.persistNodes] - Whether to persist the nodes (true by default).
+ * @param {boolean} [params.createMultipleEntities] - Whether to create the multiple entities (true by default).
+ * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
+ * @param {object} [t] - The database transaction.
+ * @returns {Promise<object>} - The update result (updated record and nodes).
+ */
+export const insertNode = async (
+  {
+    user,
+    survey,
+    record,
+    node,
+    system,
+    timezoneOffset,
+    lang,
+    persistNodes = true,
+    createMultipleEntities = true,
+    sideEffect = false,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    node: ArenaRecordNode
+    system: boolean
+    timezoneOffset?: number
+    lang?: string
+    persistNodes?: boolean
+    createMultipleEntities?: boolean
+    sideEffect?: boolean
+  },
+  t: DbClient
+) => {
+  node[Node.keys.created] = true // mark node as created (flag used by RDB manager to update data tables)
+
+  const surveyId = Survey.getId(survey)
+  const nodeDefUuid = Node.getNodeDefUuid(node)
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+  // If it's a code, don't insert if it has been inserted already (by another user)
+  if (NodeDef.isCode(nodeDef)) {
+    const parentNode = Record.getParentNode(node)(record)
+    const siblings = Record.getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
+    if (siblings.some((sibling) => Objects.isEqual(Node.getValue(sibling), Node.getValue(node)))) {
+      return _createUpdateResult({ record, sideEffect })
+    }
+  }
+
+  const nodesCreated = {
+    [Node.getUuid(node)]: node,
+  }
+  let recordUpdated = Record.assocNode(node, { sideEffect })(record)
+
+  if (NodeDef.isEntity(nodeDef)) {
+    const descendantsCreateResult = await RecordNodesUpdater.addDescendants({
+      ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang }),
+      record: recordUpdated,
+      parentNode: node,
+      nodeDef,
+      createMultipleEntities,
+    })
+    Object.assign(nodesCreated, descendantsCreateResult.nodes)
+    recordUpdated = descendantsCreateResult.record
+  }
+
+  const nodesInserted = persistNodes
+    ? ObjectUtils.toUuidIndexedObj(
+        await insertNodesInBatch({ user, surveyId, nodes: Object.values(nodesCreated), systemActivity: system }, t)
+      )
+    : nodesCreated
+
+  return _createUpdateResult({ record: recordUpdated, node, nodes: nodesInserted, sideEffect })
+}

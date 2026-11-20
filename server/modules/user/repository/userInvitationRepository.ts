@@ -1,0 +1,126 @@
+import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
+import { db, DbClient } from '@server/db/db'
+
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+import camelize from 'camelize'
+import * as DbUtils from '@server/db/dbUtils'
+
+export const tableName = 'user_invitation'
+
+export const tableColumns = ['user_uuid', 'survey_uuid', 'invited_by', 'invited_date', 'removed_date']
+
+export const insertUserInvitation = (
+  { user, survey, userToInvite }: { user: ArenaUser; survey: ArenaSurvey; userToInvite: ArenaUser },
+  client: DbClient = db
+) =>
+  client.one(
+    `INSERT INTO ${tableName} (user_uuid, survey_uuid, invited_by)
+      VALUES ($1, $2, $3)
+      RETURNING id`,
+    [User.getUuid(userToInvite), Survey.getUuid(Survey.getSurveyInfo(survey)), User.getUuid(user)]
+  )
+
+export const deleteUserInvitation = (
+  { surveyUuid, userUuid }: { surveyUuid: string; userUuid: string },
+  client: DbClient = db
+) =>
+  client.query(
+    `DELETE FROM ${tableName} 
+    WHERE survey_uuid = $1 AND user_uuid = $2`,
+    [surveyUuid, userUuid]
+  )
+
+export const updateRemovedDate = (
+  { surveyUuid, userUuidToRemove }: { surveyUuid: string; userUuidToRemove: any },
+  client: DbClient = db
+) =>
+  client.oneOrNone(
+    `UPDATE ${tableName}
+    SET removed_date = (now() AT TIME ZONE 'UTC')
+    WHERE user_uuid = $1 AND survey_uuid = $2
+    AND removed_date is null
+    RETURNING id`,
+    [userUuidToRemove, surveyUuid]
+  )
+
+export const fetchUserInvitationBySurveyAndUserUuid = (
+  { surveyUuid, userUuid }: { surveyUuid: string; userUuid: string },
+  client: DbClient = db
+) =>
+  client.oneOrNone(
+    `SELECT *
+    FROM user_invitation
+    WHERE survey_uuid = $1 AND user_uuid = $2
+    `,
+    [surveyUuid, userUuid],
+    camelize
+  )
+
+/**
+ * Checks if the user has invitations (not removed) to surveys other than the specified one.
+ * @param {!object} params - The parameters.
+ * @param {!string} params.userUuid - UUID of the user.
+ * @param {!string} params.surveyUuid - UUID of the survey to exclude.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<boolean>} - True if the user has been invited to other surveys.
+ */
+export const existsUserInvitationInOtherSurveys = (
+  { userUuid, surveyUuid }: { userUuid: string; surveyUuid: string },
+  client: DbClient = db
+) =>
+  client.one(
+    `SELECT EXISTS (
+      SELECT 1
+      FROM ${tableName}
+      WHERE user_uuid = $1 AND survey_uuid <> $2 AND removed_date IS NULL
+    ) AS result`,
+    [userUuid, surveyUuid],
+    (row) => row.result
+  )
+
+export const fetchUserInvitationsBySurveyUuid = ({ surveyUuid }: { surveyUuid: string }, client: DbClient = db) =>
+  client.map(
+    `
+    SELECT *
+    FROM user_invitation
+    WHERE survey_uuid = $1
+    `,
+    [surveyUuid],
+    camelize
+  )
+
+export const insertManyBatch = (
+  { survey, userInvitations }: { survey: ArenaSurvey; userInvitations: any },
+  client: DbClient = db
+) =>
+  userInvitations.length > 0 &&
+  client.none(
+    DbUtils.insertAllQueryBatch(
+      'public',
+      tableName,
+      tableColumns,
+      userInvitations.map((userInvitation) => ({
+        user_uuid: userInvitation.userUuid,
+        survey_uuid: Survey.getUuid(Survey.getSurveyInfo(survey)),
+        invited_by: userInvitation.invitedBy,
+        invited_date: userInvitation.invitedDate,
+        removed_date: userInvitation.removedDate,
+      }))
+    )
+  )
+
+export const deleteExpiredInvitations = (client: DbClient = db) =>
+  client.map(
+    `DELETE FROM user_invitation ui
+    WHERE ui.invited_date < NOW() - INTERVAL '1 MONTH' 
+      AND EXISTS (
+        SELECT u.uuid 
+        FROM public.user u 
+        WHERE u.uuid = ui.user_uuid 
+          AND u.password IS NULL
+      )
+    RETURNING *`,
+    [],
+    camelize
+  )

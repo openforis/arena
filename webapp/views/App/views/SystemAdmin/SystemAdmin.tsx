@@ -2,6 +2,8 @@ import { appModules, systemAdminModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import JobsMonitor from '../JobsMonitor'
+import AuthProviderEdit from './AuthProviders/AuthProviderEdit'
+import AuthProvidersList from './AuthProviders/AuthProvidersList'
 import MessageDetails from '../Message/MessageDetails'
 import { MessageList } from '../Message/MessageList'
 import SystemLogs from '../SystemLogs'
@@ -26,6 +28,14 @@ const SystemAdmin = () => (
       {
         component: MessageDetails,
         path: `${systemAdminModules.message.path}/:messageUuid/`,
+      },
+      {
+        component: AuthProvidersList,
+        path: systemAdminModules.authProviders.path,
+      },
+      {
+        component: AuthProviderEdit,
+        path: `${systemAdminModules.authProvider.path}/:providerId/`,
       },
     ]}
   />

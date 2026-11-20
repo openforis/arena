@@ -87,8 +87,8 @@ export const JobsHeader = ({ onRefresh, highlighted = false }: Props) => {
 
 ## UI texts (i18n)
 
-- Every UI text goes through i18next. The texts are in `core/i18n/resources/<lang>/<namespace>.(js|ts)`, and
-  each namespace is registered in `core/i18n/resources/<lang>/index.js`. Missing texts fall back to English.
+- Every UI text goes through i18next. The texts are in `core/i18n/resources/<lang>/<namespace>.ts`, and
+  each namespace is registered in `core/i18n/resources/<lang>/index.ts`. Missing texts fall back to English.
   Recent PRs add new keys to every language, and big features get their own namespace (e.g. `systemLogsView.ts`).
 - Keys look like `namespace:path.to.key` (`'dataView:dataMatrixExport.preview'`). A key without a namespace
   is looked up in `common` (`'common.refresh'`). For parameters, write `{{name}}` in the text and call
@@ -175,7 +175,7 @@ the action to its `store/actions/` and register it in `useActions`, as was done 
   areas.
 - A new page needs the module in `appModules.js` and a route in the parent `ModuleSwitch`. If it appears in the
   side bar, it also needs an entry in `webapp/views/App/SideBar/Modules/utils.js` and a label
-  `appModules.<key>` in `core/i18n/resources/<lang>/common.js`.
+  `appModules.<key>` in `core/i18n/resources/<lang>/common.ts`.
 
 ## House components
 
@@ -189,10 +189,29 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
   (a label with an optional info tooltip) is in `webapp/components/form/Input`.
 - Dialogs: `Modal` with `ModalBody`/`ModalFooter` (`webapp/components/modal.js`), `ResizableModal`,
   `PanelRight`. For confirmations and notifications use the hooks listed under "Global state".
+- Resizable side panels: `Split` (`webapp/components/Split.js`). Style any other resize handle with the
+  `%pane-resize-handle` placeholder (`webapp/style/_layoutMixins.scss`), as the map rail panels do, so that every
+  handle looks the same.
 - Lists:
   - `DataGrid` (`webapp/components/DataGrid`, based on MUI X) for rows already loaded, e.g.
     `webapp/views/App/views/JobsMonitor/JobsMonitor.tsx`
   - `Table` (`webapp/components/Table`) loads its pages from `moduleApiUri` and `moduleApiUri/count`, and keeps
     paging, sorting and search in the URL, e.g. `webapp/views/App/views/Message/MessageList.js`
+  - Both have the same look: change it in the table variables of `webapp/style/_vars.scss` (used by
+    `webapp/style/table.scss`) and in the `MuiDataGrid` overrides of `webapp/theme/createArenaTheme.ts` together.
+  - Both behave the same way. `onRowOpen(item)` opens (views or edits) the item of a row: a click opens it, or a
+    double click when the rows can be selected (`selectable` in `Table`, `checkboxSelection` in `DataGrid`), where
+    a click selects the row. Enter opens the row; in `Table`, Space selects it (or opens it if the table is not
+    selectable).
+    Pass `isRowOpenable(item)` when some rows cannot be opened: they do nothing on click and don't look clickable.
+    Clicks on the buttons and inputs inside a row don't select or open it.
+  - Row action buttons are the last columns, in this order: the other actions (download, show on map...), then
+    view/edit (`ButtonIconEditOrView`, or `ButtonIconEdit`), then delete (`ButtonIconDelete`). Tables whose rows
+    open an item show the view/edit button too, so that it can also be opened without knowing about the row click.
+    In a `DataGrid`, `rowActionColumns` (`webapp/components/DataGrid`) builds the download, show on map, edit and
+    delete columns in this order.
+  - Expandable rows (`expandableRows` and `rowExpandedComponent` in `Table`) have the expand/collapse toggle
+    (`ButtonIconExpandToggle`) in the first column, only in the rows that can be expanded (`isRowExpandable`). The
+    expanded panel is as tall as its content (up to 300px, then it scrolls).
 - Generic hooks are in `webapp/components/hooks`, and many components are re-exported by
   `webapp/components/index.js`.

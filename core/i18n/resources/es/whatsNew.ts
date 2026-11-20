@@ -6,6 +6,20 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    loginProviders: {
+      title: 'Inicio de sesión con Google, Microsoft o la cuenta de su organización',
+      description: `En **Administración del sistema > Proveedores de inicio de sesión**, permita a los usuarios iniciar sesión con **Google**, **Microsoft** o cualquier proveedor **OpenID Connect** (p. ej., Keycloak, Okta o el inicio de sesión único de su organización): cada proveedor tiene un botón en la página de inicio de sesión. El formulario del proveedor muestra el URI de redirección que hay que registrar en el proveedor, los pasos de configuración y un enlace a una guía detallada; **Probar la conexión** y **Probar el inicio de sesión** comprueban la configuración sin iniciar la sesión de nadie.
+
+Solo pueden iniciar sesión los usuarios que ya tienen una cuenta de Arena o una invitación: la primera vez, la cuenta se asocia por su dirección de correo verificada. Los usuarios invitados pueden aceptar la invitación con un proveedor en lugar de elegir una contraseña, y cada usuario puede vincular o desvincular proveedores en **Mi perfil > Métodos de inicio de sesión**. El inicio de sesión con correo y contraseña siempre está disponible.
+
+El servidor necesita las variables de entorno \`ARENA_PUBLIC_URL\` y \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` (véase \`.env.template\`).`,
+    },
+    mobileUploadEmailNotification: {
+      title: 'Notificación por correo electrónico de los registros cargados desde Arena Mobile',
+      description: `En **Información de la encuesta → Seguridad**, marque **Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile**: después de cada carga, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados, sus valores clave, si son nuevos o actualizados, el usuario que los creó, las fechas y el número de errores y advertencias de validación.
+
+Se envía un solo correo por carga, aunque un dispositivo cargue muchos registros. La opción está disponible cuando **Permitir la carga de registros de Arena Mobile al servidor** está marcada, y se aplica una vez publicada la encuesta.`,
+    },
     surveyGuestRole: {
       title: 'Nuevo rol: Invitado, para ver los registros sin editarlos',
       description: `Invite usuarios con el nuevo rol **Invitado** (**Usuarios > Invitar usuario**): pueden ver todos los registros de la encuesta, también en **Arena Mobile**, pero no pueden editarlos ni eliminarlos, ni añadir nuevos.

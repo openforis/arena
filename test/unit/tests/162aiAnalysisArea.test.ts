@@ -1,3 +1,5 @@
+import { Query } from '@common/model/query'
+
 import {
   getAnalysisAreaStatus,
   getProposedQueryId,
@@ -176,7 +178,7 @@ describe('queries of a turn', () => {
       onChange: state.setQueries,
       now: () => 'T',
     })
-    store.add({ query: { entityDefUuid: 'e1' }, explanation: 'E', entityName: 'tree', mode: 'raw' })
+    store.add({ query: Query.create({ entityDefUuid: 'e1' }), explanation: 'E', entityName: 'tree', mode: 'raw' })
     expect(Object.keys(state.get().queries ?? {})).toEqual(['q1'])
     expect(Object.keys(updates.at(-1).queries)).toEqual(['q1'])
     // later turn state updates keep the queries
@@ -199,8 +201,8 @@ describe('analysis status keeps the engine availability (F5)', () => {
 
 describe('query ids continue in a reloaded conversation', () => {
   test('q3 after q2', () => {
-    const entry = { query: {}, explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
+    const entry = { query: Query.create(), explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
     const store = createAnalysisQueryStore({ queries: { q1: { ...entry, id: 'q1' }, q2: { ...entry, id: 'q2' } } })
-    expect(store.add({ query: {}, explanation: 'E', entityName: 'tree', mode: 'raw' }).id).toBe('q3')
+    expect(store.add({ query: Query.create(), explanation: 'E', entityName: 'tree', mode: 'raw' }).id).toBe('q3')
   })
 })

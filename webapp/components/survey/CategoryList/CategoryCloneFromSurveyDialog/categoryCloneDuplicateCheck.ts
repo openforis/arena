@@ -1,4 +1,4 @@
-import { Category as ArenaCategory } from '@openforis/arena-core'
+import { ArenaCategory } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
 import {

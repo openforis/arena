@@ -1,0 +1,148 @@
+import type { DbClient } from '@server/db/db'
+import type { ArenaSurvey } from '@openforis/arena-core'
+import * as A from '@core/arena'
+
+import { db } from '../../../../db/db'
+import * as dbUtils from '../../../../db/dbUtils'
+
+import * as Expression from '../../../../../core/expressionParser/expression'
+import * as Survey from '../../../../../core/survey/survey'
+import { Schemata, ViewDataNodeDef } from '../../../../../common/model/db'
+import { Sort, Query } from '../../../../../common/model/query'
+import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAggBuilder'
+
+import { getUserGroupAccessCondition } from './userGroupAccessCondition'
+
+const _getSelectQuery = ({
+  survey,
+  cycle,
+  recordOwnerUuid,
+  userGroupAccessFilters,
+  query,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  recordOwnerUuid: string
+  userGroupAccessFilters: any
+  query: any
+}) => {
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const filter = Query.getFilter(query)
+
+  const nodeDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  const queryBuilder = new SqlSelectAggBuilder({ viewDataNodeDef })
+
+  // SELECT measures
+  Object.entries(Query.getMeasures(query)).forEach(([nodeDefUuid, aggFunctions], index) =>
+    queryBuilder.selectMeasure({ aggFunctions: aggFunctions as string[], nodeDefUuid, index })
+  )
+
+  // SELECT dimensions
+  const dimensions = Query.getDimensions(query)
+  dimensions.forEach((dimension, index) => queryBuilder.selectDimension({ dimension, index }))
+
+  // FROM clause
+  queryBuilder.from(`${Schemata.getSchemaSurveyRdb(viewDataNodeDef.surveyId)}.$/table:name/`)
+  queryBuilder.addParams({ table: viewDataNodeDef.name })
+
+  // WHERE clause
+  queryBuilder.where(`${ViewDataNodeDef.columnSet.recordCycle} = $/cycle/`)
+  queryBuilder.addParams({ cycle })
+
+  if (recordOwnerUuid) {
+    queryBuilder.where(`${ViewDataNodeDef.columnSet.recordOwnerUuid} = $/recordOwnerUuid/`)
+    queryBuilder.addParams({ recordOwnerUuid })
+  }
+
+  const userGroupAccessCondition = getUserGroupAccessCondition({
+    survey,
+    accessFilters: userGroupAccessFilters,
+    recordUuidColumn: ViewDataNodeDef.columnSet.recordUuid,
+  })
+  if (userGroupAccessCondition) {
+    queryBuilder.where(userGroupAccessCondition.clause)
+    queryBuilder.addParams(userGroupAccessCondition.params)
+  }
+
+  const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
+  if (filterClause) {
+    queryBuilder.where(filterClause)
+    queryBuilder.addParams(filterParams)
+  }
+
+  // ORDER BY clause
+  const sort = Query.getSort(query)
+  const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
+  if (!A.isEmpty(sortParams)) {
+    queryBuilder.orderBy(sortClause)
+    queryBuilder.addParams(sortParams)
+  }
+  return { select: queryBuilder.build(), queryParams: queryBuilder.params }
+}
+
+/**
+ * Counts the number of rows of a data view associated to an entity node definition,
+ * aggregated by the given measures aggregate functions, grouped by the given dimensions and
+ * filtered by the given filter.
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!Query} [params.query] - The query used to filter the rows.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID used to tilter the records. If null, all records will be included.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be included.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<number>} - The count of rows.
+ */
+export const countViewDataAgg = (params: any, client: DbClient = db) => {
+  const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
+
+  return client.tx(dbUtils.txOptionsReadOnly, (t) =>
+    t.one(
+      `
+    SELECT COUNT(*) AS count
+    FROM (
+      ${select}
+    ) AS t
+    `,
+      { ...queryParams },
+      (row) => Number(row.count)
+    )
+  )
+}
+
+/**
+ * Runs a select query on a data view associated to an entity node definition,
+ * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!Query} [params.query] - The query object.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID used to filter records. If null, all records will be considered.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
+ * @param {number} [params.offset] - The query offset.
+ * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewDataAgg = (params: any, client: DbClient = db) => {
+  const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null, limit, offset, stream } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
+
+  const selectWithLimit = `${select}     
+    ${A.isNil(limit) ? '' : 'LIMIT $/limit/'}
+    ${A.isNil(offset) ? '' : 'OFFSET $/offset/'}`
+
+  const queryParamsWithLimit = {
+    ...queryParams,
+    limit,
+    offset,
+  }
+
+  return stream
+    ? Promise.resolve(new dbUtils.QueryStream(dbUtils.formatQuery(selectWithLimit, queryParamsWithLimit)))
+    : client.tx(dbUtils.txOptionsReadOnly, (t) => t.any(selectWithLimit, queryParamsWithLimit))
+}

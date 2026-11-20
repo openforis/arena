@@ -1,0 +1,175 @@
+import type { Router } from 'express'
+import { ConflictResolutionStrategy } from '@common/dataImport'
+
+import * as JobUtils from '@server/job/jobUtils'
+import * as Log from '@server/log/log'
+import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
+import * as RecordService from '@server/modules/record/service/recordService'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as ArenaMobileImportService from '../service/arenaMobileImportService'
+import * as SurveyMobilePackageService from '../service/surveyMobilePackageService'
+
+const Logger = Log.getLogger('Mobile API')
+
+const fetchSurvey = ({ surveyId, cycle, draft = false }: { surveyId: number; cycle: string; draft?: boolean }) =>
+  SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: true,
+    includeBigCategories: true,
+    includeBigTaxonomies: true,
+  })
+
+export const init = (app: Router) => {
+  // ====== READ - all survey data
+  app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      Logger.info('fetching survey data')
+
+      // draft: used by the mobile app web preview in the survey designer
+      const { surveyId, cycle, draft = false } = Request.getParams(req)
+
+      const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
+      Logger.info('total category items', totalCategoryItems)
+
+      const totalTaxa = await TaxonomyService.countTaxaBySurveyId({ surveyId })
+      Logger.info('total taxa', totalTaxa)
+
+      Logger.info('constrained memory', process.constrainedMemory())
+      Logger.info('memory usage before', process.memoryUsage())
+
+      const survey = await fetchSurvey({ surveyId, cycle, draft })
+
+      Logger.info('memory usage after', process.memoryUsage())
+
+      res.json({ survey })
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  // ====== READ - survey package (zip with the Arena export layout: info.json, survey.json, surveyfiles/)
+  app.get('/mobile/survey/:surveyId/package', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, draft = false } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const survey = await fetchSurvey({ surveyId, cycle, draft })
+
+      Response.setContentTypeFile({ res, fileName: `survey_${surveyId}.zip`, contentType: Response.contentTypes.zip })
+      await SurveyMobilePackageService.writeSurveyMobilePackage({ user, survey, outputStream: res })
+    } catch (e) {
+      if (res.headersSent) {
+        // the zip is partially sent: the app sees a failed download and keeps the survey it has
+        Logger.error(`error writing survey package: ${e}`)
+        res.destroy(e)
+      } else {
+        next(e)
+      }
+    }
+  })
+
+  // ====== UPDATE - records and files of the survey
+  app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const {
+        surveyId,
+        conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting,
+        skipMissingFiles = false,
+        fileId,
+        reuseUploadedFile = false,
+        selectedRecordsUuids,
+      } = Request.getParams(req)
+
+      // when reusing a file previously uploaded to generate an import preview/summary, no new file is sent
+      const tempFile = reuseUploadedFile ? { fileId } : await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
+        const job = ArenaMobileImportService.startArenaMobileImportJob({
+          user,
+          ...tempFile,
+          surveyId,
+          conflictResolutionStrategy,
+          skipMissingFiles,
+          reuseUploadedFile,
+          selectedRecordsUuids,
+          serverUrl: Request.getPublicServerUrl(req),
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ chunkProcessing: true })
+      }
+    } catch (e) {
+      next(e)
+    }
+  })
+
+  // ====== PREVIEW - generates a summary of what would happen if the given Arena format file was imported,
+  // without writing anything to the database. The uploaded file is kept for a subsequent, real import request.
+  app.post(
+    '/mobile/survey/:surveyId/import-summary',
+    AuthMiddleware.requireRecordCreatePermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } =
+          Request.getParams(req)
+
+        const tempFile = await processChunkedFileForBackgroundMerge({ req })
+        if (tempFile) {
+          const job = ArenaMobileImportService.startArenaMobileImportSummaryJob({
+            user,
+            ...tempFile,
+            surveyId,
+            conflictResolutionStrategy,
+          })
+          res.json({ job: JobUtils.jobToJSON(job) })
+        } else {
+          res.json({ chunkProcessing: true })
+        }
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  // ====== PREVIEW CANCEL - deletes a file previously uploaded to generate an import preview,
+  // when the user cancels the import instead of confirming it.
+  app.delete(
+    '/mobile/survey/:surveyId/import-summary/:fileId',
+    AuthMiddleware.requireRecordCreatePermission,
+    async (req, res, next) => {
+      try {
+        const { fileId } = Request.getParams(req)
+        await TempFileManager.deletePendingImportFileIfAny({ fileId })
+        res.json({})
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  // ====== FILE UUIDS - for the given records, returns the UUIDs of the files already stored
+  // on the server, so a mobile client can skip re-uploading file content that hasn't changed.
+  app.post(
+    '/mobile/survey/:surveyId/records/file-uuids',
+    AuthMiddleware.requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, recordUuids = [] } = Request.getParams(req)
+        const fileUuidsByRecordUuid = await RecordService.fetchFileUuidsByRecordUuid({ surveyId, recordUuids })
+        res.json({ fileUuidsByRecordUuid })
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+}

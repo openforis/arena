@@ -1,4 +1,4 @@
-import type { AreaOfInterestDescriptor } from '@openforis/arena-core'
+import type { ArenaAreaOfInterestDescriptor } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
@@ -17,8 +17,8 @@ const validate = async ({
   areasOfInterest,
   areaOfInterest,
 }: {
-  areasOfInterest: AreaOfInterestDescriptor[]
-  areaOfInterest: Partial<AreaOfInterestDescriptor>
+  areasOfInterest: ArenaAreaOfInterestDescriptor[]
+  areaOfInterest: Partial<ArenaAreaOfInterestDescriptor>
 }) =>
   Validator.validate(areaOfInterest, {
     [keys.name]: [
@@ -26,7 +26,7 @@ const validate = async ({
       Validator.validateName(Validation.messageKeys.nameInvalid),
       Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
       // not validateItemPropUniqueness: it skips items by uuid, and descriptors have none
-      (_propName: string, item: Partial<AreaOfInterestDescriptor>) =>
+      (_propName: string, item: Partial<ArenaAreaOfInterestDescriptor>) =>
         areasOfInterest.some((other) => other.name === item.name)
           ? { key: Validation.messageKeys.surveyAreaOfInterest.nameDuplicate }
           : null,

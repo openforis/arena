@@ -46,11 +46,11 @@ export const requireValid = (valid: boolean, reason: string): void => {
 
 /**
  * Returns the languages of the draft survey info.
- * @param {number|string} surveyId - Survey id.
+ * @param {number} surveyId - Survey id.
  * @param {object} client - Database client.
  * @returns {Promise<string[]>} The languages, default first.
  */
-export const fetchSurveyLanguages = async (surveyId: number | string, client: any): Promise<string[]> => {
+export const fetchSurveyLanguages = async (surveyId: number, client: any): Promise<string[]> => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   return Survey.getLanguages(surveyInfo) as string[]
 }
@@ -81,12 +81,12 @@ const parseLimit = (limit: unknown): number => {
 /**
  * Counts the items missing a label, per category and language (nothing with fewer than two languages).
  * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
+ * @param {number} params.surveyId - Survey id.
  * @param {object} [client] - Database client.
  * @returns {Promise<MissingLabelsCounts>} Counts by category uuid, then language.
  */
 export const countItemsMissingLabels = async (
-  { surveyId }: { surveyId: number | string },
+  { surveyId }: { surveyId: number },
   client: any = db
 ): Promise<MissingLabelsCounts> => {
   const langs = await fetchSurveyLanguages(surveyId, client)
@@ -97,7 +97,7 @@ export const countItemsMissingLabels = async (
 /**
  * Fetches one page of the items of a category whose label is missing in a language.
  * @param {object} params - Parameters (raw request values).
- * @param {number|string} params.surveyId - Survey id.
+ * @param {number} params.surveyId - Survey id.
  * @param {string} params.categoryUuid - Category uuid.
  * @param {string} params.lang - Missing language (a survey language).
  * @param {string} [params.cursor] - nextCursor of the previous page.
@@ -112,7 +112,7 @@ export const fetchItemsMissingLabels = async (
     lang,
     cursor,
     limit,
-  }: { surveyId: number | string; categoryUuid: unknown; lang: unknown; cursor?: unknown; limit?: unknown },
+  }: { surveyId: number; categoryUuid: unknown; lang: unknown; cursor?: unknown; limit?: unknown },
   client: any = db
 ): Promise<MissingLabelsPage> => {
   requireValid(typeof categoryUuid === 'string' && isUuid(categoryUuid), 'category')
@@ -224,13 +224,13 @@ const newLabelsActivity = (row: CategoryItemLabelsRepository.ItemLabelsRow, labe
 /**
  * Writes the updates that do not conflict, in request order.
  * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
+ * @param {number} params.surveyId - Survey id.
  * @param {CategoryItemLabelUpdate[]} params.updates - Updates.
  * @param {object} tx - Transaction.
  * @returns {Promise<object>} The answer without categories, the activities and the touched category uuids.
  */
 const writeUpdates = async (
-  { surveyId, updates }: { surveyId: number | string; updates: CategoryItemLabelUpdate[] },
+  { surveyId, updates }: { surveyId: number; updates: CategoryItemLabelUpdate[] },
   tx: any
 ) => {
   const itemUuids = [...new Set(updates.map((update) => update.itemUuid))]
@@ -267,13 +267,13 @@ const writeUpdates = async (
  * Writes category item labels in one language each, if they are still what the proposal saw (compare and set).
  * @param {object} params - Parameters.
  * @param {object} params.user - User.
- * @param {number|string} params.surveyId - Survey id.
+ * @param {number} params.surveyId - Survey id.
  * @param {unknown} params.items - Raw request items (CategoryItemLabelUpdate[]).
  * @param {object} [client] - Database client.
  * @returns {Promise<CategoryItemLabelsUpdateAnswer>} Written labels, conflicts and the touched categories.
  */
 export const updateItemsLabels = async (
-  { user, surveyId, items }: { user: any; surveyId: number | string; items: unknown },
+  { user, surveyId, items }: { user: any; surveyId: number; items: unknown },
   client: any = db
 ): Promise<CategoryItemLabelsUpdateAnswer> =>
   client.tx(async (tx: any) => {

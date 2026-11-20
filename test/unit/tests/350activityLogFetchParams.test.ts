@@ -1,6 +1,13 @@
+import { SurveyFactory } from '@openforis/arena-core'
+
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
-const surveyInfo = { id: 7, uuid: '11111111-1111-4111-8111-111111111111', published: false }
+const surveyInfo = {
+  ...SurveyFactory.createInstance({ ownerUuid: 'owner-uuid', name: 'survey' }),
+  id: 7,
+  uuid: '11111111-1111-4111-8111-111111111111',
+  published: false,
+}
 
 /**
  * Runs the fetch against a database client double that records the statement and its parameters.

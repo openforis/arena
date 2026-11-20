@@ -1,0 +1,232 @@
+import type { ArenaChain, ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import * as Chain from '@common/analysis/chain'
+
+type SurveyChainParams = { survey: ArenaSurvey; chain: ArenaChain }
+
+const PLOT_AREA_SUFFIX = '_plot_area_'
+const WEIGHT_NODE_DEF_NAME = 'weight'
+const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(String.raw`^\w+${PLOT_AREA_SUFFIX}$`)
+
+const getEntityAreaNodeDefName = ({ nodeDefParent }: { nodeDefParent: ArenaNodeDefEntity }): string =>
+  `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
+
+const isWeightNodeDef = (nodeDef: ArenaAnyNodeDef): boolean => WEIGHT_NODE_DEF_NAME === NodeDef.getName(nodeDef)
+
+const isEntityAreaNodeDef = ({
+  nodeDef,
+  nodeDefParent,
+  includeOnlyValid = true,
+}: {
+  nodeDef: ArenaAnyNodeDef
+  nodeDefParent: ArenaNodeDefEntity
+  includeOnlyValid?: boolean
+}): boolean => {
+  if (!NodeDef.isSampling(nodeDef)) return false
+
+  const name = NodeDef.getName(nodeDef)
+  const isNestedEntityName = SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX.test(name)
+
+  return (
+    (includeOnlyValid && name === getEntityAreaNodeDefName({ nodeDefParent })) ||
+    (!includeOnlyValid && (isWeightNodeDef(nodeDef) || isNestedEntityName))
+  )
+}
+
+const isBaseUnitEntityAreaNodeDef = ({
+  survey,
+  chain,
+  nodeDef,
+}: SurveyChainParams & { nodeDef: ArenaAnyNodeDef }): boolean => {
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  return (
+    NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef) && SamplingNodeDefs.isEntityAreaNodeDef({ nodeDef, nodeDefParent })
+  )
+}
+
+const getAllEntityAreaNodeDefs = ({ survey, chain }: SurveyChainParams): ArenaAnyNodeDef[] => {
+  const samplingNodeDefs = Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs: true })(survey)
+  return samplingNodeDefs.filter((nodeDef) => {
+    const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+    return isWeightNodeDef(nodeDef) || isEntityAreaNodeDef({ nodeDef, nodeDefParent, includeOnlyValid: false })
+  })
+}
+
+const getAreaNodeDefDefaultScript = ({
+  nodeDefParent,
+  isWeight,
+}: {
+  nodeDefParent: ArenaNodeDefEntity
+  isWeight: boolean
+}): string => {
+  const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
+  const parentName = NodeDef.getName(nodeDefParent)
+  const defaultValue = isWeight ? '1' : 'NA'
+  return `${parentName}$${name} <- ${defaultValue}`
+}
+
+const newEntityAreaNodeDef = ({
+  nodeDefParent,
+  baseUnitNodeDef,
+  chainUuid,
+  cycleKeys,
+  isWeight = false,
+}: {
+  nodeDefParent: ArenaNodeDefEntity
+  baseUnitNodeDef: ArenaAnyNodeDef | null
+  chainUuid: string
+  cycleKeys: string[]
+  isWeight?: boolean
+}): ArenaAnyNodeDef => {
+  const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
+  const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
+
+  const props = { [NodeDef.propKeys.name]: name }
+  const script = getAreaNodeDefDefaultScript({ nodeDefParent, isWeight })
+
+  const advancedProps = {
+    [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
+    [NodeDef.keysPropsAdvanced.active]: true,
+    [NodeDef.keysPropsAdvanced.index]: -1,
+    [NodeDef.keysPropsAdvanced.isBaseUnit]: isBaseUnit,
+    [NodeDef.keysPropsAdvanced.isSampling]: true,
+    [NodeDef.keysPropsAdvanced.script]: script,
+  }
+  const temporary = true
+  const virtual = false
+  return NodeDef.newNodeDef(
+    nodeDefParent,
+    NodeDef.nodeDefType.decimal,
+    cycleKeys,
+    props,
+    advancedProps,
+    temporary,
+    virtual
+  )
+}
+
+const determinePlotAreaNodeDefs = ({
+  survey,
+  chain,
+}: SurveyChainParams): { nodeDefsToCreate: ArenaAnyNodeDef[]; nodeDefsToDelete: ArenaAnyNodeDef[] } => {
+  const nodeDefsToCreate: ArenaAnyNodeDef[] = []
+  const nodeDefsToDelete: ArenaAnyNodeDef[] = []
+  const validNodeDefsAlreadyExisting: ArenaAnyNodeDef[] = []
+
+  const chainUuid = Chain.getUuid(chain)
+  const cycleKeys = Survey.getCycleKeys(survey)
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+
+  const createAreaNodeDefIfNecessary = ({
+    existingNodeDef,
+    nodeDefParent,
+    isWeight,
+  }: {
+    existingNodeDef: ArenaAnyNodeDef | undefined
+    nodeDefParent: ArenaNodeDefEntity
+    isWeight: boolean
+  }) => {
+    if (existingNodeDef) {
+      // weight def already existing
+      validNodeDefsAlreadyExisting.push(existingNodeDef)
+    } else {
+      const newSamplingNodeDef = newEntityAreaNodeDef({
+        nodeDefParent,
+        baseUnitNodeDef,
+        chainUuid,
+        cycleKeys,
+        isWeight,
+      })
+      nodeDefsToCreate.push(newSamplingNodeDef)
+    }
+  }
+
+  // the weight node def is tied only to the base unit entity itself, regardless of its position in the hierarchy
+  if (baseUnitNodeDef) {
+    const baseUnitChildDefs = Survey.getNodeDefChildren({
+      nodeDef: baseUnitNodeDef,
+      includeSamplingDefsWithoutSiblings: true,
+    })(survey)
+    const existingWeightNodeDef = baseUnitChildDefs.find(
+      (childDef) => isWeightNodeDef(childDef) && NodeDef.getChainUuid(childDef) === chainUuid
+    )
+    createAreaNodeDefIfNecessary({
+      existingNodeDef: existingWeightNodeDef,
+      nodeDefParent: baseUnitNodeDef,
+      isWeight: true,
+    })
+  }
+
+  // plot area node defs are determined independently of the base unit's position in the hierarchy:
+  // any analysis entity with an active area based estimated attribute belonging to this chain gets one
+  const analysisEntities = Survey.getAnalysisEntities({ chain })(survey)
+
+  for (const nodeDefParent of analysisEntities) {
+    const childDefs = Survey.getNodeDefChildren({ nodeDef: nodeDefParent, includeSamplingDefsWithoutSiblings: true })(
+      survey
+    )
+    const existingEntityAreaNodeDef = childDefs.find((childDef) =>
+      isEntityAreaNodeDef({ nodeDef: childDef, nodeDefParent })
+    )
+    const hasAreaBasedDef = childDefs.some(
+      (childDef) =>
+        NodeDef.isAreaBasedEstimatedOf(childDef) &&
+        NodeDef.isActive(childDef) &&
+        NodeDef.getChainUuid(childDef) === chainUuid
+    )
+
+    if (hasAreaBasedDef) {
+      // create new plot_area node def only if there is an active area based node def in the same chain
+      createAreaNodeDefIfNecessary({ existingNodeDef: existingEntityAreaNodeDef, nodeDefParent, isWeight: false })
+    }
+  }
+
+  // check if some existing entity area node def of this chain is not valid anymore and must be deleted
+  // (e.g. its entity doesn't have any active area based node def anymore)
+  const existingEntityAreaNodeDefs = getAllEntityAreaNodeDefs({ survey, chain })
+  const validNodeDefsAlreadyExistingUuids = new Set(validNodeDefsAlreadyExisting.map(NodeDef.getUuid))
+  const existingEntityAreaNodeDefsToDelete = existingEntityAreaNodeDefs.filter(
+    (existingSamplingNodeDef) => !validNodeDefsAlreadyExistingUuids.has(NodeDef.getUuid(existingSamplingNodeDef))
+  )
+
+  nodeDefsToDelete.push(...existingEntityAreaNodeDefsToDelete)
+
+  return { nodeDefsToCreate, nodeDefsToDelete }
+}
+
+const getSamplingDefsInEntities = ({
+  survey,
+  chain,
+  entities,
+  analysisNodeDefs,
+}: SurveyChainParams & { entities: ArenaAnyNodeDef[]; analysisNodeDefs: ArenaAnyNodeDef[] }): ArenaAnyNodeDef[] => {
+  const entityUuids = new Set(entities.map(NodeDef.getUuid))
+
+  const samplingDefs = analysisNodeDefs.filter(
+    (analysisNodeDef) => NodeDef.isSampling(analysisNodeDef) && entityUuids.has(NodeDef.getParentUuid(analysisNodeDef))
+  )
+
+  // put the "weight" node def first
+  samplingDefs.sort((samplingDef1, samplingDef2) => {
+    if (isWeightNodeDef(samplingDef1)) return -1
+    if (isWeightNodeDef(samplingDef2)) return 1
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) return -1
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) return 1
+    return 0
+  })
+
+  return samplingDefs
+}
+
+export const SamplingNodeDefs = {
+  getEntityAreaNodeDefName,
+  isWeightNodeDef,
+  isEntityAreaNodeDef,
+  isBaseUnitEntityAreaNodeDef,
+  determinePlotAreaNodeDefs,
+  getSamplingDefsInEntities,
+}

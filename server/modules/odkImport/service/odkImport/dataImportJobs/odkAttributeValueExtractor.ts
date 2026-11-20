@@ -1,3 +1,5 @@
+import type { DbClient } from '@server/db/db'
+import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
@@ -78,11 +80,11 @@ const extractCode = async ({
   text,
   tx,
 }: {
-  survey: any
-  nodeDef: any
+  survey: ArenaSurvey
+  nodeDef: ArenaAnyNodeDef
   categoryItemProvider: { getItemByCode: (params: any) => Promise<any> }
   text: string
-  tx: any
+  tx: DbClient
 }): Promise<any> => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const codes = NodeDef.isMultiple(nodeDef) ? text.split(/\s+/) : [text]
@@ -119,11 +121,11 @@ export const extractAttributeValue = async ({
   rawText,
   tx,
 }: {
-  survey: any
-  nodeDef: any
+  survey: ArenaSurvey
+  nodeDef: ArenaAnyNodeDef
   categoryItemProvider: { getItemByCode: (params: any) => Promise<any> }
   rawText: string | null
-  tx: any
+  tx: DbClient
 }): Promise<any> => {
   const text = rawText?.trim() ?? ''
   if (!text) return null

@@ -7,7 +7,7 @@
  * There is no fallback between providers: an unreadable saved key fails with aiApiKeyUnreadable.
  */
 import type { LanguageModelV4 } from '@ai-sdk/provider'
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -24,8 +24,6 @@ export const sources = {
   user: 'user',
   adminDefault: 'admin-default',
 }
-
-type ArenaUser = User
 
 export type ResolvedProviderConfig = { cfg: ProviderConfig; source: string; providerId: string }
 

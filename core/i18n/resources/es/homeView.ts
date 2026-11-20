@@ -1,0 +1,268 @@
+export default {
+  dashboard: {
+    activeSurveyNotSelected:
+      '<title>Encuesta activa no seleccionada</title>\n      <p><label>Por favor, seleccione una de la</label><linkToSurveys>Lista de encuestas</linkToSurveys> o <linkToNewSurvey>Cree una nueva</linkToNewSurvey></p>',
+    activeUsers: 'Usuarios activos',
+    activityLog: {
+      title: 'Registro de actividad',
+      size: '$t(homeView:dashboard.activityLog.title) tamaño: {{size}}',
+      loadError: 'No se pudo cargar la actividad.',
+      empty: 'Aún no hay actividad.',
+    },
+    exportWithData: 'Exportar + datos (Copia de seguridad)',
+    exportWithDataNoActivityLog: 'Exportar + datos (SIN registro de actividad)',
+    exportWithDataNoResultAttributes: 'Exportar + datos (SIN atributos de resultado)',
+    surveyPropUpdate: {
+      main: '<title>Bienvenido a Arena</title>\n  \n        <p>Primero debe establecer el <strong>nombre</strong> y la <strong>etiqueta</strong> de la encuesta.</p>\n        \n        <p>Haga clic a continuación en <linkWithIcon> $t(homeView:surveyInfo.editInfo)</linkWithIcon>o en el nombre de la encuesta:<basicLink>{{surveyName}}</basicLink></p>\n        ',
+      secondary:
+        '\n        <p>Si el nombre y la etiqueta son correctos, cree el primer atributo\n        <linkWithIcon>Encuesta > Diseñador de formularios</linkWithIcon>\n        </p>\n        ',
+    },
+    nodeDefCreate: {
+      main: '<title>Vamos a crear el primer atributo de {{surveyName}} </title>\n        \n        <p>Vaya a <linkWithIcon>Encuesta > Diseñador de formularios</linkWithIcon></p>\n        <br />\n        ',
+    },
+    storageSummary: {
+      title: 'Uso del almacenamiento',
+      availableSpace: 'Disponible ({{size}})',
+      usedSpace: 'Usado ({{size}})',
+      usedSpaceOutOf: `Usado {{percent}}% ({{used}} de {{total}})`,
+    },
+    storageSummaryDb: {
+      title: 'Uso del almacenamiento (Base de datos)',
+    },
+    storageSummaryFiles: {
+      title: 'Uso del almacenamiento (archivos)',
+    },
+    samplingPointDataCompletion: {
+      title: 'Finalización de datos de puntos de muestreo',
+      totalItems: 'Total de elementos: {{totalItems}}',
+      remainingItems: 'Elementos restantes',
+    },
+    kpi: {
+      records: 'Registros',
+      contributors: 'Colaboradores',
+      storage: 'Almacenamiento',
+      expandDetails: 'Mostrar detalles',
+      collapseDetails: 'Ocultar detalles',
+    },
+    recordsCard: {
+      total: 'Registros añadidos en el período seleccionado',
+      byStep: 'Por etapa del flujo de trabajo (todo el tiempo)',
+    },
+    contributorsCard: {
+      active: 'Colaboradores activos en el período seleccionado: {{count}}',
+    },
+    map: {
+      title: 'Mapa',
+      allOwners: 'Todos los propietarios',
+    },
+    step: {
+      entry: 'Entrada de datos',
+      cleansing: 'Limpieza de datos',
+      analysis: 'Análisis de datos',
+    },
+    recordsByUser: 'Registros por usuario',
+    recordsAddedPerUserWithCount: 'Registros añadidos por usuario (Total de {{totalCount}})',
+    dailyRecordsByUser: 'Registros diarios por usuario',
+    totalRecords: 'Total de registros',
+    selectUsers: 'Seleccionar usuarios...',
+    noRecordsAddedInSelectedPeriod: 'No se añadieron registros en el período seleccionado',
+  },
+  surveyDeleted: 'La encuesta {{surveyName}} ha sido eliminada',
+  landing: {
+    openDashboard: 'Abrir panel',
+  },
+  surveyInfo: {
+    basic: 'Información básica',
+    branding: {
+      title: 'Marca',
+      primaryColor: 'Color primario',
+      titleFontSize: 'Tamaño de fuente del título',
+      descriptionFontSize: 'Tamaño de fuente de la descripción',
+      fontSizePreset: {
+        small: 'Pequeño',
+        default: 'Predeterminado',
+        large: 'Grande',
+      },
+      surveyLogo1: 'Logo de la encuesta 1',
+      surveyLogo2: 'Logo de la encuesta 2',
+      surveyLogo3: 'Logo de la encuesta 3',
+      landingBackground: 'Imagen de fondo de la página de inicio',
+      uploadLogo: 'Subir logo',
+      logoFileFormatHint: 'PNG, JPEG, WebP o SVG (máx. {{maxMb}} MB)',
+      logoFileTooLarge: 'La imagen del logo debe ser de {{maxMb}} MB o menos',
+      preview: 'Vista previa',
+      backgroundFileTooLarge: 'La imagen de fondo debe ser de {{maxMb}} MB o menos',
+      invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
+      invalidSaveBlocked: 'Corrija los campos de marca no válidos antes de guardar la información de la encuesta',
+      imageLoadError: 'No se pudo cargar la imagen "{{name}}". Elimínela y cargue una nueva.',
+      imageLoadErrorReadOnly: 'No se pudo cargar la imagen "{{name}}"',
+      downloadImage: 'Haga clic para descargar la imagen',
+    },
+    configuration: {
+      title: 'Configuración',
+      filesTotalSpace: 'Espacio total de archivos (GB)',
+    },
+    confirmDeleteCycleHeader: '¿Eliminar este ciclo?',
+    confirmDeleteCycle:
+      '¿Está seguro de que desea eliminar el ciclo {{cycle}}?\n\n$t(common.cantUndoWarning)\n\nSi hay registros asociados a este ciclo, se eliminarán.',
+    cycleForArenaMobile: 'Ciclo para Arena Mobile',
+    keepNonApplicableValues: `Conservar los valores de los atributos no relevantes`,
+    keepNonApplicableValuesInfo: `Si no está marcado (predeterminado), durante la entrada de datos se borran los valores de los atributos que ya no son relevantes (tras la confirmación del usuario).
+Si está marcado, esos valores se conservan en el registro, aunque los atributos ya no sean relevantes.`,
+    deleteActivityLog: 'Borrar registro de actividad',
+    deleteActivityLogConfirm: {
+      headerText: '¿Borrar TODOS los datos del registro de actividad de esta encuesta?',
+      message: `
+  - TODOS los datos del registro de actividad para la encuesta **{{surveyName}}** se eliminarán;\n\n
+  - el espacio ocupado por la encuesta en la BD se reducirá;\n\n
+  - no afectará a los datos de entrada de la encuesta;\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Escriba el nombre de esta encuesta para confirmar:',
+    },
+    fieldManualLink: 'Enlace al manual de campo',
+    map: 'Mapa',
+    editInfo: 'Editar información',
+    viewInfo: 'Ver información',
+
+    areasOfInterest: {
+      title: 'Áreas de interés',
+      info: 'Polígonos (GeoJSON, coordenadas WGS84) usados por las funciones de expresión geoDistanceToAOIBoundary (distancia al límite de un área) y geoAOIContaining (área que contiene una ubicación), también sin conexión en Arena Mobile. El nombre de un área se usa en las expresiones.',
+      name: 'Nombre',
+      polygons: 'Polígonos',
+      vertices: 'Vértices',
+      invalidFile: 'El archivo no contiene un polígono válido en formato GeoJSON con coordenadas WGS84',
+      confirmDelete: '¿Está seguro de que desea eliminar esta área de interés?',
+      showAllOnMap: 'Mostrar todas en el mapa',
+      editor: {
+        title: 'Área de interés',
+      },
+    },
+
+    preloadedMapLayers: {
+      enabledMessage: 'Capas de mapa precargadas habilitadas',
+      title: 'Capas de mapa precargadas',
+      confirmDelete: '¿Está seguro de que desea eliminar esta capa de mapa precargada?',
+      editor: {
+        title: 'Capa de mapa precargada',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Diseño del documento',
+      title: 'Imágenes del documento',
+      layoutOptions: {
+        title: 'Opciones de diseño',
+        headerOnFirstPageOnly: 'Encabezado solo en la primera página',
+        pageNumbering: 'Numeración de páginas',
+      },
+      documentPlace: 'Ubicación',
+      documentPlaceValues: {
+        header: 'Encabezado',
+        footer: 'Pie de página',
+      },
+      applyIf: 'Aplicar si condición',
+      confirmDelete: '¿Está seguro de que desea eliminar esta imagen del documento?',
+      editor: {
+        title: 'Imagen del documento',
+      },
+    },
+
+    preferredLanguage: 'Idioma preferido',
+    sampleBasedImageInterpretation: 'Interpretación de imágenes basada en muestras',
+    sampleBasedImageInterpretationEnabled: 'Interpretación de imágenes basada en muestras habilitada',
+    aiPolicy: {
+      title: 'Política de IA',
+      intro:
+        'Elija dónde puede la IA procesar el contenido de esta encuesta. Se aplica lo más restrictivo entre esta política y los límites de esta instancia de Arena.',
+      schemaLabel: 'Diseño de la encuesta (esquema)',
+      schemaHint: 'Definiciones de nodos, etiquetas y expresiones.',
+      dataLabel: 'Datos de los registros',
+      dataHint: 'Valores recopilados y actividad de los usuarios.',
+      levelHint: {
+        off: 'La IA nunca se usa con este contenido.',
+        onDevice: 'Solo lo procesa un motor de IA que se ejecuta en el dispositivo del usuario.',
+        orgHosted: 'Lo procesa un servidor de IA gestionado por su organización.',
+        cloud: 'Puede procesarlo un proveedor de IA en la nube.',
+      },
+      notAllowedOnInstance: 'No permitido en esta instancia de Arena: {{levels}}',
+      dataLimitedBySchema:
+        'Los datos de los registros no pueden ser más permisivos que el diseño de la encuesta. No disponible: {{levels}}',
+      onDeviceNote: 'En este dispositivo: los usuarios necesitan un servidor de IA local (por ejemplo, LM Studio).',
+      readOnly: 'Solo los administradores de la encuesta pueden cambiar la política de IA.',
+      saved: 'Política de IA guardada',
+      savedDataLowered:
+        'Política de IA guardada. Los datos de los registros también se redujeron: no pueden ser más permisivos que el diseño de la encuesta.',
+      saveError: 'No se pudo guardar la política de IA: {{message}}',
+      loadError: 'No se pudo cargar la política de IA',
+    },
+    security: {
+      title: 'Seguridad',
+      publishToApply: 'Los cambios en estas opciones se aplican una vez publicada la encuesta.',
+      dataEditorViewNotOwnedRecordsAllowed: 'El editor de datos puede ver registros no propios',
+      dataAnalystViewNotOwnedRecordsAllowed: 'El analista de datos puede ver registros no propios',
+      visibleInMobile: 'Visible en Arena Mobile',
+      allowRecordsDownloadInMobile: 'Permitir la descarga de registros del servidor a Arena Mobile',
+      allowRecordsUploadFromMobile: 'Permitir la carga de registros de Arena Mobile al servidor',
+      allowRecordsWithErrorsUploadFromMobile:
+        'Permitir la carga al servidor de registros con errores de validación desde Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Si está marcada, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados desde Arena Mobile (valores clave, creador, fechas, validación y UUID).',
+      formPreviewForDataEntryUsers:
+        'Permitir a los usuarios de entrada de datos ver la vista previa del formulario borrador (no publicado)',
+      formPreviewForDataEntryUsersInfo:
+        'Los usuarios que pueden introducir datos pero no pueden editar la encuesta verán un botón Vista previa del formulario en la lista de registros, para probar el formulario con los últimos cambios no publicados (p. ej. para pruebas de aceptación). Los datos introducidos en la vista previa no se guardan.',
+      allowRecordsMergeWithSameKeys:
+        'Permitir la fusión de registros con las mismas claves (p. ej. registros creados en distintos dispositivos con Arena Mobile)',
+    },
+    srsPlaceholder: 'Escriba el código o la etiqueta',
+    unpublish: 'Despublicar y eliminar datos',
+    unpublishSurveyDialog: {
+      confirmUnpublish: '¿Está seguro de que desea despublicar esta encuesta?',
+      unpublishWarning:
+        'Al despublicar la encuesta **{{surveyName}}** se eliminarán todos sus datos.\n\n$t(common.cantUndoWarning)',
+      confirmName: 'Introduzca el nombre de esta encuesta para confirmar:',
+    },
+    userExtraProps: {
+      title: 'Propiedades adicionales de usuario',
+      info: "Propiedades adicionales que se pueden asignar a cada usuario asociado a la encuesta. \nEsas propiedades se pueden usar en valores predeterminados, reglas de validación y expresiones de aplicabilidad. \nEj.: *userProp('property_name') == 'some_value'*",
+    },
+  },
+  deleteSurveyDialog: {
+    confirmDelete: '¿Está seguro de que desea eliminar esta encuesta?',
+    deleteWarning:
+      'Al eliminar la encuesta **{{surveyName}}** se eliminarán todos sus datos.\n\n$t(common.cantUndoWarning)',
+    confirmName: 'Introduzca el nombre de esta encuesta para confirmar:',
+  },
+  surveyList: {
+    active: '$t(common.active)',
+    activate: 'Activar',
+  },
+  collectImportReport: {
+    excludeResolvedItems: 'Excluir elementos resueltos',
+    expression: 'Expresión',
+    resolved: 'Resuelto',
+    exprType: {
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
+      codeParent: 'Código padre',
+      defaultValue: 'Valor predeterminado',
+      requiredIf: 'Obligatorio si',
+      validationRule: 'Regla de validación',
+    },
+    title: 'Informe de importación de Collect',
+  },
+  recordsSummary: {
+    recordsAddedInTheLast: 'Registros añadidos en los últimos:',
+    fromToPeriod: 'de {{from}} a {{to}}',
+    record: '{{count}} Registro',
+    record_other: '{{count}} Registros',
+    week: '{{count}} Semana',
+    week_other: '{{count}} Semanas',
+    month: '{{count}} Mes',
+    month_other: '{{count}} Meses',
+    year: '{{count}} Año',
+    year_other: '{{count}} Años',
+  },
+}

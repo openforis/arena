@@ -1,0 +1,131 @@
+export default {
+  signature: `<p>Thank you,<br>
+      $t(common.appNameFull) platform
+      </p>
+      <p><i>Note: this is an automated message, please <b>DO NOT REPLY</b> to this email.</i></p>
+      `,
+  temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
+  userInviteCommon: `<p>You have been invited by {{invitingUserName}} to join the $t(common.appNameFull) survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
+      {{-message}}
+      <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
+        <ul>{{-groupPermissions}}</ul>
+      </p>`,
+  userInvite: {
+    subject: 'You have been invited to $t(common.appNameFull)!',
+    body: `<p>Hello,</p>
+             $t(emails:userInviteCommon)
+             <p><a href="{{urlResetPassword}}">Click here to complete your registration to $t(common.appNameFull)</a></p>
+             <p>If the link doesn't work, please copy and paste this address into your browser: {{urlResetPassword}}</p>
+             $t(emails:temporaryMsg)
+             <p><i>You have received this email because {{invitingUserName}} invited you to access $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
+             <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
+             <p>$t(common.raiseTicketInSupportForum)</p>
+             $t(emails:signature)`,
+  },
+  userInviteExistingUser: {
+    subject: `You have been invited to join the survey '{{surveyLabel}}' in $t(common.appNameFull)!`,
+    body: `<p>Hello,</p>
+             $t(emails:userInviteCommon)
+             <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
+             <p>If the link doesn't work, please copy and paste this address into your browser: {{serverUrl}}</p>
+             $t(emails:signature)`,
+  },
+  userAccessRequestConfirmation: {
+    subject: '$t(common.appNameFull) - Access request received',
+    body: `<p>Hello {{firstName}},</p>
+      <p>We have received your request to access $t(common.appNameFull). It will be evaluated and you will be contacted as soon as possible.</p>
+      <p><i>You have received this email because this address was submitted in an access request on {{serverUrl}}. If you did not make this request, please let us know by writing to <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</i></p>
+      $t(emails:signature)`,
+  },
+  userAccessRequest: {
+    subject: '$t(common.appNameFull) - User Access Request',
+    body: `<p>Hello,</p>
+      <p>The following user has requested access to $t(common.appNameFull).</p>
+      <p>
+        <ul>
+          <li>$t(guest:accessRequestView.fields.email): {{email}}</li>
+          <li>$t(guest:accessRequestView.fields.props.firstName): {{firstName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.lastName): {{lastName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.institution): {{institution}}</li>
+          <li>$t(guest:accessRequestView.fields.props.country): {{country}}</li>
+          <li>$t(guest:accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(guest:accessRequestView.fields.props.surveyName): {{surveyName}}</li>
+        </ul>
+      </p>
+      <p>Please evaluate this request and get back to the user as soon as possible.</p>
+      <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
+      $t(emails:signature)`,
+  },
+  recordsUploadedFromMobile: {
+    subject_one: `$t(common.appNameFull) - {{count}} record uploaded from Arena Mobile to survey '{{surveyName}}'`,
+    subject_other: `$t(common.appNameFull) - {{count}} records uploaded from Arena Mobile to survey '{{surveyName}}'`,
+    body: `<p>Hello {{name}},</p>
+      <p>{{uploadedByName}} ({{uploadedByEmail}}) has uploaded the following record(s) from Arena Mobile to the survey <b>{{surveyFullName}}</b> on {{dateSubmitted}}:</p>
+      {{-recordsTable}}
+      <p>To find a record in $t(common.appNameFull), open the survey, go to Data > Records and search it by its key values.</p>
+      {{-accessLinkMsg}}
+      <p><i>You have received this email because you are an administrator of the survey '{{surveyName}}' and the option to be notified when records are uploaded from Arena Mobile is enabled in the survey info. Any survey administrator can disable it.</i></p>
+      $t(emails:signature)`,
+    accessLink: '<p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>',
+    action: {
+      inserted: 'New',
+      updated: 'Updated',
+    },
+    table: {
+      keys: 'Key values',
+      cycle: 'Cycle',
+      action: 'Status',
+      owner: 'Created by',
+      dateCreated: 'Date created',
+      dateModified: 'Date modified',
+      validation: 'Errors / warnings',
+      uuid: 'Record UUID',
+    },
+  },
+  userInviteRepeatConfirmation: 'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
+  userResetPassword: {
+    subject: '$t(common.appNameFull). Password reset',
+    body: `<p>Hello {{name}},</p>
+             <p>You recently requested to reset your password for your $t(common.appNameFull) account. Click the link below to reset it.</p>
+             <p><a href="{{url}}">Reset your password</a></p>
+             <p>If the link doesn't work, please copy and paste this address into your browser: {{url}}</p>
+             $t(emails:temporaryMsg)
+             <p>If you did not request a password reset, please ignore this email or let us know.</p>
+             $t(emails:signature)`,
+  },
+  authProviderUnlinked: {
+    subject: '$t(common.appNameFull): {{providerLabel}} unlinked from your account',
+    body: `<p>Hello {{name}},</p>
+      <p>Your <strong>{{providerLabel}}</strong> account has been unlinked from your $t(common.appNameFull) account: you can no longer use it to sign in.</p>
+      <p>If you did not make this change, please contact the $t(common.appNameFull) administrators.</p>
+      $t(emails:signature)`,
+  },
+  authProviderDeleted: {
+    subject: '$t(common.appNameFull): sign-in with {{providerLabel}} is no longer available',
+    body: `<p>Hello {{name}},</p>
+      <p>Signing in to $t(common.appNameFull) with <strong>{{providerLabel}}</strong> is no longer available, and it was your only way to sign in.</p>
+      <p>To get back into your account, set a password with "Forgot password?" on the login page: <a href="{{serverUrl}}/guest/forgotPassword">{{serverUrl}}/guest/forgotPassword</a></p>
+      $t(emails:signature)`,
+  },
+  userDeleted: {
+    subject: `You have been removed from the survey {{surveyLabel}} in $t(common.appNameFull)`,
+    body: `<p>Hello {{name}},</p>
+      <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
+      <p>If you want to have access again to that survey, please contact the survey administrator.</p>
+      $t(emails:signature)`,
+  },
+  userRegistrationExpired: {
+    subject: 'Your $t(common.appNameFull) account has been removed',
+    accountRemoved: '<p>For this reason your account has been removed.</p>',
+    accountAndSurveysRemoved: `<p>For this reason your account has been removed, together with the following survey(s), which had not been modified since they were created:</p>
+      <ul>{{-surveysList}}</ul>`,
+    surveyItem: '<li><b>{{survey}}</b></li>',
+    requestAccessAgain: `<p>If you still want to use $t(common.appNameFull), you can request access again here: <a href="{{serverUrl}}">{{serverUrl}}</a></p>`,
+    body: `<p>Hello,</p>
+      <p>Your registration to $t(common.appNameFull) was not completed within 7 days of receiving the registration link, so the link has expired.</p>
+      {{-accountRemovedMsg}}
+      {{-requestAccessAgainMsg}}
+      <p>$t(common.raiseTicketInSupportForum)</p>
+      $t(emails:signature)`,
+  },
+}

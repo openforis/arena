@@ -1,0 +1,480 @@
+import type { ArenaUser, ArenaSurvey, ArenaRecordNode, ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
+import { Authorizer, Queue } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+
+import * as ActivityLog from '@common/activityLog/activityLog'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
+import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
+
+import BatchPersister from '@server/db/batchPersister'
+import * as FileXml from '@server/utils/file/fileXml'
+import Job from '@server/job/job'
+import UnauthorizedError from '@server/utils/unauthorizedError'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as RecordManager from '../../../../record/manager/recordManager'
+import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
+
+import * as CollectRecord from '../model/collectRecord'
+import * as CollectSurvey from '../model/collectSurvey'
+import * as CollectAttributeValueExtractor from './collectAttributeValueExtractor'
+
+const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
+
+const evaluateApplicability = async ({
+  user,
+  survey,
+  childDef,
+  record,
+  node,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  childDef: ArenaAnyNodeDef
+  record: ArenaRecord
+  node: ArenaRecordNode
+}) => {
+  let applicable = true
+  const expressionsApplicable = NodeDef.getApplicable(childDef)
+
+  if (!A.isEmpty(expressionsApplicable)) {
+    const exprEval = await RecordExpressionParser.evalApplicableExpression(
+      survey,
+      record,
+      node,
+      expressionsApplicable,
+      user
+    )
+    applicable = A.propOr(false, 'value', exprEval)
+  }
+  return applicable
+}
+
+export default class RecordsImportJob extends Job {
+  static readonly type = 'RecordsImportJob'
+  batchPersister: any
+
+  constructor(params?: any) {
+    super(RecordsImportJob.type, params)
+
+    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
+  }
+
+  async onStart() {
+    await super.onStart()
+
+    // Speed up processing a bit:
+    await this.tx.query('SET CONSTRAINTS ALL DEFERRED')
+  }
+
+  async execute() {
+    const { surveyId, user, tx } = this
+
+    const { deleteAllRecords, collectSurvey, cycle = Survey.cycleOneKey, forceImport = false } = this.context
+
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, cycle, draft: true, advanced: true },
+      tx
+    )
+    const surveyInfo = Survey.getSurveyInfo(survey)
+
+    if (!forceImport) {
+      // check survey URI
+      const collectSurveyUri = CollectSurvey.getUri(collectSurvey)
+      if (Survey.getCollectUri(surveyInfo) !== collectSurveyUri) {
+        throw new SystemError('importingDataIntoWrongCollectSurvey', { collectSurveyUri })
+      }
+    }
+
+    if (deleteAllRecords) {
+      // already checked when starting the import: checked again because every record of the cycle is deleted
+      if (!Authorizer.canEditSurvey(user, surveyInfo)) {
+        throw new UnauthorizedError(User.getName(user))
+      }
+      this.logDebug('deleting all records before import')
+      await RecordManager.deleteRecordsByCycles(surveyId, [cycle], this.tx)
+    }
+
+    const entryNames = this.getEntryNames()
+
+    this.total = entryNames.length
+
+    const nodeDefNamesByPath = CollectSurvey.generateArenaNodeDefNamesByPath(collectSurvey)
+
+    const insertedRecordsUuids = []
+
+    for (const entryName of entryNames) {
+      if (this.isCanceled()) {
+        break
+      }
+
+      // This.logDebug(`-- start import record ${entryName}`)
+
+      // this.logDebug(`${entryName} findCollectRecordData start`)
+      const collectRecordData = this.findCollectRecordData(entryName)
+      const { collectRecordXml, step } = collectRecordData
+      // This.logDebug(`${entryName} findCollectRecordData done`)
+
+      // this.logDebug(`${entryName} parseToJson start`)
+      const collectRecordJson = FileXml.parseToJson(collectRecordXml)
+      // This.logDebug(`${entryName} parseToJson done`)
+
+      // this.logDebug(`${entryName} recordToCreate start`)
+      const recordToCreate = Record.newRecord(
+        user,
+        cycle,
+        false,
+        CollectRecord.getDateCreated(collectRecordJson),
+        String(step)
+      )
+
+      /* NOSONAR */ await ActivityLogManager.insert(
+        user,
+        surveyId,
+        ActivityLog.type.recordImportFromCollect,
+        { recordUuid: Record.getUuid(recordToCreate) },
+        false,
+        tx
+      )
+
+      const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx) // NOSONAR
+      // This.logDebug(`${entryName} recordToCreate end`)
+
+      insertedRecordsUuids.push(Record.getUuid(record))
+
+      // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
+      await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) // NOSONAR
+      // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
+
+      // this.logDebug(`-- end import record ${entryName}`)
+
+      if (!this.isCanceled()) {
+        this.incrementProcessedItems()
+      }
+    }
+
+    // recordUuids is read by the following RecordCheckJob (collectImportJob.js/collectDataImportJob.js
+    // chain it right after this job, sharing the same context): it scopes the check to just the
+    // records imported here and forces every node def to be checked, not just newly-added ones - a
+    // Collect-imported record is only given nodes for paths present in the Collect data, so it can be
+    // missing nodes (and therefore default values) for Arena-only attributes even though their node
+    // defs are already published. See RecordCheckJob._fetchSurveyAndNodeDefsByCycle.
+    this.setContext({ insertedRecords: this.processed, recordUuids: insertedRecordsUuids })
+  }
+
+  async beforeSuccess() {
+    await this.batchPersister.flush(this.tx)
+  }
+
+  getEntriesPath({ step }) {
+    const { collectSurvey } = this.context
+    return CollectSurvey.isCollectEarthSurvey(collectSurvey) ? `${step}/` : `data/${step}/`
+  }
+
+  getEntryNames() {
+    const { collectSurveyFileZip } = this.context
+
+    const steps = [1, 2, 3]
+
+    for (const step of steps) {
+      const entryNames = collectSurveyFileZip.getEntryNames({ path: this.getEntriesPath({ step }) })
+      if (!A.isEmpty(entryNames)) {
+        return entryNames
+      }
+    }
+
+    return []
+  }
+
+  findCollectRecordData(entryName) {
+    const { collectSurveyFileZip } = this.context
+
+    const steps = [3, 2, 1]
+
+    for (const step of steps) {
+      const entryPath = `${this.getEntriesPath({ step })}${entryName}`
+      const collectRecordXml = collectSurveyFileZip.getEntryAsText(entryPath)
+      if (collectRecordXml) {
+        return { collectRecordXml, step }
+      }
+    }
+
+    throw new SystemError('entryDataNotFound', { entryName })
+  }
+
+  async traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) {
+    const { collectSurvey } = this.context
+
+    let recordUpdated = { ...record }
+
+    const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
+    const collectRootEntityDefPath = `/${collectRootEntityName}`
+    const collectRootEntityDef = CollectSurvey.getNodeDefByPath(collectRootEntityDefPath)(collectSurvey)
+    const collectRootEntity = CollectRecord.getRootEntity(collectRecordJson, collectRootEntityName)
+
+    const queue = new Queue([
+      {
+        nodeParent: null,
+        collectNodeDef: collectRootEntityDef,
+        collectNodeDefPath: collectRootEntityDefPath,
+        collectNode: collectRootEntity,
+      },
+    ])
+
+    recordUpdated = await this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
+    recordUpdated = await this._updateRelevance(survey, recordUpdated, this.user)
+
+    await this._insertRecordNodes(recordUpdated)
+  }
+
+  // processes the queue items one by one: each node insert depends on the record updated by the previous one
+  async _insertNodesFromQueue({ survey, record, nodeDefNamesByPath, queue }) {
+    if (queue.isEmpty()) return record
+    // awaiting before recursing keeps the call stack flat
+    const recordUpdated = await this._insertNodesFromQueueItem({
+      survey,
+      record,
+      nodeDefNamesByPath,
+      queue,
+      item: queue.dequeue(),
+    })
+    return this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
+  }
+
+  _insertNodesFromQueueItem({ survey, record, nodeDefNamesByPath, queue, item }) {
+    const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
+
+    const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
+    if (!nodeDefsInfo) {
+      this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+      return Promise.resolve(record)
+    }
+    return nodeDefsInfo.reduce(async (recordPromise, { uuid: nodeDefUuid, field }) => {
+      const recordCurrent = await recordPromise
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      if (!nodeDef) {
+        this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+        return recordCurrent
+      }
+      return this._insertNodeFromCollectNode({
+        survey,
+        record: recordCurrent,
+        nodeDefNamesByPath,
+        nodeDef,
+        nodeParent,
+        collectNodeDef,
+        collectNodeDefPath,
+        collectNode,
+        field,
+        queue,
+      })
+    }, Promise.resolve(record))
+  }
+
+  async _insertNodeFromCollectNode({
+    survey,
+    record,
+    nodeDefNamesByPath,
+    nodeDef,
+    nodeParent,
+    collectNodeDef,
+    collectNodeDefPath,
+    collectNode,
+    field,
+    queue,
+  }: {
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodeDefNamesByPath: any
+    nodeDef: ArenaAnyNodeDef
+    nodeParent: ArenaRecordNode
+    collectNodeDef: CollectSurvey.CollectNodeDef
+    collectNodeDefPath: string
+    collectNode: CollectRecord.CollectNode
+    field: string | null
+    queue: any
+  }) {
+    const { collectSurveyFileZip } = this.context
+
+    let nodeToInsert = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), nodeParent)
+
+    const valueAndMeta: { value?: unknown; meta?: Record<string, unknown> } | null = NodeDef.isAttribute(nodeDef)
+      ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
+          survey,
+          categoryItemProvider,
+          taxonProvider,
+          nodeDef,
+          record,
+          node: nodeToInsert,
+          collectSurveyFileZip,
+          collectNodeDef,
+          collectNode,
+          collectNodeField: field,
+          tx: this.tx,
+        })
+      : {}
+
+    const { value = null, meta = {} } = valueAndMeta || {}
+
+    nodeToInsert = A.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
+
+    const recordUpdated = Record.assocNode(nodeToInsert, { sideEffect: true })(record)
+
+    if (NodeDef.isEntity(nodeDef)) {
+      // Create child items to insert
+      const { itemsToInsert } = this._extractChildrenItemsToInsert({
+        survey,
+        nodeDefNamesByPath,
+        collectNodeDef,
+        collectNodeDefPath,
+        collectNode,
+        node: nodeToInsert,
+      })
+      queue.enqueueItems(itemsToInsert)
+    }
+    return recordUpdated
+  }
+
+  _extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath }) {
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
+
+    const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+    if (nodeDefsInfo) return nodeDefsInfo
+
+    const nodeDefName = nodeDefNamesByPath[collectNodeDefPath]
+    const nodeDef = nodeDefName ? Survey.getNodeDefByName(nodeDefName)(survey) : null
+    return nodeDef ? [{ uuid: nodeDef.uuid }] : null
+  }
+
+  _extractChildrenItemsToInsert({
+    survey,
+    nodeDefNamesByPath,
+    collectNodeDef,
+    collectNodeDefPath,
+    collectNode,
+    node,
+  }: {
+    survey: ArenaSurvey
+    nodeDefNamesByPath: any
+    collectNodeDef: CollectSurvey.CollectNodeDef
+    collectNodeDefPath: string
+    collectNode: CollectRecord.CollectNode
+    node: ArenaRecordNode
+  }) {
+    // Output
+    const itemsToInsert = []
+
+    const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
+    collectNodeDefChildren.some((collectNodeDefChild) => {
+      if (this.isCanceled()) {
+        return true //breaks the loop
+      }
+
+      const collectNodeDefChildName = CollectSurvey.getAttributeName(collectNodeDefChild)
+      const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
+      const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({
+        survey,
+        nodeDefNamesByPath,
+        collectNodeDefPath: collectNodeDefChildPath,
+      })
+
+      if (nodeDefsInfo) {
+        const collectChildNodes = CollectRecord.getNodeChildren([collectNodeDefChildName])(collectNode)
+
+        const childrenCount = collectChildNodes.length
+
+        // If children count > 0
+        collectChildNodes.some((collectChildNode) => {
+          if (this.isCanceled()) {
+            return true //breaks the loop
+          }
+
+          itemsToInsert.push({
+            nodeParent: node,
+            collectNodeDef: collectNodeDefChild,
+            collectNodeDefPath: collectNodeDefChildPath,
+            collectNode: collectChildNode,
+          })
+        })
+
+        // Get nodeDefUuid from first nodeDef field
+        const { uuid: nodeDefChildUuid } = nodeDefsInfo[0]
+        const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
+
+        if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
+          itemsToInsert.push({
+            nodeParent: node,
+            collectNodeDef: collectNodeDefChild,
+            collectNodeDefPath: collectNodeDefChildPath,
+            collectNode: {},
+          })
+        }
+      } else {
+        this.logError(`==== NodeDef not found for ${collectNodeDefChildPath}`)
+      }
+    })
+
+    return { itemsToInsert }
+  }
+
+  async _insertRecordNodes(record) {
+    for (const node of Record.getNodesArray(record)) {
+      await this.batchPersister.addItem(node, this.tx) // NOSONAR
+    }
+  }
+
+  /**
+   * Evaluates all record entities children applicability and stores the updated nodes.
+   * @param {!Survey} survey - The survey object.
+   * @param {!Record} record - The record object.
+   * @param {!User} user - The user performing the import (used to evaluate user-dependent expressions).
+   * @returns {Promise<null>} - The updated record (promise).
+   */
+  async _updateRelevance(survey, record, user) {
+    const stack = []
+    stack.push(Record.getRootNode(record))
+    let recordUpdated = record
+
+    while (stack.length > 0) {
+      const node = stack.pop()
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      if (NodeDef.isEntity(nodeDef)) {
+        const childrenApplicability = {}
+        const nodeDefChildren = Survey.getNodeDefChildren({ nodeDef })(survey)
+        for (const childDef of nodeDefChildren) {
+          const applicable = await evaluateApplicability({ user, survey, childDef, record: recordUpdated, node }) // NOSONAR
+          const childDefUuid = NodeDef.getUuid(childDef)
+          if (applicable) {
+            const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)
+            stack.push(...nodeChildren)
+          } else {
+            // store children applicability only if not applicable (applicable by default)
+            childrenApplicability[childDefUuid] = applicable
+          }
+        }
+        if (!A.isEmpty(childrenApplicability)) {
+          const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
+          recordUpdated = Record.assocNode(nodeUpdated, { sideEffect: true })(recordUpdated)
+        }
+      }
+    }
+    return recordUpdated
+  }
+
+  async nodesBatchInsertHandler(nodesArray, tx) {
+    await RecordManager.insertNodesInBulk(
+      { user: this.user, surveyId: this.surveyId, nodesArray, systemActivity: true },
+      tx
+    )
+  }
+}

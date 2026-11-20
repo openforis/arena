@@ -35,6 +35,7 @@ export const UserExtraPropEditor = (props) => {
     onDelete: onDeleteProp,
     onEditChange,
     onSave: onSaveProp,
+    readOnly = false,
     uuid,
     value: valueProp,
   } = props
@@ -126,6 +127,7 @@ export const UserExtraPropEditor = (props) => {
         onDelete={editingItems ? undefined : onDelete}
         onEdit={editingItems ? undefined : onEdit}
         onSave={onSave}
+        readOnly={readOnly}
         validation={validation}
       />
     </div>
@@ -141,6 +143,7 @@ UserExtraPropEditor.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onEditChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
   uuid: PropTypes.string,
   value: PropTypes.string,
 }

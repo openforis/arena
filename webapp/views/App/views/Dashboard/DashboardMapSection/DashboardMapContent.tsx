@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -31,13 +32,13 @@ export const DashboardMapContent = () => {
   })
 
   const geoAttributeDefs = useMemo(
-    () => Survey.getNodeDefsArray(survey).filter((nodeDef: unknown) => NodeDef.isGeo(nodeDef)),
+    () => Survey.getNodeDefsArray(survey).filter((nodeDef: ArenaAnyNodeDef) => NodeDef.isGeo(nodeDef)),
     [survey]
   )
   const layerColors = useRandomColors(geoAttributeDefs.length)
 
   const renderPopup = useCallback(
-    (params: { attributeDef: unknown; pointFeature: { properties?: Record<string, unknown> } }) => (
+    (params: { attributeDef: ArenaAnyNodeDef; pointFeature: { properties?: Record<string, unknown> } }) => (
       <DashboardPolygonPopup attributeDef={params.attributeDef} pointFeature={params.pointFeature} />
     ),
     []

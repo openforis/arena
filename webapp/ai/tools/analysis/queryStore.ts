@@ -1,6 +1,8 @@
+import type { QueryItem } from '@common/model/query/query/query'
+
 export type AnalysisQueryEntry = {
   id: string
-  query: object
+  query: QueryItem
   explanation: string
   entityName: string
   mode: string

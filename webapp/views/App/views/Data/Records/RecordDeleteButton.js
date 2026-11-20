@@ -8,7 +8,7 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions } from '@webapp/store/ui/record'
 
-import { ButtonDelete } from '@webapp/components'
+import { ButtonIconDelete } from '@webapp/components'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 
@@ -49,13 +49,5 @@ export const RecordDeleteButton = (props) => {
     [dispatch, keyValues, onDeleteConfirmed]
   )
 
-  return (
-    <ButtonDelete
-      testId={testId}
-      title="dataView:records.deleteRecord"
-      showLabel={false}
-      onClick={onDeleteButtonClick}
-      variant="text"
-    />
-  )
+  return <ButtonIconDelete testId={testId} title="dataView:records.deleteRecord" onClick={onDeleteButtonClick} />
 }

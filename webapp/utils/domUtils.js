@@ -123,3 +123,20 @@ export const extractPreElementContentFromHtml = (htmlText) => {
     return null
   }
 }
+
+const interactiveElementsSelector =
+  'a, button, input, label, select, textarea, [contenteditable="true"], [role="button"], [role="checkbox"], [role="combobox"], [role="menuitem"], [role="option"]'
+
+/**
+ * Checks whether an event handled by a container (e.g. a table row) comes from a control inside it.
+ * @param {{ currentTarget: Node, target: EventTarget }} event - The event (DOM or React).
+ * @returns {boolean} True if the target is an interactive element (button, input...) inside the container,
+ * or is outside the container DOM (React events bubble from portals, e.g. menus opened from the container).
+ */
+export const isEventFromInteractiveChild = (event) => {
+  const { currentTarget } = event
+  const target = /** @type {Element} */ (event.target)
+  if (!currentTarget.contains(target)) return true
+  const interactiveElement = target.closest(interactiveElementsSelector)
+  return Boolean(interactiveElement) && interactiveElement !== currentTarget
+}

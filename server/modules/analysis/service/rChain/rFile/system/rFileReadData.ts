@@ -1,0 +1,137 @@
+import { FlatDataExportColumnDataType, FlatDataExportModel } from '@openforis/arena-core'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import * as ApiRoutes from '@common/apiRoutes'
+
+import RFileSystem from './rFileSystem'
+import {
+  setVar,
+  arenaGetCSV,
+  arenaDfColumnsAsCharacter,
+  arenaDfColumnsAsLogical,
+  arenaDfColumnsAsNumeric,
+} from '../../rFunctions'
+
+const dataConversionTypes = { asCharacter: 'asCharacter', asLogical: 'asLogical', asNumeric: 'asNumeric' }
+
+const conversionTypeByColumnDataType = {
+  [FlatDataExportColumnDataType.boolean]: dataConversionTypes.asLogical,
+  [FlatDataExportColumnDataType.numeric]: dataConversionTypes.asNumeric,
+  [FlatDataExportColumnDataType.text]: dataConversionTypes.asCharacter,
+}
+
+const conversionFunctionByType = {
+  [dataConversionTypes.asCharacter]: arenaDfColumnsAsCharacter,
+  [dataConversionTypes.asLogical]: arenaDfColumnsAsLogical,
+  [dataConversionTypes.asNumeric]: arenaDfColumnsAsNumeric,
+}
+
+export default class RFileReadData extends RFileSystem {
+  constructor(rChain) {
+    super(rChain, 'read-data')
+  }
+
+  async initSchemaSummary() {
+    const { survey, cycle } = this.rChain
+
+    const schemaSummaryCSV = arenaGetCSV(ApiRoutes.survey.schemaSummary({ surveyId: Survey.getId(survey), cycle }))
+    await this.appendContent(setVar('arena.schemaSummary', schemaSummaryCSV))
+  }
+
+  async initEntitiesData() {
+    const { chainUuid, survey, cycle, entities } = this.rChain
+
+    for (const entityDef of entities) {
+      // Fetch entity data
+      const dfName = NodeDef.getName(entityDef)
+      const dataCSV = arenaGetCSV(
+        ApiRoutes.rChain.entityData({
+          surveyId: Survey.getId(survey),
+          cycle,
+          chainUuid,
+          entityUuid: NodeDef.getUuid(entityDef),
+        })
+      )
+      await this.appendContent(setVar(dfName, dataCSV)) // NOSONAR
+      await this.appendContentToConvertDataTypes({ entityDef }) // NOSONAR
+
+      await this.initMultipleAttributesData({ entityDef }) // NOSONAR
+    }
+  }
+
+  async initMultipleAttributesData({ entityDef }) {
+    const { chainUuid, survey, cycle } = this.rChain
+
+    const multipleAttrDefs = Survey.getNodeDefChildren({ nodeDef: entityDef, includeAnalysis: false })(survey).filter(
+      NodeDef.isMultipleAttribute
+    )
+    for (const multipleAttrDef of multipleAttrDefs) {
+      const dfName = NodeDef.getName(multipleAttrDef)
+      const dataCSV = arenaGetCSV(
+        ApiRoutes.rChain.multipleAttributeData({
+          surveyId: Survey.getId(survey),
+          cycle,
+          chainUuid,
+          attributeDefUuid: NodeDef.getUuid(multipleAttrDef),
+        })
+      )
+      await this.appendContent(setVar(dfName, dataCSV)) // NOSONAR
+    }
+  }
+
+  async appendContentToConvertDataTypes({ entityDef }) {
+    const { survey, cycle } = this.rChain
+
+    const flatDataExportModel = new FlatDataExportModel({
+      survey,
+      cycle,
+      nodeDefContext: entityDef,
+      options: { includeAncestorAttributes: true, includeFiles: false },
+    })
+
+    const columnNamesByConversionType = flatDataExportModel.columns.reduce((acc: Record<string, string[]>, column) => {
+      const { header, nodeDef, dataType } = column
+
+      const conversionType = conversionTypeByColumnDataType[dataType]
+
+      if (!NodeDef.isSingleAttribute(nodeDef) || NodeDef.isAnalysis(nodeDef) || !conversionType) {
+        return acc
+      }
+
+      const headersWithinType = acc[conversionType] || []
+      headersWithinType.push(header)
+      acc[conversionType] = headersWithinType
+      return acc
+    }, {})
+
+    const dfEntity = NodeDef.getName(entityDef)
+
+    const content = []
+    Object.entries(columnNamesByConversionType).forEach(([conversionType, columnNames]) => {
+      if (columnNames.length === 0) return
+
+      content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))
+    })
+    if (content.length > 0) {
+      await this.appendContent(...content)
+    }
+  }
+
+  async init() {
+    await super.init()
+
+    const { listCategories, listTaxonomies } = this.rChain
+
+    await this.initSchemaSummary()
+
+    await this.initEntitiesData()
+
+    // Append categories and taxoniomies initialization
+    await this.appendContent(...listCategories.scripts)
+    await this.appendContent(...listTaxonomies.scripts)
+
+    return this
+  }
+}

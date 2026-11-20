@@ -1,0 +1,56 @@
+import {
+  NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
+  NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
+  ArenaAnyNodeDef,
+} from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaValidationResult } from '@openforis/arena-core'
+
+type FindReferencedNodeDefLastParams = {
+  survey: ArenaSurvey
+  nodeDef: ArenaAnyNodeDef
+  exprString: string
+  isContextParent?: boolean
+  selfReferenceAllowed?: boolean
+}
+
+export const findReferencedNodeDefLast = ({
+  survey,
+  nodeDef,
+  exprString,
+  isContextParent = true,
+  selfReferenceAllowed = true,
+}: FindReferencedNodeDefLastParams): Promise<ArenaAnyNodeDef | null> => {
+  return new CoreNodeDefExpressionEvaluator().evalExpression({
+    survey,
+    nodeDef,
+    expression: exprString,
+    isContextParent,
+    selfReferenceAllowed,
+  })
+}
+
+export const validate = async ({
+  survey,
+  nodeDefCurrent,
+  exprString,
+  selfReferenceAllowed = false,
+  includeAnalysis = false,
+}: {
+  survey: ArenaSurvey
+  nodeDefCurrent: ArenaAnyNodeDef
+  exprString: string
+  selfReferenceAllowed?: boolean
+  includeAnalysis?: boolean
+}): Promise<ArenaValidationResult | null> => {
+  // the context ($context) is the parent entity (the root entity for itself), as when evaluating record expressions
+  const { validationResult } = await new CoreNodeDefExpressionValidator().validate({
+    expression: exprString,
+    survey,
+    nodeDefCurrent,
+    selfReferenceAllowed,
+    includeAnalysis,
+  })
+  if (validationResult === null || validationResult.valid) return null
+
+  return validationResult
+}

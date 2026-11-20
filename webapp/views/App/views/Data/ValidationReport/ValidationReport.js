@@ -33,7 +33,6 @@ const ValidationReport = () => {
   const { recordUuid } = useParams()
   // computed once for the report: the row action is shown on every row only when the Cleaning area is available
   const askAssistantAvailable = useCleaningAreaStatus().status === 'available'
-  const rowProps = useMemo(() => ({ askAssistantAvailable }), [askAssistantAvailable])
   const [query, setQuery] = useState(null)
   const [selectedMessageTypeCategoryIds, setSelectedMessageTypeCategoryIds] = useState(MessageTypeFilterCategoryIds)
 
@@ -77,7 +76,7 @@ const ValidationReport = () => {
     return MessageTypeFilterCategoryIds.every((categoryId) => selectedSet.has(categoryId))
   }, [selectedMessageTypeCategoryIds])
 
-  const onRowClick = (row) => {
+  const onRowOpen = (row) => {
     const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
     const pageNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
     const recordUuid = RecordValidationReportItem.getRecordUuid(row)
@@ -134,8 +133,8 @@ const ValidationReport = () => {
         gridTemplateColumns={askAssistantAvailable ? '50px 1fr 2fr 6rem 50px 50px' : '50px 1fr 2fr 6rem 50px'}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
-        rowProps={rowProps}
-        onRowClick={onRowClick}
+        rowProps={{ askAssistantAvailable, onRowOpen }}
+        onRowOpen={onRowOpen}
       />
       {recordUuid && (
         <div className="footer">

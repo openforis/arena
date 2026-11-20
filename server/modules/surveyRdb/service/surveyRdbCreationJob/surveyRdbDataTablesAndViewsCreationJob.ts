@@ -1,0 +1,108 @@
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import Job from '@server/job/job'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
+  static readonly type = 'SurveyRdbDataTablesAndViewsCreationJob'
+
+  constructor(params?: any) {
+    super(SurveyRdbDataTablesAndViewsCreationJob.type, params)
+  }
+
+  async execute() {
+    const { tx } = this
+
+    const survey = await this.fetchSurvey()
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const surveyId = Survey.getId(survey)
+    const surveyName = Survey.getName(surveyInfo)
+
+    const jobDescription = `RDB tables and views creation for survey ${surveyId} (${surveyName})`
+    this.logDebug(`${jobDescription} - start`)
+
+    // Get entities or multiple attributes tables
+    const descendantMultipleDefs = Survey.findDescendants({
+      filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+    })(survey)
+
+    this.total = descendantMultipleDefs.length + 3
+
+    // Visit entities and multiple attributes to create and populate tables
+    // (break loop if job is canceled)
+    const stopIfFunction = () => this.isCanceled()
+
+    for (let index = 0; index < descendantMultipleDefs.length && !this.isCanceled(); index++) {
+      const nodeDef = descendantMultipleDefs[index]
+
+      const nodeDefName = NodeDef.getName(nodeDef)
+
+      // ===== create table and view
+      this.logDebug(`create data table ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx) // NOSONAR
+      this.logDebug(`create data table ${nodeDefName} - end`)
+
+      // ===== insert into table
+      this.logDebug(`insert into table ${nodeDefName} - start`)
+      await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx) // NOSONAR
+      this.logDebug(`insert into table ${nodeDefName} - end`)
+
+      if (this.isCanceled()) break
+
+      // ===== create indexes (after populating the table, to speed up the insert)
+      this.logDebug(`create indexes on table ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataTableIndexes({ survey, nodeDef }, tx) // NOSONAR
+      this.logDebug(`create indexes on table ${nodeDefName} - end`)
+
+      this.incrementProcessedItems()
+    }
+
+    // create views
+    for (let index = 0; index < descendantMultipleDefs.length && !this.isCanceled(); index++) {
+      const nodeDef = descendantMultipleDefs[index]
+
+      const nodeDefName = NodeDef.getName(nodeDef)
+      this.logDebug(`create view for ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx) // NOSONAR
+      this.logDebug(`create view for ${nodeDefName} - end`)
+    }
+
+    if (this.isCanceled()) return
+
+    this.logDebug('create node keys view - start')
+    await SurveyRdbManager.createNodeKeysView(survey, tx)
+    this.incrementProcessedItems()
+    this.logDebug('create node keys view - end')
+
+    if (this.isCanceled()) return
+
+    this.logDebug('create node hierarchy disaggregated view - start')
+    await SurveyRdbManager.createNodeHierarchyDisaggregatedView(survey, tx)
+    this.incrementProcessedItems()
+    this.logDebug('create node hierarchy disaggregated view - end')
+
+    if (this.isCanceled()) return
+
+    this.logDebug('create node keys hierarchy view - start')
+    await SurveyRdbManager.createNodeKeysHierarchyView(survey, tx)
+    this.incrementProcessedItems()
+    this.logDebug('create node keys hierarchy view - end')
+
+    this.logDebug(`${jobDescription} - end`)
+  }
+
+  async fetchSurvey() {
+    const { surveyId, tx } = this
+    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
+    const surveyInfo = Survey.getSurveyInfo(surveySummary)
+    const fetchDraft =
+      (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
+
+    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
+      tx
+    )
+  }
+}

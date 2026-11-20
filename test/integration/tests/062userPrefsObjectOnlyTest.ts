@@ -1,3 +1,5 @@
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -38,7 +40,7 @@ describe('The prefs of a user stay an object (062)', () => {
     const survey = await SB.survey(admin, SB.entity('root', SB.attribute('root_key').key())).buildAndStore()
     surveyId = Survey.getId(survey)
     member = await createSurveyMember({ admin, surveyId, groupName: AuthGroup.groupNames.surveyEditor })
-    await UserManager.updateUserPrefs({ uuid: User.getUuid(member), prefs: { language: 'fr' } })
+    await UserManager.updateUserPrefs({ uuid: User.getUuid(member), prefs: { language: 'fr' } } as unknown as ArenaUser)
     await writeAiPrefs({ userUuid: User.getUuid(member), aiPrefs: ai })
   })
 
@@ -91,7 +93,10 @@ describe('The prefs of a user stay an object (062)', () => {
   })
 
   test('an object still merges, and the server-only keys are still stripped', async () => {
-    await UserManager.updateUserPrefs({ uuid: User.getUuid(member), prefs: { theme: 'dark', ai: { providers: [1] } } })
+    await UserManager.updateUserPrefs({
+      uuid: User.getUuid(member),
+      prefs: { theme: 'dark', ai: { providers: [1] } },
+    } as unknown as ArenaUser)
     const prefs = await readPrefs()
     expect(prefs.theme).toBe('dark')
     expect(prefs.language).toBe('fr')

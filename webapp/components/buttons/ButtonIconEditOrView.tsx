@@ -8,7 +8,7 @@ type ButtonIconEditOrViewProps = ButtonProps & {
 
 export const ButtonIconEditOrView = (props: ButtonIconEditOrViewProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { canEdit, label: _label, variant = 'outlined', ...otherProps } = props
+  const { canEdit, label: _label, variant = 'text', ...otherProps } = props
   return canEdit ? (
     <ButtonIconEdit {...otherProps} variant={variant} />
   ) : (

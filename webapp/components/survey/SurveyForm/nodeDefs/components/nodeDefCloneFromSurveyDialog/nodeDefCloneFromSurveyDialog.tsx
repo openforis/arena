@@ -1,3 +1,4 @@
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import '../../../../cloneFromSurveyDialog.scss'
 import './nodeDefCloneFromSurveyDialog.scss'
 
@@ -27,7 +28,7 @@ type NodeDefCloneFromSurveyDialogProps = {
   onConfirm: (params: ConfirmParams) => void
 }
 
-const targetEntityFilterFn = ({ cycle, entityDef }: { cycle: string; entityDef: object }): boolean =>
+const targetEntityFilterFn = ({ cycle, entityDef }: { cycle: string; entityDef: ArenaAnyNodeDef }): boolean =>
   NodeDef.isEntity(entityDef) && !NodeDefLayout.isRenderTable(cycle)(entityDef)
 
 export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialogProps): React.ReactElement => {
@@ -70,7 +71,7 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
 
         <FormItem label="surveyForm:cloneFromAnotherSurvey.targetEntityCurrentSurvey">
           <EntitySelector
-            filterFn={(entityDef: object) => targetEntityFilterFn({ cycle, entityDef })}
+            filterFn={(entityDef: ArenaAnyNodeDef) => targetEntityFilterFn({ cycle, entityDef })}
             hierarchy={surveyCurrentHierarchy}
             nodeDefLabelType={NodeDef.NodeDefLabelTypes.labelAndName}
             nodeDefUuidEntity={targetEntityDefUuid}

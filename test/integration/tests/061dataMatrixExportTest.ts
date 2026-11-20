@@ -78,7 +78,7 @@ describe('Data matrix export', () => {
   const exportMatrixHeader = async (options: object) => {
     const filePath = await exportMatrix(options)
     const content = await FileUtils.readFile(filePath)
-    await FileUtils.deleteFile(filePath)
+    await FileUtils.deleteFileAsync(filePath)
     return content.split(/\r?\n/)[0]
   }
 
@@ -155,7 +155,7 @@ describe('Data matrix export', () => {
   test('csv file has one row per species and layer and one column per record', async () => {
     const filePath = await exportMatrix(getOptions(FileFormats.csv))
     const content = await FileUtils.readFile(filePath)
-    await FileUtils.deleteFile(filePath)
+    await FileUtils.deleteFileAsync(filePath)
 
     const rows = content
       .trim()
@@ -168,7 +168,7 @@ describe('Data matrix export', () => {
     const filePath = await exportMatrix(getOptions(FileFormats.xlsx))
     const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.read(Readable.from(await FileUtils.readBinaryFile(filePath)))
-    await FileUtils.deleteFile(filePath)
+    await FileUtils.deleteFileAsync(filePath)
 
     const rows: string[][] = []
     workbook.worksheets[0].eachRow((row) => {
@@ -180,7 +180,7 @@ describe('Data matrix export', () => {
   test('only the data matching the filter is exported', async () => {
     const filePath = await exportMatrix(getOptions(FileFormats.csv, `relevee_id == 'B'`))
     const content = await FileUtils.readFile(filePath)
-    await FileUtils.deleteFile(filePath)
+    await FileUtils.deleteFileAsync(filePath)
 
     expect(content.split(/\r?\n/)[0]).toBe('"species_scientific_name","layer","B"')
     expect(content).not.toContain('Rumex')

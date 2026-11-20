@@ -1,7 +1,17 @@
 import PropTypes from 'prop-types'
 
 export const ContentRowCell = (props) => {
-  const { active, cellTestIdExtractor, column, item, itemPosition, itemSelected, initData, ...otherProps } = props
+  const {
+    active,
+    cellTestIdExtractor,
+    column,
+    item,
+    itemPosition,
+    itemSelected,
+    initData,
+    onItemSelectToggle,
+    ...otherProps
+  } = props
 
   const { key, className, renderItem } = column
 
@@ -9,7 +19,7 @@ export const ContentRowCell = (props) => {
 
   return (
     <div key={key} className={className} data-testid={testId}>
-      {renderItem({ ...otherProps, active, item, itemPosition, itemSelected, initData })}
+      {renderItem({ ...otherProps, active, item, itemPosition, itemSelected, initData, onItemSelectToggle })}
     </div>
   )
 }
@@ -22,4 +32,5 @@ ContentRowCell.propTypes = {
   itemPosition: PropTypes.number.isRequired,
   itemSelected: PropTypes.bool.isRequired,
   initData: PropTypes.func.isRequired,
+  onItemSelectToggle: PropTypes.func.isRequired,
 }

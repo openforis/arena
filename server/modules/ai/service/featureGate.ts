@@ -2,7 +2,7 @@
  * Feature gating shared by the gateway endpoint and the server jobs: env master switch, env per-feature flags,
  * user master switch, user category toggle (in this order).
  */
-import type { User } from '@openforis/arena-core'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -19,11 +19,11 @@ const isDisabledByFlag = (flags: unknown, feature: string): boolean =>
 /**
  * Throws when the given feature can't be used by the user.
  * @param {string} feature - Feature key.
- * @param {User} user - Acting user (null for system calls: only the env checks apply).
+ * @param {ArenaUser} user - Acting user (null for system calls: only the env checks apply).
  * @param {GateEnv} [env] - Env values (injectable for tests).
  * @returns {void}
  */
-export const assertFeatureEnabled = (feature: string, user: User | null, env: GateEnv = ENV): void => {
+export const assertFeatureEnabled = (feature: string, user: ArenaUser | null, env: GateEnv = ENV): void => {
   if (!env.aiFeaturesEnabled) {
     throw new SystemError('aiFeaturesDisabled', { feature }, StatusCodes.NOT_FOUND)
   }

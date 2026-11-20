@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react'
 
-import type { AreaOfInterestDescriptor } from '@openforis/arena-core'
+import type { ArenaAreaOfInterestDescriptor } from '@openforis/arena-core'
 
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 
-import { Button, ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
-import { DataGrid } from '@webapp/components/DataGrid'
+import { Button, ButtonAdd } from '@webapp/components'
+import { DataGrid, rowActionColumns } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { type SurveyFileRef, SurveyFilesMapPanel } from '@webapp/components/MapContainer/fileLayers'
@@ -17,21 +17,21 @@ import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { AreaOfInterestDialog } from './AreaOfInterestDialog'
 
 type Props = {
-  areasOfInterest: AreaOfInterestDescriptor[]
+  areasOfInterest: ArenaAreaOfInterestDescriptor[]
   readOnly: boolean
-  setAreasOfInterest: (areasOfInterest: AreaOfInterestDescriptor[]) => void
+  setAreasOfInterest: (areasOfInterest: ArenaAreaOfInterestDescriptor[]) => void
 }
 
-type DialogState = { open: boolean; edited: AreaOfInterestDescriptor | null }
+type DialogState = { open: boolean; edited: ArenaAreaOfInterestDescriptor | null }
 
 type MapPanelState = { header: string; surveyFiles: SurveyFileRef[] }
 
-const isSameArea = (areaA: AreaOfInterestDescriptor | null) => (areaB: AreaOfInterestDescriptor) =>
+const isSameArea = (areaA: ArenaAreaOfInterestDescriptor | null) => (areaB: ArenaAreaOfInterestDescriptor) =>
   areaA?.fileUuid === areaB.fileUuid
 
 const toSurveyFileRef =
   (lang: string) =>
-  (area: AreaOfInterestDescriptor): SurveyFileRef => ({
+  (area: ArenaAreaOfInterestDescriptor): SurveyFileRef => ({
     fileUuid: area.fileUuid,
     fileName: area.fileName,
     label: SurveyAreaOfInterest.getLabel(lang)(area),
@@ -52,7 +52,7 @@ export const AreasOfInterestEditor = (props: Props) => {
   const closeDialog = useCallback(() => setDialog({ open: false, edited: null }), [])
 
   const onDialogOk = useCallback(
-    (areaOfInterest: AreaOfInterestDescriptor) => {
+    (areaOfInterest: ArenaAreaOfInterestDescriptor) => {
       const { edited } = dialog
       setAreasOfInterest(
         edited
@@ -65,12 +65,12 @@ export const AreasOfInterestEditor = (props: Props) => {
   )
 
   const onEdit = useCallback(
-    (areaOfInterest: AreaOfInterestDescriptor) => !readOnly && setDialog({ open: true, edited: areaOfInterest }),
+    (areaOfInterest: ArenaAreaOfInterestDescriptor) => !readOnly && setDialog({ open: true, edited: areaOfInterest }),
     [readOnly]
   )
 
   const onDelete = useCallback(
-    async (areaOfInterest: AreaOfInterestDescriptor) => {
+    async (areaOfInterest: ArenaAreaOfInterestDescriptor) => {
       if (await confirm({ key: 'homeView:surveyInfo.areasOfInterest.confirmDelete' })) {
         setAreasOfInterest(areasOfInterest.filter((area) => !isSameArea(areaOfInterest)(area)))
       }
@@ -79,7 +79,7 @@ export const AreasOfInterestEditor = (props: Props) => {
   )
 
   const onShowOnMap = useCallback(
-    (areaOfInterest: AreaOfInterestDescriptor) =>
+    (areaOfInterest: ArenaAreaOfInterestDescriptor) =>
       setMapPanel({
         header: SurveyAreaOfInterest.getLabel(lang)(areaOfInterest),
         surveyFiles: [toSurveyFileRef(lang)(areaOfInterest)],
@@ -113,17 +113,6 @@ export const AreasOfInterestEditor = (props: Props) => {
       </div>
       <DataGrid
         columns={[
-          ...(readOnly
-            ? []
-            : [
-                {
-                  field: 'edit',
-                  width: 60,
-                  headerName: '',
-                  renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
-                  sortable: false,
-                },
-              ]),
           {
             field: 'name',
             flex: 0.3,
@@ -157,46 +146,18 @@ export const AreasOfInterestEditor = (props: Props) => {
             headerName: i18n.t('homeView:surveyInfo.areasOfInterest.vertices'),
             sortable: false,
           },
-          {
-            field: 'download',
-            width: 60,
-            headerName: '',
-            renderCell: ({ row }) => (
-              <ButtonDownload
-                href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: row.fileUuid })}
-                showLabel={false}
-                variant="text"
-              />
-            ),
-            sortable: false,
-          },
-          ...(canUseMap
-            ? [
-                {
-                  field: 'map',
-                  width: 60,
-                  headerName: '',
-                  renderCell: ({ row }) => <ButtonIconMap onClick={() => onShowOnMap(row)} />,
-                  sortable: false,
-                },
-              ]
-            : []),
-          ...(readOnly
-            ? []
-            : [
-                {
-                  field: 'delete',
-                  width: 60,
-                  headerName: '',
-                  renderCell: ({ row }) => <ButtonIconDelete onClick={() => onDelete(row)} />,
-                  sortable: false,
-                },
-              ]),
+          ...rowActionColumns<ArenaAreaOfInterestDescriptor>({
+            getDownloadUrl: (areaOfInterest) =>
+              API.getSurveyFileDownloadUrl({ surveyId, fileUuid: areaOfInterest.fileUuid }),
+            onShowOnMap: canUseMap ? onShowOnMap : undefined,
+            onEdit: readOnly ? undefined : onEdit,
+            onDelete: readOnly ? undefined : onDelete,
+          }),
         ]}
         density="compact"
         getRowId={(row) => row.fileUuid}
         hideFooterPagination
-        onRowDoubleClick={({ row }) => onEdit(row)}
+        onRowOpen={readOnly ? undefined : onEdit}
         rows={areasOfInterest}
       />
       {dialog.open && (

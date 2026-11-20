@@ -35,9 +35,9 @@ export default {
   plugins,
   target: 'node',
   entry: {
-    server: entry('server/server.js'),
-    jobThread: entry('server/job/jobThread.js'),
-    recordsUpdateThread: entry('server/modules/record/service/update/thread/recordsUpdateThread.js'),
+    server: entry('server/server.ts'),
+    jobThread: entry('server/job/jobThread.ts'),
+    recordsUpdateThread: entry('server/modules/record/service/update/thread/recordsUpdateThread.ts'),
   },
   output: {
     publicPath: 'dist/',

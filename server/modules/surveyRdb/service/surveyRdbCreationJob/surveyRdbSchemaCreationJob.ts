@@ -1,0 +1,21 @@
+import Job from '@server/job/job'
+
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+
+export default class SurveyRdbSchemaCreationJob extends Job {
+  static readonly type = 'SurveyRdbSchemaCreationJob'
+
+  constructor(params?: any) {
+    super(SurveyRdbSchemaCreationJob.type, params)
+  }
+
+  async execute() {
+    const { surveyId, tx } = this
+
+    const jobDescription = `drop and create schema for survey ${surveyId}`
+    this.logDebug(`${jobDescription} - start`)
+    await SurveyRdbManager.dropDataTablesAndViews(surveyId, tx)
+    await SurveyRdbManager.createSchema(surveyId, tx)
+    this.logDebug(`${jobDescription} - end`)
+  }
+}

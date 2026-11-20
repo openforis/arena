@@ -1,8 +1,12 @@
+import { useParams, useSearchParams } from 'react-router'
+
 import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
+import { ExternalLoginButtons } from '@webapp/views/Guest/components/ExternalLoginButtons'
 import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
+import { LoginActions } from '@webapp/store/login'
 
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
@@ -12,6 +16,10 @@ import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/compo
 
 const ResetPassword = () => {
   const i18n = useI18n()
+  const { uuid: invitationUuid } = useParams()
+  // error of an invitation accepted with an external login provider
+  const [searchParams] = useSearchParams()
+  const externalLoginErrorKey = searchParams.get('externalLoginError')
 
   const {
     state: { initialUser, user, error },
@@ -39,6 +47,7 @@ const ResetPassword = () => {
         title={`guest:resetPasswordView.title.${viewKey}`}
       />
       <Error error={error} />
+      {externalLoginErrorKey && <Error error={LoginActions.toExternalLoginErrorMessageKey(externalLoginErrorKey)} />}
 
       <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
 
@@ -80,6 +89,13 @@ const ResetPassword = () => {
         onClick={onSubmit}
         type="submit"
       />
+      {!hasAlreadyAccepted && (
+        // accept the invitation with an external provider instead of a password
+        <ExternalLoginButtons
+          labelKey="guest:externalLogin.continueWith"
+          query={{ invitation: invitationUuid, name: user.name ?? '' }}
+        />
+      )}
     </form>
   )
 }

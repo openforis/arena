@@ -1,4 +1,4 @@
-import type { AreaOfInterest } from '@openforis/arena-core'
+import type { ArenaAreaOfInterest } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
@@ -10,7 +10,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SB from '@test/utils/surveyBuilder'
 
 // pilot area (WGS84) around the location set as browser geolocation in the Playwright config
-export const areaOfInterest: AreaOfInterest = {
+export const areaOfInterest: ArenaAreaOfInterest = {
   type: 'Polygon',
   coordinates: [
     [

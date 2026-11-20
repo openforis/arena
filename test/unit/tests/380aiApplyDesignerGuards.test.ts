@@ -1,3 +1,5 @@
+import { UserFactory } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -248,7 +250,13 @@ describe('NodeDefManager.updateNodeDefProps refuses a category change on a publi
     const { updateNodeDefProps } = await import('@server/modules/nodeDef/manager/nodeDefManager')
     const nodeDef = getDefByName(target, 'country')
     return updateNodeDefProps(
-      { user: { uuid: 'u' }, survey: target, nodeDefUuid: NodeDef.getUuid(nodeDef), parentUuid: 'p', props },
+      {
+        user: { ...UserFactory.createInstance({ email: 'u@arena.test', name: 'u' }), uuid: 'u' },
+        survey: target,
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        parentUuid: 'p',
+        props,
+      },
       fakeClient
     )
   }
