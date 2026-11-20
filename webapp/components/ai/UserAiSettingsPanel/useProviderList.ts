@@ -163,7 +163,6 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     async (entry: AiProviderEntry) => {
       const name = getProviderDisplayName({ entry, t })
       if (!(await confirm({ key: 'userAiSettings:list.removeConfirm', params: { name } }))) return
-      let removed = false
       try {
         if (entry.kind === 'local') {
           if (!(await removeLocalProvider({ id: entry.id, defaultProviderId }))) {
@@ -174,12 +173,12 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
           // the server resets the default when it was this provider
           await API.aiProviders.removeProvider(entry.id)
         }
-        removed = true
       } finally {
         // also when resetting the default failed after the local provider was removed: the list must not go stale
         await refreshAll()
       }
-      if (removed) notifyInfo({ key: 'userAiSettings:list.removed', params: { name } })
+      // reached only when the removal succeeded: a failure returned or threw above
+      notifyInfo({ key: 'userAiSettings:list.removed', params: { name } })
     },
     [confirm, defaultProviderId, notifyError, notifyInfo, refreshAll, t]
   )

@@ -21,7 +21,7 @@ const propose = async (input: object, target: any, ctxOverrides: Record<string, 
 }
 
 const created = (changeSet: ChangeSet | undefined) =>
-  (changeSet?.operations as NodeDefCreateOperation[]).map((op) => op.nodeDef)
+  ((changeSet?.operations ?? []) as NodeDefCreateOperation[]).map((op) => op.nodeDef)
 
 const clusterIn = (cycles: string[]) =>
   withNodeDef(survey, 'cluster', (nodeDef) => NodeDef.assocCycles(cycles)(nodeDef))

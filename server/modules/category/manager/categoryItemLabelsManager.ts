@@ -139,7 +139,7 @@ export const fetchItemsMissingLabels = async (
  * @returns {CategoryItemLabelUpdate} The update.
  */
 const parseUpdate = (raw: unknown, langs: string[]): CategoryItemLabelUpdate => {
-  requireValid(typeof raw === 'object' && raw !== null && !Array.isArray(raw), 'item')
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw categoryItemLabelsInvalid('item')
   const { itemUuid, lang, text, expectedText } = raw as Record<string, unknown>
   requireValid(typeof itemUuid === 'string' && isUuid(itemUuid), 'item')
   requireValid(typeof lang === 'string' && langs.includes(lang), 'lang')

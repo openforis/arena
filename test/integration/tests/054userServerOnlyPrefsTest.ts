@@ -15,7 +15,7 @@ import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'
 import * as SB from '@test/utils/surveyBuilder'
-import { collectRoutes } from '@test/utils/routeUtils'
+import { getRouteHandler } from '@test/utils/routeUtils'
 
 const VICTIM_CIPHERTEXT = 'v2:victim-ciphertext'
 const victimAi = {
@@ -90,8 +90,7 @@ describe('Server-only user prefs (054)', () => {
   })
 
   test('a survey member listing the users of the survey cannot see the AI prefs of another member', async () => {
-    const route = collectRoutes(UserApi.init).find(({ path }) => path === '/survey/:surveyId/users')
-    const handler = route?.handlers.at(-1)
+    const handler = getRouteHandler(UserApi.init, ({ path }) => path === '/survey/:surveyId/users')
     const res = createFakeResponse()
     const next = jest.fn()
     await handler({ params: { surveyId: String(surveyId) }, query: {}, user: attacker }, res, next)
@@ -125,10 +124,10 @@ describe('Server-only user prefs (054)', () => {
 
   test('a user cannot write their own prefs.ai through POST /user/:userUuid/prefs', async () => {
     const attackerUuid = User.getUuid(attacker)
-    const route = collectRoutes(UserApi.init).find(
+    const handler = getRouteHandler(
+      UserApi.init,
       ({ method, path }) => method === 'post' && path === '/user/:userUuid/prefs'
     )
-    const handler = route?.handlers.at(-1)
     const body = {
       ...attacker,
       prefs: { language: 'fr', ai: { providers: [{ id: 'acct:x', apiKeyEncrypted: VICTIM_CIPHERTEXT }] }, aiUsage: {} },

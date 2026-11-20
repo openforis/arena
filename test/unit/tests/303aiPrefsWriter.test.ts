@@ -225,7 +225,7 @@ describe('AI prefs are changed on their latest stored value (303)', () => {
       const snapshot = userWith([legacyProvider(), keyless('acct:b')])
       const { deps, store } = createDeps(snapshot)
       await AiProviderService.removeProvider({ user: snapshot, id: 'acct:b', deps })
-      const [stored] = store.get()?.providers
+      const [stored] = store.get()?.providers ?? []
       expect(SecretBox.isLegacyEnvelope(stored.apiKeyEncrypted)).toBe(false)
       expect(SecretBox.decrypt(stored.apiKeyEncrypted, aadOf(stored))).toBe('sk-old')
       expect(() => SecretBox.decrypt(stored.apiKeyEncrypted, aadOf({ ...stored, id: 'acct:other' }))).toThrow()

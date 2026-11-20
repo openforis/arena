@@ -14,7 +14,7 @@ import { getContextUser } from '../config/context'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-import { collectRoutes } from '@test/utils/routeUtils'
+import { collectRoutes, getRouteHandler } from '@test/utils/routeUtils'
 
 describe('Per-node endpoint: node of another record', () => {
   let survey: any
@@ -41,10 +41,10 @@ describe('Per-node endpoint: node of another record', () => {
 
   // the route handler, run after the permission and qualifier middlewares
   const runNodeHandler = async ({ query = {}, body = {} }: { query?: object; body?: object }) => {
-    const route = collectRoutes(RecordApi.init).find(
+    const handler = getRouteHandler(
+      RecordApi.init,
       ({ method, path }) => method === 'post' && path === '/survey/:surveyId/record/:recordUuid/node'
     )
-    const handler = route?.handlers[route.handlers.length - 1]
     const req: any = {
       params: { surveyId: String(Survey.getId(survey)), recordUuid: Record.getUuid(recordA) },
       query,
