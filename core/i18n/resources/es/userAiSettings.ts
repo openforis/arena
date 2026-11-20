@@ -1,19 +1,19 @@
 export default {
-  title: 'Configuracion de IA',
+  title: 'Configuración de IA',
   section: 'Funciones de IA',
   enableFeatures: 'Habilitar funciones de IA',
-  categoriesSection: 'Niveles de integracion de IA',
+  categoriesSection: 'Niveles de integración de IA',
   categories: {
     chat: 'Chatbot de documentación',
-    chatHint: 'Boton de ayuda flotante que responde preguntas sobre Arena, usando el proveedor de IA configurado.',
-    expressions: 'Generacion y validacion de expresiones',
-    expressionsHint: 'Asistencia de IA para redactar y explicar expresiones de validacion de encuesta.',
-    translation: 'Traduccion de etiquetas',
-    translationHint: 'Traduccion automatica de etiquetas de campos multilingues mediante su proveedor de IA.',
+    chatHint: 'Botón de ayuda flotante que responde preguntas sobre Arena, usando el proveedor de IA configurado.',
+    expressions: 'Generación y validación de expresiones',
+    expressionsHint: 'Asistencia de IA para redactar y explicar expresiones de validación de encuesta.',
+    translation: 'Traducción de etiquetas',
+    translationHint: 'Traducción automática de etiquetas de campos multilingües mediante su proveedor de IA.',
     dataDictionary: 'Diccionario de datos',
     dataDictionaryHint: 'Exportaciones de diccionario de datos redactadas por IA.',
     userActivity: 'Actividad del usuario',
-    userActivityHint: 'Resumenes del registro de actividad generados por IA.',
+    userActivityHint: 'Resúmenes del registro de actividad generados por IA.',
     dataQuery: 'Consultas de datos',
     dataQueryHint: 'Generar consultas del Explorador de datos a partir de una descripción en lenguaje natural.',
   },
@@ -22,7 +22,7 @@ export default {
   sourceUser: 'su proveedor personal',
   'sourceAdmin-default': 'el valor predeterminado de la plataforma',
   notConfigured:
-    'La IA no esta configurada para su cuenta o este despliegue. Configure un proveedor personal a continuacion o contacte al administrador.',
+    'La IA no está configurada para su cuenta o este despliegue. Configure un proveedor personal a continuación o contacte al administrador.',
   encryptionMissing:
     'En el despliegue falta AI_USER_KEY_ENCRYPTION_SECRET; las claves API personales no se pueden guardar hasta que un administrador lo configure.',
 
@@ -49,23 +49,23 @@ export default {
   location: 'Ubicación',
   locationHint: 'Región de Google Cloud (p. ej. europe-west1). Deje en blanco para usar el endpoint global.',
   vercelAiSdkHint:
-    'Un endpoint de chat de Vercel AI SDK se trata como un agente fijo: la seleccion de modelo y la clave API no aplican. La generacion de texto libre funciona; las funciones de salida estructurada pueden no funcionar.',
+    'Un endpoint de chat de Vercel AI SDK se trata como un agente fijo: la selección de modelo y la clave API no aplican. La generación de texto libre funciona; las funciones de salida estructurada pueden no funcionar.',
   fetchModels: 'Obtener modelos',
   fetchingModels: 'Obteniendo modelos...',
   modelsFetchFailed: 'No se pudieron obtener los modelos del proveedor.',
 
   save: 'Guardar',
-  testConnection: 'Probar conexion',
+  testConnection: 'Probar conexión',
   clear: 'Limpiar',
 
-  testing: 'Probando conexion...',
-  testOk: 'Conexion correcta ({{latencyMs}} ms).',
+  testing: 'Probando conexión...',
+  testOk: 'Conexión correcta ({{latencyMs}} ms).',
   testFailed: 'Fallo de conexión.',
   errorAuthHint: 'Compruebe que la clave API sea válida y esté habilitada para este proveedor.',
   showDetails: 'Mostrar detalles',
   hideDetails: 'Ocultar detalles',
 
-  savedSuccessfully: 'Configuracion de IA guardada.',
-  saveFailed: 'Error al guardar la configuracion de IA: {{message}}',
+  savedSuccessfully: 'Configuración de IA guardada.',
+  saveFailed: 'Error al guardar la configuración de IA: {{message}}',
   cleared: 'Se eliminaron las configuraciones personales de IA.',
 }

@@ -12,6 +12,19 @@ export default {
 
 La primera vez, la cuenta de Google se vincula a su cuenta de Arena por su dirección de correo electrónico: utilice la misma dirección de correo electrónico de su cuenta de Arena. Los usuarios invitados también pueden aceptar la invitación con Google. Vincule o desvincule su cuenta de Google en **Mi perfil > Métodos de inicio de sesión**; el inicio de sesión con correo electrónico y contraseña sigue disponible.`,
     },
+    aiFeatures: {
+      title: 'Asistencia de IA',
+      description: `Active la asistencia de IA en **Mi perfil > Funciones de IA** y elija las funciones que desea usar:
+
+- **Chatbot de documentación**: un botón de ayuda que responde preguntas sobre Arena;
+- **Generación y validación de expresiones**: redacte y explique expresiones en el editor de expresiones;
+- **Traducción de etiquetas**: traduzca las etiquetas de la encuesta a sus otros idiomas (diseñador de formularios);
+- **Diccionario de datos**: exporte un diccionario de datos con descripciones redactadas por la IA (diseñador de formularios);
+- **Actividad del usuario**: resúmenes del registro de actividad (panel de control);
+- **Consultas de datos**: cree consultas del Explorador de datos a partir de una descripción en lenguaje natural.
+
+Arena utiliza el proveedor de IA configurado por el administrador, o su propio proveedor y clave de API (OpenAI, Anthropic, Google Gemini y otros).`,
+    },
     mobileUploadEmailNotification: {
       title: 'Notificación por correo electrónico de los registros cargados desde Arena Mobile',
       description: `En **Información de la encuesta → Seguridad**, marque **Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile**: después de cada carga, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados, sus valores clave, si son nuevos o actualizados, el usuario que los creó, las fechas y el número de errores y advertencias de validación.

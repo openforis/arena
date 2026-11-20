@@ -12,6 +12,19 @@ export default {
 
 The first time, the Google account is linked to your Arena account by its email address: use the same email address as your Arena account. Invited users can accept the invitation with Google too. Link or unlink your Google account in **My profile > Sign-in methods**; email and password login is still available.`,
     },
+    aiFeatures: {
+      title: 'AI assistance',
+      description: `Turn on AI assistance in **My profile > AI features** and choose the features to use:
+
+- **Documentation chatbot**: a help button that answers questions about Arena;
+- **Expression generation & validation**: draft and explain expressions in the expression editor;
+- **Label translation**: translate the survey labels into its other languages (form designer);
+- **Data dictionary**: export a data dictionary with descriptions drafted by AI (form designer);
+- **User activity**: summaries of the activity log (dashboard);
+- **Data queries**: create Data Explorer queries from a plain-language description.
+
+Arena uses the AI provider set by the administrator, or your own provider and API key (OpenAI, Anthropic, Google Gemini and others).`,
+    },
     mobileUploadEmailNotification: {
       title: 'Email notification of the records uploaded from Arena Mobile',
       description: `In **Survey info → Security**, check **Notify survey administrators by email when records are uploaded from Arena Mobile**: after each upload, every survey administrator receives an email listing the uploaded records, with their key values, whether they are new or updated, the user who created them, the dates and the number of validation errors and warnings.

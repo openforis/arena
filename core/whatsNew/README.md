@@ -12,6 +12,7 @@ dismissed yet, and it is always available in Help > What's new.
    - `audience`: `all`, `dataCleanser` (data cleansers, data analysts and survey designers), `surveyAdmin` (survey designer
      features) or `systemAdmin`;
    - `experimental: true` if the feature is visible only with `EXPERIMENTAL_FEATURES=true`;
+   - `aiFeatures: true` if the feature is visible only with `AI_FEATURES_ENABLED=true`;
    - `images` (optional): e.g. `['/img/whats-new/<id>.png']`, stored in `web-resources/img/whats-new/`; more than one
      image is shown in a carousel.
 2. Add `items.<id>.title` and `items.<id>.description` (markdown) to `core/i18n/resources/en/whatsNew.ts`

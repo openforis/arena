@@ -12,6 +12,19 @@ export default {
 
 Beim ersten Mal wird das Google-Konto über seine E-Mail-Adresse mit Ihrem Arena-Konto verknüpft: Verwenden Sie dieselbe E-Mail-Adresse wie für Ihr Arena-Konto. Eingeladene Benutzer können die Einladung auch mit Google annehmen. Verknüpfen oder trennen Sie Ihr Google-Konto unter **Mein Profil > Anmeldemethoden**; die Anmeldung mit E-Mail und Passwort bleibt verfügbar.`,
     },
+    aiFeatures: {
+      title: 'KI-Unterstützung',
+      description: `Aktivieren Sie die KI-Unterstützung unter **Mein Profil > KI-Funktionen** und wählen Sie die gewünschten Funktionen:
+
+- **Dokumentations-Chatbot**: eine Hilfeschaltfläche, die Fragen zu Arena beantwortet;
+- **Ausdruckserzeugung und -prüfung**: Ausdrücke im Ausdruckseditor entwerfen und erklären lassen;
+- **Übersetzung von Bezeichnungen**: die Beschriftungen der Erhebung in ihre anderen Sprachen übersetzen (Formular-Designer);
+- **Datenwörterbuch**: ein Datenwörterbuch mit von der KI entworfenen Beschreibungen exportieren (Formular-Designer);
+- **Benutzeraktivität**: Zusammenfassungen des Aktivitätsprotokolls (Dashboard);
+- **Datenabfragen**: Daten-Explorer-Abfragen aus einer Beschreibung in Alltagssprache erstellen.
+
+Arena verwendet den vom Administrator eingerichteten KI-Anbieter oder Ihren eigenen Anbieter und API-Schlüssel (OpenAI, Anthropic, Google Gemini und andere).`,
+    },
     mobileUploadEmailNotification: {
       title: 'E-Mail-Benachrichtigung bei aus Arena Mobile hochgeladenen Datensätzen',
       description: `Aktivieren Sie unter **Erhebungsinformationen → Sicherheit** die Option **Erhebungsadministratoren per E-Mail benachrichtigen, wenn Datensätze aus Arena Mobile hochgeladen werden**. Nach jedem Upload erhalten alle Erhebungsadministratoren eine E-Mail mit den hochgeladenen Datensätzen, ihren Schlüsselwerten, dem Status „neu“ oder „aktualisiert“, dem Ersteller, den Datumsangaben sowie der Anzahl der Validierungsfehler und Warnungen.

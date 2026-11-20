@@ -12,6 +12,19 @@ export default {
 
 La première fois, le compte Google est associé à votre compte Arena par son adresse e-mail : utilisez la même adresse e-mail que celle de votre compte Arena. Les utilisateurs invités peuvent aussi accepter l'invitation avec Google. Associez ou dissociez votre compte Google dans **Mon profil > Méthodes de connexion** ; la connexion par e-mail et mot de passe reste disponible.`,
     },
+    aiFeatures: {
+      title: 'Assistance IA',
+      description: `Activez l'assistance IA dans **Mon profil > Fonctionnalités IA** et choisissez les fonctionnalités à utiliser :
+
+- **Chatbot de documentation** : un bouton d'aide qui répond aux questions sur Arena ;
+- **Génération et validation d'expressions** : rédigez et expliquez les expressions dans l'éditeur d'expressions ;
+- **Traduction des libellés** : traduisez les libellés de l'enquête dans ses autres langues (concepteur de formulaires) ;
+- **Dictionnaire de données** : exportez un dictionnaire de données avec des descriptions rédigées par l'IA (concepteur de formulaires) ;
+- **Activité utilisateur** : résumés du journal d'activité (tableau de bord) ;
+- **Requêtes de données** : créez des requêtes de l'Explorateur de données à partir d'une description en langage courant.
+
+Arena utilise le fournisseur d'IA configuré par l'administrateur, ou votre propre fournisseur et votre clé d'API (OpenAI, Anthropic, Google Gemini et d'autres).`,
+    },
     mobileUploadEmailNotification: {
       title: 'Notification par e-mail des enregistrements téléversés depuis Arena Mobile',
       description: `Dans **Infos de l'enquête → Sécurité**, cochez **Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile** : après chaque téléversement, chaque administrateur de formulaire reçoit un e-mail avec la liste des enregistrements téléversés, leurs valeurs clés, s'ils sont nouveaux ou mis à jour, l'utilisateur qui les a créés, les dates et le nombre d'erreurs et d'avertissements de validation.

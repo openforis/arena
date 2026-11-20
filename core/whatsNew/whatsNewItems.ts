@@ -20,6 +20,8 @@ export type WhatsNewItem = {
   audience: WhatsNewAudience
   /** When true, the item is visible only if the EXPERIMENTAL_FEATURES env variable is set. */
   experimental?: boolean
+  /** When true, the item is visible only if AI features are enabled on the server (AI_FEATURES_ENABLED). */
+  aiFeatures?: boolean
   /** Optional image paths (e.g. '/img/whats-new/<id>.png', stored in web-resources/img/whats-new), shown in a carousel when more than one. */
   images?: string[]
 }
@@ -31,6 +33,20 @@ export const whatsNewItems: WhatsNewItem[] = [
     version: '3.0.0',
     audience: whatsNewAudiences.all,
     images: ['/img/whats-new/googleSignIn.png'],
+  },
+  {
+    id: 'aiFeatures',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    aiFeatures: true,
+    images: ['/img/whats-new/aiFeatures.png'],
+  },
+  {
+    id: 'dataQueryAiGenerate',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    aiFeatures: true,
+    images: ['/img/whats-new/dataQueryAiGenerate.png'],
   },
   {
     id: 'odkImport',
@@ -133,13 +149,6 @@ export const whatsNewItems: WhatsNewItem[] = [
     version: '2.9.5',
     audience: whatsNewAudiences.systemAdmin,
     images: ['/img/whats-new/systemLogs.png'],
-  },
-  {
-    id: 'dataQueryAiGenerate',
-    version: '2.9.4',
-    audience: whatsNewAudiences.all,
-    experimental: true,
-    images: ['/img/whats-new/dataQueryAiGenerate.png'],
   },
   { id: 'recordPrint', version: '2.9.0', audience: whatsNewAudiences.all, images: ['/img/whats-new/recordPrint.png'] },
   {

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import * as WhatsNew from '@core/whatsNew/whatsNew'
 
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useSystemConfigAiFeaturesEnabled, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
 
 /**
@@ -14,7 +14,11 @@ import { UserActions, useUser } from '@webapp/store/user'
 export const useWhatsNewVisibleItems = (): WhatsNew.WhatsNewItem[] => {
   const user = useUser()
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  return useMemo(() => WhatsNew.getVisibleItems({ user, experimentalFeatures }), [experimentalFeatures, user])
+  const aiFeaturesEnabled = useSystemConfigAiFeaturesEnabled()
+  return useMemo(
+    () => WhatsNew.getVisibleItems({ user, experimentalFeatures, aiFeaturesEnabled }),
+    [aiFeaturesEnabled, experimentalFeatures, user]
+  )
 }
 
 /**
@@ -26,10 +30,11 @@ export const useWhatsNewUnseenItems = () => {
   const dispatch = useDispatch()
   const user = useUser()
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
+  const aiFeaturesEnabled = useSystemConfigAiFeaturesEnabled()
 
   const unseenItems = useMemo(
-    () => (user ? WhatsNew.getUnseenItems({ user, experimentalFeatures }) : []),
-    [experimentalFeatures, user]
+    () => (user ? WhatsNew.getUnseenItems({ user, experimentalFeatures, aiFeaturesEnabled }) : []),
+    [aiFeaturesEnabled, experimentalFeatures, user]
   )
 
   const markItemsAsSeen = useCallback(
