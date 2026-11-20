@@ -1640,7 +1640,6 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
     },
     unavailable: {
       noSurvey: 'Öffnen Sie eine Erhebung, um diesen Bereich zu verwenden.',
-      noPermission: 'Sie benötigen die Berechtigung zum Bearbeiten der Erhebung.',
       policy: 'Die KI-Richtlinie der Erhebung erlaubt den konfigurierten KI-Anbieter nicht.',
     },
     menu: {

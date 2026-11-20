@@ -116,7 +116,7 @@ export const getHelpAreaStatus = ({
  * @param {boolean} params.hasDraftSurvey - The draft survey definitions are loaded.
  * @param {AiFeatureAvailability} params.availability - Availability of the assistantDesign feature (B).
  * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
- * @returns {AssistantAreaStatus} The status.
+ * @returns {AssistantAreaStatus} The status: hidden when the user cannot edit the survey.
  */
 export const getDesignAreaStatus = ({
   categoryEnabled,
@@ -135,11 +135,27 @@ export const getDesignAreaStatus = ({
 }): AssistantAreaStatus => {
   if (!categoryEnabled) return hidden('design')
   if (!surveyOpen) return unavailable('design', ['aiAssistant.unavailable.noSurvey'])
-  if (!canEditSurvey) return unavailable('design', ['aiAssistant.unavailable.noPermission'])
+  // hidden like Analysis and Cleaning without their permission (a data editor sees only Help)
+  if (!canEditSurvey) return hidden('design')
   // the designer loads the draft definitions for editors only (survey/actions/active.js)
   if (!hasDraftSurvey) return unavailable('design', ['aiAssistant.unavailable.noSurvey'])
   return fromAvailability('design', availability, canSwitchProvider)
 }
+
+/**
+ * Returns the areas with a tab (not hidden), in tab order.
+ * @param {AssistantAreaStatus[]} statuses - Area statuses.
+ * @returns {AssistantArea[]} The areas.
+ */
+export const getTabAreas = (statuses: AssistantAreaStatus[]): AssistantArea[] =>
+  statuses.filter((status) => status.status !== 'hidden').map((status) => status.area)
+
+/**
+ * Returns true when the tab bar is shown: a single tab (e.g. only Help) has nothing to switch to.
+ * @param {AssistantArea[]} tabAreas - Areas with a tab.
+ * @returns {boolean} True with two tabs or more.
+ */
+export const isTabBarShown = (tabAreas: AssistantArea[]): boolean => tabAreas.length > 1
 
 /**
  * Returns true when the panel button is shown (at least one area not hidden).

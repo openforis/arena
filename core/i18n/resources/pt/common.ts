@@ -1630,7 +1630,6 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     },
     unavailable: {
       noSurvey: 'Abra um inventário para usar esta área.',
-      noPermission: 'Você precisa de permissão para editar o inventário.',
       policy: 'A política de IA do inventário não permite o provedor de IA configurado.',
     },
     menu: {

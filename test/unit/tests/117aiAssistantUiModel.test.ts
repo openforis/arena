@@ -9,7 +9,9 @@ import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import {
   getDesignAreaStatus,
   getHelpAreaStatus,
+  getTabAreas,
   isAssistantShown,
+  isTabBarShown,
   parseAppPath,
   pickArea,
   type AssistantAreaStatus,
@@ -127,10 +129,12 @@ describe('assistant areas', () => {
     expect(getDesignAreaStatus({ ...base, categoryEnabled: false }).status).toBe('hidden')
     const noSurvey = { ...base, surveyOpen: false, canEditSurvey: false, hasDraftSurvey: false, availability: disabled }
     expect(getDesignAreaStatus(noSurvey).reasonKeys).toEqual(['aiAssistant.unavailable.noSurvey'])
-    // a viewer of a published survey: no permission (not "no survey")
-    expect(getDesignAreaStatus({ ...base, canEditSurvey: false, hasDraftSurvey: false }).reasonKeys).toEqual([
-      'aiAssistant.unavailable.noPermission',
-    ])
+    // a user who cannot edit the survey (e.g. a data editor): hidden, like Analysis and Cleaning
+    expect(getDesignAreaStatus({ ...base, canEditSurvey: false, hasDraftSurvey: false })).toEqual({
+      area: 'design',
+      status: 'hidden',
+      reasonKeys: [],
+    })
     expect(getDesignAreaStatus({ ...base, hasDraftSurvey: false }).reasonKeys).toEqual([
       'aiAssistant.unavailable.noSurvey',
     ])
@@ -138,6 +142,26 @@ describe('assistant areas', () => {
       getDesignAreaStatus({ ...base, availability: { status: 'policyBlocked', location } as any }).reasonKeys
     ).toEqual(['aiAssistant.unavailable.policy'])
     expect(getDesignAreaStatus(base).status).toBe('available')
+  })
+
+  test('the tab bar is shown only with two tabs or more', () => {
+    const statuses: AssistantAreaStatus[] = [
+      { area: 'design', status: 'hidden', reasonKeys: [] },
+      { area: 'analysis', status: 'hidden', reasonKeys: [] },
+      { area: 'cleaning', status: 'hidden', reasonKeys: [] },
+      { area: 'help', status: 'available', reasonKeys: [] },
+    ]
+    expect(getTabAreas(statuses)).toEqual(['help'])
+    expect(isTabBarShown(getTabAreas(statuses))).toBe(false)
+    expect(pickArea({ statuses, panelOpen: false, current: null, userSelectedArea: null, module: 'designer' })).toBe(
+      'help'
+    )
+    const withDesign: AssistantAreaStatus[] = [
+      { area: 'design', status: 'unavailable', reasonKeys: ['aiAssistant.unavailable.noSurvey'] },
+      ...statuses.slice(1),
+    ]
+    expect(getTabAreas(withDesign)).toEqual(['design', 'help'])
+    expect(isTabBarShown(getTabAreas(withDesign))).toBe(true)
   })
 
   test('pickArea and isAssistantShown', () => {

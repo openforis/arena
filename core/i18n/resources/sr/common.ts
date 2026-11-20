@@ -1667,7 +1667,6 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
     },
     unavailable: {
       noSurvey: 'Otvorite istraživanje da biste koristili ovu oblast.',
-      noPermission: 'Potrebna vam je dozvola za uređivanje istraživanja.',
       policy: 'AI politika istraživanja ne dozvoljava konfigurisanog AI provajdera.',
     },
     menu: {

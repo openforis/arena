@@ -1507,7 +1507,6 @@ $t(common.appNameFull)
     },
     unavailable: {
       noSurvey: 'Abra una encuesta para usar esta área.',
-      noPermission: 'Necesita permiso para editar la encuesta.',
       policy: 'La política de IA de la encuesta no permite el proveedor de IA configurado.',
     },
     menu: {
