@@ -136,5 +136,5 @@ export const proposeQueryTool: AiTool<ProposeQueryInput, unknown> = {
   dataClass: 'schema',
   requires: canViewCurrentSurvey,
   // synchronous work: a throw still becomes a rejection, as with an async function
-  execute: (input, ctx) => new Promise((resolve) => resolve(proposeQuery(input, ctx))),
+  execute: (input, ctx) => Promise.resolve().then(() => proposeQuery(input, ctx)),
 }

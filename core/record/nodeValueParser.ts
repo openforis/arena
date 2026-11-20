@@ -475,8 +475,10 @@ const headersOf = (nodeDef: any): string[] => [NodeDef.getName(nodeDef)]
  * @param {NodeValueInput} input - The input.
  * @returns {string} The text.
  */
-const inputToText = (input: NodeValueInput): string =>
-  typeof input === 'object' && input !== null ? JSON.stringify(input) : String(input)
+const inputToText = (input: NodeValueInput): string => {
+  if (input === null) return 'null'
+  return typeof input === 'object' ? JSON.stringify(input) : String(input)
+}
 
 /**
  * Converts a scalar to text; any other value (object, array, missing) becomes an empty string.

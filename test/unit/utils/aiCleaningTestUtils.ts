@@ -111,7 +111,7 @@ export const newFakeCleaningApi = (overrides: Partial<Record<keyof CleaningApi, 
         calls.push({ name, params })
         const impl = overrides[name]
         // like an async function: a throwing implementation rejects
-        return new Promise((resolve) => resolve(impl ? impl(params) : null))
+        return Promise.resolve().then(() => (impl ? impl(params) : null))
       },
     ])
   ) as unknown as CleaningApi

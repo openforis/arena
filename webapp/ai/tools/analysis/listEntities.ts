@@ -133,5 +133,5 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
   dataClass: 'schema',
   requires: canViewCurrentSurvey,
   // synchronous work: a throw still becomes a rejection, as with an async function
-  execute: (input, ctx) => new Promise((resolve) => resolve(listEntities(input, ctx))),
+  execute: (input, ctx) => Promise.resolve().then(() => listEntities(input, ctx)),
 }

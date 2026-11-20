@@ -139,5 +139,5 @@ export const proposeMapLayerTool: AiTool<ProposeMapLayerInput, unknown> = {
   requires: (ctx: AiToolContext) =>
     canViewCurrentSurvey(ctx) && Authorizer.canUseMap(ctx.user, Survey.getSurveyInfo(ctx.survey)),
   // synchronous work: a throw still becomes a rejection, as with an async function
-  execute: (input, ctx) => new Promise((resolve) => resolve(proposeMapLayer(input, ctx))),
+  execute: (input, ctx) => Promise.resolve().then(() => proposeMapLayer(input, ctx)),
 }
