@@ -12,14 +12,6 @@ export default {
 
 La première fois, le compte Google est associé à votre compte Arena par son adresse e-mail : utilisez la même adresse e-mail que celle de votre compte Arena. Les utilisateurs invités peuvent aussi accepter l'invitation avec Google. Associez ou dissociez votre compte Google dans **Mon profil > Méthodes de connexion** ; la connexion par e-mail et mot de passe reste disponible.`,
     },
-    loginProviders: {
-      title: 'Connexion avec Google, Microsoft ou le compte de votre organisation',
-      description: `Dans **Administration du système > Fournisseurs de connexion**, permettez aux utilisateurs de se connecter avec **Google**, **Microsoft** ou tout fournisseur **OpenID Connect** (par ex. Keycloak, Okta ou l'authentification unique de votre organisation) : chaque fournisseur a un bouton sur la page de connexion. Le formulaire du fournisseur indique l'URI de redirection à enregistrer chez le fournisseur, les étapes de configuration et un lien vers un guide détaillé ; **Tester la connexion** et **Tester la connexion utilisateur** vérifient la configuration sans connecter personne.
-
-Seuls les utilisateurs qui ont déjà un compte Arena ou une invitation peuvent se connecter : la première fois, le compte est associé par son adresse e-mail vérifiée. Les utilisateurs invités peuvent accepter l'invitation avec un fournisseur au lieu de choisir un mot de passe, et chaque utilisateur peut lier ou délier des fournisseurs dans **Mon profil > Méthodes de connexion**. La connexion par e-mail et mot de passe reste toujours disponible.
-
-Le serveur a besoin des variables d'environnement \`ARENA_PUBLIC_URL\` et \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` (voir \`.env.template\`).`,
-    },
     mobileUploadEmailNotification: {
       title: 'Notification par e-mail des enregistrements téléversés depuis Arena Mobile',
       description: `Dans **Infos de l'enquête → Sécurité**, cochez **Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile** : après chaque téléversement, chaque administrateur de formulaire reçoit un e-mail avec la liste des enregistrements téléversés, leurs valeurs clés, s'ils sont nouveaux ou mis à jour, l'utilisateur qui les a créés, les dates et le nombre d'erreurs et d'avertissements de validation.

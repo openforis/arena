@@ -33,12 +33,6 @@ export const whatsNewItems: WhatsNewItem[] = [
     images: ['/img/whats-new/googleSignIn.png'],
   },
   {
-    id: 'loginProviders',
-    version: '3.0.0',
-    audience: whatsNewAudiences.systemAdmin,
-    images: ['/img/whats-new/loginProviders.png', '/img/whats-new/loginProvidersAdmin.png'],
-  },
-  {
     id: 'odkImport',
     version: '3.0.0',
     audience: whatsNewAudiences.surveyAdmin,

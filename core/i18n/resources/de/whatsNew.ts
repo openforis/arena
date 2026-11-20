@@ -12,14 +12,6 @@ export default {
 
 Beim ersten Mal wird das Google-Konto über seine E-Mail-Adresse mit Ihrem Arena-Konto verknüpft: Verwenden Sie dieselbe E-Mail-Adresse wie für Ihr Arena-Konto. Eingeladene Benutzer können die Einladung auch mit Google annehmen. Verknüpfen oder trennen Sie Ihr Google-Konto unter **Mein Profil > Anmeldemethoden**; die Anmeldung mit E-Mail und Passwort bleibt verfügbar.`,
     },
-    loginProviders: {
-      title: 'Mit Google, Microsoft oder dem Konto Ihrer Organisation anmelden',
-      description: `Unter **Systemverwaltung > Anmeldeanbieter** können Sie Benutzern die Anmeldung mit **Google**, **Microsoft** oder einem beliebigen **OpenID-Connect-Anbieter** (z. B. Keycloak, Okta oder dem Single Sign-on Ihrer Organisation) ermöglichen. Jeder Anbieter erhält eine Schaltfläche auf der Anmeldeseite. Das Anbieterformular zeigt die beim Anbieter zu registrierende Weiterleitungs-URI, die Einrichtungsschritte und einen Link zu einer ausführlichen Anleitung. Mit **Verbindung testen** und **Anmeldung testen** lässt sich die Konfiguration prüfen, ohne jemanden anzumelden.
-
-Nur Benutzer, die bereits ein Arena-Konto oder eine Einladung besitzen, können sich anmelden. Bei der ersten Anmeldung wird das Konto anhand der bestätigten E-Mail-Adresse zugeordnet. Eingeladene Benutzer können die Einladung über einen Anbieter annehmen, anstatt ein Passwort festzulegen. Jeder Benutzer kann unter **Mein Profil > Anmeldemethoden** Anbieter verknüpfen oder entfernen. Die Anmeldung mit E-Mail-Adresse und Passwort bleibt immer verfügbar.
-
-Auf dem Server müssen die Umgebungsvariablen \`ARENA_PUBLIC_URL\` und \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` gesetzt sein (siehe \`.env.template\`).`,
-    },
     mobileUploadEmailNotification: {
       title: 'E-Mail-Benachrichtigung bei aus Arena Mobile hochgeladenen Datensätzen',
       description: `Aktivieren Sie unter **Erhebungsinformationen → Sicherheit** die Option **Erhebungsadministratoren per E-Mail benachrichtigen, wenn Datensätze aus Arena Mobile hochgeladen werden**. Nach jedem Upload erhalten alle Erhebungsadministratoren eine E-Mail mit den hochgeladenen Datensätzen, ihren Schlüsselwerten, dem Status „neu“ oder „aktualisiert“, dem Ersteller, den Datumsangaben sowie der Anzahl der Validierungsfehler und Warnungen.
