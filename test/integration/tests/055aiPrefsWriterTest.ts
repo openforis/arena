@@ -237,7 +237,7 @@ describe('AI prefs writer (055)', () => {
     const old = { ...keyless('acct:old'), type: 'openai', baseUrl: null, apiKeyEncrypted: legacyEnvelope('sk-old') }
     await writeAiPrefs({ userUuid: uuid(), aiPrefs: { accessLevel: 1, providers: [old] } })
     await AiProviderService.upgradeLegacyProviderKeys({ user: await loadRequestUser() })
-    const [stored] = (await readAiPrefs({ userUuid: uuid() }))?.providers
+    const [stored] = (await readAiPrefs({ userUuid: uuid() }))?.providers ?? []
     expect(SecretBox.isLegacyEnvelope(stored.apiKeyEncrypted)).toBe(false)
     const aad = buildKeyAad({ userUuid: uuid(), provider: stored })
     expect(SecretBox.decrypt(stored.apiKeyEncrypted, aad)).toBe('sk-old')
@@ -279,7 +279,7 @@ describe('AI prefs writer (055)', () => {
         aiPrefs: { accessLevel: 1, providers: [providerWith(copiedKey), { ...providerWith(unique), id: 'acct:own' }] },
       })
       await AiProviderService.upgradeLegacyProviderKeys({ user: await loadRequestUser() })
-      const [shared, own] = (await readAiPrefs({ userUuid: uuid() }))?.providers
+      const [shared, own] = (await readAiPrefs({ userUuid: uuid() }))?.providers ?? []
       expect(shared.apiKeyEncrypted).toBeNull()
       expect(SecretBox.isLegacyEnvelope(own.apiKeyEncrypted)).toBe(false)
       expect(SecretBox.decrypt(own.apiKeyEncrypted, buildKeyAad({ userUuid: uuid(), provider: own }))).toBe('sk-unique')
@@ -293,8 +293,8 @@ describe('AI prefs writer (055)', () => {
         aiPrefs: { accessLevel: 1, providers: [providerWith(copiedKey), { ...providerWith(unique), id: 'acct:own' }] },
       })
       expect(await removeCopiedLegacyKeys()).toBeGreaterThanOrEqual(2)
-      expect((await readAiPrefs({ userUuid: User.getUuid(other) }))?.providers[0].apiKeyEncrypted).toBeNull()
-      const [shared, own] = (await readAiPrefs({ userUuid: uuid() }))?.providers
+      expect((await readAiPrefs({ userUuid: User.getUuid(other) }))?.providers?.[0]?.apiKeyEncrypted).toBeNull()
+      const [shared, own] = (await readAiPrefs({ userUuid: uuid() }))?.providers ?? []
       expect(shared.apiKeyEncrypted).toBeNull()
       expect(own.apiKeyEncrypted).toBe(unique)
     })

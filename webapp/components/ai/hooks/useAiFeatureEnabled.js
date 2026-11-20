@@ -69,7 +69,7 @@ export const useAiFeatureEnabled = (category) => {
   useEffect(() => {
     const unsubscribe = settingsCache.subscribe(() => forceRender())
     // after a fetch that failed for a reason that may pass, the next consumer that mounts asks again
-    if (aiFeaturesEnabledInSystemConfig && userUuid) settingsCache.fetchOnce()
+    if (aiFeaturesEnabledInSystemConfig && userUuid) void settingsCache.fetchOnce()
     return unsubscribe
   }, [aiFeaturesEnabledInSystemConfig, userUuid])
 

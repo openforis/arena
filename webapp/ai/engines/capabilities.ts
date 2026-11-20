@@ -293,7 +293,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     const probes = isAiOff(nextSettings)
       ? localProviders.map(() => null)
       : await Promise.all(
-          localProviders.map((provider) =>
+          localProviders.map(async (provider) =>
             // an invalid address is never called
             provider.addressInvalid
               ? null

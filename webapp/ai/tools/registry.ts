@@ -111,6 +111,19 @@ const withStringsAsLists = (input: unknown, issues: z.core.$ZodIssue[]): unknown
 const mergedKey = /^(\w+)[^\w[]*(\[.*\]),(\w+)$/s
 
 /**
+ * Drops the double quotes at the start and end of the text (without a regex: /"+$/ backtracks on many quotes).
+ * @param {string} text - Text.
+ * @returns {string} The text without the surrounding quotes.
+ */
+const trimQuotes = (text: string): string => {
+  let start = 0
+  let end = text.length
+  while (start < end && text[start] === '"') start++
+  while (end > start && text[end - 1] === '"') end--
+  return text.slice(start, end)
+}
+
+/**
  * Returns a copy of the input with the keys a small model garbles repaired, at any depth: stray quotes around a
  * name are dropped, and a key holding two arguments (name=[...],other) is split in the two.
  * @param {unknown} input - Raw input from the model.
@@ -121,7 +134,7 @@ const withKeysRepaired = (input: unknown): unknown => {
   if (!input || typeof input !== 'object') return input
   const fixed: Record<string, unknown> = {}
   for (const [rawKey, rawValue] of Object.entries(input)) {
-    const key = rawKey.replace(/^"+|"+$/g, '')
+    const key = trimQuotes(rawKey)
     const value = withKeysRepaired(rawValue)
     const [, name, json, other] = mergedKey.exec(key) ?? []
     try {

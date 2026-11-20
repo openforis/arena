@@ -211,12 +211,10 @@ export const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate)
     }
     draft = applyOperationToSurvey(draft, op)
     const uuid = getOperationNodeDefUuid(op)
-    if (!firstOperationByUuid.has(uuid)) firstOperationByUuid.set(uuid, index)
     // the expressions of the node defs depending on a renamed one use the old name: validate them too
-    if (isRename(op)) {
-      for (const dependentUuid of Survey.getNodeDefDependentsUuids(uuid)(draft)) {
-        if (!firstOperationByUuid.has(dependentUuid)) firstOperationByUuid.set(dependentUuid, index)
-      }
+    const dependentUuids: string[] = isRename(op) ? Survey.getNodeDefDependentsUuids(uuid)(draft) : []
+    for (const touchedUuid of [uuid, ...dependentUuids]) {
+      if (!firstOperationByUuid.has(touchedUuid)) firstOperationByUuid.set(touchedUuid, index)
     }
   }
   return { draft, issues, firstOperationByUuid }
