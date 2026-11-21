@@ -35,6 +35,12 @@ export const whatsNewItems: WhatsNewItem[] = [
     images: ['/img/whats-new/googleSignIn.png'],
   },
   {
+    id: 'twoFactorAuth',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    images: ['/img/whats-new/twoFactorAuth.png'],
+  },
+  {
     id: 'aiFeatures',
     version: '3.0.0',
     audience: whatsNewAudiences.all,

@@ -34,13 +34,13 @@ const getSecurityVisibility = ({
   loggedInUserSystemAdmin,
   userUuid,
 }): SignInSecuritySectionVisibility => {
-  const { canEdit, canManageTwoFactorDevices, userToUpdate } = editUser
+  const { canEdit, userToUpdate } = editUser
   return {
     passwordForm: !userUuid,
     signInMethods:
       Boolean(userUuid) && User.hasAccepted(userToUpdate) && (editingLoggedInUser || loggedInUserSystemAdmin),
     changePassword: canEdit && Boolean(userUuid),
-    twoFactorDevices: editingLoggedInUser && canManageTwoFactorDevices,
+    twoFactorDevices: editingLoggedInUser,
   }
 }
 
