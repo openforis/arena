@@ -1,7 +1,8 @@
+import type { Writable } from 'node:stream'
 import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { ExtraPropDef, type ExtraPropDefItem } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { FileFormats } from '@core/fileFormats'
 import { parsePoint } from '@core/survey/categoryItemPointParser'
@@ -13,11 +14,17 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
 
-const transformGeometryPointExtraProperty = ({ extraDef, obj }: { extraDef: any; obj: any }) => {
+const transformGeometryPointExtraProperty = ({
+  extraDef,
+  obj,
+}: {
+  extraDef: ExtraPropDefItem
+  obj: Record<string, unknown>
+}) => {
   // split geometry point into separate columns
   const extraDefName = ExtraPropDef.getName(extraDef)
   const geometryPoint = obj[extraDefName]
-  const point = parsePoint(geometryPoint)
+  const point = parsePoint(geometryPoint as string | null | undefined)
   delete obj[extraDefName]
   if (point) {
     obj[extraDefName + '_x'] = point.x
@@ -56,13 +63,13 @@ const getCategoryExportHeaders = ({
   includeCumulativeArea = false,
 }: {
   category: ArenaCategory
-  languages?: any
-  language?: any
+  languages?: string[]
+  language?: string
   includeUuid?: boolean
-  includeSingleCode?: any
-  includeCodeJoint?: any
-  includeLevelPosition?: any
-  includeCumulativeArea?: any
+  includeSingleCode?: boolean
+  includeCodeJoint?: boolean
+  includeLevelPosition?: boolean
+  includeCumulativeArea?: boolean
 }) => {
   const levels = Category.getLevelsArray(category)
   const flat = levels.length === 1
@@ -113,13 +120,13 @@ export const exportCategoryToStream = async (
     survey: ArenaSurvey
     categoryUuid: string
     draft?: boolean
-    language?: any
+    language?: string
     includeUuid?: boolean
-    includeSingleCode?: any
-    includeCodeJoint?: any
-    includeLevelPosition?: any
-    includeReportingDataCumulativeArea?: any
-    outputStream: any
+    includeSingleCode?: boolean
+    includeCodeJoint?: boolean
+    includeLevelPosition?: boolean
+    includeReportingDataCumulativeArea?: boolean
+    outputStream: Writable
     fileFormat?: string
   },
   client: DbClient = db

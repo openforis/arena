@@ -100,7 +100,7 @@ export const getFilesStatistics = A.propOr({}, keys.filesStatistics)
 
 export const getActivityLogSize = A.propOr(-1, keys.activityLogSize)
 
-export const getLanguages = ObjectUtils.getProp(keys.languages, [])
+export const getLanguages = ObjectUtils.getProp<string[]>(keys.languages, [])
 
 export const getDefaultLanguage = A.pipe(getLanguages, A.head)
 

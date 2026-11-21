@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream'
 import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
@@ -34,7 +35,7 @@ const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns
 }, {})
 
 // column name ends with x, y or srs and there are other columns with the other prefixes
-const _getGeometryPointTypeItemName = ({ columnName }: { columnName: any }) => {
+const _getGeometryPointTypeItemName = ({ columnName }: { columnName: string }) => {
   const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
   if (locationColSuffix) {
     return StringUtils.removeSuffix(locationColSuffix)(columnName)
@@ -42,10 +43,10 @@ const _getGeometryPointTypeItemName = ({ columnName }: { columnName: any }) => {
   return null
 }
 
-const _getGeometryPointTypeColumnNames = ({ itemName }: { itemName: any }) =>
+const _getGeometryPointTypeColumnNames = ({ itemName }: { itemName: string }) =>
   locationColumnsSuffixes.map((suffix) => itemName + suffix)
 
-const _isGeometryPointType = ({ columnName, columnNames }: { columnName: any; columnNames: any }) => {
+const _isGeometryPointType = ({ columnName, columnNames }: { columnName: string; columnNames: string[] }) => {
   if (!locationColumnsSuffixes.some((suffix) => columnName.endsWith(suffix))) {
     return false
   }
@@ -59,9 +60,9 @@ const _extractColumnTypeByName = ({
   columnPatterns,
   ignoreLabelsAndDescriptions = false,
 }: {
-  columnName: any
-  columnPatterns: any
-  ignoreLabelsAndDescriptions?: any
+  columnName: string
+  columnPatterns: Record<string, RegExp>
+  ignoreLabelsAndDescriptions?: boolean
 }) => {
   // try to find column type by matching one of the column patterns
   const columnType = Object.keys(columnPatterns).find((type) => columnPatterns[type].test(columnName))
@@ -77,12 +78,12 @@ const _extractLevelName = ({
   columnName,
   columnType,
 }: {
-  columnPatterns: any
-  columnName: any
-  columnType: any
+  columnPatterns: Record<string, RegExp>
+  columnName: string
+  columnType: string
 }) => {
   const pattern = columnPatterns[columnType]
-  const match = columnName.match(pattern)
+  const match = pattern.exec(columnName)
   // normalized like the names entered in the category editor (level names are validated before saving)
   return match[1] ? StringUtils.normalizeName(match[1]) : defaultLevelName
 }
@@ -93,18 +94,18 @@ const _extractLang = ({
   columnType,
   defaultLang,
 }: {
-  columnPatterns: any
-  columnName: any
-  columnType: any
-  defaultLang: any
+  columnPatterns: Record<string, RegExp>
+  columnName: string
+  columnType: string
+  defaultLang: string
 }) => {
   const pattern = columnPatterns[columnType]
-  const match = columnName.match(pattern)
+  const match = pattern.exec(columnName)
   const lang = match[2]
   return lang || defaultLang
 }
 
-const _validateSummary = (summary: any) => {
+const _validateSummary = (summary: CategoryImportSummary.CategoryImportSummary) => {
   const items = CategoryImportSummary.getItems(summary)
   const atLeastOneCodeColumn = items.some(CategoryImportSummary.isItemCode)
   if (!atLeastOneCodeColumn) {
@@ -112,7 +113,7 @@ const _validateSummary = (summary: any) => {
   }
 }
 
-const _determineDataType = ({ isExtra, isGeometryPointType }: { isExtra: any; isGeometryPointType: any }) => {
+const _determineDataType = ({ isExtra, isGeometryPointType }: { isExtra: boolean; isGeometryPointType: boolean }) => {
   if (!isExtra) return null
 
   return isGeometryPointType ? ExtraPropDef.dataTypes.geometryPoint : ExtraPropDef.dataTypes.text
@@ -125,11 +126,11 @@ export const createImportSummaryFromColumnNames = ({
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }: {
-  columnNames: any
-  defaultLang: any
-  itemsCount?: any
-  codeColumnPattern?: any
-  ignoreLabelsAndDescriptions?: any
+  columnNames: string[]
+  defaultLang: string
+  itemsCount?: number
+  codeColumnPattern?: RegExp
+  ignoreLabelsAndDescriptions?: boolean
 }) => {
   if (A.find(StringUtils.isBlank)(columnNames)) {
     throw new SystemError(Validation.messageKeys.categoryImport.emptyHeaderFound)
@@ -218,11 +219,11 @@ export const createImportSummaryFromStream = async ({
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }: {
-  stream: any
+  stream: Readable
   fileFormat?: string
-  defaultLang: any
-  codeColumnPattern?: any
-  ignoreLabelsAndDescriptions?: any
+  defaultLang: string
+  codeColumnPattern?: RegExp
+  ignoreLabelsAndDescriptions?: boolean
 }) => {
   let columnNames = []
   let rowsCount = 0
@@ -254,7 +255,7 @@ export const createImportSummary = async ({
 }: {
   filePath: string
   fileFormat: string
-  defaultLang: any
+  defaultLang: string
 }) => {
   const summary = await createImportSummaryFromStream({
     stream: fs.createReadStream(filePath),

@@ -12,7 +12,7 @@ const shouldItemIndexBeInitialized = (item: ArenaCategoryItem) => item && Object
 const isIndexable = ({ item, draft }: { item: ArenaCategoryItem; draft: boolean }) =>
   (draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))
 
-const itemsSortFunction = (itemA: any, itemB: any) => {
+const itemsSortFunction = (itemA: ArenaCategoryItem, itemB: ArenaCategoryItem) => {
   const indexA = CategoryItem.getIndex(itemA)
   const indexB = CategoryItem.getIndex(itemB)
 

@@ -170,7 +170,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
 }: {
   surveyId: number
   draft: boolean
-  includeValidation: any
+  includeValidation: boolean
   backup?: boolean
   offset?: number
   limit?: number | null
@@ -274,7 +274,7 @@ export const fetchCategoriesBySurveyId = (
   }: {
     surveyId: number
     draft?: boolean
-    includeValidation?: any
+    includeValidation?: boolean
     offset?: number
     limit?: number | null
     search?: string | null
@@ -318,7 +318,7 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
   }: {
     surveyId: number
     draft?: boolean
-    includeValidation?: any
+    includeValidation?: boolean
     backup?: boolean
     offset?: number
     limit?: number | null
@@ -344,7 +344,7 @@ export const fetchCategoryAndLevelsByUuid = async (
     draft = false,
     includeValidation = false,
     backup = false,
-  }: { surveyId: number; categoryUuid: string; draft?: boolean; includeValidation?: any; backup?: boolean },
+  }: { surveyId: number; categoryUuid: string; draft?: boolean; includeValidation?: boolean; backup?: boolean },
   client: DbClient = db
 ) => {
   const { categories } = await client.one(
@@ -400,7 +400,7 @@ const getWhereConditionItemsWithLevelParentAndCode = ({
 }: {
   draft: boolean
   parentUuid?: string
-  tableAlias?: any
+  tableAlias?: string
 }) => {
   const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, `${tableAlias}.`, true)
   return `${tableAlias}.level_uuid = $/levelUuid/ 
@@ -456,7 +456,12 @@ export const fetchItemsByLevelParentAndCode = async (
 }
 
 export const fetchItemByUuid = async (
-  { surveyId, uuid, draft = false, backup = false }: { surveyId: number; uuid: any; draft?: boolean; backup?: boolean },
+  {
+    surveyId,
+    uuid,
+    draft = false,
+    backup = false,
+  }: { surveyId: number; uuid: string; draft?: boolean; backup?: boolean },
   client: DbClient = db
 ) => {
   const item = await client.oneOrNone(
@@ -614,7 +619,7 @@ export const fetchItemsByParentUuid = async (
 }
 
 export const countItemsByLevelIndex = (
-  { surveyId, categoryUuid, levelIndex }: { surveyId: number; categoryUuid: string; levelIndex: any },
+  { surveyId, categoryUuid, levelIndex }: { surveyId: number; categoryUuid: string; levelIndex: number },
   client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
@@ -641,7 +646,7 @@ export const fetchItemsByLevelIndex = (
   }: {
     surveyId: number
     categoryUuid: string
-    levelIndex: any
+    levelIndex: number
     limit?: number | null
     offset?: number
     draft?: boolean
@@ -749,7 +754,7 @@ export const fetchIndex = async (
     surveyId,
     draft = false,
     includeBigCategories = true,
-  }: { surveyId: number; draft?: boolean; includeBigCategories?: any },
+  }: { surveyId: number; draft?: boolean; includeBigCategories?: boolean },
   client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
@@ -817,7 +822,7 @@ export const fetchItemByCodePaths = async (
     categoryUuid,
     codePaths,
     draft = false,
-  }: { surveyId: number; categoryUuid: string; codePaths: any; draft?: boolean },
+  }: { surveyId: number; categoryUuid: string; codePaths: string[]; draft?: boolean },
   client: DbClient = db
 ) => {
   let currentItem = null
@@ -889,7 +894,7 @@ export const updateItemsIndexes = async (
     surveyId,
     indexByItemUuid,
     draftProps = true,
-  }: { surveyId: number; indexByItemUuid: Record<string, number>; draftProps?: any },
+  }: { surveyId: number; indexByItemUuid: Record<string, number>; draftProps?: boolean },
   client: DbClient = db
 ) => {
   const updates = Object.entries(indexByItemUuid).map(([uuid, index]) => ({
@@ -901,7 +906,7 @@ export const updateItemsIndexes = async (
 }
 
 export const updateItemsProps = async (
-  { surveyId, items, draftProps = true }: { surveyId: number; items: ArenaCategoryItem[]; draftProps?: any },
+  { surveyId, items, draftProps = true }: { surveyId: number; items: ArenaCategoryItem[]; draftProps?: boolean },
   client: DbClient = db
 ) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
@@ -974,5 +979,5 @@ export const deleteItem = (surveyId: number, itemUuid: string, client: DbClient 
 export const deleteItems = (surveyId: number, itemUuids: string[], client: DbClient = db) =>
   deleteSurveySchemaTableRecords(surveyId, 'category_item', itemUuids, client)
 
-export const deleteItemLabels = (surveyId: number, langCode: any, client: DbClient = db) =>
+export const deleteItemLabels = (surveyId: number, langCode: string, client: DbClient = db) =>
   deleteSurveySchemaTableProp(surveyId, 'category_item', ['labels', langCode], client)

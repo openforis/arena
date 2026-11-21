@@ -41,8 +41,8 @@ const getExtraPropColumn = ({
   extraPropNameParam,
   draft = true,
 }: {
-  columnPrefix: any
-  extraPropNameParam: any
+  columnPrefix: string
+  extraPropNameParam: string
   draft?: boolean
 }) =>
   `(${DbUtils.getPropColCombined(CategoryItem.keysProps.extra, draft, columnPrefix, false)}) ->> ${extraPropNameParam}`
@@ -76,9 +76,9 @@ const generateCategoryExportQuery = ({
 }: {
   surveyId: number
   category: ArenaCategory
-  languages: any
+  languages: string[]
   draft?: boolean
-  includeCumulativeArea?: any
+  includeCumulativeArea?: boolean
 }) => {
   const params = DbUtils.newQueryParams([Category.getUuid(category)])
   const levels = Category.getLevelsArray(category)
@@ -135,8 +135,8 @@ export const generateCategoryExportStream = ({
 }: {
   surveyId: number
   category: ArenaCategory
-  languages?: any
-  includeCumulativeArea?: any
+  languages?: string[]
+  includeCumulativeArea?: boolean
   draft?: boolean
 }) => {
   const { query, values } = generateCategoryExportQuery({

@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream'
 import * as A from '@core/arena'
 
 import { Objects, PointFactory, Points, SystemError, type ArenaSurvey } from '@openforis/arena-core'
@@ -11,7 +12,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
-const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: any; columnName: any }) => {
+const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: any; columnName: string }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveySrss = Survey.getSRS(surveyInfo)
   if (!surveySrss.some((surveySrs) => Srs.getCode(surveySrs) === srs)) {
@@ -71,9 +72,9 @@ export const createRowsReaderFromStream = ({
   onRowItem,
   onTotalChange,
 }: {
-  stream: any
+  stream: Readable
   survey: ArenaSurvey
-  summary: any
+  summary: CategoryImportSummary.CategoryImportSummary
   onRowItem: any
   onTotalChange: any
 }) => {
