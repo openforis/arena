@@ -65,7 +65,8 @@ const ApplyConfirmation = ({
   }, [focus, root])
 
   /**
-   * Escape cancels the confirmation, not the assistant panel behind it.
+   * Escape cancels the confirmation, not the assistant panel behind it; on the buttons, which hold the focus (the
+   * confirmation itself is not focusable).
    * @param {React.KeyboardEvent} event - Key event.
    * @returns {void} Nothing.
    */
@@ -81,7 +82,6 @@ const ApplyConfirmation = ({
       aria-labelledby={titleId}
       className="ai-assistant-card__confirm"
       data-testid={TestId.aiAssistant.applyConfirm}
-      onKeyDown={onKeyDown}
       ref={setRoot}
       role="alertdialog"
     >
@@ -95,16 +95,17 @@ const ApplyConfirmation = ({
         ))}
       </ul>
       <div className="ai-assistant-card__footer">
-        <Button label="aiAssistant.card.confirm.review" onClick={onReview} />
+        <Button label="aiAssistant.card.confirm.review" onClick={onReview} onKeyDown={onKeyDown} />
         <Button
           disabled={disabled}
           label="aiAssistant.card.confirm.apply"
           labelParams={{ count: selectedIds.length }}
           onClick={onApply}
+          onKeyDown={onKeyDown}
           primary
           testId={TestId.aiAssistant.applyConfirmBtn}
         />
-        <Button label="aiAssistant.card.confirm.cancel" onClick={onCancel} variant="text" />
+        <Button label="aiAssistant.card.confirm.cancel" onClick={onCancel} onKeyDown={onKeyDown} variant="text" />
       </div>
     </div>
   )

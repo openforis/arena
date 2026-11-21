@@ -81,7 +81,8 @@ export const Modal = (props) => {
       open
     >
       <Fade in timeout={500}>
-        <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined}>
+        {/* a native dialog shown open: MUI Modal handles the focus trap, the backdrop and Escape */}
+        <dialog className="modal-content" open aria-modal="true" aria-labelledby={title ? titleId : undefined}>
           {(title || showCloseButton) && (
             <ModalHeader>
               {title && <span id={titleId}>{i18n.t(title, titleParams)}</span>}
@@ -89,7 +90,7 @@ export const Modal = (props) => {
             </ModalHeader>
           )}
           {children}
-        </div>
+        </dialog>
       </Fade>
     </MuiModal>
   )

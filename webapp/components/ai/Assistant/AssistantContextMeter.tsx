@@ -56,8 +56,8 @@ const AssistantContextRing = ({ meter }: { meter: ContextMeter | null }) => {
         className="ai-assistant-panel__context-ring"
         data-level={meter.level}
         data-testid={TestId.aiAssistant.contextMeter}
-        // focusable, so the tooltip opens from the keyboard too
-        tabIndex={0}
+        // focusable, so the tooltip opens from the keyboard too; not a button, whose content would hide the meter role
+        tabIndex={0} // NOSONAR
       >
         <svg aria-hidden="true" focusable="false" viewBox="0 0 20 20">
           <circle

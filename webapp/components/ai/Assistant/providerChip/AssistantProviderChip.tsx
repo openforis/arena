@@ -143,6 +143,8 @@ const ProviderChooser = ({
         className="ai-provider-chooser__rows"
         onKeyDown={onKeyDown}
         role="radiogroup"
+        // focusable from code (ARIA composite), the Tab stop stays on the selected row (roving focus)
+        tabIndex={-1}
       >
         {choices.map((choice, index) => (
           <ProviderChoiceRow

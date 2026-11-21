@@ -223,6 +223,11 @@
   }
 
   &__sent-data {
+    // a button (toggletip): no button look
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+    cursor: default;
     // block-level: TooltipNew wraps it in an inline span (see the context ring)
     display: flex;
     align-items: center;

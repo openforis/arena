@@ -123,8 +123,9 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
     <>
       {/* the hover tooltip and the keyboard reasons never show together */}
       <TooltipNew disableFocusListener renderTitle={renderTitle} suppressed={popupOpen}>
-        {/* hover target: a disabled button (MUI or native, e.g. the chat FAB) does not reliably receive hover itself */}
-        <span
+        {/* hover target: a disabled button (MUI or native, e.g. the chat FAB) does not reliably receive hover itself;
+            a focusable span, not a button: it wraps the (disabled) control, and a button inside a button is invalid */}
+        <span // NOSONAR
           aria-describedby={reasonId}
           className="ai-policy-blocked"
           data-testid={TestId.ai.policyBlocked}
@@ -132,7 +133,7 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
           onFocus={onFocus}
           onKeyDown={onKeyDown}
           ref={setTarget}
-          tabIndex={0}
+          tabIndex={0} // NOSONAR
         >
           {children}
           <span id={reasonId} style={visuallyHidden}>

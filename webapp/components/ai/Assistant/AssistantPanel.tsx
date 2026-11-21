@@ -64,7 +64,8 @@ const AssistantTabs = ({
   // after the hooks: a single area (e.g. only Help) is shown without a tab bar
   if (!isTabBarShown(tabAreas)) return null
   return (
-    <div className="ai-assistant-panel__tabs" onKeyDown={onKeyDown} role="tablist">
+    // tabIndex -1: focusable from code (ARIA composite), the Tab stop stays on the selected tab (roving focus)
+    <div className="ai-assistant-panel__tabs" onKeyDown={onKeyDown} role="tablist" tabIndex={-1}>
       {tabAreas.map((tabArea, index) => (
         <button
           {...getItemProps(index)}
@@ -228,7 +229,6 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
       data-testid={TestId.aiAssistant.panel}
       onKeyDown={onKeyDown}
       ref={dialogRef}
-      role="complementary"
     >
       <div className="ai-assistant-panel__header">
         <h2 className="ai-assistant-panel__title">{t('aiAssistant.title')}</h2>

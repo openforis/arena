@@ -62,6 +62,8 @@ const LevelSteps = ({
       role="radiogroup"
       aria-label={i18n.t('userAiSettings:access.section')}
       onKeyDown={onKeyDown}
+      // focusable from code (ARIA composite), the Tab stop stays on the selected level (roving focus)
+      tabIndex={-1}
     >
       {AI_ACCESS_LEVELS.map((level) => (
         <button
@@ -147,15 +149,15 @@ const FeatureChip = ({
         {label}
       </button>
       <Tooltip title={description} describeChild>
-        <span
+        {/* a button (toggletip): focusable, so the tooltip opens from the keyboard too */}
+        <button
+          type="button"
           className="user-ai-settings-panel__chip-info"
-          tabIndex={0}
-          role="img"
           // short name: the tooltip (describeChild) carries the sends text as the description
           aria-label={`${i18n.t('userAiSettings:access.sendsInfo')}: ${label}`}
         >
           i
-        </span>
+        </button>
       </Tooltip>
     </span>
   )

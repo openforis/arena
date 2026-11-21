@@ -31,20 +31,19 @@ export const AssistantSentDataChip = ({
   const label = t(`aiAssistant.sentData.${level}.label`)
   return (
     <TooltipNew title={`aiAssistant.sentData.${level}.tooltip`}>
-      <span
+      {/* a button (toggletip): focusable, so the tooltip opens from the keyboard too */}
+      <button
         aria-label={t('aiAssistant.sentData.ariaLabel', { label })}
         className={`ai-assistant-panel__sent-data ai-assistant-panel__sent-data--${level}`}
         data-level={level}
         data-testid={TestId.aiAssistant.sentDataChip}
-        role="note"
-        // focusable, so the tooltip opens from the keyboard too
-        tabIndex={0}
+        type="button"
       >
         <span aria-hidden="true" className={`icon ${levelIcons[level]} icon-12px`} />
         <span aria-hidden="true" className="ai-assistant-panel__sent-data-text">
           {label}
         </span>
-      </span>
+      </button>
     </TooltipNew>
   )
 }
