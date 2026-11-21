@@ -1,4 +1,4 @@
-import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey, ArenaAuthGroup, ArenaI18n } from '@openforis/arena-core'
 import { marked } from 'marked'
 
 import { db, DbClient } from '@server/db/db'
@@ -20,10 +20,10 @@ import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 import { UserInviteEmail } from './userInviteEmail'
 
-export const getResetPasswordUrl = ({ serverUrl, uuid }: { serverUrl: any; uuid: any }) =>
+export const getResetPasswordUrl = ({ serverUrl, uuid }: { serverUrl: string; uuid: string }) =>
   `${serverUrl}/guest/resetPassword/${uuid}`
 
-const _getPrettyFormatUserName = ({ user, i18n }: { user: ArenaUser; i18n: any }) => {
+const _getPrettyFormatUserName = ({ user, i18n }: { user: ArenaUser; i18n: ArenaI18n }) => {
   const parts = []
   const titleKey = User.getTitle(user)
   if (titleKey && titleKey !== User.titleKeys.preferNotToSay) {
@@ -34,7 +34,7 @@ const _getPrettyFormatUserName = ({ user, i18n }: { user: ArenaUser; i18n: any }
 }
 
 const _generateResetPasswordAndSendEmail = async (
-  { email, emailParams, i18n }: { email: string; emailParams: any; i18n: any },
+  { email, emailParams, i18n }: { email: string; emailParams: any; i18n: ArenaI18n },
   t: DbClient
 ) => {
   const { serverUrl } = emailParams
@@ -83,11 +83,11 @@ const _inviteNewUserAndSendEmail = async (
   }: {
     user: ArenaUser
     email: string
-    group: any
+    group: ArenaAuthGroup
     survey: ArenaSurvey
-    surveyCycleKey: any
+    surveyCycleKey: string
     emailParams: any
-    i18n: any
+    i18n: ArenaI18n
   },
   t: DbClient
 ) => {
@@ -118,7 +118,7 @@ const _checkCanInviteToGroup = ({
   surveyInfo,
 }: {
   user: ArenaUser
-  group: any
+  group: ArenaAuthGroup
   surveyInfo: ArenaSurvey
 }) => {
   // Only system admins can invite new system admins
@@ -176,7 +176,14 @@ const _repeatInvitation = async (
     email,
     emailParams,
     i18n,
-  }: { user: ArenaUser; survey: ArenaSurvey; userToInvite: ArenaUser; email: string; emailParams: any; i18n: any },
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    userToInvite: ArenaUser
+    email: string
+    emailParams: any
+    i18n: ArenaI18n
+  },
   t: DbClient
 ) => {
   const surveyUuid = Survey.getUuid(survey)
@@ -213,12 +220,12 @@ const _invitePendingUser = async (
   }: {
     user: ArenaUser
     survey: ArenaSurvey
-    group: any
+    group: ArenaAuthGroup
     userToInvite: ArenaUser
     email: string
-    repeatInvitation: any
+    repeatInvitation: boolean
     emailParams: any
-    i18n: any
+    i18n: ArenaI18n
   },
   t: DbClient
 ) => {
@@ -261,14 +268,14 @@ const _inviteUser = (
     serverUrl,
   }: {
     user: ArenaUser
-    i18n: any
+    i18n: ArenaI18n
     email: string
     survey: ArenaSurvey
     invitation: any
-    group: any
-    repeatInvitation: any
-    surveyCycleKey: any
-    serverUrl: any
+    group: ArenaAuthGroup
+    repeatInvitation: boolean
+    surveyCycleKey: string
+    serverUrl: string
   },
   client: DbClient = db
 ) =>
@@ -330,10 +337,10 @@ export const inviteUsers = async (
   }: {
     user: ArenaUser
     surveyId: number
-    surveyCycleKey: any
+    surveyCycleKey: string
     invitation: any
-    serverUrl: any
-    repeatInvitation?: any
+    serverUrl: string
+    repeatInvitation?: boolean
   },
   client: DbClient = db
 ) => {
