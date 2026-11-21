@@ -1,4 +1,4 @@
-import { extractTimeValue } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
+import { extractTimeValue } from '@core/record/nodeValueParser'
 
 // The file's internal VALUE_PROP_DEFAULT constant is the literal string 'value' —
 // this test builds its `value` param the same shape `extractDateOrTime`'s callers use.

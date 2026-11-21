@@ -12,11 +12,14 @@ import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
+import { isUuid } from '@core/uuid'
 
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordManager from '../../../manager/recordManager'
+import * as NodeRepository from '../../../repository/nodeRepository'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
+import { processNodesBatch } from '../nodesBatch/nodesBatchProcessor'
+import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
@@ -83,6 +86,7 @@ export class RecordsUpdateThread extends Thread {
       [RecordsUpdateThreadMessageTypes.recordReload]: this.processRecordReloadMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.nodePersist]: this.processRecordNodePersistMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.nodeDelete]: this.processRecordNodeDeleteMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.nodesBatchPersist]: this.processNodesBatchPersistMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.recordClear]: this.processRecordClearMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.surveyClear]: this.processSurveyClearMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.threadKill]: this.postMessage.bind(this),
@@ -94,15 +98,9 @@ export class RecordsUpdateThread extends Thread {
   }
 
   handleNodesUpdated({ record, updatedNodes }) {
-    if (!Objects.isEmpty(updatedNodes)) {
-      const recordUuid = Record.getUuid(record)
-      this.postMessage({
-        type: WebSocketEvent.nodesUpdate,
-        content: {
-          recordUuid,
-          updatedNodes,
-        },
-      })
+    const event = buildNodesUpdateEvent({ recordUuid: Record.getUuid(record), updatedNodes })
+    if (event) {
+      this.postMessage(event)
     }
   }
 
@@ -141,16 +139,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   handleNodesValidationUpdated({ record, validations }) {
-    const recordUpdated = Record.mergeNodeValidations(validations)(record)
-
-    this.postMessage({
-      type: WebSocketEvent.nodeValidationsUpdate,
-      content: {
-        recordUuid: Record.getUuid(record),
-        recordValid: Validation.isObjValid(recordUpdated),
-        validations,
-      },
-    })
+    this.postMessage(buildNodeValidationsUpdateEvent({ record, validations }))
   }
 
   async onMessage(msg) {
@@ -167,25 +156,23 @@ export class RecordsUpdateThread extends Thread {
         await this.processMessage(msg)
       } catch (error) {
         // SystemError is an expected error type, e.g. when there's a problem with expressions.
-        if (error instanceof SystemError) {
-          const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
-          const { key, params } = error
-          const nestedError = params.error
-          if (nestedError && nestedError instanceof SystemError) {
-            params.error = { key: nestedError.key, params: nestedError.params }
-          }
-          this.postMessage({
-            type: WebSocketEvent.applicationError,
-            content: {
-              key,
-              params,
-              recordUuid,
-            },
-          })
-          return // Stop processing
-        }
         // Unexpected error: Crash and burn
-        throw error
+        if (!(error instanceof SystemError)) throw error
+        const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
+        const { key, params } = error
+        const nestedError = params.error
+        if (nestedError && nestedError instanceof SystemError) {
+          params.error = { key: nestedError.key, params: nestedError.params }
+        }
+        // no return: the queue goes on, a message behind this one must not wait for the next enqueue
+        this.postMessage({
+          type: WebSocketEvent.applicationError,
+          content: {
+            key,
+            params,
+            recordUuid,
+          },
+        })
       } finally {
         this.processing = false
       }
@@ -392,6 +379,61 @@ export class RecordsUpdateThread extends Thread {
         )
         await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
       },
+    })
+  }
+
+  /**
+   * Returns the thread operations used by the batch processor.
+   * @returns {object} The processor dependencies.
+   */
+  getNodesBatchProcessorDeps() {
+    return {
+      getSurvey: async (msg) => (await this.getOrFetchSurveyData(msg)).survey,
+      runWithRecordLock: (recordUuid, fn) => acquireRecordLockAndRun({ recordUuid, fn }),
+      getOrFetchRecord: (params) => this.getOrFetchRecord(params),
+      fetchRecordStepAndOwner: ({ msg, recordUuid, t }) =>
+        RecordManager.fetchRecordStepAndOwner({ surveyId: msg.surveyId, recordUuid }, t),
+      fetchQualifierFilters: ({ msg, survey, t }) =>
+        SurveyManager.fetchUserQualifierFilters({ user: msg.user, survey }, t),
+      recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
+      findNodeRecordUuid: async ({ msg, nodeUuid, t }) =>
+        // a malformed uuid would make the query fail and abort the record transaction
+        isUuid(nodeUuid) ? NodeRepository.fetchNodeRecordUuid(msg.surveyId, nodeUuid, t) : null,
+      logError: (message) => Logger.error(message),
+      now: () => Date.now(),
+      persistNode: (params, t) => RecordManager.persistNode(params, t),
+      findNodeDefUuidsToClear: (params) => RecordManager.findNodeDefUuidsToClearOnNodePersist(params),
+      cacheRecord: async ({ msg, recordUuid, record, t }) => {
+        const { recordsCache } = await this.getOrFetchSurveyData(msg)
+        await this.cacheRecordWithDbDateModified({ surveyId: msg.surveyId, recordUuid, record, recordsCache, t })
+      },
+      clearCachedRecord: async ({ msg, recordUuid }) => {
+        const { recordsCache } = await this.getOrFetchSurveyData(msg)
+        recordsCache.delete(recordUuid)
+      },
+      postMessage: (message) => this.postMessage(message),
+    }
+  }
+
+  /**
+   * Applies the batch edits of one record and replies to the main thread with the results.
+   * @param {object} msg - The nodesBatchPersist message.
+   * @returns {Promise<void>} Resolved when the reply is posted.
+   */
+  async processNodesBatchPersistMsg(msg) {
+    const { requestId, recordUuid } = msg
+    // a record opened in a form stays cached; one cached only by this batch is dropped (nothing else removes it)
+    // (a survey load error is reported by the processor, so it is ignored here)
+    const recordsCache = await this.getOrFetchSurveyData(msg).then(
+      (data) => data.recordsCache,
+      () => null
+    )
+    const wasCached = recordsCache?.has(recordUuid)
+    const results = await processNodesBatch({ msg, deps: this.getNodesBatchProcessorDeps() })
+    if (recordsCache && !wasCached) recordsCache.delete(recordUuid)
+    this.postMessage({
+      type: RecordsUpdateThreadMessageTypes.nodesBatchPersistResult,
+      content: { requestId, recordUuid, results },
     })
   }
 

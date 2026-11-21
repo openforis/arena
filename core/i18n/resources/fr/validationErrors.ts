@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: "Le fichier que vous essayez d'importer est vide",
+    emptyFileName: 'Nom de fichier vide dans la colonne {{headers}}',
     invalidHeaders: 'Colonnes invalides : {{invalidHeaders}}',
     invalidBoolean: 'Valeur booléenne invalide dans la colonne {{headers}} : {{value}}',
     invalidCode: `Code invalide pour l'attribut '{{attributeName}}' : {{code}}`,
@@ -118,6 +119,10 @@ export default {
     targetsRequired: 'Au moins une cible est requise',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '« {{attributeName}} » ne peut pas être modifié (lecture seule ou calculé).',
+    unsupportedType: '« {{attributeName}} » : les valeurs de type {{type}} ne peuvent pas être définies ici.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: "L'entité est requise",
     applyIfDuplicate: 'La condition "$t(nodeDefEdit:expressionsProp.applyIf)" est dupliquée',

@@ -1,7 +1,2 @@
 export * as aiSettings from './settings'
-export * as aiExpression from './expression'
-export * as aiTranslation from './translation'
-export * as aiActivityLog from './activityLog'
-export * as aiChatbot from './chatbot'
-export * as aiDataQuery from './dataQuery'
-export { streamSse } from './streaming'
+export * as aiProviders from './providers'

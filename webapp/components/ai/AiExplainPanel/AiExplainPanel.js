@@ -1,74 +1,60 @@
 import './AiExplainPanel.scss'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
-import Markdown from '@webapp/components/markdown'
+import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
+import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
 import { useI18n, useI18nT } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
-const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
+const AiExplainPanel = ({ expression, nodeDefUuid, onClose }) => {
   const i18n = useI18n()
   // See AiActivityLogSummary: i18next escapes {{message}} by default,
   // which mangles quoted identifiers (e.g. Postgres column names) in
   // server-side error strings. Render this template via unescapeHtml.
   const tUnescaped = useI18nT({ unescapeHtml: true })
+  const survey = useSurvey()
   const surveyId = useSurveyId()
-  const cancelRef = useRef(null)
-
-  const [text, setText] = useState('')
-  const [done, setDone] = useState(false)
-  const [error, setError] = useState(null)
-
+  // read the latest survey at call time: a store update must not restart the stream
+  const surveyRef = useRef(survey)
   useEffect(() => {
-    // Reset stream state when inputs change; the stream subscription below
-    // is the external system this effect synchronizes with.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setText('')
+    surveyRef.current = survey
+  }, [survey])
 
-    setDone(false)
-
-    setError(null)
-    const cancel = API.aiExpression.explainStream({
-      surveyId,
-      nodeDefUuid,
-      expression,
-      errorMessage,
-      onChunk: (chunk) => setText((prev) => prev + chunk),
-      onDone: () => setDone(true),
-      onError: (err) => {
-        setError(err?.message || 'unknown')
-        setDone(true)
-      },
-    })
-    cancelRef.current = cancel
-    return () => {
-      cancelRef.current?.()
-    }
-  }, [surveyId, nodeDefUuid, expression, errorMessage])
+  const start = useCallback(
+    (callbacks) =>
+      AiWorkflows.explainExpression({ survey: surveyRef.current, surveyId, nodeDefUuid, expression, ...callbacks }),
+    [surveyId, nodeDefUuid, expression]
+  )
+  const { text, done, error, onRetry, cancel } = useAiTextStream({ start, onClose })
 
   const onCancel = () => {
-    cancelRef.current?.()
+    cancel()
     onClose()
   }
 
   return (
     <Modal className="ai-explain-panel" title="aiExpression.explain.title" showCloseButton onClose={onCancel}>
       <ModalBody>
+        <AiFeatureDataLocationBadge feature="expressionExplain" />
         <div className="ai-explain-panel__expression">{expression}</div>
 
         <div className={`ai-explain-panel__body${done ? '' : ' ai-explain-panel__cursor'}`}>
-          {text && <Markdown source={text} />}
+          {text && <AssistantMarkdown text={text} />}
           {!text && !done && i18n.t('aiExpression.explain.thinking')}
         </div>
 
         {error ? (
-          <div className="ai-explain-panel__error">
-            {error === 'aiRequestTimeout'
+          <div className="ai-explain-panel__error" role="alert">
+            {getAiErrorKey(error) === 'aiRequestTimeout'
               ? i18n.t('aiExpression.explain.timeout')
-              : tUnescaped('aiExpression.explain.error', { message: error })}
+              : tUnescaped('aiExpression.explain.error', { message: getAiErrorMessage({ error, i18n }) })}
+            <AiEngineErrorActions error={error} onRetry={onRetry} />
           </div>
         ) : null}
       </ModalBody>
@@ -79,7 +65,6 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
 AiExplainPanel.propTypes = {
   expression: PropTypes.string.isRequired,
   nodeDefUuid: PropTypes.string,
-  errorMessage: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 }
 

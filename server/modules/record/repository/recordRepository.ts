@@ -743,6 +743,18 @@ export const fetchRecordDateModified = async (
   return row?.date_modified ? Dates.parseISO(row.date_modified) : null
 }
 
+export const fetchRecordStepAndOwner = (
+  { surveyId, recordUuid }: { surveyId: number; recordUuid: string },
+  client: DbClient = db
+): Promise<{ step: string; ownerUuid: string } | null> =>
+  client.oneOrNone(
+    `SELECT step, owner_uuid
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid],
+    (row) => (row ? { step: row.step, ownerUuid: row.owner_uuid } : null)
+  )
+
 export const updateValidation = (
   surveyId: number,
   recordUuid: string,

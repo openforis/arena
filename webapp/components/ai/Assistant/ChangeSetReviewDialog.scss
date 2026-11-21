@@ -1,0 +1,276 @@
+// review dialog of a long change set: most of the screen, its own header and footer
+.modal.ai-change-review .modal-content {
+  width: 92vw;
+  height: 92vh;
+  margin: 4vh auto;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--color-surface);
+}
+
+.ai-change-review {
+  // a <dialog open> in the Modal: its UA box styles are reset
+  &__content {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    // focused by script when the dialog opens (a name announcement, not a control)
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-outline);
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+
+    .close-btn {
+      margin-left: auto;
+    }
+  }
+
+  &__summary {
+    overflow: hidden;
+    color: var(--color-on-surface-variant);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ai-change-item__stale {
+    margin: 0;
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--color-outline);
+  }
+
+  &__search {
+    flex: 1 1 15rem;
+    max-width: 25rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 0.25rem;
+  }
+
+  // a fieldset
+  &__segmented {
+    display: flex;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    button {
+      padding: 0.25rem 0.75rem;
+      border: 1px solid var(--color-outline);
+      background: var(--color-surface);
+      cursor: pointer;
+
+      & + button {
+        border-left: none;
+      }
+
+      &:first-child {
+        border-radius: 0.25rem 0 0 0.25rem;
+      }
+
+      &:last-child {
+        border-radius: 0 0.25rem 0.25rem 0;
+      }
+
+      &[aria-pressed='true'] {
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+      }
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__side {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: 14rem;
+    overflow-y: auto;
+    border-right: 1px solid var(--color-outline);
+
+    button {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+
+      span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      span:last-child {
+        color: var(--color-on-surface-variant);
+      }
+
+      &:hover {
+        background: var(--color-background);
+      }
+
+      &[aria-pressed='true'] {
+        background: var(--color-background);
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__table-wrap {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 0.4rem 0.5rem;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-outline);
+      text-align: left;
+
+      .ai-change-item__lang {
+        margin: 0 0 0 0.375rem;
+      }
+    }
+
+    td {
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--color-background);
+      vertical-align: top;
+    }
+  }
+
+  &__check {
+    width: 2rem;
+  }
+
+  &__group td {
+    background: var(--color-background);
+    font-weight: 600;
+  }
+
+  &__group-count {
+    margin-left: 0.25rem;
+    color: var(--color-on-surface-variant);
+    font-weight: normal;
+  }
+
+  &__row--conflict td {
+    background: var(--color-warning-container);
+  }
+
+  &__item,
+  &__kind {
+    width: 1%;
+  }
+
+  &__item {
+    white-space: nowrap;
+  }
+
+  &__detail {
+    margin-left: 0.5rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  // what a change is about, and why it can't be applied (wraps to the column width)
+  &__kind {
+    color: var(--color-on-surface-variant);
+    white-space: nowrap;
+
+    .ai-change-item__conflict {
+      min-width: 16rem;
+      white-space: normal;
+    }
+  }
+
+  &__badge {
+    margin-left: 0.5rem;
+    color: var(--color-error);
+    font-weight: 600;
+  }
+
+  &__from {
+    color: var(--color-on-surface-variant);
+    text-decoration: line-through;
+  }
+
+  &__from,
+  &__to {
+    overflow-wrap: anywhere;
+  }
+
+  &__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  &__empty {
+    padding: 2rem;
+    color: var(--color-on-surface-variant);
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-outline);
+  }
+
+  &__selected {
+    margin-right: auto;
+    color: var(--color-on-surface-variant);
+  }
+}

@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'Fajl koji pokušavate da uvezete je prazan',
+    emptyFileName: 'Prazan naziv fajla u koloni {{headers}}',
     invalidHeaders: 'Nevažeće kolone: {{invalidHeaders}}',
     invalidBoolean: 'Nevažeća logička vrijednost u koloni {{headers}}: {{value}}',
     invalidCode: `Nevažeća šifra za atribut '{{attributeName}}': {{code}}`,
@@ -117,6 +118,10 @@ export default {
     targetsRequired: 'Obavezan je najmanje jedan primalac',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '"{{attributeName}}" se ne može uređivati (samo za čitanje ili izračunato).',
+    unsupportedType: '"{{attributeName}}": vrijednosti tipa {{type}} ne mogu se ovdje postaviti.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'Entitet je obavezan',
     applyIfDuplicate: 'Uslov "$t(nodeDefEdit:expressionsProp.applyIf)" je dupliran',

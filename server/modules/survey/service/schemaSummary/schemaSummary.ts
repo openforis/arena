@@ -1,9 +1,9 @@
-import { z } from 'zod'
+import { Objects, Surveys, type ArenaSurvey, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
-import { Objects, Surveys, type ArenaUser, type ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-
+import { AiLimits } from '@common/ai/limits'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
+import { FileFormats } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -15,21 +15,12 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
 
-import * as Log from '@server/log/log'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as ModelClient from '@server/modules/ai/service/modelClient'
-import { buildDataDictionaryPrompt } from '@server/modules/ai/service/prompts/dataDictionary'
-import { parseJsonResponse } from '@server/modules/ai/service/responseParsers'
 
-const logger = Log.getLogger('SchemaSummary')
+import { neutraliseSpreadsheetFormula, parseAiDescriptions } from './aiDescriptions'
 
-const AI_DESCRIPTION_BATCH_SIZE = 10
-const MAX_AI_DESCRIPTIONS = 200
-
-const AiDescriptionsSchema = z.object({
-  descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
-})
+type SchemaSummaryProgressCallback = (progress: { total: number; processed: number }) => void
 
 const getParentPath = (nodeDef: ArenaAnyNodeDef, survey: ArenaSurvey) => {
   const parts = []
@@ -39,48 +30,6 @@ const getParentPath = (nodeDef: ArenaAnyNodeDef, survey: ArenaSurvey) => {
     cur = Survey.getNodeDefParent(cur)(survey)
   }
   return parts.join('/')
-}
-
-const runAiDescriptionBatch = async ({
-  user,
-  surveyName,
-  batch,
-  previousError,
-}: {
-  user: ArenaUser
-  surveyName: string
-  batch: any
-  previousError?: { message: string }
-}) => {
-  const batchNodeDefs = batch.map((e) => ({ uuid: e.uuid, name: e.name, type: e.type, parentPath: e.parentPath }))
-  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: batchNodeDefs, previousError })
-  const { text } = await ModelClient.generate({ user, feature: 'schemaSummary', prompt, system })
-  const json = parseJsonResponse(text)
-  return AiDescriptionsSchema.parse(json)
-}
-
-const runAiDescriptionBatchWithRetry = async ({
-  user,
-  surveyName,
-  batch,
-  batchIndex,
-}: {
-  user: ArenaUser
-  surveyName: string
-  batch: any
-  batchIndex: number
-}) => {
-  try {
-    return await runAiDescriptionBatch({ user, surveyName, batch })
-  } catch (firstError) {
-    logger.info(`schemaSummary AI batch ${batchIndex} failed: ${firstError?.message || firstError}; retrying`)
-    return runAiDescriptionBatch({
-      user,
-      surveyName,
-      batch,
-      previousError: { message: firstError?.message || String(firstError) },
-    })
-  }
 }
 
 const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef }) => {
@@ -226,20 +175,31 @@ const extractSchemaSummaryNodeDefs = (survey: ArenaSurvey, cycle: string) => {
   return nodeDefs
 }
 
+/**
+ * Builds the schema summary row of a node def.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey.
+ * @param {object} params.nodeDef - Node def.
+ * @param {string[]} params.languages - Survey languages.
+ * @param {string} params.cycle - Cycle key.
+ * @param {Record<string, string>|null} params.aiDescriptions - AI descriptions by uuid (null: no aiDescription column).
+ * @param {string} params.fileFormat - csv or xlsx (formulas are neutralised for csv only).
+ * @returns {object} The row.
+ */
 const buildNodeDefItem = ({
   survey,
   nodeDef,
   languages,
-  defaultLang,
   cycle,
-  includeAiDescriptions,
+  aiDescriptions,
+  fileFormat,
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
   languages: string[]
-  defaultLang: string
   cycle: string
-  includeAiDescriptions: boolean
+  aiDescriptions: Record<string, string> | null
+  fileFormat: string
 }) => {
   const { uuid, type } = nodeDef
   const name = NodeDef.getName(nodeDef)
@@ -259,13 +219,11 @@ const buildNodeDefItem = ({
     (acc, lang) => ({ ...acc, [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }) }),
     {}
   )
-  const aiFields = includeAiDescriptions
-    ? {
-        aiDescription: '',
-        _isRoot: NodeDef.isRoot(nodeDef),
-        _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
-        _parentPath: getParentPath(nodeDef, survey),
-      }
+  // the descriptions are generated text. A csv cell is read as a formula by spreadsheet programs, so it is neutralised;
+  // an xlsx cell is written as a string, where the added quote would show up in the text
+  const aiDescription = aiDescriptions?.[uuid] ?? ''
+  const aiFields = aiDescriptions
+    ? { aiDescription: fileFormat === FileFormats.csv ? neutraliseSpreadsheetFormula(aiDescription) : aiDescription }
     : {}
 
   return {
@@ -309,115 +267,163 @@ const buildNodeDefItem = ({
   }
 }
 
-const addAiDescriptions = async ({
-  user,
-  surveyName,
-  items,
-  processed,
-  total,
-  onProgress,
-  stopIfFunction,
-}: {
-  user: ArenaUser
-  surveyName: string
-  items: any[]
-  processed: number
-  total: number
-  onProgress: any
-  stopIfFunction: any
-}) => {
-  const entriesNeedingDesc = items
-    .filter((item) => !item._isRoot && !item._descriptionForAi?.trim())
-    .map(({ uuid, name, type, _parentPath }) => ({ uuid, name, type, parentPath: _parentPath }))
+/**
+ * Fetches the draft survey with its node defs (advanced props included).
+ * @param {number|string} surveyId - Survey id.
+ * @returns {Promise<object>} The survey.
+ */
+const fetchSurvey = (surveyId: number): Promise<ArenaSurvey> =>
+  SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
 
-  if (entriesNeedingDesc.length > MAX_AI_DESCRIPTIONS) {
-    logger.warn(
-      `schemaSummary: ${entriesNeedingDesc.length} node defs need AI descriptions; capping at ${MAX_AI_DESCRIPTIONS}`
-    )
-  }
-  const capped = entriesNeedingDesc.slice(0, MAX_AI_DESCRIPTIONS)
-  const itemByUuid = Object.fromEntries(items.map((item) => [item.uuid, item]))
+const DB_DEPS = { fetchSurvey }
 
-  let processedCount = processed
-  for (let i = 0; i < capped.length; i += AI_DESCRIPTION_BATCH_SIZE) {
-    if (stopIfFunction?.()) break
-    const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
-    const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
-    try {
-      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex }) // NOSONAR
-      for (const { uuid, description } of result.descriptions) {
-        if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
+/**
+ * Returns the default language of the survey (first language, else en).
+ * @param {object} surveyInfo - Survey info.
+ * @returns {string} The language code.
+ */
+const getDefaultLang = (surveyInfo: any): string =>
+  Survey.getDefaultLanguage(surveyInfo) || Survey.getLanguages(surveyInfo)[0] || 'en'
+
+/**
+ * Returns the node defs of the schema summary that need an AI description: not the root, no description in the
+ * default language; at most AiLimits.dataDictionaryMaxDescriptions. Only names, labels (default language, when not the
+ * name), types and paths.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey with its node defs.
+ * @param {string} params.cycle - Cycle key.
+ * @returns {{surveyName: string, nodeDefs: {uuid: string, name: string, label?: string, type: string, parentPath: string}[]}} The items.
+ */
+export const getSchemaSummaryAiItems = ({ survey, cycle }: { survey: ArenaSurvey; cycle: string }) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const defaultLang = getDefaultLang(surveyInfo)
+  const nodeDefs = extractSchemaSummaryNodeDefs(survey, cycle)
+    .filter((nodeDef) => !NodeDef.isRoot(nodeDef) && !(NodeDef.getDescription(defaultLang)(nodeDef) || '').trim())
+    .slice(0, AiLimits.dataDictionaryMaxDescriptions)
+    .map((nodeDef) => {
+      const name = NodeDef.getName(nodeDef)
+      // the label explains abbreviated names (rp, dbh, …)
+      const label = NodeDef.getLabels(nodeDef)[defaultLang]
+      return {
+        uuid: NodeDef.getUuid(nodeDef),
+        name,
+        ...(label && label !== name ? { label } : {}),
+        type: NodeDef.getType(nodeDef),
+        parentPath: getParentPath(nodeDef, survey),
       }
-    } catch (error) {
-      logger.warn(`schemaSummary AI batch ${batchIndex}: ${error?.message || error}`)
-    }
-    processedCount += batch.length
-    onProgress?.({ total, processed: processedCount })
-  }
+    })
+  return { surveyName: Survey.getName(surveyInfo) || `survey-${Survey.getIdSurveyInfo(surveyInfo)}`, nodeDefs }
 }
 
-export const generateSchemaSummaryItems = async ({
-  surveyId,
+/**
+ * Fetches the survey and returns its node defs that need an AI description (see getSchemaSummaryAiItems).
+ * @param {object} params - Parameters.
+ * @param {number|string} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @returns {Promise<object>} The items.
+ */
+export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle }: { surveyId: number; cycle: string }) =>
+  getSchemaSummaryAiItems({ survey: await fetchSurvey(surveyId), cycle })
+
+/**
+ * Builds the schema summary rows of a survey.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey with its node defs.
+ * @param {string} params.cycle - Cycle key.
+ * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
+ * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
+ * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
+ * @param {string} [params.fileFormat] - csv or xlsx: the file the rows are written to (csv when not given, which is the
+ * format that needs the formulas of the AI descriptions neutralised).
+ * @returns {object[]} The rows.
+ */
+export const buildSchemaSummaryItems = ({
+  survey,
   cycle,
-  user = null,
-  includeAiDescriptions = false,
+  aiDescriptions = null,
+  fileFormat = FileFormats.csv,
   onProgress = null,
   stopIfFunction = null,
 }: {
-  surveyId: number
+  survey: ArenaSurvey
   cycle: string
-  user?: ArenaUser
-  includeAiDescriptions?: boolean
-  onProgress?: any
-  stopIfFunction?: any
+  aiDescriptions?: Record<string, string> | null
+  fileFormat?: string
+  onProgress?: SchemaSummaryProgressCallback | null
+  stopIfFunction?: (() => boolean) | null
 }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = extractSchemaSummaryNodeDefs(survey, cycle)
-
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const languages = Survey.getLanguages(surveyInfo) as string[]
-  const defaultLang = Survey.getDefaultLanguage(surveyInfo) || languages[0] || 'en'
-  const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
-
-  const aiDescNeedingCount = includeAiDescriptions
-    ? Math.min(
-        nodeDefs.filter((nd) => !NodeDef.isRoot(nd) && !(NodeDef.getDescription(defaultLang)(nd) || '').trim()).length,
-        MAX_AI_DESCRIPTIONS
-      )
-    : 0
-  const total = nodeDefs.length + aiDescNeedingCount
-  let processed = 0
-
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as string[]
+  const total = nodeDefs.length
   const items = []
   for (const nodeDef of nodeDefs) {
     if (stopIfFunction?.()) break
-    items.push(buildNodeDefItem({ survey, nodeDef, languages, defaultLang, cycle, includeAiDescriptions }))
-    processed += 1
-    onProgress?.({ total, processed })
+    items.push(buildNodeDefItem({ survey, nodeDef, languages, cycle, aiDescriptions, fileFormat }))
+    onProgress?.({ total, processed: items.length })
   }
-
-  if (includeAiDescriptions) {
-    await addAiDescriptions({ user, surveyName, items, processed, total, onProgress, stopIfFunction })
-  }
-
-  return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
+  return items
 }
 
+/**
+ * Fetches the survey (once) and builds its schema summary rows (see buildSchemaSummaryItems). The AI descriptions are
+ * checked against the node defs of this survey.
+ * @param {object} params - Parameters.
+ * @param {number|string} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
+ * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
+ * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
+ * @param {string} [params.fileFormat] - csv or xlsx: the file the rows are written to.
+ * @param {{fetchSurvey: (surveyId: number|string) => Promise<object>}} [deps] - The dependencies (tests).
+ * @returns {Promise<any[]>} The rows.
+ * @throws {SystemError} aiDescriptionsInvalid (400) when a description is for a node def that is not in the export.
+ */
+export const generateSchemaSummaryItems = async (
+  {
+    surveyId,
+    cycle,
+    aiDescriptions = null,
+    onProgress = null,
+    stopIfFunction = null,
+    fileFormat = FileFormats.csv,
+  }: {
+    surveyId: number
+    cycle: string
+    aiDescriptions?: Record<string, string> | null
+    onProgress?: SchemaSummaryProgressCallback | null
+    stopIfFunction?: (() => boolean) | null
+    fileFormat?: string
+  },
+  deps: { fetchSurvey: (surveyId: number) => Promise<ArenaSurvey> } = DB_DEPS
+) => {
+  const survey = await deps.fetchSurvey(surveyId)
+  if (aiDescriptions) {
+    const knownUuids = extractSchemaSummaryNodeDefs(survey, cycle).map(NodeDef.getUuid)
+    parseAiDescriptions({ raw: aiDescriptions, knownUuids })
+  }
+  return buildSchemaSummaryItems({ survey, cycle, aiDescriptions, onProgress, stopIfFunction, fileFormat })
+}
+
+/**
+ * Writes the schema summary (without AI descriptions) to the output stream (used by the R scripts' route).
+ * @param {object} params - Parameters.
+ * @param {number|string} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {object} params.outputStream - Output stream.
+ * @param {string} params.fileFormat - csv or xlsx.
+ * @returns {Promise<void>} Resolves when written.
+ */
 export const exportSchemaSummary = async ({
   surveyId,
   cycle,
   outputStream,
   fileFormat,
-  user = null,
-  includeAiDescriptions = false,
 }: {
   surveyId: number
   cycle: string
   outputStream: any
   fileFormat: string
-  user?: ArenaUser
-  includeAiDescriptions?: boolean
 }) => {
-  const items = await generateSchemaSummaryItems({ surveyId, cycle, user, includeAiDescriptions })
+  const items = await generateSchemaSummaryItems({ surveyId, cycle })
   await FlatDataWriter.writeItemsToStream({ items, options: { removeNewLines: false }, outputStream, fileFormat })
 }

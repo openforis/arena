@@ -171,6 +171,31 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretación de imágenes basada en muestras',
     sampleBasedImageInterpretationEnabled: 'Interpretación de imágenes basada en muestras habilitada',
+    aiPolicy: {
+      title: 'Política de IA',
+      intro:
+        'Elija dónde puede la IA procesar el contenido de esta encuesta. Se aplica lo más restrictivo entre esta política y los límites de esta instancia de Arena.',
+      schemaLabel: 'Diseño de la encuesta (esquema)',
+      schemaHint: 'Definiciones de nodos, etiquetas y expresiones.',
+      dataLabel: 'Datos de los registros',
+      dataHint: 'Valores recopilados y actividad de los usuarios.',
+      levelHint: {
+        off: 'La IA nunca se usa con este contenido.',
+        onDevice: 'Solo lo procesa un motor de IA que se ejecuta en el dispositivo del usuario.',
+        orgHosted: 'Lo procesa un servidor de IA gestionado por su organización.',
+        cloud: 'Puede procesarlo un proveedor de IA en la nube.',
+      },
+      notAllowedOnInstance: 'No permitido en esta instancia de Arena: {{levels}}',
+      dataLimitedBySchema:
+        'Los datos de los registros no pueden ser más permisivos que el diseño de la encuesta. No disponible: {{levels}}',
+      onDeviceNote: 'En este dispositivo: los usuarios necesitan un servidor de IA local (por ejemplo, LM Studio).',
+      readOnly: 'Solo los administradores de la encuesta pueden cambiar la política de IA.',
+      saved: 'Política de IA guardada',
+      savedDataLowered:
+        'Política de IA guardada. Los datos de los registros también se redujeron: no pueden ser más permisivos que el diseño de la encuesta.',
+      saveError: 'No se pudo guardar la política de IA: {{message}}',
+      loadError: 'No se pudo cargar la política de IA',
+    },
     security: {
       title: 'Seguridad',
       publishToApply: 'Los cambios en estas opciones se aplican una vez publicada la encuesta.',

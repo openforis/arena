@@ -1,6 +1,7 @@
 import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
+import { useLocation } from 'react-router'
 
 import { isHexColor } from '@core/colorUtils'
 import * as Survey from '@core/survey/survey'
@@ -18,6 +19,7 @@ import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
 import type { SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
 import type { MapRailTab, MapWorkspaceRecords } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
+import { findSearchSelectId } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
 import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
@@ -26,6 +28,7 @@ import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
 import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
+import type { ActiveLayer } from './MapLayersPanel/MapLayersPanelContext'
 import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
 
 type LayerGroup = {
@@ -33,9 +36,12 @@ type LayerGroup = {
   count: number
 }
 
+type AiSearch = { text: string; key: string; layerKey: string | null }
+
 type MapViewContentProps = {
   layers: React.ReactElement[]
   overlayGroups: LayerGroup[]
+  aiSearch: AiSearch | null
 }
 
 // the Records tab: the records of the shown layers, to go from one to the next as in the former side panel
@@ -50,16 +56,29 @@ const RECORDS_RAIL_TABS: MapRailTab[] = [
 ]
 
 // MapContainer must always occupy the same position in the React tree so Leaflet never unmounts
-const MapViewContent = ({ layers, overlayGroups }: MapViewContentProps) => {
+const MapViewContent = ({ layers, overlayGroups, aiSearch }: MapViewContentProps) => {
   const { activeLayers, selectPoint } = useMapLayersPanel()
   // the search finds the records the Records tab lists
-  const records = useMemo<MapWorkspaceRecords>(
-    () => ({
+  const records = useMemo<MapWorkspaceRecords>(() => {
+    // the record the assistant asked for: undefined until its layer has points, then the only matching record or null
+    const requestedLayer = aiSearch?.layerKey
+      ? activeLayers.find((layer: ActiveLayer) => layer.key === aiSearch.layerKey)
+      : undefined
+    const selectId = !aiSearch?.layerKey
+      ? null
+      : requestedLayer && findSearchSelectId(buildRecordCandidates([requestedLayer]), aiSearch.text)
+    return {
       candidates: buildRecordCandidates(activeLayers),
       onSelect: (id: string) => selectRecordCandidate({ id, activeLayers, selectPoint }),
-    }),
-    [activeLayers, selectPoint]
-  )
+      searchRequest: aiSearch
+        ? {
+            text: aiSearch.text,
+            key: aiSearch.key,
+            selectId,
+          }
+        : undefined,
+    }
+  }, [activeLayers, aiSearch, selectPoint])
 
   return (
     <MapContainer
@@ -103,6 +122,18 @@ const MapWrapper = () => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()
+
+  // the assistant asks for a layer through the router state; the key changes on every navigation, so each ask counts
+  const { state: locationState, key: locationKey } = useLocation()
+  const requestedUuid: string | null = locationState?.aiMapLayer?.uuid ?? null
+  const requestedSearch: string | null = locationState?.aiMapLayer?.search ?? null
+  const aiSearch = useMemo<AiSearch | null>(
+    () => (requestedSearch ? { text: requestedSearch, key: locationKey, layerKey: requestedUuid } : null),
+    [locationKey, requestedSearch, requestedUuid]
+  )
+  // requested layers stay checked for the life of the view, so a later request does not remove them
+  const [requestedUuids, setRequestedUuids] = useState<ReadonlySet<string>>(new Set())
+  if (requestedUuid && !requestedUuids.has(requestedUuid)) setRequestedUuids(new Set(requestedUuids).add(requestedUuid))
 
   const surveyInfo = useSurveyInfo() as any
   const surveyId = Survey.getId(survey)
@@ -194,6 +225,10 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
+          checked={requestedUuids.has(NodeDef.getUuid(attributeDef))}
+          activationKey={requestedUuid === NodeDef.getUuid(attributeDef) ? locationKey : null}
+          // with a search the map goes to the record or coordinates, not to the layer
+          fitOnActivation={!requestedSearch}
           markersColor={getGeoAttributeLayerMarkersColor({
             attributeDef,
             defaultColor: layerColors[preloadedLayerRefs.length + samplingPointDataLevels.length + index],
@@ -207,8 +242,12 @@ const MapWrapper = () => {
       createRecordFromSamplingPointDataItem,
       geoAttributeDefs,
       layerColors,
+      locationKey,
       onRecordEditClick,
       preloadedLayerRefs,
+      requestedSearch,
+      requestedUuid,
+      requestedUuids,
       samplingPointDataLevels,
     ]
   )
@@ -242,7 +281,7 @@ const MapWrapper = () => {
   return (
     <MapLayersPanelProvider>
       <div className="map-view-layout">
-        <MapViewContent layers={layers} overlayGroups={overlayGroups} />
+        <MapViewContent layers={layers} overlayGroups={overlayGroups} aiSearch={aiSearch} />
       </div>
       {editingRecordUuid && (
         <RecordEditModal

@@ -24,7 +24,6 @@ export default {
   EntitiesDeleteJob: '既存項目の削除',
   FilesImportJob: 'ファイルのインポート',
   MessageSendJob: 'メッセージの送信',
-  NodeDefsTranslationJob: 'ノード定義ラベルの翻訳',
   NodeDefsImportJob: 'ノード定義のインポート',
   NodeDefsValidationJob: 'ノード定義の検証',
   OdkImportJob: 'ODKのインポート',

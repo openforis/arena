@@ -80,6 +80,8 @@ def main():
             "[]com.sun.star.beans.PropertyValue",
             props(
                 ExportBookmarks=True,
+                # the Help assistant links to the bookmark of a heading (#nameddest=...)
+                ExportBookmarksToPDFDestination=True,
                 UseTaggedPDF=True,
                 ReduceImageResolution=True,
                 MaxImageResolution=200,

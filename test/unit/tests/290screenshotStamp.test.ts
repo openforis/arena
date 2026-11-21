@@ -1,4 +1,4 @@
-import { formatCoordinates } from '@webapp/components/MapContainer/workspace/statusbar/coordinateFormat'
+import { formatCoordinates } from '@core/geo/coordinateFormat'
 import {
   getBaseMapName,
   buildStampLines,

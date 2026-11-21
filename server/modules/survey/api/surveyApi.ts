@@ -1,7 +1,7 @@
 import type { Router } from 'express'
 import * as A from '@core/arena'
 
-import { Authorizer } from '@openforis/arena-core'
+import { Authorizer, type ArenaUser } from '@openforis/arena-core'
 
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
@@ -18,12 +18,48 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '../../../job/jobUtils'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
+import { sendRouteError } from '../../../utils/sendRouteError'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import { requireAiFeaturesEnabled } from '../../ai/api/aiMiddleware'
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
+import {
+  assertNoLegacyIncludeAiDescriptions,
+  parseAiDescriptions,
+  parseAiDescriptionsFailedCount,
+} from '../service/schemaSummary/aiDescriptions'
 import * as SurveyService from '../service/surveyService'
+
+/**
+ * Validates the AI descriptions of a schema summary export (generated in the browser). Their uuids are checked by the
+ * export job, which loads the survey anyway.
+ * @param {object} params - Parameters.
+ * @param {object} params.user - Acting user.
+ * @param {unknown} params.aiDescriptions - Descriptions by uuid from the request.
+ * @param {unknown} params.aiDescriptionsFailedCount - Failed count from the request.
+ * @param {unknown} params.aiDescriptionsNotDoneCount - Not done (stopped) count from the request.
+ * @returns {{aiDescriptions: object, aiDescriptionsFailedCount: number, aiDescriptionsNotDoneCount: number}} The validated values.
+ */
+const parseExportAiDescriptions = ({
+  user,
+  aiDescriptions,
+  aiDescriptionsFailedCount,
+  aiDescriptionsNotDoneCount,
+}: {
+  user: ArenaUser
+  aiDescriptions: unknown
+  aiDescriptionsFailedCount: unknown
+  aiDescriptionsNotDoneCount: unknown
+}) => {
+  // the descriptions come from the user's AI: their data dictionary switch still applies
+  assertFeatureEnabled('dataDictionary', user)
+  return {
+    aiDescriptions: parseAiDescriptions({ raw: aiDescriptions }),
+    aiDescriptionsFailedCount: parseAiDescriptionsFailedCount(aiDescriptionsFailedCount),
+    aiDescriptionsNotDoneCount: parseAiDescriptionsFailedCount(aiDescriptionsNotDoneCount),
+  }
+}
 
 export const init = (app: Router) => {
   // ==== CREATE
@@ -321,21 +357,43 @@ export const init = (app: Router) => {
     }
   })
 
-  // schema summary export (start job)
-  app.post('/survey/:surveyId/schema-summary/export', AuthMiddleware.requireSurveyViewPermission, (req, res, next) => {
+  // schema summary: the node defs that need an AI description (described in the browser, see
+  // webapp/ai/workflows/dataDictionary.ts); names, types and paths only
+  app.get('/survey/:surveyId/schema-summary/ai-items', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
     try {
-      const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const job = SurveyService.startSchemaSummaryExportJob({
-        user,
+      const { surveyId, cycle } = Request.getParams(req)
+      assertFeatureEnabled('dataDictionary', Request.getUser(req))
+      res.json(await SchemaSummary.fetchSchemaSummaryAiItems({ surveyId, cycle }))
+    } catch (error) {
+      // not next(error): the browser reads the error key from the JSON, the error middleware would answer with HTML
+      sendRouteError({ res, error, context: 'schema summary AI items' })
+    }
+  })
+
+  // schema summary export (start job); aiDescriptions: AI descriptions generated in the browser. The request only
+  // checks their shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid,
+  // reported in its status), not this request, which answers 200 with the started job.
+  app.post('/survey/:surveyId/schema-summary/export', AuthMiddleware.requireSurveyViewPermission, (req, res) => {
+    try {
+      const params = Request.getParams(req)
+      assertNoLegacyIncludeAiDescriptions(params)
+      const {
         surveyId,
         cycle,
-        fileFormat,
-        includeAiDescriptions,
-      })
+        fileFormat = FileFormats.xlsx,
+        aiDescriptions = null,
+        aiDescriptionsFailedCount = 0,
+        aiDescriptionsNotDoneCount = 0,
+      } = params
+      const user = Request.getUser(req)
+      const ai =
+        aiDescriptions === null
+          ? {}
+          : parseExportAiDescriptions({ user, aiDescriptions, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount })
+      const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
-      next(error)
+      sendRouteError({ res, error, context: 'schema summary export' })
     }
   })
 
@@ -379,7 +437,7 @@ export const init = (app: Router) => {
       contentStream.pipe(res)
     } catch (error) {
       // sendErr preserves the "file not found" status code and key (next(error) would not)
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'survey file download' })
     }
   })
 
@@ -455,23 +513,6 @@ export const init = (app: Router) => {
       next(error)
     }
   })
-
-  // node defs AI translation (start job)
-  app.post(
-    '/survey/:surveyId/nodeDefs/translation/start',
-    AuthMiddleware.requireSurveyEditPermission,
-    requireAiFeaturesEnabled,
-    (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const user = Request.getUser(req)
-        const job = SurveyService.startNodeDefsTranslationJob({ user, surveyId })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   app.put('/survey/:surveyId/config', AuthMiddleware.requireSurveyConfigEditPermission, async (req, res, next) => {
     try {

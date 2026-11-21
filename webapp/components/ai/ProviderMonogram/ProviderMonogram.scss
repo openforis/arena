@@ -1,0 +1,43 @@
+@use '~@webapp/style/vars' as *;
+
+// solid chip per provider, white text (the monogram tokens keep 4.5:1 or more)
+.provider-monogram {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: $colorOnMonogram;
+  // default and other
+  background: $colorMonogramDefault;
+
+  &--small {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+  }
+
+  &--local {
+    background: $colorMonogramLocal;
+  }
+
+  &--openai {
+    background: $colorMonogramOpenai;
+  }
+
+  &--anthropic {
+    background: $colorMonogramAnthropic;
+  }
+
+  &--google {
+    background: $colorMonogramGoogle;
+  }
+
+  &--compatible {
+    background: $colorMonogramCompatible;
+  }
+}

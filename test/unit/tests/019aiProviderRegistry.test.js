@@ -52,16 +52,10 @@ describe('AI provider registry', () => {
       )
     })
 
-    test('throws aiApiKeyMissing for google-vertex without credential', () => {
+    test('throws aiApiKeyMissing for google-vertex without key', () => {
       expect(() => ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash' })).toThrow(
         /aiApiKeyMissing/
       )
-    })
-
-    test('throws aiVertexCredentialInvalid for google-vertex with malformed JSON credential', () => {
-      expect(() =>
-        ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash', apiKey: '{"type":"x"}' })
-      ).toThrow(/aiVertexCredentialInvalid/)
     })
 
     test('throws aiBaseUrlMissing for openai-compatible without baseUrl', () => {
@@ -105,19 +99,29 @@ describe('AI provider registry', () => {
       expect(m).toBeDefined()
     })
 
-    test('returns a model handle for google-vertex with an express mode API key', () => {
-      const m = ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash', apiKey: 'AQ.x' })
-      expect(m).toBeDefined()
-    })
-
-    test('returns a model handle for google-vertex with application default credentials (admin config)', () => {
-      const m = ProviderRegistry.buildModel({
-        provider: 'google-vertex',
-        model: 'gemini-2.5-flash',
-        project: 'my-project',
-        useApplicationDefaultCredentials: true,
-      })
-      expect(m).toBeDefined()
+    test('google-vertex with an API key calls the Vertex AI express endpoint, key in the x-goog-api-key header', async () => {
+      const originalFetch = globalThis.fetch
+      const calls = []
+      globalThis.fetch = async (input, init) => {
+        calls.push({ url: String(input), headers: new Headers(init?.headers) })
+        const body = { candidates: [{ content: { role: 'model', parts: [{ text: 'ok' }] }, finishReason: 'STOP' }] }
+        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      }
+      try {
+        const m = ProviderRegistry.buildModel({
+          provider: 'google-vertex',
+          model: 'gemini-2.5-flash',
+          apiKey: 'vx-key',
+        })
+        await m.doGenerate({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }] })
+      } finally {
+        globalThis.fetch = originalFetch
+      }
+      expect(calls).toHaveLength(1)
+      expect(calls[0].url).toBe(
+        'https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash:generateContent'
+      )
+      expect(calls[0].headers.get('x-goog-api-key')).toBe('vx-key')
     })
 
     test('returns a model handle for vercel-ai-sdk with only a baseUrl', () => {

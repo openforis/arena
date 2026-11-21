@@ -20,6 +20,9 @@ export default {
   cannotInsertFileExceedingQuota: 'ファイルを追加できません：ファイルストレージの容量上限を超えます',
   cannotOverridePublishedTaxa: '公開済みの分類群を上書きできません',
   cantUpdateStep: `ステップを更新できません`,
+  categoryItemLabelsInvalid: 'カテゴリのラベルのリクエストが無効です ({{reason}})。',
+  categoryItemLabelsTooLarge:
+    'このカテゴリは大きすぎるため、不足しているラベルを確認できません。後でもう一度お試しください。',
   chainCannotBeSaved: '処理チェーンが無効なため保存できません',
   csv: {
     emptyHeaderFound: '列{{columnPosition}}に空のヘッダーが見つかりました',
@@ -47,14 +50,17 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: 'この操作を行う権限がありません。',
   functionHasTooFewArguments:
     '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
   functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
   generic: '予期しないエラー：{{text}}',
+  unexpectedServerError: 'サーバーで予期しないエラーが発生しました。',
   geoWhispApiError: 'Whispサービスは現在一時的に利用できません。',
   geoWhispSamplingPointDataCategoryMissing: '抽出地点データのカテゴリが見つかりません。',
   geoWhispSamplingPointDataLocationsMissing: '有効な位置情報を持つ抽出地点データの項目が見つかりません。',
   importingDataIntoWrongCollectSurvey: '誤った調査へのデータインポートです。期待されるURI：{{collectSurveyUri}}',
+  invalidParams: 'リクエストパラメータが無効です。',
   invalidType: '無効な型です：{{type}}',
   jobCanceledOrErrorsFound: 'ジョブがキャンセルされたか、エラーが発生しました。トランザクションをロールバックします',
   jobOrphanedOnRestart: 'サーバーの再起動によりジョブが中断されました。もう一度お試しください。',
@@ -76,6 +82,15 @@ export default {
     entityNotFound: 'キー「{{keyValues}}」の項目「{{entityName}}」が見つかりません',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating)。ノード{{nodeDefName}}での式の評価中にエラーが発生しました：{{details}}',
+    lockTimeout: 'レコードは使用中です。数秒後にもう一度お試しください。',
+    nodeNotInRecord: 'このノードはレコード {{recordUuid}} に属していません。',
+    nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
+    nodesBatchBusy: '別の一括編集が実行中です。数秒後にもう一度お試しください。',
+    nodesBatchInvalidValue: '「{{attributeName}}」の新しい値はこの属性には無効です。',
+    nodesBatchWouldClearValues:
+      'この編集により、該当しなくなる他の値が消去されます。確認するにはフォームでこの値を編集してください。',
+    nodesBatchUnexpected: 'サーバーで予期しないエラーが発生したため、編集を適用できませんでした。',
+    nodesBatchRolledBack: '同じレコードの別の編集が失敗したため、この編集は適用されませんでした。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',
@@ -89,46 +104,98 @@ export default {
     nodeDefNameNotFound: 'ノード定義が見つかりません：{{name}}',
     dataMigrationInProgress: 'この調査はアップグレード中です。しばらくしてから再度お試しください。',
     fileNotFound: 'ファイルが見つかりません',
+    nodeDefRefLocked: '{{name}} は公開済みのため、カテゴリーまたは分類を変更できません。',
     languageCodeInvalid: '言語コードが無効です：{{lang}}',
     cycleKeysInvalid: 'サイクルは1から始まる連番である必要があります',
     srsCodeInvalid: '空間参照系のコードが無効です：{{code}}',
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors
+  aiSessionExpired: 'セッションの有効期限が切れました。もう一度ログインしてください。',
+  aiNotAuthorized: 'ここではこのAI機能を使用する権限がありません。',
   aiNotConfigured:
     'AIが設定されていません。AI設定で個人用プロバイダーを設定するか、管理者にデフォルトの設定を依頼してください。',
+  aiPolicyRefused:
+    'この調査のAIポリシーでは、$t(common:aiPolicy.dataClass.{{dataClass}})を$t(common:aiPolicy.hostingClass.{{hostingClass}})に送信することは許可されていません。',
+  aiPolicyDataAboveSchema:
+    'レコードデータには、調査の設計より緩いレベルは設定できません（設計: 「$t(common:aiPolicy.level.{{schema}})」、レコードデータ: 「$t(common:aiPolicy.level.{{data}})」）。',
+  aiPolicyInvalid: 'AIポリシーが無効です。調査の設計とレコードデータのそれぞれにレベルを選択してください。',
+  aiPolicyAboveCeiling:
+    'このArenaインスタンスでは、$t(common:aiPolicy.dataClass.{{dataClass}})に「$t(common:aiPolicy.level.{{level}})」は許可されていません（上限: 「$t(common:aiPolicy.level.{{ceiling}})」）。',
   aiFeaturesDisabled: 'このデプロイメントではAI機能が無効になっています。',
   aiFeatureDisabled: 'AI機能「{{feature}}」は無効になっています。',
   aiPromptTooLarge: 'AIプロンプトが大きすぎます（{{size}}文字、上限{{limit}}文字）。',
   aiInputTooLong: 'AI入力欄「{{field}}」が{{limit}}文字の上限を超えています。',
-  aiSchemaMissing: '機能「{{feature}}」のAI構造化出力スキーマが見つかりません。',
+  aiFeatureUnknown: '不明なAI機能「{{feature}}」です。',
+  aiCallInvalid: 'AIリクエストが無効です（{{reason}}）。',
+  aiRateLimited: 'AIリクエストが多すぎます。1分ほど待ってから再度お試しください。',
+  aiDailyBudgetExceeded:
+    '本日のArenaデフォルトAIプロバイダーの利用上限に達しました。上限はUTCの午前0時にリセットされます。AI設定で個人用プロバイダーを設定すれば、そのまま利用できます。',
+  aiRequestTimeout: 'AIの応答に時間がかかりすぎました。もう一度お試しください。',
+  aiToolNotOffered: 'AIが使用を許可されていないツールを要求したため、回答を破棄しました。もう一度お試しください。',
+  aiProviderAuth: 'AIプロバイダーが認証情報を拒否しました。AI設定のAPIキーを確認するか、管理者にお問い合わせください。',
+  aiProviderRateLimited: 'AIプロバイダーがリクエストを制限しています。しばらくしてから再度お試しください。',
+  aiProviderRejected: 'AIプロバイダーがリクエストを拒否しました（AI設定のモデル名を確認してください）。',
+  aiDataDictionaryInvalid: 'AIから利用可能なフィールド説明が返されませんでした。',
+  aiDescriptionsInvalid: 'エクスポートと一緒に送信されたAIのフィールド説明が無効です。',
+  aiIncludeAiDescriptionsRemoved: 'このページは古くなっています。再読み込みして、もう一度エクスポートしてください。',
   aiProviderInvalid: 'サポートされていないAIプロバイダーです：{{provider}}。',
   aiModelMissing: 'AIモデルの識別子が必要です。',
   aiApiKeyMissing: 'プロバイダー{{provider}}にはAPIキーが必要です。',
   aiBaseUrlMissing: 'openai-compatibleプロバイダーにはベースURLが必要です。',
-  aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
-  aiVertexCredentialInvalid:
-    'Vertex AI の認証情報が無効です：サービスアカウントの JSON キーまたは Vertex AI の API キーを貼り付けてください。',
+  aiBaseUrlNotAllowed:
+    'このベースURLは内部アドレスを指しており、Arena サーバーからは呼び出しません。お使いのコンピューター上のモデルには、ローカル AI サーバーを使用してください。組織のサーバーの場合は、組織のモデルサーバーへの追加を管理者に依頼してください。',
+  aiProviderUnavailable: 'AIプロバイダーに接続できませんでした。しばらくしてから再度お試しください。',
+  aiProviderResponseTooLarge:
+    'AIプロバイダーの応答が大きすぎたため、途中で打ち切りました。もう一度お試しいただくか、別のプロバイダーを選択してください。',
+  aiSurveyChanged: 'アシスタントの作業中に調査が変更されました。現在の調査を使うには、もう一度質問してください。',
+  aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした。',
+  aiProviderNotFound:
+    'このAIプロバイダーは存在しないか、あなたのものではありません。別のプロバイダーを選んでください。',
+  aiProviderNotGateway:
+    'このブラウザーに保存されたプロバイダーはブラウザーから呼び出され、Arenaサーバーを経由することはありません。',
+  aiApiKeyUnreadable:
+    'このプロバイダーの保存済みAPIキーを読み取れなくなりました（サーバーの暗号化シークレットが変更されました）。AI設定でプロバイダーを編集し、キーをもう一度入力してください。',
+  aiEncryptionMissing:
+    'APIキーを保存できません：サーバーに暗号化シークレットがありません。管理者にAI_USER_KEY_ENCRYPTION_SECRETの設定を依頼してください。',
+  aiProviderChanged:
+    'このAIプロバイダーは確認中に変更または削除されました。AI設定を再読み込みして、もう一度お試しください。',
+  aiProviderFieldTooLong:
+    'プロバイダーの値が長すぎます：$t(appErrors:aiProviderFieldNames.{{field}}) は最大{{max}}文字までです。',
+  aiProviderFieldNames: { model: 'モデル', baseUrl: 'ベースURL', apiKey: 'APIキー' },
+  aiProviderLimitReached: '保存できるAIプロバイダーは最大{{max}}件です。追加するには、いずれかを削除してください。',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',
   aiExpressionNodeDefMissing: '対象フィールドが指定されていないため式を生成できません。',
   aiExpressionNodeDefNotFound: '対象フィールド（uuid {{nodeDefUuid}}）が見つかりませんでした。',
   aiExpressionExpressionMissing: '空の式は説明できません。',
-  aiTranslationSocketMissing: 'WebSocketが接続されていません。しばらく待ってから再度お試しください。',
   aiTranslationSourceLangMissing: '翻訳には元言語の指定が必要です。',
   aiTranslationTargetLangsMissing: '翻訳には少なくとも1つの対象言語の指定が必要です。',
   aiTranslationItemsMissing: '翻訳する項目がありません。',
+  aiTranslationInvalid: 'AIから利用可能な翻訳が返されませんでした。もう一度お試しください。',
   aiTranslationTooManyItems: '一度に処理できる項目数（{{limit}}件）を超えています（{{count}}件指定されました）。',
-  aiActivityLogSurveyMissing: 'アクティビティログを要約するには調査の指定が必要です。',
-  aiChatbotDisabled: 'このデプロイメントではドキュメントチャットボットが無効になっています。',
-  aiChatbotUpstreamError:
-    'ドキュメントチャットボットは現在一時的に利用できません。しばらくしてから再度お試しください。',
-  aiChatbotPayloadTooLarge: '会話が長すぎます。チャットをクリアして、もう少し短い質問をお試しください。',
   aiDataQueryDescriptionMissing: '表示したいデータを自然な言葉で説明してください。',
   aiDataQueryNoEntities: 'この調査にはクエリ可能な項目がありません。',
   aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',
   aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
+  aiAssistantNoAnswer: 'アシスタントは回答を書かずに終了しました。もう一度試すか、より絞った質問をしてください。',
+  aiAssistantContextFull:
+    'アシスタントが回答する前にモデルのコンテキストがいっぱいになりました。新しい会話を始めるか、より絞った質問をするか、コンテキストの大きいモデルを使用してください。',
+  aiAssistantToolCallText:
+    'モデルがツールを呼び出さず、ツール呼び出しをテキストとして書き出しました。もう一度試すか、より大きなモデルを使用してください。',
+  aiLocalServerUnreachable:
+    'AI サーバー ({{baseUrl}}) に接続できませんでした。CORS を有効にして起動していますか？ブラウザーがローカルネットワーク上のデバイスへのアクセスをブロックしていませんか？',
+  aiLocalServerModelMissing:
+    'モデル「{{modelId}}」はローカル AI サーバーで利用できません。LM Studio で読み込むか、AI 設定で別のモデルを選択してください。',
+  aiLocalServerContextExceeded:
+    'リクエストがローカルモデルのコンテキストサイズを超えています。LM Studio でより大きなコンテキストでモデルを読み込むか、リクエストを短くしてください。',
+  aiLocalServerError: 'ローカル AI サーバーがエラーを返しました (HTTP {{status}})。',
+  aiNoEngineAvailable: 'このリクエストに使用できる AI エンジンがありません。',
+  aiLocalServerConsentCancelled: 'リクエストはキャンセルされました。',
+  aiProviderChooseAnother: 'リクエストは送信されませんでした。別の AI プロバイダーを選択してください。',
   aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
+  aiApplyTimeout:
+    'サーバーが時間内に応答しませんでした。一部の変更が適用された可能性があります。再読み込みして確認してください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',
   userCannotDeleteLastSystemAdmin: 'このユーザーは削除できません：最後のシステム管理者です',
@@ -146,6 +213,7 @@ export default {
     '調査ファイルが大きすぎます（最大 {{maxSize}} MB）：データなしで調査をエクスポートしてください。調査の比較にレコードとそのファイルは不要です',
   userIsAdmin: 'このユーザーは既にシステム管理者です',
   userNotAllowedToChangePref: 'このユーザーは設定を変更する権限がありません',
+  userPrefsInvalid: 'ユーザー設定が無効です',
   userNotAuthorized: 'ユーザー{{userName}}には権限がありません',
   userNotFound: 'ユーザーが見つかりません：{{userUuid}}',
   userNotInvitedToSurvey: 'このユーザーにはこの調査への保留中の招待がありません',

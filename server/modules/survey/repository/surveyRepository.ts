@@ -365,6 +365,21 @@ export const fetchFilesTotalSpace = (surveyId: number, client: DbClient = db) =>
     A.prop('value')
   )
 
+/**
+ * Fetches the raw AI policy stored in the survey configuration (one-column select by primary key).
+ * @param {number} surveyId - The survey id.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<object|null>} The stored value (untrusted JSON), or null when not set.
+ */
+export const fetchSurveyAiPolicy = (surveyId: number, client: DbClient = db): Promise<unknown> =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.aiPolicy}}' AS value
+     FROM survey
+     WHERE id = $1`,
+    [surveyId],
+    (row: { value?: unknown } | null) => row?.value ?? null
+  )
+
 export const fetchTemporarySurveyIds = (
   { olderThan24Hours = false }: { olderThan24Hours?: boolean } = {},
   client: DbClient = db

@@ -1,4 +1,5 @@
 import activityLog from './activityLog'
+import aiSuggestions from './aiSuggestions'
 import appErrors from './appErrors'
 import auth from './auth'
 import authProvidersView from './authProvidersView'
@@ -25,6 +26,7 @@ import whatsNew from './whatsNew'
 
 export default {
   activityLog,
+  aiSuggestions,
   appErrors,
   auth,
   authProvidersView,

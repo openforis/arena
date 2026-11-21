@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'インポートしようとしているファイルが空です',
+    emptyFileName: '列 {{headers}} のファイル名が空です',
     invalidHeaders: '無効な列：{{invalidHeaders}}',
     invalidBoolean: '列{{headers}}の真偽値が無効です：{{value}}',
     invalidCode: `属性「{{attributeName}}」のコードが無効です：{{code}}`,
@@ -115,6 +116,10 @@ export default {
     targetsRequired: '少なくとも1つの対象が必要です',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '「{{attributeName}}」は編集できません（読み取り専用または計算属性）。',
+    unsupportedType: '「{{attributeName}}」: {{type}} 型の値はここでは設定できません。',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: '項目は必須です',
     applyIfDuplicate: '「$t(nodeDefEdit:expressionsProp.applyIf)」条件が重複しています',

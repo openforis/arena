@@ -13,6 +13,7 @@ export {
   useAuthCanEditUser,
   useAuthCanInviteUser,
   useAuthCanManageUserGroups,
+  useAuthCanEditSurveyAiPolicy,
   useAuthCanEditQualifierAttributeValue,
   useAuthCanViewOtherUsersEmail,
   useAuthCanUseAnalysis,

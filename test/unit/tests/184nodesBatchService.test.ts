@@ -1,0 +1,260 @@
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
+
+import { createNodesBatchReplyRegistry } from '@server/modules/record/service/update/nodesBatch/nodesBatchReplies'
+import {
+  NodesBatchServiceDeps,
+  updateNodesBatch,
+} from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
+import { createNodesBatchSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
+import { NodesBatchMessageKeys } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
+
+import * as SB from '../../utils/surveyBuilder'
+import * as RB from '../../utils/recordBuilder'
+import * as RecordUtils from '../../utils/recordUtils'
+
+const admin = { uuid: uuidv4(), authGroups: [{ name: 'systemAdmin' }] }
+
+describe('updateNodesBatch', () => {
+  let survey: any
+  let record: any
+  let recordUuid: string
+  let aUuid: string
+  let bUuid: string
+
+  beforeAll(async () => {
+    survey = await SB.survey(
+      admin,
+      SB.entity(
+        'root',
+        SB.attribute('root_key').key(),
+        SB.attribute('a', NodeDef.nodeDefType.integer),
+        SB.attribute('b', NodeDef.nodeDefType.integer)
+      )
+    ).build()
+    record = RB.record(
+      admin,
+      survey,
+      RB.entity('root', RB.attribute('root_key', '1'), RB.attribute('a', 1), RB.attribute('b', 2))
+    ).build()
+    recordUuid = Record.getUuid(record)
+    aUuid = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, record))
+    bUuid = Node.getUuid(RecordUtils.findNodeByPath('root/b')(survey, record))
+  })
+
+  const cycle = Survey.cycleOneKey
+
+  const buildDeps = (overrides: Partial<NodesBatchServiceDeps> = {}) => {
+    const posted: any[] = []
+    const errors: string[] = []
+    const replies = createNodesBatchReplyRegistry()
+    const deps: NodesBatchServiceDeps = {
+      postBatchMessage: (msg) => {
+        posted.push(msg)
+        replies.resolveReply({
+          requestId: msg.requestId,
+          results: msg.edits.map(({ index }) => ({ index, status: 'applied' as const })),
+        })
+      },
+      replies,
+      slots: createNodesBatchSlots(),
+      logError: (message) => {
+        errors.push(message)
+      },
+      ...overrides,
+    }
+    return { deps, posted, errors }
+  }
+
+  const run = (user: any, edits: any[], deps: NodesBatchServiceDeps, recordCycle = cycle) =>
+    updateNodesBatch({ user, surveyId: 1, cycle: recordCycle, edits }, deps)
+
+  const edit = (nodeUuid: string, to: unknown) => ({ recordUuid, nodeUuid, from: 1, to })
+
+  test('posts one message per record and returns the results sorted by index', async () => {
+    const { deps, posted } = buildDeps()
+    const results = await run(admin, [edit(aUuid, 5), edit(bUuid, 6)], deps)
+    expect(results).toEqual([
+      { index: 0, status: 'applied' },
+      { index: 1, status: 'applied' },
+    ])
+    expect(posted).toHaveLength(1)
+    expect(posted[0]).toMatchObject({ recordUuid, cycle, draft: false, surveyId: 1 })
+    expect(posted[0].edits.map((e: any) => e.nodeUuid)).toEqual([aUuid, bUuid])
+  })
+
+  test('a missing reply (timeout) fails every edit of the record with aiApplyTimeout and still returns', async () => {
+    const { deps } = buildDeps({
+      postBatchMessage: () => undefined,
+      replies: createNodesBatchReplyRegistry({ timeoutMs: 5 }),
+    })
+    const results = await run(admin, [edit(aUuid, 5), edit(bUuid, 6)], deps)
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout },
+      { index: 1, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout },
+    ])
+  })
+
+  test('a failure to send the edits of one record fails only that record: the batch is not a 500', async () => {
+    const otherRecord = RB.record(
+      admin,
+      survey,
+      RB.entity('root', RB.attribute('root_key', '2'), RB.attribute('a', 1), RB.attribute('b', 2))
+    ).build()
+    const otherUuid = Record.getUuid(otherRecord)
+    const otherNode = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, otherRecord))
+    const { deps, errors } = buildDeps()
+    const postBatchMessage = deps.postBatchMessage
+    deps.postBatchMessage = (msg) => {
+      if (msg.recordUuid === recordUuid) throw new Error('the thread is gone')
+      postBatchMessage(msg)
+    }
+    const results = await run(
+      admin,
+      [edit(aUuid, 5), { recordUuid: otherUuid, nodeUuid: otherNode, from: 1, to: 5 }, edit(bUuid, 6)],
+      deps
+    )
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
+      { index: 1, status: 'applied' },
+      { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
+    ])
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain('the thread is gone')
+    // the reply that was waiting for the failed record does not stay in the registry
+    expect(deps.replies.size()).toBe(0)
+  })
+
+  test('every record message carries the deadline of the request start minus a commit margin, and the reply wait is shortened', async () => {
+    const waits: (number | undefined)[] = []
+    const { deps, posted } = buildDeps()
+    const registry = deps.replies
+    const waitFor = registry.waitFor
+    registry.waitFor = (requestId, timeoutMs) => {
+      waits.push(timeoutMs)
+      return waitFor(requestId, timeoutMs)
+    }
+    // the thread takes 10 s for each record
+    let now = 1_000_000
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
+    const postBatchMessage = deps.postBatchMessage
+    deps.postBatchMessage = (msg) => {
+      now += 10_000
+      postBatchMessage(msg)
+    }
+    try {
+      await run(admin, [edit(aUuid, 5), { ...edit(bUuid, 6), recordUuid: 'other-record' }], deps)
+    } finally {
+      nowSpy.mockRestore()
+    }
+    expect(posted).toHaveLength(2)
+    // the thread stops 2 s before the reply wait ends, so no commit lands after the timeout was reported
+    expect(posted.map((msg) => msg.deadline)).toEqual([1_058_000, 1_058_000])
+    expect(waits).toEqual([60_000, 60_000 - 10_000])
+  })
+
+  describe('one message at a time', () => {
+    const buildRecords = (count: number) =>
+      Array.from({ length: count }, (_value, index) => {
+        const rec = RB.record(
+          admin,
+          survey,
+          RB.entity('root', RB.attribute('root_key', `r${index}`), RB.attribute('a', 1), RB.attribute('b', 2))
+        ).build()
+        const nodeUuid = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, rec))
+        return { rec, recordUuid: Record.getUuid(rec), nodeUuid }
+      })
+
+    test('a batch never has more than one message in flight: it waits for the reply before sending the next', async () => {
+      const items = buildRecords(4)
+      const { deps, posted } = buildDeps()
+      let inFlight = 0
+      let maxInFlight = 0
+      deps.postBatchMessage = (msg) => {
+        posted.push(msg)
+        inFlight += 1
+        maxInFlight = Math.max(maxInFlight, inFlight)
+        // the thread answers later, as it does with a queue
+        setTimeout(() => {
+          inFlight -= 1
+          deps.replies.resolveReply({
+            requestId: msg.requestId,
+            results: msg.edits.map(({ index }) => ({ index, status: 'applied' as const })),
+          })
+        }, 5)
+      }
+
+      const results = await run(
+        admin,
+        items.map(({ recordUuid: uuid, nodeUuid }) => ({ recordUuid: uuid, nodeUuid, from: 1, to: 5 })),
+        deps
+      )
+
+      expect(results.map((result) => result.status)).toEqual(['applied', 'applied', 'applied', 'applied'])
+      expect(posted).toHaveLength(4)
+      expect(maxInFlight).toBe(1)
+    })
+
+    test('the records not yet sent when the deadline passes get aiApplyTimeout and are not posted', async () => {
+      const items = buildRecords(3)
+      const { deps, posted } = buildDeps()
+      let now = 1_000_000
+      const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
+      deps.postBatchMessage = (msg) => {
+        posted.push(msg)
+        // the first record takes the whole time of the request
+        now += 61_000
+        deps.replies.resolveReply({
+          requestId: msg.requestId,
+          results: msg.edits.map(({ index }) => ({ index, status: 'applied' as const })),
+        })
+      }
+
+      let results: any[]
+      try {
+        results = await run(
+          admin,
+          items.map(({ recordUuid: uuid, nodeUuid }) => ({ recordUuid: uuid, nodeUuid, from: 1, to: 5 })),
+          deps
+        )
+      } finally {
+        nowSpy.mockRestore()
+      }
+
+      expect(results).toEqual([
+        { index: 0, status: 'applied' },
+        { index: 1, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout },
+        { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout },
+      ])
+      expect(posted).toHaveLength(1)
+      expect(deps.replies.size()).toBe(0)
+    })
+  })
+
+  describe('a batch that never ends', () => {
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    test('does not keep its slot after the deadline (a reply wait that is never released)', async () => {
+      jest.useFakeTimers()
+      const replies = { ...createNodesBatchReplyRegistry(), waitFor: () => new Promise<any>(() => undefined) }
+      const { deps, posted } = buildDeps({ replies })
+      const outcome = run(admin, [edit(aUuid, 5)], deps).then(
+        () => null,
+        (error) => error
+      )
+      expect(deps.slots.size()).toBe(1)
+
+      await jest.advanceTimersByTimeAsync(70_000)
+
+      const error = await outcome
+      expect(error).toMatchObject({ key: NodesBatchMessageKeys.applyTimeout })
+      expect(deps.slots.size()).toBe(0)
+      expect(posted).toHaveLength(1)
+    })
+  })
+})

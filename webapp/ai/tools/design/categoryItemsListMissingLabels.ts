@@ -1,0 +1,316 @@
+/**
+ * Lists the items of a category whose label is missing in a survey language, page by page. The
+ * items come from the server: the browser does not hold the items of large categories.
+ */
+import { z } from 'zod'
+
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+
+import {
+  CATEGORY_ITEM_LABEL_TEXT_MAX,
+  type MissingLabelsItem,
+  type MissingLabelsPage,
+} from '@common/ai/categoryItemLabels'
+
+import {
+  fetchMissingLabelsPage,
+  type FetchMissingLabelsPage,
+} from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
+import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
+
+import { canEditCurrentSurvey } from '../common/toolPermissions'
+import { getResultBudget } from '../common/toolResult'
+import { AiToolFailure } from '../toolFailure'
+import type { AiTool, AiToolContext } from '../types'
+import { createCategoryItemRefs, type CategoryItemRefs } from './categoryItemRefs'
+import { requireSurvey } from './surveyLookup'
+
+export const LIST_MISSING_LABELS_SERVER_PAGE = 100
+export const LIST_MISSING_LABELS_MAX_REQUESTS = 5
+export const LIST_MISSING_LABELS_DEFAULT_LIMIT = 50
+
+const inputSchema = z.object({
+  categoryName: z.string().min(1).max(100),
+  lang: z.string().min(2).max(10).describe('The survey language whose labels are missing'),
+  // an item uuid the server gave: it refuses another text with a 400 (it restarts only on a uuid it does not know)
+  cursor: z.string().min(1).max(64).optional().describe('nextCursor of the previous call, unchanged'),
+  limit: z.number().int().min(1).max(50).optional(),
+})
+
+export type ListMissingLabelsInput = z.infer<typeof inputSchema>
+
+export type ListedCategoryItem = {
+  // code path, e.g. "2.14": what the model passes back to categoryItemLabels_proposeSet
+  ref: string
+  levelName: string
+  code: string
+  sourceLang: string | null
+  sourceText: string
+  sourceTextTruncated?: true
+}
+
+export type ListMissingLabelsResult = {
+  categoryName: string
+  lang: string
+  total: number
+  items: ListedCategoryItem[]
+  nextCursor: string | null
+  note: string
+}
+
+type PageState = { items: ListedCategoryItem[]; size: number; lastConsumed: string | null; full: boolean }
+
+type PageParams = {
+  refs: CategoryItemRefs
+  surveyId: number
+  categoryUuid: string
+  lang: string
+  languages: string[]
+  pendingItemUuids: Set<string>
+  limit: number
+  maxChars: number
+}
+
+/**
+ * Returns the category with a name, or fails for the model.
+ * @param {object} survey - Survey.
+ * @param {string} categoryName - Category name.
+ * @returns {object} The category.
+ */
+export const requireCategory = (survey: any, categoryName: string): any => {
+  const category = Survey.getCategoryByName(categoryName)(survey)
+  if (!category) {
+    throw new AiToolFailure('categoryNotFound', `No category is named "${categoryName}".`, { categoryName })
+  }
+  return category
+}
+
+/**
+ * Fails when a conversation started by Do it on this suggestion asks for another category.
+ * @param {AiToolContext} ctx - Tool context.
+ * @param {string} categoryUuid - Category uuid.
+ * @param {string} categoryName - Category name.
+ * @returns {void}
+ */
+export const checkScope = (ctx: AiToolContext, categoryUuid: string, categoryName: string): void => {
+  const scope = ctx.suggestionScope
+  if (scope?.kind !== 'categoryItemTranslations' || scope.targetKeys.includes(categoryUuid)) return
+  throw new AiToolFailure(
+    'categoryOutOfScope',
+    `The user accepted the translation of other categories; "${categoryName}" is not one of them.`,
+    { categoryName }
+  )
+}
+
+/**
+ * Returns the survey languages, failing when lang is not one of them.
+ * @param {object} survey - Survey.
+ * @param {string} lang - Requested language.
+ * @returns {string[]} The survey languages, default first.
+ */
+const requireSurveyLanguage = (survey: any, lang: string): string[] => {
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
+  if (!languages.includes(lang)) {
+    throw new AiToolFailure('invalidInput', `"${lang}" is not a survey language (${languages.join(', ')}).`)
+  }
+  return languages
+}
+
+/**
+ * Returns the items whose label in lang is in a pending card (not applied nor discarded yet).
+ * @param {AiToolContext} ctx - Tool context.
+ * @param {string} categoryUuid - Category uuid.
+ * @param {string} lang - Language.
+ * @returns {Set<string>} The item uuids.
+ */
+const getPendingItemUuids = (ctx: AiToolContext, categoryUuid: string, lang: string): Set<string> => {
+  const result = new Set<string>()
+  for (const changeSet of ctx.getPendingChangeSets?.() ?? []) {
+    for (const op of changeSet.operations) {
+      if (isCategoryItemLabelOperation(op) && op.categoryUuid === categoryUuid && op.lang === lang) {
+        result.add(op.itemUuid)
+      }
+    }
+  }
+  return result
+}
+
+/**
+ * Converts a server item to what the model reads; the source is the first filled label, default language first.
+ * @param {MissingLabelsItem} item - Server item.
+ * @param {string} lang - Language to translate to.
+ * @param {string[]} languages - Survey languages, default first.
+ * @returns {ListedCategoryItem} The item.
+ */
+const toListedItem = (item: MissingLabelsItem, lang: string, languages: string[]): ListedCategoryItem => {
+  const source = findTranslationSource({ texts: item.labels, lang, languages })
+  const sourceLang = source?.lang ?? null
+  const fullText = source?.text ?? ''
+  const truncated = fullText.length > CATEGORY_ITEM_LABEL_TEXT_MAX
+  return {
+    ref: item.codePath.join('.'),
+    levelName: item.levelName,
+    code: item.codePath.at(-1) ?? '',
+    sourceLang,
+    sourceText: truncated ? fullText.slice(0, CATEGORY_ITEM_LABEL_TEXT_MAX) : fullText,
+    ...(truncated ? { sourceTextTruncated: true as const } : {}),
+  }
+}
+
+/**
+ * Consumes the items of a server page until the limit or the JSON budget is reached.
+ * @param {MissingLabelsItem[]} items - Server items.
+ * @param {PageState} state - Collected items (updated).
+ * @param {PageParams} params - Parameters.
+ * @returns {void}
+ */
+const collectItems = (items: MissingLabelsItem[], state: PageState, params: PageParams): void => {
+  const { refs, surveyId, categoryUuid, lang, languages, pendingItemUuids, limit, maxChars } = params
+  for (const item of items) {
+    const pending = pendingItemUuids.has(item.uuid)
+    const listed = pending ? null : toListedItem(item, lang, languages)
+    const itemSize = listed ? JSON.stringify(listed).length + 1 : 0
+    // a page is cut only when it has items, so an oversized item still makes progress
+    if (listed && state.items.length > 0 && (state.items.length >= limit || state.size + itemSize > maxChars)) {
+      state.full = true
+      return
+    }
+    const entry = { itemUuid: item.uuid, levelName: item.levelName, labels: item.labels }
+    refs.register({ surveyId, categoryUuid, ref: item.codePath.join('.'), entry })
+    if (listed) {
+      state.items.push(listed)
+      state.size += itemSize
+    }
+    state.lastConsumed = item.uuid
+  }
+}
+
+/**
+ * Returns the note telling the model how to go on.
+ * @param {string|null} nextCursor - Next cursor.
+ * @param {number} pendingCount - Labels of this category and language in pending cards.
+ * @param {string|null} example - An item of the propose tool input, null when nothing is listed.
+ * @returns {string} The note.
+ */
+const buildNote = (nextCursor: string | null, pendingCount: number, example: string | null): string => {
+  const parts = [nextCursor ? 'More items remain: call again with cursor = nextCursor.' : 'No more items.']
+  if (pendingCount > 0) parts.push(`${pendingCount} items already in pending cards are not listed.`)
+  // the last thing the model reads: without it a small model writes the labels as text
+  parts.push(
+    'To set labels, call categoryItemLabels_proposeSet with the refs: labels written as text cannot be applied.'
+  )
+  if (example) parts.push(`Its "items" are like ${example}, one for each ref.`)
+  return parts.join(' ')
+}
+
+// the server's answer to a bad cursor: 400, key `appErrors:categoryItemLabelsInvalid`, params.reason `cursor`
+const isCursorRefusal = (error: any): boolean =>
+  error?.response?.status === 400 &&
+  error.response.data?.key === 'appErrors:categoryItemLabelsInvalid' &&
+  error.response.data?.params?.reason === 'cursor'
+
+/**
+ * Returns the failure for a cursor the server refuses (it answers 400 to a text that is not an item uuid).
+ * @param {any} error - Request error.
+ * @param {string|null} cursor - Cursor of the request.
+ * @returns {AiToolFailure|null} The failure, null when the error is not about the cursor.
+ */
+const toCursorFailure = (error: any, cursor: string | null): AiToolFailure | null =>
+  cursor !== null && isCursorRefusal(error)
+    ? new AiToolFailure(
+        'invalidCursor',
+        'The cursor is not one this tool returned. Pass nextCursor exactly as received, or call again without cursor to start from the first item.'
+      )
+    : null
+
+/**
+ * Fetches a server page; a cursor the server refuses becomes a failure the model can act on.
+ * @param {FetchMissingLabelsPage} fetchPage - Page fetcher.
+ * @param {Parameters<FetchMissingLabelsPage>[0]} params - Request parameters.
+ * @returns {Promise<MissingLabelsPage>} The page.
+ */
+const fetchServerPage = async (
+  fetchPage: FetchMissingLabelsPage,
+  params: Parameters<FetchMissingLabelsPage>[0]
+): Promise<MissingLabelsPage> => {
+  try {
+    return await fetchPage(params)
+  } catch (error) {
+    throw toCursorFailure(error, params.cursor) ?? error
+  }
+}
+
+/**
+ * Creates the tool (the fetcher is injected in tests).
+ * @param {object} [deps] - Dependencies.
+ * @param {FetchMissingLabelsPage} [deps.fetchPage] - Missing-labels page fetcher.
+ * @returns {AiTool} The tool.
+ */
+export const createCategoryItemsListMissingLabelsTool = ({
+  fetchPage = fetchMissingLabelsPage,
+}: { fetchPage?: FetchMissingLabelsPage } = {}): AiTool<ListMissingLabelsInput, ListMissingLabelsResult> => ({
+  name: 'categoryItems_listMissingLabels',
+  description:
+    'Lists the items of a category whose label is missing in a survey language, with the text to translate ' +
+    '(sourceText, in sourceLang). Pass nextCursor as cursor to get the next items. Items already in pending cards ' +
+    'are skipped. Propose the translations with categoryItemLabels_proposeSet, using the ref of each item.',
+  inputSchema,
+  area: ['design'],
+  dataClass: 'schema',
+  requires: canEditCurrentSurvey,
+  execute: async ({ categoryName, lang, cursor, limit = LIST_MISSING_LABELS_DEFAULT_LIMIT }, ctx) => {
+    const survey = requireSurvey(ctx)
+    const category = requireCategory(survey, categoryName)
+    const categoryUuid = Category.getUuid(category)
+    checkScope(ctx, categoryUuid, categoryName)
+    const languages = requireSurveyLanguage(survey, lang)
+    const pendingItemUuids = getPendingItemUuids(ctx, categoryUuid, lang)
+    const surveyId = Number(Survey.getId(survey))
+    const params: PageParams = {
+      refs: ctx.categoryItemRefs ?? createCategoryItemRefs(),
+      surveyId,
+      categoryUuid,
+      lang,
+      languages,
+      pendingItemUuids,
+      limit,
+      maxChars: getResultBudget(ctx),
+    }
+    const state: PageState = { items: [], size: 400, lastConsumed: cursor ?? null, full: false }
+    let serverCursor: string | null = cursor ?? null
+    let serverTotal = 0
+    for (let request = 0; request < LIST_MISSING_LABELS_MAX_REQUESTS && !state.full; request += 1) {
+      const page = await fetchServerPage(fetchPage, {
+        surveyId,
+        categoryUuid,
+        lang,
+        cursor: serverCursor,
+        limit: LIST_MISSING_LABELS_SERVER_PAGE,
+        signal: ctx.signal,
+      })
+      if (request === 0) serverTotal = page.total
+      collectItems(page.items, state, params)
+      serverCursor = page.nextCursor
+      if (serverCursor === null) break
+    }
+    const nextCursor = state.full || serverCursor !== null ? state.lastConsumed : null
+    return {
+      categoryName,
+      lang,
+      total: Math.max(0, serverTotal - pendingItemUuids.size),
+      items: state.items,
+      nextCursor,
+      note: buildNote(
+        nextCursor,
+        pendingItemUuids.size,
+        state.items.length > 0
+          ? `{ "categoryName": "${categoryName}", "ref": "${state.items[0].ref}", "lang": "${lang}", "text": "..." }`
+          : null
+      ),
+    }
+  },
+})
+
+export const categoryItemsListMissingLabelsTool = createCategoryItemsListMissingLabelsTool()

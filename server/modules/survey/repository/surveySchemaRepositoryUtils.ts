@@ -18,8 +18,10 @@ export const getSurveyDBSchema = Schemata.getSchemaSurvey
 // ====== UPDATE
 
 /**
- * @param surveyId
- * @param client
+ * Marks the survey as draft.
+ * @param {number|string} surveyId - The survey id.
+ * @param {object} [client] - The db client.
+ * @returns {Promise<void>} Resolves when the survey is marked.
  * @deprecated - Implement it in survey repository.
  */
 export const markSurveyDraft = (surveyId: number, client: DbClient = db) =>
@@ -91,7 +93,7 @@ export const bulkUpdateSurveySchemaTableProp = (
     columns: [
       { name: 'recordUuid', cast: 'uuid' }, // Key 1: For WHERE condition
       'key', // Key 2: The JSON key to update
-      'value', // Key 3: The JSON value
+      { name: 'value', mod: ':json', cast: 'jsonb' }, // Key 3: The JSON value (a number, an object...)
     ],
   })
   const valuesClause = DbUtils.createBulkUpdateValues({ columnSet, values })

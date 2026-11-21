@@ -5,15 +5,19 @@
  * - `buildDataQueryGeneratePrompt`: the schema description given to the model.
  * Both are pure functions, so they are tested without going through the LLM gateway.
  */
+import { MockLanguageModelV4 } from 'ai/test'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
 
-import { toQuery } from '@server/modules/ai/service/dataQueryGenerateService'
-import { buildDataQueryGeneratePrompt } from '@server/modules/ai/service/prompts/dataQueryGenerate'
-import { normalizeQueryName } from '@server/modules/ai/service/dataQuerySummarizeService'
-import { buildDataQuerySummarizePrompt } from '@server/modules/ai/service/prompts/dataQuerySummarize'
+import { generateDataQuery, normalizeQueryName, summarizeDataQuery, toQuery } from '@common/ai/tasks/dataQuery'
+import { generateDataQueryWorkflow } from '@webapp/ai/workflows/dataQuery'
+import { buildDataQueryGeneratePrompt } from '@common/ai/prompts/dataQueryGenerate'
+import { buildDataQuerySummarizePrompt } from '@common/ai/prompts/dataQuerySummarize'
+
+import { expectSystemErrorKey, scriptedTextGenerator } from '@test/unit/utils/aiTestUtils'
 
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -59,6 +63,27 @@ describe('AI data query generation', () => {
       expect(Query.getMeasures(query)).toEqual({ [treeUuid]: ['cnt'] })
       expect(Query.getAttributeDefUuids(query)).toEqual([])
       expect(Query.hasSelection(query)).toBe(true)
+    })
+
+    test('a column name stands for its attribute; an aggregate query sorts by the count', () => {
+      const { query, errors } = convert({
+        dimensions: ['tree_species_scientific_name'],
+        measures: [{ attribute: 'tree', functions: ['cnt'] }],
+        sort: [{ attribute: 'tree', order: 'desc' }],
+      })
+      expect(errors).toEqual([])
+      expect(Query.getDimensions(query)).toEqual([getUuid('cluster/plot/tree/tree_species')])
+      const [sortCriteria] = Query.getSort(query)
+      expect(SortCriteria.getVariable(sortCriteria)).toBe('tree_uuid_cnt')
+      expect(SortCriteria.isOrderDesc(sortCriteria)).toBe(true)
+
+      const raw = convert({
+        mode: Query.modes.raw,
+        attributes: ['tree_species'],
+        sort: [{ attribute: 'tree_species_scientific_name' }],
+      })
+      expect(raw.errors).toEqual([])
+      expect(SortCriteria.getVariable(Query.getSort(raw.query)[0])).toBe('tree_species_scientific_name')
     })
 
     test('aggregate query with ancestor dimension, measure functions, filter and sort', () => {
@@ -168,13 +193,42 @@ describe('AI data query generation', () => {
     })
 
     test('missing selection', () => {
-      expect(convert({}).errors).toEqual(
-        expect.arrayContaining([
-          'aggregate mode requires at least one dimension',
-          'aggregate mode requires at least one measure',
-        ])
-      )
+      expect(convert({}).errors).toEqual(['aggregate mode requires at least one measure'])
+      // measures alone: one figure over all the rows
+      const { query, errors } = convert({ measures: [{ attribute: 'tree', functions: ['cnt'] }] })
+      expect(errors).toEqual([])
+      expect(Query.hasSelection(query)).toBe(true)
       expect(convert({ mode: Query.modes.raw }).errors).toEqual(['raw mode requires at least one attribute'])
+    })
+
+    test('filter: a code attribute compared with a value that is not one of its codes', () => {
+      const errorsOf = (filter: string) => convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter }).errors
+      expect(errorsOf('tree_status == "L"')).toEqual([])
+      expect(errorsOf('tree_status_label == "Live"')).toEqual([])
+      // the label was written: the code to use is given
+      expect(errorsOf('tree_status == "Live"')).toEqual([
+        'filter value "Live" is not a code of "tree_status": use "L" (Live)',
+      ])
+      expect(errorsOf('"dying" != tree_status')).toEqual([
+        'filter value "dying" is not a code of "tree_status": its codes are "L" (Live), "D" (Dead)',
+      ])
+    })
+
+    test('filter: a taxon attribute compared with a name, where its column holds the code', () => {
+      const errorsOf = (filter: string) => convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter }).errors
+      expect(errorsOf('tree_species == "AFZ/QUA"')).toEqual([])
+      expect(errorsOf('tree_species_scientific_name == "Afzelia quanzensis"')).toEqual([])
+      expect(errorsOf('tree_species == "Afzelia quanzensis"')).toEqual([
+        'filter value "Afzelia quanzensis" is not a code of "tree_species": compare the name with tree_species_scientific_name',
+      ])
+    })
+
+    test('an unknown attribute name comes with the close names', () => {
+      const { errors } = convert({ mode: Query.modes.raw, attributes: ['tree_heigth', 'height'] })
+      expect(errors).toEqual([
+        'attribute "tree_heigth" not found; close names: tree_height',
+        'attribute "height" not found; close names: tree_height',
+      ])
     })
 
     test('invalid filter and sort', () => {
@@ -188,9 +242,18 @@ describe('AI data query generation', () => {
         'filter references unknown column "unknown_column"',
         'cannot sort by "dbh": sort attributes must be among the selected attributes',
       ])
+      // a guessed column gets the close ones
+      expect(convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'species == "x"' }).errors).toEqual([
+        'filter references unknown column "species"; close names: ' +
+          'tree_species, tree_species_scientific_name, tree_species_vernacular_name',
+      ])
       expect(convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'dbh >' }).errors[0]).toMatch(
         /cannot be parsed/
       )
+      // a filter in SQL style gets the syntax to use
+      expect(
+        convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter: 'dbh > 10 AND tree_id = 1' }).errors[0]
+      ).toMatch(/cannot be parsed.*JavaScript syntax.*==.*&&/)
     })
   })
 
@@ -263,6 +326,64 @@ describe('AI data query generation', () => {
       expect(normalizeQueryName({ name: '', label: 'Average DBH' })).toBe('average_dbh')
       expect(normalizeQueryName({ name: null, label: null })).toBe('ai_query')
       expect(normalizeQueryName({ name: 'a'.repeat(60) })).toHaveLength(40)
+    })
+  })
+  describe('generateDataQuery', () => {
+    const answer = (entity: string) => JSON.stringify({ entity, mode: 'raw', attributes: [], explanation: 'x' })
+
+    test('retries once with the validation errors, then fails with aiDataQueryInvalid', async () => {
+      const { generateText, calls } = scriptedTextGenerator(answer('nope'), answer('still_nope'))
+      const error = await expectSystemErrorKey(
+        generateDataQuery({ generateText, survey, cycle, lang, description: 'trees', includeAnalysis: false }),
+        'aiDataQueryInvalid'
+      )
+      expect(error.statusCode).toBe(502)
+      expect(calls).toHaveLength(2)
+      // prompts quote untrusted text with JSON.stringify (pq), hence the escaped quotes
+      expect(calls[1].prompt).toContain(String.raw`entity \"nope\" not found`)
+    })
+
+    test('rejects a blank description without calling the model', async () => {
+      const { generateText, calls } = scriptedTextGenerator()
+      await expectSystemErrorKey(
+        generateDataQuery({ generateText, survey, cycle, lang, description: ' ', includeAnalysis: false }),
+        'aiDataQueryDescriptionMissing'
+      )
+      expect(calls).toHaveLength(0)
+    })
+  })
+
+  describe('summarizeDataQuery', () => {
+    test('rejects an empty query', async () => {
+      const { generateText } = scriptedTextGenerator()
+      await expectSystemErrorKey(summarizeDataQuery({ generateText, survey, query: {}, lang }), 'aiDataQueryEmpty')
+    })
+  })
+
+  describe('generateDataQueryWorkflow', () => {
+    test('runs the shared task on the given model', async () => {
+      const answer = JSON.stringify({ entity: 'tree', mode: 'raw', attributes: ['tree_species'], explanation: 'ok' })
+      const model = new MockLanguageModelV4({
+        doGenerate: async () =>
+          ({
+            content: [{ type: 'text', text: answer }],
+            finishReason: { unified: 'stop', raw: undefined },
+            usage: { inputTokens: { total: 1 }, outputTokens: { total: 1 } },
+            warnings: [],
+          }) as any,
+      })
+      const { query, explanation } = await generateDataQueryWorkflow({
+        survey,
+        surveyId: 1,
+        cycle,
+        lang,
+        description: 'tree species',
+        includeAnalysis: false,
+        model,
+      })
+      expect(Query.getEntityDefUuid(query)).toBe(getUuid('cluster/plot/tree'))
+      expect(explanation).toBe('ok')
+      expect(model.doGenerateCalls).toHaveLength(1)
     })
   })
 })

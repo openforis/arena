@@ -1,0 +1,276 @@
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import SystemError from '@core/systemError'
+import { uuidv4 } from '@core/uuid'
+
+import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
+
+import {
+  cleaningTestRecord,
+  cleaningTestSurvey,
+  fakeI18n,
+  newCleaningSurveyUser,
+  newCleaningToolContext,
+  newFakeCleaningApi,
+  runTool,
+  validateWholeRecord,
+} from '@test/unit/utils/aiCleaningTestUtils'
+
+import * as RecordUtils from '../../utils/recordUtils'
+
+let survey: any
+let record: any
+
+const nodeUuidAt = (path: string) => Node.getUuid(RecordUtils.findNodeByPath(path)(survey, record))
+
+const newTool = (fetchRecordAndNodes: (params: any) => unknown = () => record) => {
+  const fake = newFakeCleaningApi({ fetchRecordAndNodes })
+  return { tool: createRecordsProposeEditsTool({ api: fake.api, getI18n: () => fakeI18n }) as any, calls: fake.calls }
+}
+
+beforeAll(async () => {
+  survey = await cleaningTestSurvey()
+  record = await validateWholeRecord({ survey, record: cleaningTestRecord({ survey }) })
+})
+
+describe('records_proposeEdits', () => {
+  test('is a data propose tool of the cleaning area', () => {
+    const { tool } = newTool()
+    expect(tool).toMatchObject({
+      name: 'records_proposeEdits',
+      dataClass: 'data',
+      area: ['cleaning'],
+    })
+    const dataEditor = newCleaningSurveyUser({ survey, groupName: 'dataEditor' })
+    expect(tool.requires(newCleaningToolContext({ survey, user: dataEditor }))).toBe(false)
+  })
+
+  test('valid edits become a change set; the others are returned to the model', async () => {
+    const { tool, calls } = newTool()
+    const ctx = newCleaningToolContext({ survey })
+    const recordUuid = Record.getUuid(record)
+    const result = await runTool(
+      tool,
+      {
+        summary: 'Fix DBH and remarks',
+        edits: [
+          { recordUuid, nodeUuid: nodeUuidAt('cluster/plot[0]/tree[0]/dbh'), value: '8.5' },
+          { recordUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'checked' },
+          { recordUuid, nodeUuid: nodeUuidAt('cluster/cluster_distance'), value: 'far' },
+          { recordUuid, nodeUuid: uuidv4(), value: '1' },
+          { recordUuid, nodeUuid: nodeUuidAt('cluster/plot[0]/tree[1]/dbh'), value: '10.123' },
+          { recordUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'twice' },
+        ],
+      },
+      ctx
+    )
+    // the record is loaded once
+    expect(calls.filter((call) => call.name === 'fetchRecordAndNodes')).toHaveLength(1)
+    expect(ctx.changeSets).toHaveLength(1)
+    const [changeSet] = ctx.changeSets
+    expect(result).toEqual({
+      changeSetId: changeSet.id,
+      proposed: 2,
+      operations: 2,
+      rejected: [
+        expect.objectContaining({ index: 2, code: 'invalidValue', message: expect.stringContaining('invalidNumber') }),
+        expect.objectContaining({ index: 3, code: 'nodeNotFound' }),
+        expect.objectContaining({ index: 4, code: 'noChange' }),
+        expect.objectContaining({ index: 5, code: 'duplicateEdit' }),
+      ],
+      shownToUser: true,
+    })
+    expect(changeSet.summary).toBe('Fix DBH and remarks')
+    expect(changeSet.operations[0]).toMatchObject({
+      type: 'record.attributeUpdate',
+      recordUuid,
+      nodeUuid: nodeUuidAt('cluster/plot[0]/tree[0]/dbh'),
+      recordKeys: '12',
+      path: 'cluster[12] / plot[1] / tree[1] / dbh',
+      from: 7,
+      to: 8.5,
+      display: { from: '7', to: '8.5' },
+      preview: { badge: 'noErrors', messages: [], recordNewErrors: 0 },
+    })
+    // the record editor page of an attribute is its parent entity
+    const tree = Record.getParentNode(RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]/dbh')(survey, record))(record)
+    expect(changeSet.operations[0].page).toEqual({
+      nodeUuid: Node.getUuid(tree),
+      nodeDefUuid: Node.getNodeDefUuid(tree),
+    })
+    expect(changeSet.operations[1]).toMatchObject({ path: 'cluster[12] / remarks', from: '', to: 'checked' })
+  })
+
+  test('a node that the form shows read-only is rejected, not proposed', async () => {
+    const remarks = RecordUtils.findNodeByPath('cluster/remarks')(survey, record)
+    const parent = Record.getParentNode(remarks)(record)
+    const lockedRecord = {
+      ...record,
+      nodes: {
+        ...record.nodes,
+        [Node.getUuid(parent)]: {
+          ...parent,
+          meta: { ...parent.meta, cEdit: { [Node.getNodeDefUuid(remarks)]: false } },
+        },
+      },
+    }
+    const { tool } = newTool(() => lockedRecord)
+    const ctx = newCleaningToolContext({ survey })
+    const result = await runTool(
+      tool,
+      { summary: 's', edits: [{ recordUuid: Record.getUuid(record), nodeUuid: Node.getUuid(remarks), value: 'x' }] },
+      ctx
+    )
+    expect(ctx.changeSets).toEqual([])
+    expect(JSON.stringify(result)).toContain('attributeNotEditable')
+  })
+
+  test('a record of another cycle is rejected, and operations carry the proposal cycle', async () => {
+    const ctx = newCleaningToolContext({ survey })
+    const recordUuid = Record.getUuid(record)
+    const edit = { recordUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'x' }
+    const { tool: otherCycleTool } = newTool(() => ({ ...record, cycle: 'other-cycle' }))
+    const refused = await runTool(otherCycleTool, { summary: 's', edits: [edit] }, ctx)
+    expect(ctx.changeSets).toEqual([])
+    expect(refused.error.issues).toEqual([{ operation: 0, field: 'recordOfOtherCycle', message: expect.any(String) }])
+
+    const { tool } = newTool()
+    await runTool(tool, { summary: 's', edits: [edit] }, ctx)
+    expect(ctx.changeSets[0].operations[0].cycle).toBe(Record.getCycle(record))
+  })
+
+  test('the description tells to change a child code in a later change set', () => {
+    expect(newTool().tool.description).toContain('separate, later change set')
+  })
+
+  test('a record the user may not see refuses all its edits', async () => {
+    const { tool } = newTool(() => null)
+    const ctx = newCleaningToolContext({ survey })
+    const result = await runTool(
+      tool,
+      { summary: 's', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), value: '1' }] },
+      ctx
+    )
+    expect(ctx.changeSets).toEqual([])
+    expect(result).toEqual({
+      error: {
+        code: 'invalidProposal',
+        message: expect.any(String),
+        issues: [{ operation: 0, field: 'recordNotAvailable', message: expect.any(String) }],
+      },
+    })
+  })
+
+  test('a record the user may not edit refuses all its edits', async () => {
+    const cleanser = newCleaningSurveyUser({ survey, groupName: 'dataCleanser' })
+    const analysisRecord = { ...record, step: '3' }
+    const { tool } = newTool(() => analysisRecord)
+    const ctx = newCleaningToolContext({ survey, user: cleanser })
+    const result = await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [{ recordUuid: Record.getUuid(record), nodeUuid: nodeUuidAt('cluster/remarks'), value: 'x' }],
+      },
+      ctx
+    )
+    expect(result.error.issues).toEqual([{ operation: 0, field: 'recordNotEditable', message: expect.any(String) }])
+    expect(ctx.changeSets).toEqual([])
+  })
+
+  test('a value can be cleared with null', async () => {
+    const { tool } = newTool()
+    const ctx = newCleaningToolContext({ survey })
+    await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [{ recordUuid: Record.getUuid(record), nodeUuid: nodeUuidAt('cluster/gps_model'), value: null }],
+      },
+      ctx
+    )
+    expect(ctx.changeSets[0].operations[0]).toMatchObject({ from: 'ABC-123-xyz', to: null, display: { to: null } })
+  })
+
+  test('several records: one load each, rejections sorted across records', async () => {
+    const secondUuid = uuidv4()
+    const second = { ...record, uuid: secondUuid }
+    const { tool, calls } = newTool(({ recordUuid }) => (recordUuid === secondUuid ? second : record))
+    const ctx = newCleaningToolContext({ survey })
+    const firstUuid = Record.getUuid(record)
+    const result = await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [
+          { recordUuid: firstUuid, nodeUuid: uuidv4(), value: '1' },
+          { recordUuid: secondUuid, nodeUuid: uuidv4(), value: '1' },
+          { recordUuid: firstUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'ok' },
+          { recordUuid: firstUuid, nodeUuid: uuidv4(), value: '1' },
+        ],
+      },
+      ctx
+    )
+    expect(calls.filter((call) => call.name === 'fetchRecordAndNodes')).toHaveLength(2)
+    expect(result.rejected.map((rejection: any) => rejection.index)).toEqual([0, 1, 3])
+    expect(result.proposed).toBe(1)
+  })
+
+  test('a timeout in a ref-data lookup is reported as queryTimeout, not as an invalid value', async () => {
+    const fake = newFakeCleaningApi({
+      fetchRecordAndNodes: () => record,
+      fetchCategoryItems: () => {
+        throw new SystemError('queryTimeout')
+      },
+    })
+    const tool = createRecordsProposeEditsTool({ api: fake.api, getI18n: () => fakeI18n }) as any
+    const result = await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [
+          {
+            recordUuid: Record.getUuid(record),
+            nodeUuid: nodeUuidAt('cluster/plot[0]/tree[0]/tree_status'),
+            value: 'B',
+          },
+        ],
+      },
+      newCleaningToolContext({ survey })
+    )
+    expect(result).toEqual({ error: { code: 'queryTimeout', message: expect.any(String) } })
+  })
+
+  test('the abort signal reaches the record request', async () => {
+    const { tool, calls } = newTool()
+    const ctx = newCleaningToolContext({ survey })
+    await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [{ recordUuid: Record.getUuid(record), nodeUuid: nodeUuidAt('cluster/remarks'), value: 'x' }],
+      },
+      ctx
+    )
+    expect(calls[0].params.signal).toBe(ctx.signal)
+  })
+
+  test('more than 50 distinct records are refused before any request', async () => {
+    const { tool, calls } = newTool()
+    const edits = Array.from({ length: 51 }, () => ({ recordUuid: uuidv4(), nodeUuid: uuidv4(), value: '1' }))
+    const result = await runTool(tool, { summary: 's', edits }, newCleaningToolContext({ survey }))
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.issues[0].field).toBe('tooManyRecords')
+    expect(calls).toEqual([])
+  })
+
+  test('a missing cycle is a tool error', async () => {
+    const { tool } = newTool()
+    const result = await runTool(
+      tool,
+      { summary: 's', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), value: '1' }] },
+      newCleaningToolContext({ survey, cycle: null })
+    )
+    expect(result.error.code).toBe('noCycle')
+  })
+})

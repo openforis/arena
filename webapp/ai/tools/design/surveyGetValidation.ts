@@ -1,0 +1,101 @@
+import { z } from 'zod'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import { collectNodeDefIssues, type NodeDefIssue } from '@webapp/ai/changeSets/validationIssues'
+
+import { canViewCurrentSurvey } from '../common/toolPermissions'
+import { getResultBudget, takeWithinBudget } from '../common/toolResult'
+import type { AiTool } from '../types'
+import { getDesignNodeDefsDepthFirst, getNodeDefPathNames, requireNodeDefByName, requireSurvey } from './surveyLookup'
+
+type Translate = (key: string, params?: Record<string, unknown>) => string
+
+export const VALIDATION_MAX_NODE_DEFS = 50
+
+const keepKey = (key: string): string => key
+
+/**
+ * Returns the stored design errors and warnings of a node definition (the ones the designer shows).
+ * @param {object} survey - Survey.
+ * @param {object} nodeDef - Node definition.
+ * @param {Translate} t - Translator.
+ * @returns {NodeDefIssue[]} The issues.
+ */
+export const getNodeDefIssues = (survey: any, nodeDef: any, t: Translate): NodeDefIssue[] =>
+  collectNodeDefIssues(Survey.getNodeDefValidation(nodeDef)(survey), t)
+
+/**
+ * Returns the node definitions with design errors or warnings, depth-first.
+ * @param {object} survey - Survey.
+ * @returns {object[]} The node definitions.
+ */
+const getNodeDefsWithIssues = (survey: any): any[] =>
+  getDesignNodeDefsDepthFirst(survey).filter((nodeDef) => getNodeDefIssues(survey, nodeDef, keepKey).length > 0)
+
+/**
+ * Returns the names of the node definitions with design errors or warnings, depth-first.
+ * @param {object|null} survey - Survey.
+ * @returns {string[]} The names.
+ */
+export const getNodeDefNamesWithIssues = (survey: any): string[] =>
+  survey ? getNodeDefsWithIssues(survey).map((nodeDef) => NodeDef.getName(nodeDef)) : []
+
+const describeIssues = (survey: any, nodeDef: any, t: Translate) => ({
+  name: NodeDef.getName(nodeDef),
+  type: NodeDef.getType(nodeDef),
+  path: getNodeDefPathNames(survey, nodeDef),
+  issues: getNodeDefIssues(survey, nodeDef, t),
+})
+
+/**
+ * Builds the list of the node definitions with design errors or warnings, within the result budget.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey.
+ * @param {Translate} params.t - Translator.
+ * @param {number} [params.maxNodeDefs] - Cap on the listed node definitions.
+ * @returns {object} `{ total, truncated, nodeDefs }`.
+ */
+export const buildSurveyValidation = ({
+  survey,
+  t,
+  maxNodeDefs = VALIDATION_MAX_NODE_DEFS,
+  maxChars,
+}: {
+  survey: any
+  t: Translate
+  maxNodeDefs?: number
+  maxChars?: number
+}) => {
+  const withIssues = getNodeDefsWithIssues(survey)
+  const withoutEntries = { total: withIssues.length, truncated: false, nodeDefs: [] }
+  const nodeDefs = takeWithinBudget(withIssues.slice(0, maxNodeDefs), {
+    baseChars: JSON.stringify(withoutEntries).length + 'true'.length,
+    maxChars,
+    toEntry: (nodeDef) => describeIssues(survey, nodeDef, t),
+  })
+  return { ...withoutEntries, truncated: nodeDefs.length < withIssues.length, nodeDefs }
+}
+
+const inputSchema = z.object({
+  name: z.string().min(1).max(100).optional().describe('Node definition name, e.g. "tree"; omit for all'),
+})
+
+export const surveyGetValidationTool: AiTool<z.infer<typeof inputSchema>> = {
+  name: 'survey_getValidation',
+  description:
+    'Returns the design errors and warnings the user sees in the form designer (warning icons and red messages), ' +
+    'per node definition: name, type, parent path and issues (field, severity, message). Without a name it lists ' +
+    'every node definition with issues. Call it when the user asks about an error or warning on screen.',
+  inputSchema,
+  area: ['design'],
+  dataClass: 'schema',
+  requires: canViewCurrentSurvey,
+  execute: async ({ name }, ctx) => {
+    const survey = requireSurvey(ctx)
+    if (!name) return buildSurveyValidation({ survey, t: ctx.t, maxChars: getResultBudget(ctx) })
+    const entry = describeIssues(survey, requireNodeDefByName(survey, name), ctx.t)
+    return { total: entry.issues.length > 0 ? 1 : 0, truncated: false, nodeDefs: [entry] }
+  },
+}

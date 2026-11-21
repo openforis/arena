@@ -1,6 +1,6 @@
 import './ValidationReport.scss'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
@@ -14,6 +14,9 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { RECORD_EDITS_APPLIED_EVENT } from '@webapp/ai/changeSets/recordEdits/types'
+import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
+import { useCleaningAreaStatus } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
 import Table from '@webapp/components/Table'
 import { ButtonBack } from '@webapp/components/buttons'
 
@@ -28,6 +31,8 @@ const ValidationReport = () => {
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
   const { recordUuid } = useParams()
+  // computed once for the report: the row action is shown on every row only when the Cleaning area is available
+  const askAssistantAvailable = useCleaningAreaStatus().status === 'available'
   const [query, setQuery] = useState(null)
   const [selectedMessageTypeCategoryIds, setSelectedMessageTypeCategoryIds] = useState(MessageTypeFilterCategoryIds)
 
@@ -43,6 +48,20 @@ const ValidationReport = () => {
   const [selectedAttributeDefUuids, setSelectedAttributeDefUuids] = useState(allAttributeDefUuids)
 
   useOnValueChange(allAttributeDefUuids, setSelectedAttributeDefUuids)
+
+  // the assistant counts the messages of the whole cycle itself (suggestion 7): only the cycle is passed, and only when
+  // the Cleaning area is available (with AI off the report does not even tell the suggestions it opened)
+  useEffect(() => {
+    notifyValidationReportOpened({ cycle: surveyCycleKey, askAssistantAvailable })
+  }, [surveyCycleKey, askAssistantAvailable])
+
+  // an assistant Apply changed records: remount the table so it fetches the rows again
+  const [reloadCount, setReloadCount] = useState(0)
+  useEffect(() => {
+    const onApplied = () => setReloadCount((count) => count + 1)
+    window.addEventListener(RECORD_EDITS_APPLIED_EVENT, onApplied)
+    return () => window.removeEventListener(RECORD_EDITS_APPLIED_EVENT, onApplied)
+  }, [])
 
   const allAttributesSelected = useMemo(() => {
     if (allAttributeDefUuids.length === 0) return true
@@ -96,6 +115,7 @@ const ValidationReport = () => {
   return (
     <div className="validation-report">
       <Table
+        key={reloadCount}
         className="validation-report__table"
         headerLeftComponent={HeaderLeft}
         headerProps={{
@@ -110,10 +130,10 @@ const ValidationReport = () => {
         }}
         module="validationReport"
         restParams={restParams}
-        gridTemplateColumns="50px 1fr 2fr 6rem 50px"
+        gridTemplateColumns={askAssistantAvailable ? '50px 1fr 2fr 6rem 50px 50px' : '50px 1fr 2fr 6rem 50px'}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
-        rowProps={{ onRowOpen }}
+        rowProps={{ askAssistantAvailable, onRowOpen }}
         onRowOpen={onRowOpen}
       />
       {recordUuid && (

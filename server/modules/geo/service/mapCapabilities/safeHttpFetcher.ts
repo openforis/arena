@@ -4,11 +4,7 @@ import https from 'node:https'
 
 import axios, { type AxiosRequestConfig } from 'axios'
 
-import {
-  getIpFamily,
-  isPublicIpAddress,
-  stripBrackets,
-} from '@server/modules/geo/service/mapCapabilities/ipAddressRanges'
+import { classifyIpAddress, isNonPublicIpAddress } from '@common/ai/ipAddress'
 import { isMapCustomLayersError, newMapCustomLayersError } from '@server/modules/geo/service/mapCustomLayersErrors'
 
 export type ResolvedAddress = { address: string; family: 4 | 6 }
@@ -134,16 +130,16 @@ export const resolvePublicAddresses = async ({
   dnsLookup: DnsLookup
   timeoutMs?: number
 }): Promise<ResolvedAddress[]> => {
-  const host = stripBrackets(hostname).toLowerCase()
-  const literalFamily = getIpFamily(host)
-  if (literalFamily !== 0) {
-    if (!isPublicIpAddress(host)) throw newMapCustomLayersError('urlNotAllowed')
-    return [{ address: host, family: literalFamily }]
+  const host = hostname.replace(/^\[|\]$/g, '').toLowerCase()
+  const literalClass = classifyIpAddress(host)
+  if (literalClass !== 'invalid') {
+    if (literalClass !== 'public') throw newMapCustomLayersError('urlNotAllowed')
+    return [{ address: host, family: host.includes(':') ? 6 : 4 }]
   }
   if (isLocalhostName(host)) throw newMapCustomLayersError('urlNotAllowed')
   const answers = await lookupWithTimeout({ host, dnsLookup, timeoutMs })
   if (answers.length === 0) throw newMapCustomLayersError('hostNotFound', { host })
-  if (answers.some(({ address }) => !isPublicIpAddress(address))) throw newMapCustomLayersError('urlNotAllowed')
+  if (answers.some(({ address }) => isNonPublicIpAddress(address))) throw newMapCustomLayersError('urlNotAllowed')
   return answers.map(({ address, family }) => ({ address, family: family === 6 ? 6 : 4 }))
 }
 

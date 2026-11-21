@@ -3,7 +3,8 @@ import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
 
-import { Authorizer, ServiceRegistry, ServiceType } from '@openforis/arena-core'
+import { type ArenaSurvey, Authorizer, ServiceRegistry, ServiceType } from '@openforis/arena-core'
+import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
@@ -99,6 +100,33 @@ export const requireSurveyUserExtraPropsEditPermission = async (
     next(error)
   }
 }
+
+/**
+ * Builds the middleware allowing only survey administrators (and system admins) to change the survey AI policy.
+ * @param {object} [deps] - Dependencies (tests).
+ * @param {Function} [deps.fetchSurveyInfo] - `(surveyId) => Promise<surveyInfo>`.
+ * @returns {Function} The Express middleware.
+ */
+export const createRequireSurveyAiPolicyEditPermission =
+  ({
+    fetchSurveyInfo = (surveyId: number) => SurveyManager.fetchSurveyById({ surveyId }),
+  }: { fetchSurveyInfo?: (surveyId: number) => Promise<ArenaSurvey> } = {}) =>
+  async (req: ExpressRequest, res: ExpressResponse, next: NextFunction): Promise<void> => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const surveyInfo = await fetchSurveyInfo(surveyId)
+      if (canEditSurveyAiPolicy(user, surveyInfo)) {
+        next()
+        return
+      }
+      sendForbiddenError({ req, res })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+export const requireSurveyAiPolicyEditPermission = createRequireSurveyAiPolicyEditPermission()
 
 export const requireSurveyCloneFromViewPermission = async (
   req: ExpressRequest,

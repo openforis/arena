@@ -105,25 +105,56 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
   return { job }
 }
 
+/**
+ * Fetches the node defs of the schema summary that need an AI description.
+ * @param {object} params - Params.
+ * @param {number} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @returns {Promise<{surveyName: string, nodeDefs: any[]}>} The items.
+ */
+export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle, signal }) => {
+  // errorHandledLocally: the progress dialog shows the error
+  const { data } = await axios.get(`/api/survey/${surveyId}/schema-summary/ai-items`, {
+    params: { cycle },
+    signal,
+    errorHandledLocally: true,
+  })
+  return data
+}
+
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
 
-export const startSchemaSummaryExportJob = async ({ surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
-  const {
-    data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/schema-summary/export`, { cycle, fileFormat, includeAiDescriptions })
-  return { job }
-}
-
 /**
- * Starts the AI node definitions translation job.
+ * Starts the schema summary export with the AI descriptions generated in the browser.
  * @param {object} params - Params.
  * @param {number} params.surveyId - Survey id.
- * @returns {Promise<object>} The created job.
+ * @param {string} params.cycle - Cycle key.
+ * @param {string} params.fileFormat - csv or xlsx.
+ * @param {Record<string, string>} params.aiDescriptions - AI descriptions by node def uuid. The request checks their
+ * shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid), not the request.
+ * @param {number} [params.aiDescriptionsFailedCount] - Node defs left without a description.
+ * @param {number} [params.aiDescriptionsNotDoneCount] - Node defs a stop kept the run from describing.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @returns {Promise<{job: object}>} The started job.
  */
-export const startNodeDefsTranslationJob = async ({ surveyId }) => {
+export const startSchemaSummaryExportJob = async ({
+  surveyId,
+  cycle,
+  fileFormat,
+  aiDescriptions,
+  aiDescriptionsFailedCount = 0,
+  aiDescriptionsNotDoneCount = 0,
+  signal,
+}) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/nodeDefs/translation/start`)
+  } = await axios.post(
+    `/api/survey/${surveyId}/schema-summary/export`,
+    { cycle, fileFormat, aiDescriptions, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount },
+    // the progress dialog shows the error
+    { errorHandledLocally: true, signal }
+  )
   return { job }
 }

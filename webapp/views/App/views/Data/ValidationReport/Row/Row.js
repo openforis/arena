@@ -15,8 +15,10 @@ import { ButtonIconEditOrView } from '@webapp/components'
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
+import { AskAssistantButton } from './AskAssistantButton'
+
 const Row = (props) => {
-  const { item: row, itemPosition: rowNo, onRowOpen } = props
+  const { item: row, itemPosition: rowNo, onRowOpen, askAssistantAvailable = false } = props
 
   const lang = useSurveyPreferredLang()
   const user = useUser()
@@ -57,6 +59,11 @@ const Row = (props) => {
       <div>
         <ButtonIconEditOrView canEdit={canEdit} onClick={() => onRowOpen(row)} />
       </div>
+      {askAssistantAvailable && (
+        <div>
+          <AskAssistantButton row={row} />
+        </div>
+      )}
     </>
   )
 }
@@ -65,6 +72,7 @@ Row.propTypes = {
   item: PropTypes.object.isRequired,
   itemPosition: PropTypes.number.isRequired,
   onRowOpen: PropTypes.func.isRequired,
+  askAssistantAvailable: PropTypes.bool,
 }
 
 export default Row

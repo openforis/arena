@@ -1,0 +1,164 @@
+@use '../statusText' as *;
+
+.provider-dialog {
+  .modal-content {
+    width: 34rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  &__body,
+  &__connect,
+  &__types {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  // a fieldset
+  &__type-group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__group-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+  }
+
+  &__type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.5rem;
+  }
+
+  &__type {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 0.6rem;
+    align-items: start;
+    padding: 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
+    border-radius: 6px;
+    background: inherit;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    small {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.76rem;
+      color: var(--color-on-surface-variant);
+    }
+  }
+
+  &__type-name {
+    font-weight: 600;
+  }
+
+  &__type-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  &__grow {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__select {
+    width: 100%;
+    min-width: 0;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
+    border-radius: 4px;
+    background: inherit;
+    color: inherit;
+    font: inherit;
+  }
+
+  &__result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  // live regions (<output>)
+  &__live,
+  &__status {
+    display: block;
+  }
+
+  &__live:empty {
+    display: none;
+  }
+
+  // a live region that stays in the layout, so the text added to it is announced; empty, it takes no space
+  &__status:empty {
+    margin-top: -0.25rem;
+  }
+
+  &__hint {
+    font-size: 0.8rem;
+    color: var(--color-on-surface-variant);
+
+    &--warning {
+      color: $text-warn;
+    }
+
+    &--error {
+      color: $text-bad;
+    }
+  }
+
+  &__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-primary);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+}

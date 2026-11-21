@@ -25,7 +25,6 @@ export default {
   EntitiesDeleteJob: 'Brisanje postojećih entiteta',
   FilesImportJob: 'Uvoz fajlova',
   MessageSendJob: 'Slanje poruke',
-  NodeDefsTranslationJob: 'Prevod oznaka definicija čvorova',
   NodeDefsImportJob: 'Uvoz definicija čvorova',
   NodeDefsValidationJob: 'Validacija definicija čvorova',
   OdkImportJob: 'Uvoz iz ODK',

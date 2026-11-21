@@ -366,6 +366,16 @@ export const fetchNodeByUuid = (surveyId: number, uuid: string, client: DbClient
     dbTransformCallback
   )
 
+// Returns the uuid of the record owning the node, or null when the node does not exist.
+export const fetchNodeRecordUuid = (surveyId: number, uuid: string, client: DbClient = db): Promise<string | null> =>
+  client.oneOrNone(
+    `
+    SELECT record_uuid FROM ${Schemata.getSchemaSurvey(surveyId)}.node
+    WHERE uuid = $1`,
+    [uuid],
+    (row) => row?.record_uuid ?? null
+  )
+
 export const fetchNodesWithRefDataByUuids = (
   { surveyId, nodeUuids, draft }: { surveyId: number; nodeUuids: string[]; draft: boolean },
   client: DbClient = db

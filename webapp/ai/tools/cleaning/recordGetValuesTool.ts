@@ -1,0 +1,107 @@
+import { z } from 'zod'
+
+import * as Record from '@core/record/record'
+
+import type { AiTool } from '@webapp/ai/tools/types'
+import {
+  attributeNamesSchema,
+  NAME_MAX_CHARS,
+  uuidSchema,
+  VALUE_PART_MAX_CHARS,
+} from '@webapp/ai/tools/common/toolSchemas'
+import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+
+import type { CleaningApi } from './cleaningApi'
+import { getCleaningContext, describeUnknownAttributes, resolveAttributeDefs } from './cleaningContext'
+import { findRecordUuidByKeys } from './recordLookup'
+import { getRecordValues } from './recordValues'
+import type { CleaningI18n } from './validationRows'
+
+// an Arena survey has few key attributes per record: more is a model mistake
+const RECORD_KEYS_MAX = 10
+
+const inputSchema = z.object({
+  recordUuid: uuidSchema.nullish().describe('UUID of the record.'),
+  recordKeys: z
+    .record(z.string().max(NAME_MAX_CHARS), z.union([z.string().max(VALUE_PART_MAX_CHARS), z.number()]))
+    .refine((keys) => Object.keys(keys).length <= RECORD_KEYS_MAX, `At most ${RECORD_KEYS_MAX} key attributes.`)
+    .nullish()
+    .describe('Values of the record key attributes, e.g. {"cluster_id": "12"}, when the UUID is unknown.'),
+  attributes: attributeNamesSchema(20).min(1).describe('Attribute names to read.'),
+  parentNodeUuid: uuidSchema
+    .nullish()
+    .describe('Node UUID of an entity of the record: read only the attributes below it (e.g. one tree).'),
+})
+
+type Input = z.infer<typeof inputSchema>
+
+const TIMEOUT_HINT = 'The record is too slow to load. Retry, or ask for fewer attributes.'
+
+const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
+  area: ['cleaning'],
+  dataClass: 'data',
+  requires: canCleanseCurrentSurvey,
+}
+
+/**
+ * Creates record_getValues.
+ * @param {object} deps - Dependencies.
+ * @param {CleaningApi} deps.api - Cleaning API.
+ * @param {Function} deps.getI18n - Returns the translator.
+ * @returns {AiTool} The tool.
+ */
+export const createRecordGetValuesTool = ({
+  api,
+  getI18n,
+}: {
+  api: CleaningApi
+  getI18n: () => CleaningI18n
+}): AiTool<Input, unknown> => ({
+  ...common,
+  name: 'record_getValues',
+  description:
+    'Reads attributes of one record (by UUID or by its key values): for each node its UUID, the keys of its parent ' +
+    'entity, its formatted and raw value and its validation messages. At most 100 nodes: when ' +
+    'truncated, narrow with parentNodeUuid (the node UUID of one entity) or fewer attributes.',
+  inputSchema,
+  /**
+   * Resolves the record, loads it once and reads the attributes.
+   * @param {Input} input - Tool input.
+   * @param {object} ctx - Tool context.
+   * @returns {Promise<object>} The values, or a tool error.
+   */
+  execute: async ({ recordUuid, recordKeys, attributes, parentNodeUuid }, ctx) => {
+    const { survey, surveyId, cycle } = getCleaningContext(ctx)
+    if (!recordUuid && !recordKeys) throw new AiToolFailure('recordRequired', 'Give recordUuid or recordKeys.')
+    const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: [...new Set(attributes)] })
+    if (unknownNames.length > 0) {
+      throw new AiToolFailure(
+        'unknownAttribute',
+        `Unknown attributes: ${describeUnknownAttributes({ survey, names: unknownNames })}.`
+      )
+    }
+    const { signal } = ctx
+    try {
+      const lookup = recordUuid
+        ? { recordUuid }
+        : await findRecordUuidByKeys({ api, survey, surveyId, cycle, keys: recordKeys ?? {}, signal })
+      const record = await api.fetchRecordAndNodes({ surveyId, recordUuid: lookup.recordUuid, signal })
+      if (!record) throw new AiToolFailure('recordNotAvailable', 'The record does not exist or you may not see it.')
+      if (parentNodeUuid && !Record.getNodeByUuid(parentNodeUuid)(record)) {
+        throw new AiToolFailure('unknownParentNode', 'parentNodeUuid is not a node of this record.')
+      }
+      const values = getRecordValues({ survey, cycle, record, nodeDefs, i18n: getI18n(), parentNodeUuid })
+      const fitted = fitListToBudget(values, 'nodes', getResultBudget(ctx))
+      if (!fitted.truncated) return fitted
+      return {
+        ...fitted,
+        note: `Only the first ${fitted.nodes.length} of ${values.total} nodes are shown, in record order. Narrow with parentNodeUuid (the node UUID of one entity) or fewer attributes.`,
+      }
+    } catch (error) {
+      throw toRequestFailure(error, TIMEOUT_HINT)
+    }
+  },
+})

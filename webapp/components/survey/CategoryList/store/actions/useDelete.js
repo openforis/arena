@@ -45,6 +45,6 @@ export const useDelete = () => {
         dispatch(NotificationActions.notifyInfo({ key: 'categoryEdit.cantBeDeleted' }))
       }
     },
-    [survey]
+    [dispatch, i18n, survey]
   )
 }

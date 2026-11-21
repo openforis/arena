@@ -1,0 +1,268 @@
+// test/unit/tests/253aiBatchRun.test.ts
+import SystemError from '@core/systemError'
+
+import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import {
+  type AiBatchCall,
+  chunkArray,
+  createAiBatchGuard,
+  isRunStoppingError,
+  runAiBatchCalls,
+} from '@webapp/ai/workflows/batchRun'
+
+import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
+
+const call = <T>(size: number, run: () => Promise<T>): AiBatchCall<T> => ({ size, run: async () => run() })
+const noGuard = async () => {}
+const settingsOn = { accessLevel: 2, featuresEnabled: true, featureToggles: { translation: true } }
+const cloudPolicy = { schema: 'cloud', data: 'onDevice' } as const
+const onDevicePolicy = { schema: 'onDevice', data: 'onDevice' } as const
+
+/**
+ * Creates the guard of a cloud engine for the translation of survey 7.
+ * @param {object} deps - Guard dependencies.
+ * @returns {Function} The guard.
+ */
+const cloudGuard = (deps: any) =>
+  createAiBatchGuard({
+    feature: 'translation',
+    surveyId: 7,
+    dataClass: 'schema',
+    hostingClass: 'cloud',
+    deps,
+    recheckMs: 0,
+  })
+
+describe('AI batch runner (253)', () => {
+  test('runs the calls in order and reports the progress', async () => {
+    const results: [string, number][] = []
+    const progress: unknown[] = []
+    const { failedCount } = await runAiBatchCalls({
+      calls: [call(2, async () => 'a'), call(3, async () => 'b')],
+      guard: noGuard,
+      onResult: (result, index) => {
+        results.push([result, index])
+      },
+      onProgress: (value) => progress.push(value),
+    })
+    expect(results).toEqual([
+      ['a', 0],
+      ['b', 1],
+    ])
+    expect(progress).toEqual([
+      { done: 0, total: 2 },
+      { done: 1, total: 2 },
+      { done: 2, total: 2 },
+    ])
+    expect(failedCount).toBe(0)
+  })
+
+  test('a failed call is counted by its size and the run goes on', async () => {
+    const results: string[] = []
+    const { failedCount } = await runAiBatchCalls({
+      calls: [
+        call(4, async () => {
+          throw new SystemError('aiTranslationInvalid', {}, 502)
+        }),
+        call(1, async () => 'ok'),
+        call(2, async () => {
+          throw new Error('fetch failed')
+        }),
+      ],
+      guard: noGuard,
+      onResult: (result) => {
+        results.push(result)
+      },
+    })
+    expect(results).toEqual(['ok'])
+    expect(failedCount).toBe(6)
+  })
+
+  test('an unusable answer runs the two halves instead of the same call again', async () => {
+    const tried: string[][] = []
+    const make = (items: string[]): AiBatchCall<string[]> => ({
+      size: items.length,
+      run: async () => {
+        tried.push(items)
+        // cut off with more than one item; the item 'c' fails alone too
+        if (items.length > 1 || items[0] === 'c') throw new SystemError('aiTranslationInvalid', {}, 502)
+        return items
+      },
+      split:
+        items.length > 1
+          ? () => [make(items.slice(0, items.length / 2)), make(items.slice(items.length / 2))]
+          : undefined,
+    })
+    const results: string[][] = []
+    const progress: unknown[] = []
+    const { failedCount, notRunCount } = await runAiBatchCalls({
+      calls: [make(['a', 'b', 'c', 'd'])],
+      guard: noGuard,
+      onResult: (result) => {
+        results.push(result)
+      },
+      onProgress: (value) => progress.push(value),
+    })
+    expect(tried).toEqual([['a', 'b', 'c', 'd'], ['a', 'b'], ['a'], ['b'], ['c', 'd'], ['c'], ['d']])
+    expect(results).toEqual([['a'], ['b'], ['d']])
+    expect(failedCount).toBe(1)
+    expect(notRunCount).toBe(0)
+    // the halves are not calls of the run: the progress stays on its calls
+    expect(progress).toEqual([
+      { done: 0, total: 1 },
+      { done: 1, total: 1 },
+    ])
+  })
+
+  test('an error that fails every call stops the run at once', async () => {
+    let ran = 0
+    const failing = async () => {
+      ran += 1
+      throw new SystemError('aiProviderAuth', {}, 502)
+    }
+    await expectSystemErrorKey(
+      runAiBatchCalls({ calls: [call(1, failing), call(1, failing)], guard: noGuard, onResult: () => {} }),
+      'aiProviderAuth'
+    )
+    expect(ran).toBe(1)
+  })
+
+  test('a rate-limited call is repeated after a wait, at most 3 times, then the run stops', async () => {
+    let ran = 0
+    const limitedTwice = async () => {
+      ran += 1
+      if (ran <= 2) throw new SystemError('aiRateLimited', {}, 429)
+      return 'ok'
+    }
+    const results: string[] = []
+    await runAiBatchCalls({
+      calls: [call(1, limitedTwice)],
+      guard: noGuard,
+      onResult: (result) => results.push(result),
+      rateLimitWaitMs: 0,
+    })
+    expect(results).toEqual(['ok'])
+    expect(ran).toBe(3)
+
+    ran = 0
+    const alwaysLimited = async () => {
+      ran += 1
+      throw new SystemError('aiRateLimited', {}, 429)
+    }
+    await expectSystemErrorKey(
+      runAiBatchCalls({ calls: [call(1, alwaysLimited)], guard: noGuard, onResult: () => {}, rateLimitWaitMs: 0 }),
+      'aiRateLimited'
+    )
+    expect(ran).toBe(4)
+  })
+
+  test('a policy change during the run stops it before the next call and keeps the results so far', async () => {
+    let policyReads = 0
+    let ran = 0
+    const guard = cloudGuard({
+      fetchSettings: async () => settingsOn,
+      fetchEffectivePolicy: async () => {
+        policyReads += 1
+        return policyReads === 1 ? cloudPolicy : onDevicePolicy
+      },
+    })
+    const run = async () => {
+      ran += 1
+      return ran
+    }
+    const results: number[] = []
+    const { stop, failedCount } = await runAiBatchCalls({
+      calls: [call(1, run), call(2, run)],
+      guard,
+      onResult: (result) => {
+        results.push(result)
+      },
+    })
+    expect(results).toEqual([1])
+    expect(ran).toBe(1)
+    expect(failedCount).toBe(2)
+    expect(stop).toMatchObject({ cause: 'error', done: 1, total: 2 })
+    const error: any = stop?.error
+    expect([error.key, error.statusCode]).toEqual(['aiPolicyRefused', 403])
+  })
+
+  test('a policy that refuses the first call stops the run with nothing to keep', async () => {
+    const guard = cloudGuard({
+      fetchSettings: async () => settingsOn,
+      fetchEffectivePolicy: async () => onDevicePolicy,
+    })
+    const error: any = await expectSystemErrorKey(
+      runAiBatchCalls({ calls: [call(1, async () => 1)], guard, onResult: () => {} }),
+      'aiPolicyRefused'
+    )
+    expect(error.statusCode).toBe(403)
+  })
+
+  test('cancel during a call rejects with an abort error and runs nothing more', async () => {
+    const controller = new AbortController()
+    let ran = 0
+    const run = async () => {
+      ran += 1
+      controller.abort()
+      // what the HTTP client throws when its request is aborted is not always an AbortError
+      throw new Error('fetch failed')
+    }
+    const error = await runAiBatchCalls({
+      calls: [call(1, run), call(1, run)],
+      guard: noGuard,
+      onResult: () => {},
+      signal: controller.signal,
+    }).catch((caught) => caught)
+    expect(isAiAbortError(error)).toBe(true)
+    expect(ran).toBe(1)
+  })
+
+  test('the guard re-reads the AI switches: a feature turned off stops the run', async () => {
+    const guard = cloudGuard({
+      fetchSettings: async () => ({ ...settingsOn, featureToggles: { translation: false } }),
+      fetchEffectivePolicy: async () => cloudPolicy,
+    })
+    const error: any = await expectSystemErrorKey(guard(), 'aiFeatureDisabled')
+    expect(error.statusCode).toBe(403)
+    expect(error.params).toEqual({ feature: 'translation' })
+  })
+
+  test('the guard fails closed when the settings or the policy are unknown', async () => {
+    await expectSystemErrorKey(
+      cloudGuard({ fetchSettings: async () => null, fetchEffectivePolicy: async () => cloudPolicy })(),
+      'aiFeatureDisabled'
+    )
+    await expectSystemErrorKey(
+      cloudGuard({ fetchSettings: async () => settingsOn, fetchEffectivePolicy: async () => null })(),
+      'aiPolicyRefused'
+    )
+  })
+
+  test('the guard lets a hosting class within the policy through', async () => {
+    const surveyIds: number[] = []
+    const guard = cloudGuard({
+      fetchSettings: async () => settingsOn,
+      fetchEffectivePolicy: async (surveyId: number) => {
+        surveyIds.push(surveyId)
+        return cloudPolicy
+      },
+    })
+    await expect(guard()).resolves.toBeUndefined()
+    expect(surveyIds).toEqual([7])
+  })
+
+  test('run-stopping errors', () => {
+    for (const key of ['aiPolicyRefused', 'aiFeatureDisabled', 'aiProviderAuth', 'aiLocalServerUnreachable']) {
+      expect([key, isRunStoppingError(new SystemError(key, {}, 500))]).toEqual([key, true])
+    }
+    for (const key of ['aiTranslationInvalid', 'aiDataDictionaryInvalid', 'aiRequestTimeout', 'aiPromptTooLarge']) {
+      expect([key, isRunStoppingError(new SystemError(key, {}, 500))]).toEqual([key, false])
+    }
+    expect(isRunStoppingError(new Error('x'))).toBe(false)
+  })
+
+  test('chunkArray', () => {
+    expect(chunkArray([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]])
+    expect(chunkArray([], 3)).toEqual([])
+  })
+})

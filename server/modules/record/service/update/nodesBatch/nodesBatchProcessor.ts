@@ -1,0 +1,430 @@
+/**
+ * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
+ */
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
+import { WebSocketEvent } from '@openforis/arena-server'
+
+import { Authorizer } from '@openforis/arena-core'
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+
+import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
+import { checkBatchEdit, findUniquenessErrorKey } from './nodesBatchEditCheck'
+import { withSurveyUuid } from './nodesBatchRecordPermission'
+import {
+  NodesBatchEditResult,
+  NodesBatchMessageKeys,
+  NodesBatchPersistMessage,
+  NodesBatchRecordEdit,
+  appliedResult,
+  NodesBatchEditStatus,
+  conflictResult,
+  failedResult,
+  failedResults,
+} from './nodesBatchTypes'
+
+// thrown by acquireRecordLockAndRun (records update thread) when the record stays locked for too long
+const lockTimeoutErrorKey = 'record.lockTimeout'
+
+type ThreadMessage = { type: string; content: unknown }
+
+export type NodesBatchProcessorDeps = {
+  getSurvey: (msg: NodesBatchPersistMessage) => Promise<ArenaSurvey>
+  runWithRecordLock: <T>(recordUuid: string, fn: (t: any) => Promise<T>) => Promise<T>
+  getOrFetchRecord: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    t: any
+  }) => Promise<ArenaRecord | null>
+  // step and owner as they are in the database: the thread cache does not see their changes
+  fetchRecordStepAndOwner: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    t: any
+  }) => Promise<{ step: string; ownerUuid: string } | null>
+  // the group qualifier filters of the user
+  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: ArenaSurvey; t: any }) => Promise<any>
+  recordMatchesQualifierFilters: (params: {
+    survey: ArenaSurvey
+    record: ArenaRecord
+    qualifierFilters: any
+    pendingNode: ArenaRecordNode | null
+    canEditQualifierValue: boolean
+  }) => boolean
+  // uuid of the record owning the node, or null when the node does not exist (in any record)
+  findNodeRecordUuid: (params: { msg: NodesBatchPersistMessage; nodeUuid: string; t: any }) => Promise<string | null>
+  persistNode: (params: Record<string, unknown>, t: any) => Promise<any>
+  // uuids of the node defs whose values the edit would clear (they become non-applicable)
+  findNodeDefUuidsToClear: (params: Record<string, unknown>) => Promise<string[]>
+  cacheRecord: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    record: ArenaRecord
+    t: any
+  }) => Promise<void>
+  clearCachedRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string }) => Promise<void>
+  postMessage: (message: ThreadMessage) => void
+  logError: (message: string) => void
+  // current time in epoch ms (injectable for tests)
+  now: () => number
+}
+
+type BatchState = {
+  msg: NodesBatchPersistMessage
+  deps: NodesBatchProcessorDeps
+  survey: ArenaSurvey
+  // loaded inside the lock, with the record
+  qualifierFilters: any
+  // results of the edits refused by the check (conflicts, not editable): kept when the record rolls back
+  refusedResults: NodesBatchEditResult[]
+  appliedEdits: NodesBatchRecordEdit[]
+  // index of the edit being persisted: when it throws, only that edit gets the error, the others are rolled back
+  persistingEditIndex: number | null
+  // socket events, posted only after the transaction commits
+  events: ThreadMessage[]
+}
+
+/**
+ * Keeps the primitive error params only (they go to the client and through the worker message channel).
+ * @param {object} params - The error params.
+ * @returns {object|undefined} The primitive params, or undefined when there are none.
+ */
+const toMessageParams = (params: unknown): Record<string, unknown> | undefined => {
+  if (!params || typeof params !== 'object') return undefined
+  const entries = Object.entries(params).filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value))
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined
+}
+
+/**
+ * Maps an error to the message key and params of the failed edits.
+ * @param {unknown} error - The error.
+ * @returns {{messageKey: string, params?: object}} The message.
+ */
+const toFailureMessage = (error: any): { messageKey: string; params?: Record<string, unknown> } => {
+  const key = error?.key
+  // the message of a non-application error may hold database details: it is logged, not sent
+  if (typeof key !== 'string') return { messageKey: NodesBatchMessageKeys.unexpected }
+  if (key === lockTimeoutErrorKey) {
+    return { messageKey: NodesBatchMessageKeys.lockTimeout, params: toMessageParams(error.params) }
+  }
+  // keys thrown without a namespace are application errors (webapp convention: appErrors:<key>)
+  const messageKey = key.includes(':') ? key : `appErrors:${key}`
+  return { messageKey, params: toMessageParams(error.params) }
+}
+
+/**
+ * Persists one checked edit; throws when the new value duplicates a record key or a unique attribute of another record.
+ * @param {object} params - The parameters.
+ * @param {BatchState} params.state - The batch state.
+ * @param {object} params.record - The current record.
+ * @param {object} params.node - The node to update.
+ * @param {NodesBatchRecordEdit} params.edit - The edit.
+ * @param {object} params.t - The transaction.
+ * @returns {Promise<object>} The updated record.
+ */
+const persistEdit = async ({
+  state,
+  record,
+  node,
+  edit,
+  t,
+}: {
+  state: BatchState
+  record: ArenaRecord
+  node: ArenaRecordNode
+  edit: NodesBatchRecordEdit
+  t: any
+}) => {
+  const { msg, deps, survey, events } = state
+  const recordUuid = Record.getUuid(record)
+  let uniquenessErrorKey: string | null = null
+  const recordUpdated = await deps.persistNode(
+    {
+      user: msg.user,
+      survey,
+      record,
+      node: Node.assocValue(edit.to)(node),
+      timezoneOffset: msg.timezoneOffset,
+      lang: msg.lang,
+      nodesUpdateListener: (updatedNodes: unknown) => {
+        const event = buildNodesUpdateEvent({ recordUuid, updatedNodes })
+        if (event) events.push(event)
+      },
+      nodesValidationListener: (validations: unknown) => {
+        uniquenessErrorKey ??= findUniquenessErrorKey({ validation: validations, nodeUuid: edit.nodeUuid })
+        events.push(buildNodeValidationsUpdateEvent({ record, validations }))
+      },
+    },
+    t
+  )
+  // the update manager only records duplicates as validation errors: a batch edit must not create them
+  if (uniquenessErrorKey) throw new SystemError(uniquenessErrorKey)
+  return recordUpdated
+}
+
+/**
+ * Refines the conflict of an edit whose node is missing from the record: a node that belongs to another record
+ * is a failure (never a conflict), so an edit can't be used to probe or touch the nodes of other records.
+ * @param {object} params - The parameters.
+ * @param {BatchState} params.state - The batch state.
+ * @param {object} params.record - The current record.
+ * @param {NodesBatchRecordEdit} params.edit - The edit.
+ * @param {NodesBatchEditResult} params.result - The result given by the check.
+ * @param {object} params.t - The transaction.
+ * @returns {Promise<NodesBatchEditResult>} The result to keep.
+ */
+const refineMissingNodeResult = async ({
+  state,
+  record,
+  edit,
+  result,
+  t,
+}: {
+  state: BatchState
+  record: ArenaRecord
+  edit: NodesBatchRecordEdit
+  result: NodesBatchEditResult
+  t: any
+}): Promise<NodesBatchEditResult> => {
+  const { msg, deps } = state
+  const nodeMissing = result.status === NodesBatchEditStatus.conflict && !Record.getNodeByUuid(edit.nodeUuid)(record)
+  if (!nodeMissing) return result
+  const nodeRecordUuid = await deps.findNodeRecordUuid({ msg, nodeUuid: edit.nodeUuid, t })
+  return nodeRecordUuid && nodeRecordUuid !== msg.recordUuid
+    ? failedResult(edit.index, NodesBatchMessageKeys.nodeNotInRecord)
+    : result
+}
+
+/**
+ * Returns true when the caller stopped waiting for this request.
+ * @param {BatchState} state - The batch state.
+ * @returns {boolean} Whether the deadline has passed.
+ */
+const isPastDeadline = (state: BatchState): boolean => state.deps.now() > state.msg.deadline
+
+/**
+ * Aborts the transaction when the caller stopped waiting: it reported the edits as timed out, so none may commit.
+ * @param {BatchState} state - The batch state.
+ * @returns {void}
+ * @throws {SystemError} applyTimeout when the deadline has passed.
+ */
+const assertBeforeDeadline = (state: BatchState): void => {
+  if (isPastDeadline(state)) throw new SystemError(NodesBatchMessageKeys.applyTimeout)
+}
+
+/**
+ * Returns true when the record matches the user group qualifiers (optionally with a pending node value).
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The record.
+ * @param {object|null} pendingNode - The node with its new value, or null.
+ * @returns {boolean} Whether the record matches.
+ */
+const matchesQualifiers = (state: BatchState, record: ArenaRecord, pendingNode: ArenaRecordNode | null): boolean => {
+  const { msg, deps, survey, qualifierFilters } = state
+  return deps.recordMatchesQualifierFilters({
+    survey,
+    record,
+    qualifierFilters,
+    pendingNode,
+    canEditQualifierValue: Authorizer.canEditQualifierAttributeValue(msg.user, Survey.getSurveyInfo(survey)),
+  })
+}
+
+/**
+ * Checks, with the record as it is under the lock, that the user may edit it (step, ownership, group qualifiers).
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The record.
+ * @returns {boolean} Whether the user may edit the record.
+ */
+const isRecordEditAllowed = (state: BatchState, record: ArenaRecord): boolean =>
+  Authorizer.canEditRecord(state.msg.user, withSurveyUuid(record, state.survey)) &&
+  matchesQualifiers(state, record, null)
+
+/**
+ * Returns the record with the step and owner stored in the database. The thread cache is checked with the date of
+ * the last modification, which a change of step or owner does not touch (and another process may have made it).
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The (possibly cached) record.
+ * @param {object} t - The transaction.
+ * @returns {Promise<object|null>} The record for the permission check, or null when it no longer exists.
+ */
+const withFreshStepAndOwner = async (state: BatchState, record: ArenaRecord, t: any): Promise<ArenaRecord | null> => {
+  const { msg, deps } = state
+  const fresh = await deps.fetchRecordStepAndOwner({ msg, recordUuid: msg.recordUuid, t })
+  if (!fresh) return null
+  return { ...record, [Record.keys.step]: fresh.step, [Record.keys.ownerUuid]: fresh.ownerUuid }
+}
+
+/**
+ * Checks and persists one edit.
+ * @param {object} params - The parameters.
+ * @param {BatchState} params.state - The batch state.
+ * @param {object} params.record - The current record.
+ * @param {NodesBatchRecordEdit} params.edit - The edit.
+ * @param {object} params.t - The transaction.
+ * @returns {Promise<object>} The record after the edit (the same record when the edit is refused).
+ */
+const applyEdit = async ({
+  state,
+  record,
+  edit,
+  t,
+}: {
+  state: BatchState
+  record: ArenaRecord
+  edit: NodesBatchRecordEdit
+  t: any
+}): Promise<ArenaRecord> => {
+  const { msg, deps, survey, refusedResults, appliedEdits } = state
+  const check = checkBatchEdit({ survey, record, recordUuid: msg.recordUuid, edit })
+  if (check.ok === false) {
+    refusedResults.push(await refineMissingNodeResult({ state, record, edit, result: check.result, t }))
+    return record
+  }
+  // the new value must not take the record out of the group qualifiers of the user
+  if (!matchesQualifiers(state, record, Node.assocValue(edit.to)(check.node))) {
+    refusedResults.push(failedResult(edit.index, NodesBatchMessageKeys.forbidden))
+    return record
+  }
+  // the user never confirmed a clear (form edits ask first): an edit that would clear values is refused
+  if (!Survey.isKeepNonApplicableValues(Survey.getSurveyInfo(survey))) {
+    const nodeDefUuidsToClear = await deps.findNodeDefUuidsToClear({
+      user: msg.user,
+      survey,
+      record,
+      node: Node.assocValue(edit.to)(check.node),
+      timezoneOffset: msg.timezoneOffset,
+      lang: msg.lang,
+    })
+    if (nodeDefUuidsToClear.length > 0) {
+      refusedResults.push(failedResult(edit.index, NodesBatchMessageKeys.wouldClearValues))
+      return record
+    }
+  }
+  state.persistingEditIndex = edit.index
+  const recordUpdated = await persistEdit({ state, record, node: check.node, edit, t })
+  state.persistingEditIndex = null
+  appliedEdits.push(edit)
+  return recordUpdated
+}
+
+/**
+ * Checks and persists the edits of the record, inside the record lock.
+ * @param {BatchState} state - The batch state.
+ * @param {object} t - The transaction.
+ * @returns {Promise<NodesBatchEditResult[]>} The results.
+ */
+const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEditResult[]> => {
+  const { msg, deps, survey, refusedResults, appliedEdits } = state
+  const { recordUuid, edits } = msg
+  // the lock wait may have used up the time: the caller already reported these edits as timed out
+  if (isPastDeadline(state)) return failedResults(edits, NodesBatchMessageKeys.applyTimeout)
+  let record = await deps.getOrFetchRecord({ msg, recordUuid, t })
+  // a record of another cycle (or a preview one, made with the draft survey) is not the one the proposal saw
+  if (!record || Record.isPreview(record) || Record.getCycle(record) !== msg.cycle) {
+    return edits.map(({ index }) => conflictResult(index))
+  }
+  state.qualifierFilters = await deps.fetchQualifierFilters({ msg, survey, t })
+  const recordToCheck = await withFreshStepAndOwner(state, record, t)
+  if (!recordToCheck) return edits.map(({ index }) => conflictResult(index))
+  if (!isRecordEditAllowed(state, recordToCheck)) return failedResults(edits, NodesBatchMessageKeys.forbidden)
+
+  for (const edit of edits) {
+    assertBeforeDeadline(state)
+    record = await applyEdit({ state, record, edit, t }) // NOSONAR: each edit applies to the record updated by the previous one
+  }
+  // the transaction commits when this function returns
+  assertBeforeDeadline(state)
+  if (appliedEdits.length > 0) {
+    await deps.cacheRecord({ msg, recordUuid, record, t })
+  }
+  return [...refusedResults, ...appliedEdits.map(({ index }) => appliedResult(index))]
+}
+
+/**
+ * Builds the results of a record whose transaction rolled back: refused edits keep their result, the others fail
+ * (with the error when it hit them all, e.g. a timeout; as rolled back when another edit raised it).
+ * @param {BatchState} state - The batch state.
+ * @param {unknown} error - The error.
+ * @returns {NodesBatchEditResult[]} The results.
+ */
+const rolledBackResults = (state: BatchState, error: unknown): NodesBatchEditResult[] => {
+  const { messageKey, params } = toFailureMessage(error)
+  const { persistingEditIndex } = state
+  const refusedIndexes = new Set(state.refusedResults.map(({ index }) => index))
+  const failedEdits = state.msg.edits.filter(({ index }) => !refusedIndexes.has(index))
+  const failed = failedEdits.map(({ index }) =>
+    persistingEditIndex === null || index === persistingEditIndex
+      ? failedResult(index, messageKey, params)
+      : failedResult(index, NodesBatchMessageKeys.rolledBack)
+  )
+  return [...state.refusedResults, ...failed]
+}
+
+/**
+ * Drops the cached record after a rollback (its in-memory copy may hold the rolled back values).
+ * @param {BatchState} state - The batch state.
+ * @returns {Promise<void>} Resolved when done.
+ */
+const clearCachedRecordSafely = async (state: BatchState): Promise<void> => {
+  try {
+    await state.deps.clearCachedRecord({ msg: state.msg, recordUuid: state.msg.recordUuid })
+  } catch (error) {
+    state.deps.logError(`error clearing the cached record ${state.msg.recordUuid}: ${error}`)
+  }
+}
+
+/**
+ * Sorts results by edit index.
+ * @param {NodesBatchEditResult[]} results - The results.
+ * @returns {NodesBatchEditResult[]} The sorted results.
+ */
+const sortByIndex = (results: NodesBatchEditResult[]): NodesBatchEditResult[] =>
+  [...results].sort((resultA, resultB) => resultA.index - resultB.index)
+
+/**
+ * Applies the edits of one record: conflict check per edit, persist in one transaction, events after commit.
+ * @param {object} params - The parameters.
+ * @param {NodesBatchPersistMessage} params.msg - The thread message.
+ * @param {NodesBatchProcessorDeps} params.deps - The thread dependencies.
+ * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index. Never throws.
+ */
+export const processNodesBatch = async ({
+  msg,
+  deps,
+}: {
+  msg: NodesBatchPersistMessage
+  deps: NodesBatchProcessorDeps
+}): Promise<NodesBatchEditResult[]> => {
+  const state: BatchState = {
+    msg,
+    deps,
+    survey: null,
+    qualifierFilters: [],
+    refusedResults: [],
+    appliedEdits: [],
+    persistingEditIndex: null,
+    events: [],
+  }
+  try {
+    // late message (queued behind others): the caller reported a timeout, so nothing is written
+    if (isPastDeadline(state)) return failedResults(msg.edits, NodesBatchMessageKeys.applyTimeout)
+    state.survey = await deps.getSurvey(msg)
+    const results = await deps.runWithRecordLock(msg.recordUuid, (t) => applyEditsInLock(state, t))
+    for (const event of state.events) {
+      deps.postMessage(event)
+    }
+    if (state.appliedEdits.length > 0) {
+      deps.postMessage({ type: WebSocketEvent.nodesUpdateCompleted, content: { recordUuid: msg.recordUuid } })
+    }
+    return sortByIndex(results)
+  } catch (error) {
+    if (typeof (error as any)?.key !== 'string') {
+      deps.logError(`error applying the batch edits of record ${msg.recordUuid}: ${(error as Error)?.stack ?? error}`)
+    }
+    await clearCachedRecordSafely(state)
+    return sortByIndex(rolledBackResults(state, error))
+  }
+}

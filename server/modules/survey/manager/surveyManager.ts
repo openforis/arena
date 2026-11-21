@@ -276,6 +276,7 @@ export const {
   fetchSurveyIdsAndNames,
   fetchDependencies,
   fetchFilesTotalSpace,
+  fetchSurveyAiPolicy,
   fetchUserSurveys,
 } = SurveyRepository
 

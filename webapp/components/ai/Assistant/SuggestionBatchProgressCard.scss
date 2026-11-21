@@ -1,0 +1,20 @@
+// the progress card of a batch run in the chat; its frame is the change set card's (.ai-assistant-card)
+.ai-batch-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__status {
+    font-size: 0.8rem;
+    color: var(--color-on-surface-variant);
+    font-variant-numeric: tabular-nums;
+  }
+}

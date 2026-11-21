@@ -1,0 +1,213 @@
+/**
+ * What the suggestion cards do. Do it builds a scoped request that the chat of its area claims once and sends; the
+ * suggestion is then put in progress (or removed) only when a turn was created. Dismiss hides the visible targets.
+ */
+import { uuidv4 } from '@core/uuid'
+
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
+
+import { getSuggestionScopeKey } from './detectors/designTargets'
+import type { SuggestionDefinition, SuggestionDefinitions, SuggestionDescribeContext } from './definitions'
+import { SUGGESTION_DEFINITIONS } from './registry'
+import { suggestionStore, type SuggestionStore } from './suggestionStore'
+import type { AssistantSuggestion, SuggestionRequest, SuggestionScope } from './types'
+
+export type { SuggestionDefinitions }
+
+// where a request may be sent: the chat's user, survey, cycle and area
+export type SuggestionRequestScope = {
+  userUuid: string
+  surveyId: number | null
+  cycle: string | null
+  area: AssistantArea
+}
+
+// the conversation hook's send (resolves with the new conversation id, or null when no turn was created)
+export type SuggestionSend = (
+  text: string,
+  options: { suggestion: { id: string; scope: SuggestionScope }; displayText: string }
+) => Promise<string | null>
+
+/**
+ * Returns the store bucket of the suggestion of a request: Help suggestions belong to no survey.
+ * @param {SuggestionRequest} request - Request.
+ * @returns {number|null} The survey id of the bucket.
+ */
+export const getRequestBucketSurveyId = (request: Pick<SuggestionRequest, 'area' | 'surveyId'>): number | null =>
+  request.area === 'help' ? null : request.surveyId
+
+/**
+ * Returns the request text the chat shows for a card: the card's key with `card` replaced by `request`
+ * ("missingTranslations.card" → "missingTranslations.request", "dataImported.cardOne" → "dataImported.requestOne").
+ * @param {object} params - Parameters.
+ * @param {SuggestionDefinition} params.definition - Definition.
+ * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
+ * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language.
+ * @returns {string} The text, in the interface language.
+ */
+export const getSuggestionRequestText = ({
+  definition,
+  suggestion,
+  describeContext,
+}: {
+  definition: SuggestionDefinition
+  suggestion: AssistantSuggestion
+  describeContext: SuggestionDescribeContext
+}): string => {
+  const { key, params } = definition.card(suggestion, describeContext)
+  return describeContext.t(`aiSuggestions:${key.replace(/\.card/, '.request')}`, params)
+}
+
+/**
+ * Builds the request of Do it from a visible suggestion (its targets are the visible ones).
+ * @param {object} params - Parameters.
+ * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
+ * @param {string} params.userUuid - User.
+ * @param {number|null} params.surveyId - Survey open now.
+ * @param {string|null} params.cycle - Cycle now.
+ * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language of the prompt.
+ * @param {SuggestionDefinitions} [params.definitions] - Definitions.
+ * @param {Function} [params.newId] - Request id factory.
+ * @param {AiLog} [params.log] - Reports a prompt that could not be built.
+ * @returns {SuggestionRequest|null} The request; null without a target or a prompt.
+ */
+export const buildSuggestionRequest = ({
+  suggestion,
+  userUuid,
+  surveyId,
+  cycle,
+  describeContext,
+  definitions = SUGGESTION_DEFINITIONS,
+  newId = () => uuidv4(),
+  log = logAiWarning,
+}: {
+  suggestion: AssistantSuggestion
+  userUuid: string
+  surveyId: number | null
+  cycle: string | null
+  describeContext: SuggestionDescribeContext
+  definitions?: SuggestionDefinitions
+  newId?: () => string
+  log?: AiLog
+}): SuggestionRequest | null => {
+  const definition = definitions[suggestion.kind]
+  if (suggestion.targets.length === 0 || !definition.prompt) return null
+  let prompt: string
+  let displayText: string
+  try {
+    prompt = definition.prompt(suggestion, describeContext)
+    displayText = getSuggestionRequestText({ definition, suggestion, describeContext })
+  } catch (error) {
+    // a target that no longer describes (e.g. a node def deleted meanwhile): nothing is sent
+    log(`The request of the ${suggestion.kind} suggestion could not be built`, error)
+    return null
+  }
+  return {
+    requestId: newId(),
+    userUuid,
+    surveyId,
+    cycle,
+    area: suggestion.area,
+    suggestionId: suggestion.id,
+    scope: {
+      kind: suggestion.kind,
+      key: getSuggestionScopeKey(suggestion.id),
+      targetKeys: suggestion.targets.map((target) => target.key),
+    },
+    prompt,
+    displayText,
+  }
+}
+
+/**
+ * Returns true when a request was made for this user, survey, cycle and area.
+ * @param {SuggestionRequest} request - Request.
+ * @param {SuggestionRequestScope} scope - Scope of the chat.
+ * @returns {boolean} True when it may be sent here.
+ */
+export const isRequestForScope = (request: SuggestionRequest, scope: SuggestionRequestScope): boolean =>
+  request.userUuid === scope.userUuid &&
+  request.surveyId === scope.surveyId &&
+  request.cycle === scope.cycle &&
+  request.area === scope.area
+
+/**
+ * Claims the pending request (at most once) and returns it when it belongs to the chat's scope; a request of another
+ * scope is claimed too, so it is dropped and never sent.
+ * @param {object} params - Parameters.
+ * @param {SuggestionRequest|null} params.pending - The panel's pending request.
+ * @param {SuggestionRequestScope} params.scope - Scope of the chat.
+ * @param {Function} params.claim - The panel store's claimPendingRequest.
+ * @returns {SuggestionRequest|null} The request to send.
+ */
+export const takeRequestForScope = ({
+  pending,
+  scope,
+  claim,
+}: {
+  pending: SuggestionRequest | null
+  scope: SuggestionRequestScope
+  claim: (requestId: string) => SuggestionRequest | null
+}): SuggestionRequest | null => {
+  if (!pending) return null
+  const request = claim(pending.requestId)
+  return request && isRequestForScope(request, scope) ? request : null
+}
+
+/**
+ * Sends a claimed request; once the turn exists, puts the suggestion in progress for it (or removes it).
+ * @param {object} params - Parameters.
+ * @param {SuggestionRequest} params.request - Claimed request.
+ * @param {SuggestionSend} params.send - The conversation hook's send.
+ * @param {SuggestionStore} [params.store] - Store.
+ * @param {SuggestionDefinitions} [params.definitions] - Definitions.
+ * @returns {Promise<string|null>} The new conversation id; null when nothing was sent (nothing changes). A rejected
+ * send propagates and marks nothing.
+ */
+export const acceptSuggestion = async ({
+  request,
+  send,
+  store = suggestionStore,
+  definitions = SUGGESTION_DEFINITIONS,
+}: {
+  request: SuggestionRequest
+  send: SuggestionSend
+  store?: SuggestionStore
+  definitions?: SuggestionDefinitions
+}): Promise<string | null> => {
+  const { userUuid, suggestionId: id, scope } = request
+  const conversationId = await send(request.prompt, { suggestion: { id, scope }, displayText: request.displayText })
+  if (!conversationId) return null
+  const surveyId = getRequestBucketSurveyId(request)
+  const definition = definitions[scope.kind]
+  if (definition.acceptMode === 'remove') store.remove({ userUuid, surveyId, id })
+  else store.startProgress({ userUuid, surveyId, id, conversationId, targetKeys: scope.targetKeys })
+  definition.onHandled?.({ userUuid, targetKeys: scope.targetKeys, store })
+  return conversationId
+}
+
+/**
+ * Dismisses the visible targets of a suggestion.
+ * @param {object} params - Parameters.
+ * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
+ * @param {string} params.userUuid - User.
+ * @param {SuggestionStore} [params.store] - Store.
+ * @param {SuggestionDefinitions} [params.definitions] - Definitions.
+ * @returns {void}
+ */
+export const dismissSuggestion = ({
+  suggestion,
+  userUuid,
+  store = suggestionStore,
+  definitions = SUGGESTION_DEFINITIONS,
+}: {
+  suggestion: AssistantSuggestion
+  userUuid: string
+  store?: SuggestionStore
+  definitions?: SuggestionDefinitions
+}): void => {
+  store.dismiss({ userUuid, surveyId: getRequestBucketSurveyId(suggestion), id: suggestion.id })
+  const targetKeys = suggestion.targets.map((target) => target.key)
+  definitions[suggestion.kind].onHandled?.({ userUuid, targetKeys, store })
+}

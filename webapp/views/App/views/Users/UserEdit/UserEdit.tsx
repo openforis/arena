@@ -99,11 +99,12 @@ const UserEdit = (props: Props) => {
 
   const onSaveAll = useCallback(async () => {
     const saves = []
-    if (dirty) saves.push(onSave())
+    // the AI and notification preferences save on their own: invalid profile fields must not block them
+    if (dirty && canSave) saves.push(onSave())
     if (aiSettingsDirty) saves.push(aiSaveRef.current?.())
     if (notificationPrefs.dirty) saves.push(notificationPrefs.save())
     await Promise.all(saves)
-  }, [aiSettingsDirty, dirty, notificationPrefs, onSave])
+  }, [aiSettingsDirty, canSave, dirty, notificationPrefs, onSave])
 
   if (!ready) return null
 
@@ -214,7 +215,12 @@ const UserEdit = (props: Props) => {
         {visible.removeFromSurvey && (
           <RemoveFromSurveySection onRemove={onRemove} surveyName={Survey.getLabel(surveyInfo, surveyLang)} />
         )}
-        {saveBarVisible && <UserEditSaveBar canSave={canSave} onSave={onSaveAll} />}
+        {saveBarVisible && (
+          <UserEditSaveBar
+            canSave={(dirty && canSave) || aiSettingsDirty || notificationPrefs.dirty}
+            onSave={onSaveAll}
+          />
+        )}
       </div>
     </div>
   )

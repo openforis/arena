@@ -46,6 +46,7 @@ $colorErrorContainer: var(--color-error-container);
 $colorSuccess: var(--color-success);
 $colorOnSuccess: var(--color-on-success);
 $colorSuccessContainer: var(--color-success-container);
+$colorOnSuccessContainer: var(--color-on-success-container);
 
 $colorWarning: var(--color-warning);
 $colorOnWarning: var(--color-on-warning);
@@ -61,6 +62,14 @@ $colorBrandGradientStart: var(--color-brand-gradient-start);
 $colorBrandGradientMiddle: var(--color-brand-gradient-middle);
 $colorBrandGradientEnd: var(--color-brand-gradient-end);
 $colorOnBrandGradient: var(--color-on-brand-gradient);
+
+$colorMonogramDefault: var(--color-monogram-default);
+$colorMonogramLocal: var(--color-monogram-local);
+$colorMonogramOpenai: var(--color-monogram-openai);
+$colorMonogramAnthropic: var(--color-monogram-anthropic);
+$colorMonogramGoogle: var(--color-monogram-google);
+$colorMonogramCompatible: var(--color-monogram-compatible);
+$colorOnMonogram: var(--color-on-monogram);
 
 /// Returns the color with the given opacity (runtime equivalent of `rgba($color, $opacity)`).
 /// @param {Color} $color - Color (or CSS variable).
@@ -92,8 +101,9 @@ $zIndex1App: 1;
 $zIndex5Badge: 5;
 $zIndex6Tooltip: 6;
 $zIndex10TopOfApp: 10;
-$zIndex15UserMenu: 15;
 $zIndex18PanelRight: 18;
+// above the right panels (assistant), below dropdowns and confirm dialogs (20)
+$zIndex19UserMenu: 19;
 $zIndex20AppModalConfirm: 20;
 $zIndex20Dropdown: 20;
 $zIndex20Tooltip: 20;

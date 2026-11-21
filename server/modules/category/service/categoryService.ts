@@ -16,6 +16,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as CategoryItemLabelsManager from '@server/modules/category/manager/categoryItemLabelsManager'
 import { CategoryImportTemplateGenerator } from '@server/modules/category/manager/categoryImportTemplateGenerator'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -376,3 +377,6 @@ export const {
   initializeSurveyCategoryItemsIndexes,
   initializeCategoryItemIndexesForSurvey,
 } = CategoryManager
+
+// assistant suggestion 6
+export const { countItemsMissingLabels, fetchItemsMissingLabels, updateItemsLabels } = CategoryItemLabelsManager

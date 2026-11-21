@@ -57,10 +57,12 @@ export const ButtonGroupDisplayType = (props) => {
     return availableTypes.map(getChartTypeItemByKey)
   }, [queryMode])
 
-  // display or chart type can change also when changing the query mode or resetting the entity
+  // display or chart type can change also when changing the query mode, resetting the entity or from code (assistant
+  // query cards): the page of the previous display does not apply to the new one
   useEffect(() => {
+    setQueryOffset(0)
     setQueryLimit(getQueryLimit({ displayType, chartType }))
-  }, [chartType, displayType, setQueryLimit])
+  }, [chartType, displayType, setQueryLimit, setQueryOffset])
 
   const onDisplayTypeChange = useCallback(
     (type) => {

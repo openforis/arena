@@ -1,0 +1,45 @@
+import type { LanguageModelV4StreamPart } from '@ai-sdk/provider'
+
+import SystemError, { StatusCodes } from '@core/systemError'
+import { createSseParser } from '@common/ai/sseParser'
+import { deserializeStreamPart } from '@common/ai/wire'
+
+/**
+ * Turns the gateway SSE response into a stream of LanguageModelV4 parts; cancelling it cancels the body
+ * (which aborts the request).
+ * @param {Response} response - Gateway response (status 200, text/event-stream).
+ * @returns {ReadableStream<LanguageModelV4StreamPart>} The parts.
+ * @throws {SystemError} aiProviderUnavailable when the response has no body, or the stream ends without `[DONE]`.
+ */
+export const readSseParts = (response: Response): ReadableStream<LanguageModelV4StreamPart> => {
+  if (!response.body) throw new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  return new ReadableStream<LanguageModelV4StreamPart>({
+    async start(controller) {
+      const parser = createSseParser({
+        onEvent: (event) => controller.enqueue(deserializeStreamPart(event)),
+        // a stream cut before `[DONE]` must not look like a complete answer
+        onDone: (receivedDoneToken) => {
+          if (!receivedDoneToken) throw new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
+        },
+      })
+      try {
+        for (;;) {
+          const { value, done } = await reader.read()
+          if (done) break
+          parser.push(decoder.decode(value, { stream: true }))
+        }
+        parser.end()
+        controller.close()
+      } catch (error) {
+        // a part that cannot be read ends the call: the gateway keeps streaming (and being charged) until cancelled
+        reader.cancel(error).catch(() => undefined)
+        controller.error(error)
+      }
+    },
+    cancel(reason) {
+      return reader.cancel(reason)
+    },
+  })
+}

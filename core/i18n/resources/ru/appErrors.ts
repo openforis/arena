@@ -16,9 +16,26 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Опишите обычным языком данные, которые вы хотите увидеть.',
   aiDataQueryEmpty: 'Сначала выберите сущность и атрибуты (или измерения и меры).',
+  aiAssistantNoAnswer: 'Ассистент завершил работу, не написав ответ. Повторите попытку или задайте более узкий вопрос.',
+  aiAssistantContextFull:
+    'Контекст модели заполнился до того, как ассистент смог ответить. Начните новый разговор, задайте более узкий вопрос или используйте модель с большим контекстом.',
+  aiAssistantToolCallText:
+    'Модель записала вызов инструмента как текст вместо того, чтобы вызвать инструмент. Повторите попытку или используйте более крупную модель.',
+  aiLocalServerUnreachable:
+    'Не удалось подключиться к серверу ИИ по адресу {{baseUrl}}. Запущен ли он с включённым CORS? Не заблокировал ли браузер доступ к устройствам локальной сети?',
+  aiLocalServerModelMissing:
+    'Модель «{{modelId}}» недоступна на локальном сервере ИИ. Загрузите её в LM Studio или выберите другую модель в настройках ИИ.',
+  aiLocalServerContextExceeded:
+    'Запрос слишком длинный для размера контекста локальной модели. Загрузите модель с большим контекстом в LM Studio или сократите запрос.',
+  aiLocalServerError: 'Локальный сервер ИИ вернул ошибку (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Для этого запроса нельзя использовать ни один движок ИИ.',
+  aiLocalServerConsentCancelled: 'Запрос отменён.',
+  aiProviderChooseAnother: 'Запрос не отправлен. Выберите другого поставщика ИИ.',
   aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
   aiDataQueryNoEntities: 'В этом опросе нет сущностей, по которым можно выполнить запрос.',
   aiDataQuerySummaryInvalid: 'ИИ не удалось предложить название и описание для этого запроса. Попробуйте ещё раз.',
+  aiApplyTimeout:
+    'Сервер не ответил вовремя. Некоторые изменения могли быть применены: перезагрузите страницу, чтобы проверить.',
   userCannotDeleteHasMessages:
     'Этого пользователя нельзя удалить: он является автором сообщений ({{count}}); сначала удалите или переназначьте их',
   userCannotDeleteLastSystemAdmin: 'Этого пользователя нельзя удалить: он последний системный администратор',
@@ -32,6 +49,9 @@ export default {
   cannotInsertFileExceedingQuota: 'Невозможно вставить файл: будет превышена квота хранения файлов',
   cannotOverridePublishedTaxa: 'Невозможно перезаписать опубликованные таксоны',
   cantUpdateStep: 'Не удается обновить шаг',
+  categoryItemLabelsInvalid: 'Недопустимый запрос меток категорий ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Эта категория слишком велика для проверки отсутствующих подписей; повторите попытку позже.',
   chainCannotBeSaved: 'Цепочка недействительна и не может быть сохранена',
   csv: {
     emptyHeaderFound: 'Обнаружен пустой заголовок в столбце {{columnPosition}}',
@@ -61,14 +81,17 @@ export default {
     identifierNotFound: 'Идентификатор не найден',
     undefinedFunction: 'Неопределенная функция',
   },
+  forbidden: 'У вас нет прав на это действие.',
   functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} (получено {{numArgs}})',
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
+  unexpectedServerError: 'На сервере произошла непредвиденная ошибка.',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
   geoWhispSamplingPointDataCategoryMissing: 'Категория данных точек выборки не найдена.',
   geoWhispSamplingPointDataLocationsMissing:
     'Не найдено ни одного элемента данных точек выборки с допустимым местоположением.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
+  invalidParams: 'Неверные параметры запроса.',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
   jobOrphanedOnRestart: 'Задача была прервана из-за перезапуска сервера. Повторите попытку.',
@@ -90,6 +113,15 @@ export default {
     entityNotFound: 'Сущность "{{entityName}}" с ключами "{{keyValues}}" не найдена',
     updateSelfAndDependentsDefaultValues:
       'Ошибка обновления записи; ошибка при оценке выражения в узле {{nodeDefName}}: {{details}}',
+    lockTimeout: 'Запись занята; повторите попытку через несколько секунд.',
+    nodeNotInRecord: 'Узел не принадлежит записи {{recordUuid}}.',
+    nodesBatchInvalid: 'Недопустимый запрос пакетного редактирования ({{reason}}).',
+    nodesBatchBusy: 'Другое пакетное редактирование ещё выполняется; повторите попытку через несколько секунд.',
+    nodesBatchInvalidValue: 'Новое значение "{{attributeName}}" недопустимо для этого атрибута.',
+    nodesBatchWouldClearValues:
+      'Эта правка очистит другие значения, которые станут неприменимыми; измените это значение в форме, чтобы подтвердить.',
+    nodesBatchUnexpected: 'Не удалось применить правку из-за непредвиденной ошибки на сервере.',
+    nodesBatchRolledBack: 'Правка не применена, потому что не удалась другая правка той же записи.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',
@@ -102,39 +134,75 @@ export default {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
     dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
     fileNotFound: 'Файл не найден',
+    nodeDefRefLocked: '{{name}} опубликован, поэтому его категорию или таксономию изменить нельзя.',
     languageCodeInvalid: 'Недопустимый код языка: {{lang}}',
     cycleKeysInvalid: 'Циклы должны быть пронумерованы последовательно, начиная с 1',
     srsCodeInvalid: 'Недопустимый код системы пространственной привязки: {{code}}',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
+  aiSessionExpired: 'Сеанс истёк. Войдите снова.',
+  aiNotAuthorized: 'У вас нет прав на использование этой функции ИИ здесь.',
   aiNotConfigured:
     'ИИ не настроен. Укажите личного провайдера в настройках ИИ или попросите администратора настроить провайдера по умолчанию.',
+  aiPolicyRefused:
+    'Политика ИИ этого опроса не разрешает отправлять $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyDataAboveSchema:
+    'Данные записей не могут быть менее строгими, чем структура опроса (структура: «$t(common:aiPolicy.level.{{schema}})», данные записей: «$t(common:aiPolicy.level.{{data}})»).',
+  aiPolicyInvalid: 'Недопустимая политика ИИ: выберите уровень для структуры опроса и для данных записей.',
+  aiPolicyAboveCeiling:
+    'Уровень «$t(common:aiPolicy.level.{{level}})» не разрешён на этом экземпляре Arena: нельзя передавать ИИ $t(common:aiPolicy.dataClass.{{dataClass}}) (максимум: «$t(common:aiPolicy.level.{{ceiling}})»).',
   aiFeaturesDisabled: 'Функции ИИ отключены в этом развертывании.',
   aiFeatureDisabled: 'Функция ИИ "{{feature}}" отключена.',
   aiPromptTooLarge: 'Запрос к ИИ слишком большой ({{size}} символов; лимит {{limit}}).',
   aiInputTooLong: 'Поле ввода ИИ "{{field}}" превышает лимит в {{limit}} символов.',
-  aiSchemaMissing: 'Отсутствует схема структурированного вывода ИИ для функции "{{feature}}".',
+  aiFeatureUnknown: 'Неизвестная функция ИИ «{{feature}}».',
+  aiCallInvalid: 'Недопустимый запрос к ИИ ({{reason}}).',
+  aiRateLimited: 'Слишком много запросов к ИИ. Подождите минуту и повторите попытку.',
+  aiDailyBudgetExceeded:
+    'Вы достигли сегодняшнего лимита ИИ-провайдера Arena по умолчанию. Он обнуляется в полночь по UTC. Вы можете продолжить работу со своим провайдером в настройках ИИ.',
+  aiRequestTimeout: 'ИИ слишком долго отвечал. Повторите попытку.',
+  aiToolNotOffered:
+    'ИИ запросил инструмент, который ему не разрешено использовать, поэтому ответ отброшен. Повторите попытку.',
+  aiProviderAuth:
+    'Поставщик ИИ отклонил учётные данные. Проверьте ключ API в настройках ИИ или обратитесь к администратору.',
+  aiProviderRateLimited: 'Поставщик ИИ ограничивает запросы. Повторите попытку чуть позже.',
+  aiProviderRejected: 'Поставщик ИИ отклонил запрос (проверьте название модели в настройках ИИ).',
+  aiDataDictionaryInvalid: 'ИИ не вернул пригодные описания полей.',
+  aiDescriptionsInvalid: 'Описания полей от ИИ, отправленные с экспортом, недействительны.',
+  aiIncludeAiDescriptionsRemoved: 'Эта страница устарела. Перезагрузите её и повторите экспорт.',
   aiProviderInvalid: 'Неподдерживаемый провайдер ИИ: {{provider}}.',
   aiModelMissing: 'Требуется идентификатор модели ИИ.',
   aiApiKeyMissing: 'Для провайдера {{provider}} требуется ключ API.',
   aiBaseUrlMissing: 'Для провайдера, совместимого с OpenAI, требуется базовый URL.',
-  aiModelListFailed: 'Не удалось получить список моделей от провайдера: {{message}}',
-  aiVertexCredentialInvalid:
-    'Недействительные учетные данные Vertex AI: вставьте JSON-ключ сервисного аккаунта или API-ключ Vertex AI.',
+  aiBaseUrlNotAllowed:
+    'Этот базовый URL указывает на внутренний адрес, к которому сервер Arena не обращается. Для модели на вашем компьютере используйте Локальный сервер ИИ. Для сервера вашей организации попросите администратора добавить его в серверы моделей организации.',
+  aiProviderUnavailable: 'Не удалось связаться с поставщиком ИИ. Повторите попытку позже.',
+  aiProviderResponseTooLarge:
+    'ИИ-провайдер прислал слишком большой ответ, и он был прерван. Повторите попытку или выберите другого провайдера.',
+  aiSurveyChanged: 'Опрос изменился, пока ассистент работал. Задайте вопрос ещё раз, чтобы использовать текущий опрос.',
+  aiModelListFailed: 'Не удалось получить список моделей от провайдера.',
+  aiProviderNotFound: 'Этот провайдер ИИ не существует или не принадлежит вам. Выберите другого провайдера.',
+  aiProviderNotGateway: 'Провайдер, сохранённый в этом браузере, вызывается из браузера, а не через сервер Arena.',
+  aiApiKeyUnreadable:
+    'Сохранённый ключ API этого провайдера больше не читается (изменился секрет шифрования сервера). Измените провайдера в настройках ИИ и введите ключ снова.',
+  aiEncryptionMissing:
+    'Ключи API нельзя сохранить: на сервере нет секрета шифрования. Попросите администратора задать AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'Этот провайдер ИИ был изменён или удалён во время проверки. Перезагрузите настройки ИИ и повторите попытку.',
+  aiProviderFieldTooLong:
+    'Значение провайдера слишком длинное: $t(appErrors:aiProviderFieldNames.{{field}}) может содержать не более {{max}} символов.',
+  aiProviderFieldNames: { model: 'Модель', baseUrl: 'Базовый URL', apiKey: 'Ключ API' },
+  aiProviderLimitReached: 'Можно сохранить не более {{max}} провайдеров ИИ. Удалите один, чтобы добавить другой.',
   aiExpressionDescriptionMissing: 'Опишите нужное выражение простыми словами.',
   aiExpressionTypeInvalid: 'Неизвестный тип выражения: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Невозможно сгенерировать выражение без целевого поля.',
   aiExpressionNodeDefNotFound: 'Не удалось найти целевое поле (uuid {{nodeDefUuid}}).',
   aiExpressionExpressionMissing: 'Невозможно объяснить пустое выражение.',
-  aiTranslationSocketMissing: 'WebSocket не подключен. Подождите немного и повторите попытку.',
   aiTranslationSourceLangMissing: 'Для перевода требуется исходный язык.',
   aiTranslationTargetLangsMissing: 'Для перевода требуется хотя бы один целевой язык.',
   aiTranslationItemsMissing: 'Нечего переводить.',
+  aiTranslationInvalid: 'ИИ не вернул пригодный перевод. Попробуйте ещё раз.',
   aiTranslationTooManyItems: 'Слишком много элементов в одном пакете ({{count}}); лимит — {{limit}}.',
-  aiActivityLogSurveyMissing: 'Для составления сводки журнала активности требуется опрос.',
-  aiChatbotDisabled: 'Чат-бот документации отключен в этом развертывании.',
-  aiChatbotUpstreamError: 'Чат-бот документации временно недоступен. Повторите попытку чуть позже.',
-  aiChatbotPayloadTooLarge: 'Ваш диалог слишком большой. Очистите чат и попробуйте задать более короткий вопрос.',
   userHasPendingInvitation:
     "У пользователя с адресом электронной почты '{{email}}' уже есть ожидающее приглашение; его/ее нельзя пригласить в этот опрос, пока оно не будет принято",
   userHasRole: 'Данный пользователь уже имеет роль в этом опросе',
@@ -148,6 +216,7 @@ export default {
     'Файл опроса слишком большой (макс. {{maxSize}} МБ): экспортируйте опрос без данных, записи и их файлы не нужны для сравнения опросов',
   userIsAdmin: 'Данный пользователь уже является системным администратором',
   userNotAllowedToChangePref: 'Пользователю не разрешено изменять настройки',
+  userPrefsInvalid: 'Настройки пользователя недопустимы',
   userNotAuthorized: 'Пользователь {{userName}} не авторизован',
   userNotFound: 'Пользователь не найден: {{userUuid}}',
   userNotInvitedToSurvey: 'У пользователя нет ожидающего приглашения в этот опрос',

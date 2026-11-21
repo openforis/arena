@@ -3,6 +3,12 @@
 $borderRadius: 2px;
 
 .modal-content {
+  // a native dialog: reset the browser styles the rules below do not set
+  inset: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  color: inherit;
   position: relative;
   display: flex;
   width: auto;
@@ -16,6 +22,11 @@ $borderRadius: 2px;
   margin: 10vh 20vw auto;
   padding: 1rem 2rem;
   box-shadow: $shadow3;
+}
+
+// fixed-width dialogs: the default 20vw side margins pin them to the left, so center them instead
+.modal--centered .modal-content {
+  margin: 10vh auto auto;
 }
 
 .modal-header {

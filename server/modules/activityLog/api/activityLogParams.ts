@@ -1,0 +1,43 @@
+import SystemError, { StatusCodes } from '@core/systemError'
+
+const DEFAULT_LIMIT = 30
+const MAX_LIMIT = 1000
+const INVALID_PARAMS_KEY = 'appErrors:invalidParams'
+
+/**
+ * Creates the error thrown for an invalid parameter.
+ * @param {string} name - Parameter name.
+ * @returns {SystemError} The error.
+ */
+const invalid = (name: string) => new SystemError(INVALID_PARAMS_KEY, { name }, StatusCodes.BAD_REQUEST)
+
+/**
+ * Parses an optional non-negative integer (digits only).
+ * @param {unknown} value - Raw value.
+ * @param {string} name - Parameter name.
+ * @returns {?number} The number, or null when missing.
+ */
+const parseNonNegativeInt = (value: unknown, name: string): number | null => {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' && typeof value !== 'number') throw invalid(name)
+  const text = String(value)
+  if (!/^\d+$/.test(text)) throw invalid(name)
+  const number = Number(text)
+  if (!Number.isSafeInteger(number)) throw invalid(name)
+  return number
+}
+
+/**
+ * Validates the activity log fetch parameters (a bad id is a 400, not a database cast error).
+ * @param {object} params - Request params.
+ * @returns {{idGreaterThan: ?number, idLessThan: ?number, limit: number}} The parsed params.
+ */
+export const parseActivityLogFetchParams = (params: Record<string, unknown>) => {
+  const limit = parseNonNegativeInt(params.limit, 'limit') ?? DEFAULT_LIMIT
+  if (limit < 1 || limit > MAX_LIMIT) throw invalid('limit')
+  return {
+    idGreaterThan: parseNonNegativeInt(params.idGreaterThan, 'idGreaterThan'),
+    idLessThan: parseNonNegativeInt(params.idLessThan, 'idLessThan'),
+    limit,
+  }
+}

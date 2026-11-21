@@ -68,7 +68,7 @@ describe('Sort.toSql', () => {
     ]
     const { clause, params } = Sort.toSql(sort)
     expect(clause).toBe(
-      ' $/sort_0:name/ DESC,  $/sort_1:name/ DESC,  $/sort_2:name/ ASC,  $/sort_3:name/ ASC,  $/sort_4:name/ ASC'
+      ' $/sort_0:name/ DESC NULLS LAST,  $/sort_1:name/ DESC NULLS LAST,  $/sort_2:name/ ASC,  $/sort_3:name/ ASC,  $/sort_4:name/ ASC'
     )
     expect(params).toEqual({ sort_0: 'a', sort_1: 'b', sort_2: 'c', sort_3: 'd', sort_4: 'e' })
   })

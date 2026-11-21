@@ -1,9 +1,7 @@
-import {
-  getIpFamily,
-  isPublicIpAddress,
-  parseIpv4,
-  parseIpv6,
-} from '@server/modules/geo/service/mapCapabilities/ipAddressRanges'
+import { classifyIpAddress, isNonPublicIpAddress, parseIpv4, parseIpv6 } from '@common/ai/ipAddress'
+
+// the map services fetcher uses the shared classification: a public address is one it is not refused for
+const isPublicIpAddress = (address: string): boolean => !isNonPublicIpAddress(address)
 
 describe('map capabilities IP address ranges (265)', () => {
   test('parses dotted-decimal IPv4 addresses strictly', () => {
@@ -14,10 +12,11 @@ describe('map capabilities IP address ranges (265)', () => {
     expect(parseIpv4('0x7f.0.0.1')).toBeNull()
   })
 
-  test('parses IPv6 addresses: compressed, bracketed, with an IPv4 tail; zone ids are refused', () => {
+  test('parses IPv6 addresses: compressed, with an IPv4 tail; brackets (stripped by the fetcher) and zone ids are refused', () => {
     expect(parseIpv6('::1')).toEqual([0, 0, 0, 0, 0, 0, 0, 1])
     expect(parseIpv6('::')).toEqual([0, 0, 0, 0, 0, 0, 0, 0])
-    expect(parseIpv6('[2001:db8::8a2e:370:7334]')).toEqual([0x2001, 0xdb8, 0, 0, 0, 0x8a2e, 0x370, 0x7334])
+    expect(parseIpv6('2001:db8::8a2e:370:7334')).toEqual([0x2001, 0xdb8, 0, 0, 0, 0x8a2e, 0x370, 0x7334])
+    expect(parseIpv6('[2001:db8::8a2e:370:7334]')).toBeNull()
     expect(parseIpv6('::ffff:127.0.0.1')).toEqual([0, 0, 0, 0, 0, 0xffff, 0x7f00, 1])
     expect(parseIpv6('fe80::1%eth0')).toBeNull()
     expect(parseIpv6('1:2:3:4:5:6:7:8:9')).toBeNull()
@@ -26,11 +25,11 @@ describe('map capabilities IP address ranges (265)', () => {
     expect(parseIpv6('example.org')).toBeNull()
   })
 
-  test('tells the IP family of a host', () => {
-    expect(getIpFamily('8.8.8.8')).toBe(4)
-    expect(getIpFamily('[::1]')).toBe(6)
-    expect(getIpFamily('[127.0.0.1]')).toBe(0)
-    expect(getIpFamily('example.org')).toBe(0)
+  test('tells an IP literal from a host name', () => {
+    expect(classifyIpAddress('8.8.8.8')).toBe('public')
+    expect(classifyIpAddress('::1')).toBe('loopback')
+    expect(classifyIpAddress('[127.0.0.1]')).toBe('invalid')
+    expect(classifyIpAddress('example.org')).toBe('invalid')
   })
 
   test.each([
@@ -42,7 +41,6 @@ describe('map capabilities IP address ranges (265)', () => {
     '2606:4700:4700::1111',
     '2a00:1450:4001:80b::200e',
     '::ffff:8.8.8.8',
-    '64:ff9b::808:808',
     '2001:200::1',
     '2001:4860:4860::8888',
     '3fff:1000::1',
@@ -75,6 +73,8 @@ describe('map capabilities IP address ranges (265)', () => {
     '::ffff:7f00:1',
     '::ffff:10.0.0.1',
     '64:ff9b::a00:1',
+    // NAT64 is refused whatever the IPv4 address it embeds (the stricter rule of the AI guard)
+    '64:ff9b::808:808',
     '64:ff9b:1::1',
     '::a00:1',
     '100::1',

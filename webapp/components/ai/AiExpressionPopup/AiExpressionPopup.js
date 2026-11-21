@@ -7,7 +7,9 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
@@ -22,19 +24,12 @@ const expressionTypeFromQualifier = (qualifier) => {
   return 'validation'
 }
 
-/**
- * Extracts a user-readable error message from a failed API request.
- * @param {!object} params - Parameters.
- * @param {!object} params.err - The error thrown by the request.
- * @param {!object} params.i18n - The i18n instance.
- * @returns {string} - The error message.
- */
-const getErrorMessage = ({ err, i18n }) => {
-  const data = err?.response?.data
-  const key = data?.error?.key || data?.errorKey
-  const params = data?.error?.params || data?.errorParams
-  return key ? i18n.t(`appErrors:${key}`, params) : err?.message || 'unknown'
-}
+const unusableErrorKeys = new Set([
+  'expression.identifierNotFound',
+  'expression.undefinedFunction',
+  'expression.invalidCategoryName',
+  'expression.invalidTaxonomyName',
+])
 
 /**
  * Shows the generated expression, its explanation and the related errors, if any.
@@ -52,12 +47,14 @@ const ExpressionResult = ({ result, validationError = null, isValid, i18n }) => 
     </div>
     <div className="ai-expression-popup__explanation">{result.explanation}</div>
     {!result.isValid && result.parseError ? (
-      <div className="ai-expression-popup__error">
+      <div className="ai-expression-popup__error" role="alert">
         {i18n.t('aiExpression.parseError', { message: result.parseError })}
       </div>
     ) : null}
     {result.isValid && validationError ? (
-      <div className="ai-expression-popup__error">{i18n.t(validationError.key, validationError.params)}</div>
+      <div className="ai-expression-popup__error" role="alert">
+        {i18n.t(validationError.key, validationError.params)}
+      </div>
     ) : null}
   </>
 )
@@ -90,6 +87,8 @@ const AiExpressionPopup = (props) => {
   const expressionType = expressionTypeFromQualifier(qualifier)
   // result.isValid is only a server-side syntax check; validationError catches semantic issues too
   const isValid = Boolean(result?.isValid) && !validationError
+  // an expression that references something missing can never work: no "Use anyway"
+  const usable = isValid || !unusableErrorKeys.has(validationError?.key)
 
   const onGenerate = async () => {
     if (!description.trim() || busy) return
@@ -98,7 +97,8 @@ const AiExpressionPopup = (props) => {
     setResult(null)
     setValidationError(null)
     try {
-      const res = await API.aiExpression.generate({
+      const res = await AiWorkflows.generateExpression({
+        survey,
         surveyId,
         nodeDefUuid,
         expressionType,
@@ -116,7 +116,7 @@ const AiExpressionPopup = (props) => {
         setValidationError(validatorError)
       }
     } catch (err) {
-      setError(getErrorMessage({ err, i18n }))
+      setError(err)
     } finally {
       setBusy(false)
     }
@@ -134,11 +134,13 @@ const AiExpressionPopup = (props) => {
   return (
     <Modal className="ai-expression-popup" title="aiExpression.title" showCloseButton onClose={onCancel}>
       <ModalBody>
+        <AiFeatureDataLocationBadge feature="expressionGenerate" />
         <div className="ai-expression-popup__hint">{i18n.t('aiExpression.hint')}</div>
 
         <textarea
           ref={textareaRef}
           className="ai-textarea"
+          aria-label={i18n.t('aiExpression.placeholder')}
           placeholder={i18n.t('aiExpression.placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -155,7 +157,12 @@ const AiExpressionPopup = (props) => {
           <ExpressionResult result={result} validationError={validationError} isValid={isValid} i18n={i18n} />
         ) : null}
 
-        {error ? <div className="ai-expression-popup__error">{error}</div> : null}
+        {error ? (
+          <div className="ai-expression-popup__error" role="alert">
+            {getAiErrorMessage({ error, i18n })}
+            <AiEngineErrorActions disabled={busy} error={error} onRetry={() => void onGenerate()} />
+          </div>
+        ) : null}
       </ModalBody>
 
       <ModalFooter>
@@ -163,12 +170,14 @@ const AiExpressionPopup = (props) => {
         {result ? (
           <>
             <Button label="aiExpression.tryAgain" onClick={onTryAgain} disabled={busy} />
-            <Button
-              className="btn-primary"
-              label={isValid ? 'aiExpression.use' : 'aiExpression.useAnyway'}
-              onClick={onUse}
-              disabled={busy}
-            />
+            {usable ? (
+              <Button
+                className="btn-primary"
+                label={isValid ? 'aiExpression.use' : 'aiExpression.useAnyway'}
+                onClick={onUse}
+                disabled={busy}
+              />
+            ) : null}
           </>
         ) : (
           <Button

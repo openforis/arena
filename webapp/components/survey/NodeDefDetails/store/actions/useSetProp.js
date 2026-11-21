@@ -5,8 +5,7 @@ import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import { onUpdateKey, onUpdateMultiple } from '@core/survey/nodeDefPropUpdaters'
 
 import { NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
@@ -26,33 +25,6 @@ const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
   }
 
   return true
-}
-
-const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple }) => {
-  // Reset validations required (or required if) or count
-  const validations = NodeDef.getValidations(nodeDef)
-  const validationsUpdated = multiple
-    ? A.pipe(NodeDefValidations.dissocRequired, NodeDefValidations.dissocRequiredIf)(validations)
-    : NodeDefValidations.dissocCount(validations)
-  let nodeDefUpdated = NodeDef.assocValidations(validationsUpdated)(nodeDef)
-
-  if (NodeDef.isEntity(nodeDefUpdated) && !multiple) {
-    nodeDefUpdated = NodeDef.dissocEnumerate(nodeDefUpdated)
-    nodeDefUpdated = NodeDef.mergePropsAdvanced({
-      [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null,
-    })(nodeDefUpdated)
-
-    if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
-      const nodeDefsUpdated = Survey.updateLayoutProp({
-        surveyCycleKey,
-        nodeDef: nodeDefUpdated,
-        key: NodeDefLayout.keys.renderType,
-        value: NodeDefLayout.renderType.form,
-      })(survey)
-      nodeDefUpdated = nodeDefsUpdated[nodeDef.uuid]
-    }
-  }
-  return nodeDefUpdated
 }
 
 const _onUpdateCategoryUuid = ({ nodeDef }) => {
@@ -93,13 +65,6 @@ const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
   )(nodeDef)
 }
 
-// key attributes are always required: "required if" doesn't apply to them
-const _onUpdateKey = ({ nodeDef, value: key }) => {
-  if (!key) return nodeDef
-  const validations = NodeDef.getValidations(nodeDef)
-  return NodeDef.assocValidations(NodeDefValidations.dissocRequiredIf(validations))(nodeDef)
-}
-
 const _onUpdateEnumerate = ({ nodeDef, value }) => {
   if (value) return nodeDef
 
@@ -108,8 +73,8 @@ const _onUpdateEnumerate = ({ nodeDef, value }) => {
 
 const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
-  [NodeDef.propKeys.multiple]: _onUpdateMultiple,
-  [NodeDef.propKeys.key]: _onUpdateKey,
+  [NodeDef.propKeys.multiple]: onUpdateMultiple,
+  [NodeDef.propKeys.key]: onUpdateKey,
   [NodeDef.propKeys.enumerate]: _onUpdateEnumerate,
   [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,

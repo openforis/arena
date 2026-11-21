@@ -1,6 +1,8 @@
 import type { Router } from 'express'
 import * as Request from '@server/utils/request'
+import { parseItemsLimit } from './categoryItemsLimit'
 import * as Response from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -11,6 +13,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -185,6 +188,33 @@ export const init = (app: Router) => {
   )
 
   // ==== READ
+  // assistant suggestion 6: edit permission, the labels are only read to be written
+  app.get(
+    '/survey/:surveyId/categories/items/missing-labels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        res.json(await CategoryService.countItemsMissingLabels({ surveyId }))
+      } catch (error) {
+        // Response.sendErr (not next(error)): see convertToSamplingPointData, the error key would be lost
+        sendRouteError({ res, error, context: 'category items missing labels count' })
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items/missing-labels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId, categoryUuid, lang, cursor, limit } = Request.getParams(req)
+        res.json(await CategoryService.fetchItemsMissingLabels({ surveyId, categoryUuid, lang, cursor, limit }))
+      } catch (error) {
+        sendRouteError({ res, error, context: 'category items missing labels page' })
+      }
+    }
+  )
 
   app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
@@ -353,9 +383,18 @@ export const init = (app: Router) => {
     async (req, res, next) => {
       try {
         const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
+        const limit = parseItemsLimit(Request.getNumericParam(req, 'limit'))
 
         const items = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchItemsByParentUuid({ surveyId, categoryUuid, parentUuid, draft, search, lang })
+          await CategoryService.fetchItemsByParentUuid({
+            surveyId,
+            categoryUuid,
+            parentUuid,
+            draft,
+            search,
+            lang,
+            limit,
+          })
         )
 
         res.json({ items })
@@ -446,6 +485,20 @@ export const init = (app: Router) => {
   )
 
   // ==== UPDATE
+
+  // assistant suggestion 6: compare-and-set of category item labels, one language per item
+  app.put('/survey/:surveyId/categories/items/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    try {
+      const user = Request.getUser(req)
+      // the labels come from the assistant: the AI switches (server and user) apply, as for the gateway
+      assertFeatureEnabled('assistantDesign', user)
+      const { surveyId } = Request.getParams(req)
+      const { items } = Request.getBody(req) ?? {}
+      res.json(await CategoryService.updateItemsLabels({ user, surveyId, items }))
+    } catch (error) {
+      sendRouteError({ res, error, context: 'category item labels update' })
+    }
+  })
 
   app.put(
     '/survey/:surveyId/categories/:categoryUuid',
@@ -609,7 +662,7 @@ export const init = (app: Router) => {
         // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
         // before these routes in the Express stack, so next(error) never reaches it and the specific
         // error key/params would be lost (the client would get a generic HTML error page instead).
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category conversion to sampling point data' })
       }
     }
   )

@@ -16,9 +16,25 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Үзэхийг хүссэн өгөгдлөө энгийн үгээр тайлбарлана уу.',
   aiDataQueryEmpty: 'Эхлээд объект болон шинж чанаруудыг (эсвэл хэмжээс, хэмжигдэхүүнүүдийг) сонгоно уу.',
+  aiAssistantNoAnswer: 'Туслах хариулт бичилгүйгээр дууслаа. Дахин оролдох эсвэл илүү нарийвчилсан асуулт асууна уу.',
+  aiAssistantContextFull:
+    'Туслах хариулахаас өмнө загварын контекст дүүрлээ. Шинэ харилцан яриа эхлүүлэх, илүү нарийвчилсан асуулт асуух эсвэл илүү том контексттэй загвар ашиглана уу.',
+  aiAssistantToolCallText:
+    'Загвар хэрэгслийг дуудахын оронд хэрэгслийн дуудлагыг текстээр бичлээ. Дахин оролдох эсвэл илүү том загвар ашиглана уу.',
+  aiLocalServerUnreachable:
+    '{{baseUrl}} дахь AI сервертэй холбогдож чадсангүй. Сервер CORS идэвхтэйгээр ажиллаж байна уу? Хөтөч дотоод сүлжээний төхөөрөмжид хандахыг хориглосон уу?',
+  aiLocalServerModelMissing:
+    '"{{modelId}}" загвар дотоод AI сервер дээр алга. LM Studio-д ачаалах эсвэл AI тохиргооноосоо өөр загвар сонгоно уу.',
+  aiLocalServerContextExceeded:
+    'Хүсэлт дотоод загварын контекстын хэмжээнээс урт байна. LM Studio-д загварыг илүү том контексттэй ачаалах эсвэл хүсэлтээ богиносгоно уу.',
+  aiLocalServerError: 'Дотоод AI сервер алдаа буцаалаа (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Энэ хүсэлтэд ашиглах боломжтой AI хөдөлгүүр алга.',
+  aiLocalServerConsentCancelled: 'Хүсэлтийг цуцаллаа.',
+  aiProviderChooseAnother: 'Хүсэлтийг илгээгээгүй. Өөр AI үйлчилгээ үзүүлэгч сонгоно уу.',
   aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
   aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
   aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',
+  aiApplyTimeout: 'Сервер цагтаа хариу өгсөнгүй. Зарим өөрчлөлт хэрэгжсэн байж магадгүй: дахин ачаалж шалгана уу.',
   userCannotDeleteHasMessages:
     'Энэ хэрэглэгчийг устгах боломжгүй: {{count}} мессежийн зохиогч байна; эхлээд тэдгээрийг устгах эсвэл өөр хэрэглэгчид шилжүүлнэ үү',
   userCannotDeleteLastSystemAdmin: 'Энэ хэрэглэгчийг устгах боломжгүй: системийн сүүлчийн администратор байна',
@@ -32,6 +48,8 @@ export default {
   cannotInsertFileExceedingQuota: 'Файл оруулах боломжгүй: файл хадгалах квот хэтэрсэн',
   cannotOverridePublishedTaxa: 'Нийтлэгдсэн таксоныг дарж бичих боломжгүй',
   cantUpdateStep: 'Алхам шинэчлэх боломжгүй',
+  categoryItemLabelsInvalid: 'Ангиллын шошгын хүсэлт буруу байна ({{reason}}).',
+  categoryItemLabelsTooLarge: 'Энэ ангилал хэт том тул дутуу шошгыг шалгаж чадсангүй; дараа дахин оролдоно уу.',
   chainCannotBeSaved: 'Сүлжээ буруу тул хадгалах боломжгүй',
   csv: {
     emptyHeaderFound: '{{columnPosition}} баганад хоосон гарчиг олдсон',
@@ -60,14 +78,17 @@ export default {
     identifierNotFound: 'Танигч олдсонгүй',
     undefinedFunction: 'Тодорхойлогдоогүй функц',
   },
+  forbidden: 'Танд үүнийг хийх эрх байхгүй.',
   functionHasTooFewArguments: 'Функц {{fnName}} нь дор хаяж {{minArity}} шаарддаг ({{numArgs}} авсан)',
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
+  unexpectedServerError: 'Серверт гэнэтийн алдаа гарлаа.',
   geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   geoWhispSamplingPointDataCategoryMissing: 'Дээж цэгийн өгөгдлийн ангилал олдсонгүй.',
   geoWhispSamplingPointDataLocationsMissing: 'Хүчинтэй байршилтай дээж цэгийн өгөгдлийн элемент олдсонгүй.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
+  invalidParams: 'Хүсэлтийн параметр буруу байна.',
   invalidType: 'Буруу төрөл {{type}}',
   jobCanceledOrErrorsFound: 'Ажил цуцлагдсан эсвэл алдаа олдсон; гүйлгээг буцаах',
   jobOrphanedOnRestart: 'Сервер дахин эхэлсний улмаас ажил тасалдлаа. Дахин оролдоно уу.',
@@ -89,6 +110,15 @@ export default {
     entityNotFound: '"{{entityName}}" нэртэй объект "{{keyValues}}" түлхүүрээр олдсонгүй',
     updateSelfAndDependentsDefaultValues:
       'Бичлэг шинэчлэхэд алдаа гарлаа; {{nodeDefName}} зангилааны илэрхийллийг үнэлэхэд алдаа гарлаа: {{details}}',
+    lockTimeout: 'Бүртгэл завгүй байна; хэдэн секундын дараа дахин оролдоно уу.',
+    nodeNotInRecord: 'Зангилаа {{recordUuid}} бүртгэлд хамаарахгүй.',
+    nodesBatchInvalid: 'Багц засварын хүсэлт буруу байна ({{reason}}).',
+    nodesBatchBusy: 'Өөр багц засвар хийгдэж байна; хэдэн секундын дараа дахин оролдоно уу.',
+    nodesBatchInvalidValue: '"{{attributeName}}" шинэ утга энэ атрибутад буруу байна.',
+    nodesBatchWouldClearValues:
+      'Энэ засвар нь хамааралгүй болох бусад утгыг арилгана; баталгаажуулахын тулд энэ утгыг маягт дээр засна уу.',
+    nodesBatchUnexpected: 'Серверт гэнэтийн алдаа гарсны улмаас засварыг хэрэгжүүлж чадсангүй.',
+    nodesBatchRolledBack: 'Ижил бичлэгийн өөр засвар амжилтгүй болсон тул энэ засварыг хэрэгжүүлээгүй.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',
@@ -101,40 +131,75 @@ export default {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
     dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
     fileNotFound: 'Файл олдсонгүй',
+    nodeDefRefLocked: '{{name}} нийтлэгдсэн тул ангилал эсвэл таксономийг өөрчлөх боломжгүй.',
     languageCodeInvalid: 'Хэлний код буруу байна: {{lang}}',
     cycleKeysInvalid: 'Мөчлөгүүд 1-ээс эхлэн дараалсан дугаартай байх ёстой',
     srsCodeInvalid: 'Орон зайн лавлах системийн код буруу байна: {{code}}',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
+  aiSessionExpired: 'Таны сешн дууссан байна. Дахин нэвтэрнэ үү.',
+  aiNotAuthorized: 'Та энд энэ AI боломжийг ашиглах эрхгүй байна.',
   aiNotConfigured:
     'AI тохируулагдаагүй байна. AI тохиргоонд хувийн үйлчилгээ үзүүлэгчийг тохируулах эсвэл администратороос анхдагч тохиргоо хийлгэнэ үү.',
+  aiPolicyRefused:
+    'Энэ судалгааны AI бодлого $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}) илгээхийг зөвшөөрөхгүй байна.',
+  aiPolicyDataAboveSchema:
+    'Бичлэгийн өгөгдөл судалгааны бүтцээс илүү зөвшөөрөмтгий байж болохгүй (бүтэц: «$t(common:aiPolicy.level.{{schema}})», бичлэгийн өгөгдөл: «$t(common:aiPolicy.level.{{data}})»).',
+  aiPolicyInvalid: 'AI бодлого буруу байна: судалгааны бүтэц болон бичлэгийн өгөгдөл тус бүрд түвшин сонгоно уу.',
+  aiPolicyAboveCeiling:
+    'Энэ Arena суулгац $t(common:aiPolicy.dataClass.{{dataClass}}) «$t(common:aiPolicy.level.{{level}})» түвшинд илгээхийг зөвшөөрөхгүй (дээд хязгаар: «$t(common:aiPolicy.level.{{ceiling}})»).',
   aiFeaturesDisabled: 'Энэ суулгацад AI функцууд идэвхгүй байна.',
   aiFeatureDisabled: 'AI функц "{{feature}}" идэвхгүй байна.',
   aiPromptTooLarge: 'AI хүсэлт хэт том байна ({{size}} тэмдэгт; хязгаар {{limit}}).',
   aiInputTooLong: 'AI оролтын талбар "{{field}}" нь {{limit}} тэмдэгтийн хязгаараас хэтэрсэн байна.',
-  aiSchemaMissing: '"{{feature}}" функцийн AI бүтэцлэгдсэн гаралтын схем байхгүй байна.',
+  aiFeatureUnknown: 'Тодорхойгүй AI боломж "{{feature}}".',
+  aiCallInvalid: 'AI хүсэлт буруу байна ({{reason}}).',
+  aiRateLimited: 'AI хүсэлт хэт олон байна. Нэг минут хүлээгээд дахин оролдоно уу.',
+  aiDailyBudgetExceeded:
+    'Arena-гийн анхдагч AI үйлчилгээ үзүүлэгчийн өнөөдрийн хязгаарт хүрлээ. Хязгаар UTC цагаар шөнийн 12 цагт шинэчлэгдэнэ. AI тохиргоонд өөрийн үйлчилгээ үзүүлэгчийг тохируулж үргэлжлүүлж болно.',
+  aiRequestTimeout: 'AI хариулахдаа хэт удсан. Дахин оролдоно уу.',
+  aiToolNotOffered: 'AI зөвшөөрөгдөөгүй хэрэгсэл ашиглахыг хүссэн тул хариуг нь устгасан. Дахин оролдоно уу.',
+  aiProviderAuth:
+    'AI үйлчилгээ үзүүлэгч нэвтрэх мэдээллийг татгалзлаа. AI тохиргооны API түлхүүрээ шалгах эсвэл админдаа хандана уу.',
+  aiProviderRateLimited: 'AI үйлчилгээ үзүүлэгч хүсэлтийг хязгаарлаж байна. Түр хүлээгээд дахин оролдоно уу.',
+  aiProviderRejected: 'AI үйлчилгээ үзүүлэгч хүсэлтийг татгалзлаа (AI тохиргооны загварын нэрийг шалгана уу).',
+  aiDataDictionaryInvalid: 'AI ашиглах боломжтой талбарын тайлбар буцаасангүй.',
+  aiDescriptionsInvalid: 'Экспорттой хамт илгээсэн AI талбарын тайлбар буруу байна.',
+  aiIncludeAiDescriptionsRemoved: 'Энэ хуудас хуучирсан байна. Дахин ачаалж, дахин экспортлоно уу.',
   aiProviderInvalid: 'Дэмжигдээгүй AI үйлчилгээ үзүүлэгч: {{provider}}.',
   aiModelMissing: 'AI загварын танигч шаардлагатай.',
   aiApiKeyMissing: '{{provider}} үйлчилгээ үзүүлэгчид API түлхүүр шаардлагатай.',
   aiBaseUrlMissing: 'OpenAI-тай нийцтэй үйлчилгээ үзүүлэгчид суурь URL шаардлагатай.',
-  aiModelListFailed: 'Үйлчилгээ үзүүлэгчээс загваруудын жагсаалтыг авч чадсангүй: {{message}}',
-  aiVertexCredentialInvalid:
-    'Vertex AI-н итгэмжлэл буруу байна: үйлчилгээний бүртгэлийн JSON түлхүүр эсвэл Vertex AI API түлхүүр буулгана уу.',
+  aiBaseUrlNotAllowed:
+    'Энэ үндсэн URL дотоод хаяг руу заасан бөгөөд Arena сервер түүн рүү хандахгүй. Таны компьютер дээрх загварт Дотоод AI серверийг ашиглана уу. Байгууллагын серверийн хувьд байгууллагын загварын серверүүдэд нэмүүлэхийг админаасаа хүснэ үү.',
+  aiProviderUnavailable: 'AI үйлчилгээ үзүүлэгчтэй холбогдож чадсангүй. Дараа дахин оролдоно уу.',
+  aiProviderResponseTooLarge:
+    'AI үйлчилгээ үзүүлэгчийн хариу хэт том байсан тул таслагдлаа. Дахин оролдох эсвэл өөр үйлчилгээ үзүүлэгч сонгоно уу.',
+  aiSurveyChanged: 'Туслах ажиллаж байх үед судалгаа өөрчлөгдсөн. Одоогийн судалгааг ашиглахын тулд дахин асууна уу.',
+  aiModelListFailed: 'Үйлчилгээ үзүүлэгчээс загваруудын жагсаалтыг авч чадсангүй.',
+  aiProviderNotFound: 'Энэ AI үйлчилгээ үзүүлэгч байхгүй эсвэл таных биш байна. Өөр үйлчилгээ үзүүлэгч сонгоно уу.',
+  aiProviderNotGateway: 'Энэ хөтөчид хадгалсан үйлчилгээ үзүүлэгчийг Arena серверээр биш, зөвхөн хөтчөөс дуудна.',
+  aiApiKeyUnreadable:
+    'Энэ үйлчилгээ үзүүлэгчийн хадгалсан API түлхүүрийг уншиж чадахгүй байна (серверийн шифрлэлтийн нууц өөрчлөгдсөн). AI тохиргоондоо үйлчилгээ үзүүлэгчийг засаад түлхүүрээ дахин оруулна уу.',
+  aiEncryptionMissing:
+    'API түлхүүр хадгалах боломжгүй: серверт шифрлэлтийн нууц алга. Администратороосоо AI_USER_KEY_ENCRYPTION_SECRET-ийг тохируулахыг хүснэ үү.',
+  aiProviderChanged:
+    'Энэ AI үйлчилгээ үзүүлэгчийг шалгаж байх үед өөрчилсөн эсвэл устгасан байна. AI тохиргоогоо дахин ачаалаад, дахин оролдоно уу.',
+  aiProviderFieldTooLong:
+    'Үйлчилгээ үзүүлэгчийн утга хэт урт байна: $t(appErrors:aiProviderFieldNames.{{field}}) хамгийн ихдээ {{max}} тэмдэгттэй байж болно.',
+  aiProviderFieldNames: { model: 'Загвар', baseUrl: 'Үндсэн URL', apiKey: 'API түлхүүр' },
+  aiProviderLimitReached:
+    'Та хамгийн ихдээ {{max}} AI үйлчилгээ үзүүлэгч хадгалж болно. Нэмэхийн тулд нэгийг нь устгана уу.',
   aiExpressionDescriptionMissing: 'Хүссэн илэрхийллээ энгийн үгээр тайлбарлана уу.',
   aiExpressionTypeInvalid: 'Тодорхойгүй илэрхийллийн төрөл: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Зорилтот талбаргүйгээр илэрхийлэл үүсгэх боломжгүй.',
   aiExpressionNodeDefNotFound: 'Зорилтот талбар олдсонгүй (uuid {{nodeDefUuid}}).',
   aiExpressionExpressionMissing: 'Хоосон илэрхийллийг тайлбарлах боломжгүй.',
-  aiTranslationSocketMissing: 'WebSocket холбогдоогүй байна. Түр хүлээгээд дахин оролдоно уу.',
   aiTranslationSourceLangMissing: 'Орчуулгад эх хэл шаардлагатай.',
   aiTranslationTargetLangsMissing: 'Орчуулгад дор хаяж нэг зорилтот хэл шаардлагатай.',
   aiTranslationItemsMissing: 'Орчуулах зүйл алга.',
+  aiTranslationInvalid: 'AI ашиглах боломжтой орчуулга буцаасангүй. Дахин оролдоно уу.',
   aiTranslationTooManyItems: 'Нэг багцад хэт олон элемент байна ({{count}}); хязгаар нь {{limit}}.',
-  aiActivityLogSurveyMissing: 'Үйл ажиллагааны бүртгэлийг хураангуйлахад судалгаа шаардлагатай.',
-  aiChatbotDisabled: 'Энэ суулгацад баримт бичгийн чатбот идэвхгүй байна.',
-  aiChatbotUpstreamError:
-    'Баримт бичгийн чатбот түр хугацаанд ашиглах боломжгүй байна. Хэсэг хугацааны дараа дахин оролдоно уу.',
-  aiChatbotPayloadTooLarge: 'Таны харилцан яриа хэт том байна. Чатыг цэвэрлээд богино асуулт асууж үзнэ үү.',
   userHasPendingInvitation:
     "'{{email}}' имэйлтэй хэрэглэгчид хүлээгдэж буй урилга аль хэдийн байна; үүнийг хүлээн авах хүртэл түүнийг энэ судалгаанд урих боломжгүй",
   userHasRole: 'Өгөгдсөн хэрэглэгч энэ судалгаанд аль хэдийн үүрэгтэй байна',
@@ -146,6 +211,7 @@ export default {
     'Судалгааны файл хэт том байна (дээд тал нь {{maxSize}} MB): судалгааг өгөгдөлгүйгээр экспортлоно уу, судалгааг харьцуулахад бүртгэлүүд болон тэдгээрийн файлууд шаардлагагүй',
   userIsAdmin: 'Өгөгдсөн хэрэглэгч аль хэдийн системийн администратор байна',
   userNotAllowedToChangePref: 'Хэрэглэгч тохиргоог өөрчлөх боломжгүй',
+  userPrefsInvalid: 'Хэрэглэгчийн тохиргоо буруу байна',
   userNotAuthorized: 'Хэрэглэгч {{userName}} эрхгүй байна',
   userNotFound: 'Хэрэглэгч олдсонгүй: {{userUuid}}',
   userNotInvitedToSurvey: 'Хэрэглэгчид энэ судалгаанд хүлээгдэж буй урилга байхгүй байна',

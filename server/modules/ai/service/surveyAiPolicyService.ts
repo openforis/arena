@@ -1,0 +1,190 @@
+/**
+ * Read and update the survey AI policy (stored in survey.config.aiPolicy, not versioned).
+ */
+import type { ArenaUser } from '@openforis/arena-core'
+
+import SystemError, { StatusCodes } from '@core/systemError'
+import * as Survey from '@core/survey/survey'
+import * as ActivityLog from '@common/activityLog/activityLog'
+import {
+  aiPolicyDataClasses,
+  clampAiPolicy,
+  findLevelsAboveCeiling,
+  getEffectiveAiPolicy,
+  isAiPolicyLevel,
+  isDataAboveSchema,
+  normalizeAiPolicy,
+  type AiPolicy,
+} from '@common/ai/policy'
+
+import { db } from '@server/db/db'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+
+import { getAiPolicyCeilings } from './policyCeilings'
+
+export type SurveyAiPolicyState = { policy: AiPolicy; ceilings: AiPolicy; effective: AiPolicy }
+
+export type SurveyAiPolicyDeps = {
+  fetchRawPolicy: (surveyId: number, client?: unknown) => Promise<unknown>
+  storePolicy: (params: { surveyId: number; policy: AiPolicy }, client: unknown) => Promise<void>
+  insertActivityLog: (params: { user: ArenaUser; surveyId: number; content: object }, client: unknown) => Promise<void>
+  getCeilings: () => AiPolicy
+  runInTransaction: <T>(fn: (client: unknown) => Promise<T>) => Promise<T>
+}
+
+/**
+ * Production dependencies (database, env ceilings).
+ * @returns {SurveyAiPolicyDeps} The dependencies.
+ */
+export const createDefaultSurveyAiPolicyDeps = (): SurveyAiPolicyDeps => ({
+  fetchRawPolicy: (surveyId, client = db) => SurveyRepository.fetchSurveyAiPolicy(surveyId, client as typeof db),
+  storePolicy: async ({ surveyId, policy }, client) => {
+    await SurveyRepository.updateSurveyConfigurationProp(
+      { surveyId, key: Survey.configKeys.aiPolicy, value: JSON.stringify(policy) },
+      client as typeof db
+    )
+  },
+  insertActivityLog: async ({ user, surveyId, content }, client) => {
+    const system = false
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.surveyAiPolicyUpdate,
+      content,
+      system,
+      client as typeof db
+    )
+  },
+  getCeilings: () => getAiPolicyCeilings(),
+  runInTransaction: (fn) => db.tx((t: unknown) => fn(t)),
+})
+
+const toState = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy }): SurveyAiPolicyState => ({
+  policy,
+  ceilings,
+  effective: getEffectiveAiPolicy({ policy, ceilings }),
+})
+
+const isSamePolicy = (a: AiPolicy, b: AiPolicy): boolean => a.schema === b.schema && a.data === b.data
+
+/**
+ * Validates a policy sent by the client: both classes with a valid level, and record data not more permissive than
+ * the survey design (`aiPolicyDataAboveSchema`).
+ * @param {unknown} body - Request body.
+ * @returns {AiPolicy} The policy.
+ */
+export const parseAiPolicyBody = (body: unknown): AiPolicy => {
+  const valid =
+    typeof body === 'object' &&
+    body !== null &&
+    !Array.isArray(body) &&
+    aiPolicyDataClasses.every((dataClass) => isAiPolicyLevel((body as Record<string, unknown>)[dataClass]))
+  if (!valid) throw new SystemError('aiPolicyInvalid', {}, StatusCodes.BAD_REQUEST)
+  const { schema, data } = body as AiPolicy
+  const policy = { schema, data }
+  if (isDataAboveSchema(policy)) throw new SystemError('aiPolicyDataAboveSchema', policy, StatusCodes.BAD_REQUEST)
+  return policy
+}
+
+/**
+ * Returns the survey AI policy, the instance ceilings and the effective policy.
+ * @param {number} surveyId - Survey id.
+ * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
+ * @returns {Promise<SurveyAiPolicyState>} The policy state.
+ */
+export const getSurveyAiPolicy = async (
+  surveyId: number,
+  deps: SurveyAiPolicyDeps = createDefaultSurveyAiPolicyDeps()
+): Promise<SurveyAiPolicyState> => {
+  const policy = normalizeAiPolicy(await deps.fetchRawPolicy(surveyId))
+  return toState({ policy, ceilings: deps.getCeilings() })
+}
+
+/**
+ * Rejects the classes whose level changed and is above its ceiling; unchanged classes are kept as stored
+ * (the runtime clamps them), so lowering a ceiling never blocks editing the other class.
+ * @param {object} params - Parameters.
+ * @param {AiPolicy} params.requested - Requested policy.
+ * @param {AiPolicy} params.from - Current normalized policy.
+ * @param {AiPolicy} params.ceilings - Instance ceilings.
+ * @returns {void}
+ */
+const assertChangesWithinCeilings = ({
+  requested,
+  from,
+  ceilings,
+}: {
+  requested: AiPolicy
+  from: AiPolicy
+  ceilings: AiPolicy
+}): void => {
+  const above = findLevelsAboveCeiling({ policy: requested, ceilings })
+  const dataClass = above.find((dc) => requested[dc] !== from[dc])
+  if (!dataClass) return
+  throw new SystemError(
+    'aiPolicyAboveCeiling',
+    { dataClass, level: requested[dataClass], ceiling: ceilings[dataClass] },
+    StatusCodes.BAD_REQUEST
+  )
+}
+
+/**
+ * Validates and stores the survey AI policy; logs the change in the survey activity log.
+ * @param {object} params - Parameters.
+ * @param {ArenaUser} params.user - Acting user (permission checked by the route).
+ * @param {number} params.surveyId - Survey id.
+ * @param {unknown} params.policy - Requested policy (request body).
+ * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
+ * @returns {Promise<SurveyAiPolicyState>} The new policy state.
+ */
+export const updateSurveyAiPolicy = async (
+  { user, surveyId, policy }: { user: ArenaUser; surveyId: number; policy: unknown },
+  deps: SurveyAiPolicyDeps = createDefaultSurveyAiPolicyDeps()
+): Promise<SurveyAiPolicyState> => {
+  const requested = parseAiPolicyBody(policy)
+  const ceilings = deps.getCeilings()
+  return deps.runInTransaction(async (client) => {
+    const from = normalizeAiPolicy(await deps.fetchRawPolicy(surveyId, client))
+    assertChangesWithinCeilings({ requested, from, ceilings })
+    await deps.storePolicy({ surveyId, policy: requested }, client)
+    if (!isSamePolicy(from, requested)) {
+      await deps.insertActivityLog({ user, surveyId, content: { from, to: requested } }, client)
+    }
+    return toState({ policy: requested, ceilings })
+  })
+}
+
+/**
+ * Returns the exported survey with its raw AI policy in the survey info (only when one is set).
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Exported survey (with `info`).
+ * @param {unknown} params.rawPolicy - Stored policy, or null.
+ * @returns {object} The survey to write in the export file.
+ */
+export const addAiPolicyToExportedSurvey = ({ survey, rawPolicy }: { survey: any; rawPolicy: unknown }): any => {
+  if (rawPolicy === null || rawPolicy === undefined) return survey
+  const key = Survey.configKeys.aiPolicy
+  // survey.json is the survey info itself; only old exports nest it in `info` (see Survey.getSurveyInfo)
+  if (survey.info) return { ...survey, info: { ...survey.info, [key]: rawPolicy } }
+  return { ...survey, [key]: rawPolicy }
+}
+
+/**
+ * Stores the AI policy of an imported (or cloned) survey, clamped to this instance's ceilings.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - Id of the new survey.
+ * @param {object} params.surveyInfo - Survey info read from the import file.
+ * @param {Pick<SurveyAiPolicyDeps, 'storePolicy' | 'getCeilings'>} [deps] - Dependencies (tests).
+ * @returns {Promise<AiPolicy|null>} The stored policy, or null when the file has none (defaults apply).
+ */
+export const writeImportedSurveyAiPolicy = async (
+  { surveyId, surveyInfo }: { surveyId: number; surveyInfo: any },
+  deps: Pick<SurveyAiPolicyDeps, 'storePolicy' | 'getCeilings'> = createDefaultSurveyAiPolicyDeps()
+): Promise<AiPolicy | null> => {
+  const raw = surveyInfo?.[Survey.configKeys.aiPolicy]
+  if (raw === undefined || raw === null) return null
+  const policy = clampAiPolicy({ policy: normalizeAiPolicy(raw), ceilings: deps.getCeilings() })
+  await deps.storePolicy({ surveyId, policy }, undefined)
+  return policy
+}

@@ -238,6 +238,7 @@ export {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordByUuid,
   fetchRecordDateModified,
+  fetchRecordStepAndOwner,
   fetchRecordsByUuids,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,

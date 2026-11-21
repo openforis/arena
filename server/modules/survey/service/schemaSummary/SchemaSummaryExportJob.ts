@@ -14,13 +14,13 @@ export default class SchemaSummaryExportJob extends Job {
   }
 
   async execute() {
-    const { user, surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = this.context
+    const { surveyId, cycle, fileFormat = FileFormats.xlsx, aiDescriptions = null } = this.context
 
     const items = await generateSchemaSummaryItems({
       surveyId,
       cycle,
-      user,
-      includeAiDescriptions,
+      aiDescriptions,
+      fileFormat,
       onProgress: ({ total, processed }) => {
         this.total = total
         this.processed = processed
@@ -38,8 +38,9 @@ export default class SchemaSummaryExportJob extends Job {
   }
 
   beforeSuccess() {
-    const { tempFileName } = this.context
-    this.setResult({ tempFileName })
+    // counted in the browser, which generated the descriptions
+    const { tempFileName, aiDescriptionsFailedCount = 0, aiDescriptionsNotDoneCount = 0 } = this.context
+    this.setResult({ tempFileName, aiDescriptionsFailedCount, aiDescriptionsNotDoneCount })
     return Promise.resolve()
   }
 }

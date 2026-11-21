@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'The file you are trying to import is empty',
+    emptyFileName: 'Empty file name in column {{headers}}',
     invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
     invalidBoolean: 'Invalid boolean value in column {{headers}}: {{value}}',
     invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
@@ -116,6 +117,10 @@ export default {
     targetsRequired: 'At least one target is required',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '"{{attributeName}}" cannot be edited (read-only or calculated).',
+    unsupportedType: '"{{attributeName}}": values of type {{type}} cannot be set here.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'Entity is required',
     applyIfDuplicate: '"$t(nodeDefEdit:expressionsProp.applyIf)" condition is duplicate',

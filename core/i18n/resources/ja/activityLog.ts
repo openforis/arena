@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: '調査を作成しました',
     [ActivityLog.type.surveyPropUpdate]: '調査の{{key}}を更新しました',
+    [ActivityLog.type.surveyAiPolicyUpdate]: '調査のAIポリシーを変更しました',
     [ActivityLog.type.surveyPublish]: '調査を公開しました',
     [ActivityLog.type.surveyCollectImport]: 'Collectから調査をインポートしました',
 

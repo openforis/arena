@@ -8,6 +8,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
 import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -15,6 +16,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
@@ -22,12 +24,15 @@ import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import { minMobileAppVersionRecordsDownload } from '@common/mobile'
 import * as RecordService from '../service/recordService'
 
 import {
   requireRecordAnalysisPermission,
+  requireRecordCleansePermission,
   requireRecordCreatePermission,
   requireRecordEditPermission,
   requireRecordListExportPermission,
@@ -37,16 +42,21 @@ import {
   requireRecordViewPermission,
   requireRecordsEditPermission,
   requireRecordsExportPermission,
+  requireSurveyViewPermission,
   requireRecordsMergePermission,
 } from '../../auth/authApiMiddleware'
 import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
+  getPendingNodeFromBody,
   requireMergeRecordsMatchUserGroupQualifiers,
   requireRecordMatchesUserGroupQualifiers,
   requireRecordReadableByUserGroup,
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
+import { requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
+import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
+import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
 import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
 
 const fetchRecordNodeFileAsStream = async ({
@@ -120,9 +130,10 @@ export const init = (app: Router) => {
         const user = Request.getUser(req)
         const { surveyId, recordUuid, cycle, draft, timezoneOffset, lang, clearNonApplicableValuesConfirmed } =
           Request.getParams(req)
-        const node = Request.getJsonParam(req, 'node')
+        // read like the qualifier middleware (body only), so the saved node is the checked one
+        const node = getPendingNodeFromBody(req)
         // permissions are checked on recordUuid: the node must belong to that record
-        if (Node.getRecordUuid(node) !== recordUuid) {
+        if (!node || Node.getRecordUuid(node) !== recordUuid) {
           throw new UnauthorizedError(User.getName(Request.getUser(req)))
         }
         const file = Request.getFile(req)
@@ -144,6 +155,43 @@ export const init = (app: Router) => {
         sendOk(res)
       } catch (error) {
         next(error)
+      }
+    }
+  )
+
+  // batch attribute value edits (assistant record-edit change sets): synchronous, one result per edit
+  app.post(
+    '/survey/:surveyId/records/nodes/update',
+    requireSurveyViewPermission,
+    requireRecordCleansePermission,
+    async (req, res) => {
+      try {
+        const user = Request.getUser(req)
+        // the edits come from the assistant: the AI switches (server and user) apply, as for the gateway
+        assertFeatureEnabled('assistantCleaning', user)
+        const { surveyId, timezoneOffset = null, lang = null } = Request.getParams(req)
+        const surveyInfo = await SurveyService.fetchSurveyById({ surveyId: Number(surveyId) })
+        const { cycle, edits } = parseNodesBatchRequest(Request.getBody(req), Survey.getCycleKeys(surveyInfo))
+
+        const results = await RecordService.updateNodesBatch({
+          user,
+          surveyId: Number(surveyId),
+          cycle,
+          edits,
+          timezoneOffset,
+          lang,
+        })
+        res.json({ results })
+      } catch (error) {
+        // sendErr (not next(error)): the error middleware runs before these routes, so next(error) would
+        // lose the key of the parser's 400 SystemError
+        sendRouteError({
+          res,
+          error,
+          unexpectedKey: NodesBatchMessageKeys.unexpected,
+          context: 'batch record edit',
+          retryAfterSeconds: NodesBatchLimits.busyRetryAfterSeconds,
+        })
       }
     }
   )
@@ -372,6 +420,7 @@ export const init = (app: Router) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
+    requireNodeUuidBelongsToRecord,
     requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
@@ -390,6 +439,7 @@ export const init = (app: Router) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
+    requireNodeUuidBelongsToRecord,
     requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
@@ -739,6 +789,7 @@ export const init = (app: Router) => {
   app.delete(
     '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
     requireRecordEditPermission,
+    requireNodeUuidBelongsToRecord,
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {

@@ -24,7 +24,6 @@ export default {
   EntitiesDeleteJob: 'Одоо байгаа объектуудыг устгах',
   FilesImportJob: 'Файл импортлох',
   MessageSendJob: 'Мессеж илгээх',
-  NodeDefsTranslationJob: 'Зангилааны тодорхойлолтын шошгыг орчуулах',
   NodeDefsImportJob: 'Зангилааны тодорхойлолт импортлох',
   NodeDefsValidationJob: 'Зангилааны тодорхойлолт баталгаажуулах',
   OdkImportJob: 'ODK импортлох',

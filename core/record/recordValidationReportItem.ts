@@ -39,8 +39,8 @@ export const getRecordDateModified = getProp(keys.recordDateModified)
 export const getRecordOwnerName = getProp(keys.recordOwnerName)
 export const getRecordOwnerUuid = getProp(keys.recordOwnerUuid)
 export const getRecordUuid = getProp(keys.recordUuid)
-const getNodeUuid = getProp(keys.nodeUuid)
-const getNodeDefUuid = getProp(keys.nodeDefUuid)
+export const getNodeUuid = getProp(keys.nodeUuid)
+export const getNodeDefUuid = getProp(keys.nodeDefUuid)
 const getValidationCountChildDefUuid = getProp(keys.validationCountChildDefUuid)
 const getKeysSelf: ItemGetter<Record<string, unknown>> = (item) =>
   A.propOr({}, keys.keysSelf)(item) as Record<string, unknown>

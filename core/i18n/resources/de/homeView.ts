@@ -185,6 +185,31 @@ Wenn die Option aktiviert ist, bleiben diese Werte im Datensatz erhalten, auch w
     preferredLanguage: 'Bevorzugte Sprache',
     sampleBasedImageInterpretation: 'Stichprobenbasierte Bildinterpretation',
     sampleBasedImageInterpretationEnabled: 'Stichprobenbasierte Bildinterpretation aktiviert',
+    aiPolicy: {
+      title: 'KI-Richtlinie',
+      intro:
+        'Legen Sie fest, wo KI den Inhalt dieser Erhebung verarbeiten darf. Es gilt die strengere Regel aus dieser Richtlinie und den Grenzen dieser Arena-Instanz.',
+      schemaLabel: 'Erhebungsdesign (Schema)',
+      schemaHint: 'Knotendefinitionen, Bezeichnungen und Ausdrücke.',
+      dataLabel: 'Erfasste Daten',
+      dataHint: 'Erfasste Werte und Benutzeraktivität.',
+      levelHint: {
+        off: 'Für diese Inhalte wird nie KI verwendet.',
+        onDevice: 'Nur von einer KI-Engine auf dem Gerät des Benutzers verarbeitet.',
+        orgHosted: 'Von einem KI-Server Ihrer Organisation verarbeitet.',
+        cloud: 'Kann von einem Cloud-KI-Anbieter verarbeitet werden.',
+      },
+      notAllowedOnInstance: 'Auf dieser Arena-Instanz nicht zulässig: {{levels}}',
+      dataLimitedBySchema:
+        'Erfasste Daten können nicht freizügiger geteilt werden als das Erhebungsdesign. Nicht verfügbar: {{levels}}',
+      onDeviceNote: 'Auf diesem Gerät: Benutzer benötigen einen lokalen KI-Server (zum Beispiel LM Studio).',
+      readOnly: 'Nur Erhebungsadministratoren können die KI-Richtlinie ändern.',
+      saved: 'KI-Richtlinie gespeichert',
+      savedDataLowered:
+        'KI-Richtlinie gespeichert. Die Stufe für erfasste Daten wurde ebenfalls gesenkt: Sie darf nicht freizügiger sein als das Erhebungsdesign.',
+      saveError: 'Die KI-Richtlinie konnte nicht gespeichert werden: {{message}}',
+      loadError: 'Die KI-Richtlinie konnte nicht geladen werden',
+    },
     security: {
       title: 'Sicherheit',
       publishToApply: 'Änderungen an diesen Optionen werden mit der Veröffentlichung der Erhebung wirksam.',

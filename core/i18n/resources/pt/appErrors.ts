@@ -16,9 +16,27 @@ export default {
   },
   aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
   aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
+  aiAssistantNoAnswer:
+    'O assistente terminou sem escrever uma resposta. Tente novamente ou faça uma pergunta mais específica.',
+  aiAssistantContextFull:
+    'O contexto do modelo ficou cheio antes de o assistente conseguir responder. Inicie uma nova conversa, faça uma pergunta mais específica ou use um modelo com um contexto maior.',
+  aiAssistantToolCallText:
+    'O modelo escreveu uma chamada de ferramenta como texto em vez de chamar a ferramenta. Tente novamente ou use um modelo maior.',
+  aiLocalServerUnreachable:
+    'Não foi possível conectar ao servidor de IA em {{baseUrl}}. Ele está em execução, com CORS ativado? O navegador bloqueou o acesso a dispositivos da rede local?',
+  aiLocalServerModelMissing:
+    'O modelo "{{modelId}}" não está disponível no servidor de IA local. Carregue-o no LM Studio ou escolha outro modelo nas suas configurações de IA.',
+  aiLocalServerContextExceeded:
+    'A solicitação é longa demais para o tamanho de contexto do modelo local. Carregue o modelo com um contexto maior no LM Studio ou encurte a solicitação.',
+  aiLocalServerError: 'O servidor de IA local retornou um erro (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Nenhum mecanismo de IA pode ser usado para esta solicitação.',
+  aiLocalServerConsentCancelled: 'A solicitação foi cancelada.',
+  aiProviderChooseAnother: 'A solicitação não foi enviada. Escolha outro provedor de IA.',
   aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
   aiDataQueryNoEntities: 'Este inventário não possui entidades que possam ser consultadas.',
   aiDataQuerySummaryInvalid: 'A IA não conseguiu sugerir um nome e uma descrição para esta consulta. Tente novamente.',
+  aiApplyTimeout:
+    'O servidor não respondeu a tempo. Algumas alterações podem ter sido aplicadas: recarregue para verificar.',
   userCannotDeleteHasMessages:
     'Este usuário não pode ser excluído: ele é autor de {{count}} mensagem(ns); exclua-as ou reatribua-as primeiro',
   userCannotDeleteLastSystemAdmin: 'Este usuário não pode ser excluído: ele é o último administrador do sistema',
@@ -33,6 +51,9 @@ export default {
   cannotInsertFileExceedingQuota: 'Não é possível inserir o arquivo: a cota de armazenamento seria excedida',
   cannotOverridePublishedTaxa: 'Não é possível sobrescrever táxons publicados',
   cantUpdateStep: `Não foi possível atualizar a etapa`,
+  categoryItemLabelsInvalid: 'Pedido de rótulos de categorias inválido ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Esta categoria é grande demais para verificar os rótulos em falta; tente novamente mais tarde.',
   chainCannotBeSaved: 'A cadeia é inválida e não pode ser salva',
   csv: {
     emptyHeaderFound: 'Cabeçalho vazio encontrado na coluna {{columnPosition}}',
@@ -60,14 +81,17 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: 'Você não tem permissão para fazer isto.',
   functionHasTooFewArguments: 'A função {{fnName}} requer no mínimo {{minArity}} (recebido {{numArgs}})',
   functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} (recebido {{numArgs}})',
   generic: 'Erro inesperado: {{text}}',
+  unexpectedServerError: 'Ocorreu um erro inesperado no servidor.',
   geoWhispApiError: 'O serviço Whisp está temporariamente indisponível.',
   geoWhispSamplingPointDataCategoryMissing: 'Categoria de dados de ponto amostral não encontrada.',
   geoWhispSamplingPointDataLocationsMissing:
     'Nenhum item de dados de ponto amostral com localização válida foi encontrado.',
   importingDataIntoWrongCollectSurvey: 'Importando dados no inventário errado. URI esperada: {{collectSurveyUri}}',
+  invalidParams: 'Parâmetros da requisição inválidos.',
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',
   jobOrphanedOnRestart: 'O job foi interrompido por uma reinicialização do servidor. Tente novamente.',
@@ -89,6 +113,15 @@ export default {
     entityNotFound: 'Entidade "{{entityName}}" com chaves "{{keyValues}}" não encontrada',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); erro ao avaliar expressão no nó {{nodeDefName}}: {{details}}',
+    lockTimeout: 'O registro está ocupado; tente novamente em alguns segundos.',
+    nodeNotInRecord: 'O nó não pertence ao registro {{recordUuid}}.',
+    nodesBatchInvalid: 'Pedido de edição em lote inválido ({{reason}}).',
+    nodesBatchBusy: 'Outra edição em lote ainda está em andamento; tente novamente em alguns segundos.',
+    nodesBatchInvalidValue: 'O novo valor de "{{attributeName}}" não é válido para este atributo.',
+    nodesBatchWouldClearValues:
+      'Esta edição apagaria outros valores que deixam de ser aplicáveis; edite este valor no formulário para confirmar.',
+    nodesBatchUnexpected: 'Não foi possível aplicar a edição devido a um erro inesperado no servidor.',
+    nodesBatchRolledBack: 'A edição não foi aplicada porque outra edição do mesmo registro falhou.',
   },
   recordPrintableExport: {
     missingEntityParams: 'A exportação da página atual requer entityDefUuid e entityNodeUuid',
@@ -102,39 +135,77 @@ Tente atualizar a página.`,
     nodeDefNameNotFound: 'Definição de nó não encontrada: {{name}}',
     dataMigrationInProgress: 'Esta pesquisa está sendo atualizada; tente novamente em breve.',
     fileNotFound: 'Arquivo não encontrado',
+    nodeDefRefLocked: '{{name}} não pode mudar de categoria nem de taxonomia: já está publicado.',
     languageCodeInvalid: 'O código de idioma não é válido: {{lang}}',
     cycleKeysInvalid: 'Os ciclos devem ser numerados consecutivamente, começando por 1',
     srsCodeInvalid: 'O código do sistema de referência espacial não é válido: {{code}}',
   },
   unsupportedFunctionType: 'Tipo de função não suportado: {{exprType}}',
+  aiSessionExpired: 'A sua sessão expirou. Inicie sessão novamente.',
+  aiNotAuthorized: 'Não tem permissão para usar esta funcionalidade de IA aqui.',
   aiNotConfigured:
     'A IA não está configurada. Defina um provedor pessoal nas Configurações de IA ou peça ao seu administrador para configurar um padrão.',
+  aiPolicyRefused:
+    'A política de IA deste inventário não permite enviar $t(common:aiPolicy.dataClass.{{dataClass}}) para $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyDataAboveSchema:
+    'Os dados dos registros não podem ser mais permissivos do que a estrutura do inventário (estrutura: "$t(common:aiPolicy.level.{{schema}})", dados: "$t(common:aiPolicy.level.{{data}})").',
+  aiPolicyInvalid:
+    'A política de IA não é válida: escolha um nível para a estrutura do inventário e outro para os dados dos registros.',
+  aiPolicyAboveCeiling:
+    '"$t(common:aiPolicy.level.{{level}})" não é permitido para $t(common:aiPolicy.dataClass.{{dataClass}}) nesta instância do Arena (máximo: "$t(common:aiPolicy.level.{{ceiling}})").',
   aiFeaturesDisabled: 'Os recursos de IA estão desativados nesta implantação.',
   aiFeatureDisabled: 'O recurso de IA "{{feature}}" está desativado.',
   aiPromptTooLarge: 'O prompt de IA é muito grande ({{size}} caracteres; limite {{limit}}).',
   aiInputTooLong: 'O campo de entrada de IA "{{field}}" excede o limite de {{limit}} caracteres.',
-  aiSchemaMissing: 'O esquema de saída estruturada de IA está ausente para o recurso "{{feature}}".',
+  aiFeatureUnknown: 'Funcionalidade de IA desconhecida "{{feature}}".',
+  aiCallInvalid: 'O pedido de IA não é válido ({{reason}}).',
+  aiRateLimited: 'Demasiados pedidos de IA. Aguarde um minuto e tente novamente.',
+  aiDailyBudgetExceeded:
+    'Atingiu o limite de hoje do provedor de IA padrão do Arena. Ele é reposto à meia-noite UTC. Pode continuar a trabalhar com o seu próprio provedor nas Configurações de IA.',
+  aiRequestTimeout: 'A IA demorou demasiado a responder. Tente novamente.',
+  aiToolNotOffered:
+    'A IA pediu uma ferramenta que não tinha permissão para usar, por isso a resposta foi descartada. Tente novamente.',
+  aiProviderAuth:
+    'O provedor de IA rejeitou as credenciais. Verifique a chave de API nas Definições de IA ou contacte o administrador.',
+  aiProviderRateLimited: 'O provedor de IA está a limitar os pedidos. Tente novamente dentro de momentos.',
+  aiProviderRejected: 'O provedor de IA rejeitou o pedido (verifique o nome do modelo nas Definições de IA).',
+  aiDataDictionaryInvalid: 'A IA não devolveu descrições de campos utilizáveis.',
+  aiDescriptionsInvalid: 'As descrições de campos da IA enviadas com a exportação não são válidas.',
+  aiIncludeAiDescriptionsRemoved: 'Esta página está desatualizada. Recarregue-a e exporte novamente.',
   aiProviderInvalid: 'Provedor de IA não suportado: {{provider}}.',
   aiModelMissing: 'O identificador do modelo de IA é obrigatório.',
   aiApiKeyMissing: 'A chave de API é obrigatória para o provedor {{provider}}.',
   aiBaseUrlMissing: 'Uma URL base é obrigatória para o provedor compatível com OpenAI.',
-  aiModelListFailed: 'Não foi possível listar os modelos do provedor: {{message}}',
-  aiVertexCredentialInvalid:
-    'Credencial da Vertex AI inválida: cole uma chave JSON de conta de serviço ou uma chave de API da Vertex AI.',
+  aiBaseUrlNotAllowed:
+    'Esta URL base aponta para um endereço interno, que o servidor do Arena não chama. Para um modelo no seu computador, use o Servidor de IA local. Para um servidor da sua organização, peça ao administrador que a adicione aos servidores de modelos da organização.',
+  aiProviderUnavailable: 'Não foi possível contactar o provedor de IA. Tente novamente mais tarde.',
+  aiProviderResponseTooLarge:
+    'O provedor de IA enviou uma resposta demasiado grande, que foi interrompida. Tente novamente ou escolha outro provedor.',
+  aiSurveyChanged: 'A pesquisa mudou enquanto o assistente trabalhava. Pergunte novamente para usar a pesquisa atual.',
+  aiModelListFailed: 'Não foi possível listar os modelos do provedor.',
+  aiProviderNotFound: 'Este provedor de IA não existe ou não é seu. Escolha outro provedor.',
+  aiProviderNotGateway:
+    'Um provedor salvo neste navegador é chamado a partir do navegador, nunca através do servidor do Arena.',
+  aiApiKeyUnreadable:
+    'A chave de API salva deste provedor já não pode ser lida (o segredo de criptografia do servidor mudou). Edite o provedor nas suas configurações de IA e insira a chave novamente.',
+  aiEncryptionMissing:
+    'Não é possível salvar chaves de API: o servidor não tem um segredo de criptografia. Peça ao seu administrador para definir AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'Este provedor de IA foi alterado ou removido durante a verificação. Recarregue as configurações de IA e tente novamente.',
+  aiProviderFieldTooLong:
+    'Um valor do provedor é demasiado longo: $t(appErrors:aiProviderFieldNames.{{field}}) pode ter no máximo {{max}} caracteres.',
+  aiProviderFieldNames: { model: 'Modelo', baseUrl: 'URL base', apiKey: 'Chave de API' },
+  aiProviderLimitReached: 'Pode guardar no máximo {{max}} provedores de IA. Remova um para adicionar outro.',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
   aiExpressionTypeInvalid: 'Tipo de expressão desconhecido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Não é possível gerar uma expressão sem um campo de destino.',
   aiExpressionNodeDefNotFound: 'Não foi possível encontrar o campo de destino (uuid {{nodeDefUuid}}).',
   aiExpressionExpressionMissing: 'Não é possível explicar uma expressão vazia.',
-  aiTranslationSocketMissing: 'WebSocket não conectado. Aguarde um momento e tente novamente.',
   aiTranslationSourceLangMissing: 'O idioma de origem é obrigatório para a tradução.',
   aiTranslationTargetLangsMissing: 'Pelo menos um idioma de destino é obrigatório para a tradução.',
   aiTranslationItemsMissing: 'Nada para traduzir.',
+  aiTranslationInvalid: 'A IA não retornou uma tradução utilizável. Tente novamente.',
   aiTranslationTooManyItems: 'Itens demais em um único lote ({{count}}); o limite é {{limit}}.',
-  aiActivityLogSurveyMissing: 'Um inventário é necessário para resumir o log de atividades.',
-  aiChatbotDisabled: 'O chatbot de documentação está desativado nesta implantação.',
-  aiChatbotUpstreamError: 'O chatbot de documentação está temporariamente indisponível. Tente novamente em instantes.',
-  aiChatbotPayloadTooLarge: 'Sua conversa é muito grande. Limpe o chat e tente uma pergunta mais curta.',
   userHasPendingInvitation: `Já existe um convite pendente para o usuário com email '{{email}}'; ele(a) não pode ser convidado(a) para este inventário até aceitá-lo`,
   userHasRole: 'O usuário informado já possui uma função neste inventário',
   userHasRole_other: 'Os usuários informados já possuem uma função neste inventário',
@@ -145,6 +216,7 @@ Tente atualizar a página.`,
     'O arquivo do inventário é grande demais (máx. {{maxSize}} MB): exporte o inventário sem dados, os registros e seus arquivos não são necessários para comparar inventários',
   userIsAdmin: 'O usuário informado já é administrador do sistema',
   userNotAllowedToChangePref: 'Usuário sem permissão para alterar preferências',
+  userPrefsInvalid: 'As preferências do usuário não são válidas',
   userNotAuthorized: 'Usuário {{userName}} não está autorizado',
   userNotFound: 'Usuário não encontrado: {{userUuid}}',
   userNotInvitedToSurvey: 'O usuário não possui nenhum convite pendente para este inventário',

@@ -1,0 +1,160 @@
+import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
+import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
+import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
+import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
+import { Button } from '@webapp/components/buttons'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { Spinner } from '@webapp/components/Spinner'
+import { useI18n, useI18nT } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
+import { StatusPill } from '../StatusPill'
+import { LocalConsentRevoke } from './LocalConsentRevoke'
+
+/**
+ * "Answered" pill with the data location, the context size and the no-model warning.
+ * @param {object} props - Props.
+ * @param {LocalServerTestView} props.view - A reachable result.
+ * @returns {React.ReactElement} The lines.
+ */
+const LocalAnswered = ({ view }: { view: LocalServerTestView }) => {
+  const t = useI18nT()
+  const location = getAiDataLocationText({
+    location: { hostingClass: view.hostingClass, provider: null, model: null, engine: null },
+    t,
+  })
+  const text = [t('userAiSettings:localServer.answered'), location].filter(Boolean).join(' · ')
+  return (
+    <>
+      <StatusPill tone="ok" text={text} testId={TestId.ai.providerTestResult} />
+      <span className="provider-dialog__hint">
+        {view.contextTokens
+          ? t('userAiSettings:localServer.contextTokens', { count: view.contextTokens })
+          : t('userAiSettings:localServer.contextUnknown')}
+      </span>
+      {view.models.length === 0 && (
+        <span className="provider-dialog__hint provider-dialog__hint--warning">
+          {t('userAiSettings:localServer.noModels')}
+        </span>
+      )}
+    </>
+  )
+}
+
+/**
+ * Result of the local test (or of the app's last probe of the saved server).
+ * @param {object} props - Props.
+ * @param {LocalServerTestView|null} props.view - The result, null before a test.
+ * @returns {React.ReactElement|null} The result.
+ */
+const LocalTestResult = ({ view }: { view: LocalServerTestView | null }) => {
+  const i18n = useI18n()
+  const t = useI18nT()
+  if (!view) return null
+  return (
+    <span className="provider-dialog__result">
+      {view.reachable ? (
+        <LocalAnswered view={view} />
+      ) : (
+        <StatusPill
+          tone="bad"
+          text={getAiErrorMessage({ error: view.error, i18n })}
+          testId={TestId.ai.providerTestResult}
+        />
+      )}
+      {view.showHttpsHint && <span className="provider-dialog__hint">{t('userAiSettings:localServer.httpsHint')}</span>}
+      {view.showCloudWarning && (
+        <span className="provider-dialog__hint provider-dialog__hint--warning">
+          {t('userAiSettings:localServer.cloudWarning')}
+        </span>
+      )}
+    </span>
+  )
+}
+
+type Props = {
+  baseUrl: string
+  model: string
+  // the models of the server's answer, with the chosen one first when it is not listed
+  models: string[]
+  test: LocalServerTestView | null
+  testing: boolean
+  canTest: boolean
+  // a typed address that is refused (credentials, query or fragment)
+  urlInvalid: boolean
+  // the saved address of the provider being edited (its local consent can be revoked); null when adding one
+  savedBaseUrl: string | null
+  onBaseUrlChange: (baseUrl: string) => void
+  onModelChange: (model: string) => void
+  onTest: () => void
+}
+
+/**
+ * Step 2 for a Local server: URL with Test, the result, the Model select and the setup help.
+ * @param {Props} props - Props.
+ * @returns {React.ReactElement} The fields.
+ */
+export const LocalProviderFields = ({
+  baseUrl,
+  model,
+  models,
+  test,
+  testing,
+  canTest,
+  urlInvalid,
+  savedBaseUrl,
+  onBaseUrlChange,
+  onModelChange,
+  onTest,
+}: Props) => {
+  const t = useI18nT()
+  return (
+    <>
+      <FormItem label="userAiSettings:localServer.baseUrl" htmlFor={TestId.ai.providerBaseUrl}>
+        <div className="provider-dialog__row">
+          <Input
+            value={baseUrl}
+            id={TestId.ai.providerBaseUrl}
+            onChange={onBaseUrlChange}
+            placeholder={DEFAULT_LOCAL_SERVER_BASE_URL}
+          />
+          <Button
+            variant="outlined"
+            label="userAiSettings:dialog.test"
+            onClick={onTest}
+            disabled={!canTest}
+            icon={testing ? <Spinner size={16} /> : null}
+            testId={TestId.ai.providerTest}
+          />
+        </div>
+      </FormItem>
+      {urlInvalid && (
+        <div className="provider-dialog__hint provider-dialog__hint--error" role="alert">
+          {t('aiEngine.localAddressInvalid')}
+        </div>
+      )}
+      {/* always rendered, so a screen reader announces the result when it appears */}
+      <output className="provider-dialog__live">
+        <LocalTestResult view={test} />
+      </output>
+      <FormItem label="userAiSettings:localServer.model" htmlFor={TestId.ai.providerModel}>
+        <select
+          id={TestId.ai.providerModel}
+          className="provider-dialog__select"
+          value={model}
+          onChange={(event) => onModelChange(event.target.value)}
+          data-testid={TestId.ai.providerModel}
+        >
+          <option value="">{t('userAiSettings:localServer.modelPlaceholder')}</option>
+          {models.map((modelId) => (
+            <option key={modelId} value={modelId}>
+              {modelId}
+            </option>
+          ))}
+        </select>
+      </FormItem>
+      <div className="provider-dialog__hint">{t('userAiSettings:localServer.help')}</div>
+      <LocalConsentRevoke baseUrl={savedBaseUrl} />
+    </>
+  )
+}

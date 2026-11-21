@@ -67,9 +67,8 @@ export const isModeRawEdit = isMode(modes.rawEdit)
 // utils
 export const hasSelection = (query: QueryItem): boolean =>
   !A.isEmpty(getEntityDefUuid(query)) &&
-  (isModeAggregate(query)
-    ? !A.isEmpty(getMeasures(query)) && !A.isEmpty(getDimensions(query))
-    : !A.isEmpty(getAttributeDefUuids(query)))
+  // aggregate: measures alone are one figure over all the rows
+  (isModeAggregate(query) ? !A.isEmpty(getMeasures(query)) : !A.isEmpty(getAttributeDefUuids(query)))
 
 // ====== UPDATE
 const assocProp =

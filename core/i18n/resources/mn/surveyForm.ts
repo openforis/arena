@@ -41,6 +41,12 @@ export default {
   schemaSummary_xlsx: 'Схемийн хураангуй (Excel)',
   schemaSummaryAiDescriptions_csv: 'Схемийн хураангуй + ХОС тайлбар (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Схемийн хураангуй + ХОС тайлбар (Excel)',
+  schemaSummaryAiDescriptionsFailed_one: '{{count}} талбарт AI тайлбар үүсгэж чадсангүй; хоосон үлдээлээ.',
+  schemaSummaryAiDescriptionsFailed_other: '{{count}} талбарт AI тайлбар үүсгэж чадсангүй; хоосон үлдээлээ.',
+  schemaSummaryAiDescriptionsNotDone_one:
+    'Ажиллагаа зогссон тул {{count}} талбарт AI тайлбар үүсгээгүй; хоосон үлдээлээ.',
+  schemaSummaryAiDescriptionsNotDone_other:
+    'Ажиллагаа зогссон тул {{count}} талбарт AI тайлбар үүсгээгүй; хоосон үлдээлээ.',
   hidePages: 'Хуудсыг нуух',
   showPages: 'Хуудсыг харуулах',
   move: `'{{nodeDefLabel}}' зөөх`,
@@ -210,6 +216,10 @@ Arena Mobile дээр:
     custom: 'Захиалгат',
     defaultDescription: 'Үндсэн тайлбар',
     defaultLabel: 'Үндсэн шошго',
+    failed_one: 'AI {{count}} орчуулга гаргаж чадсангүй; тэдгээрт AI-ийн санал байхгүй.',
+    failed_other: 'AI {{count}} орчуулга гаргаж чадсангүй; тэдгээрт AI-ийн санал байхгүй.',
+    notDone_one: 'Ажиллагааг зогсоосон тул {{count}} орчуулгыг хүсээгүй; түүнд AI-ийн санал байхгүй.',
+    notDone_other: 'Ажиллагааг зогсоосон тул {{count}} орчуулгыг хүсээгүй; тэдгээрт AI-ийн санал байхгүй.',
     path: 'Зам',
     showDescriptions: 'Тайлбар харуулах',
     title: 'Зангилааны тодорхойлолтын шошгыг орчуулах',

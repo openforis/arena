@@ -70,6 +70,7 @@ export default {
 
   dataImport: {
     emptyFile: 'El archivo que intenta importar está vacío',
+    emptyFileName: 'Nombre de archivo vacío en la columna {{headers}}',
     invalidHeaders: 'Columnas no válidas: {{invalidHeaders}}',
     invalidBoolean: 'Valor booleano no válido en la columna {{headers}}: {{value}}',
     invalidCode: "Código no válido para el atributo '{{attributeName}}': {{code}}",
@@ -116,6 +117,10 @@ export default {
     targetsRequired: 'Se requiere al menos un destino',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '"{{attributeName}}" no se puede editar (solo lectura o calculado).',
+    unsupportedType: '"{{attributeName}}": los valores de tipo {{type}} no se pueden establecer aquí.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'La entidad es obligatoria',
     applyIfDuplicate: 'La condición "$t(nodeDefEdit:expressionsProp.applyIf)" está duplicada',

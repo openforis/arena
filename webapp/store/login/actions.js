@@ -4,9 +4,9 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { SystemActions } from '@webapp/store/system'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
-import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import { AppInfo } from '@core/app/appInfo'
 
+import { authSession } from './authSession'
 import * as LoginState from './state'
 import { ViewState } from './state'
 
@@ -65,7 +65,7 @@ export const login = (email, password, twoFactorToken) =>
       data: { message, user, twoFactorRequired, authToken },
     } = await postLogin({ email, password, twoFactorToken, externalLogin })
     if (user) {
-      ApiConstants.setAuthToken(authToken)
+      await authSession.begin(authToken)
       dispatch(resetState)
       dispatch(SystemActions.initSystem())
     } else if (twoFactorRequired) {
@@ -80,11 +80,14 @@ export const logout =
   async (dispatch) => {
     dispatch(LoaderActions.showLoader())
 
-    await axios.post('/auth/logout')
-
-    ApiConstants.setAuthToken(null)
+    // the conversations stay in this browser until the user clears them
+    const { serverSessionEnded } = await authSession.end()
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())
+    // the server session (a cookie) may still be active: on a shared computer the browser must be closed
+    if (!serverSessionEnded) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.logoutServerNotReached', autoHide: false }))
+    }
 
     // navigate to home page
     navigate(appModuleUri(appModules.home))
