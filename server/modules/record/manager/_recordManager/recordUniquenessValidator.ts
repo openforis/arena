@@ -1,4 +1,4 @@
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
@@ -81,18 +81,18 @@ export const validateRecordsUniqueness = async (
     cycle: string
     nodeDefsUnique: ArenaAnyNodeDef[]
     nodesUnique: ArenaRecordNode[]
-    recordUuidsExcluded: any
-    errorKey: any
+    recordUuidsExcluded: string[]
+    errorKey: string
   },
   tx: DbClient
-) => {
+): Promise<{ [recordUuid: string]: ArenaValidation }> => {
   const recordsCountRows = await DataViewRepository.fetchRecordsCountByRootNodesValue(
     { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded },
     tx
   )
   if (A.isEmpty(recordsCountRows)) return {}
 
-  const result = {}
+  const result: { [recordUuid: string]: ArenaValidation } = {}
   for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
     const unique = Number(count) === 1
     const validationNodesKeyFields = {}

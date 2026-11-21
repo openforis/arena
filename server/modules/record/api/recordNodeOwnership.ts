@@ -1,3 +1,4 @@
+import type { Response as ExpressResponse } from 'express'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { isUuid } from '@core/uuid'
 
@@ -17,7 +18,7 @@ type FetchNodeRecordUuid = (surveyId: number, nodeUuid: string) => Promise<strin
  */
 export const createRequireNodeUuidBelongsToRecord =
   (fetchNodeRecordUuid: FetchNodeRecordUuid) =>
-  async (req: any, res: any, next: (error?: unknown) => void): Promise<void> => {
+  async (req: any, res: ExpressResponse, next: (error?: unknown) => void): Promise<void> => {
     try {
       const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
       // a malformed uuid is refused before querying the database

@@ -84,7 +84,7 @@ const _createThread = () => {
 }
 
 // ====== DELETE
-const _killThreadByKey = (threadKey: any) => {
+const _killThreadByKey = (threadKey: string) => {
   clearTimeout(threadTimeouts[threadKey])
   const thread = getThreadByKey(threadKey)
 
@@ -137,7 +137,7 @@ const clearRecordDataFromThread = ({
 
 // ====== READ
 
-const _resetThreadInactivityTimeout = (threadKey: any) => {
+const _resetThreadInactivityTimeout = (threadKey: string) => {
   clearTimeout(threadTimeouts[threadKey])
 
   // After one hour of inactivity, thread gets killed and user is notified
@@ -170,7 +170,7 @@ const getOrCreatedThread = () => {
 
 const { assocSocket, dissocSocket, dissocSocketBySocketId } = RecordSocketsMap
 
-const notifyRecordUpdateToSockets = async ({ eventType, content }: { eventType: any; content: any }) => {
+const notifyRecordUpdateToSockets = async ({ eventType, content }: { eventType: string; content: any }) => {
   const { recordUuid } = content
   const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   for (const socketId of socketIds) {
@@ -198,7 +198,7 @@ const notifyRecordUpdateToSocket = async ({
 }
 
 // forwards a message coming from the records update thread to the sockets interested in it
-const notifyThreadMessageToSockets = async ({ eventType, content }: { eventType: any; content: any }) => {
+const notifyThreadMessageToSockets = async ({ eventType, content }: { eventType: string; content: any }) => {
   if (eventType === WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm) {
     // only the user who requested the update has to confirm it
     await notifyRecordUpdateToSocket({ socketId: content.socketId, eventType, content })
@@ -225,9 +225,9 @@ const notifyRecordDeleteToSockets = async ({
   recordUuid,
   notifySameUser = true,
 }: {
-  socketIdUser: any
+  socketIdUser: string
   recordUuid: string
-  notifySameUser?: any
+  notifySameUser?: boolean
 }) => {
   // Notify other users viewing or editing the record it has been deleted
   const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)

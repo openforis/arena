@@ -119,7 +119,7 @@ export const updateNode = async (
     record: ArenaRecord
     node: ArenaRecordNode
     system?: boolean
-    updateDependents?: any
+    updateDependents?: boolean
   },
   t: DbClient
 ) => {

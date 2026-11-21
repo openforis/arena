@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import { SystemError as ArenaSystemError, type ArenaUser } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -97,7 +98,7 @@ describe('processNodesBatch', () => {
         if (lockError) throw lockError
         calls.insideLock = true
         try {
-          return await fn('tx')
+          return await fn('tx' as unknown as DbClient)
         } finally {
           calls.insideLock = false
         }

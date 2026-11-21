@@ -1,4 +1,4 @@
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -25,14 +25,14 @@ const uniquenessErrorKeys = new Set<string>([
 ])
 
 export type BatchEditCheck =
-  { ok: true; node: ArenaRecordNode; nodeDef: any } | { ok: false; result: NodesBatchEditResult }
+  { ok: true; node: ArenaRecordNode; nodeDef: ArenaAnyNodeDef } | { ok: false; result: NodesBatchEditResult }
 
 /**
  * Returns true when the attribute can be edited by a batch edit (editable, and not a file).
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} Whether batch edits are allowed.
  */
-export const isNodeDefBatchEditable = (nodeDef: any): boolean =>
+export const isNodeDefBatchEditable = (nodeDef: ArenaAnyNodeDef): boolean =>
   isNodeDefValueEditable(nodeDef) && !NodeDef.isFile(nodeDef)
 
 /**
@@ -97,7 +97,7 @@ export const checkBatchEdit = ({
  * @param {object} validation - The validation.
  * @returns {string[]} The error keys.
  */
-const collectErrorKeys = (validation: any): string[] => {
+const collectErrorKeys = (validation: ArenaValidation): string[] => {
   if (!validation) return []
   const ownKeys = Validation.getErrors(validation).map((error: any) => ValidationResult.getKey(error))
   const nestedKeys = Object.values(Validation.getFieldValidations(validation) ?? {}).flatMap(collectErrorKeys)
@@ -115,7 +115,7 @@ export const findUniquenessErrorKey = ({
   validation,
   nodeUuid,
 }: {
-  validation: any
+  validation: ArenaValidation
   nodeUuid: string
 }): string | null => {
   if (!validation) return null
