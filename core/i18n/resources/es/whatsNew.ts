@@ -12,6 +12,12 @@ export default {
 
 La primera vez, la cuenta de Google se vincula a su cuenta de Arena por su dirección de correo electrónico: utilice la misma dirección de correo electrónico de su cuenta de Arena. Los usuarios invitados también pueden aceptar la invitación con Google. Vincule o desvincule su cuenta de Google en **Mi perfil > Métodos de inicio de sesión**; el inicio de sesión con correo electrónico y contraseña sigue disponible.`,
     },
+    twoFactorAuth: {
+      title: 'Autenticación de dos factores',
+      description: `Proteja su cuenta con la **autenticación de dos factores (2FA)**: después de su contraseña, Arena solicita un código de verificación generado por una aplicación de autenticación en su teléfono (p. ej. Google Authenticator o Authy).
+
+En **Mi perfil > Inicio de sesión y seguridad**, haga clic en **Gestionar 2FA**, añada un dispositivo y escanee el código QR con la aplicación. Guarde los códigos de respaldo mostrados al final: cada uno de ellos le permite iniciar sesión una vez si pierde su teléfono.`,
+    },
     aiFeatures: {
       title: 'Funciones de IA',
       description: `En **Mi perfil > Funciones de IA**, elija **Qué puede ver la IA**:

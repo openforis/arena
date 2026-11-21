@@ -90,14 +90,13 @@ const Users = () => {
       {
         component: UserPasswordChange,
         path: `${userModules.userPasswordChange.path}/:userUuid?`,
-      }
-    )
-    if (Authorizer.canManageUser2FADevices(user)) {
-      _modules.push({
+      },
+      // every user manages their own 2FA devices
+      {
         component: User2FADevice,
         path: `${userModules.user2FADevices.path}/*`,
-      })
-    }
+      }
+    )
     return _modules
   }, [surveyInfo, user])
 

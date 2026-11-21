@@ -12,6 +12,12 @@ export default {
 
 Beim ersten Mal wird das Google-Konto über seine E-Mail-Adresse mit Ihrem Arena-Konto verknüpft: Verwenden Sie dieselbe E-Mail-Adresse wie für Ihr Arena-Konto. Eingeladene Benutzer können die Einladung auch mit Google annehmen. Verknüpfen oder trennen Sie Ihr Google-Konto unter **Mein Profil > Anmeldemethoden**; die Anmeldung mit E-Mail und Passwort bleibt verfügbar.`,
     },
+    twoFactorAuth: {
+      title: 'Zwei-Faktor-Authentifizierung',
+      description: `Schützen Sie Ihr Konto mit der **Zwei-Faktor-Authentifizierung (2FA)**: Nach Ihrem Passwort fragt Arena nach einem Bestätigungscode, den eine Authenticator-App auf Ihrem Telefon erzeugt (z. B. Google Authenticator oder Authy).
+
+Klicken Sie unter **Mein Profil > Anmeldung und Sicherheit** auf **2FA verwalten**, fügen Sie ein Gerät hinzu und scannen Sie den QR-Code mit der App. Bewahren Sie die am Ende angezeigten Backup-Codes auf: Mit jedem davon können Sie sich einmal anmelden, falls Sie Ihr Telefon verlieren.`,
+    },
     aiFeatures: {
       title: 'KI-Funktionen',
       description: `Wählen Sie unter **Mein Profil > KI-Funktionen**, **Was die KI sehen darf**:
