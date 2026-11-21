@@ -26,7 +26,7 @@ const AssistantPanel = React.lazy(() => import('./AssistantPanel'))
  */
 export const AssistantPanelHost = () => {
   const { statuses, module } = useAssistantAreas()
-  const { open, area, userSelectedArea } = useAssistantPanel()
+  const { open, area, userSelectedArea, view } = useAssistantPanel()
   const [mounted, setMounted] = useState(open)
   const shown = isAssistantShown(statuses)
   const { pathname } = useLocation()
@@ -53,13 +53,14 @@ export const AssistantPanelHost = () => {
       current: area,
       panelOpen: open,
       userSelectedArea,
+      currentInUse: view !== 'home',
       module,
       analysisRoute: isAnalysisRoute(pathname),
       cleaningRoute: isCleaningRoute({ pathname, explorerEditMode }),
     })
     // a running answer keeps its area: another one would hide it and its Stop button would stop it unseen
     if (next !== area && !assistantTurnRegistry.isRunning()) assistantPanelStore.setArea(next)
-  }, [area, explorerEditMode, module, open, pathname, statuses, userSelectedArea])
+  }, [area, explorerEditMode, module, open, pathname, statuses, userSelectedArea, view])
 
   return (
     <>

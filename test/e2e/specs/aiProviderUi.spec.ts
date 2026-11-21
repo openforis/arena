@@ -14,8 +14,10 @@ import {
 } from '../helpers/aiAnalysis'
 import {
   assistantPanel,
+  designAreaLabel,
   lastAssistantAnswer,
   openAssistantPanel,
+  selectAssistantArea,
   sendAssistantMessage,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
@@ -191,6 +193,8 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     await api.removeAiAccountProvider(provider.id)
     await page.reload()
     await openAssistantPanel(page)
+    // the designer may still be loading its draft survey: Design is selected explicitly, not left to the fallback
+    await selectAssistantArea(page, designAreaLabel)
     await reopenLastConversation(page)
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.providerRemovedNotice)).toBeVisible()
     await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)

@@ -164,6 +164,21 @@ describe('assistant areas', () => {
     expect(isTabBarShown(getTabAreas(withDesign))).toBe(true)
   })
 
+  test('pickArea: an area picked on its home page gives way to Design once the designer has loaded', () => {
+    const loading: AssistantAreaStatus[] = [
+      { area: 'design', status: 'unavailable', reasonKeys: ['aiAssistant.unavailable.noSurvey'] },
+      { area: 'analysis', status: 'available', reasonKeys: [] },
+      { area: 'help', status: 'available', reasonKeys: [] },
+    ]
+    const params = { panelOpen: true, userSelectedArea: null, module: 'designer' }
+    // the draft survey is still loading: the first available area is the fallback
+    expect(pickArea({ ...params, statuses: loading, current: null })).toBe('analysis')
+    const loaded: AssistantAreaStatus[] = [{ area: 'design', status: 'available', reasonKeys: [] }, ...loading.slice(1)]
+    expect(pickArea({ ...params, statuses: loaded, current: 'analysis', currentInUse: false })).toBe('design')
+    // a conversation on screen keeps its area
+    expect(pickArea({ ...params, statuses: loaded, current: 'analysis', currentInUse: true })).toBe('analysis')
+  })
+
   test('pickArea and isAssistantShown', () => {
     const statuses: AssistantAreaStatus[] = [
       { area: 'design', status: 'available', reasonKeys: [] },

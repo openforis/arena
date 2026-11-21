@@ -31,6 +31,8 @@ export const closeAssistantPanel = async (page: Page): Promise<void> => {
   await expect(assistantPanel(page)).toBeHidden()
 }
 
+export const designAreaLabel = 'Design'
+
 /**
  * Selects an area tab by its label ("Design", "Help").
  * @param {Page} page - Page.

@@ -126,8 +126,11 @@ export const acceptConsentAndWait = async (page: Page): Promise<void> => {
 export const reopenLastConversation = async (page: Page): Promise<void> => {
   const panel = assistantPanel(page)
   const bar = panel.getByTestId(TestId.aiAssistant.conversationBar)
+  const recentItem = panel.getByTestId(TestId.aiAssistant.recentItem).first()
+  // wait for the area to settle (the remembered conversation or the home page), not just for the first render
+  await expect(bar.or(recentItem)).toBeVisible()
   if (await bar.isVisible()) await bar.getByTestId(TestId.aiAssistant.conversationBackBtn).click()
-  await panel.getByTestId(TestId.aiAssistant.recentItem).first().click()
+  await recentItem.click()
   await expect(bar).toBeVisible()
 }
 

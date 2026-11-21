@@ -172,6 +172,8 @@ export const isAssistantShown = (statuses: AssistantAreaStatus[]): boolean =>
  * @param {AssistantArea|null} params.current - Area shown now (kept only while the panel is open: it protects the
  * conversation on screen; a closed panel re-evaluates the area, so Design is picked when the user reaches the designer).
  * @param {boolean} params.panelOpen - The panel is open.
+ * @param {boolean} [params.currentInUse] - The current area shows a conversation or a list, not its home page: an
+ * area picked on the home page is re-evaluated, so Design replaces the fallback once the designer has loaded.
  * @param {AssistantArea|null} params.userSelectedArea - Tab the user clicked (until the panel closes).
  * @param {string|null} params.module - Current app module.
  * @param {boolean} [params.analysisRoute] - The route is the Explorer or the dashboard (Analysis is preferred there).
@@ -183,6 +185,7 @@ export const pickArea = ({
   current,
   panelOpen,
   userSelectedArea,
+  currentInUse = true,
   module,
   analysisRoute = false,
   cleaningRoute = false,
@@ -191,6 +194,7 @@ export const pickArea = ({
   current: AssistantArea | null
   panelOpen: boolean
   userSelectedArea: AssistantArea | null
+  currentInUse?: boolean
   module: string | null
   analysisRoute?: boolean
   cleaningRoute?: boolean
@@ -201,7 +205,7 @@ export const pickArea = ({
     area !== null && statuses.some((status) => status.area === area && status.status !== 'hidden')
   // an unavailable tab the user clicked stays selected: it shows why
   if (isShown(userSelectedArea)) return userSelectedArea
-  if (panelOpen && isAvailable(current)) return current
+  if (panelOpen && currentInUse && isAvailable(current)) return current
   const moduleArea: AssistantArea = module === 'designer' ? 'design' : 'help'
   let preferred: AssistantArea = moduleArea
   if (cleaningRoute && isAvailable('cleaning')) preferred = 'cleaning'
