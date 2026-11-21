@@ -13,7 +13,8 @@ const ROOT = resolve(import.meta.dirname, '..', '..')
 
 for (const lang of HANDBOOK_LANGS) {
   const docx = resolve(ROOT, 'docs', 'user-manual', `arena-user-manual-${lang}.docx`)
-  const handbook = buildHandbook({ xml: new AdmZip(docx).readAsText('word/document.xml'), lang })
+  const xml = new AdmZip(docx).readAsText('word/document.xml') // NOSONAR: a zip entry, not FileReader#readAsText
+  const handbook = buildHandbook({ xml, lang })
   const problem = checkHandbook(handbook)
   if (problem) throw new Error(`${docx}: ${problem}`)
   const output = resolve(ROOT, 'webapp', 'ai', 'help', `handbook-${lang}.json`)

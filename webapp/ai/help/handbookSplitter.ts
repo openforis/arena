@@ -38,7 +38,7 @@ const decodeEntities = (text: string): string =>
   })
 
 const readAttribute = (attributes: string, name: string): string | null =>
-  new RegExp(`\\s${name}="([^"]*)"`).exec(attributes)?.[1] ?? null
+  new RegExp(String.raw`\s${name}="([^"]*)"`).exec(attributes)?.[1] ?? null
 
 const addSpace = (state: DocxState): void => {
   if (state.paragraph) state.paragraph.text += ' '
@@ -105,8 +105,9 @@ const TAG_HANDLERS: Record<string, (state: DocxState, attributes: string) => voi
   '/w:tr': endRow,
 }
 
-// a WordprocessingML tag (name and attributes), any other tag, or text
-const TOKEN = /<(\/?w:[a-zA-Z]+)\b([^>]*)>|<[^>]*>|([^<]+)/g
+// a WordprocessingML tag (name and attributes), any other tag, or text; the attributes start with a non-word
+// character, so they cannot overlap the name (no backtracking)
+const TOKEN = /<(\/?w:[a-zA-Z]+)([^\w>][^>]*)?>|<[^>]*>|([^<]+)/g
 
 /**
  * Reads the paragraphs and table rows of a Word document, in document order.
@@ -116,7 +117,7 @@ const TOKEN = /<(\/?w:[a-zA-Z]+)\b([^>]*)>|<[^>]*>|([^<]+)/g
  */
 export const readDocxBlocks = (xml: string): HandbookBlock[] => {
   const state: DocxState = { blocks: [], paragraph: null, inText: false, tableDepth: 0, row: [], cell: [] }
-  for (const [, tag, attributes, text] of xml.matchAll(TOKEN)) {
+  for (const [, tag, attributes = '', text] of xml.matchAll(TOKEN)) {
     if (tag) TAG_HANDLERS[tag]?.(state, attributes)
     else if (text && state.inText && state.paragraph) state.paragraph.text += decodeEntities(text)
   }
@@ -125,23 +126,28 @@ export const readDocxBlocks = (xml: string): HandbookBlock[] => {
 
 type Heading = { id: string; title: string; heading: string }
 
-// "7.5.1. Title" (the space may be missing)
-const NUMBERED_HEADING = /^((?:\d+\.)+)\s*(.*)$/
+// "7.5.1. Title" (the space may be missing; trimmed by readHeading, not by the pattern, to avoid backtracking)
+const NUMBERED_HEADING = /^((?:\d+\.)+)(.*)$/
 // "Annex 1. Title", "Annexe 1. Titre", "Anexo 1. Título"
-const ANNEX_HEADING = /^\p{L}+ (\d+)\.\s*(.*)$/u
+const ANNEX_HEADING = /^\p{L}+ (\d+)\.(.*)$/u
 
 // the id is the section number ("A1" for an annex), or the title of an unnumbered heading (Acknowledgements)
 const readHeading = (text: string): Heading => {
   const numbered = NUMBERED_HEADING.exec(text)
-  if (numbered) return { id: numbered[1].slice(0, -1), title: numbered[2], heading: `${numbered[1]} ${numbered[2]}` }
+  if (numbered) {
+    const title = numbered[2].trimStart()
+    return { id: numbered[1].slice(0, -1), title, heading: `${numbered[1]} ${title}` }
+  }
   const annex = ANNEX_HEADING.exec(text)
-  return annex ? { id: `A${annex[1]}`, title: annex[2], heading: text } : { id: text, title: text, heading: text }
+  return annex
+    ? { id: `A${annex[1]}`, title: annex[2].trimStart(), heading: text }
+    : { id: text, title: text, heading: text }
 }
 
 // LibreOffice names the PDF destination of a bookmark after it, with the hex code of every character but letters,
 // digits and "-" ("_Toc1" is "5FToc1")
 const toAnchor = (bookmark: string): string =>
-  `nameddest=${bookmark.replace(/[^0-9a-zA-Z-]/g, (char) => char.charCodeAt(0).toString(16).toUpperCase())}`
+  `nameddest=${bookmark.replace(/[^0-9a-zA-Z-]/g, (char) => (char.codePointAt(0) ?? 0).toString(16).toUpperCase())}`
 
 // splits at line ends; a single line longer than maxChars is cut
 const splitLongText = (text: string, maxChars: number): string[] => {

@@ -20,8 +20,8 @@ const heading = (level: number, content: string, bookmark?: string) =>
 const listItem = (content: string) =>
   paragraph(run(content), '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="3"/></w:numPr>')
 const cell = (content: string) => `<w:tc><w:tcPr/>${content}</w:tc>`
-const table = (rows: string[][]) =>
-  `<w:tbl><w:tblPr/>${rows.map((cells) => `<w:tr>${cells.map(cell).join('')}</w:tr>`).join('')}</w:tbl>`
+const row = (cells: string[]) => `<w:tr>${cells.map(cell).join('')}</w:tr>`
+const table = (rows: string[][]) => `<w:tbl><w:tblPr/>${rows.map(row).join('')}</w:tbl>`
 
 const body = [
   text('Open Foris Arena'),
