@@ -29,7 +29,7 @@ const _isSelectableAsPhase2JoinEntity = ({
   baseUnitNodeDef,
 }: {
   nodeDef: ArenaAnyNodeDef
-  baseUnitNodeDef?: any
+  baseUnitNodeDef?: ArenaAnyNodeDef
 }) =>
   NodeDef.isRoot(nodeDef) ||
   (Boolean(baseUnitNodeDef) &&
@@ -47,8 +47,8 @@ const _findPhase2JoinEntity = ({
   baseUnitNodeDef,
   survey,
 }: {
-  attributeNodeDef: any
-  baseUnitNodeDef?: any
+  attributeNodeDef: ArenaAnyNodeDef
+  baseUnitNodeDef?: ArenaAnyNodeDef
   survey: ArenaSurvey
 }): any => {
   let candidate = Survey.getNodeDefParent(attributeNodeDef)(survey)

@@ -7,9 +7,9 @@ import { arenaGetCSV, dfVar, setVar } from '../../rFunctions'
 
 export default class ListCategories {
   _categories: any
-  _name: any
+  _name: string
   _rChain: any
-  _scripts: any
+  _scripts: string[]
 
   constructor(rChain) {
     this._rChain = rChain

@@ -35,7 +35,7 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDef = (
     survey,
     nodeDef,
     areaBasedEstimatedOfNodeDef,
-  }: { user: ArenaUser; survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef; areaBasedEstimatedOfNodeDef: any },
+  }: { user: ArenaUser; survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef; areaBasedEstimatedOfNodeDef: ArenaAnyNodeDef },
   tx: DbClient
 ) => {
   const nodeDefUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({

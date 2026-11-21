@@ -12,10 +12,10 @@ const pathsWithErrorsIgnored = ['system/login', 'system/statistical-analysis']
 export const padStart = StringUtils.padStart(3, '0')
 
 export default class RFile {
-  _dir: any
-  _fileName: any
-  _path: any
-  _pathRelative: any
+  _dir: string
+  _fileName: string
+  _path: string
+  _pathRelative: string
   _rChain: any
 
   constructor(rChain, dir, fileName) {

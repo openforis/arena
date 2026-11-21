@@ -3,9 +3,9 @@ import { Arrays } from '@openforis/arena-core'
 export class ItemsCache {
   _itemsByKey: Record<string, any>
   _itemsSizeByKey: Record<string, any>
-  _lastAccessedKeys: any
-  _maxItems: any
-  _maxTotalItemsSize: any
+  _lastAccessedKeys: string[]
+  _maxItems: number
+  _maxTotalItemsSize: number
 
   constructor({ maxItems = 1000, maxTotalItemsSize = null } = {}) {
     this._maxItems = maxItems

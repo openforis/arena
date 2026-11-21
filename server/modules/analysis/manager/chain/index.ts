@@ -1,5 +1,13 @@
 import type { DbClient } from '@server/db/db'
-import { Authorizer, ChainFactory, type ArenaChain, type ArenaUser, type ArenaValidation } from '@openforis/arena-core'
+import {
+  Authorizer,
+  ChainFactory,
+  type ArenaChain,
+  type ArenaUser,
+  type ArenaValidation,
+  type ArenaAnyNodeDef,
+  type ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
@@ -106,7 +114,7 @@ export const updateChainStatusExec = ({
 export { migrateSamplingDesignPhaseProps } from './chainSamplingDesignMigration'
 
 const _updateChain = (
-  { user, surveyId, chain, chainDb }: { user: ArenaUser; surveyId: number; chain: ArenaChain; chainDb: any },
+  { user, surveyId, chain, chainDb }: { user: ArenaUser; surveyId: number; chain: ArenaChain; chainDb: ArenaChain },
   client: DbClient
 ) => {
   const chainUuid = Chain.getUuid(chain)
@@ -204,9 +212,9 @@ const _remapNodeDefUuid = ({
   sourceSurvey,
   targetSurvey,
 }: {
-  uuid: any
-  sourceSurvey: any
-  targetSurvey: any
+  uuid: string
+  sourceSurvey: ArenaSurvey
+  targetSurvey: ArenaSurvey
 }) => {
   if (!uuid) return undefined
   const sourceNodeDef = Survey.getNodeDefByUuid(uuid)(sourceSurvey)
@@ -230,9 +238,9 @@ const _sanitizeChainPropsForClone = ({
   sourceSurvey,
   targetSurvey,
 }: {
-  sourceChain: any
-  sourceSurvey: any
-  targetSurvey: any
+  sourceChain: ArenaChain
+  sourceSurvey: ArenaSurvey
+  targetSurvey: ArenaSurvey
 }) => {
   const remap = (uuid) => _remapNodeDefUuid({ uuid, sourceSurvey, targetSurvey })
 
@@ -303,7 +311,13 @@ const _sanitizeChainPropsForClone = ({
  * @param {string} params.sourceChainUuid - Uuid of the chain being cloned.
  * @returns {Array<object>} The analysis node defs to clone.
  */
-const _getNodeDefsToClone = ({ sourceSurvey, sourceChainUuid }: { sourceSurvey: any; sourceChainUuid: string }) => {
+const _getNodeDefsToClone = ({
+  sourceSurvey,
+  sourceChainUuid,
+}: {
+  sourceSurvey: ArenaSurvey
+  sourceChainUuid: string
+}) => {
   const analysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(NodeDef.isAnalysis)
   const chainNodeDefs = analysisNodeDefs.filter((nd) => NodeDef.getChainUuid(nd) === sourceChainUuid)
   const areaBasedEntityUuids = new Set(
@@ -331,8 +345,8 @@ const _remapAreaBasedEstimatedOf = ({
   sourceNodeDefs,
   clonedNodeDefs,
 }: {
-  sourceNodeDefs: any
-  clonedNodeDefs: any
+  sourceNodeDefs: ArenaAnyNodeDef[]
+  clonedNodeDefs: ArenaAnyNodeDef[]
 }) => {
   const clonedUuidBySourceUuid = Object.fromEntries(
     sourceNodeDefs.map((nd, index) => [NodeDef.getUuid(nd), NodeDef.getUuid(clonedNodeDefs[index])])
@@ -445,7 +459,7 @@ export const cloneChainFromSurvey = async (
     surveyId: number
     sourceSurveyId: number
     sourceChainUuid: string
-    skipMissingEntityAttributes?: any
+    skipMissingEntityAttributes?: boolean
   },
   client: DbClient = DB.client
 ) => {

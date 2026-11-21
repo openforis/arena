@@ -1,1 +1,1 @@
-export const zipr = (filePathDest: any, filePathSrc: any) => `zip::zipr('${filePathDest}', '${filePathSrc}')`
+export const zipr = (filePathDest: string, filePathSrc: string) => `zip::zipr('${filePathDest}', '${filePathSrc}')`

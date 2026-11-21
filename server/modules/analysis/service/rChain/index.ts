@@ -34,8 +34,8 @@ export const generateScript = ({
   surveyId: number
   cycle: string
   chainUuid: string
-  serverUrl: any
-  token: any
+  serverUrl: string
+  token: string
 }) => new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
