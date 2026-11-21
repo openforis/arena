@@ -4,7 +4,7 @@
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 import type { MissingLabelsCounts, MissingLabelsItem } from '@common/ai/categoryItemLabels'
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import { Schemata } from '@common/model/db'
 
 // the missing labels queries read every item of the categories: a huge category must not hold a connection for long
@@ -63,9 +63,9 @@ const itemCode = (alias: string): string => `COALESCE(${combinedProps(alias)} ->
  * @returns {Promise<T>} The result of the query.
  * @throws {SystemError} categoryItemLabelsTooLarge (503) when the query was cancelled by the timeout.
  */
-const runBounded = async <T>(client: any, query: (t: any) => Promise<T>): Promise<T> => {
+const runBounded = async <T>(client: DbClient, query: (t: DbClient) => Promise<T>): Promise<T> => {
   try {
-    return await client.tx(async (t: any) => {
+    return await client.tx(async (t: DbClient) => {
       await t.none('SET LOCAL statement_timeout = $1', [`${queryTimeoutMs}ms`])
       return query(t)
     })
@@ -87,7 +87,7 @@ const runBounded = async <T>(client: any, query: (t: any) => Promise<T>): Promis
  */
 export const countItemsMissingLabels = async (
   { surveyId, langs }: { surveyId: number | string; langs: string[] },
-  client: any = db
+  client: DbClient = db
 ): Promise<MissingLabelsCounts> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const rows: { categoryUuid: string; lang: string; count: number }[] = await runBounded(client, (t) =>
@@ -121,7 +121,7 @@ export const countItemsMissingLabels = async (
  */
 export const categoryExists = (
   { surveyId, categoryUuid }: { surveyId: number | string; categoryUuid: string },
-  client: any = db
+  client: DbClient = db
 ): Promise<boolean> =>
   client.one(
     `SELECT EXISTS (SELECT 1 FROM ${Schemata.getSchemaSurvey(surveyId)}.category WHERE uuid = $/categoryUuid/) AS found`,
@@ -166,7 +166,7 @@ export const fetchItemsMissingLabels = async (
     cursor: string | null
     limit: number
   },
-  client: any = db
+  client: DbClient = db
 ): Promise<{ total: number; items: MissingLabelsItem[] }> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   // the code path is built (upwards) only for the missing items and the cursor item, not for the whole category
@@ -250,7 +250,7 @@ export type ItemLabelsRow = {
  */
 export const fetchItemsLabelsByUuids = (
   { surveyId, itemUuids }: { surveyId: number | string; itemUuids: string[] },
-  client: any
+  client: DbClient
 ): Promise<ItemLabelsRow[]> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   return client.any(

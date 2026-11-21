@@ -1,3 +1,5 @@
+import type { CategoryImportSummary } from '@core/survey/categoryImportSummary'
+import type { Response as ExpressResponse } from 'express'
 import type { ArenaUser } from '@openforis/arena-core'
 import { Authorizer, Points } from '@openforis/arena-core'
 
@@ -36,7 +38,7 @@ export const importCategory = ({
   user: ArenaUser
   surveyId: number
   categoryUuid: string
-  summary: any
+  summary: CategoryImportSummary
 }) => {
   const job = new CategoryImportJob({
     user,
@@ -80,13 +82,13 @@ export const exportCategory = async ({
   surveyId: number
   categoryUuid: string
   draft: boolean
-  language?: any
+  language?: string
   includeUuid?: boolean
-  includeSingleCode?: any
-  includeCodeJoint?: any
-  includeLevelPosition?: any
-  includeReportingDataCumulativeArea?: any
-  res: any
+  includeSingleCode?: boolean
+  includeCodeJoint?: boolean
+  includeLevelPosition?: boolean
+  includeReportingDataCumulativeArea?: boolean
+  res: ExpressResponse
   fileFormat?: string
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
@@ -122,7 +124,7 @@ export const exportCategoryImportTemplateGeneric = async ({
 }: {
   surveyId: number
   draft: boolean
-  res: any
+  res: ExpressResponse
   fileFormat: string
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
@@ -142,7 +144,7 @@ export const exportCategoryImportTemplate = async ({
   surveyId: number
   categoryUuid: string
   draft: boolean
-  res: any
+  res: ExpressResponse
   fileFormat: string
 }) => {
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
@@ -167,7 +169,7 @@ export const exportCategoryImportTemplateSamplingPointData = async ({
 }: {
   surveyId: number
   draft: boolean
-  res: any
+  res: ExpressResponse
   fileFormat: string
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
@@ -223,7 +225,13 @@ const _getSamplingPointDataCategory = async ({ surveyId, draft = true }: { surve
   return categories.find((category) => Category.getName(category) === Category.samplingPointDataCategoryName)
 }
 
-export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }: { surveyId: number; levelIndex?: any }) => {
+export const countSamplingPointData = async ({
+  surveyId,
+  levelIndex = 0,
+}: {
+  surveyId: number
+  levelIndex?: number
+}) => {
   const category = await _getSamplingPointDataCategory({ surveyId })
   const categoryUuid = Category.getUuid(category)
   const count = await CategoryManager.countItemsByLevelIndex({ surveyId, categoryUuid, levelIndex })
@@ -237,7 +245,7 @@ export const fetchSamplingPointData = async ({
   offset,
 }: {
   surveyId: number
-  levelIndex?: any
+  levelIndex?: number
   limit: number | null
   offset: number
 }) => {
@@ -292,7 +300,7 @@ export const fetchSamplingPointData = async ({
  * @returns {number} The survey id, converted to a number.
  * @throws {Error} If the value is not a positive integer.
  */
-const _validateSurveyId = ({ surveyId, paramName }: { surveyId: number; paramName: any }) => {
+const _validateSurveyId = ({ surveyId, paramName }: { surveyId: number; paramName: string }) => {
   if (!NumberUtils.isInteger(surveyId) || Number(surveyId) <= 0) {
     throw new Error(`${paramName} must be a positive integer`)
   }

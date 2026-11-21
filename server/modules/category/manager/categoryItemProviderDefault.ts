@@ -15,7 +15,7 @@ const getItemByCodePaths = ({
 }: {
   survey: ArenaSurvey
   categoryUuid: string
-  codePaths: any
+  codePaths: string[]
   draft?: boolean
   client?: DbClient
 }) => {

@@ -2,6 +2,7 @@ import {
   countItemsMissingLabels,
   fetchItemsMissingLabels,
 } from '@server/modules/category/repository/categoryItemLabelsRepository'
+import type { DbClient } from '@server/db/db'
 
 const pgStatementTimeoutCode = '57014'
 
@@ -28,7 +29,8 @@ const createClient = ({ failure = null }: { failure?: unknown } = {}) => {
       return { total: 0, items: [] }
     },
   }
-  return { client: { tx: async (fn: (t: unknown) => Promise<unknown>) => fn(t) }, statements }
+  const client = { tx: async (fn: (t: unknown) => Promise<unknown>) => fn(t) } as unknown as DbClient
+  return { client, statements }
 }
 
 const pageParams = { surveyId: 1, categoryUuid: 'c', lang: 'fr', langs: ['en', 'fr'], cursor: null, limit: 51 }
