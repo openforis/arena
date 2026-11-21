@@ -105,8 +105,6 @@ const TAG_HANDLERS: Record<string, (state: DocxState, attributes: string) => voi
   '/w:tr': endRow,
 }
 
-// a tag (its content between < and >) or text; the tag name is read in code, so the pattern cannot backtrack
-const TOKEN = /<([^>]*)>|([^<]+)/g
 // a WordprocessingML tag name at the start of a tag content ("w:p", "/w:tbl")
 const WORD_TAG_NAME = /^\/?w:[a-zA-Z]+/
 
@@ -132,9 +130,21 @@ const handleTag = (state: DocxState, content: string): void => {
  */
 export const readDocxBlocks = (xml: string): HandbookBlock[] => {
   const state: DocxState = { blocks: [], paragraph: null, inText: false, tableDepth: 0, row: [], cell: [] }
-  for (const [, tagContent, text] of xml.matchAll(TOKEN)) {
-    if (tagContent !== undefined) handleTag(state, tagContent)
-    else if (state.inText && state.paragraph) state.paragraph.text += decodeEntities(text)
+  // a linear scan (no regular expression): each character is read once
+  let index = 0
+  while (index < xml.length) {
+    if (xml[index] === '<') {
+      const end = xml.indexOf('>', index)
+      // an unclosed tag ends the (malformed) document
+      if (end < 0) break
+      handleTag(state, xml.slice(index + 1, end))
+      index = end + 1
+    } else {
+      const next = xml.indexOf('<', index)
+      const end = next < 0 ? xml.length : next
+      if (state.inText && state.paragraph) state.paragraph.text += decodeEntities(xml.slice(index, end))
+      index = end
+    }
   }
   return state.blocks
 }
