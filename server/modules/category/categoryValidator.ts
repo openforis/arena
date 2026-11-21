@@ -41,8 +41,8 @@ const levelValidators = ({
   bigCategory,
 }: {
   levels: ArenaCategoryLevel[]
-  itemsCache: any
-  bigCategory: any
+  itemsCache: ItemsCache | null
+  bigCategory: boolean
 }) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
@@ -64,8 +64,8 @@ const validateLevels = async ({
   bigCategory,
 }: {
   category: ArenaCategory
-  itemsCache: any
-  bigCategory: any
+  itemsCache: ItemsCache | null
+  bigCategory: boolean
 }) => {
   const levels = Category.getLevelsArray(category)
 
@@ -110,9 +110,9 @@ const itemValidators = ({
   itemsByParentAndCode,
   childrenCount = 0,
 }: {
-  isLeaf: any
+  isLeaf: boolean
   itemsByParentAndCode: any
-  childrenCount?: any
+  childrenCount?: number
 }) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
@@ -174,9 +174,9 @@ const validateAllItems = ({
 }: {
   survey: ArenaSurvey
   category: ArenaCategory
-  itemsCache: any
-  onProgress?: any
-  stopIfFn?: any
+  itemsCache: ItemsCache | null
+  onProgress?: ((progress: { total: number; processed: number }) => void) | null
+  stopIfFn?: (() => boolean) | null
 }) => {
   const itemsToValidate = itemsCache.getFirstLevelItems()
   return validateItemsAndDescendants({ survey, category, itemsCache, itemsToValidate, onProgress, stopIfFn })
@@ -188,7 +188,7 @@ const _addChildrenValidation = ({
   validation,
 }: {
   itemsValidationsByUuid: Record<string, any>
-  itemChildren: any
+  itemChildren: ArenaCategoryItem[]
   validation: ArenaValidation
 }) => {
   const childrenValid = A.all((itemChild) =>
@@ -215,8 +215,8 @@ const _createItemsInvalidValidationResult = ({
   warningsFound,
   itemsValidationsByUuid,
 }: {
-  errorsFound: any
-  warningsFound: any
+  errorsFound: boolean
+  warningsFound: boolean
   itemsValidationsByUuid: Record<string, any>
 }) => {
   const validationResult = ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemsInvalid)
@@ -236,10 +236,10 @@ const validateItemsAndDescendants = async ({
 }: {
   survey: ArenaSurvey
   category: ArenaCategory
-  itemsCache: any
-  itemsToValidate: any
-  onProgress?: any
-  stopIfFn?: any
+  itemsCache: ItemsCache | null
+  itemsToValidate: ArenaCategoryItem[]
+  onProgress?: ((progress: { total: number; processed: number }) => void) | null
+  stopIfFn?: (() => boolean) | null
 }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
@@ -350,11 +350,11 @@ export const validateCategory = async ({
   categories: ArenaCategory[]
   category: ArenaCategory
   items: ArenaCategoryItem[]
-  bigCategory?: any
-  validateLevels?: any
-  validateItems?: any
-  onProgress?: any
-  stopIfFn?: any
+  bigCategory?: boolean
+  validateLevels?: boolean
+  validateItems?: boolean
+  onProgress?: ((progress: { total: number; processed: number }) => void) | null
+  stopIfFn?: (() => boolean) | null
 }) => {
   const itemsCache = !bigCategory && items && (_validateLevels || _validateItems) ? new ItemsCache(items) : null
   const categoryValidation = await validateCategoryProps(categories, category)
@@ -388,7 +388,7 @@ export const validateItems = async ({
   itemsCountByItemUuid,
 }: {
   category: ArenaCategory
-  itemsToValidate: any
+  itemsToValidate: ArenaCategoryItem[]
   itemsCountByItemUuid: Record<string, number>
 }) => {
   const prevValidation = Category.getValidation(category)

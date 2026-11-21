@@ -12,7 +12,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import CategoryBatchImportJob from './CategoryBatchImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 
-const extractCategoryNameFromZipEntryName = (entryName: any) => {
+const extractCategoryNameFromZipEntryName = (entryName: string) => {
   const lastIndexOfDirSeparator = entryName.lastIndexOf('/')
   const fileName = lastIndexOfDirSeparator > 0 ? entryName.substring(lastIndexOfDirSeparator + 1) : entryName
   return FileUtils.getBaseName(fileName)

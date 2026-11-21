@@ -2,6 +2,8 @@
  * Category item labels for the assistant (suggestion 6): missing-label counts and pages, and the atomic labels
  * update. Every request error is a 400 `appErrors:categoryItemLabelsInvalid` with the reason.
  */
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Survey from '@core/survey/survey'
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -19,7 +21,7 @@ import {
   type MissingLabelsCounts,
   type MissingLabelsPage,
 } from '@common/ai/categoryItemLabels'
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as CategoryItemLabelsRepository from '@server/modules/category/repository/categoryItemLabelsRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -50,7 +52,7 @@ export const requireValid = (valid: boolean, reason: string): void => {
  * @param {object} client - Database client.
  * @returns {Promise<string[]>} The languages, default first.
  */
-export const fetchSurveyLanguages = async (surveyId: number, client: any): Promise<string[]> => {
+export const fetchSurveyLanguages = async (surveyId: number, client: DbClient): Promise<string[]> => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   return Survey.getLanguages(surveyInfo) as string[]
 }
@@ -87,7 +89,7 @@ const parseLimit = (limit: unknown): number => {
  */
 export const countItemsMissingLabels = async (
   { surveyId }: { surveyId: number },
-  client: any = db
+  client: DbClient = db
 ): Promise<MissingLabelsCounts> => {
   const langs = await fetchSurveyLanguages(surveyId, client)
   if (langs.length < 2) return {}
@@ -113,7 +115,7 @@ export const fetchItemsMissingLabels = async (
     cursor,
     limit,
   }: { surveyId: number; categoryUuid: unknown; lang: unknown; cursor?: unknown; limit?: unknown },
-  client: any = db
+  client: DbClient = db
 ): Promise<MissingLabelsPage> => {
   requireValid(typeof categoryUuid === 'string' && isUuid(categoryUuid), 'category')
   const after = parseCursor(cursor)
@@ -231,7 +233,7 @@ const newLabelsActivity = (row: CategoryItemLabelsRepository.ItemLabelsRow, labe
  */
 const writeUpdates = async (
   { surveyId, updates }: { surveyId: number; updates: CategoryItemLabelUpdate[] },
-  tx: any
+  tx: DbClient
 ) => {
   const itemUuids = [...new Set(updates.map((update) => update.itemUuid))]
   const rows = await CategoryItemLabelsRepository.fetchItemsLabelsByUuids({ surveyId, itemUuids }, tx)
@@ -273,10 +275,10 @@ const writeUpdates = async (
  * @returns {Promise<CategoryItemLabelsUpdateAnswer>} Written labels, conflicts and the touched categories.
  */
 export const updateItemsLabels = (
-  { user, surveyId, items }: { user: any; surveyId: number; items: unknown },
-  client: any = db
+  { user, surveyId, items }: { user: ArenaUser; surveyId: number; items: unknown },
+  client: DbClient = db
 ): Promise<CategoryItemLabelsUpdateAnswer> =>
-  client.tx(async (tx: any) => {
+  client.tx(async (tx: DbClient) => {
     const langs = await fetchSurveyLanguages(surveyId, tx)
     const updates = parseUpdates(items, langs)
     const { applied, conflicts, activities, categoryUuids } = await writeUpdates({ surveyId, updates }, tx)

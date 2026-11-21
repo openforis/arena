@@ -50,7 +50,7 @@ export class CategoryImportInternalJob extends Job {
   itemsByCodes: any
   itemsUpdater: any
   srsIndex: any
-  summary: any
+  summary: CategoryImportSummary.CategoryImportSummary
   survey: ArenaSurvey | null
   totalItemsInserted: any
 

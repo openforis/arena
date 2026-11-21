@@ -5,7 +5,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as ProcessUtils from '@core/processUtils'
 import { uuidv4 } from '@core/uuid'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as CategoryApi from '@server/modules/category/api/categoryApi'
@@ -164,7 +164,7 @@ describe('Category item labels update (053)', () => {
           { itemUuid: pink, lang: 'en', text: 'Pink!', expectedText: 'Pink' },
         ],
       },
-      countingClient
+      countingClient as unknown as DbClient
     )
     expect(answer.conflicts).toEqual([])
     expect(answer.applied).toHaveLength(3)

@@ -11,7 +11,7 @@ import { ArrayUtils } from '@core/arrayUtils'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { ExtraPropDef, type ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 const generateCategoryTemplate = () => {
   let category = Category.newCategory({ [Category.keysProps.name]: 'template' })
@@ -46,7 +46,7 @@ const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.geometryPoint]: Points.toString(PointFactory.createInstance({ x: 12.48902, y: 41.88302 })),
 }
 
-const templateExtraValueGenerator = ({ extraDef }: { extraDef: any }) => {
+const templateExtraValueGenerator = ({ extraDef }: { extraDef: ExtraPropDefItem }) => {
   const extraDefName = ExtraPropDef.getName(extraDef)
 
   if (extraDefName.endsWith('_x')) return 12.48902
@@ -63,9 +63,9 @@ const generateDescendantItems = ({
   numItemsPerLevel = 2,
 }: {
   levels: ArenaCategoryLevel[]
-  levelIndex?: any
-  previousLevelCodes?: any
-  numItemsPerLevel?: any
+  levelIndex?: number
+  previousLevelCodes?: string[]
+  numItemsPerLevel?: number
 }) => {
   const codes = ArrayUtils.fromNumberOfElements(numItemsPerLevel).map((codeIndex) => `${codeIndex + 1}`)
 
@@ -106,7 +106,7 @@ const generateExtraDefsForTemplate = (category: ArenaCategory) => {
   }, [])
 }
 
-const generateItems = ({ levels, numItemsPerLevel = 2 }: { levels: ArenaCategoryLevel[]; numItemsPerLevel?: any }) =>
+const generateItems = ({ levels, numItemsPerLevel = 2 }: { levels: ArenaCategoryLevel[]; numItemsPerLevel?: number }) =>
   generateDescendantItems({ levels, numItemsPerLevel })
 
 const generateTemplate = ({

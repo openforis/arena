@@ -21,7 +21,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { ExtraPropDef, type ExtraPropDefItem } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 
 import { db, DbClient } from '@server/db/db'
@@ -72,10 +72,10 @@ const _validateCategoryFromCategories = async (
     survey: ArenaSurvey
     categories: Record<string, ArenaCategory>
     categoryUuid: string
-    validateLevels?: any
-    validateItems?: any
-    onProgress?: any
-    stopIfFn?: any
+    validateLevels?: boolean
+    validateItems?: boolean
+    onProgress?: ((progress: { total: number; processed: number }) => void) | null
+    stopIfFn?: (() => boolean) | null
   },
   client: DbClient = db
 ) => {
@@ -112,10 +112,10 @@ export const validateCategory = async (
   }: {
     survey: ArenaSurvey
     categoryUuid: string
-    validateLevels?: any
-    validateItems?: any
-    onProgress?: any
-    stopIfFn?: any
+    validateLevels?: boolean
+    validateItems?: boolean
+    onProgress?: ((progress: { total: number; processed: number }) => void) | null
+    stopIfFn?: (() => boolean) | null
   },
   client: DbClient = db
 ) => {
@@ -147,7 +147,11 @@ const _fetchCategory = (
   )
 
 const _validateSpecifiedCategoryItems = async (
-  { surveyId, categoryUuid, itemsToValidate }: { surveyId: number; categoryUuid: string; itemsToValidate: any },
+  {
+    surveyId,
+    categoryUuid,
+    itemsToValidate,
+  }: { surveyId: number; categoryUuid: string; itemsToValidate: ArenaCategoryItem[] },
   client: DbClient = db
 ) => {
   const draft = true
@@ -168,7 +172,7 @@ const _afterItemUpdate = async (
     categoryUuid,
     itemUuid,
     prevItem,
-  }: { surveyId: number; categoryUuid: string; itemUuid?: string; prevItem: any },
+  }: { surveyId: number; categoryUuid: string; itemUuid?: string; prevItem: ArenaCategoryItem },
   client: DbClient = db
 ) => {
   const bigCategory = await _isBigCategory({ surveyId, categoryUuid }, client)
@@ -219,7 +223,7 @@ const _validateCategory = async (
     categoryUuid,
     validateLevels = true,
     validateItems = true,
-  }: { surveyId: number; categoryUuid: string; validateLevels?: any; validateItems?: any },
+  }: { surveyId: number; categoryUuid: string; validateLevels?: boolean; validateItems?: boolean },
   client: DbClient = db
 ) => {
   const survey = await _fetchSurvey({ surveyId }, client)
@@ -337,7 +341,14 @@ export const insertLevel = (
     system = false,
     addLogs = true,
     validate = true,
-  }: { user: ArenaUser; surveyId: number; level: ArenaCategoryLevel; system?: any; addLogs?: any; validate?: any },
+  }: {
+    user: ArenaUser
+    surveyId: number
+    level: ArenaCategoryLevel
+    system?: boolean
+    addLogs?: boolean
+    validate?: boolean
+  },
   client: DbClient = db
 ) => {
   checkLevel(level)
@@ -357,9 +368,9 @@ export const insertCategory = async (
     user: ArenaUser
     surveyId: number
     category: ArenaCategory
-    system?: any
-    addLogs?: any
-    validate?: any
+    system?: boolean
+    addLogs?: boolean
+    validate?: boolean
     backup?: boolean
   },
   client: DbClient = db
@@ -453,7 +464,7 @@ export const insertItem = (
   user: ArenaUser,
   surveyId: number,
   categoryUuid: string,
-  itemParam: any,
+  itemParam: ArenaCategoryItem,
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -537,7 +548,7 @@ export const { exportCategoryToStream } = CategoryExportManager
 
 const allCategoryRelatedTables = ['category', 'category_level', 'category_item']
 
-export const publishProps = (surveyId: number, langsDeleted: any, client: DbClient = db) =>
+export const publishProps = (surveyId: number, langsDeleted: string[], client: DbClient = db) =>
   client.tx((t) =>
     DbUtils.runQueries(t, [
       ...allCategoryRelatedTables.map((table) => () => publishSurveySchemaTableProps(surveyId, table, t)),
@@ -562,7 +573,7 @@ export const updateCategoryProp = async (
     key,
     value,
     system = false,
-  }: { user: ArenaUser; surveyId: number; categoryUuid: string; key: string; value: unknown; system?: any },
+  }: { user: ArenaUser; surveyId: number; categoryUuid: string; key: string; value: unknown; system?: boolean },
   client: DbClient = db
 ) => {
   // async: an invalid prop must reject, not throw
@@ -598,7 +609,7 @@ const _updateCategoryItemsExtraDef = async (
     name,
     itemExtraDef,
     deleted,
-  }: { surveyId: number; categoryUuid: string; name: string; itemExtraDef: any; deleted: any },
+  }: { surveyId: number; categoryUuid: string; name: string; itemExtraDef: ExtraPropDefItem; deleted: boolean },
   t: DbClient
 ) => {
   const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, t)
@@ -626,7 +637,14 @@ export const updateCategoryItemExtraDefItem = (
     name,
     itemExtraDef = null,
     deleted = false,
-  }: { user: ArenaUser; surveyId: number; categoryUuid: string; name: string; itemExtraDef?: any; deleted?: any },
+  }: {
+    user: ArenaUser
+    surveyId: number
+    categoryUuid: string
+    name: string
+    itemExtraDef?: ExtraPropDefItem
+    deleted?: boolean
+  },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -688,7 +706,7 @@ const _newCategoryItemUpdateLogActivity = (
   item: ArenaCategoryItem,
   key: string,
   value: unknown,
-  system: any
+  system: boolean
 ) =>
   ActivityLog.newActivity(
     ActivityLog.type.categoryItemPropUpdate,
@@ -926,7 +944,7 @@ const _addLocationItemExtraDefIfMissing = async (
     categoryUuid,
     category,
     locked = true,
-  }: { surveyId: number; categoryUuid: string; category: ArenaCategory; locked?: any },
+  }: { surveyId: number; categoryUuid: string; category: ArenaCategory; locked?: boolean },
   t: DbClient
 ) => {
   if (Category.hasLocationExtraProp(category)) {
@@ -960,7 +978,7 @@ export const convertCategoryToGeoPackage = (
     surveyId,
     categoryUuid,
     locked = true,
-  }: { user: ArenaUser; surveyId: number; categoryUuid: string; locked?: any },
+  }: { user: ArenaUser; surveyId: number; categoryUuid: string; locked?: boolean },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -993,7 +1011,7 @@ export const convertCategoryToSamplingPointData = (
     surveyId,
     categoryUuid,
     locked = true,
-  }: { user: ArenaUser; surveyId: number; categoryUuid: string; locked?: any },
+  }: { user: ArenaUser; surveyId: number; categoryUuid: string; locked?: boolean },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -1133,7 +1151,7 @@ export const replaceLevels = (
   user: ArenaUser,
   surveyId: number,
   category: ArenaCategory,
-  levelNamesNew: any,
+  levelNamesNew: string[],
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
