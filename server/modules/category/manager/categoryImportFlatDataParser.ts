@@ -1,4 +1,4 @@
-import type { Readable } from 'stream'
+import type { Readable } from 'node:stream'
 import * as A from '@core/arena'
 
 import { Objects, PointFactory, Points, SystemError, type ArenaSurvey } from '@openforis/arena-core'

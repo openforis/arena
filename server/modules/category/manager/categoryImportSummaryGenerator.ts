@@ -1,4 +1,4 @@
-import type { Readable } from 'stream'
+import type { Readable } from 'node:stream'
 import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
@@ -61,7 +61,7 @@ const _extractColumnTypeByName = ({
   ignoreLabelsAndDescriptions = false,
 }: {
   columnName: string
-  columnPatterns: any
+  columnPatterns: Record<string, RegExp>
   ignoreLabelsAndDescriptions?: boolean
 }) => {
   // try to find column type by matching one of the column patterns
@@ -78,12 +78,12 @@ const _extractLevelName = ({
   columnName,
   columnType,
 }: {
-  columnPatterns: any
+  columnPatterns: Record<string, RegExp>
   columnName: string
   columnType: string
 }) => {
   const pattern = columnPatterns[columnType]
-  const match = columnName.match(pattern)
+  const match = pattern.exec(columnName)
   // normalized like the names entered in the category editor (level names are validated before saving)
   return match[1] ? StringUtils.normalizeName(match[1]) : defaultLevelName
 }
@@ -94,13 +94,13 @@ const _extractLang = ({
   columnType,
   defaultLang,
 }: {
-  columnPatterns: any
+  columnPatterns: Record<string, RegExp>
   columnName: string
   columnType: string
   defaultLang: string
 }) => {
   const pattern = columnPatterns[columnType]
-  const match = columnName.match(pattern)
+  const match = pattern.exec(columnName)
   const lang = match[2]
   return lang || defaultLang
 }

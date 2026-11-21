@@ -1,4 +1,4 @@
-import type { Writable } from 'stream'
+import type { Writable } from 'node:stream'
 import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
