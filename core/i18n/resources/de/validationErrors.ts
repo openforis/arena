@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'Die zu importierende Datei ist leer',
+    emptyFileName: 'Leerer Dateiname in Spalte {{headers}}',
     invalidHeaders: 'Ungültige Spalten: {{invalidHeaders}}',
     invalidBoolean: 'Ungültiger boolescher Wert in Spalte {{headers}}: {{value}}',
     invalidCode: `Ungültiger Code für Attribut „{{attributeName}}“: {{code}}`,
@@ -116,6 +117,10 @@ export default {
     subjectRequired: 'Betreff ist erforderlich',
     notificationTypeRequired: 'Benachrichtigungsart ist erforderlich',
     targetsRequired: 'Mindestens ein Ziel ist erforderlich',
+  },
+  nodeValueParser: {
+    attributeNotEditable: '„{{attributeName}}“ kann nicht bearbeitet werden (schreibgeschützt oder berechnet).',
+    unsupportedType: '„{{attributeName}}“: Werte vom Typ {{type}} können hier nicht gesetzt werden.',
   },
 
   nodeDefEdit: {

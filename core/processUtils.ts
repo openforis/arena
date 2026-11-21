@@ -14,6 +14,22 @@ const getJson = (val: string | undefined): unknown => {
   }
 }
 
+// Empty or non-numeric → default; 0 (or negative) is kept as is ("unlimited" for the rate limit).
+export const getNumberOrDefault = (val: unknown, defaultValue: number): number => {
+  if (typeof val !== 'string' || val.trim() === '') return defaultValue
+  const parsed = Number(val)
+  return Number.isNaN(parsed) ? defaultValue : parsed
+}
+
+// Comma-separated list → trimmed, non-empty items.
+const getList = (val: unknown): string[] =>
+  typeof val === 'string'
+    ? val
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+    : []
+
 const environments = {
   development: 'development',
   production: 'production',
@@ -95,24 +111,35 @@ export const ENV = {
   // ===== AI =====
   // Master kill switch for all AI features
   aiFeaturesEnabled: isTrue(process.env.AI_FEATURES_ENABLED ?? 'false'),
-  // Per-feature flags as a JSON object, e.g.
-  // {"translation":true,"expressionGenerate":true,"expressionExplain":true,"activityLogSummary":true,"dataDictionary":true}
+  // Per-feature flags as a JSON object; a flag can only disable a feature, e.g.
+  // {"translation":false,"dataDictionary":false}
   aiFeatureFlags: getJson(process.env.AI_FEATURE_FLAGS),
   // Default provider (used when user has no override)
   aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | google-vertex | openai-compatible | vercel-ai-sdk
   aiDefaultModel: process.env.AI_DEFAULT_MODEL,
   aiDefaultApiKey: process.env.AI_DEFAULT_API_KEY,
   aiDefaultBaseUrl: process.env.AI_DEFAULT_BASE_URL,
-  // Google Vertex AI only (project defaults to the one of the service account key or of the server credentials)
-  aiDefaultVertexProject: process.env.AI_DEFAULT_VERTEX_PROJECT,
-  aiDefaultVertexLocation: process.env.AI_DEFAULT_VERTEX_LOCATION,
-  // Documentation chatbot: send the user manual as context (disable for models with a small context window)
-  aiChatbotUserManualEnabled: isTrue(process.env.AI_CHATBOT_USER_MANUAL_ENABLED ?? 'true'),
   // Master encryption key for user-stored API keys (32-byte hex)
   aiUserKeyEncryptionSecret: process.env.AI_USER_KEY_ENCRYPTION_SECRET,
   // Limits
   aiMaxPromptChars: Number(process.env.AI_MAX_PROMPT_CHARS) || 200000,
+  aiMaxOutputTokens: Number(process.env.AI_MAX_OUTPUT_TOKENS) || 4096,
   aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS) || 60000,
+  // Requests per user per minute on the gateway endpoint; 0 or negative = unlimited
+  aiRateLimitPerMinute: getNumberOrDefault(process.env.AI_RATE_LIMIT_PER_MINUTE, 30),
+  // Calls of one user to the endpoints of their providers (test, model list, save) that may run at the same time;
+  // 0 or negative = unlimited
+  aiProviderMaxInFlightPerUser: getNumberOrDefault(process.env.AI_PROVIDER_MAX_IN_FLIGHT_PER_USER, 3),
+  // Daily budget per user of the Arena default provider (UTC day); 0 or negative = unlimited
+  aiDefaultDailyCallLimit: getNumberOrDefault(process.env.AI_DEFAULT_DAILY_CALL_LIMIT, 200),
+  aiDefaultDailyCharLimit: getNumberOrDefault(process.env.AI_DEFAULT_DAILY_CHAR_LIMIT, 2000000),
+  // User-configured base URLs allowed even if they resolve to a private address (org-hosted models)
+  aiOrgHostedBaseUrls: getList(process.env.AI_ORG_HOSTED_BASE_URLS),
+  // Test servers only: enables the canned "mock" provider (AI_DEFAULT_PROVIDER=mock)
+  aiMockProviderEnabled: isTrue(process.env.AI_MOCK_PROVIDER_ENABLED),
+  // Survey AI policy ceilings (off | onDevice | orgHosted | cloud); invalid values are treated as off
+  aiPolicyMaxSchema: process.env.AI_POLICY_MAX_SCHEMA ?? 'cloud',
+  aiPolicyMaxData: process.env.AI_POLICY_MAX_DATA ?? 'cloud',
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development

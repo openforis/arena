@@ -1,0 +1,629 @@
+.ai-assistant-panel {
+  position: fixed;
+  top: var(--headerHeight);
+  right: 0;
+  left: auto;
+  bottom: 0;
+  width: 420px;
+  max-width: 100vw;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: 1px solid var(--color-outline);
+  box-shadow: var(--shadow2);
+  background-color: var(--color-surface);
+  z-index: var(--zIndex18PanelRight);
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-outline);
+  }
+
+  &__title {
+    flex: 1;
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  &__tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-outline);
+  }
+
+  &__tab {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+
+    &[aria-selected='true'] {
+      border-bottom-color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    &:disabled {
+      cursor: default;
+      color: var(--color-surface-variant);
+    }
+  }
+
+  &__unavailable,
+  &__notice {
+    padding: 0.75rem;
+  }
+
+  &__notice {
+    background-color: var(--color-warning-container);
+  }
+
+  &__provider-notice {
+    padding: 0 0.75rem 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  &__context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  &__context-ring {
+    // block-level: TooltipNew wraps the ring in an inline span, where an inline box would sit on the text baseline
+    // above the header's centre line
+    display: flex;
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      // the arc starts at 12 o'clock and fills clockwise
+      transform: rotate(-90deg);
+    }
+  }
+
+  &__context-ring-track {
+    fill: none;
+    stroke: var(--color-outline);
+    stroke-width: 3;
+
+    // unknown window (cloud): nothing to fill
+    &--unknown {
+      stroke: var(--color-on-surface-variant);
+      stroke-width: 2;
+      stroke-dasharray: 2 2.4;
+    }
+  }
+
+  &__context-ring-fill {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 3;
+    stroke-linecap: round;
+
+    &--warning {
+      stroke: var(--color-warning);
+    }
+
+    &--critical {
+      stroke: var(--color-error);
+    }
+  }
+
+  &__context-warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__context-trimmed {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  &__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__empty {
+    color: var(--color-on-surface-variant);
+  }
+
+  &__composer {
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem 0.75rem 0.75rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 8px;
+
+    &:focus-within {
+      border-color: var(--color-primary);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 3rem;
+      padding: 0.5rem 0.75rem 0.25rem;
+      border: none;
+      outline: none;
+      resize: vertical;
+      background: none;
+    }
+
+    .ai-record-data-notice {
+      border-top: none;
+    }
+  }
+
+  &__composer-footer {
+    // the narrow rules below query this width
+    container-type: inline-size;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.4rem 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+
+    > * {
+      flex: none;
+    }
+
+    // the "no provider" chip keeps its text (the other chips are an icon), cut with an ellipsis when it doesn't fit
+    > .ai-provider-chip--none {
+      flex: 0 1 auto;
+    }
+
+    @container (max-width: 340px) {
+      .ai-assistant-panel__context-text,
+      .ai-assistant-panel__sent-data-text {
+        display: none;
+      }
+    }
+  }
+
+  &__composer-spacer {
+    flex: 1 1 0;
+  }
+
+  &__send.btn {
+    min-width: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+  }
+
+  &__sent-data {
+    // a button (toggletip): no button look
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+    cursor: default;
+    // block-level: TooltipNew wraps it in an inline span (see the context ring)
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.45rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 0.75rem;
+    line-height: 1.2;
+    white-space: nowrap;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    // record data: the step up from the survey design must be noticed
+    &--data {
+      border-color: var(--color-warning);
+      color: var(--color-warning);
+      background-color: var(--color-warning-container);
+    }
+  }
+
+  &__context-usage {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // conversation bar and the list's top bar
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.25rem;
+    padding: 0.15rem 0.75rem 0.15rem 0.35rem;
+    border-bottom: 1px solid var(--color-outline);
+  }
+
+  &__bar-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // a new conversation the model has not named yet
+    &--untitled {
+      font-weight: 400;
+      color: var(--color-on-surface-variant);
+    }
+  }
+
+  &__history {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__history-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0.75rem 0.75rem;
+  }
+
+  &__history-search {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 0.25rem;
+
+    &:focus-visible {
+      border-color: var(--color-primary);
+    }
+  }
+
+  &__section-title {
+    margin: 0.5rem 0 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-on-surface-variant);
+  }
+
+  &__history-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__history-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--color-background);
+
+    &:hover,
+    &:focus-within {
+      background-color: var(--color-background);
+
+      .ai-assistant-panel__history-delete {
+        visibility: visible;
+      }
+    }
+  }
+
+  &__history-item {
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
+    align-items: baseline;
+    min-width: 0;
+    padding: 0.4rem 0.25rem;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+
+    &[aria-current='true'] {
+      font-weight: 600;
+    }
+
+    time {
+      flex: none;
+      font-size: 0.75rem;
+      color: var(--color-on-surface-variant);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__history-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // shown on the hovered or focused row
+  &__history-delete.btn {
+    visibility: hidden;
+  }
+
+  &__history-note {
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  // home page: suggestions and recent conversations scroll above the New conversation button
+  &__home {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__start {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+  }
+
+  &__home-footer {
+    padding: 0.5rem 0.75rem 0.75rem;
+    border-top: 1px solid var(--color-outline);
+  }
+
+  &__home-new.btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  &__recent {
+    display: grid;
+    // minmax(0, ...): the implicit auto column would grow with the nowrap rows past the panel
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__recent-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--color-outline);
+    border-radius: 6px;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+
+    .icon {
+      color: var(--color-on-surface-variant);
+    }
+
+    time {
+      flex: none;
+      font-size: 0.75rem;
+      color: var(--color-on-surface-variant);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+// ⋯ menu of the panel header (rendered in a portal)
+.ai-assistant-panel__menu-danger.btn {
+  color: var(--color-error);
+}
+
+// groups the cards of a tool call without a box of its own
+.ai-assistant-message__cards {
+  display: contents;
+}
+
+.ai-assistant-message {
+  max-width: 100%;
+
+  &--user {
+    align-self: flex-end;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background-color: var(--color-primary-container);
+    white-space: pre-wrap;
+  }
+
+  &__typing::after {
+    content: '…';
+  }
+
+  &__stopped {
+    color: var(--color-on-surface-variant);
+    font-style: italic;
+  }
+
+  &__error {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-error);
+  }
+}
+
+.ai-assistant-thinking {
+  font-size: 0.8rem;
+  color: var(--color-on-surface-variant);
+
+  summary {
+    cursor: pointer;
+  }
+
+  &__text {
+    margin-top: 0.25rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--color-outline);
+  }
+}
+
+.ai-assistant-tool {
+  font-size: 0.8rem;
+  color: var(--color-on-surface-variant);
+
+  &--running::after {
+    content: '…';
+  }
+
+  &__failed {
+    margin-left: 0.5rem;
+    color: var(--color-error);
+  }
+
+  &__interrupted {
+    margin-left: 0.5rem;
+    font-style: italic;
+  }
+}
+
+.ai-record-data-notice {
+  border-top: 1px solid var(--color-outline);
+  padding: 0.5rem 0.75rem;
+  color: var(--color-on-surface-variant);
+
+  // an <output> (status), spaced as the <p> it replaces
+  &__message {
+    display: block;
+    margin: 1em 0;
+  }
+}
+
+// a tab with suggestions (the button's dot is in AssistantButton.scss)
+.ai-assistant-panel__tab-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 0.35rem;
+  border-radius: 50%;
+  background-color: var(--color-warning);
+  vertical-align: middle;
+}
+
+// the suggestions: rows (like the recent conversations) that open into their card
+.ai-assistant-suggestions {
+  flex: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  // minmax(0, ...): the nowrap rows must not widen the panel
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+
+  &__card {
+    border: 1px solid var(--color-outline);
+    border-left: 3px solid var(--color-warning);
+    border-radius: 6px;
+
+    &:hover,
+    &:focus-within {
+      border-color: var(--color-primary);
+      border-left-color: var(--color-warning);
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+  }
+
+  &__text {
+    flex: 1;
+    min-width: 0;
+    // the button's line height clips the descenders and overlaps wrapped lines
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // a CSS chevron: right on a row, up on an open card
+  &__chevron {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin-right: 0.15rem;
+    border-right: 1.5px solid var(--color-on-surface-variant);
+    border-bottom: 1.5px solid var(--color-on-surface-variant);
+    transform: rotate(-45deg);
+  }
+
+  &__card--open &__text {
+    white-space: normal;
+  }
+
+  &__card--open &__chevron {
+    transform: rotate(-135deg);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0 0.6rem 0.45rem;
+  }
+}

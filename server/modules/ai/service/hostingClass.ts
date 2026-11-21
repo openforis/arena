@@ -1,0 +1,31 @@
+/**
+ * Where the gateway sends the data: an organisation server (base URL on AI_ORG_HOSTED_BASE_URLS) or the cloud.
+ * Used by the survey AI policy. Local engines (on this device) are classified in the browser.
+ */
+import { ENV } from '@core/processUtils'
+import { isAllowlisted, parseUrl, providerTypeUsesBaseUrl } from '@common/ai/allowlist'
+
+export type GatewayHostingClass = 'orgHosted' | 'cloud'
+
+/**
+ * Returns the hosting class of a provider config: orgHosted only when its base URL is allowlisted.
+ * @param {object} params - Parameters.
+ * @param {string} params.provider - Provider key.
+ * @param {string|null} [params.baseUrl] - Configured base URL.
+ * @param {string[]} [params.allowlist] - Org-hosted base URLs (defaults to AI_ORG_HOSTED_BASE_URLS).
+ * @returns {GatewayHostingClass} The hosting class (built-in providers, the mock and unknown URLs are cloud).
+ */
+export const getProviderHostingClass = ({
+  provider,
+  baseUrl,
+  allowlist = ENV.aiOrgHostedBaseUrls,
+}: {
+  provider: string
+  baseUrl?: string | null
+  allowlist?: string[]
+}): GatewayHostingClass => {
+  if (!providerTypeUsesBaseUrl(provider) || !baseUrl) return 'cloud'
+  const url = parseUrl(baseUrl)
+  if (!url) return 'cloud'
+  return isAllowlisted(url, allowlist) ? 'orgHosted' : 'cloud'
+}

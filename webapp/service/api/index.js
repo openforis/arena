@@ -125,7 +125,6 @@ export {
   insertSurveyFile,
   fetchSurveyFile,
   startImportLabelsJob,
-  startNodeDefsTranslationJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
   updateSurveyProps,
@@ -188,12 +187,4 @@ export {
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export {
-  aiSettings,
-  aiExpression,
-  aiTranslation,
-  aiActivityLog,
-  aiChatbot,
-  aiDataQuery,
-  streamSse as aiStreamSse,
-} from './ai'
+export { aiProviders, aiSettings } from './ai'

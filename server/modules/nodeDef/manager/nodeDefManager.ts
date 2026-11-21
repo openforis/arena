@@ -15,9 +15,10 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
+import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as ObjectUtils from '@core/objectUtils'
-import SystemError from '@core/systemError'
 
 import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -125,7 +126,14 @@ export const insertNodeDef = (
 
     const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
 
-    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded: [cycle] })
+    // the parent lists the new node def in each of its cycles (the designer creates it in one: `cycle`)
+    // and only in the cycles the parent exists in (analysis node defs are created with every survey cycle)
+    const cyclesNodeDef = NodeDef.getCycles(nodeDef).length > 0 ? NodeDef.getCycles(nodeDef) : [cycle]
+    const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
+    const cyclesAdded = nodeDefParent
+      ? cyclesNodeDef.filter((cycleKey) => NodeDef.getCycles(nodeDefParent).includes(cycleKey))
+      : cyclesNodeDef
+    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded })
     if (nodeDefParentUpdated) {
       await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)
     }
@@ -257,6 +265,51 @@ const _updateAreaBasedEstimateOnPropsUpdate = (
   return Promise.resolve(null)
 }
 
+// the category or taxonomy of a published attribute cannot change (the designer disables the selectors)
+const _assertRefPropsCanChange = ({
+  survey,
+  nodeDefUuid,
+  props,
+}: {
+  survey: ArenaSurvey
+  nodeDefUuid: string
+  props: Record<string, any>
+}): void => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  // a node def missing from the (cycle filtered) survey can't be checked: its lock would be skipped
+  if (!nodeDef && [NodeDef.propKeys.categoryUuid, NodeDef.propKeys.taxonomyUuid].some((key) => key in props)) {
+    throw new SystemError('appErrors:survey.nodeDefNameNotFound', { name: nodeDefUuid }, StatusCodes.NOT_FOUND)
+  }
+  const [propKey] = getLockedRefPropsChanged({ survey, nodeDef, props })
+  if (propKey) {
+    throw new SystemError(
+      'appErrors:survey.nodeDefRefLocked',
+      { name: NodeDef.getName(nodeDef), prop: propKey },
+      StatusCodes.CONFLICT
+    )
+  }
+}
+
+/**
+ * Refuses a batch of props updates that changes the category or taxonomy of a published attribute (same rule as
+ * updateNodeDefProps, for the batch route).
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey (draft).
+ * @param {object[]} params.nodeDefs - Updates: { nodeDefUuid, props }.
+ * @throws {SystemError} 409 `appErrors:survey.nodeDefRefLocked` on the first locked change.
+ */
+export const assertNodeDefsRefPropsCanChange = ({
+  survey,
+  nodeDefs,
+}: {
+  survey: ArenaSurvey
+  nodeDefs: { nodeDefUuid: string; props?: Record<string, any> }[]
+}): void => {
+  for (const { nodeDefUuid, props = {} } of nodeDefs) {
+    _assertRefPropsCanChange({ survey, nodeDefUuid, props })
+  }
+}
+
 export const updateNodeDefProps = (
   {
     user,
@@ -283,6 +336,8 @@ export const updateNodeDefProps = (
     const surveyId = Survey.getId(survey)
 
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    _assertRefPropsCanChange({ survey, nodeDefUuid, props })
 
     const nodeDefsUpdated: Record<string, ArenaAnyNodeDef> = {}
     let surveyUpdated = survey

@@ -613,6 +613,7 @@ const _sendNodeUpdateMessage = async ({
 }
 
 export const { fetchNodeByUuid } = RecordManager
+export { updateNodesBatch } from './update/nodesBatch/nodesBatchService'
 
 export const persistNode = async ({
   socketId,

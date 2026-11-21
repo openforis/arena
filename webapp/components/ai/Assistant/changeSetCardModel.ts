@@ -1,0 +1,352 @@
+/**
+ * What a change set card shows: one row per operation (name, what changes, before → after, result), whether the
+ * survey changed since the proposal, and where a name links to in the form designer.
+ */
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
+import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
+import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
+import { getNodeDefRefName } from '@webapp/ai/changeSets/operations'
+import { findTranslationSource, type TranslationSource } from '@webapp/ai/changeSets/translationSource'
+import { isNodeDefRefProp } from '@webapp/ai/changeSets/types'
+import type {
+  ChangeOperation,
+  ChangeSet,
+  ChangeSetCardState,
+  LabelSetOperation,
+  NodeDefExpressionProp,
+  NodeDefOperation,
+  OperationConflict,
+  OperationResult,
+} from '@webapp/ai/changeSets/types'
+import { TreeSelectViewMode } from '@webapp/model'
+
+export type CardExpressionItem = { expression: string; applyIf: string | null }
+
+export type CardValue =
+  | { kind: 'text'; text: string | null }
+  | { kind: 'boolean'; value: boolean }
+  | { kind: 'expressions'; items: CardExpressionItem[] }
+
+// one more thing a new node definition sets (a key flag, a label in another language...), shown under its row
+export type CardDetail = { titleKey: string; titleParams: Record<string, string>; value: CardValue }
+
+export type CardRow = {
+  id: string
+  nodeDefUuid: string
+  nodeDefName: string
+  // i18n key (common namespace) of what changes
+  titleKey: string
+  titleParams: Record<string, string>
+  // null for a new node definition
+  from: CardValue | null
+  to: CardValue
+  // a new node definition: every non-default prop besides its type, name and one label
+  details?: CardDetail[]
+  // a label or description: the text in another language it translates
+  source?: TranslationSource | null
+  result: OperationResult | null
+}
+
+export type NodeDefNavigation =
+  { type: 'select'; nodeDefUuid: string } | { type: 'page'; pageNodeDefUuid: string; nodeDefUuid: string }
+
+const expressionPropTitleKeys: Record<NodeDefExpressionProp, string> = {
+  defaultValues: 'defaultValues',
+  applicable: 'applicable',
+  'validations.expressions': 'validations',
+  visibleIf: 'visibleIf',
+  editableIf: 'editableIf',
+}
+
+/**
+ * Returns a node definition, existing or created by the change set.
+ * @param {string} uuid - Node definition uuid.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey.
+ * @returns {object|null} The node definition; null when unknown.
+ */
+const findNodeDef = (uuid: string, changeSet: ChangeSet, survey: any): any => {
+  const existing = Survey.getNodeDefByUuid(uuid)(survey)
+  if (existing) return existing
+  const create = changeSet.operations.find(
+    (op) => op.type === 'nodeDef.create' && NodeDef.getUuid(op.nodeDef) === uuid
+  ) as { nodeDef: any } | undefined
+  return create?.nodeDef ?? null
+}
+
+/**
+ * Returns the name of a node definition, existing or created by the change set.
+ * @param {string} uuid - Node definition uuid.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey.
+ * @returns {string} The name (the uuid when unknown).
+ */
+export const findNodeDefName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
+  const nodeDef = findNodeDef(uuid, changeSet, survey)
+  return nodeDef ? NodeDef.getName(nodeDef) : uuid
+}
+
+/**
+ * Returns the text a proposed label or description translates: the same text in another survey language.
+ * @param {LabelSetOperation} op - Label operation.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey.
+ * @returns {TranslationSource|null} The source; null when no other language has the text.
+ */
+const findLabelSource = (op: LabelSetOperation, changeSet: ChangeSet, survey: any): TranslationSource | null => {
+  const nodeDef = findNodeDef(op.nodeDefUuid, changeSet, survey)
+  if (!nodeDef) return null
+  // core/survey is untyped JS: getLanguages returns the codes array, default first
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
+  // rewriting the default language text is not a translation
+  if (op.lang === languages[0] && op.from?.trim()) return null
+  const texts = op.kind === 'labels' ? NodeDef.getLabels(nodeDef) : NodeDef.getDescriptions(nodeDef)
+  return findTranslationSource({ texts, lang: op.lang, languages })
+}
+
+/**
+ * Converts a basic value to a card value.
+ * @param {string|boolean|null} value - Value.
+ * @returns {CardValue} The card value.
+ */
+const toBasicValue = (value: string | boolean | null): CardValue =>
+  typeof value === 'boolean' ? { kind: 'boolean', value } : { kind: 'text', text: value }
+
+/**
+ * Converts an update value to a card value: categories and taxonomies by name.
+ * @param {object} survey - Survey.
+ * @param {object} op - Update operation.
+ * @param {string|boolean|null} value - Its from or to value.
+ * @returns {CardValue} The card value.
+ */
+const toUpdateValue = (
+  survey: any,
+  op: Extract<ChangeOperation, { type: 'nodeDef.update' }>,
+  value: string | boolean | null
+): CardValue =>
+  isNodeDefRefProp(op.prop)
+    ? { kind: 'text', text: getNodeDefRefName(survey, op.prop, value as string | null) }
+    : toBasicValue(value)
+
+/**
+ * Converts expressions to a card value.
+ * @param {object[]} expressions - Node definition expressions.
+ * @returns {CardValue} The card value.
+ */
+const toExpressionsValue = (expressions: any[]): CardValue => ({
+  kind: 'expressions',
+  items: expressions.map((expression) => ({
+    expression: NodeDefExpression.getExpression(expression),
+    applyIf: NodeDefExpression.getApplyIf(expression) || null,
+  })),
+})
+
+const textDetail = (titleKey: string, lang: string, text: string): CardDetail => ({
+  titleKey,
+  titleParams: { lang },
+  value: { kind: 'text', text },
+})
+
+const flagDetail = (prop: string, value: boolean): CardDetail => ({
+  titleKey: `aiAssistant.card.props.${prop}`,
+  titleParams: {},
+  value: { kind: 'boolean', value },
+})
+
+/**
+ * Returns what a new node definition sets besides its type, name and the label shown on the row: the key, multiple
+ * (when not the type's default) and read only flags, the labels in the other languages and every description.
+ * @param {object} nodeDef - The node definition to create.
+ * @param {string|null} shownLang - Language of the label shown on the row.
+ * @returns {CardDetail[]} The details, flags first.
+ */
+const toCreateDetails = (nodeDef: any, shownLang: string | null): CardDetail[] => {
+  const labels: Record<string, string> = NodeDef.getLabels(nodeDef)
+  const descriptions: Record<string, string> = NodeDef.getDescriptions(nodeDef)
+  const details: CardDetail[] = []
+  if (NodeDef.isKey(nodeDef)) details.push(flagDetail('key', true))
+  // entities are multiple unless said otherwise, attributes single
+  if (NodeDef.isMultiple(nodeDef) !== NodeDef.isEntity(nodeDef)) {
+    details.push(flagDetail('multiple', NodeDef.isMultiple(nodeDef)))
+  }
+  if (NodeDef.isReadOnly(nodeDef)) details.push(flagDetail('readOnly', true))
+  for (const [lang, text] of Object.entries(labels)) {
+    if (lang !== shownLang) details.push(textDetail('aiAssistant.card.label', lang, text))
+  }
+  for (const [lang, text] of Object.entries(descriptions)) {
+    details.push(textDetail('aiAssistant.card.description', lang, text))
+  }
+  return details
+}
+
+/**
+ * Returns the row fields of a create operation.
+ * @param {ChangeOperation} op - Create operation.
+ * @param {string} lang - Language of the label shown.
+ * @returns {object} The row fields.
+ */
+const toCreateRow = (op: Extract<ChangeOperation, { type: 'nodeDef.create' }>, lang: string) => {
+  const labels: Record<string, string> = NodeDef.getLabels(op.nodeDef)
+  // the label of the preferred language, else the first one
+  const shownLang = lang in labels ? lang : (Object.keys(labels)[0] ?? null)
+  return {
+    nodeDefUuid: NodeDef.getUuid(op.nodeDef),
+    nodeDefName: NodeDef.getName(op.nodeDef),
+    titleKey: 'aiAssistant.card.newItem',
+    titleParams: { type: NodeDef.getType(op.nodeDef) },
+    from: null,
+    to: { kind: 'text', text: shownLang ? labels[shownLang] : null } as CardValue,
+    details: toCreateDetails(op.nodeDef, shownLang),
+  }
+}
+
+/**
+ * Returns the row fields of a change operation.
+ * @param {ChangeOperation} op - Operation other than create.
+ * @param {ChangeSet} changeSet - Its change set (node definitions it creates).
+ * @param {object} survey - Survey (category and taxonomy names, labels in other languages).
+ * @returns {object} The row fields.
+ */
+const toChangeRow = (
+  op: Exclude<NodeDefOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>,
+  changeSet: ChangeSet,
+  survey: any
+) => {
+  if (op.type === 'label.set') {
+    return {
+      titleKey: op.kind === 'labels' ? 'aiAssistant.card.label' : 'aiAssistant.card.description',
+      titleParams: { lang: op.lang },
+      from: toBasicValue(op.from),
+      to: toBasicValue(op.to),
+      source: findLabelSource(op, changeSet, survey),
+    }
+  }
+  if (op.type === 'nodeDef.update') {
+    return {
+      titleKey: `aiAssistant.card.props.${op.prop}`,
+      titleParams: {},
+      from: toUpdateValue(survey, op, op.from),
+      to: toUpdateValue(survey, op, op.to),
+    }
+  }
+  return {
+    titleKey: `aiAssistant.card.expressionProps.${expressionPropTitleKeys[op.prop]}`,
+    titleParams: {},
+    from: toExpressionsValue(op.from),
+    to: toExpressionsValue(op.to),
+  }
+}
+
+/**
+ * Returns the rows of a card.
+ * @param {object} params - Parameters.
+ * @param {ChangeSetCardState} params.cardState - Card state.
+ * @param {object} params.survey - Current survey (names of existing node definitions).
+ * @param {string} params.lang - Survey preferred language (label of a new node definition).
+ * @returns {CardRow[]} One row per operation, in order.
+ */
+export const buildCardRows = ({
+  cardState,
+  survey,
+  lang,
+}: {
+  cardState: ChangeSetCardState
+  survey: any
+  lang: string
+}): CardRow[] => {
+  const { changeSet, results = [] } = cardState
+  // record edits have their own card, category labels their own groups (CategoryLabelGroups)
+  return changeSet.operations
+    .filter((op) => !isRecordEditOperation(op) && !isCategoryItemLabelOperation(op))
+    .map((op) => {
+      const result = results.find((item) => item.id === op.id) ?? null
+      if (op.type === 'nodeDef.create') return { id: op.id, result, ...toCreateRow(op, lang) }
+      return {
+        id: op.id,
+        result,
+        nodeDefUuid: op.nodeDefUuid,
+        nodeDefName: findNodeDefName(op.nodeDefUuid, changeSet, survey),
+        ...toChangeRow(op, changeSet, survey),
+      }
+    })
+}
+
+/**
+ * Returns the operations that can still be applied (not applied yet, card not discarded).
+ * @param {ChangeSetCardState} cardState - Card state.
+ * @returns {string[]} Operation ids.
+ */
+export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] => {
+  if (cardState.discarded) return []
+  const applied = new Set((cardState.results ?? []).filter((r) => r.status === 'applied').map((r) => r.id))
+  return cardState.changeSet.operations
+    .filter((op) => !isRecordEditOperation(op) && !applied.has(op.id))
+    .map((op) => op.id)
+}
+
+/**
+ * Returns the pending operations that conflict with the current survey, each with its reason (a plain reason such as
+ * valueChanged, or an i18n key with its params when the designer's rules refuse it).
+ * @param {object} params - Parameters.
+ * @param {ChangeSetCardState} params.cardState - Card state.
+ * @param {object} params.survey - Current survey.
+ * @returns {OperationConflict[]} The conflicts, in operation order.
+ */
+export const getOperationConflicts = ({
+  cardState,
+  survey,
+}: {
+  cardState: ChangeSetCardState
+  survey: any
+}): OperationConflict[] => {
+  const operationIds = getPendingOperationIds(cardState)
+  if (operationIds.length === 0) return []
+  return findConflicts(cardState.changeSet, survey, { operationIds })
+}
+
+/**
+ * Returns the nearest page node definition containing a node definition.
+ * @param {object} nodeDef - Node definition.
+ * @param {object} survey - Survey.
+ * @param {string} cycle - Cycle.
+ * @returns {object} The page node definition.
+ */
+const findPageNodeDef = (nodeDef: any, survey: any, cycle: string): any => {
+  let current = NodeDef.isEntity(nodeDef) ? nodeDef : Survey.getNodeDefParent(nodeDef)(survey)
+  while (current && !NodeDef.isRoot(current) && !NodeDefLayout.hasPage(cycle)(current)) {
+    current = Survey.getNodeDefParent(current)(survey)
+  }
+  return current ?? Survey.getNodeDefRoot(survey)
+}
+
+/**
+ * Returns how to show a node definition in the form designer: select it ("all node definitions" tree mode) or
+ * open the nearest page that contains it.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey.
+ * @param {string} params.nodeDefUuid - Node definition.
+ * @param {string} params.cycle - Current cycle.
+ * @param {string} params.viewMode - Tree select view mode of the designer.
+ * @returns {NodeDefNavigation|null} The navigation; null when the node definition doesn't exist (yet).
+ */
+export const getNodeDefNavigation = ({
+  survey,
+  nodeDefUuid,
+  cycle,
+  viewMode,
+}: {
+  survey: any
+  nodeDefUuid: string
+  cycle: string
+  viewMode: string
+}): NodeDefNavigation | null => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  if (!nodeDef) return null
+  if (viewMode === TreeSelectViewMode.allNodeDefs) return { type: 'select', nodeDefUuid }
+  return { type: 'page', pageNodeDefUuid: NodeDef.getUuid(findPageNodeDef(nodeDef, survey, cycle)), nodeDefUuid }
+}

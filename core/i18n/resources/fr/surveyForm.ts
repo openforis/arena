@@ -40,6 +40,12 @@ Continuer ?`,
   schemaSummary_xlsx: 'Résumé du schéma (Excel)',
   schemaSummaryAiDescriptions_csv: 'Résumé du schéma + descriptions IA (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Résumé du schéma + descriptions IA (Excel)',
+  schemaSummaryAiDescriptionsFailed_one:
+    "La description IA n'a pas pu être générée pour {{count}} champ ; elle reste vide.",
+  schemaSummaryAiDescriptionsFailed_other:
+    "Les descriptions IA n'ont pas pu être générées pour {{count}} champs ; elles restent vides.",
+  schemaSummaryAiDescriptionsNotDone_one: `La description IA n'a pas été générée pour {{count}} champ car l'exécution a été arrêtée ; elle reste vide.`,
+  schemaSummaryAiDescriptionsNotDone_other: `Les descriptions IA n'ont pas été générées pour {{count}} champs car l'exécution a été arrêtée ; elles restent vides.`,
   hidePages: 'Masquer les pages',
   showPages: 'Afficher les pages',
   move: `Déplacer '{{nodeDefLabel}}'`,
@@ -210,6 +216,12 @@ Dans Arena Mobile :
     custom: 'Personnalisé',
     defaultDescription: 'Description par défaut',
     defaultLabel: 'Étiquette par défaut',
+    failed_one: "L'IA n'a pas pu produire {{count}} traduction ; elle n'a pas de suggestion de l'IA.",
+    failed_other: "L'IA n'a pas pu produire {{count}} traductions ; elles n'ont pas de suggestion de l'IA.",
+    notDone_one:
+      "L'exécution a été arrêtée avant de demander {{count}} traduction ; elle n'a pas de suggestion de l'IA.",
+    notDone_other:
+      "L'exécution a été arrêtée avant de demander {{count}} traductions ; elles n'ont pas de suggestion de l'IA.",
     path: 'Chemin',
     showDescriptions: 'Afficher les descriptions',
     title: 'Traduire les étiquettes des définitions de nœuds',

@@ -1,0 +1,32 @@
+/**
+ * How a suggestion is shown (card) and what Do it sends (prompt), both built from its visible targets only. The chat
+ * shows the request text instead of the prompt: the card's key with `card` replaced by `request`, same params.
+ */
+import type { SuggestionStore } from '../suggestionStore'
+import type { AssistantSuggestion, SuggestionKind } from '../types'
+
+export type SuggestionDescribeContext = {
+  survey: any
+  t: (key: string, params?: Record<string, unknown>) => string
+  lang: string
+}
+
+export type SuggestionDefinition = {
+  kind: SuggestionKind
+  // i18n key under aiSuggestions and its params, built from the VISIBLE targets only
+  card: (
+    suggestion: AssistantSuggestion,
+    ctx: SuggestionDescribeContext
+  ) => { key: string; params: Record<string, unknown> }
+  // English prompt, built from the visible targets only (none: Do it does not start a chat turn)
+  prompt?: (suggestion: AssistantSuggestion, ctx: SuggestionDescribeContext) => string
+  // what Do it does to the suggestion: in progress until its cards settle (default), or removed (no card expected)
+  acceptMode?: 'progress' | 'remove'
+  // the kind has no change-set card: a completed answer settles it (default: it needs a card)
+  settlesWithoutCard?: boolean
+  // after Do it or Dismiss, with the targets handled (the module introduction records the module as seen)
+  onHandled?: (params: { userUuid: string; targetKeys: string[]; store: SuggestionStore }) => void
+}
+
+// complete: every kind has its card
+export type SuggestionDefinitions = Record<SuggestionKind, SuggestionDefinition>

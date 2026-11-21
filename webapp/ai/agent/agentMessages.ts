@@ -1,0 +1,163 @@
+/**
+ * Conversation → model messages. Earlier turns go as plain text: their tool results described the survey as it
+ * was, so the model reads again instead of trusting them.
+ */
+import type { ModelMessage } from 'ai'
+
+import type { AssistantMessage, ConversationMessage, ConversationToolPart } from '@webapp/ai/conversations/types'
+import { toWebMcpDescriptor } from '@webapp/ai/tools/registry'
+import type { AiTool } from '@webapp/ai/tools/types'
+
+export const APPLY_NOTE_PREFIX = 'Note from Arena (not the user): '
+
+// records of the past, in prose: bracketed tool names look like a call the model could write itself
+const STOPPED_NOTE = '(The user stopped this answer.)'
+const EARLIER = 'Earlier in this conversation'
+const HISTORY_SHARE = 0.8
+// the history keeps this share of the limit even when the tool results of all steps would not fit
+const MIN_HISTORY_SHARE = 0.1
+
+type TextMessage = { role: 'user' | 'assistant'; content: string }
+
+/**
+ * Describes a tool call of an earlier turn.
+ * @param {ConversationToolPart} part - Tool part.
+ * @returns {string} A short sentence in parentheses.
+ */
+export const describeToolPart = (part: ConversationToolPart): string => {
+  const output = part.output as any
+  if (part.state === 'running') return `(${EARLIER}, ${part.toolName} was interrupted.)`
+  if (part.state === 'failed' || output?.error)
+    return `(${EARLIER}, ${part.toolName} failed: ${output?.error?.code ?? 'toolFailed'}.)`
+  if (typeof output?.changeSetId === 'string') {
+    return `(${EARLIER} a change set with ${output.operations} operations was shown to the user.)`
+  }
+  const list = output && typeof output === 'object' ? Object.values(output).find(Array.isArray) : null
+  return list ? `(${EARLIER}, ${part.toolName} returned ${list.length} items.)` : `(${EARLIER}, ${part.toolName} ran.)`
+}
+
+/**
+ * Flattens an answer into text lines, tool calls as notes.
+ * @param {AssistantMessage} message - Assistant message.
+ * @returns {string} The text, empty when the answer has no content.
+ */
+const assistantText = (message: AssistantMessage): string => {
+  // thinking stays out of the history (empty line, filtered below): the model only needs its answers
+  const lines = message.parts
+    .map((part) => {
+      if (part.type === 'reasoning') return ''
+      return part.type === 'text' ? part.text.trim() : describeToolPart(part)
+    })
+    .filter((line) => line.length > 0)
+  if (lines.length > 0 && message.status === 'stopped') lines.push(STOPPED_NOTE)
+  return lines.join('\n')
+}
+
+/**
+ * Converts a conversation message to a plain text message.
+ * @param {ConversationMessage} message - Conversation message.
+ * @returns {TextMessage | null} The text message, or null when it is left out.
+ */
+const toTextMessage = (message: ConversationMessage): TextMessage | null => {
+  if (message.role === 'user') return { role: 'user', content: message.text }
+  if (message.role === 'applyNote') return { role: 'user', content: `${APPLY_NOTE_PREFIX}${message.text}` }
+  if (message.status === 'error' || message.status === 'streaming') return null
+  const content = assistantText(message)
+  return content ? { role: 'assistant', content } : null
+}
+
+// some providers refuse two consecutive messages of the same role
+/**
+ * Merges consecutive messages of the same role.
+ * @param {TextMessage[]} messages - Messages in order.
+ * @returns {TextMessage[]} Messages that alternate roles.
+ */
+const mergeSameRole = (messages: TextMessage[]): TextMessage[] => {
+  const merged: TextMessage[] = []
+  for (const message of messages) {
+    const last = merged.at(-1)
+    if (last?.role === message.role)
+      merged[merged.length - 1] = { ...last, content: `${last.content}\n\n${message.content}` }
+    else merged.push({ ...message })
+  }
+  return merged
+}
+
+/**
+ * Drops the oldest messages until the text fits the budget.
+ * @param {TextMessage[]} earlier - Earlier messages, oldest first.
+ * @param {TextMessage} newMessage - The new user message, always kept.
+ * @param {number} budgetChars - Characters available.
+ * @returns {TextMessage[]} Kept messages, not starting with an answer, the new message last.
+ */
+const fitBudget = (earlier: TextMessage[], newMessage: TextMessage, budgetChars: number): TextMessage[] => {
+  let total = newMessage.content.length
+  let start = earlier.length
+  while (start > 0 && total + earlier[start - 1].content.length <= budgetChars) {
+    start -= 1
+    total += earlier[start].content.length
+  }
+  const kept = earlier.slice(start)
+  while (kept[0]?.role === 'assistant') kept.shift()
+  return [...kept, newMessage]
+}
+
+export type TrimmedHistory = { messages: ModelMessage[]; droppedCount: number }
+
+/**
+ * Builds the model messages of a turn and counts the earlier messages left out to fit the budget.
+ * @param {object} params - Parameters.
+ * @param {ConversationMessage[]} params.messages - Earlier messages of the conversation.
+ * @param {string} params.userMessage - The new user message.
+ * @param {number} params.budgetChars - Characters available for the history (new message included).
+ * @returns {TrimmedHistory} The messages (the new user message last) and the number of messages dropped.
+ */
+export const buildTrimmedHistory = ({
+  messages,
+  userMessage,
+  budgetChars,
+}: {
+  messages: ConversationMessage[]
+  userMessage: string
+  budgetChars: number
+}): TrimmedHistory => {
+  const all = mergeSameRole([
+    ...messages.map(toTextMessage).filter((message): message is TextMessage => message !== null),
+    { role: 'user', content: userMessage },
+  ])
+  const earlier = all.slice(0, -1)
+  const kept = fitBudget(earlier, all.at(-1), budgetChars)
+  // kept ends with the new message
+  return { messages: kept, droppedCount: earlier.length - (kept.length - 1) }
+}
+
+/**
+ * Returns the characters of the tool definitions sent to the model.
+ * @param {AiTool[]} tools - Tools offered.
+ * @returns {number} The length of their JSON descriptors (0 without tools).
+ */
+export const getToolDefinitionChars = (tools: AiTool[]): number =>
+  tools.length > 0 ? JSON.stringify(tools.map(toWebMcpDescriptor)).length : 0
+
+/**
+ * Returns the characters left for the history of a turn.
+ * @param {object} params - Parameters.
+ * @param {number} params.maxPromptChars - Prompt limit of the engine.
+ * @param {string} params.systemPrompt - System prompt.
+ * @param {AiTool[]} params.tools - Tools offered (their schemas count toward the limit).
+ * @returns {number} The budget, at least 0.
+ */
+export const getHistoryBudget = ({
+  maxPromptChars,
+  systemPrompt,
+  tools,
+}: {
+  maxPromptChars: number
+  systemPrompt: string
+  tools: AiTool[]
+}): number => {
+  const available = Math.floor(maxPromptChars * HISTORY_SHARE) - systemPrompt.length - getToolDefinitionChars(tools)
+  // with tools the rest of the context is for the tool loop, which ends only when the context is full
+  const budget = tools.length > 0 ? Math.min(available, Math.floor(maxPromptChars * MIN_HISTORY_SHARE)) : available
+  return Math.max(0, budget)
+}

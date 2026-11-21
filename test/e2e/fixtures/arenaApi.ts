@@ -1,6 +1,7 @@
 import { APIRequestContext, expect, request } from '@playwright/test'
 
 import type { TestUser } from './testUsers'
+import { AiFeatureCategory } from '@common/ai/features'
 
 type JobSummary = {
   uuid: string
@@ -20,6 +21,14 @@ export type SurveyCreateParams = {
 
 const jobPollIntervalMs = 250
 const jobTimeoutMs = 30_000
+const jobThreadCleanupWaitMs = 1500
+
+/**
+ * Returns every AI category switched on (one per AiFeatureCategory, so new categories are included).
+ * @returns {Record<string, boolean>} The switches.
+ */
+const allAiFeatureToggles = (): Record<string, boolean> =>
+  Object.fromEntries(Object.values(AiFeatureCategory).map((category) => [category, true]))
 
 /**
  * Thin client of the Arena REST API, used to prepare (and clean up) the data needed by a test
@@ -79,6 +88,107 @@ export class ArenaApi {
     return response.json()
   }
 
+  private async put(url: string, data: unknown) {
+    const response = await this.requestContext.put(url, { headers: this.headers, data })
+    expect(response.ok(), `PUT ${url} failed: ${response.status()}`).toBeTruthy()
+    return response.json()
+  }
+
+  private async delete(url: string) {
+    const response = await this.requestContext.delete(url, { headers: this.headers })
+    expect(response.ok(), `DELETE ${url} failed: ${response.status()}`).toBeTruthy()
+    return response.json()
+  }
+
+  /**
+   * Turns on the AI features (access level 3, every category) for the test user, with Arena default as the default
+   * provider: an earlier spec of the same worker may have left a local default.
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async enableAiFeatures(): Promise<void> {
+    await this.put('/api/ai/settings', { accessLevel: 3, featureToggles: allAiFeatureToggles() })
+    await this.setAiDefaultProvider('arena-default')
+  }
+
+  /**
+   * Turns off the AI features for the test user (access level 0).
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async disableAiFeatures(): Promise<void> {
+    await this.put('/api/ai/settings', { accessLevel: 0 })
+  }
+
+  /**
+   * Returns the AI settings of the test user (GET /api/ai/settings).
+   * @returns {Promise<Record<string, any>>} - The settings response.
+   */
+  async getAiSettings(): Promise<Record<string, any>> {
+    return this.get('/api/ai/settings')
+  }
+
+  /**
+   * Sends a request and returns its status and JSON body without asserting success (for error cases).
+   * @param {string} method - HTTP method.
+   * @param {string} url - URL (relative to the base URL).
+   * @param {unknown} [data] - JSON body.
+   * @returns {Promise<{status: number, body: any}>} - Status and body (null when the body is not JSON).
+   */
+  async requestRaw(
+    method: 'get' | 'post' | 'put' | 'delete',
+    url: string,
+    data?: unknown
+  ): Promise<{ status: number; body: any }> {
+    const response = await this.requestContext.fetch(url, { method: method.toUpperCase(), headers: this.headers, data })
+    return { status: response.status(), body: await response.json().catch(() => null) }
+  }
+
+  /**
+   * Adds an account AI provider for the test user (POST /api/ai/providers; the server tests it first).
+   * @param {object} provider - Provider fields.
+   * @param {string} provider.type - Provider type (`mock` on the e2e server).
+   * @param {string} [provider.name] - Display name.
+   * @param {string} provider.model - Model id.
+   * @param {string} [provider.baseUrl] - Base URL (openai-compatible, vercel-ai-sdk).
+   * @param {string} [provider.apiKey] - API key.
+   * @returns {Promise<{provider: Record<string, any>, settings: Record<string, any>}>} - The new entry and the settings.
+   */
+  async addAiAccountProvider(provider: {
+    type: string
+    name?: string
+    model: string
+    baseUrl?: string
+    apiKey?: string
+  }): Promise<{ provider: Record<string, any>; settings: Record<string, any> }> {
+    return this.post('/api/ai/providers', provider)
+  }
+
+  /**
+   * Removes an account AI provider of the test user.
+   * @param {string} id - Provider id (`acct:<id>`).
+   * @returns {Promise<void>} - Resolves when removed.
+   */
+  async removeAiAccountProvider(id: string): Promise<void> {
+    await this.delete(`/api/ai/providers/${encodeURIComponent(id)}`)
+  }
+
+  /**
+   * Sets the default AI provider of the test user.
+   * @param {string} providerId - Provider id.
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async setAiDefaultProvider(providerId: string): Promise<void> {
+    await this.put('/api/ai/settings/default', { providerId })
+  }
+
+  /**
+   * Returns the uuid of the logged-in test user (the key of the localStorage settings).
+   * @returns {Promise<string>} - The user uuid.
+   */
+  async getCurrentUserUuid(): Promise<string> {
+    const { user } = await this.get('/auth/user')
+    return user.uuid
+  }
+
   async waitForJob(jobUuid: string): Promise<JobSummary> {
     const start = Date.now()
     for (;;) {
@@ -94,6 +204,73 @@ export class ArenaApi {
   }
 
   /**
+   * Counts the validation report rows of a cycle, without filters (what the report shows before any filter).
+   * @param {number} surveyId - Survey id.
+   * @param {string} [cycle] - Cycle key.
+   * @returns {Promise<number>} - The count.
+   */
+  async countValidationReportRows(surveyId: number, cycle = '0'): Promise<number> {
+    const { count } = await this.get(`/api/survey/${surveyId}/validationReport/count?cycle=${cycle}`)
+    return Number(count)
+  }
+
+  /**
+   * Returns the uuid of the root entity of the published survey.
+   * @param {number} surveyId - Survey id.
+   * @returns {Promise<string>} - The uuid.
+   */
+  async getRootNodeDefUuid(surveyId: number): Promise<string> {
+    const { nodeDefs } = await this.get(
+      `/api/survey/${surveyId}/nodeDefs?cycle=0&draft=false&validate=false&includeAnalysis=false`
+    )
+    const root = Object.values(nodeDefs ?? {}).find((nodeDef: any) => !nodeDef.parentUuid) as any
+    expect(root, `survey ${surveyId} has no root entity`).toBeTruthy()
+    return root.uuid
+  }
+
+  /**
+   * Starts a flat data (CSV) import that inserts new records into the root entity (one upload, no chunks).
+   * @param {object} params - Parameters.
+   * @param {number} params.surveyId - Survey id.
+   * @param {string} params.nodeDefUuid - Root entity uuid.
+   * @param {string} params.csv - CSV content (header with the key attribute names).
+   * @param {string} [params.cycle] - Cycle key.
+   * @returns {Promise<{ uuid: string }>} - The job started.
+   */
+  async startFlatDataImport({
+    surveyId,
+    nodeDefUuid,
+    csv,
+    cycle = '0',
+  }: {
+    surveyId: number
+    nodeDefUuid: string
+    csv: string
+    cycle?: string
+  }): Promise<{ uuid: string }> {
+    const url = `/api/survey/${surveyId}/data-import/flat-data`
+    const response = await this.requestContext.post(url, {
+      headers: this.headers,
+      multipart: {
+        cycle,
+        nodeDefUuid,
+        fileFormat: 'csv',
+        dryRun: 'false',
+        insertNewRecords: 'true',
+        insertMissingNodes: 'false',
+        updateRecordsInAnalysis: 'false',
+        includeFiles: 'false',
+        deleteExistingEntities: 'false',
+        abortOnErrors: 'true',
+        file: { name: 'records.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf8') },
+      },
+    })
+    expect(response.ok(), `POST ${url} failed: ${response.status()}`).toBeTruthy()
+    const { job } = await response.json()
+    return job
+  }
+
+  /**
    * Creates a new survey (and sets it as current survey of the user).
    * @param {SurveyCreateParams} params - Survey info.
    * @returns {Promise<number>} - The id of the survey created.
@@ -103,6 +280,56 @@ export class ArenaApi {
     expect(validation, `survey validation failed: ${JSON.stringify(validation)}`).toBeUndefined()
     const jobEnded = await this.waitForJob(job.uuid)
     return Number(jobEnded.result!.surveyId)
+  }
+
+  /**
+   * Clones a survey (job) and returns the id of the clone.
+   * @param {object} params - Parameters.
+   * @param {number} params.cloneFrom - Id of the survey to clone.
+   * @param {string} [params.cloneFromCycle] - Cycle of the survey to clone.
+   * @param {string} params.name - Name of the clone.
+   * @param {string} params.label - Label of the clone.
+   * @param {string} [params.lang] - Language.
+   * @returns {Promise<number>} - The id of the clone.
+   */
+  async cloneSurvey({
+    cloneFrom,
+    cloneFromCycle = '0',
+    name,
+    label,
+    lang = 'en',
+  }: {
+    cloneFrom: number
+    cloneFromCycle?: string
+    name: string
+    label: string
+    lang?: string
+  }): Promise<number> {
+    // the server ends the user's job thread 1 s after a job ends: a job started in that window would be killed
+    await new Promise((resolve) => setTimeout(resolve, jobThreadCleanupWaitMs))
+    const { job, validation } = await this.post('/api/survey', { name, label, lang, cloneFrom, cloneFromCycle })
+    expect(validation, `survey clone validation failed: ${JSON.stringify(validation)}`).toBeUndefined()
+    const jobEnded = await this.waitForJob(job.uuid)
+    return Number(jobEnded.result!.surveyId)
+  }
+
+  /**
+   * Returns the AI policy of a survey.
+   * @param {number} surveyId - Survey id.
+   * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
+   */
+  async getSurveyAiPolicy(surveyId: number): Promise<any> {
+    return this.get(`/api/survey/${surveyId}/ai-policy`)
+  }
+
+  /**
+   * Sets the AI policy of a survey (the test user is a system administrator).
+   * @param {number} surveyId - Survey id.
+   * @param {{schema: string, data: string}} policy - Policy.
+   * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
+   */
+  async putSurveyAiPolicy(surveyId: number, policy: { schema: string; data: string }): Promise<any> {
+    return this.put(`/api/survey/${surveyId}/ai-policy`, policy)
   }
 
   /**

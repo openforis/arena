@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'Файл, который вы пытаетесь импортировать, пуст',
+    emptyFileName: 'Пустое имя файла в столбце {{headers}}',
     invalidHeaders: 'Неверные столбцы: {{invalidHeaders}}',
     invalidBoolean: 'Неверное логическое значение в столбце {{headers}}: {{value}}',
     invalidCode: `Неверный код для атрибута '{{attributeName}}': {{code}}`,
@@ -117,6 +118,10 @@ export default {
     targetsRequired: 'Требуется как минимум одна целевая аудитория',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '«{{attributeName}}» нельзя изменить (только чтение или вычисляемый атрибут).',
+    unsupportedType: '«{{attributeName}}»: значения типа {{type}} нельзя задать здесь.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'Сущность обязательна',
     applyIfDuplicate: 'Условие "$t(nodeDefEdit:expressionsProp.applyIf)" повторяется',

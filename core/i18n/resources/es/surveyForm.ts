@@ -40,6 +40,14 @@ eliminando los valores existentes insertados en ellas (si los hay).
   schemaSummary_xlsx: 'Resumen del esquema (Excel)',
   schemaSummaryAiDescriptions_csv: 'Resumen del esquema + descripciones IA (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Resumen del esquema + descripciones IA (Excel)',
+  schemaSummaryAiDescriptionsFailed_one:
+    'No se pudo generar la descripción con IA para {{count}} campo; se deja vacía.',
+  schemaSummaryAiDescriptionsFailed_other:
+    'No se pudieron generar descripciones con IA para {{count}} campos; se dejan vacías.',
+  schemaSummaryAiDescriptionsNotDone_one:
+    'No se generó la descripción con IA para {{count}} campo porque se detuvo la ejecución; se deja vacía.',
+  schemaSummaryAiDescriptionsNotDone_other:
+    'No se generaron descripciones con IA para {{count}} campos porque se detuvo la ejecución; se dejan vacías.',
   hidePages: 'Ocultar páginas',
   showPages: 'Mostrar páginas',
   move: `Mover '{{nodeDefLabel}}'`,
@@ -210,6 +218,10 @@ En Arena Mobile:
     custom: 'Personalizado',
     defaultDescription: 'Descripción por defecto',
     defaultLabel: 'Etiqueta por defecto',
+    failed_one: 'La IA no pudo generar {{count}} traducción; no tiene sugerencia de la IA.',
+    failed_other: 'La IA no pudo generar {{count}} traducciones; no tienen sugerencia de la IA.',
+    notDone_one: 'Se detuvo la ejecución antes de pedir {{count}} traducción; no tiene sugerencia de la IA.',
+    notDone_other: 'Se detuvo la ejecución antes de pedir {{count}} traducciones; no tienen sugerencia de la IA.',
     path: 'Ruta',
     showDescriptions: 'Mostrar descripciones',
     title: 'Traducir etiquetas de definiciones de nodos',

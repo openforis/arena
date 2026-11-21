@@ -1,4 +1,4 @@
-import { parseJsonResponse, stripFence } from '@server/modules/ai/service/responseParsers'
+import { parseJsonResponse, stripCodeFences as stripFence } from '@common/ai/parsing'
 
 describe('stripFence', () => {
   test.each([

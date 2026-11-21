@@ -9,10 +9,14 @@ import * as ProcessUtils from '@core/processUtils'
 import * as JobManager from '@server/job/jobManager'
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import { stripServerOnlyPrefsFromLoginResponse } from '@server/modules/auth/authResponseMiddleware'
 import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
+import { createUserServiceWithPrefsUpdate } from '@server/modules/user/service/userServicePrefsOverride'
+import { getAiPolicyCeilingErrors } from '@server/modules/ai/service/policyCeilings'
+import { removeCopiedLegacyKeys } from '@server/modules/ai/service/aiPrefsWriter'
 
 import * as apiRouter from './apiRouter'
 import { registerArenaServerServices } from './arenaServerServices'
@@ -41,6 +45,11 @@ export const run = async () => {
 
   logger.info('server initialization start')
 
+  // an invalid ceiling disables AI for that data class: make the misconfiguration visible
+  for (const message of getAiPolicyCeilingErrors()) {
+    logger.error(message)
+  }
+
   // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
   // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema
   // itself, together with that survey's data migration, so the two no longer need to run twice.
@@ -48,10 +57,20 @@ export const run = async () => {
   const httpRequestLogger = createHttpRequestLogger()
   const arenaApp = await ArenaServer.init({
     skipSurveySchemaDbMigrations: true,
-    initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
+    // the login routes belong to arena-server: strip the server-only prefs from what they send
+    initialMiddlewares: [...(httpRequestLogger ? [httpRequestLogger] : []), stripServerOnlyPrefsFromLoginResponse],
   })
   const { express: app, serviceRegistry } = arenaApp
   registerArenaServerServices(serviceRegistry)
+  // arena-server's user service cannot update the prefs (it throws), which its login uses when the current survey of
+  // the user cannot be loaded
+  serviceRegistry.registerService(
+    ServiceType.user,
+    createUserServiceWithPrefsUpdate(
+      serviceRegistry.getService(ServiceType.user),
+      UserManager.updateUserPrefsAndFetchGroups
+    )
+  )
 
   // Fail any pending/running job rows left behind by a previous incarnation of this exact process
   // (crash or restart): must run before this process enqueues any job of its own, since a
@@ -112,6 +131,13 @@ export const run = async () => {
   // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info) as unknown as { updateVersion: () => Promise<void> }
   await infoService.updateVersion()
+
+  // ====== AI provider keys copied from another user: removed before any request is served. Every instance runs it
+  // (idempotent): a cluster try-lock would let an instance serve while another one is still removing them
+  const usersWithCopiedAiKeys = await removeCopiedLegacyKeys()
+  if (usersWithCopiedAiKeys > 0) {
+    logger.warn(`removed the AI provider keys copied between users from ${usersWithCopiedAiKeys} user(s)`)
+  }
 
   // ====== Start server
   await ArenaServer.start(arenaApp)

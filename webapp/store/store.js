@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import { configureStore } from '@reduxjs/toolkit'
 
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
+import { aiSuggestionsMiddleware } from '@webapp/ai/suggestions/aiSuggestionsMiddleware'
 
 // == app reducer
 
@@ -31,7 +32,7 @@ const createReducer = (asyncReducers) =>
 export const store = configureStore({
   reducer: createReducer(),
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }).concat([appErrorsMiddleware]),
+    getDefaultMiddleware({ serializableCheck: false }).concat([appErrorsMiddleware, aiSuggestionsMiddleware]),
 })
 
 store.asyncReducers = {}

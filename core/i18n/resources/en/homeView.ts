@@ -184,6 +184,30 @@ When checked, those values are kept in the record, even if the attributes are no
     preferredLanguage: 'Preferred language',
     sampleBasedImageInterpretation: 'Sample-based image interpretation',
     sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
+    aiPolicy: {
+      title: 'AI policy',
+      intro:
+        'Choose where AI may process the content of this survey. The stricter of this policy and the limits of this Arena instance applies.',
+      schemaLabel: 'Survey design (schema)',
+      schemaHint: 'Node definitions, labels and expressions.',
+      dataLabel: 'Record data',
+      dataHint: 'Collected values and user activity.',
+      levelHint: {
+        off: 'AI is never used for this content.',
+        onDevice: "Processed only by an AI engine running on the user's device.",
+        orgHosted: 'Processed by an AI server run by your organisation.',
+        cloud: 'May be processed by a cloud AI provider.',
+      },
+      notAllowedOnInstance: 'Not allowed on this Arena instance: {{levels}}',
+      dataLimitedBySchema: "Record data can't be more permissive than the survey design. Not available: {{levels}}",
+      onDeviceNote: 'On this device: users need a local AI server (for example LM Studio).',
+      readOnly: 'Only survey administrators can change the AI policy.',
+      saved: 'AI policy saved',
+      savedDataLowered:
+        "AI policy saved. Record data was lowered too: it can't be more permissive than the survey design.",
+      saveError: 'Could not save the AI policy: {{message}}',
+      loadError: 'Could not load the AI policy',
+    },
     security: {
       title: 'Security',
       publishToApply: 'Changes to these options take effect once the survey is published.',

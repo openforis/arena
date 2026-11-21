@@ -1,0 +1,18 @@
+.ai-not-available {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 22rem;
+
+  &__reasons {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+}

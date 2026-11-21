@@ -2,7 +2,7 @@
  * Tests for the prompt builder used by the survey-label translation
  * feature (Tier 1 #1).
  */
-import { buildTranslationPrompt } from '@server/modules/ai/service/prompts/translation'
+import { buildTranslationPrompt } from '@common/ai/prompts/translation'
 
 describe('buildTranslationPrompt', () => {
   test('emits a non-empty system prompt with style guidance', () => {

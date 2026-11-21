@@ -5,7 +5,8 @@ import * as Validation from '@core/validation/validation'
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
 
-import * as SurveyActions from '../actions'
+// the defs module alone: the actions index pulls in the whole component tree (jsdom), which the unit bundle cannot load
+import { resetSurveyDefs } from '../actions/defs'
 import * as SurveyState from '../state'
 
 export const surveyInfoUpdate = 'survey/info/update'
@@ -21,7 +22,7 @@ export const updateSurveyInfoProps = (props) => async (dispatch, getState) => {
   if (Validation.isObjValid(surveyInfo)) {
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
     dispatch({ type: surveyInfoUpdate, surveyInfo })
-    dispatch(SurveyActions.resetSurveyDefs())
+    dispatch(resetSurveyDefs())
   } else {
     dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrors' }))
     dispatch({

@@ -40,6 +40,14 @@ Fortfahren?`,
   schemaSummary_xlsx: 'Schemazusammenfassung (Excel)',
   schemaSummaryAiDescriptions_csv: 'Schemazusammenfassung + KI-Beschreibungen (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Schemazusammenfassung + KI-Beschreibungen (Excel)',
+  schemaSummaryAiDescriptionsFailed_one:
+    'Für {{count}} Feld konnte keine KI-Beschreibung erzeugt werden; es bleibt leer.',
+  schemaSummaryAiDescriptionsFailed_other:
+    'Für {{count}} Felder konnten keine KI-Beschreibungen erzeugt werden; sie bleiben leer.',
+  schemaSummaryAiDescriptionsNotDone_one:
+    'Für {{count}} Feld wurde keine KI-Beschreibung erzeugt, weil der Lauf angehalten wurde; es bleibt leer.',
+  schemaSummaryAiDescriptionsNotDone_other:
+    'Für {{count}} Felder wurden keine KI-Beschreibungen erzeugt, weil der Lauf angehalten wurde; sie bleiben leer.',
   hidePages: 'Seiten ausblenden',
   showPages: 'Seiten anzeigen',
   move: `„{{nodeDefLabel}}“ verschieben`,
@@ -209,6 +217,12 @@ In Arena Mobile:
     custom: 'Benutzerdefiniert',
     defaultDescription: 'Standardbeschreibung',
     defaultLabel: 'Standardbezeichnung',
+    failed_one: 'Die KI konnte {{count}} Übersetzung nicht erstellen; sie hat keinen KI-Vorschlag.',
+    failed_other: 'Die KI konnte {{count}} Übersetzungen nicht erstellen; sie haben keinen KI-Vorschlag.',
+    notDone_one:
+      'Der Lauf wurde angehalten, bevor {{count}} Übersetzung angefordert wurde; sie hat keinen KI-Vorschlag.',
+    notDone_other:
+      'Der Lauf wurde angehalten, bevor {{count}} Übersetzungen angefordert wurden; sie haben keinen KI-Vorschlag.',
     path: 'Pfad',
     showDescriptions: 'Beschreibungen anzeigen',
     title: 'Bezeichnungen der Knotendefinitionen übersetzen',

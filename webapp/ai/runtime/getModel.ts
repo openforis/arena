@@ -1,0 +1,56 @@
+/**
+ * App wiring of the gateway model (auth token + token refresh shared with axios).
+ */
+import type { LanguageModelV4 } from '@ai-sdk/provider'
+
+import SystemError from '@core/systemError'
+import { type AiDataClass, getAiFeature } from '@common/ai/features'
+
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
+import { refreshAuthToken } from '@webapp/app/appErrorsMiddleware'
+
+import { createAuthorizedFetch } from './authorizedFetch'
+import { createGatewayModel } from './gatewayModel'
+
+/**
+ * Refreshes the auth token of the gateway fetch through the app's single-flight refresh (shared with axios).
+ * @returns {Promise<string|null>} The new token, or null when the refresh failed.
+ */
+export const refreshGatewayAuthToken = async (): Promise<string | null> => (await refreshAuthToken()).authToken ?? null
+
+const authorizedFetch = createAuthorizedFetch({
+  fetchImpl: (url, init) => fetch(url, init),
+  getAuthToken: ApiConstants.getAuthToken,
+  refreshAuthToken: refreshGatewayAuthToken,
+})
+
+/**
+ * Returns the gateway model for a feature and a provider.
+ * @param {object} params - Parameters.
+ * @param {string} params.feature - Feature key.
+ * @param {number} [params.surveyId] - Survey (required for survey-scoped features).
+ * @param {AiDataClass} [params.dataClass] - Data class of the request (default: the feature's).
+ * @param {string} params.providerId - Provider the server calls.
+ * @returns {LanguageModelV4} The model.
+ */
+export const getGatewayModel = ({
+  feature,
+  surveyId,
+  dataClass,
+  providerId,
+}: {
+  feature: string
+  surveyId?: number
+  dataClass?: AiDataClass
+  providerId: string
+}): LanguageModelV4 => {
+  const aiFeature = getAiFeature(feature)
+  if (!aiFeature) throw new SystemError('aiFeatureUnknown', { feature }, 400)
+  return createGatewayModel({
+    feature,
+    dataClass: dataClass ?? aiFeature.dataClass,
+    surveyId,
+    providerId,
+    fetchImpl: authorizedFetch,
+  })
+}

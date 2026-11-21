@@ -25,7 +25,6 @@ export default {
   EntitiesDeleteJob: 'Vorhandene Entitäten löschen',
   FilesImportJob: 'Dateien importieren',
   MessageSendJob: 'Nachricht senden',
-  NodeDefsTranslationJob: 'Bezeichnungen der Knotendefinitionen übersetzen',
   NodeDefsImportJob: 'Knotendefinitionen importieren',
   NodeDefsValidationJob: 'Knotendefinitionen validieren',
   OdkImportJob: 'ODK importieren',

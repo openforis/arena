@@ -1,0 +1,283 @@
+import type { AiPolicy } from '@common/ai/policy'
+
+import { fromAvailability } from '@webapp/components/ai/Assistant/assistantAreas'
+import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
+import { selectEngine } from '@webapp/ai/engines/selectEngine'
+import { isProviderChoiceError } from '@webapp/ai/engines/engineUi'
+import type { AiCapabilities, AiProviderEntry } from '@webapp/ai/engines/types'
+import {
+  buildProviderChoices,
+  canOpenProviderChooser,
+  getConversationProvider,
+  getProviderChipLabel,
+  getProviderChipView,
+  hasPickableProvider,
+  shouldShowProviderRemoved,
+} from '@webapp/components/ai/Assistant/providerChip/providerChipModel'
+import { CYRILLIC, CYRILLIC_LANGUAGES, RESOURCES } from '../utils/i18nParity'
+import { fakeT as t } from '../utils/fakeT'
+
+const ACCOUNT: AiProviderEntry = {
+  id: 'acct:a1',
+  kind: 'account',
+  type: 'openai',
+  name: 'My OpenAI',
+  model: 'gpt-x',
+  baseUrl: null,
+  hostingClass: 'cloud',
+  status: 'ready',
+}
+const LOCAL: AiProviderEntry = {
+  id: 'local:l1',
+  kind: 'local',
+  type: 'local',
+  name: 'Desk server',
+  model: 'local-model',
+  baseUrl: 'http://localhost:1234/v1',
+  hostingClass: 'onDevice',
+  status: 'ready',
+}
+const ARENA: AiProviderEntry = {
+  id: 'arena-default',
+  kind: 'arenaDefault',
+  type: 'openai',
+  name: 'Arena default',
+  model: 'admin-model',
+  baseUrl: null,
+  hostingClass: 'cloud',
+  status: 'ready',
+}
+const ARENA_NOT_SET_UP: AiProviderEntry = {
+  ...ARENA,
+  type: 'arena-default',
+  model: null,
+  hostingClass: null,
+  status: 'notSetUp',
+}
+
+const CLOUD: AiPolicy = { schema: 'cloud', data: 'cloud' }
+const KEEP_DATA_ON_DEVICE: AiPolicy = { schema: 'cloud', data: 'onDevice' }
+
+/** Builds capabilities with the given provider list and default. */
+const capabilities = ({
+  providers = [ACCOUNT, LOCAL, ARENA],
+  defaultProviderId = 'acct:a1',
+}: { providers?: AiProviderEntry[]; defaultProviderId?: string } = {}): AiCapabilities => ({
+  instance: { policyCeilings: CLOUD, orgHostedBaseUrls: [], maxPromptChars: 200000 },
+  providers,
+  defaultProviderId,
+  local: {},
+})
+
+/** Test translation function: prefixes the key. */
+
+/** Summarizes each row as [id, disabled, reason, selected, default]. */
+const summarize = (choices: ReturnType<typeof buildProviderChoices>) =>
+  choices.map((choice) => [choice.entry.id, choice.disabled, choice.reasonKey, choice.selected, choice.isDefault])
+
+const resources = RESOURCES
+
+describe('provider chip (271)', () => {
+  test('a removed provider falls back to the default with a notice', () => {
+    expect(getConversationProvider({ capabilities: capabilities(), providerId: 'acct:gone' })).toEqual({
+      providerId: 'acct:a1',
+      entry: ACCOUNT,
+      removed: true,
+    })
+    expect(getConversationProvider({ capabilities: capabilities(), providerId: 'local:l1' })).toEqual({
+      providerId: 'local:l1',
+      entry: LOCAL,
+      removed: false,
+    })
+    expect(getConversationProvider({ capabilities: capabilities() }).removed).toBe(false)
+  })
+
+  test('the removed notice waits for the capabilities of the user to load', () => {
+    const params = { capabilities: capabilities(), providerId: 'acct:gone' }
+    expect(shouldShowProviderRemoved({ ...params, loaded: false })).toBe(false)
+    expect(shouldShowProviderRemoved({ ...params, loaded: true })).toBe(true)
+    expect(shouldShowProviderRemoved({ capabilities: capabilities(), loaded: true, providerId: 'local:l1' })).toBe(
+      false
+    )
+    expect(shouldShowProviderRemoved({ capabilities: capabilities(), loaded: true })).toBe(false)
+  })
+
+  test('rows the policy blocks are disabled with the reason; the others can be picked', () => {
+    const choices = buildProviderChoices({
+      capabilities: capabilities(),
+      effective: KEEP_DATA_ON_DEVICE,
+      dataClass: 'data',
+      surveyScoped: true,
+      selectedId: 'local:l1',
+    })
+    expect(summarize(choices)).toEqual([
+      ['acct:a1', true, 'aiPolicy.blocked.data.onDevice', false, true],
+      ['local:l1', false, null, true, false],
+      ['arena-default', true, 'aiPolicy.blocked.data.onDevice', false, false],
+    ])
+    const help = buildProviderChoices({
+      capabilities: capabilities(),
+      effective: KEEP_DATA_ON_DEVICE,
+      dataClass: 'data',
+      surveyScoped: false,
+      selectedId: 'acct:a1',
+    })
+    expect(help[0].reasonKey).toBe('aiPolicy.blockedByInstance.data')
+  })
+
+  test('Arena default without an admin default is not set up; every row waits for the policy', () => {
+    const caps = capabilities({ providers: [ACCOUNT, ARENA_NOT_SET_UP] })
+    const params = { capabilities: caps, dataClass: 'schema' as const, surveyScoped: true, selectedId: 'acct:a1' }
+    expect(summarize(buildProviderChoices({ ...params, effective: CLOUD }))).toEqual([
+      ['acct:a1', false, null, true, true],
+      ['arena-default', true, 'userAiSettings:status.notSetUp', false, false],
+    ])
+    expect(summarize(buildProviderChoices({ ...params, effective: null }))).toEqual([
+      ['acct:a1', true, null, true, true],
+      ['arena-default', true, null, false, false],
+    ])
+  })
+
+  test('rows show where the provider runs', () => {
+    const choices = buildProviderChoices({
+      capabilities: capabilities(),
+      effective: CLOUD,
+      dataClass: 'schema',
+      surveyScoped: true,
+      selectedId: 'acct:a1',
+    })
+    expect(choices.map((choice) => choice.whereKey)).toEqual(['cloudOwnKey', 'onDevice', 'cloud'])
+  })
+
+  test('the chip: provider name and model, a red dot when it cannot answer', () => {
+    const caps = capabilities()
+    const current = getConversationProvider({ capabilities: caps })
+    expect(getProviderChipView({ capabilities: caps, current, status: 'available' })).toEqual({
+      kind: 'provider',
+      entry: ACCOUNT,
+      tone: 'ok',
+    })
+    expect(getProviderChipView({ capabilities: caps, current, status: 'noEngine' })).toEqual({
+      kind: 'provider',
+      entry: ACCOUNT,
+      tone: 'bad',
+    })
+    expect(getProviderChipLabel({ entry: ACCOUNT, t })).toBe('My OpenAI · gpt-x')
+    expect(getProviderChipLabel({ entry: ARENA, t })).toBe('userAiSettings:list.arenaDefault · admin-model')
+    expect(getProviderChipLabel({ entry: { ...LOCAL, model: null }, t })).toBe('Desk server')
+  })
+
+  test('"No provider" when nothing is set up; a default of another computer is missing', () => {
+    const empty = capabilities({ providers: [ARENA_NOT_SET_UP], defaultProviderId: 'arena-default' })
+    const emptyCurrent = getConversationProvider({ capabilities: empty })
+    expect(getProviderChipView({ capabilities: empty, current: emptyCurrent, status: 'noEngine' })).toEqual({
+      kind: 'none',
+    })
+    const elsewhere = capabilities({ defaultProviderId: 'local:at-home' })
+    const current = getConversationProvider({ capabilities: elsewhere })
+    expect(current).toEqual({ providerId: 'local:at-home', entry: null, removed: false })
+    expect(getProviderChipView({ capabilities: elsewhere, current, status: 'noEngine' })).toEqual({ kind: 'missing' })
+  })
+
+  test('the switcher cannot open when no provider is set up', () => {
+    expect(canOpenProviderChooser(capabilities())).toBe(true)
+    expect(canOpenProviderChooser(capabilities({ providers: [ARENA_NOT_SET_UP] }))).toBe(false)
+  })
+
+  test('provider-level problems keep the chat open when a provider can be picked', () => {
+    const base = { status: 'noEngine', reasonKeys: ['k'], surveyScoped: true, engine: null } as any
+    const missing = { ...base, reasons: ['missingOnThisBrowser'] }
+    expect(fromAvailability('design', missing, true)).toMatchObject({
+      status: 'available',
+      engineAvailability: missing,
+    })
+    const down = { ...base, reasons: ['notAvailable'] }
+    expect(fromAvailability('design', down, true)).toMatchObject({ status: 'available', engineAvailability: down })
+    const hosting = { ...base, status: 'policyBlocked', reasons: ['policyForbids'] }
+    expect(fromAvailability('design', hosting, true)).toMatchObject({
+      status: 'available',
+      engineAvailability: hosting,
+    })
+  })
+
+  test('without a provider to pick, or with nothing set up, the panel with the reasons stays', () => {
+    const base = { status: 'noEngine', reasonKeys: ['k'], surveyScoped: true, engine: null } as any
+    expect(fromAvailability('design', { ...base, reasons: ['missingOnThisBrowser'] }).status).toBe('unavailable')
+    expect(fromAvailability('design', { ...base, reasons: ['notAvailable'] }, false).status).toBe('unavailable')
+    expect(fromAvailability('design', { ...base, reasons: ['notSetUp'] }, true).status).toBe('unavailable')
+    const off = { ...base, status: 'policyBlocked', reasons: ['policyForbids'] }
+    expect(fromAvailability('design', off, false).status).toBe('unavailable')
+  })
+
+  test('the switcher can be reached only when a row can be picked', () => {
+    const rows = (policy: AiPolicy, providers = [ACCOUNT, LOCAL, ARENA]) => ({
+      capabilities: capabilities({ providers }),
+      effective: policy,
+      dataClass: 'data' as const,
+      surveyScoped: true,
+    })
+    expect(hasPickableProvider(rows(KEEP_DATA_ON_DEVICE))).toBe(true)
+    expect(hasPickableProvider(rows(KEEP_DATA_ON_DEVICE, [ACCOUNT, ARENA]))).toBe(false)
+    expect(hasPickableProvider(rows({ schema: 'cloud', data: 'off' }))).toBe(false)
+    expect(hasPickableProvider(rows(CLOUD, [ARENA_NOT_SET_UP]))).toBe(false)
+    expect(hasPickableProvider({ ...rows(CLOUD), effective: null })).toBe(false)
+  })
+
+  test('nothing is sent to a blocked provider: the selection stays an error although the chat opens', () => {
+    const blocked = getAiEngineFeatureAvailability({
+      enabled: true,
+      effective: KEEP_DATA_ON_DEVICE,
+      dataClass: 'data',
+      surveyScoped: true,
+      capabilities: capabilities(),
+    })
+    expect(blocked.engine).toBeNull()
+    expect(blocked.reasons).toEqual(['policyForbids'])
+    expect(fromAvailability('analysis', blocked, true).status).toBe('available')
+    expect(selectEngine({ effective: KEEP_DATA_ON_DEVICE, dataClass: 'data', capabilities: capabilities() })).toEqual({
+      unavailable: ['policyForbids'],
+    })
+  })
+
+  test('errors of the provider offer the switcher', () => {
+    for (const key of [
+      'aiNoEngineAvailable',
+      'aiLocalServerUnreachable',
+      'aiLocalServerModelMissing',
+      'aiProviderChooseAnother',
+      'aiProviderNotFound',
+      'aiApiKeyUnreadable',
+      'aiProviderAuth',
+      'aiProviderUnavailable',
+    ]) {
+      expect([key, isProviderChoiceError(key)]).toEqual([key, true])
+    }
+    for (const key of ['aiLocalServerContextExceeded', 'aiTranslationInvalid', null, undefined]) {
+      expect([key, isProviderChoiceError(key)]).toEqual([key, false])
+    }
+  })
+
+  test('every language has the chip texts, and no "Now using" text', () => {
+    const keys = Object.keys(resources.en.common.aiAssistant.providerChip).sort((a, b) => a.localeCompare(b))
+    expect(keys).toEqual([
+      'answerWith',
+      'chooseAnother',
+      'defaultFailed',
+      'isDefault',
+      'makeDefault',
+      'manage',
+      'missing',
+      'none',
+      'removedNotice',
+      'title',
+    ])
+    for (const [lang, resource] of Object.entries(resources)) {
+      const chip = resource.common.aiAssistant.providerChip
+      expect([lang, Object.keys(chip).sort((a, b) => a.localeCompare(b))]).toEqual([lang, keys])
+      expect([lang, resource.common.aiEngine.nowUsing]).toEqual([lang, undefined])
+    }
+    for (const lang of CYRILLIC_LANGUAGES) {
+      expect(resources[lang].common.aiAssistant.providerChip.removedNotice).toMatch(CYRILLIC)
+    }
+  })
+})

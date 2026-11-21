@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'создал(а) опрос',
     [ActivityLog.type.surveyPropUpdate]: 'обновил(а) {{key}} опроса',
+    [ActivityLog.type.surveyAiPolicyUpdate]: 'изменил(а) политику ИИ опроса',
     [ActivityLog.type.surveyPublish]: 'опубликовал(а) опрос',
     [ActivityLog.type.surveyCollectImport]: 'импортировал(а) опрос из Collect',
 

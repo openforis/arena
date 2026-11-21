@@ -1,8 +1,12 @@
 import './SurveyInfo.scss'
 
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router'
+
 import * as ObjectUtils from '@core/objectUtils'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -12,6 +16,7 @@ import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyU
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
 import { SurveyInfoBrandingForm } from './SurveyInfoBrandingForm'
+import { SurveyAiPolicyEditor } from './SurveyAiPolicyEditor'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
 import { SurveyInfoDocuments } from './SurveyInfoDocuments'
 import { SurveyInfoMap } from './SurveyInfoMap'
@@ -23,6 +28,22 @@ const SurveyInfoForm = () => {
   const readOnly = !useAuthCanEditSurvey()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canUseAnalysis = useAuthCanUseAnalysis()
+  const aiFeaturesEnabled = useSystemConfigAiFeaturesEnabled()
+  // the AI policy tooltip links here with { tab: 'aiPolicy' }
+  const location = useLocation()
+  const navigate = useNavigate()
+  const locationState = location.state
+  const requestedTab = locationState?.tab
+  // tab selection applied from the navigation state; `nonce` remounts the TabBar so a new request is re-applied
+  const [tabRequest, setTabRequest] = useState({ locationKey: location.key, nonce: 0, tab: requestedTab })
+  if (requestedTab && tabRequest.locationKey !== location.key) {
+    setTabRequest({ locationKey: location.key, nonce: tabRequest.nonce + 1, tab: requestedTab })
+  }
+
+  // clear the state once read, so Back/Forward does not reopen the tab later
+  useEffect(() => {
+    if (requestedTab) navigate(location.pathname, { replace: true, state: null })
+  }, [requestedTab, location.pathname, navigate])
 
   const {
     areasOfInterest,
@@ -155,6 +176,14 @@ const SurveyInfoForm = () => {
         },
       }
     )
+    if (aiFeaturesEnabled) {
+      tabs.push({
+        key: 'aiPolicy',
+        id: 'aiPolicy',
+        component: SurveyAiPolicyEditor,
+        label: 'homeView:surveyInfo.aiPolicy.title',
+      })
+    }
     if (isSystemAdmin) {
       tabs.push({
         key: 'configuration',
@@ -164,9 +193,14 @@ const SurveyInfoForm = () => {
     }
   }
 
+  const initialTabIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tab.key === tabRequest.tab)
+  )
+
   return (
     <div className="home-survey-info">
-      <TabBar showTabs={tabs.length > 1} tabs={tabs} />
+      <TabBar key={tabRequest.nonce} selection={initialTabIndex} showTabs={tabs.length > 1} tabs={tabs} />
       {!readOnly && (
         <ButtonSave className="survey-info-save-btn" onClick={saveProps} testId={TestId.surveyInfo.saveBtn} />
       )}

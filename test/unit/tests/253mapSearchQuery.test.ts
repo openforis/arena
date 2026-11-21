@@ -2,6 +2,8 @@
 import {
   buildMapSearchResults,
   findRecordCandidates,
+  findSearchSelectId,
+  findSingleRecordMatch,
   parseMapSearchQuery,
 } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
 import type { MapRecordCandidate } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
@@ -104,5 +106,23 @@ describe('Map search query (253)', () => {
     const both = buildMapSearchResults({ input: '1 2', candidates: [candidate('1 2')] })
     expect(both.map((result) => result.type)).toEqual(['coordinates', 'record'])
     expect(buildMapSearchResults({ input: '95, 1', candidates: [] })).toEqual([{ type: 'invalidCoordinates' }])
+  })
+
+  test('findSingleRecordMatch: whole label or last key, exactly one', () => {
+    const candidates = ['1', '10', '3 - EP', '4 - EP', '5 - Ab'].map(candidate)
+    const find = (text: string) => findSingleRecordMatch(candidates, text)?.label ?? null
+    expect(find('10')).toBe('10')
+    expect(find('1')).toBe('1')
+    expect(find('ep')).toBeNull()
+    expect(find('ab')).toBe('5 - Ab')
+    expect(find('3 - ep')).toBe('3 - EP')
+    expect(find('0')).toBeNull()
+    expect(find(' ')).toBeNull()
+  })
+
+  test('findSearchSelectId: coordinates win over a record with that label', () => {
+    const candidates = ['41.9, 12.5', '7'].map(candidate)
+    expect(findSearchSelectId(candidates, '7')).toBe('id-7')
+    expect(findSearchSelectId(candidates, '41.9, 12.5')).toBeNull()
   })
 })

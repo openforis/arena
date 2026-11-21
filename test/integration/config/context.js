@@ -52,8 +52,13 @@ export const setContextSurvey = (s) => {
   }
 }
 
+/**
+ * Cleans up after all the tests: deletes the context survey, if there is one, and closes the DB pool.
+ * A run that does not create it (a filtered run, or a file that works with its own surveys) has none.
+ * @returns {Promise<void>} Resolves when the pool is closed.
+ */
 export const destroyTestContext = async () => {
-  if (getContextUser() && getContextSurveyId()) {
+  if (getContextUser() && getContextSurvey()) {
     await SurveyManager.deleteSurvey(getContextSurveyId())
     setContextSurvey(null)
     setContextUser(null)

@@ -1,0 +1,423 @@
+import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+
+import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
+import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
+import { createFakeRequest, createFakeResponse, parseSseWrites } from '@test/unit/utils/fakeExpress'
+
+const user: any = {
+  uuid: 'user-1',
+  prefs: { ai: { featuresEnabled: true, featureToggles: { expressions: true, chat: true } } },
+}
+const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]
+const body = (override = {}) => ({
+  surveyId: 1,
+  feature: 'expressionGenerate',
+  dataClass: 'schema',
+  stream: false,
+  call: { prompt },
+  ...override,
+})
+const usage = { inputTokens: { total: 3 }, outputTokens: { total: 2 } }
+const finishReason = { unified: 'stop', raw: 'stop' }
+
+const generateModel = () =>
+  new MockLanguageModelV4({
+    doGenerate: async () => ({ content: [{ type: 'text', text: 'ok' }], finishReason, usage, warnings: [] }) as any,
+  })
+
+const streamModel = (parts: any[]) =>
+  new MockLanguageModelV4({ doStream: async () => ({ stream: convertArrayToReadableStream(parts) }) as any })
+
+const textParts = [
+  { type: 'stream-start', warnings: [] },
+  { type: 'text-start', id: 't' },
+  { type: 'text-delta', id: 't', delta: 'Hel' },
+  { type: 'text-delta', id: 't', delta: 'lo' },
+  { type: 'text-end', id: 't' },
+  { type: 'finish', finishReason, usage },
+]
+
+// a stream that never ends until aborted (to test timeout / disconnect)
+const hangingModel = () => {
+  const state: { signal?: AbortSignal } = {}
+  const model = new MockLanguageModelV4({
+    doStream: async ({ abortSignal }) => {
+      state.signal = abortSignal
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue({ type: 'stream-start', warnings: [] })
+          controller.enqueue({ type: 'text-start', id: 't' })
+          controller.enqueue({ type: 'text-delta', id: 't', delta: 'partial' })
+          abortSignal?.addEventListener('abort', () => controller.error(abortSignal.reason))
+        },
+      })
+      return { stream } as any
+    },
+  })
+  return { model, state }
+}
+
+/**
+ * Waits, turn by turn of the event loop, until a condition holds (no fixed delay).
+ * @param {Function} condition - What to wait for.
+ * @returns {Promise<void>} Resolves when it holds; fails the test if it never does.
+ */
+const waitUntil = async (condition: () => boolean): Promise<void> => {
+  for (let turn = 0; turn < 1000 && !condition(); turn += 1) {
+    await new Promise((resolve) => setImmediate(resolve))
+  }
+  expect(condition()).toBe(true)
+}
+
+const createDeps = (model: any, overrides: any = {}) => {
+  const telemetry: any[] = []
+  const logged: string[] = []
+  const deps = {
+    resolveModel: async () => ({ model, meta: { source: 'user', provider: 'openai', model: 'm' } }),
+    assertPolicyAllows: async () => {},
+    rateLimiter: createRateLimiter({ limitPerMinute: 0 }),
+    recordTelemetry: (ctx: any, outcome: any) => telemetry.push({ ctx, outcome }),
+    logError: (message: string) => logged.push(message),
+    limits: { maxPromptChars: 1000, maxOutputTokens: 100, timeoutMs: 5000 },
+    gateEnv: { aiFeaturesEnabled: true, aiFeatureFlags: null },
+    ...overrides,
+  }
+  return { deps, telemetry, logged }
+}
+
+const run = async (requestBody: any, deps: any) => {
+  const req = createFakeRequest(requestBody)
+  const res = createFakeResponse()
+  await handleModelRequest({ req, res, user, deps })
+  return res
+}
+
+describe('handleModelRequest: generate', () => {
+  test('forwards the sanitized call and returns the wire result', async () => {
+    const model = generateModel()
+    const { deps, telemetry } = createDeps(model)
+    const res = await run(body({ call: { prompt, maxOutputTokens: 5000, providerOptions: { x: 1 } } }), deps)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body.content).toEqual([{ type: 'text', text: 'ok' }])
+    expect(model.doGenerateCalls[0].maxOutputTokens).toBe(100)
+    expect(model.doGenerateCalls[0].providerOptions).toBeUndefined()
+    expect(model.doGenerateCalls[0].abortSignal).toBeDefined()
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].ctx.feature).toBe('expressionGenerate')
+    expect(telemetry[0].outcome.usage).toEqual(usage)
+  })
+
+  test.each([
+    [body({ feature: 'nope' }), 400, 'aiFeatureUnknown'],
+    [body({ call: { prompt, tools: [{}] } }), 400, 'aiCallInvalid'],
+    [
+      body({ call: { prompt: [{ role: 'user', content: [{ type: 'text', text: 'x'.repeat(1001) }] }] } }),
+      413,
+      'aiPromptTooLarge',
+    ],
+    [body({ feature: 'translation' }), 403, 'aiFeatureDisabled'], // category off for this user
+  ])('refuses %# with %p %s, without calling the model', async (requestBody, status, key) => {
+    const model = generateModel()
+    const { deps, telemetry } = createDeps(model)
+    const res = await run(requestBody, deps)
+    expect(res.statusCode).toBe(status)
+    expect(res.body).toMatchObject({ status: 'error', key })
+    expect(model.doGenerateCalls).toHaveLength(0)
+    expect(telemetry).toHaveLength(0)
+  })
+
+  test('AI switched off on the server → 404 aiFeaturesDisabled', async () => {
+    const { deps } = createDeps(generateModel(), { gateEnv: { aiFeaturesEnabled: false, aiFeatureFlags: null } })
+    const res = await run(body(), deps)
+    expect(res.statusCode).toBe(404)
+    expect(res.body.key).toBe('aiFeaturesDisabled')
+  })
+
+  test('rate limited → 429 aiRateLimited', async () => {
+    const { deps } = createDeps(generateModel(), { rateLimiter: createRateLimiter({ limitPerMinute: 1 }) })
+    await run(body(), deps)
+    const res = await run(body(), deps)
+    expect(res.statusCode).toBe(429)
+    expect(res.body.key).toBe('aiRateLimited')
+  })
+
+  test('an upstream failure is mapped, logged in full and recorded once', async () => {
+    const model = new MockLanguageModelV4({
+      doGenerate: async () => {
+        throw Object.assign(new TypeError('fetch failed'), { cause: new Error('ECONNREFUSED 10.0.0.1') })
+      },
+    })
+    const { deps, telemetry, logged } = createDeps(model)
+    const res = await run(body(), deps)
+    expect(res.statusCode).toBe(502)
+    expect(res.body).toEqual({ status: 'error', key: 'aiProviderUnavailable', params: {} })
+    expect(JSON.stringify(res.body)).not.toMatch(/ECONNREFUSED/)
+    expect(logged.join('\n')).toMatch(/ECONNREFUSED/)
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.error).toBeDefined()
+  })
+
+  test('no provider configured → aiNotConfigured from the resolver', async () => {
+    const SystemError = (await import('@core/systemError')).default
+    const { deps } = createDeps(generateModel(), {
+      resolveModel: async () => {
+        throw new SystemError('aiNotConfigured', {}, 503)
+      },
+    })
+    const res = await run(body(), deps)
+    expect(res.statusCode).toBe(503)
+    expect(res.body.key).toBe('aiNotConfigured')
+  })
+
+  test('unexpected errors before the provider call are logged; SystemErrors are not', async () => {
+    const SystemError = (await import('@core/systemError')).default
+    const failing = (error: Error) =>
+      createDeps(generateModel(), {
+        resolveModel: async () => {
+          throw error
+        },
+      })
+    const unexpected = failing(new Error('db exploded'))
+    const res1 = await run(body(), unexpected.deps)
+    expect(res1.statusCode).toBe(500)
+    expect(res1.body.key).toBe('appErrors:unexpectedServerError')
+    expect(JSON.stringify(res1.body)).not.toMatch(/db exploded/)
+    expect(unexpected.logged.join('\n')).toMatch(/db exploded/)
+
+    const expected = failing(new SystemError('aiNotConfigured', {}, 503))
+    await run(body(), expected.deps)
+    expect(expected.logged).toEqual([])
+  })
+
+  test('the policy hook gets survey, data class and hosting class, and can refuse before the provider call', async () => {
+    const SystemError = (await import('@core/systemError')).default
+    const policyCalls: any[] = []
+    const model = generateModel()
+    const { deps } = createDeps(model, {
+      assertPolicyAllows: async (params: any) => {
+        policyCalls.push(params)
+        throw new SystemError('aiPolicyRefused', {}, 403)
+      },
+    })
+    const res = await run(body(), deps)
+    expect(policyCalls).toEqual([{ surveyId: 1, dataClass: 'schema', hostingClass: null }])
+    expect(res.statusCode).toBe(403)
+    expect(model.doGenerateCalls).toHaveLength(0)
+  })
+})
+
+describe('handleModelRequest: stream', () => {
+  test('streams the wire parts and ends with [DONE]', async () => {
+    const { deps, telemetry } = createDeps(streamModel(textParts))
+    const res = await run(body({ stream: true }), deps)
+
+    expect(res.headers['content-type']).toBe('text/event-stream')
+    const frames = parseSseWrites(res)
+    expect(frames.at(-1)).toBe('[DONE]')
+    expect(
+      frames
+        .filter((f: any) => f.type === 'text-delta')
+        .map((f: any) => f.delta)
+        .join('')
+    ).toBe('Hello')
+    expect(frames.find((f: any) => f.type === 'finish')).toEqual({ type: 'finish', finishReason, usage })
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.usage).toEqual(usage)
+    expect(res.writableEnded).toBe(true)
+  })
+
+  test('an error part is forwarded as a key only', async () => {
+    const parts = [
+      { type: 'stream-start', warnings: [] },
+      { type: 'error', error: new Error('secret upstream detail') },
+    ]
+    const { deps } = createDeps(streamModel(parts))
+    const res = await run(body({ stream: true }), deps)
+    const frames = parseSseWrites(res)
+    expect(frames).toContainEqual({ type: 'error', error: { key: 'aiProviderUnavailable', params: {} } })
+    expect(res.writes.join('')).not.toMatch(/secret upstream detail/)
+  })
+
+  test('timeout mid-stream: upstream aborted, aiRequestTimeout sent after the partial text, recorded once', async () => {
+    const { model, state } = hangingModel()
+    const { deps, telemetry } = createDeps(model, {
+      limits: { maxPromptChars: 1000, maxOutputTokens: 100, timeoutMs: 50 },
+    })
+    const res = await run(body({ stream: true }), deps)
+
+    const frames = parseSseWrites(res)
+    expect(frames).toContainEqual({ type: 'text-delta', id: 't', delta: 'partial' })
+    expect(frames).toContainEqual({ type: 'error', error: { key: 'aiRequestTimeout', params: {} } })
+    expect(frames.at(-1)).toBe('[DONE]')
+    expect(state.signal.aborted).toBe(true)
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.error).toBeDefined()
+  })
+
+  test('timer firing after the finish part keeps a completed answer (no timeout error)', async () => {
+    const model = new MockLanguageModelV4({
+      doStream: async ({ abortSignal }) => {
+        const stream = new ReadableStream({
+          start(controller) {
+            for (const part of textParts) controller.enqueue(part)
+            // the provider is slow to close after finishing
+            abortSignal?.addEventListener('abort', () => controller.close())
+          },
+        })
+        return { stream } as any
+      },
+    })
+    const { deps, telemetry } = createDeps(model, {
+      limits: { maxPromptChars: 1000, maxOutputTokens: 100, timeoutMs: 50 },
+    })
+    const res = await run(body({ stream: true }), deps)
+    const frames = parseSseWrites(res)
+    expect(frames.find((frame: any) => frame?.type === 'error')).toBeUndefined()
+    expect(frames.some((frame: any) => frame?.type === 'finish')).toBe(true)
+    expect(frames.at(-1)).toBe('[DONE]')
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.error).toBeUndefined()
+  })
+
+  test.each([
+    ['piped through a TransformStream', (stream: ReadableStream) => stream.pipeThrough(new TransformStream())],
+    ['ignoring the abort signal', null],
+  ])('timeout with a stream %s still ends with aiRequestTimeout then [DONE]', async (_label, wrap) => {
+    const model = new MockLanguageModelV4({
+      doStream: async ({ abortSignal }) => {
+        const source = new ReadableStream({
+          start(controller) {
+            controller.enqueue({ type: 'stream-start', warnings: [] })
+            controller.enqueue({ type: 'text-start', id: 't' })
+            controller.enqueue({ type: 'text-delta', id: 't', delta: 'partial' })
+            if (wrap) abortSignal?.addEventListener('abort', () => controller.error(abortSignal.reason))
+          },
+        })
+        return { stream: wrap ? wrap(source) : source } as any
+      },
+    })
+    const { deps, telemetry, logged } = createDeps(model, {
+      limits: { maxPromptChars: 1000, maxOutputTokens: 100, timeoutMs: 50 },
+    })
+    const res = await run(body({ stream: true }), deps)
+    const frames = parseSseWrites(res)
+    expect(frames).toContainEqual({ type: 'error', error: { key: 'aiRequestTimeout', params: {} } })
+    expect(frames.at(-1)).toBe('[DONE]')
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.error).toBeDefined()
+    expect(logged).toHaveLength(1)
+  })
+
+  test('client disconnect mid-stream: upstream aborted, nothing more written, recorded once', async () => {
+    const { model, state } = hangingModel()
+    const { deps, telemetry } = createDeps(model)
+    const req = createFakeRequest(body({ stream: true }))
+    const res = createFakeResponse()
+    const unhandled: unknown[] = []
+    const onUnhandled = (reason: unknown) => unhandled.push(reason)
+    process.on('unhandledRejection', onUnhandled)
+    try {
+      const done = handleModelRequest({ req, res, user, deps })
+      // the stream is open when the first part reached the client
+      await waitUntil(() => res.writes.some((chunk: string) => chunk.includes('partial')) && !!state.signal)
+      const writesBefore = res.writes.length
+      res.disconnect()
+      await done
+      // the abort is the positive signal; two more turns let a stray rejection or late write show up
+      expect(state.signal.aborted).toBe(true)
+      await new Promise((resolve) => setImmediate(resolve))
+      await new Promise((resolve) => setImmediate(resolve))
+
+      expect(state.signal.aborted).toBe(true)
+      expect(res.writes).toHaveLength(writesBefore)
+      expect(telemetry).toHaveLength(1)
+      expect(unhandled).toEqual([])
+    } finally {
+      process.off('unhandledRejection', onUnhandled)
+    }
+  })
+
+  test('a client that left before the stream started: the provider stream is aborted and cancelled', async () => {
+    let cancelled = false
+    let signal: AbortSignal | undefined
+    const model = new MockLanguageModelV4({
+      doStream: async ({ abortSignal }) => {
+        signal = abortSignal
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue({ type: 'stream-start', warnings: [] })
+          },
+          cancel() {
+            cancelled = true
+          },
+        })
+        return { stream } as any
+      },
+    })
+    const { deps, telemetry } = createDeps(model)
+    const req = createFakeRequest(body({ stream: true }))
+    const res = createFakeResponse()
+    // the socket closes while the policy and budget checks run, before the close listener exists
+    res.destroyed = true
+    await handleModelRequest({ req, res, user, deps })
+    expect(signal?.aborted).toBe(true)
+    expect(cancelled).toBe(true)
+    expect(telemetry).toHaveLength(1)
+  })
+
+  test('an error before the stream starts is a plain JSON error', async () => {
+    const model = new MockLanguageModelV4({
+      doStream: async () => {
+        throw Object.assign(new Error('bad key'), { name: 'AI_APICallError' })
+      },
+    })
+    const { deps } = createDeps(model)
+    const res = await run(body({ stream: true }), deps)
+    expect(res.statusCode).toBe(502)
+    expect(res.body.key).toBe('aiProviderUnavailable')
+    expect(res.writes).toEqual([])
+  })
+})
+
+describe('mock provider canned answers', () => {
+  const answer = async (system: string) => {
+    const { mockAnswerFor } = await import('@server/modules/ai/service/mockProvider')
+    return mockAnswerFor([{ role: 'system', content: system }] as any)
+  }
+
+  test('the two data query prompts get different answers (both mention the Data Explorer)', async () => {
+    const summarize = await answer(
+      'You are an assistant that names data queries in the Data Explorer of Open Foris Arena'
+    )
+    const generate = await answer(
+      'You are an assistant that builds data queries for the Data Explorer of Open Foris Arena'
+    )
+    expect(JSON.parse(summarize)).toEqual({ name: 'mock_query', label: 'MOCK label', description: 'MOCK' })
+    expect(JSON.parse(generate)).toMatchObject({ entity: 'tree', mode: 'raw' })
+  })
+
+  test('the translation prompt gets a translation for every item id and target language', async () => {
+    const { buildTranslationPrompt } = await import('@common/ai/prompts/translation')
+    const { system, prompt } = buildTranslationPrompt({
+      sourceLang: 'en',
+      glossary: undefined,
+      targetLangs: ['fr', 'es'],
+      items: [
+        { id: 'u1_label', text: 'Tree', kind: 'nodeDefLabel' },
+        { id: 'u2_desc', text: 'A "quoted" help', kind: 'nodeDefDescription' },
+      ],
+    })
+    const { mockAnswerFor } = await import('@server/modules/ai/service/mockProvider')
+    const answered = JSON.parse(
+      mockAnswerFor([
+        { role: 'system', content: system },
+        { role: 'user', content: [{ type: 'text', text: prompt }] },
+      ] as any)
+    )
+    expect(answered.translations).toEqual([
+      { id: 'u1_label', byLang: { fr: 'MOCK fr', es: 'MOCK es' } },
+      { id: 'u2_desc', byLang: { fr: 'MOCK fr', es: 'MOCK es' } },
+    ])
+  })
+})

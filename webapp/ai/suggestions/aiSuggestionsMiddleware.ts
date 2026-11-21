@@ -1,0 +1,75 @@
+/**
+ * Redux middleware that derives suggestion events from the actions the store already sees: a succeeded job (records
+ * imported, and a category import for the category item labels), the survey info saved, a category deleted. It reads only the action.
+ */
+import type { Middleware } from 'redux'
+
+import * as JobSerialized from '@common/job/jobSerialized'
+import { JOB_UPDATE } from '@webapp/store/app/job/actions'
+import { surveyCategoryDelete } from '@webapp/store/survey/actions/actionTypes'
+import { surveyInfoUpdate } from '@webapp/store/survey/surveyInfo/actions'
+
+import type { SuggestionEvent } from './detectors'
+import { notifySuggestionEvent } from './suggestionEvents'
+
+type Notify = (event: SuggestionEvent) => void
+
+// jobs that change the categories of the survey
+const CATEGORY_JOB_TYPES = new Set(['CategoryImportJob', 'CategoriesBatchImportJob'])
+
+// events sent once the code that dispatched the action finished its dispatches: saving the survey info resets the defs
+// right after, and the event must find the new defs, not the old ones
+const DEFERRED_EVENTS = new Set<SuggestionEvent['type']>(['surveyInfoSaved'])
+
+/**
+ * Returns the events of a job update: only a succeeded job is one.
+ * @param {any} job - Serialized job (null when the monitor is reset).
+ * @returns {SuggestionEvent[]} The events.
+ */
+const getJobEvents = (job: any): SuggestionEvent[] => {
+  if (!job || !JobSerialized.isSucceeded(job)) return []
+  const events: SuggestionEvent[] = [{ type: 'jobSucceeded', job }]
+  if (CATEGORY_JOB_TYPES.has(JobSerialized.getType(job))) events.push({ type: 'categoriesChanged' })
+  return events
+}
+
+/**
+ * Returns the suggestion events of an action.
+ * @param {any} action - Redux action.
+ * @returns {SuggestionEvent[]} The events (none for most actions).
+ */
+const getEvents = (action: any): SuggestionEvent[] => {
+  switch (action?.type) {
+    case JOB_UPDATE:
+      return getJobEvents(action.job)
+    case surveyInfoUpdate:
+      // a new language can leave category item labels missing
+      // SurveyConfigurationEditor dispatches surveyInfoUpdate too, so it also triggers surveyInfoSaved:
+      // harmless, the event is throttled and the detector only reads the survey
+      return [{ type: 'surveyInfoSaved' }]
+    case surveyCategoryDelete:
+      return [{ type: 'categoriesChanged' }]
+    default:
+      return []
+  }
+}
+
+/**
+ * Creates the middleware.
+ * @param {Notify} notify - Receives the events (notifySuggestionEvent already isolates a failing subscriber).
+ * @returns {Middleware} The middleware.
+ */
+export const createAiSuggestionsMiddleware =
+  (notify: Notify): Middleware =>
+  () =>
+  (next) =>
+  (action: any) => {
+    const result = next(action)
+    for (const event of getEvents(action)) {
+      if (DEFERRED_EVENTS.has(event.type)) queueMicrotask(() => notify(event))
+      else notify(event)
+    }
+    return result
+  }
+
+export const aiSuggestionsMiddleware = createAiSuggestionsMiddleware(notifySuggestionEvent)

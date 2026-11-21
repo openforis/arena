@@ -16,10 +16,11 @@ import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
+import { isValidPrefsUpdate, omitServerOnlyPrefsFromUser } from '../serverOnlyPrefs'
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { UserExportService } from '../service/userExportService'
@@ -178,7 +179,8 @@ export const init = (app: Router) => {
         }
         const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
         const userGroup = userGroups[0]
-        res.json({ user, userGroup })
+        // the user of the request has the server-only prefs (AI keys, usage): never sent
+        res.json({ user: omitServerOnlyPrefsFromUser(user), userGroup })
       } catch (error) {
         next(error)
       }
@@ -545,6 +547,10 @@ export const init = (app: Router) => {
 
       if (!User.isEqual(userToUpdate)(user)) {
         throw new SystemError('userNotAllowedToChangePref')
+      }
+      // an array or a scalar would replace the stored prefs object for good
+      if (!isValidPrefsUpdate(User.getPrefs(userToUpdate))) {
+        throw new SystemError('userPrefsInvalid', {}, StatusCodes.BAD_REQUEST)
       }
 
       await UserService.updateUserPrefs(userToUpdate)

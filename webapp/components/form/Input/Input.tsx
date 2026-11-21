@@ -13,6 +13,8 @@ import { ButtonIconCancel } from '@webapp/components/buttons'
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
+import { translatePlaceholder } from '../translatePlaceholder'
+import { getInputTitle } from './inputTitle'
 
 type NumberFormatProps = {
   decimalScale?: number
@@ -85,7 +87,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const selectionRef = useRef<number[]>(selectionInitial)
   const valueTextOrUndefined = Objects.isEmpty(value) ? undefined : String(value)
   const valueText = valueTextOrUndefined ?? ''
-  const title = titleProp ?? valueTextOrUndefined
+  const title = getInputTitle({ title: titleProp, value, type })
 
   const handleValueChange = useCallback(
     (newValue: string) => {
@@ -121,7 +123,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
 
   const className = classNames('form-input', classNameProp)
   const rows = inputType === 'textarea' ? textAreaRows : undefined
-  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
+  const placeholder = translatePlaceholder(i18n, placeholderProp)
 
   const clearButtonVisible = allowClear && !disabled && !readOnly && Objects.isNotEmpty(value)
   const endAdornment = clearButtonVisible ? (

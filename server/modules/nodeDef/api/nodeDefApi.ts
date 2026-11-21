@@ -160,7 +160,7 @@ export const init = (app: Router) => {
       const { surveyId } = Request.getParams(req)
       const { nodeDefs, cycle } = Request.getBody(req)
 
-      const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, surveyId })
+      const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
       const _nodeDefsUpdated = ObjectUtils.toUuidIndexedObj(_nodeDefsUpdatedArray)
 
       const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({

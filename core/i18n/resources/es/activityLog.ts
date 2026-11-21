@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'creó la encuesta',
     [ActivityLog.type.surveyPropUpdate]: 'actualizó {{key}} de la encuesta',
+    [ActivityLog.type.surveyAiPolicyUpdate]: 'cambió la política de IA de la encuesta',
     [ActivityLog.type.surveyPublish]: 'publicó la encuesta',
     [ActivityLog.type.surveyCollectImport]: 'importó la encuesta desde Collect',
 

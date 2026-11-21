@@ -185,6 +185,31 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
     preferredLanguage: 'Langue préférée',
     sampleBasedImageInterpretation: "Interprétation d'images basée sur des échantillons",
     sampleBasedImageInterpretationEnabled: "Interprétation d'images basée sur des échantillons activée",
+    aiPolicy: {
+      title: "Politique d'IA",
+      intro:
+        "Choisissez où l'IA peut traiter le contenu de ce formulaire. Le plus strict entre cette politique et les limites de cette instance d'Arena s'applique.",
+      schemaLabel: 'Conception du formulaire (schéma)',
+      schemaHint: 'Définitions de nœuds, libellés et expressions.',
+      dataLabel: 'Données des enregistrements',
+      dataHint: 'Valeurs collectées et activité des utilisateurs.',
+      levelHint: {
+        off: "L'IA n'est jamais utilisée pour ce contenu.",
+        onDevice: "Traité uniquement par un moteur d'IA qui s'exécute sur l'appareil de l'utilisateur.",
+        orgHosted: "Traité par un serveur d'IA géré par votre organisation.",
+        cloud: "Peut être traité par un fournisseur d'IA dans le cloud.",
+      },
+      notAllowedOnInstance: "Non autorisé sur cette instance d'Arena : {{levels}}",
+      dataLimitedBySchema:
+        'Les données des enregistrements ne peuvent pas être plus permissives que la conception du formulaire. Non disponible : {{levels}}',
+      onDeviceNote: "Sur cet appareil : les utilisateurs ont besoin d'un serveur d'IA local (par exemple LM Studio).",
+      readOnly: "Seuls les administrateurs du formulaire peuvent modifier la politique d'IA.",
+      saved: "Politique d'IA enregistrée",
+      savedDataLowered:
+        "Politique d'IA enregistrée. Les données des enregistrements ont aussi été abaissées : elles ne peuvent pas être plus permissives que la conception du formulaire.",
+      saveError: "Impossible d'enregistrer la politique d'IA : {{message}}",
+      loadError: "Impossible de charger la politique d'IA",
+    },
     security: {
       title: 'Sécurité',
       publishToApply: 'Les modifications de ces options prennent effet une fois le formulaire publié.',

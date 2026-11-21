@@ -7,7 +7,7 @@ import {
   nextCoordinateNotation,
   normalizeLongitude,
   utmToLatLon,
-} from '@webapp/components/MapContainer/workspace/statusbar/coordinateFormat'
+} from '@core/geo/coordinateFormat'
 
 // reference values computed with the Krüger series (they match PROJ to the millimetre)
 const utmCases: Array<[number, number, number, string, number, number]> = [

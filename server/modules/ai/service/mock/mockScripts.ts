@@ -1,0 +1,264 @@
+/**
+ * Scripted mock turns of the assistant (e2e): chosen by the area marker of the system prompt and a pattern on the
+ * last user message. Each model call plays the next step: a tool call, then the closing text.
+ */
+import type { LanguageModelV4Content, LanguageModelV4Prompt, LanguageModelV4StreamPart } from '@ai-sdk/provider'
+
+import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
+import { stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
+
+import { assistantAnalysisMockScripts } from './mockScriptsAnalysis'
+import { assistantCleaningMockScripts } from './mockScriptsCleaning'
+import { assistantSuggestionMockScripts } from './mockScriptsSuggestions'
+
+export type MockScriptParams = { lastUserMessage: string; lastToolOutput: unknown }
+
+// a text may be computed from the last tool output, and so may a tool call input
+export type MockScriptStep =
+  | { toolCall: { toolName: string; input: unknown /* or (params: MockScriptParams) => unknown */ } }
+  | { text: string | ((params: MockScriptParams) => string) }
+
+// a step as played by the model: texts resolved
+export type PlayedMockScriptStep = { toolCall: { toolName: string; input: unknown } } | { text: string }
+
+export type MockScript = { promptMarker: string; pattern: RegExp; steps: MockScriptStep[] }
+
+// default answer of a marked prompt without a matching script (never the canned answers of unmarked prompts)
+export const MOCK_SCRIPT_DEFAULT_TEXT = 'MOCK answer.'
+
+// the scripts of every assistant area
+export const MOCK_SCRIPTS: MockScript[] = [
+  // first: the suggestion prompts name labels_proposeSet, which the /label/i script would catch
+  ...assistantSuggestionMockScripts,
+  {
+    promptMarker: assistantMarkers.design,
+    pattern: /label/i,
+    steps: [
+      { toolCall: { toolName: 'nodeDef_get', input: { name: 'cluster_id' } } },
+      {
+        toolCall: {
+          toolName: 'labels_proposeSet',
+          input: {
+            summary: 'New label of cluster_id',
+            items: [{ nodeDefName: 'cluster_id', kind: 'labels', lang: 'en', text: 'Cluster identifier' }],
+          },
+        },
+      },
+      { text: 'MOCK: I proposed a new label for `cluster_id`. Review the card and click Apply.' },
+    ],
+  },
+  {
+    promptMarker: assistantMarkers.design,
+    pattern: /remarks/i,
+    steps: [
+      {
+        toolCall: {
+          toolName: 'nodeDef_proposeCreate',
+          input: {
+            summary: 'Add a remarks field to cluster',
+            nodeDefs: [
+              {
+                parentName: 'cluster',
+                type: 'text',
+                name: 'cluster_remarks',
+                labels: [{ lang: 'en', text: 'Remarks' }],
+              },
+            ],
+          },
+        },
+      },
+      { text: 'MOCK: I proposed a new text attribute `cluster_remarks`. Review the card and click Apply.' },
+    ],
+  },
+  {
+    promptMarker: assistantMarkers.help,
+    pattern: /publish/i,
+    steps: [
+      { toolCall: { toolName: 'docs_search', input: { query: 'publish survey' } } },
+      { text: 'MOCK help: publish the survey from the survey list (see the cited section).' },
+    ],
+  },
+  {
+    // the module introduction's Do it (Part 1 e2e)
+    promptMarker: assistantMarkers.help,
+    pattern: /I'm new to the/i,
+    steps: [
+      { toolCall: { toolName: 'docs_search', input: { query: 'getting started' } } },
+      { text: 'MOCK help: start with the steps of the cited manual section.' },
+    ],
+  },
+  ...assistantAnalysisMockScripts,
+  ...assistantCleaningMockScripts,
+]
+
+/**
+ * Returns the text of a message content.
+ * @param {LanguageModelV4Prompt[number]['content']} content - The content.
+ * @returns {string} The text parts joined.
+ */
+const contentText = (content: LanguageModelV4Prompt[number]['content']): string =>
+  typeof content === 'string' ? content : content.map((part: any) => (part.type === 'text' ? part.text : '')).join('')
+
+/**
+ * Finds the assistant marker in the system messages.
+ * @param {LanguageModelV4Prompt} prompt - The prompt.
+ * @returns {string|null} The marker, or null.
+ */
+const findMarker = (prompt: LanguageModelV4Prompt): string | null => {
+  const system = prompt.filter((message) => message.role === 'system').map((message) => contentText(message.content))
+  return Object.values(assistantMarkers).find((marker) => system.some((text) => text.includes(marker))) ?? null
+}
+
+/**
+ * Returns the index of the last user message.
+ * @param {LanguageModelV4Prompt} prompt - The prompt.
+ * @returns {number} The index, -1 when none.
+ */
+const lastUserIndex = (prompt: LanguageModelV4Prompt): number => {
+  for (let index = prompt.length - 1; index >= 0; index -= 1) {
+    if (prompt[index].role === 'user') return index
+  }
+  return -1
+}
+
+// tool results since the last user message = steps already played in this turn
+/**
+ * Counts the tool results after a message index.
+ * @param {LanguageModelV4Prompt} prompt - The prompt.
+ * @param {number} fromIndex - Index of the last user message.
+ * @returns {number} The count.
+ */
+const countToolResults = (prompt: LanguageModelV4Prompt, fromIndex: number): number =>
+  prompt
+    .slice(fromIndex + 1)
+    .filter((message) => message.role === 'tool')
+    .reduce(
+      (count, message) => count + (message.content as any[]).filter((part) => part.type === 'tool-result').length,
+      0
+    )
+
+// output of the last tool result after the last user message (the json value; a text value parsed when it is JSON)
+/**
+ * Returns the output of the last tool result after a message index.
+ * @param {LanguageModelV4Prompt} prompt - The prompt.
+ * @param {number} fromIndex - Index of the last user message.
+ * @returns {unknown} The output value, null when none.
+ */
+const getLastToolOutput = (prompt: LanguageModelV4Prompt, fromIndex: number): unknown => {
+  const results = prompt
+    .slice(fromIndex + 1)
+    .filter((message) => message.role === 'tool')
+    .flatMap((message) => (message.content as any[]).filter((part) => part.type === 'tool-result'))
+  const output = results.at(-1)?.output
+  if (!output) return null
+  if (output.type === 'json' || output.type === 'error-json') return output.value
+  if (output.type !== 'text' && output.type !== 'error-text') return null
+  try {
+    return JSON.parse(output.value)
+  } catch {
+    return output.value
+  }
+}
+
+/**
+ * Resolves the text or the tool call input of a step computed from the user message or the last tool output.
+ * @param {MockScriptStep} step - Step.
+ * @param {MockScriptParams} params - Parameters of the computed values.
+ * @returns {PlayedMockScriptStep} The step with its computed values resolved.
+ */
+const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScriptStep => {
+  if ('text' in step) return { text: typeof step.text === 'function' ? step.text(params) : step.text }
+  const { toolName, input } = step.toolCall
+  // a function input is built from the user message (e.g. the UUIDs of the row context)
+  return { toolCall: { toolName, input: typeof input === 'function' ? input(params) : input } }
+}
+
+/**
+ * Returns the scripted step to play for a prompt.
+ * @param {LanguageModelV4Prompt} prompt - The prompt.
+ * @param {MockScript[]} [scripts] - Scripts.
+ * @returns {PlayedMockScriptStep|null} The step; null when the prompt has no assistant marker (the canned answers apply).
+ */
+export const getScriptedStep = (
+  prompt: LanguageModelV4Prompt,
+  scripts: MockScript[] = MOCK_SCRIPTS
+): PlayedMockScriptStep | null => {
+  const marker = findMarker(prompt)
+  if (!marker) return null
+  const userIndex = lastUserIndex(prompt)
+  const userText = userIndex >= 0 ? contentText(prompt[userIndex].content) : ''
+  const script = scripts.find((candidate) => candidate.promptMarker === marker && candidate.pattern.test(userText))
+  const step = script?.steps[countToolResults(prompt, userIndex)]
+  if (!step) return { text: MOCK_SCRIPT_DEFAULT_TEXT }
+  return playStep(step, { lastUserMessage: userText, lastToolOutput: getLastToolOutput(prompt, userIndex) })
+}
+
+/**
+ * Returns the id of the scripted tool call.
+ * @param {LanguageModelV4Prompt} prompt - The prompt.
+ * @returns {string} The id.
+ */
+const toolCallId = (prompt: LanguageModelV4Prompt): string => `mock-call-${prompt.length}`
+
+/**
+ * Returns the generate content of a step.
+ * @param {PlayedMockScriptStep} step - Step.
+ * @param {LanguageModelV4Prompt} prompt - Prompt (for the tool call id).
+ * @returns {{content: LanguageModelV4Content[], finishReason: object}} Content and finish reason.
+ */
+export const toScriptedContent = (step: PlayedMockScriptStep, prompt: LanguageModelV4Prompt) => {
+  if ('text' in step)
+    return {
+      content: [{ type: 'text', text: step.text }] as LanguageModelV4Content[],
+      finishReason: stopFinishReason(),
+    }
+  const { toolName, input } = step.toolCall
+  return {
+    content: [
+      { type: 'tool-call', toolCallId: toolCallId(prompt), toolName, input: JSON.stringify(input) },
+    ] as LanguageModelV4Content[],
+    finishReason: { unified: 'tool-calls', raw: undefined } as const,
+  }
+}
+
+/**
+ * Returns the stream parts of a step.
+ * @param {PlayedMockScriptStep} step - Step.
+ * @param {LanguageModelV4Prompt} prompt - Prompt (for the tool call id).
+ * @returns {LanguageModelV4StreamPart[]} The parts, finish included.
+ */
+export const toScriptedStreamParts = (
+  step: PlayedMockScriptStep,
+  prompt: LanguageModelV4Prompt
+): LanguageModelV4StreamPart[] => {
+  const { content, finishReason } = toScriptedContent(step, prompt)
+  const [first] = content as any[]
+  const body: LanguageModelV4StreamPart[] =
+    first.type === 'text'
+      ? [
+          { type: 'text-start', id: 'mock' },
+          { type: 'text-delta', id: 'mock', delta: first.text },
+          { type: 'text-end', id: 'mock' },
+        ]
+      : [first]
+  return [{ type: 'stream-start', warnings: [] }, ...body, { type: 'finish', finishReason, usage: unknownUsageV4() }]
+}
+
+/**
+ * Returns the stream of a step.
+ * @param {PlayedMockScriptStep} step - Step.
+ * @param {LanguageModelV4Prompt} prompt - Prompt.
+ * @returns {ReadableStream<LanguageModelV4StreamPart>} The stream.
+ */
+export const toScriptedStream = (
+  step: PlayedMockScriptStep,
+  prompt: LanguageModelV4Prompt
+): ReadableStream<LanguageModelV4StreamPart> => {
+  const parts = toScriptedStreamParts(step, prompt)
+  return new ReadableStream({
+    start(controller) {
+      for (const part of parts) controller.enqueue(part)
+      controller.close()
+    },
+  })
+}

@@ -184,6 +184,30 @@ export default {
     preferredLanguage: '優先言語',
     sampleBasedImageInterpretation: 'サンプルベースの画像判読',
     sampleBasedImageInterpretationEnabled: 'サンプルベースの画像判読が有効です',
+    aiPolicy: {
+      title: 'AIポリシー',
+      intro:
+        'この調査の内容をAIがどこで処理できるかを選択します。このポリシーとこのArenaインスタンスの上限のうち、より厳しい方が適用されます。',
+      schemaLabel: '調査の設計（スキーマ）',
+      schemaHint: 'ノード定義、ラベル、式。',
+      dataLabel: 'レコードデータ',
+      dataHint: '収集された値とユーザーのアクティビティ。',
+      levelHint: {
+        off: 'このコンテンツにAIは使用されません。',
+        onDevice: 'ユーザーのデバイス上で動作するAIエンジンのみが処理します。',
+        orgHosted: '組織が運用するAIサーバーが処理します。',
+        cloud: 'クラウドのAIプロバイダーが処理する場合があります。',
+      },
+      notAllowedOnInstance: 'このArenaインスタンスでは許可されていません: {{levels}}',
+      dataLimitedBySchema: 'レコードデータは、調査の設計より緩いレベルにはできません。選択できません: {{levels}}',
+      onDeviceNote: 'このデバイス上: ユーザーにはローカル AI サーバー (例: LM Studio) が必要です。',
+      readOnly: 'AIポリシーを変更できるのは調査の管理者のみです。',
+      saved: 'AIポリシーを保存しました',
+      savedDataLowered:
+        'AIポリシーを保存しました。レコードデータのレベルも下げました。調査の設計より緩いレベルにはできません。',
+      saveError: 'AIポリシーを保存できませんでした: {{message}}',
+      loadError: 'AIポリシーを読み込めませんでした',
+    },
     security: {
       title: 'セキュリティ',
       publishToApply: 'これらのオプションの変更は、調査を公開すると有効になります。',

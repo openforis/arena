@@ -1,0 +1,75 @@
+/**
+ * Assistant tools: what the model may call in the browser. The shape matches WebMCP (name, description, JSON-schema
+ * input), so the tools can be registered with navigator.modelContext later.
+ */
+import type { z } from 'zod'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
+
+import type { AiDataClass } from '@common/ai/features'
+
+import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import type { SuggestionScope } from '@webapp/ai/suggestions/types'
+
+import type { AnalysisQueryStore } from './analysis/queryStore'
+import type { CategoryItemRefs } from './design/categoryItemRefs'
+
+export type AiToolArea = 'design' | 'help' | 'analysis' | 'cleaning'
+
+export type AiCurrentView = { module: string | null; subModule: string | null; selectedNodeDefUuid: string | null }
+
+export type AiTranslate = (key: string, params?: Record<string, unknown>) => string
+
+export type AiToolContext = {
+  getState: () => any
+  dispatch: (action: any) => any
+  user: ArenaUser
+  // the draft survey in Redux; null in the Help area (no survey content leaves the browser there)
+  survey: ArenaSurvey | null
+  // reads the survey from the store: each tool call gets the survey as it is then, not as it was when the turn began
+  getSurvey?: () => ArenaSurvey | null
+  cycle: string | null
+  // survey preferred language
+  lang: string
+  // the user's interface language
+  uiLang: string
+  signal: AbortSignal
+  // computed once with the Authorizer, so `requires` stays a pure function
+  canViewSurvey: boolean
+  canEditSurvey: boolean
+  getCurrentView: () => AiCurrentView
+  // translates i18n keys (validation messages of a refused proposal)
+  t: AiTranslate
+  // a propose tool hands its validated change set to the conversation here (never persisted by the tool)
+  onChangeSet: (changeSet: ChangeSet) => void
+  // first message of a conversation only: the model's title for it (conversation_setTitle)
+  setConversationTitle?: (title: string) => void
+  // analysis area: queries proposed in the current conversation
+  analysisQueries?: AnalysisQueryStore
+  // set by the turn when the conversation was started by Do it (kept for the whole conversation)
+  suggestionScope?: SuggestionScope | null
+  // change sets of this conversation that are neither applied nor discarded (work lists skip their items)
+  getPendingChangeSets?: () => ChangeSet[]
+  // category items listed in this conversation, by ref (categoryItems_listMissingLabels → categoryItemLabels_proposeSet)
+  categoryItemRefs?: CategoryItemRefs
+  // cap of a result in this turn (set by the registry on every call; read with getResultBudget)
+  resultCapChars?: number
+  // provider picked in the chat: the batch tools send their requests to it
+  providerId?: string
+  // the call being run (set by the registry): a long tool reports its progress under its row with onToolProgress
+  toolCallId?: string
+  onToolProgress?: (toolCallId: string, output: unknown) => void
+}
+
+export type AiTool<I = any, O = unknown> = {
+  // /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/: valid for WebMCP and every provider's function names
+  name: string
+  description: string
+  inputSchema: z.ZodType<I>
+  area: AiToolArea[]
+  // what the result may expose (checked against the survey AI policy)
+  dataClass: AiDataClass
+  requires: (ctx: AiToolContext) => boolean
+  execute: (input: I, ctx: AiToolContext) => Promise<O>
+}
+
+export type AiToolErrorResult = { error: { code: string; message: string; [detail: string]: unknown } }

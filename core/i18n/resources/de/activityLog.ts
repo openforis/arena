@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'hat die Erhebung erstellt',
     [ActivityLog.type.surveyPropUpdate]: 'hat {{key}} der Erhebung aktualisiert',
+    [ActivityLog.type.surveyAiPolicyUpdate]: 'hat die KI-Richtlinie der Erhebung geändert',
     [ActivityLog.type.surveyPublish]: 'hat die Erhebung veröffentlicht',
     [ActivityLog.type.surveyCollectImport]: 'hat die Erhebung aus Collect importiert',
 

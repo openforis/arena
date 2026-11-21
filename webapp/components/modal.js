@@ -1,6 +1,6 @@
 import './modal.scss'
 
-import { useCallback } from 'react'
+import { useCallback, useId } from 'react'
 import PropTypes from 'prop-types'
 import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
@@ -10,7 +10,13 @@ import { useI18n } from '@webapp/store/system'
 import { Button } from './buttons'
 
 export const ModalClose = ({ onClose }) => (
-  <Button className="modal-close" iconClassName="icon-cross icon-20px" onClick={onClose} variant="text" />
+  <Button
+    className="modal-close"
+    iconClassName="icon-cross icon-20px"
+    onClick={onClose}
+    title="common.close"
+    variant="text"
+  />
 )
 
 ModalClose.propTypes = {
@@ -41,12 +47,14 @@ export const Modal = (props) => {
     className = '',
     closeOnEsc = true,
     onClose: onCloseProp,
+    onDismiss,
     showCloseButton = false,
     title,
     titleParams,
   } = props
 
   const i18n = useI18n()
+  const titleId = useId()
 
   const onClose = useCallback(
     (event) => {
@@ -55,24 +63,34 @@ export const Modal = (props) => {
     [onCloseProp]
   )
 
+  // a click on the backdrop or the Escape key: onDismiss(reason) when given, else onClose
+  const onBackdropOrEscape = useCallback(
+    (event, reason) => {
+      if (onDismiss) onDismiss(reason)
+      else onClose(event)
+    },
+    [onClose, onDismiss]
+  )
+
   return (
     <MuiModal
       className={`modal ${className}`}
       data-testid={TestId.modal.modal}
       disableEscapeKeyDown={!closeOnEsc}
-      onClose={onClose}
+      onClose={onBackdropOrEscape}
       open
     >
       <Fade in timeout={500}>
-        <div className="modal-content">
+        {/* a native dialog shown open: MUI Modal handles the focus trap, the backdrop and Escape */}
+        <dialog className="modal-content" open aria-modal="true" aria-labelledby={title ? titleId : undefined}>
           {(title || showCloseButton) && (
             <ModalHeader>
-              {title && <span>{i18n.t(title, titleParams)}</span>}
+              {title && <span id={titleId}>{i18n.t(title, titleParams)}</span>}
               {showCloseButton && <ModalClose onClose={onClose} />}
             </ModalHeader>
           )}
           {children}
-        </div>
+        </dialog>
       </Fade>
     </MuiModal>
   )
@@ -83,6 +101,8 @@ Modal.propTypes = {
   className: PropTypes.string,
   closeOnEsc: PropTypes.bool,
   onClose: PropTypes.func,
+  // called with 'backdropClick' or 'escapeKeyDown' instead of onClose (to ask before closing)
+  onDismiss: PropTypes.func,
   title: PropTypes.string,
   titleParams: PropTypes.object,
   showCloseButton: PropTypes.bool,

@@ -3,6 +3,7 @@ import { FormControlLabel, Radio } from '@mui/material'
 import { useI18n } from '@webapp/store/system'
 
 type Props = {
+  autoFocus?: boolean
   checked?: boolean
   label: string
   labelParams?: Record<string, unknown>
@@ -12,7 +13,7 @@ type Props = {
 }
 
 export const RadioButton = (props: Props) => {
-  const { checked, label, labelParams, value, disabled, onClick } = props
+  const { autoFocus, checked, label, labelParams, value, disabled, onClick } = props
 
   const i18n = useI18n()
 
@@ -20,7 +21,7 @@ export const RadioButton = (props: Props) => {
     <FormControlLabel
       className="radio-button-group-item"
       value={value}
-      control={<Radio checked={checked} disabled={disabled} onClick={onClick} />}
+      control={<Radio autoFocus={autoFocus} checked={checked} disabled={disabled} onClick={onClick} />}
       label={i18n.t(label, labelParams)}
     />
   )

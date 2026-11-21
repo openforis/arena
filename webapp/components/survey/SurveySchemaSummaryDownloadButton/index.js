@@ -1,1 +1,1 @@
-export { default } from './SurveySchemaSummaryDownloadButton'
+export { default, SchemaSummaryExportCloseButton } from './SurveySchemaSummaryDownloadButton'

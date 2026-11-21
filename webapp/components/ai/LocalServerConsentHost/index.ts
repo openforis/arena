@@ -1,0 +1,1 @@
+export { LocalServerConsentHost } from './LocalServerConsentHost'

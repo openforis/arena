@@ -183,6 +183,31 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretação de imagem baseada em amostra',
     sampleBasedImageInterpretationEnabled: 'Interpretação de imagem baseada em amostra habilitada',
+    aiPolicy: {
+      title: 'Política de IA',
+      intro:
+        'Escolha onde a IA pode processar o conteúdo deste inventário. Aplica-se o mais restritivo entre esta política e os limites desta instância do Arena.',
+      schemaLabel: 'Estrutura do inventário (esquema)',
+      schemaHint: 'Definições de nós, rótulos e expressões.',
+      dataLabel: 'Dados dos registros',
+      dataHint: 'Valores coletados e atividade dos usuários.',
+      levelHint: {
+        off: 'A IA nunca é usada com este conteúdo.',
+        onDevice: 'Processado apenas por um motor de IA executado no dispositivo do usuário.',
+        orgHosted: 'Processado por um servidor de IA gerido pela sua organização.',
+        cloud: 'Pode ser processado por um provedor de IA na nuvem.',
+      },
+      notAllowedOnInstance: 'Não permitido nesta instância do Arena: {{levels}}',
+      dataLimitedBySchema:
+        'Os dados dos registros não podem ser mais permissivos do que a estrutura do inventário. Indisponível: {{levels}}',
+      onDeviceNote: 'Neste dispositivo: os usuários precisam de um servidor de IA local (por exemplo, LM Studio).',
+      readOnly: 'Apenas os administradores do inventário podem alterar a política de IA.',
+      saved: 'Política de IA salva',
+      savedDataLowered:
+        'Política de IA salva. Os dados dos registros também foram reduzidos: não podem ser mais permissivos do que a estrutura do inventário.',
+      saveError: 'Não foi possível salvar a política de IA: {{message}}',
+      loadError: 'Não foi possível carregar a política de IA',
+    },
     security: {
       title: 'Segurança',
       publishToApply: 'As alterações nestas opções entram em vigor quando o inquérito é publicado.',

@@ -42,6 +42,9 @@ export default {
   cannotInsertFileExceedingQuota: 'Datei kann nicht eingefügt werden: Das Speicherkontingent würde überschritten',
   cannotOverridePublishedTaxa: 'Veröffentlichte Taxa können nicht überschrieben werden',
   cantUpdateStep: `Schritt kann nicht aktualisiert werden`,
+  categoryItemLabelsInvalid: 'Ungültige Anfrage für Kategoriebezeichnungen ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Diese Kategorie ist zu groß, um fehlende Bezeichnungen zu prüfen; versuchen Sie es später erneut oder verwenden Sie eine kleinere Kategorie.',
   chainCannotBeSaved: 'Die Verarbeitungskette ist ungültig und kann nicht gespeichert werden',
   csv: {
     emptyHeaderFound: 'Leere Spaltenüberschrift an Position {{columnPosition}} gefunden',
@@ -70,15 +73,18 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: 'Sie sind dazu nicht berechtigt.',
   functionHasTooFewArguments: 'Funktion {{fnName}} benötigt mindestens {{minArity}} Argumente (erhalten: {{numArgs}})',
   functionHasTooManyArguments:
     'Funktion {{fnName}} akzeptiert höchstens {{maxArity}} Argumente (erhalten: {{numArgs}})',
   generic: 'Unerwarteter Fehler: {{text}}',
+  unexpectedServerError: 'Auf dem Server ist ein unerwarteter Fehler aufgetreten.',
   geoWhispApiError: 'Der Whisp-Dienst ist vorübergehend nicht verfügbar.',
   geoWhispSamplingPointDataCategoryMissing: 'Kategorie für Stichprobenpunktdaten nicht gefunden.',
   geoWhispSamplingPointDataLocationsMissing: 'Kein Stichprobenpunktdatenelement mit gültigem Standort gefunden.',
   importingDataIntoWrongCollectSurvey:
     'Daten werden in die falsche Erhebung importiert. Erwartete URI: {{collectSurveyUri}}',
+  invalidParams: 'Ungültige Anfrageparameter.',
   invalidType: 'Ungültiger Typ {{type}}',
   jobCanceledOrErrorsFound: 'Auftrag abgebrochen oder Fehler gefunden; Transaktion wird zurückgesetzt',
   jobOrphanedOnRestart: 'Der Auftrag wurde durch einen Serverneustart unterbrochen. Versuchen Sie es erneut.',
@@ -100,6 +106,17 @@ export default {
     entityNotFound: 'Entität „{{entityName}}“ mit den Schlüsseln „{{keyValues}}“ nicht gefunden',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); Fehler beim Auswerten des Ausdrucks im Knoten {{nodeDefName}}: {{details}}',
+    lockTimeout: 'Der Datensatz ist gerade belegt; versuchen Sie es in einigen Sekunden erneut.',
+    nodeNotInRecord: 'Der Knoten gehört nicht zum Datensatz {{recordUuid}}.',
+    nodesBatchInvalid: 'Ungültige Anfrage zur Stapelbearbeitung ({{reason}}).',
+    nodesBatchBusy: 'Eine andere Stapelbearbeitung läuft noch; versuchen Sie es in einigen Sekunden erneut.',
+    nodesBatchInvalidValue: 'Der neue Wert von „{{attributeName}}“ ist für dieses Attribut nicht gültig.',
+    nodesBatchWouldClearValues:
+      'Diese Änderung würde andere Werte löschen, die nicht mehr relevant sind; bearbeiten Sie diesen Wert im Formular, um dies zu bestätigen.',
+    nodesBatchUnexpected:
+      'Die Änderung konnte wegen eines unerwarteten Fehlers auf dem Server nicht übernommen werden.',
+    nodesBatchRolledBack:
+      'Die Änderung wurde nicht übernommen, weil eine andere Änderung desselben Datensatzes fehlgeschlagen ist.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Der Export der aktuellen Seite erfordert entityDefUuid und entityNodeUuid',
@@ -113,47 +130,108 @@ Versuchen Sie, die Seite zu aktualisieren.`,
     nodeDefNameNotFound: 'Knotendefinition nicht gefunden: {{name}}',
     dataMigrationInProgress: 'Diese Erhebung wird gerade aktualisiert. Versuchen Sie es in Kürze erneut.',
     fileNotFound: 'Datei nicht gefunden',
+    nodeDefRefLocked: '{{name}} kann keine andere Kategorie oder Taxonomie erhalten: Es ist veröffentlicht.',
     languageCodeInvalid: 'Ungültiger Sprachcode: {{lang}}',
     cycleKeysInvalid: 'Zyklen müssen ab 1 fortlaufend nummeriert sein',
     srsCodeInvalid: 'Ungültiger Code des räumlichen Bezugssystems: {{code}}',
   },
   unsupportedFunctionType: 'Nicht unterstützter Funktionstyp: {{exprType}}',
+  aiSessionExpired: 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
+  aiNotAuthorized: 'Sie dürfen diese KI-Funktion hier nicht verwenden.',
   // AI gateway errors
   aiNotConfigured:
     'KI ist nicht konfiguriert. Legen Sie in den KI-Einstellungen einen persönlichen Anbieter fest oder bitten Sie Ihren Administrator, einen Standard zu konfigurieren.',
+  aiPolicyRefused:
+    'Die KI-Richtlinie dieser Erhebung erlaubt nicht, $t(common:aiPolicy.dataClass.{{dataClass}}) an $t(common:aiPolicy.hostingClass.{{hostingClass}}) zu senden.',
+  aiPolicyDataAboveSchema:
+    'Erfasste Daten dürfen nicht freizügiger geteilt werden als das Erhebungsdesign (Design: „$t(common:aiPolicy.level.{{schema}})“, erfasste Daten: „$t(common:aiPolicy.level.{{data}})“).',
+  aiPolicyInvalid:
+    'Die KI-Richtlinie ist ungültig: Wählen Sie eine Stufe für das Erhebungsdesign und eine für die erfassten Daten.',
+  aiPolicyAboveCeiling:
+    '„$t(common:aiPolicy.level.{{level}})“ ist für $t(common:aiPolicy.dataClass.{{dataClass}}) auf dieser Arena-Instanz nicht zulässig (Maximum: „$t(common:aiPolicy.level.{{ceiling}})“).',
   aiFeaturesDisabled: 'KI-Funktionen sind in dieser Bereitstellung deaktiviert.',
   aiFeatureDisabled: 'Die KI-Funktion „{{feature}}“ ist deaktiviert.',
   aiPromptTooLarge: 'Die KI-Eingabe ist zu groß ({{size}} Zeichen; Grenzwert: {{limit}}).',
   aiInputTooLong: 'Das KI-Eingabefeld „{{field}}“ überschreitet den Grenzwert von {{limit}} Zeichen.',
-  aiSchemaMissing: 'Für die Funktion „{{feature}}“ fehlt das Schema für strukturierte KI-Ausgaben.',
+  aiFeatureUnknown: 'Unbekannte KI-Funktion „{{feature}}“.',
+  aiCallInvalid: 'Die KI-Anfrage ist ungültig ({{reason}}).',
+  aiRateLimited: 'Zu viele KI-Anfragen. Bitte warten Sie eine Minute und versuchen Sie es erneut.',
+  aiDailyBudgetExceeded:
+    'Sie haben das heutige Limit des Arena-Standard-KI-Anbieters erreicht. Es wird um Mitternacht UTC zurückgesetzt. Mit Ihrem eigenen Anbieter in den KI-Einstellungen können Sie weiterarbeiten.',
+  aiRequestTimeout: 'Die Antwort der KI hat zu lange gedauert. Bitte versuchen Sie es erneut.',
+  aiToolNotOffered:
+    'Die KI hat ein Werkzeug angefordert, das sie nicht verwenden darf; ihre Antwort wurde daher verworfen. Bitte versuchen Sie es erneut.',
+  aiProviderAuth:
+    'Der KI-Anbieter hat die Anmeldedaten abgelehnt. Prüfen Sie den API-Schlüssel in den KI-Einstellungen oder wenden Sie sich an Ihren Administrator.',
+  aiProviderRateLimited: 'Der KI-Anbieter drosselt die Anfragen. Bitte versuchen Sie es gleich erneut.',
+  aiProviderRejected: 'Der KI-Anbieter hat die Anfrage abgelehnt (prüfen Sie den Modellnamen in den KI-Einstellungen).',
+  aiDataDictionaryInvalid: 'Die KI hat keine verwendbaren Feldbeschreibungen geliefert.',
+  aiDescriptionsInvalid: 'Die mit dem Export gesendeten KI-Feldbeschreibungen sind ungültig.',
+  aiIncludeAiDescriptionsRemoved: 'Diese Seite ist veraltet. Laden Sie sie neu und exportieren Sie erneut.',
   aiProviderInvalid: 'Nicht unterstützter KI-Anbieter: {{provider}}.',
   aiModelMissing: 'Eine KI-Modellkennung ist erforderlich.',
   aiApiKeyMissing: 'Für den Anbieter {{provider}} ist ein API-Schlüssel erforderlich.',
   aiBaseUrlMissing: 'Für den OpenAI-kompatiblen Anbieter ist eine Basis-URL erforderlich.',
+  aiBaseUrlNotAllowed:
+    'Diese Basis-URL verweist auf eine interne Adresse, die der Arena-Server nicht aufruft. Verwenden Sie für ein Modell auf Ihrem Computer den lokalen KI-Server. Für einen Server Ihrer Organisation bitten Sie Ihren Administrator, ihn zu den Modellservern der Organisation hinzuzufügen.',
+  aiProviderUnavailable: 'Der KI-Anbieter ist nicht erreichbar. Bitte versuchen Sie es später erneut.',
+  aiProviderResponseTooLarge:
+    'Die Antwort des KI-Anbieters war zu groß und wurde abgeschnitten. Bitte versuchen Sie es erneut oder wählen Sie einen anderen Anbieter.',
+  aiSurveyChanged:
+    'Die Erhebung hat sich geändert, während der Assistent gearbeitet hat. Fragen Sie erneut, um die aktuelle Erhebung zu verwenden.',
   aiModelListFailed: 'Modelle konnten nicht vom Anbieter abgerufen werden: {{message}}',
-  aiVertexCredentialInvalid:
-    'Ungültige Vertex-AI-Anmeldedaten: Fügen Sie den JSON-Schlüssel eines Dienstkontos oder einen Vertex-AI-API-Schlüssel ein.',
+  aiProviderNotFound: 'Dieser KI-Anbieter existiert nicht oder gehört nicht Ihnen. Wählen Sie einen anderen Anbieter.',
+  aiProviderNotGateway:
+    'Ein in diesem Browser gespeicherter Anbieter wird vom Browser aus aufgerufen, nie über den Arena-Server.',
+  aiApiKeyUnreadable:
+    'Der gespeicherte API-Schlüssel dieses Anbieters kann nicht mehr gelesen werden (das Verschlüsselungsgeheimnis des Servers wurde geändert). Bearbeiten Sie den Anbieter in Ihren KI-Einstellungen und geben Sie den Schlüssel erneut ein.',
+  aiEncryptionMissing:
+    'API-Schlüssel können nicht gespeichert werden: Der Server hat kein Verschlüsselungsgeheimnis. Bitten Sie Ihren Administrator, AI_USER_KEY_ENCRYPTION_SECRET festzulegen.',
+  aiProviderChanged:
+    'Dieser KI-Anbieter wurde während der Prüfung geändert oder entfernt. Laden Sie die KI-Einstellungen neu und versuchen Sie es erneut.',
+  aiProviderFieldTooLong:
+    'Ein Anbieterwert ist zu lang: $t(appErrors:aiProviderFieldNames.{{field}}) darf höchstens {{max}} Zeichen haben.',
+  aiProviderFieldNames: {
+    model: 'Modell',
+    baseUrl: 'Basis-URL',
+    apiKey: 'API-Schlüssel',
+  },
+  aiProviderLimitReached:
+    'Sie können höchstens {{max}} KI-Anbieter speichern. Entfernen Sie einen, um einen weiteren hinzuzufügen.',
   aiExpressionDescriptionMissing: 'Beschreiben Sie den gewünschten Ausdruck in natürlicher Sprache.',
   aiExpressionTypeInvalid: 'Unbekannte Ausdrucksart: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Ohne ein Zielfeld kann kein Ausdruck erzeugt werden.',
   aiExpressionNodeDefNotFound: 'Das Zielfeld wurde nicht gefunden (UUID {{nodeDefUuid}}).',
   aiExpressionExpressionMissing: 'Ein leerer Ausdruck kann nicht erklärt werden.',
-  aiTranslationSocketMissing: 'WebSocket ist nicht verbunden. Warten Sie einen Moment und versuchen Sie es erneut.',
   aiTranslationSourceLangMissing: 'Für die Übersetzung ist eine Ausgangssprache erforderlich.',
   aiTranslationTargetLangsMissing: 'Für die Übersetzung ist mindestens eine Zielsprache erforderlich.',
   aiTranslationItemsMissing: 'Nichts zu übersetzen.',
+  aiTranslationInvalid: 'Die KI hat keine verwendbare Übersetzung geliefert. Bitte versuchen Sie es erneut.',
   aiTranslationTooManyItems: 'Zu viele Elemente in einem Stapel ({{count}}); der Grenzwert beträgt {{limit}}.',
-  aiActivityLogSurveyMissing: 'Zum Zusammenfassen des Aktivitätsprotokolls ist eine Erhebung erforderlich.',
-  aiChatbotDisabled: 'Der Dokumentations-Chatbot ist in dieser Bereitstellung deaktiviert.',
-  aiChatbotUpstreamError:
-    'Der Dokumentations-Chatbot ist vorübergehend nicht verfügbar. Versuchen Sie es gleich erneut.',
-  aiChatbotPayloadTooLarge: 'Ihre Unterhaltung ist zu groß. Leeren Sie den Chat und stellen Sie eine kürzere Frage.',
   aiDataQueryDescriptionMissing: 'Beschreiben Sie in natürlicher Sprache, welche Daten Sie anzeigen möchten.',
   aiDataQueryNoEntities: 'Diese Erhebung besitzt keine abfragbaren Entitäten.',
   aiDataQueryInvalid: 'Die KI konnte für diese Anfrage keine gültige Abfrage erzeugen: {{errors}}',
   aiDataQueryEmpty: 'Wählen Sie zunächst eine Entität und einige Attribute (oder Dimensionen und Kennzahlen) aus.',
+  aiAssistantNoAnswer:
+    'Der Assistent hat ohne Antwort beendet. Versuchen Sie es erneut oder stellen Sie eine engere Frage.',
+  aiAssistantContextFull:
+    'Der Kontext des Modells war voll, bevor der Assistent antworten konnte. Beginnen Sie eine neue Unterhaltung, stellen Sie eine engere Frage oder verwenden Sie ein Modell mit größerem Kontext.',
+  aiAssistantToolCallText:
+    'Das Modell hat einen Werkzeugaufruf als Text geschrieben, statt das Werkzeug aufzurufen. Versuchen Sie es erneut oder verwenden Sie ein größeres Modell.',
+  aiLocalServerUnreachable:
+    'Der KI-Server unter {{baseUrl}} ist nicht erreichbar. Läuft er mit aktiviertem CORS? Hat der Browser den Zugriff auf Geräte im lokalen Netzwerk blockiert?',
+  aiLocalServerModelMissing:
+    'Das Modell „{{modelId}}“ ist auf dem lokalen KI-Server nicht verfügbar. Laden Sie es in LM Studio oder wählen Sie in Ihren KI-Einstellungen ein anderes Modell.',
+  aiLocalServerContextExceeded:
+    'Die Anfrage ist für die Kontextgröße des lokalen Modells zu lang. Laden Sie das Modell in LM Studio mit einem größeren Kontext oder kürzen Sie die Anfrage.',
+  aiLocalServerError: 'Der lokale KI-Server hat einen Fehler zurückgegeben (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Für diese Anfrage kann keine KI-Engine verwendet werden.',
+  aiLocalServerConsentCancelled: 'Die Anfrage wurde abgebrochen.',
+  aiProviderChooseAnother: 'Die Anfrage wurde nicht gesendet. Wählen Sie einen anderen KI-Anbieter.',
   aiDataQuerySummaryInvalid:
     'Die KI konnte keinen Namen und keine Beschreibung für diese Abfrage vorschlagen. Versuchen Sie es erneut.',
+  aiApplyTimeout:
+    'Der Server hat nicht rechtzeitig geantwortet. Einige Änderungen wurden möglicherweise übernommen: Laden Sie neu, um dies zu prüfen.',
   userCannotDeleteHasMessages:
     'Dieser Benutzer kann nicht gelöscht werden: Er hat {{count}} Nachricht(en) verfasst. Löschen Sie diese zuerst oder weisen Sie sie neu zu.',
   userCannotDeleteLastSystemAdmin: 'Dieser Benutzer kann nicht gelöscht werden: Er ist der letzte Systemadministrator',
@@ -173,6 +251,7 @@ Versuchen Sie, die Seite zu aktualisieren.`,
     'Die Erhebungsdatei ist zu groß (max. {{maxSize}} MB): Exportieren Sie die Erhebung ohne Daten; Datensätze und zugehörige Dateien werden für den Vergleich nicht benötigt',
   userIsAdmin: 'Der angegebene Benutzer ist bereits Systemadministrator',
   userNotAllowedToChangePref: 'Der Benutzer darf diese Einstellung nicht ändern',
+  userPrefsInvalid: 'Die Benutzereinstellungen sind ungültig',
   userNotAuthorized: 'Benutzer {{userName}} ist nicht autorisiert',
   userNotFound: 'Benutzer nicht gefunden: {{userUuid}}',
   userNotInvitedToSurvey: 'Für diesen Benutzer liegt keine ausstehende Einladung zu dieser Erhebung vor',

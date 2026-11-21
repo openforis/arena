@@ -1,0 +1,79 @@
+import { useCallback } from 'react'
+import { useSelector } from 'react-redux'
+
+import * as Survey from '@core/survey/survey'
+import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
+
+import { buildRowContextDraft } from '@common/ai/prompts/cleaningRowContext'
+import { toValidationListItems } from '@webapp/ai/tools/cleaning/validationList'
+import { useNotifyWarning } from '@webapp/components/hooks'
+import { DataExplorerState } from '@webapp/store/dataExplorer'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanCleanseRecords, useUser } from '@webapp/store/user'
+
+import type { AssistantAreaStatus } from '../assistantAreas'
+import { useAssistantFeatureAvailability } from '../useAssistantFeatureAvailability'
+import { assistantPanelStore } from '../assistantPanelStore'
+import { assistantTurnRegistry } from '../assistantTurnRegistry'
+import { getCleaningAreaStatus } from './cleaningArea'
+
+/**
+ * State of the Cleaning tab (cleanse permission and an engine allowed for `data`).
+ * @returns {AssistantAreaStatus} The tab state.
+ */
+export const useCleaningAreaStatus = (): AssistantAreaStatus => {
+  const surveyInfo = useSurveyInfo()
+  const canCleanseRecords = useAuthCanCleanseRecords()
+  const { availability, canSwitchProvider } = useAssistantFeatureAvailability('assistantCleaning', {
+    dataClass: 'data',
+  })
+  return getCleaningAreaStatus({
+    surveyOpen: Survey.isValid(surveyInfo),
+    canCleanseRecords,
+    availability,
+    canSwitchProvider,
+  })
+}
+
+/**
+ * Whether the Explorer is in edit mode (one of the views where the Cleaning area is selected).
+ * @returns {boolean} The edit mode.
+ */
+export const useExplorerEditMode = (): boolean => useSelector(DataExplorerState.isEditMode)
+
+/**
+ * Returns a function that opens the Cleaning area in a new conversation with a validation report row pre-filled.
+ * @returns {Function} (row) => void.
+ */
+export const useAskAssistantAboutRow = () => {
+  const survey = useSurvey()
+  const user = useUser()
+  const lang = useSurveyPreferredLang()
+  const i18n = useI18n()
+  const notifyWarning = useNotifyWarning()
+
+  return useCallback(
+    (row: any) => {
+      // a running answer would be left stuck in its area, and its Stop button would stop it from the new chat
+      if (assistantTurnRegistry.isRunning()) {
+        notifyWarning({ key: 'aiCleaning.rowAction.busy' })
+        return
+      }
+      const [item] = toValidationListItems({ survey, rows: [row], user, i18n, lang })
+      const draft = buildRowContextDraft({
+        question: i18n.t('aiCleaning.rowAction.question'),
+        context: {
+          recordUuid: item.recordUuid,
+          recordKeys: item.recordKeys,
+          nodeUuid: item.nodeUuid,
+          parentNodeUuid: RecordValidationReportItem.getNodeContextUuid(row),
+          path: item.path,
+          messages: item.messages,
+        },
+      })
+      assistantPanelStore.openWithDraft({ area: 'cleaning', draft })
+    },
+    [i18n, lang, notifyWarning, survey, user]
+  )
+}

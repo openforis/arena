@@ -1,0 +1,320 @@
+import './AssistantProviderChip.scss'
+
+import { useCallback, useMemo, useState } from 'react'
+import classNames from 'classnames'
+import Popover from '@mui/material/Popover'
+
+import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
+import { getConversationDataClass } from '@webapp/ai/conversations/dataClass'
+import type { Conversation } from '@webapp/ai/conversations/types'
+import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
+import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
+import { useAiEngineActions } from '@webapp/components/ai/AiNotAvailable/useAiEngineActions'
+import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
+import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
+import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
+import { getApiErrorMessage, type TFunction } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
+import { getProviderDisplayName, getProviderMonogramType } from '@webapp/components/ai/UserAiSettingsPanel/providerList'
+import { useNotifyError } from '@webapp/components/hooks'
+import { setDefaultProvider } from '@webapp/service/api/ai/providers'
+import { useI18nT } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
+import type { AssistantArea } from '../assistantAreas'
+import {
+  buildProviderChoices,
+  getConversationProvider,
+  getProviderChipFullLabel,
+  getProviderChipView,
+  type ProviderChoice,
+} from './providerChipModel'
+
+type Props = {
+  area: AssistantArea
+  conversation: Conversation | null
+  // provider stored with the conversation (or picked in the blank chat)
+  providerId: string | undefined
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onChoose: (providerId: string) => void
+  // a turn is running: its provider can't change
+  disabled: boolean
+}
+
+/**
+ * One row of the "Answer with" popover: radio, monogram, name and model, where it runs (or why it is blocked).
+ * @param {object} props - Props.
+ * @param {ProviderChoice} props.choice - Row.
+ * @param {Function} props.onChoose - Called with the provider id.
+ * @param {object} props.itemProps - Ref and tabIndex of the roving focus.
+ * @param {TFunction} props.t - Translation function.
+ * @returns {React.ReactElement} The row.
+ */
+const ProviderChoiceRow = ({
+  choice,
+  onChoose,
+  itemProps,
+  t,
+}: {
+  choice: ProviderChoice
+  onChoose: (providerId: string) => void
+  itemProps: ReturnType<ReturnType<typeof useRovingFocus>['getItemProps']>
+  t: TFunction
+}) => {
+  const { entry, selected, isDefault, disabled, reasonKey, whereKey } = choice
+  const details = [
+    whereKey ? t(`userAiSettings:where.${whereKey}`) : null,
+    isDefault ? t('aiAssistant.providerChip.isDefault') : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  return (
+    <button
+      {...itemProps}
+      aria-checked={selected}
+      // not `disabled`: a blocked row stays focusable so its reason is read out
+      aria-disabled={disabled}
+      className={classNames('ai-provider-chooser__row', {
+        'ai-provider-chooser__row--selected': selected,
+        'ai-provider-chooser__row--blocked': disabled,
+      })}
+      data-testid={TestId.aiAssistant.providerChoice(entry.id)}
+      onClick={() => {
+        if (!disabled) onChoose(entry.id)
+      }}
+      role="radio"
+      type="button"
+    >
+      <span aria-hidden="true" className="ai-provider-chooser__radio" />
+      <ProviderMonogram small type={getProviderMonogramType(entry)} />
+      <span className="ai-provider-chooser__text">
+        <span>
+          <b>{getProviderDisplayName({ entry, t })}</b>
+          {entry.model ? ` · ${entry.model}` : ''}
+        </span>
+        {reasonKey ? <small className="ai-provider-chooser__reason">{t(reasonKey)}</small> : <small>{details}</small>}
+      </span>
+    </button>
+  )
+}
+
+/**
+ * Content of the "Answer with" popover: the rows, and the "Make it my default" choice. The popover unmounts it when
+ * it closes, so the choice never carries over to the next time.
+ * @param {object} props - Props.
+ * @param {ProviderChoice[]} props.choices - Rows.
+ * @param {Function} props.onChoose - Called with the provider id and whether to make it the default.
+ * @param {Function} props.onManage - Opens the provider settings.
+ * @param {TFunction} props.t - Translation function.
+ * @returns {React.ReactElement} The content.
+ */
+const ProviderChooser = ({
+  choices,
+  onChoose,
+  onManage,
+  t,
+}: {
+  choices: ProviderChoice[]
+  onChoose: (providerId: string, makeDefault: boolean) => void
+  onManage: () => void
+  t: TFunction
+}) => {
+  const [makeDefault, setMakeDefault] = useState(false)
+  // arrows move the focus only: choosing a row closes the popover, so Enter or Space picks it
+  const { onKeyDown, getItemProps } = useRovingFocus({
+    count: choices.length,
+    activeIndex: Math.max(
+      0,
+      choices.findIndex((choice) => choice.selected)
+    ),
+  })
+  return (
+    // rendered open in the popover, which handles the focus and Escape
+    <dialog
+      aria-label={t('aiAssistant.providerChip.answerWith')}
+      className="ai-provider-chooser"
+      data-testid={TestId.aiAssistant.providerChooser}
+      open
+    >
+      <span className="ai-provider-chooser__title">{t('aiAssistant.providerChip.answerWith')}</span>
+      <div
+        aria-label={t('aiAssistant.providerChip.answerWith')}
+        className="ai-provider-chooser__rows"
+        onKeyDown={onKeyDown}
+        role="radiogroup"
+        // focusable from code (ARIA composite), the Tab stop stays on the selected row (roving focus)
+        tabIndex={-1}
+      >
+        {choices.map((choice, index) => (
+          <ProviderChoiceRow
+            choice={choice}
+            itemProps={getItemProps(index)}
+            key={choice.entry.id}
+            onChoose={(id) => onChoose(id, makeDefault)}
+            t={t}
+          />
+        ))}
+      </div>
+      <div className="ai-provider-chooser__footer">
+        <label className="ai-provider-chooser__default">
+          <input
+            checked={makeDefault}
+            data-testid={TestId.aiAssistant.providerMakeDefault}
+            onChange={(event) => setMakeDefault(event.target.checked)}
+            type="checkbox"
+          />
+          {t('aiAssistant.providerChip.makeDefault')}
+        </label>
+        <button
+          className="ai-provider-chooser__manage"
+          data-testid={TestId.aiAssistant.providerManage}
+          onClick={onManage}
+          type="button"
+        >
+          {t('aiAssistant.providerChip.manage')}
+        </button>
+      </div>
+    </dialog>
+  )
+}
+
+/**
+ * Provider chip of the composer: the provider of the conversation, and the "Answer with" popover to pick another one.
+ * @param {Props} props - Props.
+ * @returns {React.ReactElement|null} The chip, or null while the area's feature is off or loading.
+ */
+export const AssistantProviderChip = (props: Props) => {
+  const { area, conversation, providerId, open, onOpenChange, onChoose, disabled } = props
+  const t = useI18nT({ unescapeHtml: true })
+  const notifyError = useNotifyError()
+  const runAction = useAiEngineActions()
+  // a callback ref (state): the popover is anchored once the chip is mounted
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null)
+  const { enabled, effective, surveyScoped, capabilities, requestDataClass } = useAiFeaturePolicy(
+    assistantAreaFeatures[area],
+    { dataClass: area === 'analysis' ? getConversationDataClass(conversation) : undefined }
+  )
+  const current = getConversationProvider({ capabilities, providerId })
+  const availability = useMemo(
+    () =>
+      getAiEngineFeatureAvailability({
+        enabled,
+        effective,
+        dataClass: requestDataClass,
+        surveyScoped,
+        capabilities,
+        providerId,
+      }),
+    [capabilities, effective, enabled, providerId, requestDataClass, surveyScoped]
+  )
+  const choices = useMemo(
+    () =>
+      buildProviderChoices({
+        capabilities,
+        effective,
+        dataClass: requestDataClass,
+        surveyScoped,
+        selectedId: current.providerId,
+      }),
+    [capabilities, current.providerId, effective, requestDataClass, surveyScoped]
+  )
+
+  /**
+   * Closes the popover.
+   * @returns {void} Nothing.
+   */
+  const close = useCallback(() => onOpenChange(false), [onOpenChange])
+
+  /**
+   * Picks a provider for the conversation, and saves it as the default when asked.
+   * @param {string} id - Provider id.
+   * @param {boolean} makeDefault - Also make it the user's default provider.
+   * @returns {Promise<void>} Resolves when done.
+   */
+  const choose = useCallback(
+    async (id: string, makeDefault: boolean) => {
+      onChoose(id)
+      close()
+      if (!makeDefault) return
+      try {
+        await setDefaultProvider({ providerId: id })
+        // the capabilities hold the default (the refresh also reads the settings again)
+        await refreshAiCapabilities()
+      } catch (error) {
+        notifyError({
+          key: 'aiAssistant.providerChip.defaultFailed',
+          params: { message: getApiErrorMessage({ error, t }) },
+        })
+      }
+    },
+    [close, notifyError, onChoose, t]
+  )
+
+  /**
+   * Opens the provider settings.
+   * @returns {void} Nothing.
+   */
+  const manage = useCallback(() => {
+    close()
+    void runAction('openSettings')
+  }, [close, runAction])
+
+  if (availability.status === 'disabled') return null
+
+  const view = getProviderChipView({ capabilities, current, status: availability.status })
+  if (view.kind === 'none') {
+    return (
+      <button
+        className="ai-provider-chip ai-provider-chip--none"
+        data-testid={TestId.aiAssistant.providerChip}
+        onClick={manage}
+        title={getProviderChipFullLabel({ view, t })}
+        type="button"
+      >
+        <span className="ai-provider-chip__text">{t('aiAssistant.providerChip.none')}</span>
+      </button>
+    )
+  }
+  // where the provider runs, and that it can't answer now, are in the accessible name and the tooltip (not in colour)
+  const fullLabel = getProviderChipFullLabel({ view, t })
+  const tone = view.kind === 'provider' ? view.tone : 'bad'
+  // a default missing on this browser is a local provider of another computer: no location to show
+  const iconClass = getHostingIconClass(view.kind === 'provider' ? view.entry.hostingClass : null)
+
+  return (
+    <>
+      <button
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label={t('aiAssistant.providerChip.title', { name: fullLabel })}
+        className={`ai-provider-chip ai-provider-chip--${tone}`}
+        data-testid={TestId.aiAssistant.providerChip}
+        disabled={disabled}
+        onClick={() => onOpenChange(!open)}
+        ref={setAnchor}
+        title={fullLabel}
+        type="button"
+      >
+        <span aria-hidden="true" className={`ai-provider-chip__icon icon ${iconClass} icon-14px`} />
+        <span aria-hidden="true" className="ai-provider-chip__caret">
+          ▾
+        </span>
+      </button>
+      <Popover
+        anchorEl={anchor}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        onClose={close}
+        open={open && anchor !== null}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <ProviderChooser
+          choices={choices}
+          onChoose={(id, makeDefault) => void choose(id, makeDefault)}
+          onManage={manage}
+          t={t}
+        />
+      </Popover>
+    </>
+  )
+}

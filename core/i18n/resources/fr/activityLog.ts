@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'a créé le formulaire',
     [ActivityLog.type.surveyPropUpdate]: 'a mis à jour le formulaire {{key}}',
+    [ActivityLog.type.surveyAiPolicyUpdate]: "a modifié la politique d'IA du formulaire",
     [ActivityLog.type.surveyPublish]: 'a publié le formulaire',
     [ActivityLog.type.surveyCollectImport]: 'a importé le formulaire depuis Collect',
 

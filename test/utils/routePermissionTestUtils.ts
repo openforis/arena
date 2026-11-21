@@ -1,0 +1,269 @@
+import { ArenaServer, Responses, ServerError, UnauthorizedError } from '@openforis/arena-server'
+
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+import { uuidv4 } from '@core/uuid'
+
+import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as UserManager from '@server/modules/user/manager/userManager'
+import * as UserRepository from '@server/modules/user/repository/userRepository'
+import * as Response from '@server/utils/response'
+
+import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
+
+/**
+ * Builds a user that belongs to no group (cannot edit any survey).
+ * @param {object} user - User to copy.
+ * @returns {object} The user without groups.
+ */
+export const buildUserWithoutGroups = (user: any) => ({
+  ...user,
+  uuid: uuidv4(),
+  name: 'Outsider',
+  email: 'outsider@example.com',
+  authGroups: [],
+})
+
+/**
+ * Creates a persisted non-admin user that is a member of a survey group.
+ * @param {object} params - Parameters.
+ * @param {object} params.admin - User performing the invitation.
+ * @param {number} params.surveyId - Survey id.
+ * @param {string} params.groupName - Survey group name (AuthGroup.groupNames).
+ * @returns {Promise<any>} The user, with its auth groups.
+ */
+export const createSurveyMember = async ({
+  admin,
+  surveyId,
+  groupName,
+}: {
+  admin: any
+  surveyId: number
+  groupName: string
+}): Promise<any> => {
+  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId, draft: true }))
+  const groups = await AuthGroupRepository.fetchSurveyGroups(surveyId)
+  const email = `route_permission_${groupName}_${uuidv4()}@openforis.org`
+  await UserManager.insertUser({
+    user: admin,
+    surveyInfo,
+    email,
+    password: 'test_password',
+    status: User.userStatus.ACCEPTED,
+    group: groups.find((group: any) => AuthGroup.getName(group) === groupName),
+    name: groupName,
+  })
+  return UserManager.fetchUserByEmail(email)
+}
+
+/**
+ * Deletes persisted users.
+ * @param {object[]} users - Users to delete.
+ * @returns {Promise<void>} Resolves when deleted.
+ */
+export const deleteUsers = async (users: any[]): Promise<void> => {
+  for (const user of users) {
+    await UserRepository.deleteUser(User.getUuid(user)) // NOSONAR: teardown, one delete at a time: no concurrent writes on the user tables
+  }
+}
+
+export const outsiderKey = 'outsider'
+export const systemAdminKey = AuthGroup.groupNames.systemAdmin
+
+export type RouteAccess = 'granted' | 'refused'
+
+/**
+ * Runs one middleware of a route and tells whether the user passed it. A refusal is either an UnauthorizedError
+ * passed to next (answered 403 by the API error handler) or a 401/403 answer written by the middleware itself.
+ * @param {object} params - Parameters.
+ * @param {object} params.route - Route with its handlers.
+ * @param {object} params.user - Requesting user (undefined: not logged in).
+ * @param {number} params.surveyId - Survey id (route param).
+ * @param {object} [params.body] - Request body (the survey of a body-driven route, the feature of the gateway).
+ * @param {number} [params.handlerIndex] - Index of the middleware in the route chain.
+ * @returns {Promise<RouteAccess>} Granted or refused; any other outcome (an unexpected error, or a route that is
+ *   not registered) fails the test.
+ */
+export const checkRouteAccess = async ({
+  route,
+  user,
+  surveyId,
+  body = {},
+  handlerIndex = 0,
+}: {
+  route: { handlers: any[] } | undefined
+  user: any
+  surveyId: number
+  body?: object
+  handlerIndex?: number
+}): Promise<RouteAccess> => {
+  if (!route) throw new Error('Route not found: it is not registered, so its access cannot be checked')
+  const res = createFakeResponse()
+  let nextCalled = false
+  let error: any
+  const req = { params: { surveyId: String(surveyId) }, query: {}, body, user }
+  await route.handlers[handlerIndex](req, res, (nextError?: any) => {
+    nextCalled = true
+    error = nextError
+  })
+  if (nextCalled && error === undefined) return 'granted'
+  if (error instanceof UnauthorizedError) return 'refused'
+  if (!nextCalled && [401, 403].includes(res.statusCode)) return 'refused'
+  const detail = nextCalled ? `next(${String(error)})` : `status ${res.statusCode}`
+  throw new Error(`Unexpected outcome: ${detail}`)
+}
+
+/**
+ * Creates one persisted member per survey group (guests excluded), plus a user without groups and the system admin.
+ * @param {object} params - Parameters.
+ * @param {object} params.admin - System admin (also the inviter).
+ * @param {number} params.surveyId - Survey id.
+ * @returns {Promise<Record<string, any>>} Users by group name (`outsider` has no groups, `systemAdmin` is the admin).
+ */
+export const createMembersOfAllGroups = async ({
+  admin,
+  surveyId,
+}: {
+  admin: any
+  surveyId: number
+}): Promise<Record<string, any>> => {
+  // the permission middleware reads the survey through these services; the harness never runs the app bootstrap
+  ArenaServer.initServices()
+  const members: Record<string, any> = { [outsiderKey]: buildUserWithoutGroups(admin), [systemAdminKey]: admin }
+  // surveyGuest is not created for new surveys
+  const groupNames = AuthGroup.surveyGroupNames.filter((name) => name !== AuthGroup.groupNames.surveyGuest)
+  for (const groupName of groupNames) {
+    members[groupName] = await createSurveyMember({ admin, surveyId, groupName }) // NOSONAR: one member at a time: each invitation writes the user and group tables
+  }
+  return members
+}
+
+/**
+ * Deletes the users created by createMembersOfAllGroups.
+ * @param {Record<string, any>} members - Users by group name.
+ * @returns {Promise<void>} Resolves when deleted.
+ */
+export const deleteMembersOfAllGroups = async (members: Record<string, any>): Promise<void> => {
+  await deleteUsers(
+    Object.entries(members)
+      .filter(([key]) => key !== outsiderKey && key !== systemAdminKey)
+      .map(([, member]) => member)
+  )
+}
+
+/**
+ * Tells, for every user, whether the user passes a route middleware.
+ * @param {object} params - Parameters.
+ * @param {object} params.route - Route with its handlers.
+ * @param {Record<string, any>} params.members - Users by key (createMembersOfAllGroups).
+ * @param {number} params.surveyId - Survey id.
+ * @param {object} [params.body] - Request body.
+ * @param {number} [params.handlerIndex] - Index of the middleware in the route chain.
+ * @returns {Promise<Record<string, RouteAccess>>} The access by user key.
+ */
+export const getAccessByUser = async ({
+  route,
+  members,
+  surveyId,
+  body,
+  handlerIndex,
+}: {
+  route: { handlers: any[] } | undefined
+  members: Record<string, any>
+  surveyId: number
+  body?: object
+  handlerIndex?: number
+}): Promise<Record<string, RouteAccess>> => {
+  const access: Record<string, RouteAccess> = {}
+  for (const [key, user] of Object.entries(members)) {
+    access[key] = await checkRouteAccess({ route, user, surveyId, body, handlerIndex }) // NOSONAR: one user at a time keeps the DB load of the check predictable
+  }
+  return access
+}
+
+/**
+ * Builds the expected access: the given keys are granted, every other user key is refused.
+ * @param {Record<string, any>} members - Users by key (createMembersOfAllGroups).
+ * @param {string[]} allowed - Keys of the users that must be granted.
+ * @returns {Record<string, RouteAccess>} The expected access by user key.
+ */
+export const accessGrantedTo = (members: Record<string, any>, allowed: string[]): Record<string, RouteAccess> => {
+  expect(Object.keys(members)).toEqual(expect.arrayContaining(allowed))
+  return Object.fromEntries(Object.keys(members).map((key) => [key, allowed.includes(key) ? 'granted' : 'refused']))
+}
+
+/**
+ * Checks the survey edit permission of routes: granted to survey editors, survey admins and the system admin, refused
+ * to every other member (data analysts, cleansers and editors included) and to a user without groups.
+ * @param {object} params - Parameters.
+ * @param {object[]} params.routes - Routes to check.
+ * @param {object} params.admin - System admin (also the inviter).
+ * @param {number} params.surveyId - Survey id.
+ * @returns {Promise<void>} Resolves when checked; the created users are deleted.
+ */
+export const expectEditPermissionOnly = async ({
+  routes,
+  admin,
+  surveyId,
+}: {
+  routes: ({ handlers: any[] } | undefined)[]
+  admin: any
+  surveyId: number
+}): Promise<void> => {
+  const members = await createMembersOfAllGroups({ admin, surveyId })
+  try {
+    const { groupNames } = AuthGroup
+    const allowed = [groupNames.surveyEditor, groupNames.surveyAdmin, systemAdminKey]
+    for (const route of routes) {
+      expect(await getAccessByUser({ route, members, surveyId })).toEqual(accessGrantedTo(members, allowed)) // NOSONAR: one route at a time keeps the DB load of the check predictable
+    }
+  } finally {
+    await deleteMembersOfAllGroups(members)
+  }
+}
+
+/**
+ * Runs the whole handler chain of a route the way Express does (each handler runs when the one before calls next), on
+ * a fake request and response. An error passed to next is answered as the API error handler does.
+ * @param {object} params - Parameters.
+ * @param {object} params.route - Route with its handlers.
+ * @param {object} [params.user] - Requesting user (undefined: not logged in).
+ * @param {object} [params.params] - Route params (a route without `:surveyId` has none).
+ * @param {object} [params.body] - Request body.
+ * @returns {Promise<any>} The fake response (statusCode, body, writes).
+ */
+export const runRouteChain = async ({
+  route,
+  user,
+  params = {},
+  body = {},
+}: {
+  route: { handlers: any[] } | undefined
+  user?: any
+  params?: Record<string, string>
+  body?: object
+}): Promise<any> => {
+  if (!route) throw new Error('Route not found: it is not registered, so it cannot be run')
+  const req = createFakeRequest(body)
+  req.params = params
+  req.user = user
+  const res = createFakeResponse()
+  for (const handler of route.handlers) {
+    let nextCalled = false
+    let error: any
+    await handler(req, res, (nextError?: any) => {
+      nextCalled = true
+      error = nextError
+    })
+    if (error !== undefined) {
+      // an UnauthorizedError of the permission middlewares is answered by the error handler of arena-server
+      if (error instanceof ServerError) Responses.sendError(res, error)
+      else Response.sendErr(res, error)
+      break
+    }
+    if (!nextCalled) break
+  }
+  return res
+}

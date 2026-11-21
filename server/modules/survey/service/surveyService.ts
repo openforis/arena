@@ -40,7 +40,6 @@ import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
-import NodeDefsTranslationJob from './NodeDefsTranslationJob'
 import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import SurveysListExportJob from './SurveysListExportJob'
 import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
@@ -212,32 +211,43 @@ export const startCreateSurveyJob = ({ user, surveyInfo }: { user: ArenaUser; su
 }
 
 /**
- * Starts the node definitions AI translation job.
+ * Starts the schema summary export job.
  * @param {object} params - Params.
  * @param {object} params.user - Acting user.
  * @param {number} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {string} params.fileFormat - csv or xlsx.
+ * @param {Record<string, string>|null} [params.aiDescriptions] - Validated AI descriptions (null: no AI column).
+ * @param {number} [params.aiDescriptionsFailedCount] - Node defs the browser could not describe.
+ * @param {number} [params.aiDescriptionsNotDoneCount] - Node defs the browser did not try (the run was stopped).
  * @returns {object} The enqueued job.
  */
-export const startNodeDefsTranslationJob = ({ user, surveyId }: { user: ArenaUser; surveyId: number }) => {
-  const job = new NodeDefsTranslationJob({ user, surveyId })
-  JobManager.enqueueJob(job)
-  return job
-}
-
 export const startSchemaSummaryExportJob = ({
   user,
   surveyId,
   cycle,
   fileFormat,
-  includeAiDescriptions = false,
+  aiDescriptions = null,
+  aiDescriptionsFailedCount = 0,
+  aiDescriptionsNotDoneCount = 0,
 }: {
   user: ArenaUser
   surveyId: number
   cycle: string
   fileFormat: string
-  includeAiDescriptions?: boolean
+  aiDescriptions?: Record<string, string> | null
+  aiDescriptionsFailedCount?: number
+  aiDescriptionsNotDoneCount?: number
 }) => {
-  const job = new SchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, includeAiDescriptions })
+  const job = new SchemaSummaryExportJob({
+    user,
+    surveyId,
+    cycle,
+    fileFormat,
+    aiDescriptions,
+    aiDescriptionsFailedCount,
+    aiDescriptionsNotDoneCount,
+  })
   JobManager.enqueueJob(job)
   return job
 }
@@ -440,8 +450,26 @@ export const insertSurveyFile = async ({
   await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }
 
+/**
+ * Tells if a file belongs to a record: it is read through the record routes, which check the record permissions.
+ * @param {object} summary - The file summary.
+ * @returns {boolean} True for a record attachment.
+ */
+const isRecordFile = (summary: ArenaSurveyFile): boolean =>
+  Boolean(SurveyFile.getRecordUuid(summary)) ||
+  SurveyFile.getProps(summary)[SurveyFile.propKeys.type] === SurveyFile.SurveyFileType.recordAttachment
+
+/**
+ * Fetches a survey file (map layer, doc image, logo...) with its content; record attachments are not survey files.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.fileUuid - The file uuid.
+ * @returns {Promise<{summary: object, contentStream: object}>} The file summary and its content stream.
+ * @throws {SystemError} 404 fileNotFound when the file does not exist or is a record attachment.
+ */
 export const fetchSurveyFile = async ({ surveyId, fileUuid }: { surveyId: number; fileUuid: string }) => {
-  const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const summary = fileSummary && !isRecordFile(fileSummary) ? fileSummary : null
   const contentStream = summary
     ? await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })
     : null

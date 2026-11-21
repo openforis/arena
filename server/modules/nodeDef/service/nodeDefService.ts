@@ -235,10 +235,27 @@ export const updateNodeDefProps = (
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsDependentsUuids, nodeDefsUpdated })
   })
 
-export const updateNodeDefsProps = (
-  { surveyId, nodeDefs }: { surveyId: number; nodeDefs: NodeDefPropsUpdate[] },
+const _touchesRefProps = ({ props = {} }: NodeDefPropsUpdate): boolean =>
+  NodeDef.propKeys.categoryUuid in props || NodeDef.propKeys.taxonomyUuid in props
+
+// `survey` can be given by a caller that has it already
+export const updateNodeDefsProps = async (
+  {
+    surveyId,
+    cycle,
+    nodeDefs,
+    survey = null,
+  }: { surveyId: number; cycle?: string; nodeDefs: NodeDefPropsUpdate[]; survey?: ArenaSurvey | null },
   client: DbClient = db
-) => NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
+) => {
+  // the category and taxonomy of a published attribute are locked (as in updateNodeDefProps): the survey is only
+  // loaded when the batch touches them
+  if (nodeDefs.some(_touchesRefProps)) {
+    const surveyDraft = survey ?? (await fetchSurvey({ surveyId, cycle }, client))
+    NodeDefManager.assertNodeDefsRefPropsCanChange({ survey: surveyDraft, nodeDefs })
+  }
+  return NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
+}
 
 export const moveNodeDef = (
   {

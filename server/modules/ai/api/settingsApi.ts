@@ -1,0 +1,161 @@
+/**
+ * Express routes for the per-user AI settings. All routes are "self-only": a user can only read or modify their own
+ * AI configuration, and every `acct:` id is checked against the user's own providers.
+ *
+ *   GET    /api/ai/settings          — settings, providers (no keys), admin default, engine fields
+ *   PUT    /api/ai/settings          — save the access level and toggles (other fields are ignored)
+ *   PUT    /api/ai/settings/default  — { providerId } choose the default provider
+ *   POST   /api/ai/providers/test    — test a draft or a saved provider (`id` + changed fields)
+ *   POST   /api/ai/providers/models  — list the models of a draft or a saved provider
+ *   POST   /api/ai/providers         — add an account provider (tested again here)
+ *   PUT    /api/ai/providers/:id     — edit an account provider (`apiKey` omitted = keep)
+ *   DELETE /api/ai/providers/:id     — remove an account provider
+ *
+ * The routes that connect to the endpoint of a provider (test, models, add, edit) are rate limited per user.
+ */
+import type { ArenaUser } from '@openforis/arena-core'
+
+import * as Request from '@server/utils/request'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as SecretBox from '@server/utils/crypto/secretBox'
+import { ENV } from '@core/processUtils'
+
+import * as AiProviderService from '../service/aiProviderService'
+import * as AiSettingsService from '../service/aiSettingsService'
+import * as ProviderResolver from '../service/providerResolver'
+import { getDisabledFeatureKeys } from '../service/featureGate'
+import { getAiPolicyCeilings } from '../service/policyCeilings'
+import { requireAiFeaturesEnabled } from './aiMiddleware'
+import { limitProviderCalls, releaseProviderCall } from './providerRateLimit'
+
+/**
+ * Returns the body of GET /api/ai/settings: the settings, the providers and the instance fields.
+ * @param {object} user - Arena user.
+ * @returns {object} The settings body.
+ */
+export const buildResponseBody = (user: SettingsUser) => ({
+  ...AiSettingsService.getPublicSettings(user),
+  // the instance default (no key), for the "Arena default" row
+  adminDefault: ProviderResolver.describeAdminDefault(),
+  encryptionConfigured: SecretBox.isConfigured(),
+  // the dialog offers the mock type only where the server accepts it (e2e servers)
+  mockProviderEnabled: ENV.aiMockProviderEnabled === true,
+  disabledFeatures: getDisabledFeatureKeys(),
+  // for the browser engines: org-hosted allowlist, instance policy ceilings and gateway prompt cap
+  orgHostedBaseUrls: [...ENV.aiOrgHostedBaseUrls],
+  policyCeilings: getAiPolicyCeilings(),
+  maxPromptChars: ENV.aiMaxPromptChars,
+})
+
+type SettingsUser = { uuid: string; prefs?: Record<string, any> }
+type RouteHandler = (args: {
+  user: ArenaUser
+  body: Record<string, unknown>
+  params: Record<string, string>
+}) => unknown
+type ExpressRequest = { params: Record<string, string>; [key: string]: unknown }
+
+const guards = [AuthMiddleware.requireLoggedInUser, requireAiFeaturesEnabled]
+
+// the routes that connect to the endpoint of a provider, which the user chooses, are rate limited per user
+const providerCallGuards = [...guards, limitProviderCalls]
+
+/**
+ * Returns the body of a request as an object: anything else (nothing, a list, a scalar) is an empty one.
+ * @param {unknown} body - The parsed body.
+ * @returns {Record<string, unknown>} The body.
+ */
+const toBodyObject = (body: unknown): Record<string, unknown> =>
+  body !== null && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {}
+
+/**
+ * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON and forwards
+ * errors to Express. The in-flight slot of a provider call is freed when the handler settles.
+ * @param {RouteHandler} handler - Receives `{ user, body, params }`.
+ * @returns {(req: object, res: object, next: (error?: unknown) => void) => Promise<void>} The Express handler.
+ */
+const jsonRoute =
+  (handler: RouteHandler) =>
+  async (
+    req: ExpressRequest,
+    res: { json: (body: unknown) => void },
+    next: (error?: unknown) => void
+  ): Promise<void> => {
+    try {
+      res.json(
+        await handler({ user: Request.getUser(req), body: toBodyObject(Request.getBody(req)), params: req.params })
+      )
+    } catch (error) {
+      next(error)
+    } finally {
+      releaseProviderCall(res)
+    }
+  }
+
+/**
+ * Registers the AI settings and provider routes.
+ * @param {object} app - Express router.
+ * @returns {void}
+ */
+export const init = (app): void => {
+  app.get(
+    '/ai/settings',
+    ...guards,
+    // the keys saved before they were bound to their owner are encrypted again the first time the settings are read
+    jsonRoute(async ({ user }) => buildResponseBody(await AiProviderService.upgradeLegacyProviderKeys({ user })))
+  )
+
+  app.put(
+    '/ai/settings',
+    ...guards,
+    jsonRoute(async ({ user, body }) => buildResponseBody(await AiSettingsService.saveSettings({ user, update: body })))
+  )
+
+  app.put(
+    '/ai/settings/default',
+    ...guards,
+    jsonRoute(async ({ user, body }) => {
+      const { user: updated } = await AiProviderService.setDefaultProvider({ user, providerId: body.providerId })
+      return { settings: buildResponseBody(updated) }
+    })
+  )
+
+  app.post(
+    '/ai/providers/test',
+    ...providerCallGuards,
+    jsonRoute(({ user, body }) => AiProviderService.testProvider({ user, input: body }))
+  )
+
+  app.post(
+    '/ai/providers/models',
+    ...providerCallGuards,
+    jsonRoute(({ user, body }) => AiProviderService.listProviderModels({ user, input: body }))
+  )
+
+  app.post(
+    '/ai/providers',
+    ...providerCallGuards,
+    jsonRoute(async ({ user, body }) => {
+      const { user: updated, provider } = await AiProviderService.addProvider({ user, input: body })
+      return { provider, settings: buildResponseBody(updated) }
+    })
+  )
+
+  app.put(
+    '/ai/providers/:id',
+    ...providerCallGuards,
+    jsonRoute(async ({ user, body, params }) => {
+      const { user: updated, provider } = await AiProviderService.updateProvider({ user, id: params.id, input: body })
+      return { provider, settings: buildResponseBody(updated) }
+    })
+  )
+
+  app.delete(
+    '/ai/providers/:id',
+    ...guards,
+    jsonRoute(async ({ user, params }) => {
+      const { user: updated } = await AiProviderService.removeProvider({ user, id: params.id })
+      return { settings: buildResponseBody(updated) }
+    })
+  )
+}

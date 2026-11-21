@@ -1,0 +1,251 @@
+import type { Page } from '@playwright/test'
+
+import { TestId } from '@webapp/utils/testId'
+
+import { expect, test } from '../fixtures'
+import type { ArenaApi } from '../fixtures/arenaApi'
+import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
+import {
+  acceptConsentAndWait,
+  analysisAreaLabel,
+  analysisMessages,
+  askAnalysis,
+  collectRequestBodies,
+  expectAveragesInTable,
+  expectedAverages,
+  isExplorerQueryRequest,
+  isGatewayRequest,
+  mapLayerCard,
+  queryCard,
+  reopenLastConversation,
+  reloadApp,
+  setLocalProvider,
+} from '../helpers/aiAnalysis'
+import {
+  assistantPanel,
+  openAssistantPanel,
+  selectAssistantArea,
+  waitForAssistantTurn,
+} from '../helpers/assistantPanel'
+import { Urls } from '../helpers/urls'
+import { startLocalModelServer } from '../stubs/localModelServer'
+
+// the server must run with the mock provider (see test/e2e/README.md)
+const aiMock = process.env.E2E_AI_MOCK === 'true'
+if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: the AI specs would be skipped')
+
+/**
+ * Opens the Map Layers panel (when closed) and gives the Cluster coordinate checkbox.
+ * @param {Page} page - The page.
+ * @returns {Promise<Locator>} The checkbox.
+ */
+const openLayersPanelCheckbox = async (page: Page) => {
+  const mapIds = TestId.mapWorkspace
+  // the Layers panel may already be open: a click on the open tab would collapse it
+  const layersPanel = page.getByTestId(mapIds.railPanel('layers'))
+  if (!(await layersPanel.isVisible())) await page.getByTestId(mapIds.railTab('layers')).click()
+  return layersPanel
+    .locator('label', { hasText: 'Cluster coordinate' })
+    .locator('input.leaflet-control-layers-selector')
+}
+
+test.describe('AI analysis assistant (mock provider)', () => {
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
+
+  test.use({ sampleSurveyOptions: { records: sampleRecords } })
+
+  test.beforeEach(async ({ api }) => {
+    await api.enableAiFeatures()
+  })
+
+  test('cloud gateway, default policy: query card, no record data sent', async ({ page, sampleSurvey: _ }) => {
+    const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
+    await page.goto(Urls.dataExplorer)
+
+    await askAnalysis(page, analysisMessages.propose)
+    await waitForAssistantTurn(page)
+    await expect(queryCard(page, 'q1')).toBeVisible()
+
+    await page.getByTestId(TestId.aiQueryCard.openInExplorer('q1')).click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.dataExplorer}$`))
+    await expectAveragesInTable(page)
+
+    // review focus 2: schema only, no data tool, no row value
+    expect(gatewayBodies.length).toBeGreaterThan(0)
+    for (const body of gatewayBodies) {
+      expect(body.dataClass).toBe('schema')
+      const text = JSON.stringify(body)
+      expect(text).not.toContain('query_run')
+      expect(text).not.toContain('query_count')
+      for (const value of expectedAverages) expect(text).not.toContain(value)
+      // the offered tools, when listed, include no data tool
+      for (const tool of body.call?.tools ?? []) {
+        expect(String(tool?.name ?? tool)).not.toMatch(/^query_(run|count)$/)
+      }
+    }
+  })
+
+  test('show as chart opens the bar chart with all rows', async ({ page, sampleSurvey: _ }) => {
+    const queryBodies = collectRequestBodies(page, isExplorerQueryRequest)
+    await page.goto(Urls.dataExplorer)
+
+    await askAnalysis(page, analysisMessages.propose)
+    await waitForAssistantTurn(page)
+    await page.getByTestId(TestId.aiQueryCard.showAsChart('q1')).click()
+
+    await expect(page.locator('.data-query-chart-wrapper')).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('.data-query-chart-wrapper .recharts-bar-rectangle')).toHaveCount(3)
+    // an aggregate chart loads all its rows, not the table page size
+    expect(queryBodies.some((body) => body.limit == null)).toBe(true)
+  })
+
+  test('map card: opens the Map with the layer ticked, again after unticking', async ({ page, sampleSurvey: _ }) => {
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.map)
+    await waitForAssistantTurn(page)
+    await expect(mapLayerCard(page)).toBeVisible()
+
+    const showOnMap = page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]')
+    await showOnMap.click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.map}$`))
+
+    const checkbox = await openLayersPanelCheckbox(page)
+    await expect(checkbox).toBeChecked()
+
+    await checkbox.uncheck()
+    await expect(checkbox).not.toBeChecked()
+    await showOnMap.click()
+    await expect(checkbox).toBeChecked()
+
+    await reloadApp(page)
+    await openAssistantPanel(page)
+    // on the Map the assistant opens on the Help area
+    await selectAssistantArea(page, analysisAreaLabel)
+    await reopenLastConversation(page)
+    await expect(mapLayerCard(page)).toBeVisible()
+  })
+
+  test('map card: a record search goes to the record, and applies again after clearing', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.mapRecord)
+    await waitForAssistantTurn(page)
+    const showOnMap = page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]')
+    await showOnMap.click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.map}$`))
+
+    const searchInput = page.getByTestId(mapIds.searchInput)
+    await expect(searchInput).toHaveValue('1')
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
+    await expect(page.getByTestId(mapIds.statusZoom)).not.toHaveText('Zoom 3')
+    const checkbox = await openLayersPanelCheckbox(page)
+    await expect(checkbox).toBeChecked()
+
+    await searchInput.clear()
+    await showOnMap.click()
+    await expect(searchInput).toHaveValue('1')
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
+  })
+
+  test('map card: a search without a match fills the search box', async ({ page, sampleSurvey: _ }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.mapNoMatch)
+    await waitForAssistantTurn(page)
+    await page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]').click()
+
+    await expect(page.getByTestId(mapIds.searchInput)).toHaveValue('9')
+    await expect(page.getByTestId(mapIds.searchResult(0))).toContainText('No record or coordinates match')
+    // the request focused the box: leaving it closes the list
+    await page.locator('.leaflet-container').click({ position: { x: 400, y: 300 } })
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
+  })
+
+  test('map card: coordinates fly the Map there', async ({ page, sampleSurvey: _ }) => {
+    const mapIds = TestId.mapWorkspace
+    await page.goto(Urls.dataExplorer)
+    await askAnalysis(page, analysisMessages.mapCoordinates)
+    await waitForAssistantTurn(page)
+    await expect(mapLayerCard(page)).toContainText('Map location')
+    await page.locator('[data-testid^="ai-map-layer-card-"][data-testid$="-show-on-map"]').click()
+
+    await expect(page.getByTestId(mapIds.searchInput)).toHaveValue('41.9, 12.5')
+    await expect(page.getByTestId(mapIds.statusZoom)).toHaveText('Zoom 14')
+    await expect(page.locator('.map-search-marker')).toHaveCount(1)
+    await expect(page.getByTestId(mapIds.searchResult(0))).toBeHidden()
+  })
+
+  test.describe('with the stub local server', () => {
+    let stub: Awaited<ReturnType<typeof startLocalModelServer>>
+
+    test.beforeEach(async () => {
+      stub = await startLocalModelServer()
+    })
+
+    test.afterEach(async () => {
+      await stub?.stop()
+    })
+
+    /**
+     * Runs the scripted "run the average" turn on the local provider until its query card shows.
+     * @param {Page} page - The page.
+     * @param {ArenaApi} api - The ArenaApi fixture.
+     * @returns {Promise<void>} Resolves when the query card shows.
+     */
+    const runAverageLocally = async (page: Page, api: ArenaApi): Promise<void> => {
+      await page.goto(Urls.dataExplorer)
+      await setLocalProvider(page, api, { enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
+      await reloadApp(page)
+
+      await askAnalysis(page, analysisMessages.run)
+      await acceptConsentAndWait(page)
+      await expect(queryCard(page, 'q1')).toBeVisible()
+    }
+
+    test('runs the query and answers with its result', async ({ page, api, sampleSurvey: _ }) => {
+      const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
+      const queryBodies = collectRequestBodies(page, isExplorerQueryRequest)
+
+      await runAverageLocally(page, api)
+
+      const answer = page.getByText(/Average of tree_dec_1 by cluster_id \(query q1\)/)
+      await expect(answer).toContainText('1: 30.5')
+      await expect(answer).toContainText('3: 32.5')
+      await expect(
+        assistantPanel(page).getByTestId(TestId.aiAssistant.composerFooter).getByTestId(TestId.aiAssistant.sentDataChip)
+      ).toHaveAttribute('data-level', 'data')
+      // query_run asks for one row more than the aggregate cap
+      expect(queryBodies.some((body) => body.limit === 201)).toBe(true)
+      // the data turn never went to the gateway; the stub received the turn's model calls
+      expect(gatewayBodies).toEqual([])
+      expect(stub.requests.some((request) => request.path === '/v1/chat/completions')).toBe(true)
+    })
+
+    test('a conversation with record data is not continued without the local server', async ({
+      page,
+      api,
+      sampleSurvey: _,
+    }) => {
+      await runAverageLocally(page, api)
+      const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
+
+      // the local provider is removed: Arena default (cloud) is the default again
+      await setLocalProvider(page, api, { enabled: false, baseUrl: stub.baseUrl, modelId: stub.modelId })
+      await reloadApp(page)
+      await openAssistantPanel(page)
+      // the Explorer selects the Analysis area (schema still allowed on the gateway); the panel starts empty
+      await reopenLastConversation(page)
+
+      const panel = assistantPanel(page)
+      const notice = panel.getByTestId(TestId.aiAssistant.recordDataNotice)
+      await expect(notice).toContainText('This conversation contains record data.')
+      await expect(notice.getByRole('button', { name: 'New conversation' })).toBeVisible()
+      // nothing falls back to the cloud: no gateway request, and the composer is gone so no new turn can be sent
+      expect(gatewayBodies).toEqual([])
+      await expect(panel.getByTestId(TestId.aiAssistant.input)).toHaveCount(0)
+    })
+  })
+})

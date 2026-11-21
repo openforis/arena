@@ -1,6 +1,6 @@
 import * as DomUtils from '@webapp/utils/domUtils'
 
-import { formatCoordinates } from '@webapp/components/MapContainer/workspace/statusbar/coordinateFormat'
+import { formatCoordinates } from '@core/geo/coordinateFormat'
 import type { LatLngLiteral } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 
 const SEPARATOR = ' · '

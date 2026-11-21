@@ -1,0 +1,151 @@
+/**
+ * Mutable holder of the conversation during a turn: each change makes a new conversation object and reports it.
+ */
+import type { AiDataClass } from '@common/ai/features'
+import { toRowContextDisplayText } from '@common/ai/prompts/cleaningRowContext'
+import { uuidv4 } from '@core/uuid'
+
+import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
+import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import { toConversationTitle } from '@webapp/ai/conversations/conversationModel'
+import { escalateConversationDataClass, isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
+import type {
+  AssistantMessage,
+  AssistantMessageStatus,
+  AssistantMessageUsage,
+  Conversation,
+  UserMessage,
+} from '@webapp/ai/conversations/types'
+
+export type TurnState = {
+  get: () => Conversation
+  appendText: (text: string) => void
+  appendReasoning: (text: string) => void
+  startTool: (call: { toolCallId: string; toolName: string; input: unknown }) => void
+  endTool: (result: { toolCallId: string; output: unknown }) => void
+  // the output of a call still running (the progress of a batch)
+  setToolOutput: (result: { toolCallId: string; output: unknown }) => void
+  addChangeSet: (changeSet: ChangeSet) => void
+  escalateDataClass: (dataClass: AiDataClass) => void
+  setQueries: (queries: Record<string, AnalysisQueryEntry>) => void
+  setUsage: (usage: AssistantMessageUsage) => void
+  setTitle: (title: string) => void
+  finish: (status: AssistantMessageStatus, errorKey?: string, errorParams?: Record<string, unknown>) => void
+}
+
+/**
+ * Appends text to the last part of an answer when it has the same type (or starts a new part).
+ * @param {AssistantMessage} message - Answer.
+ * @param {'text'|'reasoning'} type - Part type.
+ * @param {string} text - Text to append.
+ * @returns {AssistantMessage} The new answer.
+ */
+const appendToPart = (message: AssistantMessage, type: 'text' | 'reasoning', text: string): AssistantMessage => {
+  const last = message.parts.at(-1)
+  if (last?.type === type) {
+    return { ...message, parts: [...message.parts.slice(0, -1), { type, text: last.text + text }] }
+  }
+  return { ...message, parts: [...message.parts, { type, text }] }
+}
+
+/**
+ * Starts a turn: adds the user message and an empty streaming answer to the conversation.
+ * @param {object} params - Parameters.
+ * @param {Conversation} params.conversation - Conversation before the turn.
+ * @param {string} params.userMessage - User message.
+ * @param {string} [params.displayText] - What the chat shows instead of the user message.
+ * @param {Function} params.onUpdate - Called with every new conversation object.
+ * @returns {TurnState} The turn state.
+ */
+export const createTurnState = ({
+  conversation,
+  userMessage,
+  displayText,
+  onUpdate,
+}: {
+  conversation: Conversation
+  userMessage: string
+  displayText?: string
+  onUpdate: (conversation: Conversation) => void
+}): TurnState => {
+  const now = new Date().toISOString()
+  // the model needs the row UUIDs of "Ask the assistant", the user does not
+  const shownText = displayText ?? toRowContextDisplayText(userMessage)
+  const user: UserMessage = {
+    id: uuidv4(),
+    role: 'user',
+    text: userMessage,
+    ...(shownText ? { displayText: shownText } : {}),
+    createdAt: now,
+  }
+  const answer: AssistantMessage = { id: uuidv4(), role: 'assistant', parts: [], status: 'streaming', createdAt: now }
+  let current: Conversation = {
+    ...conversation,
+    messages: [...conversation.messages, user, answer],
+    updatedAt: now,
+  }
+  /**
+   * Makes the conversation current and reports it.
+   * @param {Conversation} next - New conversation.
+   * @returns {void}
+   */
+  const set = (next: Conversation) => {
+    current = { ...next, updatedAt: new Date().toISOString() }
+    onUpdate(current)
+  }
+  /**
+   * Updates the answer of the turn.
+   * @param {Function} update - Maps the answer to its new version.
+   * @returns {void}
+   */
+  const updateAnswer = (update: (message: AssistantMessage) => AssistantMessage) =>
+    set({
+      ...current,
+      messages: current.messages.map((message) =>
+        message.id === answer.id && message.role === 'assistant' ? update(message) : message
+      ),
+    })
+  onUpdate(current)
+  return {
+    get: () => current,
+    appendText: (text) => updateAnswer((message) => appendToPart(message, 'text', text)),
+    appendReasoning: (text) => updateAnswer((message) => appendToPart(message, 'reasoning', text)),
+    startTool: ({ toolCallId, toolName, input }) =>
+      updateAnswer((message) => ({
+        ...message,
+        parts: [...message.parts, { type: 'tool', toolCallId, toolName, input, state: 'running' }],
+      })),
+    endTool: ({ toolCallId, output }) =>
+      updateAnswer((message) => ({
+        ...message,
+        parts: message.parts.map((part) =>
+          part.type === 'tool' && part.toolCallId === toolCallId
+            ? { ...part, output, state: isToolErrorOutput(output) ? 'failed' : 'done' }
+            : part
+        ),
+      })),
+    setToolOutput: ({ toolCallId, output }) =>
+      updateAnswer((message) => ({
+        ...message,
+        parts: message.parts.map((part) =>
+          part.type === 'tool' && part.toolCallId === toolCallId ? { ...part, output } : part
+        ),
+      })),
+    addChangeSet: (changeSet) =>
+      set({ ...current, changeSets: { ...current.changeSets, [changeSet.id]: { changeSet } } }),
+    escalateDataClass: (dataClass) => {
+      const next = escalateConversationDataClass({ conversation: current, dataClass })
+      if (next !== current) set(next)
+    },
+    setQueries: (queries) => set({ ...current, queries }),
+    setUsage: (usage) => updateAnswer((message) => ({ ...message, usage })),
+    setTitle: (title) => set({ ...current, title }),
+    finish: (status, errorKey, errorParams) => {
+      // the model gave no title (conversation_setTitle): the first message is the title
+      if (!current.title) current = { ...current, title: toConversationTitle(displayText || userMessage) }
+      updateAnswer((message) =>
+        errorKey ? { ...message, status, errorKey, ...(errorParams ? { errorParams } : {}) } : { ...message, status }
+      )
+    },
+  }
+}
