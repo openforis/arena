@@ -105,9 +105,24 @@ const TAG_HANDLERS: Record<string, (state: DocxState, attributes: string) => voi
   '/w:tr': endRow,
 }
 
-// a WordprocessingML tag (name and attributes), any other tag, or text; the attributes start with a non-word
-// character, so they cannot overlap the name (no backtracking)
-const TOKEN = /<(\/?w:[a-zA-Z]+)([^\w>][^>]*)?>|<[^>]*>|([^<]+)/g
+// a tag (its content between < and >) or text; the tag name is read in code, so the pattern cannot backtrack
+const TOKEN = /<([^>]*)>|([^<]+)/g
+// a WordprocessingML tag name at the start of a tag content ("w:p", "/w:tbl")
+const WORD_TAG_NAME = /^\/?w:[a-zA-Z]+/
+
+/**
+ * Handles a tag: a WordprocessingML tag with a handler gets the text after its name (the attributes).
+ * @param {DocxState} state - Reading state.
+ * @param {string} content - Tag content, between < and >.
+ */
+const handleTag = (state: DocxState, content: string): void => {
+  const name = WORD_TAG_NAME.exec(content)?.[0]
+  if (!name) return
+  const attributes = content.slice(name.length)
+  // a longer name ("w:pPr" is not "w:p") is another tag
+  if (/^\w/.test(attributes)) return
+  TAG_HANDLERS[name]?.(state, attributes)
+}
 
 /**
  * Reads the paragraphs and table rows of a Word document, in document order.
@@ -117,9 +132,9 @@ const TOKEN = /<(\/?w:[a-zA-Z]+)([^\w>][^>]*)?>|<[^>]*>|([^<]+)/g
  */
 export const readDocxBlocks = (xml: string): HandbookBlock[] => {
   const state: DocxState = { blocks: [], paragraph: null, inText: false, tableDepth: 0, row: [], cell: [] }
-  for (const [, tag, attributes = '', text] of xml.matchAll(TOKEN)) {
-    if (tag) TAG_HANDLERS[tag]?.(state, attributes)
-    else if (text && state.inText && state.paragraph) state.paragraph.text += decodeEntities(text)
+  for (const [, tagContent, text] of xml.matchAll(TOKEN)) {
+    if (tagContent !== undefined) handleTag(state, tagContent)
+    else if (state.inText && state.paragraph) state.paragraph.text += decodeEntities(text)
   }
   return state.blocks
 }
