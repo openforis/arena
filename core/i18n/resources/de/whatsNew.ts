@@ -13,17 +13,31 @@ export default {
 Beim ersten Mal wird das Google-Konto über seine E-Mail-Adresse mit Ihrem Arena-Konto verknüpft: Verwenden Sie dieselbe E-Mail-Adresse wie für Ihr Arena-Konto. Eingeladene Benutzer können die Einladung auch mit Google annehmen. Verknüpfen oder trennen Sie Ihr Google-Konto unter **Mein Profil > Anmeldemethoden**; die Anmeldung mit E-Mail und Passwort bleibt verfügbar.`,
     },
     aiFeatures: {
-      title: 'KI-Unterstützung',
-      description: `Aktivieren Sie die KI-Unterstützung unter **Mein Profil > KI-Funktionen** und wählen Sie die gewünschten Funktionen:
+      title: 'KI-Funktionen',
+      description: `Wählen Sie unter **Mein Profil > KI-Funktionen**, **Was die KI sehen darf**:
 
-- **Dokumentations-Chatbot**: eine Hilfeschaltfläche, die Fragen zu Arena beantwortet;
-- **Ausdruckserzeugung und -prüfung**: Ausdrücke im Ausdruckseditor entwerfen und erklären lassen;
-- **Übersetzung von Bezeichnungen**: die Beschriftungen der Erhebung in ihre anderen Sprachen übersetzen (Formular-Designer);
-- **Datenwörterbuch**: ein Datenwörterbuch mit von der KI entworfenen Beschreibungen exportieren (Formular-Designer);
-- **Benutzeraktivität**: Zusammenfassungen des Aktivitätsprotokolls (Dashboard);
-- **Datenabfragen**: Daten-Explorer-Abfragen aus einer Beschreibung in Alltagssprache erstellen.
+- **Nur Hilfe**: Ihre Fragen und Auszüge aus dem Arena-Benutzerhandbuch;
+- **+ Erhebungsdesign**: auch Entitäten, Attribute, Beschriftungen, Kategorien und Ausdrücke (keine erfassten Werte);
+- **+ Erfasste Daten**: auch die Werte der Datensätze und Abfrageergebnisse.
 
-Arena verwendet den vom Administrator eingerichteten KI-Anbieter oder Ihren eigenen Anbieter und API-Schlüssel (OpenAI, Anthropic, Google Gemini und andere).`,
+Mit **Anpassen** schalten Sie einzelne Funktionen ein oder aus. Unter **Anbieter** verwenden Sie den **Arena-Standard** oder fügen Ihren eigenen hinzu: einen **lokalen Server** auf Ihrem Computer oder in Ihrem Netzwerk (z. B. LM Studio oder Ollama) oder einen Cloud-Anbieter mit Ihrem API-Schlüssel (OpenAI, Anthropic, Google Gemini und andere).`,
+    },
+    aiAssistant: {
+      title: 'KI-Assistent',
+      description: `Klicken Sie in der Kopfzeile auf **KI-Assistent**, um ein Panel zu öffnen, das mit dem aktuellen Bildschirm arbeitet:
+
+- **Design**: erstellt und ändert die Erhebung im Formular-Designer;
+- **Analyse**: beantwortet Fragen zu den Daten mit Abfragen;
+- **Bereinigung**: sucht Fehler in den Datensätzen und schlägt Korrekturen vor;
+- **Hilfe**: beantwortet Fragen zu Arena.
+
+Vorgeschlagene Änderungen werden erst angewendet, nachdem Sie sie geprüft haben. Im Panel erscheinen **Vorschläge** (z. B. fehlende Beschriftungen in einer Sprache): Klicken Sie auf einen, damit der Assistent ihn umsetzt.`,
+    },
+    surveyAiPolicy: {
+      title: 'KI-Richtlinie der Erhebung',
+      description: `Unter **Erhebungsinformationen > KI-Richtlinie** legen die Erhebungsadministratoren fest, wo die KI den Inhalt der Erhebung verarbeiten darf, getrennt für das **Erhebungsdesign** und die **Erfassten Daten**: **Aus**, **Auf diesem Gerät** (ein lokaler KI-Server), **Organisationsserver** oder **Cloud**.
+
+Es gilt die strengere Einstellung aus dieser Richtlinie und den Grenzen des Arena-Servers, für alle Benutzer der Erhebung.`,
     },
     mobileUploadEmailNotification: {
       title: 'E-Mail-Benachrichtigung bei aus Arena Mobile hochgeladenen Datensätzen',

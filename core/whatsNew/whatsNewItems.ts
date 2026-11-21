@@ -42,6 +42,20 @@ export const whatsNewItems: WhatsNewItem[] = [
     images: ['/img/whats-new/aiFeatures.png'],
   },
   {
+    id: 'aiAssistant',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    aiFeatures: true,
+    images: ['/img/whats-new/aiAssistant.png'],
+  },
+  {
+    id: 'surveyAiPolicy',
+    version: '3.0.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    aiFeatures: true,
+    images: ['/img/whats-new/surveyAiPolicy.png'],
+  },
+  {
     id: 'dataQueryAiGenerate',
     version: '3.0.0',
     audience: whatsNewAudiences.all,

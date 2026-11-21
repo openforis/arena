@@ -13,17 +13,31 @@ export default {
 La primera vez, la cuenta de Google se vincula a su cuenta de Arena por su dirección de correo electrónico: utilice la misma dirección de correo electrónico de su cuenta de Arena. Los usuarios invitados también pueden aceptar la invitación con Google. Vincule o desvincule su cuenta de Google en **Mi perfil > Métodos de inicio de sesión**; el inicio de sesión con correo electrónico y contraseña sigue disponible.`,
     },
     aiFeatures: {
-      title: 'Asistencia de IA',
-      description: `Active la asistencia de IA en **Mi perfil > Funciones de IA** y elija las funciones que desea usar:
+      title: 'Funciones de IA',
+      description: `En **Mi perfil > Funciones de IA**, elija **Qué puede ver la IA**:
 
-- **Chatbot de documentación**: un botón de ayuda que responde preguntas sobre Arena;
-- **Generación y validación de expresiones**: redacte y explique expresiones en el editor de expresiones;
-- **Traducción de etiquetas**: traduzca las etiquetas de la encuesta a sus otros idiomas (diseñador de formularios);
-- **Diccionario de datos**: exporte un diccionario de datos con descripciones redactadas por la IA (diseñador de formularios);
-- **Actividad del usuario**: resúmenes del registro de actividad (panel de control);
-- **Consultas de datos**: cree consultas del Explorador de datos a partir de una descripción en lenguaje natural.
+- **Solo ayuda**: sus preguntas y fragmentos del manual de usuario de Arena;
+- **+ Diseño de la encuesta**: también entidades, atributos, etiquetas, categorías y expresiones (ningún valor de los registros);
+- **+ Datos de los registros**: también los valores de los registros y los resultados de las consultas.
 
-Arena utiliza el proveedor de IA configurado por el administrador, o su propio proveedor y clave de API (OpenAI, Anthropic, Google Gemini y otros).`,
+Con **Personalizar** activa o desactiva cada función. En **Proveedores**, use el proveedor **Predeterminado de Arena** o añada el suyo: un **Servidor local** en su computadora o su red (p. ej. LM Studio u Ollama) o un proveedor en la nube con su clave API (OpenAI, Anthropic, Google Gemini y otros).`,
+    },
+    aiAssistant: {
+      title: 'Asistente de IA',
+      description: `Haga clic en el botón **Asistente de IA** del encabezado para abrir un panel que trabaja sobre la pantalla que está usando:
+
+- **Diseño**: crea y modifica la encuesta en el diseñador de formularios;
+- **Análisis**: responde preguntas sobre los datos mediante consultas;
+- **Depuración**: busca errores en los registros y propone correcciones;
+- **Ayuda**: responde preguntas sobre Arena.
+
+Los cambios que propone se aplican solo después de que usted los revise. En el panel aparecen **sugerencias** (p. ej. etiquetas que faltan en un idioma): haga clic en una para que el asistente se encargue.`,
+    },
+    surveyAiPolicy: {
+      title: 'Política de IA de la encuesta',
+      description: `En **Información de la encuesta > Política de IA**, los administradores de la encuesta eligen dónde puede la IA procesar el contenido de la encuesta, por separado para el **Diseño de la encuesta** y los **Datos de los registros**: **Desactivada**, **En este dispositivo** (un servidor de IA local), **Servidor de la organización** o **Nube**.
+
+Se aplica la más estricta entre esta política y los límites del servidor de Arena, a todos los usuarios de la encuesta.`,
     },
     mobileUploadEmailNotification: {
       title: 'Notificación por correo electrónico de los registros cargados desde Arena Mobile',

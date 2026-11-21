@@ -13,17 +13,31 @@ export default {
 The first time, the Google account is linked to your Arena account by its email address: use the same email address as your Arena account. Invited users can accept the invitation with Google too. Link or unlink your Google account in **My profile > Sign-in methods**; email and password login is still available.`,
     },
     aiFeatures: {
-      title: 'AI assistance',
-      description: `Turn on AI assistance in **My profile > AI features** and choose the features to use:
+      title: 'AI features',
+      description: `In **My profile > AI features**, choose **What AI can see**:
 
-- **Documentation chatbot**: a help button that answers questions about Arena;
-- **Expression generation & validation**: draft and explain expressions in the expression editor;
-- **Label translation**: translate the survey labels into its other languages (form designer);
-- **Data dictionary**: export a data dictionary with descriptions drafted by AI (form designer);
-- **User activity**: summaries of the activity log (dashboard);
-- **Data queries**: create Data Explorer queries from a plain-language description.
+- **Help only**: your questions and passages from the Arena user manual;
+- **+ Survey design**: also entities, attributes, labels, categories and expressions (no record values);
+- **+ Record data**: also record values and query results.
 
-Arena uses the AI provider set by the administrator, or your own provider and API key (OpenAI, Anthropic, Google Gemini and others).`,
+With **Customize** you turn single features on or off. In **Providers**, use the **Arena default** provider or add your own: a **Local server** on your computer or network (e.g. LM Studio or Ollama) or a cloud provider with your API key (OpenAI, Anthropic, Google Gemini and others).`,
+    },
+    aiAssistant: {
+      title: 'AI assistant',
+      description: `Click the **AI assistant** button in the header to open a panel that works on the screen you are using:
+
+- **Design**: builds and changes the survey in the form designer;
+- **Analysis**: answers questions about the data with queries;
+- **Cleaning**: looks for errors in the records and proposes fixes;
+- **Help**: answers questions about Arena.
+
+The changes it proposes are applied only after you review them. **Suggestions** (e.g. labels missing in a language) appear in the panel: click one to let the assistant do it.`,
+    },
+    surveyAiPolicy: {
+      title: 'AI policy of the survey',
+      description: `In **Survey Info > AI policy**, survey administrators choose where AI may process the content of the survey, separately for the **Survey design** and the **Record data**: **Off**, **On this device** (a local AI server), **Organisation server** or **Cloud**.
+
+The stricter of this policy and the limits of the Arena server applies to every user of the survey.`,
     },
     mobileUploadEmailNotification: {
       title: 'Email notification of the records uploaded from Arena Mobile',

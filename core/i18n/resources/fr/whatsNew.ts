@@ -13,17 +13,31 @@ export default {
 La première fois, le compte Google est associé à votre compte Arena par son adresse e-mail : utilisez la même adresse e-mail que celle de votre compte Arena. Les utilisateurs invités peuvent aussi accepter l'invitation avec Google. Associez ou dissociez votre compte Google dans **Mon profil > Méthodes de connexion** ; la connexion par e-mail et mot de passe reste disponible.`,
     },
     aiFeatures: {
-      title: 'Assistance IA',
-      description: `Activez l'assistance IA dans **Mon profil > Fonctionnalités IA** et choisissez les fonctionnalités à utiliser :
+      title: 'Fonctionnalités IA',
+      description: `Dans **Mon profil > Fonctionnalités IA**, choisissez **Ce que l'IA peut voir** :
 
-- **Chatbot de documentation** : un bouton d'aide qui répond aux questions sur Arena ;
-- **Génération et validation d'expressions** : rédigez et expliquez les expressions dans l'éditeur d'expressions ;
-- **Traduction des libellés** : traduisez les libellés de l'enquête dans ses autres langues (concepteur de formulaires) ;
-- **Dictionnaire de données** : exportez un dictionnaire de données avec des descriptions rédigées par l'IA (concepteur de formulaires) ;
-- **Activité utilisateur** : résumés du journal d'activité (tableau de bord) ;
-- **Requêtes de données** : créez des requêtes de l'Explorateur de données à partir d'une description en langage courant.
+- **Aide seulement** : vos questions et des extraits du manuel d'utilisation d'Arena ;
+- **+ Conception du formulaire** : aussi les entités, attributs, étiquettes, catégories et expressions (aucune valeur des enregistrements) ;
+- **+ Données des enregistrements** : aussi les valeurs des enregistrements et les résultats des requêtes.
 
-Arena utilise le fournisseur d'IA configuré par l'administrateur, ou votre propre fournisseur et votre clé d'API (OpenAI, Anthropic, Google Gemini et d'autres).`,
+Avec **Personnaliser**, vous activez ou désactivez chaque fonctionnalité. Dans **Fournisseurs**, utilisez le **Fournisseur par défaut d'Arena** ou ajoutez le vôtre : un **Serveur local** sur votre ordinateur ou votre réseau (par ex. LM Studio ou Ollama) ou un fournisseur cloud avec votre clé API (OpenAI, Anthropic, Google Gemini et d'autres).`,
+    },
+    aiAssistant: {
+      title: 'Assistant IA',
+      description: `Cliquez sur le bouton **Assistant IA** de l'en-tête pour ouvrir un panneau qui travaille sur l'écran que vous utilisez :
+
+- **Conception** : crée et modifie le formulaire dans le concepteur de formulaires ;
+- **Analyse** : répond aux questions sur les données à l'aide de requêtes ;
+- **Nettoyage** : recherche les erreurs dans les enregistrements et propose des corrections ;
+- **Aide** : répond aux questions sur Arena.
+
+Les modifications proposées ne sont appliquées qu'après votre vérification. Des **suggestions** (par ex. des étiquettes manquantes dans une langue) apparaissent dans le panneau : cliquez sur l'une d'elles pour que l'assistant s'en charge.`,
+    },
+    surveyAiPolicy: {
+      title: "Politique d'IA du formulaire",
+      description: `Dans **Infos du formulaire > Politique d'IA**, les administrateurs du formulaire choisissent où l'IA peut traiter le contenu du formulaire, séparément pour la **Conception du formulaire** et les **Données des enregistrements** : **Désactivée**, **Sur cet appareil** (un serveur d'IA local), **Serveur de l'organisation** ou **Cloud**.
+
+La plus stricte entre cette politique et les limites du serveur Arena s'applique à tous les utilisateurs du formulaire.`,
     },
     mobileUploadEmailNotification: {
       title: 'Notification par e-mail des enregistrements téléversés depuis Arena Mobile',
