@@ -30,20 +30,26 @@ const isVisibleToAudienceByAudience: Record<WhatsNewAudience, (user: any) => boo
  * @param {object} params - The parameters.
  * @param {object} params.user - The user.
  * @param {boolean} [params.experimentalFeatures=false] - Whether experimental features are enabled.
+ * @param {boolean} [params.aiFeaturesEnabled=false] - Whether AI features are enabled on the server.
  * @param {WhatsNewItem[]} [params.items] - The items to filter (defaults to the whole catalog).
  * @returns {WhatsNewItem[]} - The visible items.
  */
 export const getVisibleItems = ({
   user,
   experimentalFeatures = false,
+  aiFeaturesEnabled = false,
   items = whatsNewItems,
 }: {
   user: any
   experimentalFeatures?: boolean
+  aiFeaturesEnabled?: boolean
   items?: WhatsNewItem[]
 }): WhatsNewItem[] =>
   items.filter(
-    (item) => (experimentalFeatures || !item.experimental) && isVisibleToAudienceByAudience[item.audience](user)
+    (item) =>
+      (experimentalFeatures || !item.experimental) &&
+      (aiFeaturesEnabled || !item.aiFeatures) &&
+      isVisibleToAudienceByAudience[item.audience](user)
   )
 
 /**
@@ -52,20 +58,23 @@ export const getVisibleItems = ({
  * @param {object} params - The parameters.
  * @param {object} params.user - The user.
  * @param {boolean} [params.experimentalFeatures=false] - Whether experimental features are enabled.
+ * @param {boolean} [params.aiFeaturesEnabled=false] - Whether AI features are enabled on the server.
  * @param {WhatsNewItem[]} [params.items] - The items to filter (defaults to the whole catalog).
  * @returns {WhatsNewItem[]} - The unseen items (at most maxAutoShownItems).
  */
 export const getUnseenItems = ({
   user,
   experimentalFeatures = false,
+  aiFeaturesEnabled = false,
   items = whatsNewItems,
 }: {
   user: any
   experimentalFeatures?: boolean
+  aiFeaturesEnabled?: boolean
   items?: WhatsNewItem[]
 }): WhatsNewItem[] => {
   const seenIds = new Set(User.getPrefWhatsNewSeenIds(user))
-  return getVisibleItems({ user, experimentalFeatures, items })
+  return getVisibleItems({ user, experimentalFeatures, aiFeaturesEnabled, items })
     .filter((item) => !seenIds.has(item.id))
     .slice(0, maxAutoShownItems)
 }

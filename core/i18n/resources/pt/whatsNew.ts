@@ -113,10 +113,10 @@ Pode escolher a orientação da página (vertical ou horizontal).`,
       description: `No **designer de formulários**, use o menu de um atributo para o **clonar** na mesma entidade ou noutra, com todas as suas propriedades.`,
     },
     odkImport: {
-      title: 'Importar inquéritos e dados do ODK',
-      description: `Crie um novo inquérito a partir de um **formulário ODK (.xml)** e importe os dados recolhidos com o **ODK Collect**.
+      title: 'Importar inventários e dados do ODK',
+      description: `Crie um novo inventário a partir de um **formulário ODK** (XForm, .xml): em **Início > Novo inventário > Importar**, selecione **ODK (.xml)** como **Origem** e clique em **Iniciar importação**. As perguntas do formulário tornam-se atributos, as repetições (repeats) entidades múltiplas e as listas de opções categorias, com as etiquetas em todas as línguas do formulário. Antes de publicar, defina os atributos-chave da entidade raiz e corrija os erros indicados por **Publicar**, se existirem.
 
-*Esta funcionalidade está em fase beta.*`,
+Depois, importe os dados recolhidos com o **ODK Collect** em **Dados > Importação de dados > ODK / ODK Collect**: um ficheiro .zip com uma pasta por submissão (exportação do ODK Briefcase). As submissões já importadas são ignoradas.`,
     },
     dynamicEnumerator: {
       title: 'Enumeração dinâmica de entidades',

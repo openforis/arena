@@ -6,13 +6,38 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
-    loginProviders: {
-      title: "Sign in with Google, Microsoft or your organization's account",
-      description: `In **System Administration > Login providers**, let the users sign in with **Google**, **Microsoft** or any **OpenID Connect** provider (e.g. Keycloak, Okta or the single sign-on of your organization): each provider gets a button on the login page. The provider form shows the redirect URI to register at the provider, the setup steps and a link to a detailed guide; **Test connection** and **Test sign-in** check the configuration without logging anybody in.
+    googleSignIn: {
+      title: 'Sign in with your Google account',
+      description: `On the login page, click **Sign in with Google** to sign in with your Google account (Gmail or Google Workspace) instead of typing your password.
 
-Only users who already have an Arena account or an invitation can sign in: the first time, the account is matched by its verified email address. Invited users can accept the invitation with a provider instead of choosing a password, and every user can link or unlink providers in **My profile > Sign-in methods**. Email and password login is always available.
+The first time, the Google account is linked to your Arena account by its email address: use the same email address as your Arena account. Invited users can accept the invitation with Google too. Link or unlink your Google account in **My profile > Sign-in methods**; email and password login is still available.`,
+    },
+    aiFeatures: {
+      title: 'AI features',
+      description: `In **My profile > AI features**, choose **What AI can see**:
 
-The server needs the \`ARENA_PUBLIC_URL\` and \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` environment variables (see \`.env.template\`).`,
+- **Help only**: your questions and passages from the Arena user manual;
+- **+ Survey design**: also entities, attributes, labels, categories and expressions (no record values);
+- **+ Record data**: also record values and query results.
+
+With **Customize** you turn single features on or off. In **Providers**, use the **Arena default** provider or add your own: a **Local server** on your computer or network (e.g. LM Studio or Ollama) or a cloud provider with your API key (OpenAI, Anthropic, Google Gemini and others).`,
+    },
+    aiAssistant: {
+      title: 'AI assistant',
+      description: `Click the **AI assistant** button in the header to open a panel that works on the screen you are using:
+
+- **Design**: builds and changes the survey in the form designer;
+- **Analysis**: answers questions about the data with queries;
+- **Cleaning**: looks for errors in the records and proposes fixes;
+- **Help**: answers questions about Arena.
+
+The changes it proposes are applied only after you review them. **Suggestions** (e.g. labels missing in a language) appear in the panel: click one to let the assistant do it.`,
+    },
+    surveyAiPolicy: {
+      title: 'AI policy of the survey',
+      description: `In **Survey Info > AI policy**, survey administrators choose where AI may process the content of the survey, separately for the **Survey design** and the **Record data**: **Off**, **On this device** (a local AI server), **Organisation server** or **Cloud**.
+
+The stricter of this policy and the limits of the Arena server applies to every user of the survey.`,
     },
     mobileUploadEmailNotification: {
       title: 'Email notification of the records uploaded from Arena Mobile',
@@ -122,9 +147,15 @@ You can choose the page orientation (portrait or landscape).`,
     },
     odkImport: {
       title: 'Import surveys and data from ODK',
-      description: `Create a new survey from an **ODK form (.xml)** and import the data collected with **ODK Collect**.
+      description: `Create a new survey from an **ODK form** (XForm, .xml): in **Home > New Survey > Import**, select **ODK (.xml)** as **Source**, then click **Start import**. The questions of the form become attributes, the repeats become multiple entities and the choice lists become categories, with the labels in all the languages of the form. Before publishing, define the key attributes of the root entity and fix the errors listed by **Publish**, if any.
 
-*This feature is in beta.*`,
+Then import the data collected with **ODK Collect** in **Data > Data Import > ODK / ODK Collect**: a .zip file with one folder per submission (ODK Briefcase export). Submissions already imported are skipped.`,
+    },
+    positionTracking: {
+      title: 'Position tracking: record the path walked in the field',
+      description: `Check **Position tracking** in the **Basic** tab of a single **Geospatial** attribute: in **Arena Mobile**, the value of the attribute is the path walked by the user while filling in the record, recorded by tracking the position of the device.
+
+The path cannot be edited manually. The option applies only to Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Dynamic enumeration of entities',

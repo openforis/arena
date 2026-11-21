@@ -411,7 +411,7 @@ export default {
     changelog: 'Өөрчлөлтийн түүх',
     whatsNew: 'Шинэ боломжууд',
     termsOfService: 'Үйлчилгээний нөхцөл',
-    privacyNotice: 'Нууцлалын мэдэгдэл',
+    privacyPolicy: 'Нууцлалын бодлого',
     userManual: 'Хэрэглэгчийн гарын авлага',
   },
   surveyDefsLoader: {

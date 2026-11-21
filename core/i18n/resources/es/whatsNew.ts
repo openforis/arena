@@ -6,13 +6,38 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
-    loginProviders: {
-      title: 'Inicio de sesión con Google, Microsoft o la cuenta de su organización',
-      description: `En **Administración del sistema > Proveedores de inicio de sesión**, permita a los usuarios iniciar sesión con **Google**, **Microsoft** o cualquier proveedor **OpenID Connect** (p. ej., Keycloak, Okta o el inicio de sesión único de su organización): cada proveedor tiene un botón en la página de inicio de sesión. El formulario del proveedor muestra el URI de redirección que hay que registrar en el proveedor, los pasos de configuración y un enlace a una guía detallada; **Probar la conexión** y **Probar el inicio de sesión** comprueban la configuración sin iniciar la sesión de nadie.
+    googleSignIn: {
+      title: 'Inicio de sesión con su cuenta de Google',
+      description: `En la página de inicio de sesión, haga clic en **Iniciar sesión con Google** para iniciar sesión con su cuenta de Google (Gmail o Google Workspace) en lugar de escribir su contraseña.
 
-Solo pueden iniciar sesión los usuarios que ya tienen una cuenta de Arena o una invitación: la primera vez, la cuenta se asocia por su dirección de correo verificada. Los usuarios invitados pueden aceptar la invitación con un proveedor en lugar de elegir una contraseña, y cada usuario puede vincular o desvincular proveedores en **Mi perfil > Métodos de inicio de sesión**. El inicio de sesión con correo y contraseña siempre está disponible.
+La primera vez, la cuenta de Google se vincula a su cuenta de Arena por su dirección de correo electrónico: utilice la misma dirección de correo electrónico de su cuenta de Arena. Los usuarios invitados también pueden aceptar la invitación con Google. Vincule o desvincule su cuenta de Google en **Mi perfil > Métodos de inicio de sesión**; el inicio de sesión con correo electrónico y contraseña sigue disponible.`,
+    },
+    aiFeatures: {
+      title: 'Funciones de IA',
+      description: `En **Mi perfil > Funciones de IA**, elija **Qué puede ver la IA**:
 
-El servidor necesita las variables de entorno \`ARENA_PUBLIC_URL\` y \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` (véase \`.env.template\`).`,
+- **Solo ayuda**: sus preguntas y fragmentos del manual de usuario de Arena;
+- **+ Diseño de la encuesta**: también entidades, atributos, etiquetas, categorías y expresiones (ningún valor de los registros);
+- **+ Datos de los registros**: también los valores de los registros y los resultados de las consultas.
+
+Con **Personalizar** activa o desactiva cada función. En **Proveedores**, use el proveedor **Predeterminado de Arena** o añada el suyo: un **Servidor local** en su computadora o su red (p. ej. LM Studio u Ollama) o un proveedor en la nube con su clave API (OpenAI, Anthropic, Google Gemini y otros).`,
+    },
+    aiAssistant: {
+      title: 'Asistente de IA',
+      description: `Haga clic en el botón **Asistente de IA** del encabezado para abrir un panel que trabaja sobre la pantalla que está usando:
+
+- **Diseño**: crea y modifica la encuesta en el diseñador de formularios;
+- **Análisis**: responde preguntas sobre los datos mediante consultas;
+- **Depuración**: busca errores en los registros y propone correcciones;
+- **Ayuda**: responde preguntas sobre Arena.
+
+Los cambios que propone se aplican solo después de que usted los revise. En el panel aparecen **sugerencias** (p. ej. etiquetas que faltan en un idioma): haga clic en una para que el asistente se encargue.`,
+    },
+    surveyAiPolicy: {
+      title: 'Política de IA de la encuesta',
+      description: `En **Información de la encuesta > Política de IA**, los administradores de la encuesta eligen dónde puede la IA procesar el contenido de la encuesta, por separado para el **Diseño de la encuesta** y los **Datos de los registros**: **Desactivada**, **En este dispositivo** (un servidor de IA local), **Servidor de la organización** o **Nube**.
+
+Se aplica la más estricta entre esta política y los límites del servidor de Arena, a todos los usuarios de la encuesta.`,
     },
     mobileUploadEmailNotification: {
       title: 'Notificación por correo electrónico de los registros cargados desde Arena Mobile',
@@ -122,9 +147,15 @@ Puedes elegir la orientación de la página (vertical u horizontal).`,
     },
     odkImport: {
       title: 'Importar encuestas y datos desde ODK',
-      description: `Crea una nueva encuesta a partir de un **formulario ODK (.xml)** e importa los datos recogidos con **ODK Collect**.
+      description: `Cree una nueva encuesta a partir de un **formulario ODK** (XForm, .xml): en **Inicio > Nueva encuesta > Importar**, seleccione **ODK (.xml)** como **Fuente** y haga clic en **Iniciar importación**. Las preguntas del formulario se convierten en atributos, las repeticiones (repeats) en entidades múltiples y las listas de opciones en categorías, con las etiquetas en todos los idiomas del formulario. Antes de publicar, defina los atributos clave de la entidad raíz y corrija los errores indicados por **Publicar**, si los hay.
 
-*Esta función está en fase beta.*`,
+Después, importe los datos recopilados con **ODK Collect** en **Datos > Importación de datos > ODK / ODK Collect**: un archivo .zip con una carpeta por envío (exportación de ODK Briefcase). Los envíos ya importados se omiten.`,
+    },
+    positionTracking: {
+      title: 'Seguimiento de la posición: registrar el recorrido realizado en el campo',
+      description: `Marque **Seguimiento de la posición** en la pestaña **Básico** de un atributo **Geoespacial** simple: en **Arena Mobile**, el valor del atributo es el recorrido realizado por el usuario mientras rellena el registro, registrado siguiendo la posición del dispositivo.
+
+El recorrido no se puede editar manualmente. La opción se aplica solo a Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Enumeración dinámica de entidades',

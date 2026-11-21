@@ -232,7 +232,6 @@ export class RecordForm {
 
   /**
    * Selects the entity to edit in a multiple entity form page, by its key.
-   * The selector is a native select, or a MUI Select when the experimental features are enabled.
    * @param {string} keyLabel - Label of the key attribute.
    * @param {string} keyValue - Value of the key attribute.
    * @returns {Promise<void>} - Resolves when the entity has been selected.
@@ -240,9 +239,7 @@ export class RecordForm {
   async selectEntity(keyLabel: string, keyValue: string): Promise<void> {
     const label = `${keyLabel}: ${keyValue}`
     const select = this.page.getByTestId(TestId.entities.form.nodeSelect)
-    if ((await select.evaluate((el) => el.tagName)) === 'SELECT') {
-      await select.selectOption({ label })
-    } else if (!((await select.textContent()) ?? '').includes(label)) {
+    if (!((await select.textContent()) ?? '').includes(label)) {
       await select.locator('[role="combobox"]').click()
       await this.page.getByRole('option', { name: label }).click()
     }

@@ -20,6 +20,8 @@ export type WhatsNewItem = {
   audience: WhatsNewAudience
   /** When true, the item is visible only if the EXPERIMENTAL_FEATURES env variable is set. */
   experimental?: boolean
+  /** When true, the item is visible only if AI features are enabled on the server (AI_FEATURES_ENABLED). */
+  aiFeatures?: boolean
   /** Optional image paths (e.g. '/img/whats-new/<id>.png', stored in web-resources/img/whats-new), shown in a carousel when more than one. */
   images?: string[]
 }
@@ -27,10 +29,50 @@ export type WhatsNewItem = {
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
   {
-    id: 'loginProviders',
-    version: '2.14.0',
-    audience: whatsNewAudiences.systemAdmin,
-    images: ['/img/whats-new/loginProviders.png', '/img/whats-new/loginProvidersAdmin.png'],
+    id: 'googleSignIn',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    images: ['/img/whats-new/googleSignIn.png'],
+  },
+  {
+    id: 'aiFeatures',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    aiFeatures: true,
+    images: ['/img/whats-new/aiFeatures.png'],
+  },
+  {
+    id: 'aiAssistant',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    aiFeatures: true,
+    images: ['/img/whats-new/aiAssistant.png'],
+  },
+  {
+    id: 'surveyAiPolicy',
+    version: '3.0.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    aiFeatures: true,
+    images: ['/img/whats-new/surveyAiPolicy.png'],
+  },
+  {
+    id: 'dataQueryAiGenerate',
+    version: '3.0.0',
+    audience: whatsNewAudiences.all,
+    aiFeatures: true,
+    images: ['/img/whats-new/dataQueryAiGenerate.png'],
+  },
+  {
+    id: 'odkImport',
+    version: '3.0.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    images: ['/img/whats-new/odkImport.png', '/img/whats-new/odkDataImport.png'],
+  },
+  {
+    id: 'positionTracking',
+    version: '3.0.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    images: ['/img/whats-new/positionTracking.png'],
   },
   { id: 'mobileUploadEmailNotification', version: '2.13.2', audience: whatsNewAudiences.surveyAdmin },
   { id: 'surveyGuestRole', version: '2.13.0', audience: whatsNewAudiences.surveyAdmin },
@@ -122,26 +164,12 @@ export const whatsNewItems: WhatsNewItem[] = [
     audience: whatsNewAudiences.systemAdmin,
     images: ['/img/whats-new/systemLogs.png'],
   },
-  {
-    id: 'dataQueryAiGenerate',
-    version: '2.9.4',
-    audience: whatsNewAudiences.all,
-    experimental: true,
-    images: ['/img/whats-new/dataQueryAiGenerate.png'],
-  },
   { id: 'recordPrint', version: '2.9.0', audience: whatsNewAudiences.all, images: ['/img/whats-new/recordPrint.png'] },
   {
     id: 'attributeClone',
     version: '2.9.0',
     audience: whatsNewAudiences.surveyAdmin,
     images: ['/img/whats-new/attributeClone.png'],
-  },
-  {
-    id: 'odkImport',
-    version: '2.8.3',
-    audience: whatsNewAudiences.surveyAdmin,
-    experimental: true,
-    images: ['/img/whats-new/odkImport.png'],
   },
   {
     id: 'dynamicEnumerator',

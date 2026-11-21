@@ -440,7 +440,7 @@ Pokušati ponovo?`,
     changelog: 'Dnevnik izmjena',
     whatsNew: 'Šta je novo',
     termsOfService: 'Uslovi korišćenja',
-    privacyNotice: 'Obavještenje o privatnosti',
+    privacyPolicy: 'Politika privatnosti',
     userManual: 'Korisničko uputstvo',
   },
   surveyDefsLoader: {

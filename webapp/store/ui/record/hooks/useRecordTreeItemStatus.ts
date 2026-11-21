@@ -10,7 +10,6 @@ import * as RecordCore from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
-import * as SystemInfoState from '@webapp/store/system/info/state'
 import * as RecordState from '../state'
 import {
   getMultiplePageScopeEntityUuid as resolveMultiplePageScopeEntityUuid,
@@ -308,11 +307,6 @@ export const useRecordTreeItemStatus = ({
       descendantPageUuids,
       descendantPageUuidsByPage,
       isTreeItemExpanded,
-    }
-
-    const experimentalFeatures = SystemInfoState.getConfigExperimentalFeatures(state)
-    if (!experimentalFeatures) {
-      return getNonMultipleTreeItemStatus(state, params, { instanceScoped: false })
     }
 
     const survey = SurveyState.getSurvey(state)

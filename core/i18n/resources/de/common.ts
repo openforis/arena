@@ -412,7 +412,7 @@ Erneut versuchen?`,
     changelog: 'Änderungsprotokoll',
     whatsNew: 'Neuigkeiten',
     termsOfService: 'Nutzungsbedingungen',
-    privacyNotice: 'Datenschutzhinweis',
+    privacyPolicy: 'Datenschutzerklärung',
     userManual: 'Benutzerhandbuch',
   },
   surveyDefsLoader: {

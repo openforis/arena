@@ -6,13 +6,38 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
-    loginProviders: {
-      title: 'Connexion avec Google, Microsoft ou le compte de votre organisation',
-      description: `Dans **Administration du système > Fournisseurs de connexion**, permettez aux utilisateurs de se connecter avec **Google**, **Microsoft** ou tout fournisseur **OpenID Connect** (par ex. Keycloak, Okta ou l'authentification unique de votre organisation) : chaque fournisseur a un bouton sur la page de connexion. Le formulaire du fournisseur indique l'URI de redirection à enregistrer chez le fournisseur, les étapes de configuration et un lien vers un guide détaillé ; **Tester la connexion** et **Tester la connexion utilisateur** vérifient la configuration sans connecter personne.
+    googleSignIn: {
+      title: 'Connexion avec votre compte Google',
+      description: `Sur la page de connexion, cliquez sur **Se connecter avec Google** pour vous connecter avec votre compte Google (Gmail ou Google Workspace) au lieu de saisir votre mot de passe.
 
-Seuls les utilisateurs qui ont déjà un compte Arena ou une invitation peuvent se connecter : la première fois, le compte est associé par son adresse e-mail vérifiée. Les utilisateurs invités peuvent accepter l'invitation avec un fournisseur au lieu de choisir un mot de passe, et chaque utilisateur peut lier ou délier des fournisseurs dans **Mon profil > Méthodes de connexion**. La connexion par e-mail et mot de passe reste toujours disponible.
+La première fois, le compte Google est associé à votre compte Arena par son adresse e-mail : utilisez la même adresse e-mail que celle de votre compte Arena. Les utilisateurs invités peuvent aussi accepter l'invitation avec Google. Associez ou dissociez votre compte Google dans **Mon profil > Méthodes de connexion** ; la connexion par e-mail et mot de passe reste disponible.`,
+    },
+    aiFeatures: {
+      title: 'Fonctionnalités IA',
+      description: `Dans **Mon profil > Fonctionnalités IA**, choisissez **Ce que l'IA peut voir** :
 
-Le serveur a besoin des variables d'environnement \`ARENA_PUBLIC_URL\` et \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` (voir \`.env.template\`).`,
+- **Aide seulement** : vos questions et des extraits du manuel d'utilisation d'Arena ;
+- **+ Conception du formulaire** : aussi les entités, attributs, étiquettes, catégories et expressions (aucune valeur des enregistrements) ;
+- **+ Données des enregistrements** : aussi les valeurs des enregistrements et les résultats des requêtes.
+
+Avec **Personnaliser**, vous activez ou désactivez chaque fonctionnalité. Dans **Fournisseurs**, utilisez le **Fournisseur par défaut d'Arena** ou ajoutez le vôtre : un **Serveur local** sur votre ordinateur ou votre réseau (par ex. LM Studio ou Ollama) ou un fournisseur cloud avec votre clé API (OpenAI, Anthropic, Google Gemini et d'autres).`,
+    },
+    aiAssistant: {
+      title: 'Assistant IA',
+      description: `Cliquez sur le bouton **Assistant IA** de l'en-tête pour ouvrir un panneau qui travaille sur l'écran que vous utilisez :
+
+- **Conception** : crée et modifie le formulaire dans le concepteur de formulaires ;
+- **Analyse** : répond aux questions sur les données à l'aide de requêtes ;
+- **Nettoyage** : recherche les erreurs dans les enregistrements et propose des corrections ;
+- **Aide** : répond aux questions sur Arena.
+
+Les modifications proposées ne sont appliquées qu'après votre vérification. Des **suggestions** (par ex. des étiquettes manquantes dans une langue) apparaissent dans le panneau : cliquez sur l'une d'elles pour que l'assistant s'en charge.`,
+    },
+    surveyAiPolicy: {
+      title: "Politique d'IA du formulaire",
+      description: `Dans **Infos du formulaire > Politique d'IA**, les administrateurs du formulaire choisissent où l'IA peut traiter le contenu du formulaire, séparément pour la **Conception du formulaire** et les **Données des enregistrements** : **Désactivée**, **Sur cet appareil** (un serveur d'IA local), **Serveur de l'organisation** ou **Cloud**.
+
+La plus stricte entre cette politique et les limites du serveur Arena s'applique à tous les utilisateurs du formulaire.`,
     },
     mobileUploadEmailNotification: {
       title: 'Notification par e-mail des enregistrements téléversés depuis Arena Mobile',
@@ -121,10 +146,16 @@ Vous pouvez choisir l'orientation de la page (portrait ou paysage).`,
       description: `Dans le **concepteur de formulaires**, utilisez le menu d'un attribut pour le **cloner** dans la même entité ou dans une autre, avec toutes ses propriétés.`,
     },
     odkImport: {
-      title: 'Importer des enquêtes et des données depuis ODK',
-      description: `Créez une nouvelle enquête à partir d'un **formulaire ODK (.xml)** et importez les données collectées avec **ODK Collect**.
+      title: 'Importer des formulaires et des données depuis ODK',
+      description: `Créez un nouveau formulaire à partir d'un **formulaire ODK** (XForm, .xml) : dans **Accueil > Nouveau formulaire > Importer**, sélectionnez **ODK (.xml)** comme **Source**, puis cliquez sur **Démarrer l'importation**. Les questions du formulaire deviennent des attributs, les répétitions (repeats) des entités multiples et les listes de choix des catégories, avec les étiquettes dans toutes les langues du formulaire. Avant de publier, définissez les attributs clés de l'entité racine et corrigez les éventuelles erreurs signalées par **Publier**.
 
-*Cette fonctionnalité est en version bêta.*`,
+Importez ensuite les données collectées avec **ODK Collect** dans **Données > Importation de données > ODK / ODK Collect** : un fichier .zip avec un dossier par soumission (export ODK Briefcase). Les soumissions déjà importées sont ignorées.`,
+    },
+    positionTracking: {
+      title: 'Suivi de la position : enregistrer le trajet parcouru sur le terrain',
+      description: `Cochez **Suivi de la position** dans l'onglet **Basique** d'un attribut **Géospatial** simple : dans **Arena Mobile**, la valeur de l'attribut est le trajet parcouru par l'utilisateur pendant la saisie de l'enregistrement, enregistré en suivant la position de l'appareil.
+
+Le trajet ne peut pas être modifié manuellement. L'option s'applique uniquement à Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Énumération dynamique des entités',

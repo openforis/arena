@@ -1,7 +1,7 @@
 /**
  * Tests for the "What's new" feature catalog and selectors:
  * - catalog consistency (unique ids, versions listed in CHANGELOG.md, English texts defined);
- * - visibility by audience and experimental flag;
+ * - visibility by audience, experimental flag and AI features;
  * - unseen items (dismissed items tracked by id in the user prefs).
  */
 import fs from 'fs'
@@ -27,6 +27,11 @@ const items: WhatsNew.WhatsNewItem[] = [
   { id: 'forSurveyAdmins', version: '1.0.1', audience: whatsNewAudiences.surveyAdmin },
   { id: 'forSystemAdmins', version: '1.0.1', audience: whatsNewAudiences.systemAdmin },
   { id: 'experimentalForAll', version: '1.0.0', audience: whatsNewAudiences.all, experimental: true },
+]
+
+const aiItems: WhatsNew.WhatsNewItem[] = [
+  { id: 'forAll', version: '1.0.2', audience: whatsNewAudiences.all },
+  { id: 'aiForAll', version: '1.0.1', audience: whatsNewAudiences.all, aiFeatures: true },
 ]
 
 const ids = (itemsToMap: WhatsNew.WhatsNewItem[]) => itemsToMap.map((item) => item.id)
@@ -89,6 +94,14 @@ describe('WhatsNew.getVisibleItems', () => {
     expect(ids(WhatsNew.getVisibleItems({ user: dataEditor, experimentalFeatures: true, items }))).toEqual([
       'forAll',
       'experimentalForAll',
+    ])
+  })
+
+  test('AI items visible only when AI features are enabled', () => {
+    expect(ids(WhatsNew.getVisibleItems({ user: dataEditor, items: aiItems }))).toEqual(['forAll'])
+    expect(ids(WhatsNew.getVisibleItems({ user: dataEditor, aiFeaturesEnabled: true, items: aiItems }))).toEqual([
+      'forAll',
+      'aiForAll',
     ])
   })
 })

@@ -407,7 +407,7 @@ export default {
     changelog: '変更履歴',
     whatsNew: '新機能',
     termsOfService: '利用規約',
-    privacyNotice: 'プライバシーに関する通知',
+    privacyPolicy: 'プライバシーポリシー',
     userManual: 'ユーザーマニュアル',
   },
   surveyDefsLoader: {

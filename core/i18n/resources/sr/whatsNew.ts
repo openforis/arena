@@ -114,9 +114,9 @@ Možete izabrati orijentaciju stranice (uspravna ili položena).`,
     },
     odkImport: {
       title: 'Uvoz istraživanja i podataka iz ODK',
-      description: `Kreirajte novo istraživanje iz **ODK obrasca (.xml)** i uvezite podatke prikupljene pomoću **ODK Collect**.
+      description: `Kreirajte novo istraživanje iz **ODK obrasca** (XForm, .xml): u **Početna > Novo istraživanje > Uvezi** izaberite **ODK (.xml)** kao **Izvor**, a zatim kliknite na **Pokreni uvoz**. Pitanja iz obrasca postaju atributi, ponavljanja (repeats) višestruki entiteti, a liste izbora kategorije, sa oznakama na svim jezicima obrasca. Pre objavljivanja definišite ključne atribute korenskog entiteta i ispravite greške koje prikaže **Objavi**, ako ih ima.
 
-*Ova funkcija je u beta fazi.*`,
+Zatim uvezite podatke prikupljene pomoću **ODK Collect** u **Podaci > Uvoz podataka > ODK / ODK Collect**: .zip datoteka sa jednom fasciklom po podnesku (ODK Briefcase izvoz). Već uvezeni podnesci se preskaču.`,
     },
     dynamicEnumerator: {
       title: 'Dinamičko nabrajanje entiteta',

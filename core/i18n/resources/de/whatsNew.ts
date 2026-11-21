@@ -6,13 +6,38 @@ export default {
   slideCounter: '{{current}} von {{total}}',
   noItems: 'Keine neuen Funktionen vorhanden.',
   items: {
-    loginProviders: {
-      title: 'Mit Google, Microsoft oder dem Konto Ihrer Organisation anmelden',
-      description: `Unter **Systemverwaltung > Anmeldeanbieter** können Sie Benutzern die Anmeldung mit **Google**, **Microsoft** oder einem beliebigen **OpenID-Connect-Anbieter** (z. B. Keycloak, Okta oder dem Single Sign-on Ihrer Organisation) ermöglichen. Jeder Anbieter erhält eine Schaltfläche auf der Anmeldeseite. Das Anbieterformular zeigt die beim Anbieter zu registrierende Weiterleitungs-URI, die Einrichtungsschritte und einen Link zu einer ausführlichen Anleitung. Mit **Verbindung testen** und **Anmeldung testen** lässt sich die Konfiguration prüfen, ohne jemanden anzumelden.
+    googleSignIn: {
+      title: 'Mit Ihrem Google-Konto anmelden',
+      description: `Klicken Sie auf der Anmeldeseite auf **Mit Google anmelden**, um sich mit Ihrem Google-Konto (Gmail oder Google Workspace) anzumelden, ohne Ihr Passwort einzugeben.
 
-Nur Benutzer, die bereits ein Arena-Konto oder eine Einladung besitzen, können sich anmelden. Bei der ersten Anmeldung wird das Konto anhand der bestätigten E-Mail-Adresse zugeordnet. Eingeladene Benutzer können die Einladung über einen Anbieter annehmen, anstatt ein Passwort festzulegen. Jeder Benutzer kann unter **Mein Profil > Anmeldemethoden** Anbieter verknüpfen oder entfernen. Die Anmeldung mit E-Mail-Adresse und Passwort bleibt immer verfügbar.
+Beim ersten Mal wird das Google-Konto über seine E-Mail-Adresse mit Ihrem Arena-Konto verknüpft: Verwenden Sie dieselbe E-Mail-Adresse wie für Ihr Arena-Konto. Eingeladene Benutzer können die Einladung auch mit Google annehmen. Verknüpfen oder trennen Sie Ihr Google-Konto unter **Mein Profil > Anmeldemethoden**; die Anmeldung mit E-Mail und Passwort bleibt verfügbar.`,
+    },
+    aiFeatures: {
+      title: 'KI-Funktionen',
+      description: `Wählen Sie unter **Mein Profil > KI-Funktionen**, **Was die KI sehen darf**:
 
-Auf dem Server müssen die Umgebungsvariablen \`ARENA_PUBLIC_URL\` und \`AUTH_PROVIDER_SECRET_ENCRYPTION_KEY\` gesetzt sein (siehe \`.env.template\`).`,
+- **Nur Hilfe**: Ihre Fragen und Auszüge aus dem Arena-Benutzerhandbuch;
+- **+ Erhebungsdesign**: auch Entitäten, Attribute, Beschriftungen, Kategorien und Ausdrücke (keine erfassten Werte);
+- **+ Erfasste Daten**: auch die Werte der Datensätze und Abfrageergebnisse.
+
+Mit **Anpassen** schalten Sie einzelne Funktionen ein oder aus. Unter **Anbieter** verwenden Sie den **Arena-Standard** oder fügen Ihren eigenen hinzu: einen **lokalen Server** auf Ihrem Computer oder in Ihrem Netzwerk (z. B. LM Studio oder Ollama) oder einen Cloud-Anbieter mit Ihrem API-Schlüssel (OpenAI, Anthropic, Google Gemini und andere).`,
+    },
+    aiAssistant: {
+      title: 'KI-Assistent',
+      description: `Klicken Sie in der Kopfzeile auf **KI-Assistent**, um ein Panel zu öffnen, das mit dem aktuellen Bildschirm arbeitet:
+
+- **Design**: erstellt und ändert die Erhebung im Formular-Designer;
+- **Analyse**: beantwortet Fragen zu den Daten mit Abfragen;
+- **Bereinigung**: sucht Fehler in den Datensätzen und schlägt Korrekturen vor;
+- **Hilfe**: beantwortet Fragen zu Arena.
+
+Vorgeschlagene Änderungen werden erst angewendet, nachdem Sie sie geprüft haben. Im Panel erscheinen **Vorschläge** (z. B. fehlende Beschriftungen in einer Sprache): Klicken Sie auf einen, damit der Assistent ihn umsetzt.`,
+    },
+    surveyAiPolicy: {
+      title: 'KI-Richtlinie der Erhebung',
+      description: `Unter **Erhebungsinformationen > KI-Richtlinie** legen die Erhebungsadministratoren fest, wo die KI den Inhalt der Erhebung verarbeiten darf, getrennt für das **Erhebungsdesign** und die **Erfassten Daten**: **Aus**, **Auf diesem Gerät** (ein lokaler KI-Server), **Organisationsserver** oder **Cloud**.
+
+Es gilt die strengere Einstellung aus dieser Richtlinie und den Grenzen des Arena-Servers, für alle Benutzer der Erhebung.`,
     },
     mobileUploadEmailNotification: {
       title: 'E-Mail-Benachrichtigung bei aus Arena Mobile hochgeladenen Datensätzen',
@@ -126,9 +151,15 @@ Sie können zwischen Hoch- und Querformat wählen.`,
     },
     odkImport: {
       title: 'Erhebungen und Daten aus ODK importieren',
-      description: `Erstellen Sie eine neue Erhebung aus einem **ODK-Formular (.xml)** und importieren Sie die mit **ODK Collect** erhobenen Daten.
+      description: `Erstellen Sie eine neue Erhebung aus einem **ODK-Formular** (XForm, .xml): Wählen Sie unter **Startseite > Neue Erhebung > Import** als **Quelle** **ODK (.xml)** und klicken Sie auf **Import starten**. Die Fragen des Formulars werden zu Attributen, die Wiederholungen (Repeats) zu mehrfachen Entitäten und die Auswahllisten zu Kategorien, mit den Beschriftungen in allen Sprachen des Formulars. Legen Sie vor der Veröffentlichung die Schlüsselattribute der Stammentität fest und beheben Sie gegebenenfalls die unter **Veröffentlichen** angezeigten Fehler.
 
-*Diese Funktion befindet sich in der Betaphase.*`,
+Importieren Sie anschließend die mit **ODK Collect** erhobenen Daten unter **Daten > Datenimport > ODK / ODK Collect**: eine .zip-Datei mit einem Ordner pro Übermittlung (ODK-Briefcase-Export). Bereits importierte Übermittlungen werden übersprungen.`,
+    },
+    positionTracking: {
+      title: 'Positionsverfolgung: den im Gelände zurückgelegten Weg aufzeichnen',
+      description: `Aktivieren Sie **Positionsverfolgung** auf der Registerkarte **Allgemein** eines einfachen **Geodaten**-Attributs: In **Arena Mobile** ist der Wert des Attributs der Weg, den der Benutzer beim Ausfüllen des Datensatzes zurücklegt, aufgezeichnet durch Verfolgung der Geräteposition.
+
+Der Weg kann nicht manuell bearbeitet werden. Die Option gilt nur für Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Dynamische Aufzählung von Entitäten',
