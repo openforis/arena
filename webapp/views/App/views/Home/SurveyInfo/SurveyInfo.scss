@@ -35,8 +35,13 @@
   .survey-info-branding-form,
   .extra-prop-defs-editor,
   .survey-security-editor,
+  .survey-ai-policy,
   .survey-configuration {
     justify-self: center;
+  }
+
+  .survey-ai-policy {
+    width: min(56rem, 100%);
   }
 
   .survey-info-branding-form {
