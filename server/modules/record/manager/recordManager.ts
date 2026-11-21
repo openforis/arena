@@ -445,7 +445,7 @@ export const updateRecordsStep = (
     stepFrom,
     stepTo,
     recordUuids,
-  }: { user: ArenaUser; surveyId: number; cycle: string; stepFrom: any; stepTo: any; recordUuids: string[] },
+  }: { user: ArenaUser; surveyId: number; cycle: string; stepFrom: string; stepTo: string; recordUuids: string[] },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {

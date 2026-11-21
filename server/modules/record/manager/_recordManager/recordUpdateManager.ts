@@ -7,6 +7,7 @@ import {
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
+  type ArenaValidation,
 } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -64,8 +65,8 @@ export const initNewRecord = async (
     record: ArenaRecord
     timezoneOffset?: number
     lang: string
-    nodesUpdateListener?: any
-    nodesValidationListener?: any
+    nodesUpdateListener?: (nodes: NodesByUuid) => void
+    nodesValidationListener?: (validation: ArenaValidation) => void
     createMultipleEntities?: boolean
   },
   client: DbClient = db
@@ -122,8 +123,8 @@ const _applyGroupQualifierValues = async (
     record: ArenaRecord
     timezoneOffset?: number
     lang: string
-    nodesUpdateListener: any
-    nodesValidationListener: any
+    nodesUpdateListener: (nodes: NodesByUuid) => void
+    nodesValidationListener: (validation: ArenaValidation) => void
   },
   client: DbClient
 ) => {
@@ -307,8 +308,8 @@ export const persistNode = (
     node: ArenaRecordNode
     timezoneOffset?: number
     lang: string
-    nodesUpdateListener?: any
-    nodesValidationListener?: any
+    nodesUpdateListener?: (nodes: NodesByUuid) => void
+    nodesValidationListener?: (validation: ArenaValidation) => void
     system?: boolean
     createMultipleEntities?: boolean
     clearNonApplicableValues?: boolean
@@ -364,8 +365,8 @@ export const deleteNode = (
     nodeUuid: string
     timezoneOffset?: number
     lang: string
-    nodesUpdateListener?: any
-    nodesValidationListener?: any
+    nodesUpdateListener?: (nodes: NodesByUuid) => void
+    nodesValidationListener?: (validation: ArenaValidation) => void
     clearNonApplicableValues?: boolean
   },
   t: DbClient = db
@@ -415,8 +416,8 @@ const _updateNodeAndValidateRecordUniqueness = (
     lang: string
     clearNonApplicableValues?: boolean
     nodesUpdateFn: any
-    nodesUpdateListener?: any
-    nodesValidationListener?: any
+    nodesUpdateListener?: (nodes: NodesByUuid) => void
+    nodesValidationListener?: (validation: ArenaValidation) => void
   },
   client: DbClient = db
 ) =>
@@ -532,8 +533,8 @@ const _onNodesUpdate = async (
     timezoneOffset?: number
     lang: string
     clearNonApplicableValues: boolean
-    nodesUpdateListener: any
-    nodesValidationListener: any
+    nodesUpdateListener: (nodes: NodesByUuid) => void
+    nodesValidationListener: (validation: ArenaValidation) => void
   },
   t: DbClient
 ) => {
@@ -572,7 +573,12 @@ const _afterNodesUpdate = async (
     record,
     nodes,
     nodesValidationListener = null,
-  }: { survey: ArenaSurvey; record: ArenaRecord; nodes: NodesByUuid; nodesValidationListener?: any },
+  }: {
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodes: NodesByUuid
+    nodesValidationListener?: (validation: ArenaValidation) => void
+  },
   t: DbClient
 ) => {
   if (Record.isPreview(record)) return
@@ -629,7 +635,13 @@ const validateNodesAndPersistToRDB = async (
     record,
     nodes,
     nodesValidationListener = null,
-  }: { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord; nodes: NodesByUuid; nodesValidationListener?: any },
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    nodes: NodesByUuid
+    nodesValidationListener?: (validation: ArenaValidation) => void
+  },
   t: DbClient
 ) => {
   const nodesArray = Object.values(nodes)

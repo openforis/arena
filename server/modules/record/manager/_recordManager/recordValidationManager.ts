@@ -8,6 +8,7 @@ import {
   type ArenaRecord,
   type ArenaSurvey,
   ArenaAnyNodeDef,
+  type ArenaValidation,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -35,7 +36,7 @@ const _processAndPersistValidation = async (
     record,
     nodesValidation,
     startValidation,
-  }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: any; startValidation: any },
+  }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: ArenaValidation; startValidation: ArenaValidation },
   tx: DbClient
 ) => {
   const validationUpdated = A.pipe(
@@ -48,7 +49,7 @@ const _processAndPersistValidation = async (
 }
 
 export const replaceAndPersistValidation = (
-  { survey, record, nodesValidation }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: any },
+  { survey, record, nodesValidation }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: ArenaValidation },
   tx: DbClient
 ) => {
   const startValidation = Validation.newInstance()
@@ -56,7 +57,7 @@ export const replaceAndPersistValidation = (
 }
 
 export const mergeAndPersistValidation = (
-  { survey, record, nodesValidation }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: any },
+  { survey, record, nodesValidation }: { survey: ArenaSurvey; record: ArenaRecord; nodesValidation: ArenaValidation },
   tx: DbClient
 ) => {
   const startValidation = Record.getValidation(record)
@@ -179,8 +180,8 @@ export const validateRecordsUniquenessAndPersistValidation = async (
     cycle: string
     nodeDefsUnique: ArenaAnyNodeDef[]
     nodesUnique: ArenaRecordNode[]
-    recordUuidsExcluded: any
-    errorKey: any
+    recordUuidsExcluded: string[]
+    errorKey: string
   },
   t: DbClient
 ) => {

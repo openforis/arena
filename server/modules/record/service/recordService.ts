@@ -1,3 +1,4 @@
+import type { Response as ExpressResponse } from 'express'
 import * as fs from 'node:fs'
 import { randomBytes } from 'node:crypto'
 
@@ -107,7 +108,7 @@ export const createRecord = ({
 }: {
   user: ArenaUser
   surveyId: number
-  recordToCreate: any
+  recordToCreate: ArenaRecord
 }) => {
   Logger.debug('creating record: ', recordToCreate)
 
@@ -203,7 +204,7 @@ export const exportRecordsSummary = async ({
   ownerUuid = null,
   user,
 }: {
-  res: any
+  res: ExpressResponse
   surveyId: number
   cycle: string
   fileFormat: string
@@ -309,7 +310,7 @@ export const deleteRecord = async ({
   user: ArenaUser
   surveyId: number
   recordUuid: string
-  notifySameUser?: any
+  notifySameUser?: boolean
 }) => {
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
@@ -384,7 +385,7 @@ export const checkIn = async ({
   surveyId: number
   recordUuid: string
   draft: boolean
-  timezoneOffset: any
+  timezoneOffset: number
   lang: string
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
@@ -696,7 +697,7 @@ export const deleteNode = ({
   draft: boolean
   recordUuid: string
   nodeUuid: string
-  timezoneOffset: any
+  timezoneOffset: number
   lang: string
   clearNonApplicableValuesConfirmed?: boolean
 }) =>
@@ -930,10 +931,10 @@ const generateDocumentWithQrCode = async ({
   recordUuid: string
   entityDefUuid: string
   entityNodeUuid: string
-  serverUrl: any
+  serverUrl: string
   generatorOptions: any
   generator: any
-  extension: any
+  extension: string
 }) => {
   if (!serverUrl) {
     throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
@@ -989,17 +990,17 @@ const exportRecordDocument = async ({
   user: ArenaUser
   surveyId: number
   recordUuid: string
-  outputStream: any
+  outputStream: ExpressResponse
   lang: string
   generator: any
-  extension: any
+  extension: string
   contentType: any
   exportScope?: any
   entityDefUuid: string
   entityNodeUuid: string
   orientation?: any
   includeQrCode?: boolean
-  serverUrl?: any
+  serverUrl?: string
 }) => {
   if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeUuid)) {
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
@@ -1124,14 +1125,14 @@ export const exportRecordDocx = ({
   user: ArenaUser
   surveyId: number
   recordUuid: string
-  outputStream: any
+  outputStream: ExpressResponse
   lang?: string
   exportScope: any
   entityDefUuid: string
   entityNodeUuid: string
   orientation: any
   includeQrCode: boolean
-  serverUrl: any
+  serverUrl: string
 }) =>
   exportRecordDocument({
     user,
@@ -1166,14 +1167,14 @@ export const exportRecordPdf = ({
   user: ArenaUser
   surveyId: number
   recordUuid: string
-  outputStream: any
+  outputStream: ExpressResponse
   lang?: string
   exportScope: any
   entityDefUuid: string
   entityNodeUuid: string
   orientation: any
   includeQrCode: boolean
-  serverUrl: any
+  serverUrl: string
 }) =>
   exportRecordDocument({
     user,

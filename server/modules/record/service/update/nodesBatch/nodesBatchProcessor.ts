@@ -1,7 +1,8 @@
+import type { DbClient } from '@server/db/db'
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { Authorizer } from '@openforis/arena-core'
@@ -32,20 +33,20 @@ type ThreadMessage = { type: string; content: unknown }
 
 export type NodesBatchProcessorDeps = {
   getSurvey: (msg: NodesBatchPersistMessage) => Promise<ArenaSurvey>
-  runWithRecordLock: <T>(recordUuid: string, fn: (t: any) => Promise<T>) => Promise<T>
+  runWithRecordLock: <T>(recordUuid: string, fn: (t: DbClient) => Promise<T>) => Promise<T>
   getOrFetchRecord: (params: {
     msg: NodesBatchPersistMessage
     recordUuid: string
-    t: any
+    t: DbClient
   }) => Promise<ArenaRecord | null>
   // step and owner as they are in the database: the thread cache does not see their changes
   fetchRecordStepAndOwner: (params: {
     msg: NodesBatchPersistMessage
     recordUuid: string
-    t: any
+    t: DbClient
   }) => Promise<{ step: string; ownerUuid: string } | null>
   // the group qualifier filters of the user
-  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: ArenaSurvey; t: any }) => Promise<any>
+  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: ArenaSurvey; t: DbClient }) => Promise<any>
   recordMatchesQualifierFilters: (params: {
     survey: ArenaSurvey
     record: ArenaRecord
@@ -54,15 +55,19 @@ export type NodesBatchProcessorDeps = {
     canEditQualifierValue: boolean
   }) => boolean
   // uuid of the record owning the node, or null when the node does not exist (in any record)
-  findNodeRecordUuid: (params: { msg: NodesBatchPersistMessage; nodeUuid: string; t: any }) => Promise<string | null>
-  persistNode: (params: Record<string, unknown>, t: any) => Promise<any>
+  findNodeRecordUuid: (params: {
+    msg: NodesBatchPersistMessage
+    nodeUuid: string
+    t: DbClient
+  }) => Promise<string | null>
+  persistNode: (params: Record<string, unknown>, t: DbClient) => Promise<any>
   // uuids of the node defs whose values the edit would clear (they become non-applicable)
   findNodeDefUuidsToClear: (params: Record<string, unknown>) => Promise<string[]>
   cacheRecord: (params: {
     msg: NodesBatchPersistMessage
     recordUuid: string
     record: ArenaRecord
-    t: any
+    t: DbClient
   }) => Promise<void>
   clearCachedRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string }) => Promise<void>
   postMessage: (message: ThreadMessage) => void
@@ -135,7 +140,7 @@ const persistEdit = async ({
   record: ArenaRecord
   node: ArenaRecordNode
   edit: NodesBatchRecordEdit
-  t: any
+  t: DbClient
 }) => {
   const { msg, deps, survey, events } = state
   const recordUuid = Record.getUuid(record)
@@ -152,7 +157,7 @@ const persistEdit = async ({
         const event = buildNodesUpdateEvent({ recordUuid, updatedNodes })
         if (event) events.push(event)
       },
-      nodesValidationListener: (validations: unknown) => {
+      nodesValidationListener: (validations: ArenaValidation) => {
         uniquenessErrorKey ??= findUniquenessErrorKey({ validation: validations, nodeUuid: edit.nodeUuid })
         events.push(buildNodeValidationsUpdateEvent({ record, validations }))
       },
@@ -186,7 +191,7 @@ const refineMissingNodeResult = async ({
   record: ArenaRecord
   edit: NodesBatchRecordEdit
   result: NodesBatchEditResult
-  t: any
+  t: DbClient
 }): Promise<NodesBatchEditResult> => {
   const { msg, deps } = state
   const nodeMissing = result.status === NodesBatchEditStatus.conflict && !Record.getNodeByUuid(edit.nodeUuid)(record)
@@ -250,7 +255,11 @@ const isRecordEditAllowed = (state: BatchState, record: ArenaRecord): boolean =>
  * @param {object} t - The transaction.
  * @returns {Promise<object|null>} The record for the permission check, or null when it no longer exists.
  */
-const withFreshStepAndOwner = async (state: BatchState, record: ArenaRecord, t: any): Promise<ArenaRecord | null> => {
+const withFreshStepAndOwner = async (
+  state: BatchState,
+  record: ArenaRecord,
+  t: DbClient
+): Promise<ArenaRecord | null> => {
   const { msg, deps } = state
   const fresh = await deps.fetchRecordStepAndOwner({ msg, recordUuid: msg.recordUuid, t })
   if (!fresh) return null
@@ -275,7 +284,7 @@ const applyEdit = async ({
   state: BatchState
   record: ArenaRecord
   edit: NodesBatchRecordEdit
-  t: any
+  t: DbClient
 }): Promise<ArenaRecord> => {
   const { msg, deps, survey, refusedResults, appliedEdits } = state
   const check = checkBatchEdit({ survey, record, recordUuid: msg.recordUuid, edit })
@@ -316,7 +325,7 @@ const applyEdit = async ({
  * @param {object} t - The transaction.
  * @returns {Promise<NodesBatchEditResult[]>} The results.
  */
-const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEditResult[]> => {
+const applyEditsInLock = async (state: BatchState, t: DbClient): Promise<NodesBatchEditResult[]> => {
   const { msg, deps, survey, refusedResults, appliedEdits } = state
   const { recordUuid, edits } = msg
   // the lock wait may have used up the time: the caller already reported these edits as timed out

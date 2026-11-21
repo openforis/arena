@@ -2,7 +2,7 @@
  * The socket events sent after a record update, shared by the records update thread (single node edits) and the batch
  * processor, so both send the same content.
  */
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaRecord } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
@@ -37,7 +37,7 @@ export const buildNodeValidationsUpdateEvent = ({
   record,
   validations,
 }: {
-  record: any
+  record: ArenaRecord
   validations: any
 }): RecordSocketEvent => ({
   type: WebSocketEvent.nodeValidationsUpdate,
