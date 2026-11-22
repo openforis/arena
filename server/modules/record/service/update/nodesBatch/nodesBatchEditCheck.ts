@@ -99,7 +99,7 @@ export const checkBatchEdit = ({
  */
 const collectErrorKeys = (validation: ArenaValidation): string[] => {
   if (!validation) return []
-  const ownKeys = Validation.getErrors(validation).map((error: any) => ValidationResult.getKey(error))
+  const ownKeys = Validation.getErrors(validation).map((error) => ValidationResult.getKey(error))
   const nestedKeys = Object.values(Validation.getFieldValidations(validation) ?? {}).flatMap(collectErrorKeys)
   return [...ownKeys, ...nestedKeys]
 }

@@ -21,7 +21,7 @@ export default class PersistOlapDataJob extends Job {
   static readonly type = 'PersistOlapDataJob'
   chain: ArenaChain
   cycle: string
-  fileZip: any
+  fileZip: FileZip
   reader: any
   survey: ArenaSurvey
 

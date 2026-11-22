@@ -2,7 +2,7 @@ import type { DbClient } from '@server/db/db'
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaUser, ArenaValidation } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { Authorizer } from '@openforis/arena-core'
@@ -11,6 +11,7 @@ import SystemError from '@core/systemError'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 
+import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
 import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
 import { checkBatchEdit, findUniquenessErrorKey } from './nodesBatchEditCheck'
 import { withSurveyUuid } from './nodesBatchRecordPermission'
@@ -31,6 +32,20 @@ const lockTimeoutErrorKey = 'record.lockTimeout'
 
 type ThreadMessage = { type: string; content: unknown }
 
+type NodeEditParams = {
+  user: ArenaUser
+  survey: ArenaSurvey
+  record: ArenaRecord
+  node: ArenaRecordNode
+  timezoneOffset?: number | null
+  lang?: string | null
+}
+
+type NodePersistParams = NodeEditParams & {
+  nodesUpdateListener?: (updatedNodes: { [nodeUuid: string]: ArenaRecordNode }) => void
+  nodesValidationListener?: (validation: ArenaValidation) => void
+}
+
 export type NodesBatchProcessorDeps = {
   getSurvey: (msg: NodesBatchPersistMessage) => Promise<ArenaSurvey>
   runWithRecordLock: <T>(recordUuid: string, fn: (t: DbClient) => Promise<T>) => Promise<T>
@@ -46,11 +61,15 @@ export type NodesBatchProcessorDeps = {
     t: DbClient
   }) => Promise<{ step: string; ownerUuid: string } | null>
   // the group qualifier filters of the user
-  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: ArenaSurvey; t: DbClient }) => Promise<any>
+  fetchQualifierFilters: (params: {
+    msg: NodesBatchPersistMessage
+    survey: ArenaSurvey
+    t: DbClient
+  }) => Promise<QualifierFilter[]>
   recordMatchesQualifierFilters: (params: {
     survey: ArenaSurvey
     record: ArenaRecord
-    qualifierFilters: any
+    qualifierFilters: QualifierFilter[]
     pendingNode: ArenaRecordNode | null
     canEditQualifierValue: boolean
   }) => boolean
@@ -60,9 +79,9 @@ export type NodesBatchProcessorDeps = {
     nodeUuid: string
     t: DbClient
   }) => Promise<string | null>
-  persistNode: (params: Record<string, unknown>, t: DbClient) => Promise<any>
+  persistNode: (params: NodePersistParams, t: DbClient) => Promise<ArenaRecord>
   // uuids of the node defs whose values the edit would clear (they become non-applicable)
-  findNodeDefUuidsToClear: (params: Record<string, unknown>) => Promise<string[]>
+  findNodeDefUuidsToClear: (params: NodeEditParams) => Promise<string[]>
   cacheRecord: (params: {
     msg: NodesBatchPersistMessage
     recordUuid: string
@@ -81,7 +100,7 @@ type BatchState = {
   deps: NodesBatchProcessorDeps
   survey: ArenaSurvey
   // loaded inside the lock, with the record
-  qualifierFilters: any
+  qualifierFilters: QualifierFilter[]
   // results of the edits refused by the check (conflicts, not editable): kept when the record rolls back
   refusedResults: NodesBatchEditResult[]
   appliedEdits: NodesBatchRecordEdit[]
@@ -153,7 +172,7 @@ const persistEdit = async ({
       node: Node.assocValue(edit.to)(node),
       timezoneOffset: msg.timezoneOffset,
       lang: msg.lang,
-      nodesUpdateListener: (updatedNodes: unknown) => {
+      nodesUpdateListener: (updatedNodes) => {
         const event = buildNodesUpdateEvent({ recordUuid, updatedNodes })
         if (event) events.push(event)
       },
@@ -430,7 +449,7 @@ export const processNodesBatch = async ({
     }
     return sortByIndex(results)
   } catch (error) {
-    if (typeof (error as any)?.key !== 'string') {
+    if (typeof (error as { key?: unknown })?.key !== 'string') {
       deps.logError(`error applying the batch edits of record ${msg.recordUuid}: ${(error as Error)?.stack ?? error}`)
     }
     await clearCachedRecordSafely(state)

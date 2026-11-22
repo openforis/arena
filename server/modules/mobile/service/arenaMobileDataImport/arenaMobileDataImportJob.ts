@@ -1,3 +1,4 @@
+import type { ArenaMobileDataImportJobContext } from './arenaMobileDataImportJobContext'
 import { Surveys, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -15,7 +16,7 @@ import ArenaFileReadJob from './jobs/arenaFileReadJob'
 import RecordsImportJob from './jobs/recordsImportJob'
 import * as RecordsUploadNotificationService from '../recordsUploadNotificationService'
 
-export default class ArenaMobileDataImportJob extends Job {
+export default class ArenaMobileDataImportJob extends Job<ArenaMobileDataImportJobContext> {
   static readonly type = 'ArenaMobileDataImportJob'
 
   /**

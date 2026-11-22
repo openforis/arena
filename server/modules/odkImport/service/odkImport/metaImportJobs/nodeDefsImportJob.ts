@@ -10,6 +10,7 @@ import * as Category from '@core/survey/category'
 import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
 
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 // Small, generic (no Collect-specific logic) name-deduplication utility - reused as-is rather than
@@ -50,7 +51,7 @@ export type OdkNodeDefOriginalNameInfo = {
  * referencing a sibling that hasn't been inserted yet (appears later in the primary instance) will fail
  * to resolve and gets flagged rather than silently retried.
  */
-export default class NodeDefsImportJob extends Job {
+export default class NodeDefsImportJob extends Job<OdkImportJobContext> {
   static readonly type = 'NodeDefsImportJob'
 
   nodeDefs: Record<string, any>
@@ -78,7 +79,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   async execute() {
-    const context: any = this.context
+    const { context } = this
     const { xform, surveyId } = context
 
     const bindsByPath = XForm.buildBindsByPath(xform)
@@ -156,7 +157,7 @@ export default class NodeDefsImportJob extends Job {
     parentPath: string | null
     instanceElement: XmlElement
   }): Promise<any> {
-    const context: any = this.context
+    const { context } = this
     const { defaultLanguage, bindsByPath, repeatPaths, bodyControlsByPath, itextTranslations, categoriesByKey } =
       context as {
         defaultLanguage: string
@@ -582,7 +583,7 @@ export default class NodeDefsImportJob extends Job {
   }
 
   get survey() {
-    const context: any = this.context
+    const { context } = this
     // dependency graph generation not necessary here, same as collectImport's NodeDefsImportJob
     return Survey.assocNodeDefsSimple({ nodeDefs: this.nodeDefs })(context.survey)
   }

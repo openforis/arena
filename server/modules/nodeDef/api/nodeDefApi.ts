@@ -1,5 +1,5 @@
 import type { ArenaNodeDefMap } from '@openforis/arena-core'
-import type { Router } from 'express'
+import type { Router, Response as ExpressResponse } from 'express'
 import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
@@ -23,7 +23,7 @@ const sendRespNodeDefsAndValidation = async ({
   nodeDefsUpdated = null,
   includeAnalysis = true,
 }: {
-  res: any
+  res: ExpressResponse
   surveyId: number
   cycle: string
   sendNodeDefs?: any

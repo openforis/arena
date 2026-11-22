@@ -1,3 +1,5 @@
+import type { Response as ExpressResponse } from 'express'
+import type { Writable } from 'node:stream'
 import type { ArenaUser } from '@openforis/arena-core'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -108,7 +110,7 @@ export const exportTaxa = async ({
 }: {
   surveyId: number
   taxonomyUuid: string
-  outputStream: any
+  outputStream: Writable
   fileFormat: string
   draft?: boolean
 }) => {
@@ -140,7 +142,7 @@ export const exportTaxaImportTemplate = async ({
   surveyId: number
   taxonomyUuid: string
   draft: boolean
-  res: any
+  res: ExpressResponse
   fileFormat: string
   templateType: any
 }) => {

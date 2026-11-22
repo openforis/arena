@@ -1,3 +1,4 @@
+import type { ArenaJobContext } from '@openforis/arena-core'
 import { FileFormats } from '@core/fileFormats'
 import * as User from '@core/user/user'
 
@@ -9,7 +10,14 @@ import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 /**
  * Exports the data of a multiple entity (filtered as in Data Explorer) as a matrix, with one column per record.
  */
-export default class DataMatrixExportJob extends Job {
+interface DataMatrixExportJobContext extends ArenaJobContext {
+  cycle: string
+  options: { fileFormat?: string; [key: string]: unknown }
+  fileFormat?: string
+  tempFileName?: string
+}
+
+export default class DataMatrixExportJob extends Job<DataMatrixExportJobContext> {
   static readonly type = 'DataMatrixExportJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -17,7 +25,7 @@ export default class DataMatrixExportJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, options } = this.context as any
+    const { surveyId, cycle, options } = this.context
     const { fileFormat = FileFormats.xlsx } = options
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
@@ -30,7 +38,7 @@ export default class DataMatrixExportJob extends Job {
   }
 
   async generateResult() {
-    const { fileFormat, tempFileName } = this.context as any
+    const { fileFormat, tempFileName } = this.context
     const { token: downloadToken } = DownloadAuthTokenUtils.generateToken({
       userUuid: User.getUuid(this.user),
       fileName: tempFileName,

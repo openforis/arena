@@ -1,4 +1,5 @@
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 import FileZip from '@server/utils/file/fileZip'
 
 const submissionFileName = 'submission.xml'
@@ -9,7 +10,7 @@ const submissionFileName = 'submission.xml'
  * job context for RecordsImportJob. Mirrors collectImport's CollectSurveyReaderJob (open once, read
  * many) rather than extracting to disk - same streaming-entry-read convention `FileZip` establishes.
  */
-export default class OdkSubmissionReaderJob extends Job {
+export default class OdkSubmissionReaderJob extends Job<OdkImportJobContext> {
   static readonly type = 'OdkSubmissionReaderJob'
 
   constructor(params?: Partial<JobParams>) {

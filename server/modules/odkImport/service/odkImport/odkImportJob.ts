@@ -1,4 +1,5 @@
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from './odkImportJobContext'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
@@ -22,7 +23,7 @@ const createInnerJobs = () => [
   new SurveyRdbCreationJob(),
 ]
 
-export default class OdkImportJob extends Job {
+export default class OdkImportJob extends Job<OdkImportJobContext> {
   static readonly type = 'OdkImportJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -30,14 +31,14 @@ export default class OdkImportJob extends Job {
   }
 
   generateResult(): Promise<any> {
-    const context: any = this.context
+    const { context } = this
     return Promise.resolve({ surveyId: context.surveyId })
   }
 
   async onEnd() {
     await super.onEnd()
 
-    const context: any = this.context
+    const { context } = this
     const { filePath, surveyId } = context
 
     if (surveyId) {

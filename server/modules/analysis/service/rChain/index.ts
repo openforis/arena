@@ -1,3 +1,4 @@
+import type { Response as ExpressResponse } from 'express'
 import type { ArenaNodeDefEntity, ArenaUser, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { db } from '@server/db/db'
 
@@ -48,7 +49,7 @@ export const fetchNodeData = async ({
   draft = true,
   fileFormat = FileFormats.csv,
 }: {
-  res: any
+  res: ExpressResponse
   surveyId: number
   cycle: string
   chainUuid: string

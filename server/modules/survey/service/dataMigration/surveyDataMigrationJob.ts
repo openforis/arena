@@ -1,4 +1,4 @@
-import { Versions } from '@openforis/arena-core'
+import { Versions, type ArenaJobContext } from '@openforis/arena-core'
 
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -25,7 +25,11 @@ export const getPendingSurveyDataMigrationSteps = ({
  * to be instantiated and started directly by `AllSurveysDataMigrationJob`, never registered/created from a
  * serialized job type.
  */
-export default class SurveyDataMigrationJob extends Job {
+interface SurveyDataMigrationJobContext extends ArenaJobContext {
+  surveyAppVersion?: string
+}
+
+export default class SurveyDataMigrationJob extends Job<SurveyDataMigrationJobContext> {
   static readonly type = 'SurveyDataMigrationJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -33,7 +37,7 @@ export default class SurveyDataMigrationJob extends Job {
   }
 
   async execute() {
-    const context: any = this.context
+    const { context } = this
     const { surveyId, surveyAppVersion } = context
 
     const stepsToRun = getPendingSurveyDataMigrationSteps({ surveyAppVersion })

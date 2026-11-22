@@ -10,7 +10,7 @@ import {
   usersBackupType,
 } from './usersBackupModel'
 
-const readJsonEntry = (fileZip: any, entryName: string) => {
+const readJsonEntry = (fileZip: FileZip, entryName: string) => {
   const content = fileZip.getEntryAsText(entryName)
   return content ? JSON.parse(content) : null
 }
@@ -31,11 +31,11 @@ const open = async (filePath: string): Promise<any> => {
   return fileZip
 }
 
-const readInfo = (fileZip: any): UsersBackupInfo => readJsonEntry(fileZip, UsersBackupFile.info)
+const readInfo = (fileZip: FileZip): UsersBackupInfo => readJsonEntry(fileZip, UsersBackupFile.info)
 
-const readUsers = (fileZip: any): UsersBackupUser[] => readJsonEntry(fileZip, UsersBackupFile.users) ?? []
+const readUsers = (fileZip: FileZip): UsersBackupUser[] => readJsonEntry(fileZip, UsersBackupFile.users) ?? []
 
-const readProfilePicture = (fileZip: any, userUuid: string): Buffer | null =>
+const readProfilePicture = (fileZip: FileZip, userUuid: string): Buffer | null =>
   fileZip.getEntryData(UsersBackupFile.profilePicture({ userUuid }))
 
 export const UsersBackupFileReader = {

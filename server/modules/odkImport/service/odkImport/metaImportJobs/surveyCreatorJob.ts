@@ -5,6 +5,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
 import { ensureStartsWithLetter } from '@server/modules/collectImport/service/collectImport/model/nodeDefUniqueNameGenerator'
@@ -16,7 +17,7 @@ import * as XForm from '../model/xform'
  * Creates the (temporary, draft) Arena survey shell from the XForm's title and resolved languages -
  * NodeDefs/Categories are added by the jobs that follow. Mirrors collectImport's SurveyCreatorJob.
  */
-export default class SurveyCreatorJob extends Job {
+export default class SurveyCreatorJob extends Job<OdkImportJobContext> {
   static readonly type = 'SurveyCreatorJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -24,7 +25,7 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const context: any = this.context
+    const { context } = this
     const { xform, languages, defaultLanguage, newSurvey: newSurveyParam } = context
 
     const formTitle = XForm.getFormTitle(xform)

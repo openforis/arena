@@ -3,7 +3,7 @@ import { WebSocketEvent } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
@@ -18,17 +18,27 @@ import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordManager from '../../../manager/recordManager'
 import * as NodeRepository from '../../../repository/nodeRepository'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
-import { processNodesBatch } from '../nodesBatch/nodesBatchProcessor'
+import { type NodesBatchProcessorDeps, processNodesBatch } from '../nodesBatch/nodesBatchProcessor'
 import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
+
+// messages are built by the main thread (see RecordService / SurveyRecordsThreadService)
+type RecordsUpdateThreadMessage = { type: string; [key: string]: any }
+
+type SurveyData = { survey: ArenaSurvey; recordsCache: IdleTimeoutCache<ArenaRecord> }
 
 const isClearNonApplicableValuesEnabled = (survey: ArenaSurvey) =>
   !Survey.isKeepNonApplicableValues(Survey.getSurveyInfo(survey))
 
 // the user must confirm the update first (if it clears values) only when the request comes from a socket
-const isClearNonApplicableValuesConfirmationNeeded = ({ msg, survey }: { msg: any; survey: ArenaSurvey }) =>
-  isClearNonApplicableValuesEnabled(survey) && !msg.clearNonApplicableValuesConfirmed && Boolean(msg.socketId)
+const isClearNonApplicableValuesConfirmationNeeded = ({
+  msg,
+  survey,
+}: {
+  msg: { clearNonApplicableValuesConfirmed?: boolean; socketId?: string }
+  survey: ArenaSurvey
+}) => isClearNonApplicableValuesEnabled(survey) && !msg.clearNonApplicableValuesConfirmed && Boolean(msg.socketId)
 
 const getNodeAndDescendants = ({ record, nodeUuid }: { record: ArenaRecord; nodeUuid: string }) => {
   const node = Record.getNodeByUuid(nodeUuid)(record)
@@ -47,7 +57,7 @@ const pgErrorCodeLockNotAvailable = '55P03'
 // Serializes record mutations across dynos: acquires a transaction-scoped Postgres advisory
 // lock keyed by recordUuid, runs fn with that transaction's client, and lets the lock be
 // auto-released on commit/rollback.
-const acquireRecordLockAndRun = ({ recordUuid, fn }: { recordUuid: string; fn: any }) =>
+const acquireRecordLockAndRun = <T>({ recordUuid, fn }: { recordUuid: string; fn: (t: DbClient) => Promise<T> }) =>
   db.tx(async (t) => {
     await t.none('SET LOCAL lock_timeout = $1', [`${recordLockTimeoutMs}ms`])
     try {
@@ -69,10 +79,10 @@ const acquireRecordLockAndRun = ({ recordUuid, fn }: { recordUuid: string; fn: a
 // Exported only so that tests can instantiate the thread class directly (in the main thread,
 // overriding postMessage): the module still creates and initializes the real worker instance below.
 export class RecordsUpdateThread extends Thread {
-  messageProcessorByType: Record<string, any>
-  processing: any
-  queue: any
-  surveysDataCache: any
+  messageProcessorByType: { [messageType: string]: (msg: RecordsUpdateThreadMessage) => unknown }
+  processing: boolean
+  queue: Queue<RecordsUpdateThreadMessage>
+  surveysDataCache: IdleTimeoutCache<SurveyData>
 
   constructor(paramsObj?: Record<string, any>) {
     super(paramsObj)
@@ -386,7 +396,7 @@ export class RecordsUpdateThread extends Thread {
    * Returns the thread operations used by the batch processor.
    * @returns {object} The processor dependencies.
    */
-  getNodesBatchProcessorDeps() {
+  getNodesBatchProcessorDeps(): NodesBatchProcessorDeps {
     return {
       getSurvey: async (msg) => (await this.getOrFetchSurveyData(msg)).survey,
       runWithRecordLock: (recordUuid, fn) => acquireRecordLockAndRun({ recordUuid, fn }),
