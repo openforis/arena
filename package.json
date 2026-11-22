@@ -143,7 +143,7 @@
     "@mui/x-date-pickers": "^9.18.0",
     "@mui/x-tree-view": "^9.18.0",
     "@ngageoint/geopackage": "^4.2.10",
-    "@openforis/arena-core": "^3.1.2",
+    "@openforis/arena-core": "^3.1.3",
     "@openforis/arena-server": "^3.0.3",
     "@react-leaflet/core": "3.0.0",
     "@reduxjs/toolkit": "^2.15.0",

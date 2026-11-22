@@ -4039,9 +4039,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^3.1.0, @openforis/arena-core@npm:^3.1.2":
-  version: 3.1.2
-  resolution: "@openforis/arena-core@npm:3.1.2"
+"@openforis/arena-core@npm:^3.1.0, @openforis/arena-core@npm:^3.1.3":
+  version: 3.1.3
+  resolution: "@openforis/arena-core@npm:3.1.3"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.1.0"
     "@turf/bearing": "npm:^7.4.0"
@@ -4054,10 +4054,10 @@ __metadata:
     dayjs: "npm:^1.11.23"
     jsep: "npm:^1.6.0"
     lodash.isequal: "npm:^4.5.0"
-    n2words: "npm:^6.3.0"
-    proj4: "npm:^2.22.0"
+    n2words: "npm:^6.3.1"
+    proj4: "npm:^2.23.0"
     uuid: "npm:^14.0.3"
-  checksum: 10c0/ea3150e4960abaf0e6d1332241776ce2582eca49e88e43b62f68ce802039bf2de37870507c4279fc3633d189776e76689c8336bf949411750b867635e540cd0c
+  checksum: 10c0/b4394d2fc5a9c4a50a7f8902ed869dda81c9d2a1ee342dc76323dddede3f1c7bbddd6a53d1aecc699d7239e0c35103adecf903d77cb915c04af016f879e77316
   languageName: node
   linkType: hard
 
@@ -14917,7 +14917,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"n2words@npm:^6.3.0":
+"n2words@npm:^6.3.1":
   version: 6.3.1
   resolution: "n2words@npm:6.3.1"
   bin:
@@ -15483,7 +15483,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9.18.0"
     "@mui/x-tree-view": "npm:^9.18.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
-    "@openforis/arena-core": "npm:^3.1.2"
+    "@openforis/arena-core": "npm:^3.1.3"
     "@openforis/arena-server": "npm:^3.0.3"
     "@playwright/test": "npm:1.65.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
@@ -16981,7 +16981,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:^2.1.4, proj4@npm:^2.10.0, proj4@npm:^2.22.0, proj4@npm:^2.4.4, proj4@npm:^2.8.0, proj4@npm:^2.9.0, proj4@npm:^2.9.2":
+"proj4@npm:^2.1.4, proj4@npm:^2.10.0, proj4@npm:^2.23.0, proj4@npm:^2.4.4, proj4@npm:^2.8.0, proj4@npm:^2.9.0, proj4@npm:^2.9.2":
   version: 2.23.0
   resolution: "proj4@npm:2.23.0"
   dependencies:
