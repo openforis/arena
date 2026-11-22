@@ -49,7 +49,7 @@ export const countItems = (
   client?: DbClient
 ) => ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
 
-export const insertItem = (surveyId: number, item: any, client?: DbClient) =>
+export const insertItem = (surveyId: number, item: OdkImportReportItem.OdkImportReportItem, client?: DbClient) =>
   ImportReportRepository.insertItem(
     surveyId,
     source,
@@ -61,7 +61,10 @@ export const insertItem = (surveyId: number, item: any, client?: DbClient) =>
     client
   )
 
-export const insertItems = async ({ surveyId, items = [] }: { surveyId: number; items?: any[] }, client?: DbClient) =>
+export const insertItems = async (
+  { surveyId, items = [] }: { surveyId: number; items?: OdkImportReportItem.OdkImportReportItem[] },
+  client?: DbClient
+) =>
   ImportReportRepository.insertItems(
     {
       surveyId,
@@ -75,5 +78,10 @@ export const insertItems = async ({ surveyId, items = [] }: { surveyId: number; 
     client
   )
 
-export const updateItem = (surveyId: number, itemId: number, props: any, resolved: boolean, client?: DbClient) =>
-  ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)
+export const updateItem = (
+  surveyId: number,
+  itemId: number,
+  props: { [key: string]: unknown },
+  resolved: boolean,
+  client?: DbClient
+) => ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)

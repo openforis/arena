@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaCategory } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaCategoryItem } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -66,8 +66,8 @@ export default class CategoriesImportJob extends Job<OdkImportJobContext> {
 
     this.total = sources.length
 
-    const categoriesByKey: Record<string, any> = {}
-    const categories: any[] = []
+    const categoriesByKey: Record<string, ArenaCategory> = {}
+    const categories: ArenaCategory[] = []
 
     for (const source of sources) {
       if (this.isCanceled()) break
@@ -179,7 +179,7 @@ export default class CategoriesImportJob extends Job<OdkImportJobContext> {
     }
   }
 
-  async itemsInsertHandler(items: any[], tx: DbClient) {
+  async itemsInsertHandler(items: ArenaCategoryItem[], tx: DbClient) {
     await CategoryManager.insertItems(this.user, this.surveyId, items, tx)
   }
 }
