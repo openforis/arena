@@ -72,7 +72,7 @@ export const fetchAuthGroupMembershipsForBackup = (client: DbClient = db): Promi
       JOIN auth_group g ON g.uuid = gu.group_uuid
       LEFT OUTER JOIN survey s ON s.uuid = g.survey_uuid`,
     [],
-    (row: any) => ({ ...camelize(row), props: row.props })
+    (row: { props: unknown; [column: string]: unknown }) => ({ ...camelize(row), props: row.props })
   )
 
 export const fetchUserGroupMembershipsForBackup = (client: DbClient = db): Promise<UserGroupMembershipRow[]> =>
@@ -87,7 +87,11 @@ export const fetchUserGroupMembershipsForBackup = (client: DbClient = db): Promi
   )
 
 export const fetchUserUuidByEmail = ({ email }: { email: string }, client: DbClient = db): Promise<string | null> =>
-  client.oneOrNone(`SELECT uuid FROM "user" WHERE email = $1`, [email], (row: any) => row?.uuid ?? null)
+  client.oneOrNone(
+    `SELECT uuid FROM "user" WHERE email = $1`,
+    [email],
+    (row: { uuid: string } | null) => row?.uuid ?? null
+  )
 
 export const fetchUserUuidsByEmails = (
   { emails }: { emails: string[] },
@@ -98,7 +102,7 @@ export const fetchUserUuidsByEmails = (
     : client.map(`SELECT email, uuid FROM "user" WHERE email IN ($1:csv)`, [emails], camelize)
 
 export const existsUserByUuid = ({ uuid }: { uuid: string }, client: DbClient = db): Promise<boolean> =>
-  client.one(`SELECT EXISTS (SELECT 1 FROM "user" WHERE uuid = $1)`, [uuid], (row: any) => row.exists)
+  client.one(`SELECT EXISTS (SELECT 1 FROM "user" WHERE uuid = $1)`, [uuid], (row: { exists: boolean }) => row.exists)
 
 export const fetchAuthGroups = (client: DbClient = db): Promise<AuthGroupRow[]> =>
   client.map(
@@ -121,10 +125,18 @@ export const fetchUserGroups = (client: DbClient = db): Promise<UserGroupRow[]> 
   )
 
 export const fetchUserAuthGroupUuids = ({ userUuid }: { userUuid: string }, client: DbClient = db): Promise<string[]> =>
-  client.map(`SELECT group_uuid FROM auth_group_user WHERE user_uuid = $1`, [userUuid], (row: any) => row.group_uuid)
+  client.map(
+    `SELECT group_uuid FROM auth_group_user WHERE user_uuid = $1`,
+    [userUuid],
+    (row: { group_uuid: string }) => row.group_uuid
+  )
 
 export const fetchUserUserGroupUuids = ({ userUuid }: { userUuid: string }, client: DbClient = db): Promise<string[]> =>
-  client.map(`SELECT group_uuid FROM user_group_user WHERE user_uuid = $1`, [userUuid], (row: any) => row.group_uuid)
+  client.map(
+    `SELECT group_uuid FROM user_group_user WHERE user_uuid = $1`,
+    [userUuid],
+    (row: { group_uuid: string }) => row.group_uuid
+  )
 
 // CREATE
 

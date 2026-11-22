@@ -64,7 +64,7 @@ export const importNewUser = (
     password: string
     status: string
     title: UserTitle
-    profilePicture: any
+    profilePicture: Buffer | null
   },
   client: DbClient = db
 ) =>
@@ -102,7 +102,7 @@ export const insertUser = (
     status: string
     name?: string
     title?: UserTitle
-    profilePicture?: any
+    profilePicture?: Buffer | null
     surveyId?: number
     surveyCycleKey?: string
   },
@@ -189,7 +189,7 @@ const _usersSelectQuery = ({
   includeSurveys = false,
 }: {
   onlyAccepted?: boolean
-  selectFields: any
+  selectFields: string[]
   search?: string | null
   sortBy?: string | null
   sortOrder?: string | null
@@ -287,7 +287,7 @@ export const fetchUsers = (
     camelize
   )
 
-export const fetchUsersIntoStream = ({ processor }: { processor: any }, client: DbClient = db) => {
+export const fetchUsersIntoStream = ({ processor }: { processor: DbUtils.StreamProcessor }, client: DbClient = db) => {
   const select = _usersSelectQuery({
     selectFields: ['u.email', 'u.name', `u.props ->> '${User.keysProps.title}' AS title`, 'u.status'],
     includeSurveys: true,
@@ -479,7 +479,7 @@ export const updateUser = (
     name: string
     email: string
     profilePictureSet?: boolean
-    profilePicture?: any
+    profilePicture?: Buffer | null
     props?: Record<string, any>
   },
   client: DbClient = db

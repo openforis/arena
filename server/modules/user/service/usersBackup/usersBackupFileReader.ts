@@ -16,7 +16,7 @@ const readJsonEntry = (fileZip: FileZip, entryName: string) => {
 }
 
 // Opens a users backup zip file; it throws an error if the file is not a valid users backup.
-const open = async (filePath: string): Promise<any> => {
+const open = async (filePath: string): Promise<FileZip> => {
   const fileZip = new FileZip(filePath)
   try {
     await fileZip.init()
