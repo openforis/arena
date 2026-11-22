@@ -158,7 +158,7 @@ export const insertUser = (
     group: ArenaAuthGroup
     name?: string
     title?: UserTitle
-    profilePicture?: any
+    profilePicture?: Buffer | null
     surveyInfo?: ArenaSurvey
     surveyCycleKey?: string
   },
@@ -221,7 +221,7 @@ const _attachAuthGroupsAndInvitationToUser = async ({
 }: {
   user: ArenaUser
   invitationsByUserUuid?: Record<string, any>
-  userGroups?: any
+  userGroups?: ArenaAuthGroup[]
   t?: DbClient
 }) => {
   // Assoc auth groups
@@ -360,7 +360,11 @@ export const fetchUsersBySurveyId = (
     return _attachAuthGroupsAndInvitationToUsers({ users: usersFiltered, invitationsByUserUuid, t })
   })
 
-export const findUserByEmailAndPassword = async (email: string, password: string, passwordCompareFn: any) => {
+export const findUserByEmailAndPassword = async (
+  email: string,
+  password: string,
+  passwordCompareFn: (password: string, hash: string) => Promise<boolean> | boolean
+) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
@@ -461,7 +465,7 @@ const _updateUser = (
   user: ArenaUser,
   surveyId: number,
   userToUpdate: ArenaUser,
-  profilePicture: any,
+  profilePicture: Buffer | null,
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -540,7 +544,7 @@ export const updateUserAuthGroupExtraProps = ({
 }: {
   surveyId: number
   userUuid: string
-  extraProps: any
+  extraProps: { [key: string]: unknown }
 }) => AuthGroupRepository.updateUserGroupExtraProps({ surveyId, userUuid, extraProps })
 
 export const updateUserPrefs = (user: ArenaUser) => UserRepository.updateUserPrefs(user)

@@ -9,6 +9,13 @@ const keys = {
   userUuid: 'userUuid',
 } as const
 
+export type UserPasswordChangeFormData = {
+  oldPassword?: string
+  newPassword?: string
+  confirmPassword?: string
+  userUuid?: string
+}
+
 const newForm = () => Object.values(keys).reduce<Record<string, string>>((acc, key) => ({ ...acc, [key]: '' }), {})
 const isEmpty = (form: Record<string, unknown>) => Object.values(keys).every((key) => Objects.isEmpty(form[key]))
 

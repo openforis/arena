@@ -71,8 +71,7 @@ import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
 import { resolveValidationReportParams } from './validationReportParams'
-
-type UploadedFile = { name: string; size: number; tempFilePath: string }
+import type { UploadedFile } from '@server/utils/file/uploadedFile'
 
 type PrintableDocumentGenerator = (options: SurveyDocxOptions) => Promise<{ buffer: Buffer; surveyName: string }>
 
