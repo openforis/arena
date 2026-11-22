@@ -62,7 +62,7 @@ export const startCollectDataImportJob = async ({
   filePath: string
   deleteAllRecords: boolean
   cycle: string
-  forceImport: any
+  forceImport: boolean
 }) => {
   await checkCollectDataImportOptions({ user, surveyId, deleteAllRecords })
 
@@ -128,13 +128,13 @@ export const startFlatDataImportJob = ({
   fileFormat: string
   cycle: string
   nodeDefUuid: string
-  dryRun?: any
-  insertNewRecords?: any
-  insertMissingNodes?: any
+  dryRun?: boolean
+  insertNewRecords?: boolean
+  insertMissingNodes?: boolean
   updateRecordsInAnalysis?: boolean
   includeFiles?: boolean
   deleteExistingEntities?: boolean
-  abortOnErrors?: any
+  abortOnErrors?: boolean
 }) => {
   checkFlatDataImportOptions({ user, includeFiles, deleteExistingEntities })
 

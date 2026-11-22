@@ -23,7 +23,7 @@ export const fetchItems = (
   client?: DbClient
 ) => ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
 
-export const fetchItemsStream = ({ surveyId, messageLangCode }: { surveyId: number; messageLangCode: any }) => {
+export const fetchItemsStream = ({ surveyId, messageLangCode }: { surveyId: number; messageLangCode: string }) => {
   const select = `
       SELECT
         cr.id,
@@ -51,7 +51,7 @@ export const countItems = (
   client?: DbClient
 ) => ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
 
-export const insertItem = (surveyId: number, item: any, client: DbClient) =>
+export const insertItem = (surveyId: number, item: CollectImportReportItem.CollectImportReportItem, client: DbClient) =>
   ImportReportRepository.insertItem(
     surveyId,
     source,
@@ -63,7 +63,10 @@ export const insertItem = (surveyId: number, item: any, client: DbClient) =>
     client
   )
 
-export const insertItems = ({ surveyId, items = [] }: { surveyId: number; items?: any[] }, client: DbClient) =>
+export const insertItems = (
+  { surveyId, items = [] }: { surveyId: number; items?: CollectImportReportItem.CollectImportReportItem[] },
+  client: DbClient
+) =>
   ImportReportRepository.insertItems(
     {
       surveyId,

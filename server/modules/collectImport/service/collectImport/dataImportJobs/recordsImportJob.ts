@@ -59,9 +59,19 @@ const evaluateApplicability = async ({
   return applicable
 }
 
+// Arena node def names by Collect node def path (see CollectSurvey.generateArenaNodeDefNamesByPath)
+type NodeDefNamesByPath = { [collectNodeDefPath: string]: string }
+
+type NodeInsertQueueItem = {
+  nodeParent: ArenaRecordNode | null
+  collectNodeDef: CollectSurvey.CollectNodeDef
+  collectNodeDefPath: string
+  collectNode: CollectRecord.CollectNode
+}
+
 export default class RecordsImportJob extends Job {
   static readonly type = 'RecordsImportJob'
-  batchPersister: any
+  batchPersister: BatchPersister<ArenaRecordNode>
 
   constructor(params?: Partial<JobParams>) {
     super(RecordsImportJob.type, params)
@@ -221,7 +231,7 @@ export default class RecordsImportJob extends Job {
     const collectRootEntityDef = CollectSurvey.getNodeDefByPath(collectRootEntityDefPath)(collectSurvey)
     const collectRootEntity = CollectRecord.getRootEntity(collectRecordJson, collectRootEntityName)
 
-    const queue = new Queue([
+    const queue = new Queue<NodeInsertQueueItem>([
       {
         nodeParent: null,
         collectNodeDef: collectRootEntityDef,
@@ -294,14 +304,14 @@ export default class RecordsImportJob extends Job {
   }: {
     survey: ArenaSurvey
     record: ArenaRecord
-    nodeDefNamesByPath: any
+    nodeDefNamesByPath: NodeDefNamesByPath
     nodeDef: ArenaAnyNodeDef
     nodeParent: ArenaRecordNode
     collectNodeDef: CollectSurvey.CollectNodeDef
     collectNodeDefPath: string
     collectNode: CollectRecord.CollectNode
     field: string | null
-    queue: any
+    queue: Queue<NodeInsertQueueItem>
   }) {
     const { collectSurveyFileZip } = this.context
 
@@ -365,7 +375,7 @@ export default class RecordsImportJob extends Job {
     node,
   }: {
     survey: ArenaSurvey
-    nodeDefNamesByPath: any
+    nodeDefNamesByPath: NodeDefNamesByPath
     collectNodeDef: CollectSurvey.CollectNodeDef
     collectNodeDefPath: string
     collectNode: CollectRecord.CollectNode

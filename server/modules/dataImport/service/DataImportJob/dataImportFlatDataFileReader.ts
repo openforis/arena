@@ -1,10 +1,17 @@
-import { FlatDataExportModel, Objects, type ArenaSurvey } from '@openforis/arena-core'
+import type { Readable } from 'node:stream'
+
+import { FlatDataExportModel, Objects, type ArenaAnyNodeDef, type ArenaSurvey } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import { VALUE_PROP_DEFAULT, parseNodeValueProps } from '@core/record/nodeValueParser'
+import {
+  type CategoryItemProvider,
+  type TaxonProvider,
+  VALUE_PROP_DEFAULT,
+  parseNodeValueProps,
+} from '@core/record/nodeValueParser'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
@@ -29,7 +36,7 @@ const requiredValuePropsByNodeDefType = {
   [NodeDef.nodeDefType.taxon]: [Node.valuePropsTaxon.code],
 }
 
-const isRequiredColumn = (column: any) => {
+const isRequiredColumn = (column: { key?: boolean; nodeDef: ArenaAnyNodeDef; valueProp?: string }) => {
   const { key, nodeDef, valueProp } = column
   if (!key) return false
   const requiredValueProps = requiredValuePropsByNodeDefType[NodeDef.getType(nodeDef)]
@@ -84,15 +91,20 @@ const createReaderFromStream = ({
   validateHeaders = true,
   includeFiles = false,
 }: {
-  stream: any
+  stream: Readable
   fileFormat: string
   survey: ArenaSurvey
-  categoryItemProvider: any
-  taxonProvider?: any
+  categoryItemProvider: CategoryItemProvider
+  taxonProvider?: TaxonProvider
   cycle: string
   nodeDefUuid: string
-  onRowItem: any
-  onTotalChange?: any
+  onRowItem: (item: {
+    row: { [header: string]: unknown }
+    valuesByDefUuid: { [nodeDefUuid: string]: unknown }
+    refDataByDefUuid: { [nodeDefUuid: string]: unknown }
+    errors: unknown[]
+  }) => Promise<void> | void
+  onTotalChange?: (total: number) => void
   includeAnalysis?: boolean
   validateHeaders?: boolean
   includeFiles?: boolean

@@ -15,7 +15,7 @@ import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImport
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob/nodeDefsImportJob'
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
-const createInnerJob = (params: any) => {
+const createInnerJob = (params: Partial<JobParams>) => {
   const { options = {} } = params
   const { includeData = true } = options
 

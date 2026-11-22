@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import { AppInfo } from '@core/app/appInfo'
 import * as User from '@core/user/user'
 
@@ -29,7 +30,7 @@ interface UsersBackupExportJobContext extends ZipFileCreatorJobContext {
 export default class UsersBackupExportJob extends ZipFileCreatorBaseJob<UsersBackupExportJobContext> {
   static readonly type = 'UsersBackupExportJob'
 
-  constructor(params: any) {
+  constructor(params: Partial<JobParams>) {
     // temp file name must be a uuid to be accepted by the download endpoint
     super(UsersBackupExportJob.type, { outputFileName: FileUtils.newTempFileName(), ...params })
   }

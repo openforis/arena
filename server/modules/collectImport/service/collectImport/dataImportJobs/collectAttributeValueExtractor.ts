@@ -19,6 +19,8 @@ import { db, DbClient } from '@server/db/db'
 import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
+import type { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import type { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 const { nodeDefType } = NodeDef
 
@@ -37,7 +39,7 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
   client = db,
 }: {
   survey: ArenaSurvey
-  categoryItemProvider: any
+  categoryItemProvider: Pick<typeof CategoryItemProviderDefault, 'getItemByCode'>
   nodeDef: ArenaAnyNodeDef
   code: string
   record: ArenaRecord
@@ -179,7 +181,7 @@ const findTaxonUuid = async ({
   taxonCode,
 }: {
   survey: ArenaSurvey
-  taxonProvider: any
+  taxonProvider: Pick<typeof TaxonProviderDefault, 'getTaxonByCode'>
   nodeDef: ArenaAnyNodeDef
   taxonCode: string
 }) => {
@@ -237,8 +239,8 @@ const extractTimeValueAndMeta = (collectNode: CollectRecord.CollectNode) => {
 // params of the extraction of the value (and meta) of an Arena attribute from the matching Collect node
 type AttributeValueExtractParams = {
   survey: ArenaSurvey
-  categoryItemProvider?: any
-  taxonProvider?: any
+  categoryItemProvider?: Pick<typeof CategoryItemProviderDefault, 'getItemByCode'>
+  taxonProvider?: Pick<typeof TaxonProviderDefault, 'getTaxonByCode'>
   nodeDef: ArenaAnyNodeDef
   record?: ArenaRecord
   node?: ArenaRecordNode

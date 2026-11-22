@@ -8,7 +8,7 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
 export default class EntitiesDeleteJob extends DataImportBaseJob {
-  entitiesDeleted: any
+  entitiesDeleted: number
 
   constructor(params?: Partial<JobParams>) {
     super('EntitiesDeleteJob', params)
