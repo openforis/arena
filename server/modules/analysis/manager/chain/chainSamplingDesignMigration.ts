@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaChain, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaChain, ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as Survey from '@core/survey/survey'
@@ -50,7 +50,7 @@ const _findPhase2JoinEntity = ({
   attributeNodeDef: ArenaAnyNodeDef
   baseUnitNodeDef?: ArenaAnyNodeDef
   survey: ArenaSurvey
-}): any => {
+}): ArenaNodeDefEntity | null => {
   let candidate = Survey.getNodeDefParent(attributeNodeDef)(survey)
   while (candidate) {
     if (_isSelectableAsPhase2JoinEntity({ nodeDef: candidate, baseUnitNodeDef })) return candidate
@@ -126,7 +126,7 @@ export const migrateSamplingDesignPhaseProps = async (
     client
   )
 
-  for (const chain of chainsToMigrate as any[]) {
+  for (const chain of chainsToMigrate) {
     const samplingDesign = Chain.getSamplingDesign(chain)
     const migratedSamplingDesign = _migrateSamplingDesignPhaseProps({ samplingDesign, survey })
     /* NOSONAR */ await ChainRepository.updateChain(

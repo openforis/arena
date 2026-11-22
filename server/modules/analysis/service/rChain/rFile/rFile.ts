@@ -1,3 +1,4 @@
+import type RChain from '../rChain'
 import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
@@ -16,9 +17,9 @@ export default class RFile {
   _fileName: string
   _path: string
   _pathRelative: string
-  _rChain: any
+  _rChain: RChain
 
-  constructor(rChain, dir, fileName) {
+  constructor(rChain: RChain, dir: string, fileName: string) {
     this._rChain = rChain
     this._dir = dir
     this._fileName = `${fileName}.R`

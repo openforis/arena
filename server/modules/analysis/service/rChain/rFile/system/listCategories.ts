@@ -1,3 +1,6 @@
+import type { ArenaCategory } from '@openforis/arena-core'
+
+import type RChain from '../../rChain'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
@@ -6,12 +9,12 @@ import * as ApiRoutes from '@common/apiRoutes'
 import { arenaGetCSV, dfVar, setVar } from '../../rFunctions'
 
 export default class ListCategories {
-  _categories: any
+  _categories: ArenaCategory[]
   _name: string
-  _rChain: any
+  _rChain: RChain
   _scripts: string[]
 
-  constructor(rChain) {
+  constructor(rChain: RChain) {
     this._rChain = rChain
     this._scripts = []
     this._name = 'categories'
