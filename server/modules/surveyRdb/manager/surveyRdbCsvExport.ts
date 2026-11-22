@@ -88,7 +88,7 @@ const getCsvExportFields = ({
   includeDateCreated = false,
 }: {
   survey: ArenaSurvey
-  query: any
+  query: Query.QueryItem
   addCycle?: boolean
   includeCategoryItemsLabels?: boolean
   expandCategoryItems?: boolean
@@ -131,7 +131,15 @@ const getCsvExportFields = ({
   return fields
 }
 
-const getCsvExportFieldsAgg = ({ survey, query, options = {} }: { survey: ArenaSurvey; query: any; options?: any }) => {
+const getCsvExportFieldsAgg = ({
+  survey,
+  query,
+  options = {},
+}: {
+  survey: ArenaSurvey
+  query: Query.QueryItem
+  options?: any
+}) => {
   const { includeCategoryItemsLabels = false } = options
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
@@ -157,7 +165,13 @@ const getCsvExportFieldsAgg = ({ survey, query, options = {} }: { survey: ArenaS
   return fields
 }
 
-const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }: { survey: ArenaSurvey; query: any }) => {
+const getCsvObjectTransformerExpandCategoryItems = ({
+  survey,
+  query,
+}: {
+  survey: ArenaSurvey
+  query: Query.QueryItem
+}) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const nodeDefCodeCols = nodeDefCols.filter(NodeDef.isCode)
@@ -184,7 +198,7 @@ const getCsvObjectTransformerUniqueFileNames = ({
   uniqueFileNamesGenerator,
 }: {
   survey: ArenaSurvey
-  query: any
+  query: Query.QueryItem
   uniqueFileNamesGenerator: any
 }) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)

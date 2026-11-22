@@ -1,3 +1,4 @@
+import type { UserGroupAccessFilters } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 import camelize from 'camelize'
@@ -37,7 +38,7 @@ import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/co
 
 import { getUserGroupAccessCondition } from './userGroupAccessCondition'
 
-const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef: any, nodeDef: ArenaAnyNodeDef) => {
+const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef: ViewDataNodeDef, nodeDef: ArenaAnyNodeDef) => {
   const { survey } = viewDataNodeDef
   const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
@@ -128,11 +129,11 @@ const _prepareSelectFields = ({
   includeDateCreated = false,
 }: {
   queryBuilder: any
-  viewDataNodeDef: any
-  columnNodeDefs: any
-  nodeDefCols: any
-  editMode: any
-  streamMode: any
+  viewDataNodeDef: ViewDataNodeDef
+  columnNodeDefs: ArenaAnyNodeDef[]
+  nodeDefCols: ArenaAnyNodeDef[]
+  editMode: boolean
+  streamMode: boolean
   includeFileAttributeDefs?: boolean
   includeDateCreated?: boolean
 }) => {
@@ -181,9 +182,9 @@ const _prepareFromClause = ({
   editMode,
 }: {
   queryBuilder: any
-  viewDataNodeDef: any
-  nodeDefCols: any
-  editMode: any
+  viewDataNodeDef: ViewDataNodeDef
+  nodeDefCols: ArenaAnyNodeDef[]
+  editMode: boolean
 }) => {
   queryBuilder.from(viewDataNodeDef.nameAliased)
   if (editMode) {
@@ -267,12 +268,12 @@ const _prepareRecordsWhereConditions = ({
   userGroupAccessFilters,
 }: {
   queryBuilder: any
-  viewDataNodeDef: any
+  viewDataNodeDef: ViewDataNodeDef
   cycle: string
-  query: any
-  recordSteps: any
+  query: Query.QueryItem
+  recordSteps: string[]
   recordOwnerUuid: string
-  userGroupAccessFilters: any
+  userGroupAccessFilters: UserGroupAccessFilters
 }) => {
   if (!A.isNil(cycle)) {
     queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
@@ -312,7 +313,13 @@ const outlierIqrFactor = 1.5
 
 const _isNumericNodeDef = (nodeDef: ArenaAnyNodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
 
-const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }: { viewDataNodeDef: any; nodeDefCols: any }) =>
+const _getSampleNumericColumns = ({
+  viewDataNodeDef,
+  nodeDefCols,
+}: {
+  viewDataNodeDef: ViewDataNodeDef
+  nodeDefCols: ArenaAnyNodeDef[]
+}) =>
   nodeDefCols
     .filter(_isNumericNodeDef)
     // same X and Y axes used by the scatter chart: first 2 numeric attributes
@@ -359,8 +366,8 @@ const _createSampleWithOutliersSelect = ({
   nodeDefCols,
 }: {
   baseSelect: any
-  viewDataNodeDef: any
-  nodeDefCols: any
+  viewDataNodeDef: ViewDataNodeDef
+  nodeDefCols: ArenaAnyNodeDef[]
 }) => {
   const columns = _getSampleNumericColumns({ viewDataNodeDef, nodeDefCols })
   if (columns.length === 0) {
@@ -544,11 +551,11 @@ export const countDataTableRows = async (
   }: {
     surveyId: number
     cycle: string
-    tableName: any
+    tableName: string
     filter?: any
     recordOwnerUuid?: string
     survey?: ArenaSurvey
-    userGroupAccessFilters?: any
+    userGroupAccessFilters?: UserGroupAccessFilters
   },
   client: DbClient = db
 ) => {
@@ -667,7 +674,7 @@ export const fetchRecordsCountByRootNodesValue = (
     cycle: string
     nodeDefs: ArenaAnyNodeDef[]
     nodes: ArenaRecordNode[]
-    recordUuidsExcluded?: any
+    recordUuidsExcluded?: string[]
   },
   client: DbClient = db
 ) => {

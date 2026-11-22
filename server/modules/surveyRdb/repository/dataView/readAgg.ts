@@ -1,3 +1,4 @@
+import type { UserGroupAccessFilters } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
 import type { DbClient } from '@server/db/db'
 import type { ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
@@ -23,8 +24,8 @@ const _getSelectQuery = ({
   survey: ArenaSurvey
   cycle: string
   recordOwnerUuid: string
-  userGroupAccessFilters: any
-  query: any
+  userGroupAccessFilters: UserGroupAccessFilters
+  query: Query.QueryItem
 }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)

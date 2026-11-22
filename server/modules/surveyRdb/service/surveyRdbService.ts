@@ -123,7 +123,7 @@ type FetchViewDataParams = {
   user?: ArenaUser | null
   surveyId: number
   cycle: string
-  query: any
+  query: Query.QueryItem
   offset?: number
   limit?: number | null
   randomize?: boolean
@@ -226,7 +226,12 @@ export const fetchViewData = async (params: FetchViewDataParams) => {
  * @param {!Query} [params.query] - The Query used to filter the records.
  * @returns {Promise<number>} - The count of rows.
  */
-export const countTable = async (params: { user?: ArenaUser | null; surveyId: number; cycle: string; query: any }) => {
+export const countTable = async (params: {
+  user?: ArenaUser | null
+  surveyId: number
+  cycle: string
+  query: Query.QueryItem
+}) => {
   const { user, surveyId, cycle, query } = params
 
   const survey = await _fetchSurvey({ surveyId, cycle })
@@ -295,7 +300,7 @@ export const exportViewDataToTempFile = async ({
   user: ArenaUser
   surveyId: number
   cycle: string
-  query: any
+  query: Query.QueryItem
   columnNodeDefs?: boolean
   addCycle?: boolean
   options?: any

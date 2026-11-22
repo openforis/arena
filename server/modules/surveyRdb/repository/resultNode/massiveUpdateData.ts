@@ -11,7 +11,7 @@ const pgp = pgPromise()
 const { Column } = pgp.helpers
 
 export default class MassiveUpdateData extends MassiveUpdate {
-  columnNames: any
+  columnNames: string[]
   nodeDefsByColumnName: Record<string, any>
 
   constructor({ survey, entityDef, analysisNodeDefs }, tx) {
