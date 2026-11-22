@@ -2,12 +2,12 @@ import { Objects } from '@openforis/arena-core'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFile } from '../exportFile'
 
 export default class RecordFilesExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('RecordFilesExportJob', params)
   }
 

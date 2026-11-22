@@ -1,6 +1,6 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -22,7 +22,7 @@ import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
 export default class SurveyPublishJob extends Job {
   static readonly type: string = 'SurveyPublishJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyPublishJob.type, params, [
       new NodeDefsValidationJob(),
       new CategoriesValidationJob(),

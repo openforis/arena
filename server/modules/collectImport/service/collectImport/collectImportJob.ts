@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
@@ -36,7 +36,7 @@ const createInnerJob = (params: any) => {
 export default class CollectImportJob extends Job {
   static readonly type = 'CollectImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(CollectImportJob.type, params, createInnerJob(params))
   }
 

@@ -30,13 +30,13 @@ const rowToSrs = (row: any) => {
  * @param {import('@server/db/db').DbClient} [client] - The database client.
  * @returns {Promise<import('@openforis/arena-core').ArenaSRS[]>} - The SRSs.
  */
-export const fetchSRSsByCodes = ({ srsCodes }: { srsCodes: any }, client: DbClient = db) =>
+export const fetchSRSsByCodes = ({ srsCodes }: { srsCodes: string[] }, client: DbClient = db) =>
   // "IN ()" is not valid SQL
   srsCodes.length === 0
     ? Promise.resolve([])
     : client.map(`SELECT * FROM spatial_ref_sys WHERE srid IN ($1:csv)`, [srsCodes], rowToSrs)
 
-export const findSRSByCodeOrName = (codeOrName: any, client: DbClient = db) => {
+export const findSRSByCodeOrName = (codeOrName: string, client: DbClient = db) => {
   const codeOrNameTrimmed = codeOrName.trim().toLowerCase()
   const codeSearch = `${codeOrNameTrimmed}%`
   const nameSearch = `%DATUM[%${codeOrNameTrimmed}%`

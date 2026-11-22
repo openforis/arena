@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
@@ -6,7 +6,7 @@ import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbSe
 export default class DataSummaryExportJob extends Job {
   static readonly type = 'DataSummaryExportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(DataSummaryExportJob.type, params)
   }
 

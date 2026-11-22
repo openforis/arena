@@ -1,3 +1,4 @@
+import type { Request as ExpressRequest } from 'express'
 import { isUuid } from '@core/uuid'
 
 import * as Request from '../../../utils/request'
@@ -5,7 +6,7 @@ import * as FileUtils from '../../../utils/file/fileUtils'
 
 import * as TempFileManager from '../manager/tempFileManager'
 
-const getFileContentOrPath = (req: any) => {
+const getFileContentOrPath = (req: ExpressRequest) => {
   const filePath = Request.getFilePath(req)
   if (filePath) {
     return { filePath }
@@ -28,10 +29,10 @@ const writeChunkIfNeeded = async ({
   totalChunks,
 }: {
   filePath: string
-  fileContent: any
+  fileContent: Buffer | string
   fileId: string
-  chunk: any
-  totalChunks: any
+  chunk: number
+  totalChunks: number
 }) => {
   const isSingleFile = !totalChunks
 
@@ -45,7 +46,7 @@ const writeChunkIfNeeded = async ({
   return { isSingleFile }
 }
 
-const getChunkedFileParams = (req: any) => {
+const getChunkedFileParams = (req: ExpressRequest) => {
   const { fileId = undefined } = Request.getParams(req)
   const { filePath, fileContent } = getFileContentOrPath(req)
 
@@ -90,7 +91,7 @@ export type ChunkedFileUploadResult = {
 export const processChunkedFileForBackgroundMerge = async ({
   req,
 }: {
-  req: any
+  req: ExpressRequest
 }): Promise<ChunkedFileUploadResult | null> => {
   const { chunk, fileContent, fileId, filePath, totalChunks, totalFileSize } = getChunkedFileParams(req)
 

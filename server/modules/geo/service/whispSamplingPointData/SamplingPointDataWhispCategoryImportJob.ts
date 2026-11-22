@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import { FileFormats } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -15,7 +16,7 @@ import { CategoryImportInternalJob } from '@server/modules/category/service/cate
 export default class SamplingPointDataWhispCategoryImportJob extends CategoryImportInternalJob {
   static readonly type = 'SamplingPointDataWhispCategoryImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(params, SamplingPointDataWhispCategoryImportJob.type)
   }
 

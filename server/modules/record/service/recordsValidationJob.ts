@@ -1,13 +1,13 @@
 import { Records } from '@openforis/arena-core'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export default class RecordsValidationJob extends Job {
   static readonly type: string = 'RecordsValidationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsValidationJob.type, params)
   }
 

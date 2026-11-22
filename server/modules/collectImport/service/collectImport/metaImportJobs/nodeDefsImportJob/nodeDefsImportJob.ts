@@ -13,7 +13,7 @@ import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
@@ -104,7 +104,7 @@ export default class NodeDefsImportJob extends Job {
   nodeDefs: ArenaNodeDefMap
   nodeDefsInfoByCollectPath: Record<string, any>
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(NodeDefsImportJob.type, params)
 
     this.nodeDefs = {} // Node definitions by uuid

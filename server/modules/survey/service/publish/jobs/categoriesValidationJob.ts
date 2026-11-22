@@ -1,7 +1,7 @@
 import type { ArenaValidation } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Category from '@core/survey/category'
 import * as Validation from '@core/validation/validation'
@@ -41,7 +41,7 @@ const _removeWarnings = (validation: ArenaValidation): ArenaValidation => {
 export default class CategoriesValidationJob extends Job {
   static readonly type: string = 'CategoriesValidationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(CategoriesValidationJob.type, params)
   }
 

@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import * as A from '@core/arena'
 
 import * as StringUtils from '@core/stringUtils'
@@ -18,7 +19,7 @@ import * as SrsManager from '../../../../geo/manager/srsManager'
 import * as CollectSurvey from '../model/collectSurvey'
 
 export default class SurveyCreatorJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('SurveyCreatorJob', params)
   }
 

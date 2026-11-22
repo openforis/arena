@@ -1,9 +1,9 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as AnalysisService from '@server/modules/analysis/service'
 import { ExportFile } from '../exportFile'
 
 export default class ChainExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('ChainExportJob', params)
   }
 

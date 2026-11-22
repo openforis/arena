@@ -13,7 +13,7 @@ import {
   expandSelection,
 } from '@core/survey/surveyCompare'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
@@ -47,7 +47,7 @@ export default class SurveyCompareApplyJob extends Job {
    * @param {string[]} params.selectedIds - Ids of the changes to apply.
    * @param {Record<string, string>} [params.manualMatches] - Node defs matched by the user (target uuid by source uuid).
    */
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyCompareApplyJob.type, params)
   }
 

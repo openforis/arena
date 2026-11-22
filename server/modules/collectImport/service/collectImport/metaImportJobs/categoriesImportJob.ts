@@ -7,7 +7,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
@@ -22,7 +22,7 @@ export default class CategoriesImportJob extends Job {
   itemBatchPersister: any
   qualifiableItemCodesByCategoryAndLevel: Record<string, any>
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('CategoriesImportJob', params)
 
     this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))

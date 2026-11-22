@@ -1,7 +1,7 @@
 import { FileFormats } from '@core/fileFormats'
 import * as User from '@core/user/user'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
@@ -12,7 +12,7 @@ import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 export default class DataMatrixExportJob extends Job {
   static readonly type = 'DataMatrixExportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(DataMatrixExportJob.type, params)
   }
 

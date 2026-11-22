@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
@@ -12,7 +12,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
  * Saves the list of inserted categories in the "categories" context property.
  */
 export default class CategoriesImportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('CategoriesImportJob', params)
   }
 

@@ -1,7 +1,7 @@
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 
@@ -24,7 +24,7 @@ const findDeletedLanguages = async ({ surveyId }: { surveyId: number }, t: DbCli
 export default class SurveyPropsPublishJob extends Job {
   static readonly type: string = 'SurveyPropsPublishJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyPropsPublishJob.type, params)
   }
 

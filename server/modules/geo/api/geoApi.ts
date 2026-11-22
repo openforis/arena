@@ -1,4 +1,4 @@
-import type { Router } from 'express'
+import type { Request as ExpressRequest, Router } from 'express'
 import axios from 'axios'
 
 import { Objects } from '@openforis/arena-core'
@@ -24,7 +24,7 @@ const elevationApiUrls = [
   ({ lat, lng }) => `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
 ]
 
-const getMapTileForwardUrl = (req: any) => {
+const getMapTileForwardUrl = (req: ExpressRequest) => {
   const { provider, period, x, y, z, proc } = Request.getParams(req)
   const apiKey = MapUtils.mapApiKeyByProvider[provider]
 

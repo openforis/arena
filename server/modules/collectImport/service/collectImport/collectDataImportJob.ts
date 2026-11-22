@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
@@ -9,7 +9,7 @@ import RecordsImportJob from './dataImportJobs/recordsImportJob'
 export default class CollectDataImportJob extends Job {
   static readonly type = 'CollectDataImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(CollectDataImportJob.type, params, [
       new CollectSurveyReaderJob(),
       new RecordsImportJob(),

@@ -2,7 +2,7 @@ import { Surveys, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
@@ -19,7 +19,7 @@ import RecordsImportSummaryJob from './jobs/recordsImportSummaryJob'
 export default class ArenaMobileDataImportSummaryJob extends Job {
   static readonly type = 'ArenaMobileDataImportSummaryJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(ArenaMobileDataImportSummaryJob.type, params, [
       new PrepareImportFileJob(),
       new ArenaFileReadJob(),

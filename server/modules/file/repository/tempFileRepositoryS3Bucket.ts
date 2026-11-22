@@ -23,7 +23,7 @@ const {
   getFileKey: getTempFileKey,
 })
 
-export const deleteFile = ({ fileNameOrPath }: { fileNameOrPath: any }) =>
+export const deleteFile = ({ fileNameOrPath }: { fileNameOrPath: string }) =>
   deleteFileCommon({ fileUuid: fileNameOrPath })
 
 export const writeChunkToTempFile = async ({
@@ -33,9 +33,9 @@ export const writeChunkToTempFile = async ({
   chunk,
 }: {
   filePath?: string
-  fileContent?: any
+  fileContent?: Buffer | string
   fileId: string
-  chunk: any
+  chunk: number
 }) => {
   const fileUuid = getChunkFileName({ fileId, chunk })
   if (filePath) {
@@ -49,7 +49,7 @@ export const writeChunkToTempFile = async ({
   }
 }
 
-const calculateTotalChunksSize = async ({ totalChunks, fileId }: { totalChunks: any; fileId: string }) => {
+const calculateTotalChunksSize = async ({ totalChunks, fileId }: { totalChunks: number; fileId: string }) => {
   let totalContentLength = 0
   for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
     const chunkFileName = getChunkFileName({ fileId, chunk })
@@ -62,7 +62,7 @@ const calculateTotalChunksSize = async ({ totalChunks, fileId }: { totalChunks: 
   return totalContentLength
 }
 
-export const mergeTempChunksToS3 = async ({ fileId, totalChunks }: { fileId: string; totalChunks: any }) => {
+export const mergeTempChunksToS3 = async ({ fileId, totalChunks }: { fileId: string; totalChunks: number }) => {
   const totalContentLength = await calculateTotalChunksSize({ fileId, totalChunks })
 
   const finalFileName = FileUtils.newTempFileName()
@@ -101,8 +101,8 @@ export const mergeTempChunks = async ({
   onChunkMerged = null,
 }: {
   fileId: string
-  totalChunks: any
-  onChunkMerged?: any
+  totalChunks: number
+  onChunkMerged?: ((progress: { chunk: number; totalChunks: number }) => Promise<void> | void) | null
 }) => {
   const finalFileName = FileUtils.newTempFileName()
   const finalFilePath = FileUtils.tempFilePath(finalFileName)
@@ -127,7 +127,7 @@ export const mergeTempChunks = async ({
   }
 }
 
-export const deleteOldTempFiles = async ({ olderThanHours }: { olderThanHours: any }) => {
+export const deleteOldTempFiles = async ({ olderThanHours }: { olderThanHours: number }) => {
   const files = await listFiles({ prefix: tempPrefix })
   const cutoff = new Date(Date.now() - olderThanHours * 60 * 60 * 1000)
   const oldFiles = files.filter((file) => {

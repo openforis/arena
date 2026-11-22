@@ -8,7 +8,7 @@ import * as Record from '@core/record/record'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -21,7 +21,7 @@ export default class RecordsCloneJob extends Job {
 
   static readonly type: string = 'RecordsCloneJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsCloneJob.type, params)
   }
 

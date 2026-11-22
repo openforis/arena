@@ -1,6 +1,6 @@
 import FileZip from '@server/utils/file/fileZip'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
@@ -8,7 +8,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
  * Reads the schema from a Arena backup file and saves it into the job context under idmlSource property.
  */
 export default class ArenaSurveyReaderJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('ArenaSurveyReaderJob', params)
   }
 

@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 
@@ -10,7 +10,7 @@ import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCre
  * Creates the view when survey Imported is published.
  */
 export default class CreateRdbJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('CreateRdbJob', params, [
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),

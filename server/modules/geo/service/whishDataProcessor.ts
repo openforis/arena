@@ -27,7 +27,7 @@ const getRequestHeaders = () => {
   return { 'x-api-key': apiKey, 'Content-Type': 'application/json' }
 }
 
-const wait = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms))
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // Wraps errors coming from the external Whisp API (e.g. its own 401s) so they are never
 // mistaken by clients for an Arena authentication error (see appErrorsMiddleware.js on the client).
@@ -62,7 +62,7 @@ const sendRequest = async (requestFn: any) => {
   }
 }
 
-const waitForProcessing = async ({ token, pollingPeriod }: { token: any; pollingPeriod: any }) => {
+const waitForProcessing = async ({ token, pollingPeriod }: { token: string; pollingPeriod: number }) => {
   const url = `${whispApiGeoProcessingStatusUrl}/${token}`
   const headers = getRequestHeaders()
 
@@ -94,7 +94,7 @@ const generateData = async ({
 }: {
   geojson: any
   analysisOptions?: any
-  pollingPeriod?: any
+  pollingPeriod?: number
 }) => {
   const requestPayload = { ...geojson, analysisOptions: { ...analysisOptions, async: true } }
   const headers = getRequestHeaders()

@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
 
 const submissionFileName = 'submission.xml'
@@ -12,7 +12,7 @@ const submissionFileName = 'submission.xml'
 export default class OdkSubmissionReaderJob extends Job {
   static readonly type = 'OdkSubmissionReaderJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(OdkSubmissionReaderJob.type, params)
   }
 

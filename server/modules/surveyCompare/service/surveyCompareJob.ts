@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import { compareSurveys } from '@core/survey/surveyCompare'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
@@ -17,7 +17,7 @@ import { computeSurveyFingerprint } from './surveyFingerprintService'
 class SurveyCompareDiffJob extends Job {
   static readonly type = 'SurveyCompareDiffJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyCompareDiffJob.type, params)
   }
 
@@ -75,7 +75,7 @@ export default class SurveyCompareJob extends Job {
    * @param {number} [params.sourceSurveyId] - Id of another survey on this server (source).
    * @param {Record<string, string>} [params.manualMatches] - Node defs matched by the user (target uuid by source uuid).
    */
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyCompareJob.type, params, [new PrepareImportFileJob(), new SurveyCompareDiffJob()])
   }
 

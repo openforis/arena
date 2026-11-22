@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
@@ -9,7 +10,7 @@ import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 export default class EntitiesDeleteJob extends DataImportBaseJob {
   entitiesDeleted: any
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('EntitiesDeleteJob', params)
     this.entitiesDeleted = 0
   }

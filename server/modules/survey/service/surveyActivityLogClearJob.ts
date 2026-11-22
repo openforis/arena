@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as DbUtils from '@server/db/dbUtils'
 import * as SurveyManager from '../manager/surveyManager'
 import { Schemata } from '@openforis/arena-server'
@@ -6,7 +6,7 @@ import { Schemata } from '@openforis/arena-server'
 export default class SurveyActivityLogClearJob extends Job {
   static readonly type: string = 'SurveyActivityLogClearJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyActivityLogClearJob.type, params)
   }
 

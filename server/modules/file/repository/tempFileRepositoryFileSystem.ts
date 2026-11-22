@@ -3,7 +3,7 @@ import { endWriteStream, writeStreamAndWaitForEnd } from '@server/utils/ioUtils'
 
 import { getChunkFileName } from '../tempFileUtils'
 
-export const deleteFile = async ({ fileNameOrPath }: { fileNameOrPath: any }) => {
+export const deleteFile = async ({ fileNameOrPath }: { fileNameOrPath: string }) => {
   const filePath = fileNameOrPath.startsWith('/') ? fileNameOrPath : FileUtils.tempFilePath(fileNameOrPath)
   await FileUtils.deleteFileAsync(filePath)
 }
@@ -15,9 +15,9 @@ export const writeChunkToTempFile = async ({
   chunk,
 }: {
   filePath?: string
-  fileContent?: any
+  fileContent?: Buffer | string
   fileId: string
-  chunk: any
+  chunk: number
 }) => {
   const destFileName = getChunkFileName({ fileId, chunk })
   const destFilePath = FileUtils.tempFilePath(destFileName)
@@ -36,8 +36,8 @@ export const mergeTempChunks = async ({
   onChunkMerged = null,
 }: {
   fileId: string
-  totalChunks: any
-  onChunkMerged?: any
+  totalChunks: number
+  onChunkMerged?: ((progress: { chunk: number; totalChunks: number }) => Promise<void> | void) | null
 }) => {
   const finalFileName = FileUtils.newTempFileName()
   const finalFilePath = FileUtils.tempFilePath(finalFileName)

@@ -4,7 +4,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
 import { ensureStartsWithLetter } from '@server/modules/collectImport/service/collectImport/model/nodeDefUniqueNameGenerator'
@@ -19,7 +19,7 @@ import * as XForm from '../model/xform'
 export default class SurveyCreatorJob extends Job {
   static readonly type = 'SurveyCreatorJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyCreatorJob.type, params)
   }
 

@@ -1,6 +1,6 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
 import SurveyPropsUnpublishPublishJob from './jobs/surveyPropsUnpublishJob'
@@ -9,7 +9,7 @@ import DataDeleteJob from './jobs/dataDeleteJob'
 export default class SurveyUnpublishJob extends Job {
   static readonly type: string = 'SurveyUnpublishJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyUnpublishJob.type, params, [new SurveyPropsUnpublishPublishJob(), new DataDeleteJob()])
   }
 

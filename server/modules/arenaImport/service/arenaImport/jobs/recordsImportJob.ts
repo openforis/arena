@@ -6,7 +6,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
@@ -38,7 +38,7 @@ const prepareRecordSummaryToStore = (record: ArenaRecord) => {
 export default class RecordsImportJob extends Job {
   static readonly type = 'RecordsImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsImportJob.type, params)
   }
 

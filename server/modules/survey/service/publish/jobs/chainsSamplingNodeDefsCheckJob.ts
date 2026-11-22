@@ -1,7 +1,7 @@
 import { Objects } from '@openforis/arena-core'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as AnalysisManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -10,7 +10,7 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 export default class ChainsSamplingNodeDefsCheckJob extends Job {
   static readonly type: string = 'ChainsSamplingNodeDefsCheckJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(ChainsSamplingNodeDefsCheckJob.type, params)
   }
 

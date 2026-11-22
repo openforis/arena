@@ -1,12 +1,12 @@
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import { ExportFile } from '../exportFile'
 
 export default class UsersExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('UsersExportJob', params)
   }
 

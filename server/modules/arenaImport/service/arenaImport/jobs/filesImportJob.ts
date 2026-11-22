@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import { Objects } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
@@ -9,7 +10,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import { FileImportBaseJob } from './filesImportBaseJob'
 
 export default class FilesImportJob extends FileImportBaseJob {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('FilesImportJob', params)
   }
 
