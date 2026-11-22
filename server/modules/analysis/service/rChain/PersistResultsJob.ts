@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import * as Record from '@core/record/record'
 
 import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/FlatDataImportJob'
@@ -14,7 +15,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
   recordsProvider: any
   stream: any
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(params, PersistResultsJob.type)
   }
 

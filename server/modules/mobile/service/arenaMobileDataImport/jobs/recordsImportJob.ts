@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import { Authorizer, Dates } from '@openforis/arena-core'
 
 import { RecordImportAction } from '@common/dataImport'
@@ -40,7 +41,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   userNamesByUuid: Map<string, string>
   userQualifierFilters: any
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob

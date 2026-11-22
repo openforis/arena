@@ -1,3 +1,4 @@
+import type { Request as ExpressRequest, Response as ExpressResponse } from 'express'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { SurveyCompareMaxFileSizeMB } from '@core/survey/surveyCompare/surveyCompareTypes'
 
@@ -17,7 +18,7 @@ const fileTooLargeError = () =>
   new SystemError('surveyCompareFileTooLarge', { maxSize: SurveyCompareMaxFileSizeMB }, StatusCodes.BAD_REQUEST)
 
 // chunked uploads declare the total size: reject them before storing any chunk
-const checkDeclaredFileSize = (req: any) => {
+const checkDeclaredFileSize = (req: ExpressRequest) => {
   const totalFileSize = Request.getNumericParam(req, 'totalFileSize')
   if (totalFileSize !== null && totalFileSize > maxFileSizeBytes) {
     throw fileTooLargeError()
@@ -31,7 +32,7 @@ const checkUploadedFileSize = async (filePath?: string) => {
   }
 }
 
-const getSourceParams = async (req: any) => {
+const getSourceParams = async (req: ExpressRequest) => {
   const { sourceFileId, sourceSurveyId } = Request.getParams(req)
   if (sourceSurveyId) return { sourceSurveyId: Number(sourceSurveyId) }
   if (sourceFileId) return { sourceFileId }
@@ -48,7 +49,7 @@ export const init = (app: any) => {
     '/survey/:surveyId/compare',
     AuthMiddleware.requireSurveyEditPermission,
     AuthMiddleware.requireSurveyCompareSourceViewPermission,
-    async (req: any, res: any) => {
+    async (req: ExpressRequest, res: ExpressResponse) => {
       try {
         const user = Request.getUser(req)
         const { surveyId } = Request.getParams(req)
@@ -74,7 +75,7 @@ export const init = (app: any) => {
   app.get(
     '/survey/:surveyId/compare/result',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: any, res: any) => {
+    async (req: ExpressRequest, res: ExpressResponse) => {
       try {
         const { resultFileId } = Request.getParams(req)
         const result = await SurveyCompareService.readSurveyCompareResult({ resultFileId })
@@ -89,7 +90,7 @@ export const init = (app: any) => {
     '/survey/:surveyId/compare/apply',
     AuthMiddleware.requireSurveyEditPermission,
     AuthMiddleware.requireSurveyCompareSourceViewPermission,
-    (req: any, res: any) => {
+    (req: ExpressRequest, res: ExpressResponse) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, sourceFileId, sourceSurveyId } = Request.getParams(req)
@@ -111,13 +112,17 @@ export const init = (app: any) => {
   )
 
   // fingerprints of the survey definition: they tell whether two surveys have the same definition
-  app.get('/survey/:surveyId/fingerprint', AuthMiddleware.requireSurveyViewPermission, async (req: any, res: any) => {
-    try {
-      const { surveyId, draft } = Request.getParams(req)
-      const fingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: Number(surveyId), draft })
-      res.json(fingerprint)
-    } catch (error) {
-      Response.sendErr(res, error)
+  app.get(
+    '/survey/:surveyId/fingerprint',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      try {
+        const { surveyId, draft } = Request.getParams(req)
+        const fingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: Number(surveyId), draft })
+        res.json(fingerprint)
+      } catch (error) {
+        Response.sendErr(res, error)
+      }
     }
-  })
+  )
 }

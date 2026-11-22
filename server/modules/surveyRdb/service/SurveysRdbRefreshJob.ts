@@ -1,11 +1,11 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import SurveyRdbCreationJob from './surveyRdbCreationJob'
 
 export default class SurveysRdbRefreshJob extends Job {
   static readonly type = 'SurveysRdbRefreshJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveysRdbRefreshJob.type, params)
   }
 

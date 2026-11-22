@@ -46,7 +46,7 @@ export const getStorageFunctionOrThrow = ({
   return fn
 }
 
-export const deleteTempFile = async (fileNameOrPath: any) => {
+export const deleteTempFile = async (fileNameOrPath: string) => {
   const deleteFn = getStorageFunctionOrThrow({
     functionByStorageType: contentDeleteFunctionByStorageType,
     operation: 'deleteTempFile',
@@ -71,9 +71,9 @@ export const writeChunkToTempFile = async ({
   fileContent = null,
 }: {
   fileId: string
-  chunk: any
+  chunk: number
   filePath?: string
-  fileContent?: any
+  fileContent?: Buffer | string
 }) => {
   checkFileIdIsValid(fileId)
   const writeChunkFunction = getStorageFunctionOrThrow({
@@ -89,8 +89,8 @@ export const mergeTempChunks = async ({
   onChunkMerged = null,
 }: {
   fileId: string
-  totalChunks: any
-  onChunkMerged?: any
+  totalChunks: number
+  onChunkMerged?: ((progress: { chunk: number; totalChunks: number }) => Promise<void> | void) | null
 }) => {
   checkFileIdIsValid(fileId)
   const mergeChunksFunction = getStorageFunctionOrThrow({

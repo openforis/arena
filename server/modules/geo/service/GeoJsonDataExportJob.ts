@@ -10,7 +10,7 @@ import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import i18nInstance from '@core/i18n/i18nFactory'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -21,8 +21,8 @@ const generateLocationGeoJson = ({
   latitude,
 }: {
   survey: ArenaSurvey
-  longitude: any
-  latitude: any
+  longitude: number
+  latitude: number
 }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
@@ -58,7 +58,7 @@ const extractKeys = ({
 export class GeoJsonDataExportJob extends Job {
   static readonly type = 'GeoJsonDataExportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(GeoJsonDataExportJob.type, params)
   }
 

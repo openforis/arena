@@ -1,6 +1,6 @@
 import { ArrayUtils } from '@core/arrayUtils'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import { ExportFile } from '../exportFile'
 
@@ -8,7 +8,7 @@ const taxaBatchSize = 10000
 const draft = true // always include draft taxonomies
 
 export default class TaxonomiesExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('TaxonomiesExportJob', params)
   }
 

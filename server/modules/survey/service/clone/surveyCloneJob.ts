@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import SurveyExportJob from '../surveyExport/surveyExportJob'
 import ArenaImportJob from '../../../arenaImport/service/arenaImport/arenaImportJob'
@@ -7,7 +7,7 @@ import { SurveyCreatorJobHelper } from '../surveyCreatorJobHelper'
 export default class SurveyCloneJob extends Job {
   static readonly type: string = 'SurveyCloneJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     const backup = false
     const cloning = true
     const { cycle } = params

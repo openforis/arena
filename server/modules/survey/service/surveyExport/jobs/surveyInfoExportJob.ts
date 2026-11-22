@@ -5,7 +5,7 @@ import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { addAiPolicyToExportedSurvey } from '@server/modules/ai/service/surveyAiPolicyService'
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { ExportFile } from '../exportFile'
 
@@ -25,7 +25,7 @@ const keepOnlyOneCycle = ({ survey, cycle }: { survey: ArenaSurvey; cycle: strin
 }
 
 export default class SurveyInfoExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('SurveyInfoExportJob', params)
   }
 

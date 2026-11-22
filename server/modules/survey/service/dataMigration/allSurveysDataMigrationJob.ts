@@ -1,6 +1,6 @@
 import { DBMigrator, runWithClusterLock } from '@openforis/arena-server'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
 import SurveyDataMigrationJob, { getPendingSurveyDataMigrationSteps } from './surveyDataMigrationJob'
@@ -31,7 +31,7 @@ export const getSurveysToMigrate = (surveys: SurveyIdAndAppVersion[]): SurveyIdA
 export default class AllSurveysDataMigrationJob extends Job {
   static readonly type = 'AllSurveysDataMigrationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(AllSurveysDataMigrationJob.type, params)
   }
 

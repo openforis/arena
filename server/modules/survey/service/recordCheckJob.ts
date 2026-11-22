@@ -20,7 +20,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as DbUtils from '@server/db/dbUtils'
 import BatchPersister from '@server/db/batchPersister'
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
 import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
@@ -36,7 +36,7 @@ export default class RecordCheckJob extends Job {
 
   static readonly type: string = 'RecordCheckJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordCheckJob.type, params)
 
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle

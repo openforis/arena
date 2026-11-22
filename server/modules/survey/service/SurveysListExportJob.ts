@@ -1,7 +1,7 @@
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '../manager/surveyManager'
@@ -9,7 +9,7 @@ import * as SurveyManager from '../manager/surveyManager'
 export default class SurveysListExportJob extends Job {
   static readonly type: string = 'SurveysListExportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveysListExportJob.type, params)
   }
 

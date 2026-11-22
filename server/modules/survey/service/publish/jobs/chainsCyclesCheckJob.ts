@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 
@@ -10,7 +10,7 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 export default class ChainsCyclesCheckJob extends Job {
   static readonly type: string = 'ChainsCyclesCheckJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(ChainsCyclesCheckJob.type, params)
   }
 

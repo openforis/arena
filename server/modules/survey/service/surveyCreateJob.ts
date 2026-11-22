@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 
@@ -7,7 +7,7 @@ import * as SurveyManager from '../manager/surveyManager'
 export default class SurveyCreatorJob extends Job {
   static readonly type: string = 'SurveyCreatorJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyCreatorJob.type, params)
   }
 

@@ -10,7 +10,7 @@ import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
@@ -55,7 +55,7 @@ type SamplingPointFeature = {
 export default class SamplingPointDataWhispAnalysisJob extends Job {
   static readonly type = 'SamplingPointDataWhispAnalysisJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SamplingPointDataWhispAnalysisJob.type, params)
   }
 

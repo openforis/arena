@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ChainManager from '@server/modules/analysis/manager'
@@ -9,7 +9,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
  * Saves the list of inserted chains in the "chains" context property.
  */
 export default class ChainsImportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('ChainsImportJob', params)
   }
 

@@ -3,7 +3,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
@@ -11,7 +11,7 @@ import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
 const errorPrefix = `validationErrors:surveyLabelsImport.`
 
-const extractLabels = ({ row, langCodes, columnPrefix }: { row: any; langCodes: any; columnPrefix: any }) =>
+const extractLabels = ({ row, langCodes, columnPrefix }: { row: any; langCodes: string[]; columnPrefix: string }) =>
   langCodes.reduce((acc, langCode) => {
     const value = row[`${columnPrefix}${langCode}`]
     if (StringUtils.isNotBlank(value)) {
@@ -25,7 +25,7 @@ export default class SurveyLabelsImportJob extends Job {
 
   static readonly type: string = 'SurveyLabelsImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyLabelsImportJob.type, params)
     this.validateHeaders = this.validateHeaders.bind(this)
   }

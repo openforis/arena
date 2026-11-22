@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as TempFileManager from '../manager/tempFileManager'
 
@@ -6,7 +6,7 @@ import * as TempFileManager from '../manager/tempFileManager'
  * Merges uploaded temp chunks into a single file before the main import work starts.
  */
 export default class PrepareImportFileJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('PrepareImportFileJob', params)
   }
 

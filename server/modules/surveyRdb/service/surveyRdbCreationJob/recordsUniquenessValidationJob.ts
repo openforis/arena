@@ -9,7 +9,7 @@ import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -36,7 +36,7 @@ export default class RecordsUniquenessValidationJob extends Job {
   // Cache of record validations
   validationByRecordUuid: Record<string, ArenaValidation>
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsUniquenessValidationJob.type, params)
 
     this.validationByRecordUuid = {}

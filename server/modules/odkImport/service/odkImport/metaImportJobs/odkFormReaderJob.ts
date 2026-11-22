@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as XForm from '../model/xform'
@@ -10,7 +10,7 @@ import * as XForm from '../model/xform'
 export default class OdkFormReaderJob extends Job {
   static readonly type = 'OdkFormReaderJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(OdkFormReaderJob.type, params)
   }
 

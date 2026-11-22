@@ -1,6 +1,6 @@
 import { Versions } from '@openforis/arena-core'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import {
   getCurrentAppVersionStamp,
@@ -28,7 +28,7 @@ export const getPendingSurveyDataMigrationSteps = ({
 export default class SurveyDataMigrationJob extends Job {
   static readonly type = 'SurveyDataMigrationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyDataMigrationJob.type, params)
   }
 

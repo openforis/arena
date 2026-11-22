@@ -1,1 +1,1 @@
-export const getChunkFileName = ({ fileId, chunk }: { fileId: string; chunk: any }) => `${fileId}_part${chunk}`
+export const getChunkFileName = ({ fileId, chunk }: { fileId: string; chunk: number }) => `${fileId}_part${chunk}`

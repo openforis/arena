@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import * as A from '@core/arena'
 
 import { PointFactory, Points } from '@openforis/arena-core'
@@ -25,7 +26,7 @@ const keysItem = {
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
 class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(
       {
         ...params,
@@ -126,7 +127,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
 }
 
 export default class SamplingPointDataImportJob extends CategoryImportJob {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(params, 'SamplingPointDataImportJob', SamplingPointDataImportInternalJob)
   }
 }

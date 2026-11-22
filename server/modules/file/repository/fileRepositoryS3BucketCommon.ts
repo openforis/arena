@@ -59,7 +59,7 @@ export const checkFileExistsInS3 = async ({ key }: { key: string }) => {
   }
 }
 
-export const copyObjectInS3 = ({ sourceKey, destinationKey }: { sourceKey: any; destinationKey: any }) => {
+export const copyObjectInS3 = ({ sourceKey, destinationKey }: { sourceKey: string; destinationKey: string }) => {
   const command = new CopyObjectCommand({
     Bucket,
     CopySource: `${Bucket}/${sourceKey}`,

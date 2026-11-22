@@ -15,7 +15,7 @@ import * as User from '@core/user/user'
 
 import BatchPersister from '@server/db/batchPersister'
 import * as FileXml from '@server/utils/file/fileXml'
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
@@ -63,7 +63,7 @@ export default class RecordsImportJob extends Job {
   static readonly type = 'RecordsImportJob'
   batchPersister: any
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsImportJob.type, params)
 
     this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)

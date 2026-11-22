@@ -1,11 +1,11 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 export default class SurveyRdbSchemaCreationJob extends Job {
   static readonly type = 'SurveyRdbSchemaCreationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyRdbSchemaCreationJob.type, params)
   }
 

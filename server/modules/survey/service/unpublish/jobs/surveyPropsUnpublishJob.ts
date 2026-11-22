@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -8,7 +8,7 @@ import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManag
 export default class SurveyPropsUnpublishJob extends Job {
   static readonly type: string = 'SurveyPropsUnpublishJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyPropsUnpublishJob.type, params)
   }
 

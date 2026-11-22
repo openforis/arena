@@ -1,9 +1,9 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 
 export default class CSVDataExtractionJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('CSVDataExtraction', params)
   }
 

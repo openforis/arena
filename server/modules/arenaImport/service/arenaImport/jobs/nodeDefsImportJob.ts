@@ -1,13 +1,13 @@
 import * as Survey from '@core/survey/survey'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
 export default class NodeDefsImportJob extends Job {
   static readonly type = 'NodeDefsImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(NodeDefsImportJob.type, params)
   }
 
