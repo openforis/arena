@@ -88,7 +88,7 @@ export const validateSortedNodesAndPersistValidation = async (
     record: ArenaRecord
     nodesArray: ArenaRecordNode[]
     validateRecordUniqueness?: boolean
-    mergeValidation?: any
+    mergeValidation?: boolean
   },
   tx: DbClient
 ) => {

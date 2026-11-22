@@ -43,7 +43,7 @@ export const writeFileContent = async ({
 }: {
   surveyId: number
   fileUuid: string
-  content: any
+  content: Parameters<typeof FileUtils.writeFile>[1]
   recordUuid?: string
 }) => {
   const subfolderPath = getSubfolderPath({ surveyId, recordUuid })

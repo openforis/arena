@@ -16,7 +16,7 @@ const pgp = pgPromise()
 // column name (prefixed with '?' if it's only a condition column) or pg-promise column config
 export type ColumnSetColumn = string | pgPromise.IColumnConfig<any>
 
-type StreamProcessor = (stream: Readable) => Promise<unknown>
+export type StreamProcessor = (stream: Readable) => Promise<unknown>
 
 export const QueryStream = _QueryStream
 

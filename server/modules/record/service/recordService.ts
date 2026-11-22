@@ -16,12 +16,18 @@ import {
   type ArenaSurveyDocImage,
   ArenaAnyNodeDef,
 } from '@openforis/arena-core'
-import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
+import { SurveyDocxGenerator, type SurveyDocxOptions, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-import { PrintableExportScopes, PrintOrientations } from '@common/record/printableExport'
+import {
+  type PrintableExportScope,
+  PrintableExportScopes,
+  type PrintOrientation,
+  PrintOrientations,
+} from '@common/record/printableExport'
+import { Query } from '@common/model/query'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -65,6 +71,10 @@ import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
 import { resolveValidationReportParams } from './validationReportParams'
+
+type UploadedFile = { name: string; size: number; tempFilePath: string }
+
+type PrintableDocumentGenerator = (options: SurveyDocxOptions) => Promise<{ buffer: Buffer; surveyName: string }>
 
 const Logger = Log.getLogger('RecordService')
 
@@ -470,9 +480,9 @@ export const fetchValidationReport = async ({
   offset: number
   limit: number | null
   recordUuid: string
-  query: any
+  query: Query.QueryItem | null
   attributeDefUuids?: string[]
-  messageTypeKeys?: any
+  messageTypeKeys?: string[] | null
   sortBy: string | null
   sortOrder: string | null
 }) => {
@@ -511,9 +521,9 @@ export const countValidationReportItems = async ({
   surveyId: number
   cycle: string
   recordUuid: string
-  query: any
+  query: Query.QueryItem | null
   attributeDefUuids?: string[]
-  messageTypeKeys?: any
+  messageTypeKeys?: string[] | null
 }) => {
   const { rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
     user,
@@ -543,8 +553,8 @@ export const startRecordsCloneJob = ({
 }: {
   user: ArenaUser
   surveyId: number
-  cycleFrom: any
-  cycleTo: any
+  cycleFrom: string
+  cycleTo: string
   recordsUuids: string[]
 }) => {
   const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
@@ -569,9 +579,9 @@ export const startValidationReportGenerationJob = ({
   cycle: string
   lang: string
   recordUuid: string
-  query: any
+  query: Query.QueryItem | null
   attributeDefUuids: string[]
-  messageTypeKeys: any
+  messageTypeKeys: string[] | null
   fileFormat: string
 }) => {
   const job = new VaidationReportGenerationJob({
@@ -598,19 +608,17 @@ export const startRecordsValidationJob = ({ user, surveyId }: { user: ArenaUser;
 // NODE
 const _sendNodeUpdateMessage = async ({
   socketId,
-  user,
   recordUuid,
   msg,
 }: {
   socketId: string
-  user: ArenaUser
   recordUuid: string
-  msg: any
+  msg: { [key: string]: unknown }
 }) => {
   await _assocSocketBestEffort({ recordUuid, socketId })
 
   const thread = RecordsUpdateThreadService.getOrCreatedThread()
-  thread.postMessage(msg, user)
+  thread.postMessage(msg)
 }
 
 export const { fetchNodeByUuid } = RecordManager
@@ -634,7 +642,7 @@ export const persistNode = async ({
   draft: boolean
   cycle: string
   node: ArenaRecordNode
-  file?: any
+  file?: UploadedFile
   timezoneOffset?: number
   lang?: string
   clearNonApplicableValuesConfirmed?: boolean
@@ -661,7 +669,6 @@ export const persistNode = async ({
 
   await _sendNodeUpdateMessage({
     socketId,
-    user,
     recordUuid,
     msg: {
       type: RecordsUpdateThreadMessageTypes.nodePersist,
@@ -703,7 +710,6 @@ export const deleteNode = ({
 }) =>
   _sendNodeUpdateMessage({
     socketId,
-    user,
     recordUuid,
     msg: {
       type: RecordsUpdateThreadMessageTypes.nodeDelete,
@@ -932,8 +938,8 @@ const generateDocumentWithQrCode = async ({
   entityDefUuid: string
   entityNodeUuid: string
   serverUrl: string
-  generatorOptions: any
-  generator: any
+  generatorOptions: SurveyDocxOptions
+  generator: PrintableDocumentGenerator
   extension: string
 }) => {
   if (!serverUrl) {
@@ -992,13 +998,13 @@ const exportRecordDocument = async ({
   recordUuid: string
   outputStream: ExpressResponse
   lang: string
-  generator: any
+  generator: PrintableDocumentGenerator
   extension: string
-  contentType: any
-  exportScope?: any
+  contentType: string
+  exportScope?: PrintableExportScope
   entityDefUuid: string
   entityNodeUuid: string
-  orientation?: any
+  orientation?: PrintOrientation
   includeQrCode?: boolean
   serverUrl?: string
 }) => {
@@ -1127,10 +1133,10 @@ export const exportRecordDocx = ({
   recordUuid: string
   outputStream: ExpressResponse
   lang?: string
-  exportScope: any
+  exportScope: PrintableExportScope
   entityDefUuid: string
   entityNodeUuid: string
-  orientation: any
+  orientation: PrintOrientation
   includeQrCode: boolean
   serverUrl: string
 }) =>
@@ -1169,10 +1175,10 @@ export const exportRecordPdf = ({
   recordUuid: string
   outputStream: ExpressResponse
   lang?: string
-  exportScope: any
+  exportScope: PrintableExportScope
   entityDefUuid: string
   entityNodeUuid: string
-  orientation: any
+  orientation: PrintOrientation
   includeQrCode: boolean
   serverUrl: string
 }) =>

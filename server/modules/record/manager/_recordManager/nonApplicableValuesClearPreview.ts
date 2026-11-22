@@ -33,7 +33,7 @@ const _findNodeDefUuidsToClear = async ({
   return Array.from(clearedDefUuids ?? [])
 }
 
-const _prepareNodeToPersist = ({ record, node }: { record: ArenaRecord; node: ArenaRecordNode }): any => {
+const _prepareNodeToPersist = ({ record, node }: { record: ArenaRecord; node: ArenaRecordNode }): ArenaRecordNode => {
   const nodeExisting = Record.getNodeByUuid(Node.getUuid(node))(record)
   if (!nodeExisting) {
     return Node.assocCreated(true)(node)
@@ -42,7 +42,7 @@ const _prepareNodeToPersist = ({ record, node }: { record: ArenaRecord; node: Ar
   const refData = node[NodeRefData.keys.refData]
   return A.pipe(
     Node.assocValue(Node.getValue(node)),
-    (n: any) => (refData ? NodeRefData.assocRefData(refData)(n) : n),
+    (n: ArenaRecordNode) => (refData ? NodeRefData.assocRefData(refData)(n) : n),
     Node.assocUpdated(true)
   )(nodeExisting)
 }

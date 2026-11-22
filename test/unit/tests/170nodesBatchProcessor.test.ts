@@ -1,4 +1,5 @@
 import type { DbClient } from '@server/db/db'
+import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
 import { SystemError as ArenaSystemError, type ArenaUser } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -108,7 +109,7 @@ describe('processNodesBatch', () => {
         stepAndOwnerInDb === undefined
           ? recordInDb && { step: Record.getStep(recordInDb), ownerUuid: Record.getOwnerUuid(recordInDb) }
           : stepAndOwnerInDb,
-      fetchQualifierFilters: async () => [{ nodeDef: 'qualifier' }],
+      fetchQualifierFilters: async () => [{ nodeDef: 'qualifier' }] as unknown as QualifierFilter[],
       recordMatchesQualifierFilters: ({ pendingNode }) => matchesQualifiers({ pendingNode }),
       findNodeRecordUuid: async ({ nodeUuid, t }) => {
         expect(t).toBe('tx')

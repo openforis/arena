@@ -15,7 +15,7 @@ import * as RecordManager from '../manager/recordManager'
 import { resolveValidationReportParams } from './validationReportParams'
 
 export default class VaidationReportGenerationJob extends Job {
-  categoriesTempFolderName: any
+  categoriesTempFolderName: string | undefined
   dbStream: Readable
 
   static readonly type: string = 'VaidationReportGenerationJob'

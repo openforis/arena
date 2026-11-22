@@ -62,7 +62,7 @@ const _onNodeUpdate = async (
   survey: ArenaSurvey,
   record: ArenaRecord,
   node: ArenaRecordNode,
-  nodeDependents: any,
+  nodeDependents: NodesByUuid | null,
   t: DbClient
 ) => {
   const surveyId = Survey.getId(survey)

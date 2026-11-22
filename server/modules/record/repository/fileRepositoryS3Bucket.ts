@@ -44,7 +44,7 @@ const deleteFiles = async ({
 // unlike the shared temp-file repository (where a missing object is always an error), a record
 // file registered in the DB can legitimately have no content left in the bucket, so return null
 // instead of throwing, matching the other storage backends (filesystem, DB)
-const getFileContentAsStream = async (params: any) => {
+const getFileContentAsStream = async (params: Parameters<typeof getFileContentAsStreamRaw>[0]) => {
   try {
     return await getFileContentAsStreamRaw(params)
   } catch (error) {
