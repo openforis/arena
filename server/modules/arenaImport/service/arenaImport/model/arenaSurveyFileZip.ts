@@ -59,8 +59,8 @@ export const getChainMauFilesSummaries = (zipFile: FileZip) => _getJson(zipFile,
 export const getFilesSummaries = (zipFile: FileZip) => _getJson(zipFile, ExportFile.filesSummaries)
 export const getFile = (zipFile: FileZip, fileUuid: string) => zipFile.getEntryData(ExportFile.file({ fileUuid }))
 // Deprecated
-export const getFileUuidsOld = async (zipFile: FileZip) => {
-  const entryNames = (await zipFile.getEntryNames({ path: ExportFile.filesDir })) || []
+export const getFileUuidsOld = (zipFile: FileZip) => {
+  const entryNames = zipFile.getEntryNames({ path: ExportFile.filesDir }) || []
   // extract uuids from entry names
   return entryNames.map((entryName) => entryName.slice(1, -5))
 }
