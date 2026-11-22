@@ -18,7 +18,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as AuthManager from '@server/modules/auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
-import { UserInviteEmail } from './userInviteEmail'
+import { UserInviteEmail, type UserInviteEmailParams } from './userInviteEmail'
 
 export const getResetPasswordUrl = ({ serverUrl, uuid }: { serverUrl: string; uuid: string }) =>
   `${serverUrl}/guest/resetPassword/${uuid}`
@@ -34,7 +34,7 @@ const _getPrettyFormatUserName = ({ user, i18n }: { user: ArenaUser; i18n: Arena
 }
 
 const _generateResetPasswordAndSendEmail = async (
-  { email, emailParams, i18n }: { email: string; emailParams: any; i18n: ArenaI18n },
+  { email, emailParams, i18n }: { email: string; emailParams: UserInviteEmailParams; i18n: ArenaI18n },
   t: DbClient
 ) => {
   const { serverUrl } = emailParams
@@ -86,7 +86,7 @@ const _inviteNewUserAndSendEmail = async (
     group: ArenaAuthGroup
     survey: ArenaSurvey
     surveyCycleKey: string
-    emailParams: any
+    emailParams: UserInviteEmailParams
     i18n: ArenaI18n
   },
   t: DbClient
@@ -181,7 +181,7 @@ const _repeatInvitation = async (
     survey: ArenaSurvey
     userToInvite: ArenaUser
     email: string
-    emailParams: any
+    emailParams: UserInviteEmailParams
     i18n: ArenaI18n
   },
   t: DbClient
@@ -224,7 +224,7 @@ const _invitePendingUser = async (
     userToInvite: ArenaUser
     email: string
     repeatInvitation: boolean
-    emailParams: any
+    emailParams: UserInviteEmailParams
     i18n: ArenaI18n
   },
   t: DbClient
@@ -271,7 +271,7 @@ const _inviteUser = (
     i18n: ArenaI18n
     email: string
     survey: ArenaSurvey
-    invitation: any
+    invitation: UserGroupInvitation.UserGroupInvitation
     group: ArenaAuthGroup
     repeatInvitation: boolean
     surveyCycleKey: string
@@ -338,7 +338,7 @@ export const inviteUsers = async (
     user: ArenaUser
     surveyId: number
     surveyCycleKey: string
-    invitation: any
+    invitation: UserGroupInvitation.UserGroupInvitation
     serverUrl: string
     repeatInvitation?: boolean
   },

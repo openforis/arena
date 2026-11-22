@@ -91,7 +91,18 @@ export const fetchUserInvitationsBySurveyUuid = ({ surveyUuid }: { surveyUuid: s
   )
 
 export const insertManyBatch = (
-  { survey, userInvitations }: { survey: ArenaSurvey; userInvitations: any },
+  {
+    survey,
+    userInvitations,
+  }: {
+    survey: ArenaSurvey
+    userInvitations: {
+      userUuid: string
+      invitedBy: string
+      invitedDate: string
+      removedDate?: string | null
+    }[]
+  },
   client: DbClient = db
 ) =>
   userInvitations.length > 0 &&

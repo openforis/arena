@@ -54,6 +54,9 @@ export type UserAccessRequest = {
   createdSurveyName?: string | null
 }
 
+// access request submitted by a user (with the reCaptcha token)
+export type UserAccessRequestSubmission = Pick<UserAccessRequest, 'email' | 'props'> & { reCaptchaToken?: string }
+
 export const editableFields = [
   { name: keys.email, required: true },
   { name: `props.${keysProps.firstName}`, required: true },
