@@ -61,7 +61,7 @@
       "items": [
         {
           "type": "kicker",
-          "text": "Everyone"
+          "text": "Look and feel"
         },
         {
           "type": "title",
@@ -105,7 +105,7 @@
       "items": [
         {
           "type": "kicker",
-          "text": "Survey admins"
+          "text": "Look and feel · Survey admins"
         },
         {
           "type": "title",
@@ -244,220 +244,86 @@
       ]
     },
     {
-      "id": "aoi",
-      "theme": "dark",
+      "id": "surveys",
       "say": [
-        "With areas of interest, Arena checks if a location is inside an area.",
-        "In the survey info, add one or more polygons, for example the municipalities of a pilot area, and check them on a map as you add them.",
-        "They also show up as layers in the data map."
+        "Moving surveys between servers is easier.",
+        "Compare a survey with one from another server, for example test and production, and apply only the changes you pick."
       ],
       "items": [
         {
           "type": "kicker",
-          "text": "Survey design · Maps"
+          "text": "Survey design · Survey management"
         },
         {
           "type": "title",
-          "text": "Areas of interest",
-          "size": 96
+          "text": "Move surveys between servers"
         },
         {
           "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/areaOfInterestDialog.jpg",
+          "src": "web:whats-new/surveyCompare.png",
           "x": 120,
-          "y": 360,
-          "w": 760,
-          "h": 600,
-          "caption": "GeoJSON polygons, checked on the map"
-        },
-        {
-          "type": "shot",
-          "at": 2,
-          "src": "web:whats-new/areaOfInterestDataMap.jpg",
-          "x": 960,
-          "y": 470,
-          "w": 840,
-          "h": 320,
-          "caption": "Shown as layers in Data > Map"
-        }
-      ]
-    },
-    {
-      "id": "aoiExpressions",
-      "theme": "dark",
-      "say": [
-        "So, is the plot inside the area?",
-        "The new function, geo distance to A-O-I boundary, gives the distance from a location to the edge of the area: negative inside, positive outside.",
-        "Compare it with the G-P-S accuracy, and field teams know right away if a plot is inside, outside, or uncertain.",
-        "And it all works offline, in Arena Mobile."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Areas of interest · Expressions"
-        },
-        {
-          "type": "title",
-          "text": "Is the plot inside the area?"
-        },
-        {
-          "type": "aoiMap",
-          "x": 120,
-          "y": 290,
-          "w": 960,
-          "h": 690
-        },
-        {
-          "type": "code",
-          "at": 1,
-          "delay": 0.6,
-          "text": "geoDistanceToAOIBoundary(\n  location, 'pilot_area'\n)",
-          "x": 1150,
           "y": 300,
-          "w": 650
-        },
-        {
-          "type": "legend",
-          "at": 2,
-          "delay": 0.4,
-          "x": 1150,
-          "y": 560,
-          "w": 650
-        },
-        {
-          "type": "chips",
-          "at": 3,
-          "x": 1150,
-          "y": 870,
-          "w": 650,
-          "items": [
-            "Offline in Arena Mobile, too"
-          ],
-          "icon": "local:arena-mobile-icon.png"
-        }
-      ]
-    },
-    {
-      "id": "print",
-      "say": [
-        "Need a paper copy? Records can now be printed, in Word or P-D-F.",
-        "They follow the form layout, with pictures, a Q-R code, and your own letterhead."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Data entry"
-        },
-        {
-          "type": "title",
-          "text": "Print records, ready to file or share"
-        },
-        {
-          "type": "shot",
-          "src": "deck:printed-record.png",
-          "x": 1120,
-          "y": 250,
-          "w": 680,
-          "h": 790,
-          "paper": true
-        },
-        {
-          "type": "chips",
-          "delay": 1.2,
-          "x": 120,
-          "y": 330,
-          "w": 820,
-          "items": [
-            "Word or PDF, portrait or landscape"
-          ]
+          "w": 1180,
+          "h": 620,
+          "caption": "Compare and update"
         },
         {
           "type": "chips",
           "at": 1,
-          "x": 120,
-          "y": 420,
-          "w": 820,
+          "x": 1360,
+          "y": 380,
+          "w": 440,
           "items": [
-            "Follows the form layout",
-            "Pictures included",
-            "QR code to open the record online",
-            "Your own header and footer"
+            "Test → production",
+            "Only the changes you pick"
           ]
         }
       ]
     },
     {
-      "id": "explorer",
+      "id": "odk",
       "say": [
-        "New in the Data Explorer, still experimental: describe the data you need, and A-I builds the query for you.",
-        "Then export species-by-record tables, ready for vegetation analysis tools."
+        "Coming from O-D-K? Create a survey from an O-D-K form, in one step.",
+        "Then import the data collected with O-D-K Collect: the records show up in the records list and in the Data Explorer.",
+        "Submissions already imported are skipped."
       ],
       "items": [
         {
           "type": "kicker",
-          "text": "Data Explorer"
+          "text": "Survey design · ODK"
         },
         {
           "type": "title",
-          "text": "Ask, explore, export"
+          "text": "From ODK to Arena, form and data"
         },
         {
           "type": "shot",
-          "src": "web:whats-new/dataQueryAiGenerate.png",
+          "src": "web:whats-new/odkImport.png",
           "x": 120,
           "y": 290,
-          "w": 800,
+          "w": 760,
+          "h": 690,
+          "caption": "New survey › Import › ODK (.xml)"
+        },
+        {
+          "type": "shot",
+          "at": 1,
+          "src": "web:whats-new/odkDataImport.png",
+          "x": 960,
+          "y": 300,
+          "w": 840,
           "h": 480,
-          "caption": "Ask AI (experimental)",
-          "sub": "Describe the data, AI builds the query"
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/dataMatrixExport.png",
-          "x": 860,
-          "y": 540,
-          "w": 940,
-          "h": 440,
-          "caption": "Data matrix export",
-          "sub": "For Turboveg, Juice and Synbiosys"
-        }
-      ]
-    },
-    {
-      "id": "totals",
-      "say": [
-        "In aggregate mode, the Data Explorer now shows totals and percentages:",
-        "a total row, and the percentage of each row, from the new View menu."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Data Explorer"
-        },
-        {
-          "type": "title",
-          "text": "Totals and percentages"
-        },
-        {
-          "type": "shot",
-          "src": "web:whats-new/dataQueryTotals.png",
-          "x": 120,
-          "y": 290,
-          "w": 1100,
-          "h": 680
+          "caption": "Data import › ODK / ODK Collect",
+          "sub": "A .zip with one folder per submission"
         },
         {
           "type": "chips",
-          "at": 1,
-          "x": 1300,
-          "y": 420,
-          "w": 500,
+          "at": 2,
+          "x": 960,
+          "y": 830,
+          "w": 840,
           "items": [
-            "Total row",
-            "Percentage of each row",
-            "View › Show total and percentage"
+            "Already imported submissions skipped"
           ]
         }
       ]
@@ -530,6 +396,412 @@
       ]
     },
     {
+      "id": "aoi",
+      "theme": "dark",
+      "say": [
+        "With areas of interest, Arena checks if a location is inside an area.",
+        "In the survey info, add one or more polygons, for example the municipalities of a pilot area, and check them on a map as you add them.",
+        "They also show up as layers in the data map."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Maps"
+        },
+        {
+          "type": "title",
+          "text": "Areas of interest",
+          "size": 96
+        },
+        {
+          "type": "shot",
+          "at": 1,
+          "src": "web:whats-new/areaOfInterestDialog.jpg",
+          "x": 120,
+          "y": 360,
+          "w": 760,
+          "h": 600,
+          "caption": "GeoJSON polygons, checked on the map"
+        },
+        {
+          "type": "shot",
+          "at": 2,
+          "src": "web:whats-new/areaOfInterestDataMap.jpg",
+          "x": 960,
+          "y": 470,
+          "w": 840,
+          "h": 320,
+          "caption": "Shown as layers in Data > Map"
+        }
+      ]
+    },
+    {
+      "id": "aoiExpressions",
+      "theme": "dark",
+      "say": [
+        "So, is the plot inside the area?",
+        "The new function, geo distance to A-O-I boundary, gives the distance from a location to the edge of the area: negative inside, positive outside.",
+        "Compare it with the G-P-S accuracy, and field teams know right away if a plot is inside, outside, or uncertain.",
+        "And it all works offline, in Arena Mobile."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Maps · Expressions"
+        },
+        {
+          "type": "title",
+          "text": "Is the plot inside the area?"
+        },
+        {
+          "type": "aoiMap",
+          "x": 120,
+          "y": 290,
+          "w": 960,
+          "h": 690
+        },
+        {
+          "type": "code",
+          "at": 1,
+          "delay": 0.6,
+          "text": "geoDistanceToAOIBoundary(\n  location, 'pilot_area'\n)",
+          "x": 1150,
+          "y": 300,
+          "w": 650
+        },
+        {
+          "type": "legend",
+          "at": 2,
+          "delay": 0.4,
+          "x": 1150,
+          "y": 560,
+          "w": 650
+        },
+        {
+          "type": "chips",
+          "at": 3,
+          "x": 1150,
+          "y": 870,
+          "w": 650,
+          "items": [
+            "Offline in Arena Mobile, too"
+          ],
+          "icon": "local:arena-mobile-icon.png"
+        }
+      ]
+    },
+    {
+      "id": "preloadedLayers",
+      "say": [
+        "Survey administrators can now preload map layers, like the boundaries of the sampling units, or the roads of the study area.",
+        "Add Geo JSON, K-M-L or K-M-Z files in the survey info.",
+        "They show up in the data map, and Arena Mobile downloads them with the survey, to use them offline."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Maps · Survey admins"
+        },
+        {
+          "type": "title",
+          "text": "Preloaded map layers, also offline"
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "icon": "layers",
+          "title": "Your map files",
+          "text": "GeoJSON, KML or KMZ, e.g. sampling unit boundaries or roads.",
+          "x": 120,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "card",
+          "at": 2,
+          "icon": "map",
+          "title": "In the data map",
+          "text": "Shown as layers in Data › Map, next to your records.",
+          "x": 700,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "card",
+          "at": 2,
+          "delay": 2.6,
+          "icon": "phone",
+          "title": "Offline in the field",
+          "text": "Downloaded with the survey by Arena Mobile.",
+          "x": 1280,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "delay": 1.2,
+          "x": 120,
+          "y": 830,
+          "w": 1680,
+          "row": true,
+          "items": [
+            "Survey info › Map",
+            "Up to 10 MiB per file"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "positionTracking",
+      "say": [
+        "Arena Mobile can now record the path walked in the field.",
+        "Check Position tracking on a geospatial attribute, and the device records the path while the record is filled in.",
+        "It cannot be edited by hand."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Maps · Arena Mobile"
+        },
+        {
+          "type": "title",
+          "text": "Position tracking: the path walked"
+        },
+        {
+          "type": "track",
+          "x": 120,
+          "y": 290,
+          "w": 860,
+          "h": 690,
+          "walk": 11
+        },
+        {
+          "type": "shot",
+          "at": 1,
+          "src": "web:whats-new/positionTracking.png",
+          "x": 1040,
+          "y": 300,
+          "w": 760,
+          "h": 340,
+          "caption": "Geospatial attribute › Basic"
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "x": 1040,
+          "y": 700,
+          "w": 760,
+          "items": [
+            "Recorded automatically",
+            "Cannot be edited by hand"
+          ]
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "delay": 1.2,
+          "x": 1040,
+          "y": 870,
+          "w": 760,
+          "items": [
+            "Arena Mobile only"
+          ],
+          "icon": "local:arena-mobile-icon.png"
+        }
+      ]
+    },
+    {
+      "id": "print",
+      "say": [
+        "Need a paper copy? Records can now be printed, in Word or P-D-F.",
+        "They follow the form layout, with pictures, a Q-R code, and your own letterhead."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Data"
+        },
+        {
+          "type": "title",
+          "text": "Print records, ready to file or share"
+        },
+        {
+          "type": "shot",
+          "src": "deck:printed-record.png",
+          "x": 1120,
+          "y": 250,
+          "w": 680,
+          "h": 790,
+          "paper": true
+        },
+        {
+          "type": "chips",
+          "delay": 1.2,
+          "x": 120,
+          "y": 330,
+          "w": 820,
+          "items": [
+            "Word or PDF, portrait or landscape"
+          ]
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "x": 120,
+          "y": 420,
+          "w": 820,
+          "items": [
+            "Follows the form layout",
+            "Pictures included",
+            "QR code to open the record online",
+            "Your own header and footer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "uploadEmail",
+      "say": [
+        "Survey administrators can now get an email when records are uploaded from Arena Mobile.",
+        "One email per upload lists the records: their keys, new or updated, who created them, and their errors and warnings.",
+        "Turn it on in the survey info, under Security."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Data · Arena Mobile"
+        },
+        {
+          "type": "title",
+          "text": "An email for every upload from Arena Mobile"
+        },
+        {
+          "type": "card",
+          "delay": 1.2,
+          "icon": "phone",
+          "title": "Records uploaded",
+          "text": "From Arena Mobile, by any field team.",
+          "x": 120,
+          "y": 320,
+          "w": 520,
+          "h": 420
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "icon": "mail",
+          "title": "One email per upload",
+          "text": "To every survey administrator, even when a device uploads many records.",
+          "x": 700,
+          "y": 320,
+          "w": 520,
+          "h": 420
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "delay": 2.4,
+          "icon": "list",
+          "title": "Every record listed",
+          "text": "Keys, new or updated, creator, dates, errors and warnings.",
+          "x": 1280,
+          "y": 320,
+          "w": 520,
+          "h": 420
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "x": 120,
+          "y": 800,
+          "w": 1680,
+          "row": true,
+          "items": [
+            "Survey info › Security",
+            "Off by default"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "totals",
+      "say": [
+        "In aggregate mode, the Data Explorer now shows totals and percentages:",
+        "a total row, and the percentage of each row, from the new View menu."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Data · Data Explorer"
+        },
+        {
+          "type": "title",
+          "text": "Totals and percentages"
+        },
+        {
+          "type": "shot",
+          "src": "web:whats-new/dataQueryTotals.png",
+          "x": 120,
+          "y": 290,
+          "w": 1100,
+          "h": 680
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "x": 1300,
+          "y": 420,
+          "w": 500,
+          "items": [
+            "Total row",
+            "Percentage of each row",
+            "View › Show total and percentage"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "explorer",
+      "say": [
+        "And for vegetation surveys, export species-by-record tables, ready for analysis tools like Turboveg, Juice and Synbiosys."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Data · Data Explorer"
+        },
+        {
+          "type": "title",
+          "text": "Species-by-record tables"
+        },
+        {
+          "type": "shot",
+          "src": "web:whats-new/dataMatrixExport.png",
+          "x": 120,
+          "y": 300,
+          "w": 1180,
+          "h": 640,
+          "caption": "Data matrix export"
+        },
+        {
+          "type": "chips",
+          "delay": 1.2,
+          "x": 1360,
+          "y": 380,
+          "w": 440,
+          "items": [
+            "Turboveg",
+            "Juice",
+            "Synbiosys"
+          ]
+        }
+      ]
+    },
+    {
       "id": "analysis",
       "say": [
         "For analysis, run Whisp on every sampling point, in the background,",
@@ -585,7 +857,7 @@
       "items": [
         {
           "type": "kicker",
-          "text": "Under the hood"
+          "text": "Analysis · Under the hood"
         },
         {
           "type": "title",
@@ -625,17 +897,88 @@
       ]
     },
     {
+      "id": "signIn",
+      "say": [
+        "Sign in with your Google account, instead of typing your password.",
+        "Arena links it to your account by its email address, and invitations can be accepted with Google, too.",
+        "Email and password still work."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Users and security"
+        },
+        {
+          "type": "title",
+          "text": "Sign in with Google"
+        },
+        {
+          "type": "logo",
+          "src": "web:auth-providers/google.svg",
+          "x": 330,
+          "y": 330,
+          "w": 180,
+          "h": 180
+        },
+        {
+          "type": "shot",
+          "delay": 0.6,
+          "src": "web:whats-new/googleSignIn.png",
+          "x": 120,
+          "y": 570,
+          "w": 600,
+          "h": 300,
+          "caption": "On the login page"
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "icon": "mail",
+          "title": "Linked by email",
+          "text": "The same email address as your Arena account.",
+          "x": 820,
+          "y": 340,
+          "w": 470,
+          "h": 420
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "delay": 2.4,
+          "icon": "users",
+          "title": "Invitations, too",
+          "text": "Invited users can accept with their Google account.",
+          "x": 1330,
+          "y": 340,
+          "w": 470,
+          "h": 420
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "x": 820,
+          "y": 820,
+          "w": 980,
+          "row": true,
+          "items": [
+            "My profile › Sign-in methods",
+            "Email and password still available"
+          ]
+        }
+      ]
+    },
+    {
       "id": "security",
       "say": [
         "Security gets stronger:",
-        "two-factor authentication,",
+        "two-factor authentication, now for every user, from your profile,",
         "Q-R code login for Arena Mobile,",
         "and finer control over which user groups can see which records."
       ],
       "items": [
         {
           "type": "kicker",
-          "text": "Security"
+          "text": "Users and security"
         },
         {
           "type": "title",
@@ -646,7 +989,7 @@
           "at": 1,
           "icon": "lock",
           "title": "Two-factor authentication",
-          "text": "A code from an authenticator app at login; each code works only once.",
+          "text": "For every user: a code from an authenticator app.",
           "x": 120,
           "y": 340,
           "w": 520,
@@ -677,110 +1020,6 @@
       ]
     },
     {
-      "id": "uploadEmail",
-      "say": [
-        "Survey administrators can now get an email when records are uploaded from Arena Mobile.",
-        "One email per upload lists the records: their keys, new or updated, who created them, and their errors and warnings.",
-        "Turn it on in the survey info, under Security."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Survey admins"
-        },
-        {
-          "type": "title",
-          "text": "An email for every upload from Arena Mobile"
-        },
-        {
-          "type": "card",
-          "delay": 1.2,
-          "icon": "phone",
-          "title": "Records uploaded",
-          "text": "From Arena Mobile, by any field team.",
-          "x": 120,
-          "y": 320,
-          "w": 520,
-          "h": 420
-        },
-        {
-          "type": "card",
-          "at": 1,
-          "icon": "mail",
-          "title": "One email per upload",
-          "text": "To every survey administrator, even when a device uploads many records.",
-          "x": 700,
-          "y": 320,
-          "w": 520,
-          "h": 420
-        },
-        {
-          "type": "card",
-          "at": 1,
-          "delay": 2.4,
-          "icon": "list",
-          "title": "Every record listed",
-          "text": "Keys, new or updated, creator, dates, errors and warnings.",
-          "x": 1280,
-          "y": 320,
-          "w": 520,
-          "h": 420
-        },
-        {
-          "type": "chips",
-          "at": 2,
-          "x": 120,
-          "y": 800,
-          "w": 1680,
-          "row": true,
-          "items": [
-            "Survey info › Security",
-            "Off by default"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "surveys",
-      "say": [
-        "Moving surveys between servers is easier.",
-        "Compare a survey with one from another server, and apply only the changes you pick.",
-        "You can even create a survey from an O-D-K form, and import its data."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Survey management"
-        },
-        {
-          "type": "title",
-          "text": "Move surveys between servers and tools"
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/surveyCompare.png",
-          "x": 120,
-          "y": 320,
-          "w": 1060,
-          "h": 470,
-          "caption": "Compare and update",
-          "sub": "e.g. test → production, only the changes you pick"
-        },
-        {
-          "type": "shot",
-          "at": 2,
-          "src": "web:whats-new/odkImport.png",
-          "x": 1240,
-          "y": 320,
-          "w": 560,
-          "h": 420,
-          "caption": "Import from ODK (beta)",
-          "sub": "Form and data from ODK Collect"
-        }
-      ]
-    },
-    {
       "id": "guest",
       "say": [
         "And there is a new role: Guest.",
@@ -790,7 +1029,7 @@
       "items": [
         {
           "type": "kicker",
-          "text": "Users"
+          "text": "Users and security"
         },
         {
           "type": "title",
@@ -829,6 +1068,70 @@
           "y": 340,
           "w": 520,
           "h": 430
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "theme": "dark",
+      "say": [
+        "And finally, A-I.",
+        "An assistant helps you design surveys, analyse and clean data, and answers questions about Arena.",
+        "You decide what it can see, and you review its changes before they are applied.",
+        "More on that in the dedicated video on A-I in Arena."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "AI"
+        },
+        {
+          "type": "title",
+          "text": "An AI assistant, under your control"
+        },
+        {
+          "type": "shot",
+          "at": 1,
+          "src": "web:whats-new/aiAssistant.png",
+          "x": 120,
+          "y": 290,
+          "w": 760,
+          "h": 690
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "delay": 1.6,
+          "x": 960,
+          "y": 330,
+          "w": 840,
+          "items": [
+            "Designs and translates the survey",
+            "Analyses and cleans the data",
+            "Answers questions about Arena"
+          ]
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "x": 960,
+          "y": 640,
+          "w": 840,
+          "items": [
+            "You choose what AI can see",
+            "Changes applied after your review"
+          ]
+        },
+        {
+          "type": "chips",
+          "at": 3,
+          "x": 960,
+          "y": 860,
+          "w": 840,
+          "row": true,
+          "items": [
+            "More in the AI video"
+          ]
         }
       ]
     },

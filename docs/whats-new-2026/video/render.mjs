@@ -49,7 +49,8 @@ if (mode === 'stills') {
   const [from, to, out, scale = '2', crf = '20'] = rest
   const { browser, page } = await open(Number(scale))
   const ff = spawn(ffmpegPath(), ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', crf, '-pix_fmt', 'yuv420p', '-r', String(FPS), out], { stdio: ['pipe', 'inherit', 'inherit'] })
+    // few threads per encoder: x264 sizes its buffers on the thread count (all cores: ~2.7 GB each at 4K)
+    '-c:v', 'libx264', '-threads', '2', '-preset', 'medium', '-crf', crf, '-pix_fmt', 'yuv420p', '-r', String(FPS), out], { stdio: ['pipe', 'inherit', 'inherit'] })
   const done = new Promise((resolve, reject) => ff.on('close', (code) => (code ? reject(new Error(`ffmpeg ${code}`)) : resolve())))
   const frame = async (f) => {
     await page.evaluate((x) => window.render(x), f / FPS)
