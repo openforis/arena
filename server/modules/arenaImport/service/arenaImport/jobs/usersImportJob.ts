@@ -1,7 +1,7 @@
 import type FileZip from '@server/utils/file/fileZip'
 import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
 import { UserInvitation } from '@core/user/userInvitation'
@@ -145,7 +145,7 @@ const insertInvitations = async (
 }
 
 export default class UsersImportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('UsersImportJob', params)
   }
 

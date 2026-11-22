@@ -1,7 +1,8 @@
+import type { JobParams } from '@server/job/job'
 import FilesImportJob from '@server/modules/arenaImport/service/arenaImport/jobs/filesImportJob'
 
 export default class DataFilesImportJob extends FilesImportJob {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(params)
   }
 

@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -18,7 +18,7 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
   chain: ArenaChain | null | undefined
   baseUnitDef: ArenaNodeDefEntity | null
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SurveyRdbOlapDataTablesCreationJob.type, params)
     // internal variables
     this.survey = null

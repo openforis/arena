@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
@@ -25,7 +25,7 @@ const createInnerJobs = () => [
 export default class OdkImportJob extends Job {
   static readonly type = 'OdkImportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(OdkImportJob.type, params, createInnerJobs())
   }
 

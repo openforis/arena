@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -11,7 +11,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 const categoriesOutputFolderName = 'categories'
 
 export default class CategoriesExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('CategoriesExportJob', params)
   }
 

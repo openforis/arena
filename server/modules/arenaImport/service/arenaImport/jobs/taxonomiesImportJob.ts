@@ -1,6 +1,6 @@
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
@@ -12,7 +12,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
  * Saves the list of inserted taxonomies in the "taxonomies" context property.
  */
 export default class TaxonomiesImportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('TaxonomiesImportJob', params)
   }
 

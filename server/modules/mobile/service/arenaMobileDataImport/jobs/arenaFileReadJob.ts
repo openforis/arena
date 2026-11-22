@@ -2,7 +2,7 @@ import { isMobileAppVersionNotSupported, minMobileAppVersionRecordsUpload } from
 import { AppInfo } from '@core/app/appInfo'
 import SystemError from '@core/systemError'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import FileZip from '@server/utils/file/fileZip'
 
@@ -21,7 +21,7 @@ const checkMobileAppVersionSupported = async (arenaSurveyFileZip: any) => {
 export default class ArenaFileReadJob extends Job {
   static readonly type = 'ArenaFileReadJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(ArenaFileReadJob.type, params)
   }
 

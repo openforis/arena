@@ -1,10 +1,10 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipUtils } from '@server/utils/file/zipUtils'
 
 export default class ZipCreationJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('ZipCreationJob', params)
   }
 

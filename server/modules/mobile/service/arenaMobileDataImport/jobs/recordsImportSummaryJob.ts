@@ -1,7 +1,7 @@
 import SystemError from '@core/systemError'
 import * as Record from '@core/record/record'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
@@ -21,7 +21,7 @@ export default class RecordsImportSummaryJob extends Job {
 
   items: any[]
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsImportSummaryJob.type, params)
     this.items = []
   }

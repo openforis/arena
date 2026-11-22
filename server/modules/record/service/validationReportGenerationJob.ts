@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as DateUtils from '@core/dateUtils'
 import i18nInstance from '@core/i18n/i18nFactory'
@@ -19,7 +19,7 @@ export default class VaidationReportGenerationJob extends Job {
 
   static readonly type: string = 'VaidationReportGenerationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(VaidationReportGenerationJob.type, params)
   }
 

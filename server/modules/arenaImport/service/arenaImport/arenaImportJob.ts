@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -62,7 +62,7 @@ export default class ArenaImportJob extends Job {
    * @param {object} [params.surveyInfoTarget] - Target survey info (optional).
    * @returns {ArenaImportJob} - The import job.
    */
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     const paramsTransformed = transformParams(params)
     super(ArenaImportJob.type, paramsTransformed, createInnerJobs(paramsTransformed))
   }

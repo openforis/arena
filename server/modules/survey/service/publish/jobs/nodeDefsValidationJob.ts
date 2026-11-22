@@ -1,7 +1,7 @@
 import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -26,7 +26,7 @@ const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: Are
 export default class NodeDefsValidationJob extends Job {
   static readonly type: string = 'NodeDefsValidationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(NodeDefsValidationJob.type, params)
   }
 

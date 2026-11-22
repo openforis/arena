@@ -10,7 +10,7 @@ import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -36,7 +36,7 @@ export default class CategoryGeoPackageExportJob extends Job {
   geoPackage: GeoPackage | null
   skippedItems: number
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(CategoryGeoPackageExportJob.type, params)
     this.geoPackage = null
     this.skippedItems = 0

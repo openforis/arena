@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import * as Survey from '@core/survey/survey'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyBranding from '@core/survey/surveyBranding'
@@ -7,7 +8,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import { FileImportBaseJob } from './filesImportBaseJob'
 
 export default class SurveyFilesImportJob extends FileImportBaseJob {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('SurveyFilesImportJob', params)
   }
 

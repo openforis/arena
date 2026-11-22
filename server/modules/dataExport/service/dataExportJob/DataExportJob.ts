@@ -1,6 +1,6 @@
 import * as User from '@core/user/user'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
@@ -24,7 +24,7 @@ const createInternalJobs = (params: any) => {
 export default class DataExportJob extends Job {
   static readonly type = 'DataExportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(DataExportJob.type, params, createInternalJobs(params))
   }
 

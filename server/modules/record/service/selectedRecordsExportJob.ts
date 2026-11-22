@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import { ArenaExportType } from '@openforis/arena-core'
 
 import InfoExportJob from '@server/modules/survey/service/surveyExport/jobs/infoExportJob'
@@ -11,7 +12,7 @@ import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 export default class SelectedRecordsExportJob extends ZipFileCreatorBaseJob {
   static readonly type: string = 'SelectedRecordsExportJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SelectedRecordsExportJob.type, { ...params, exportType: ArenaExportType.records }, [
       new RecordsExportJob(),
       new RecordFilesExportJob(),

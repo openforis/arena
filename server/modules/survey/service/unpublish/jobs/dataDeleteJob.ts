@@ -1,13 +1,13 @@
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 export default class DataDeleteJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('DataDeleteJob', params)
   }
 

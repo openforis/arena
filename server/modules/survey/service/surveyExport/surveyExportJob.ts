@@ -1,3 +1,4 @@
+import type { JobParams } from '@server/job/job'
 import * as User from '@core/user/user'
 
 import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
@@ -51,7 +52,7 @@ export default class SurveyExportJob extends ZipFileCreatorBaseJob {
    * @param {boolean} [params.includeActivityLog] - If true, includes the activity log in the export.
    * @returns {SurveyExportJob} - The export job.
    */
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     const { backup = true, includeResultAttributes = true, includeActivityLog = true } = params
     super(
       SurveyExportJob.type,

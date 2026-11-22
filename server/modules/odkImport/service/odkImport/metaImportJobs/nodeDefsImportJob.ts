@@ -9,7 +9,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Category from '@core/survey/category'
 import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 // Small, generic (no Collect-specific logic) name-deduplication utility - reused as-is rather than
@@ -60,7 +60,7 @@ export default class NodeDefsImportJob extends Job {
   reportItems: any[]
   entityUuidsWithKeyAssigned: Set<string>
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(NodeDefsImportJob.type, params)
     this.nodeDefs = {}
     this.nodeDefsByXFormPath = new Map()

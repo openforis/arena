@@ -1,3 +1,5 @@
+import type { Request as ExpressRequest } from 'express'
+
 import * as ProcessUtils from '@core/processUtils'
 import { uuidv4 } from '@core/uuid'
 
@@ -7,15 +9,16 @@ import { getChunkFileName } from '@server/modules/file/tempFileUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 // first of two chunks of a chunked upload
-const newChunkRequest = (fileId: string) => ({
-  body: {
-    fileId,
-    file: Buffer.from('chunk content').toString('base64'),
-    chunk: '1',
-    totalChunks: '2',
-    totalFileSize: '26',
-  },
-})
+const newChunkRequest = (fileId: string): ExpressRequest =>
+  ({
+    body: {
+      fileId,
+      file: Buffer.from('chunk content').toString('base64'),
+      chunk: '1',
+      totalChunks: '2',
+      totalFileSize: '26',
+    },
+  }) as unknown as ExpressRequest
 
 const invalidFileIds = ['', 'not-a-uuid', '../outside-temp-folder', `${uuidv4()}/../other`]
 

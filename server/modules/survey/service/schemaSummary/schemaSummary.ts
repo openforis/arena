@@ -93,7 +93,7 @@ const getRequiredIfSummary = ({ nodeDef }: { nodeDef: ArenaAnyNodeDef }) => {
   return getExpressionsSummary({ expressions: NodeDefValidations.getRequiredIf(validations) })
 }
 
-const getValidationCountSummary = ({ nodeDef, countType }: { nodeDef: ArenaAnyNodeDef; countType: any }) => {
+const getValidationCountSummary = ({ nodeDef, countType }: { nodeDef: ArenaAnyNodeDef; countType: string }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const count = NodeDefValidations.getCountProp(countType)(validations)
   if (Objects.isEmpty(count)) {
@@ -282,7 +282,7 @@ const DB_DEPS = { fetchSurvey }
  * @param {object} surveyInfo - Survey info.
  * @returns {string} The language code.
  */
-const getDefaultLang = (surveyInfo: any): string =>
+const getDefaultLang = (surveyInfo: ArenaSurvey): string =>
   Survey.getDefaultLanguage(surveyInfo) || Survey.getLanguages(surveyInfo)[0] || 'en'
 
 /**

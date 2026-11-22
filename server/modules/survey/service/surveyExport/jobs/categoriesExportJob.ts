@@ -1,7 +1,7 @@
 import * as CategoryItem from '@core/survey/categoryItem'
 import { ArrayUtils } from '@core/arrayUtils'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 
 import { ExportFile } from '../exportFile'
@@ -9,7 +9,7 @@ import { ExportFile } from '../exportFile'
 const itemsBatchSize = 10000
 
 export default class CategoriesExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('CategoriesExportJob', params)
   }
 

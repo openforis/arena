@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -10,7 +10,7 @@ import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 export default class TaxonomiesValidationJob extends Job {
   static readonly type: string = 'TaxonomiesValidationJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(TaxonomiesValidationJob.type, params)
   }
 

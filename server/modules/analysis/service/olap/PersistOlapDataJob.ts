@@ -7,7 +7,7 @@ import * as Chain from '@common/analysis/chain'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
 import BatchPersister from '@server/db/batchPersister'
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as ChainManager from '@server/modules/analysis/manager'
@@ -25,7 +25,7 @@ export default class PersistOlapDataJob extends Job {
   reader: any
   survey: ArenaSurvey
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(PersistOlapDataJob.type, params)
 
     this.survey = null

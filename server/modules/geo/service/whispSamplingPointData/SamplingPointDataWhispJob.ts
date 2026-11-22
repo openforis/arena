@@ -1,4 +1,4 @@
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { CategoryValidationJob } from '@server/modules/category/service/CategoryValidationJob'
 
@@ -12,7 +12,7 @@ import SamplingPointDataWhispCategoryImportJob from './SamplingPointDataWhispCat
 export default class SamplingPointDataWhispJob extends Job {
   static readonly type = 'SamplingPointDataWhispJob'
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(SamplingPointDataWhispJob.type, params, [
       new SamplingPointDataWhispAnalysisJob(params),
       new SamplingPointDataWhispCategoryImportJob(params),

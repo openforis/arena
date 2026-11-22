@@ -1,12 +1,12 @@
 import { ArrayUtils } from '@core/arrayUtils'
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import { ExportFile } from '../exportFile'
 
 const BATCH_SIZE = 5000
 
 export default class ActivityLogExportJob extends Job {
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('ActivityLogExportJob', params)
   }
 

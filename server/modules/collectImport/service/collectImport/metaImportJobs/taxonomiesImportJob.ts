@@ -11,7 +11,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { FileFormats } from '@core/fileFormats'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import TaxonomyImportManager from '@server/modules/taxonomy/manager/taxonomyImportManager'
@@ -37,7 +37,7 @@ export default class TaxonomiesImportJob extends Job {
   taxonomyImportManager: any
   vernacularLangCodes: string[]
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super('TaxonomiesImportJob', params)
 
     this.taxonomyCurrent = null // Current taxonomy being imported

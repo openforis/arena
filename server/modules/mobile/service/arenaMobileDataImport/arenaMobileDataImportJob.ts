@@ -2,7 +2,7 @@ import { Surveys, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
@@ -29,7 +29,7 @@ export default class ArenaMobileDataImportJob extends Job {
    * @param {string} [params.serverUrl] - Public URL of the server, used in the notification emails.
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(ArenaMobileDataImportJob.type, params, [
       new PrepareImportFileJob(),
       new ArenaFileReadJob(),

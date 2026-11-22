@@ -10,7 +10,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -74,7 +74,7 @@ export default class RecordsImportJob extends Job {
   submittedCount: number
   skippedCount: number
 
-  constructor(params?: any) {
+  constructor(params?: Partial<JobParams>) {
     super(RecordsImportJob.type, params)
     this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
     this.submittedCount = 0
