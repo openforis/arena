@@ -12,8 +12,8 @@ export const init = (app: Router) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { cycle, surveyId, offset, limit } = Request.getParams(req)
-        const list = await NodeDefService.fetchVirtualEntities({ surveyId, cycle, offset, limit })
+        const { surveyId, offset, limit } = Request.getParams(req)
+        const list = await NodeDefService.fetchVirtualEntities({ surveyId, offset, limit })
         res.json({ list })
       } catch (error) {
         next(error)
@@ -26,8 +26,8 @@ export const init = (app: Router) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { cycle, surveyId } = Request.getParams(req)
-        const count = await NodeDefService.countVirtualEntities({ surveyId, cycle })
+        const { surveyId } = Request.getParams(req)
+        const count = await NodeDefService.countVirtualEntities({ surveyId })
         res.json(count)
       } catch (error) {
         next(error)

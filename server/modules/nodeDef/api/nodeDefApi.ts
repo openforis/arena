@@ -26,7 +26,7 @@ const sendRespNodeDefsAndValidation = async ({
   res: ExpressResponse
   surveyId: number
   cycle: string
-  sendNodeDefs?: any
+  sendNodeDefs?: boolean
   draft?: boolean
   advanced?: boolean
   validate?: boolean

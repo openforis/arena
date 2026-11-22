@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaAnyNodeDef, ArenaNodeDefPropsAdvanced } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefMeta, ArenaNodeDefPropsAdvanced } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 import { DB, TableNodeDef, Schemata, NodeDefRepository as NodeDefRepositoryServer } from '@openforis/arena-server'
 
@@ -17,7 +17,7 @@ const dbTransformCallback = ({
   advanced = false,
   backup = false,
 }: {
-  row: any
+  row: { [column: string]: unknown }
   draft: boolean
   advanced?: boolean
   backup?: boolean
@@ -263,7 +263,7 @@ export const updateNodeDefProps = async (
     parentUuid: string
     props?: Record<string, any>
     propsAdvanced?: ArenaNodeDefPropsAdvanced
-    meta?: any
+    meta?: Partial<ArenaNodeDefMeta>
   },
   client: DbClient = DB
 ) => {
@@ -324,7 +324,7 @@ export const updateNodeDefPropsInBatch = async (
 }
 
 export const updateNodeDefType = async (
-  { surveyId, nodeDefUuid, type }: { surveyId: number; nodeDefUuid: string; type: any },
+  { surveyId, nodeDefUuid, type }: { surveyId: number; nodeDefUuid: string; type: string },
   client: DbClient = DB
 ) => {
   checkNodeDefType(type)
@@ -344,7 +344,8 @@ export const updateNodeDefTypeAndProps = async (
   }: {
     surveyId: number
     nodeDefUuid: string
-    type: any
+    // validated by checkNodeDefType
+    type: string
     props?: Record<string, any>
     propsAdvanced?: ArenaNodeDefPropsAdvanced
   },
@@ -441,7 +442,7 @@ export const deleteNodeDefsCycles = async (surveyId: number, cycles: string[], c
   await deleteNodeDefsCyclesLayout(surveyId, null, cycles, client)
 }
 
-export const updateNodeDefAnalysisCycles = (surveyId: number, cycleKeys: any, client: DbClient = DB) =>
+export const updateNodeDefAnalysisCycles = (surveyId: number, cycleKeys: string[], client: DbClient = DB) =>
   client.query(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
@@ -541,7 +542,7 @@ export const markNodeDefsWithoutCyclesDeleted = (surveyId: number, client: DbCli
       jsonb_array_length(${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, true, '', false)}) = 0
   `)
 
-const _deleteNodeDefsProp = (surveyId: number, deletePath: any, client: DbClient = DB) =>
+const _deleteNodeDefsProp = (surveyId: number, deletePath: string[], client: DbClient = DB) =>
   client.none(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
@@ -556,7 +557,11 @@ export const deleteNodeDefsLabels = (surveyId: number, langCode: string, client:
 export const deleteNodeDefsDescriptions = (surveyId: number, langCode: string, client: DbClient = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
-export const deleteNodeDefsValidationMessageLabels = async (surveyId: number, langs: any, client: DbClient = DB) => {
+export const deleteNodeDefsValidationMessageLabels = async (
+  surveyId: number,
+  langs: string[],
+  client: DbClient = DB
+) => {
   const schema = getSchemaSurvey(surveyId)
   // one "#-" operator per language, with the path passed as a parameter
   const params = DbUtils.newQueryParams()
@@ -609,7 +614,10 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId: number, la
  * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<any[]>} - The result promise.
  */
-export const fetchVirtualEntities = (params: any, client: DbClient = DB) => {
+export const fetchVirtualEntities = (
+  params: { surveyId: number; offset?: number; limit?: number | null },
+  client: DbClient = DB
+) => {
   const { surveyId, offset = 0, limit = null } = params
 
   const tableNodeDef = new TableNodeDef(surveyId)
@@ -636,7 +644,7 @@ export const fetchVirtualEntities = (params: any, client: DbClient = DB) => {
  * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<number>} - The result promise.
  */
-export const countVirtualEntities = (params: any, client: DbClient = DB) => {
+export const countVirtualEntities = (params: { surveyId: number }, client: DbClient = DB) => {
   const { surveyId } = params
   const tableNodeDef = new TableNodeDef(surveyId)
   return client.one(`select count(*) from ${tableNodeDef.nameAliased} where virtual = TRUE and deleted = FALSE`)
