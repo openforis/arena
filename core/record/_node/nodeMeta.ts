@@ -90,7 +90,7 @@ const compactMeta = (meta?: ArenaRecordNodeMeta | null): ArenaRecordNodeMeta =>
   Object.fromEntries(Object.entries(meta ?? {}).filter((entry) => !_isMetaValueDefault(entry)))
 
 // meta keys not stored in the db: the hierarchy is rebuilt from the parent uuids when reading the nodes
-const metaKeysNotStored: string[] = [metaKeys.hierarchy]
+const metaKeysNotStored = new Set<string>([metaKeys.hierarchy])
 
 /**
  * Returns the node meta to store in the db: compacted (see compactMeta) and without the items rebuilt when reading the nodes.
@@ -99,7 +99,7 @@ const metaKeysNotStored: string[] = [metaKeys.hierarchy]
  */
 const toStoredMeta = (meta?: ArenaRecordNodeMeta | null): ArenaRecordNodeMeta =>
   Object.fromEntries(
-    Object.entries(meta ?? {}).filter((entry) => !metaKeysNotStored.includes(entry[0]) && !_isMetaValueDefault(entry))
+    Object.entries(meta ?? {}).filter((entry) => !metaKeysNotStored.has(entry[0]) && !_isMetaValueDefault(entry))
   )
 
 /**

@@ -122,16 +122,17 @@ const _getAncestorUuidSelect = ({
   // a{k} is the ancestor of n k levels above it
   const joins = []
   for (let k = 1; k < maxLevels; k++) {
-    joins.push(`LEFT JOIN ${schema}.node a${k} ON a${k}.uuid = ${k === 1 ? 'n' : `a${k - 1}`}.parent_uuid`)
+    const childAlias = k === 1 ? 'n' : 'a' + (k - 1)
+    joins.push(`LEFT JOIN ${schema}.node a${k} ON a${k}.uuid = ${childAlias}.parent_uuid`)
   }
   const getAncestorUuid = (levels: number) => (levels === 1 ? 'n.parent_uuid' : `a${levels - 1}.parent_uuid`)
   if (nodeDefUuidsByLevels.size === 1) {
     return { field: getAncestorUuid(maxLevels), joins }
   }
-  const cases = [...nodeDefUuidsByLevels.entries()].map(
-    ([levels, nodeDefUuids]) =>
-      `WHEN n.node_def_uuid IN (${nodeDefUuids.map((uuid) => `'${uuid}'`).join(', ')}) THEN ${getAncestorUuid(levels)}`
-  )
+  const cases = [...nodeDefUuidsByLevels.entries()].map(([levels, nodeDefUuids]) => {
+    const nodeDefUuidsSql = nodeDefUuids.map((uuid) => "'" + uuid + "'").join(', ')
+    return `WHEN n.node_def_uuid IN (${nodeDefUuidsSql}) THEN ${getAncestorUuid(levels)}`
+  })
   return { field: `CASE ${cases.join(' ')} END`, joins }
 }
 
@@ -190,11 +191,13 @@ export const getNodeSelectQuery = ({
       'r.owner_uuid AS record_owner_uuid',
       `${ancestorUuidSelect.field} AS ancestor_uuid`
     )
-    fromParts.push(`JOIN ${schema}.record r 
+    fromParts.push(
+      `JOIN ${schema}.record r 
       ON r.uuid = n.record_uuid
       -- exclude merged records
-      AND r.merged_into_record_uuid IS NULL`)
-    fromParts.push(...ancestorUuidSelect.joins)
+      AND r.merged_into_record_uuid IS NULL`,
+      ...ancestorUuidSelect.joins
+    )
   }
 
   if (includeRefData) {

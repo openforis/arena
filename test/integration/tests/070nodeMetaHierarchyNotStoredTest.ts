@@ -118,7 +118,8 @@ describe('Node meta hierarchy not stored', () => {
       [Node.getUuid(treeNo)],
       (row) => row[columns.nodeAncestorUuid]
     )
-    expect([...ancestorUuids].sort()).toEqual([...getExpectedHierarchy(treeNo)].sort())
+    const sortUuids = (uuids: string[]) => [...uuids].sort((uuidA, uuidB) => uuidA.localeCompare(uuidB))
+    expect(sortUuids(ancestorUuids)).toEqual(sortUuids(getExpectedHierarchy(treeNo)))
   })
 
   test('the RDB data tables are populated with the values of the attributes in single entities', async () => {
@@ -161,7 +162,9 @@ describe('Node meta hierarchy not stored', () => {
     )
     const rows = await SurveyRdbManager.fetchViewData({ survey, cycle: Survey.cycleOneKey, query })
     const slopeDefUuid = getDefUuid('slope')
-    const slopeValues = rows.map((row) => Node.getValue(row.cols[slopeDefUuid].node)).sort()
+    const slopeValues = rows
+      .map((row) => Node.getValue(row.cols[slopeDefUuid].node))
+      .sort((valueA, valueB) => valueA - valueB)
     expect(slopeValues).toEqual([10, 20])
   })
 })
