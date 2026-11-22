@@ -6,6 +6,7 @@ import {
   type ArenaSurvey,
   type ArenaRecord,
   type ArenaAnyNodeDef,
+  type ArenaUser,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -18,16 +19,37 @@ import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Validation from '@core/validation/validation'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
+
+// existing record summary, with the root key values as props named after the camelized key node def names
+type RecordSummary = ArenaRecord & { [keyProp: string]: unknown }
+
+// record summaries by the composite key of their root key values
+type RecordsSummaryIndex = Map<string, RecordSummary[]>
+
+// the (data import) job context
+type RecordProviderContext = {
+  survey: ArenaSurvey
+  surveyId: number
+  cycle: string
+  user: ArenaUser
+  dryRun?: boolean
+  insertNewRecords?: boolean
+  updateRecordsInAnalysis?: boolean
+  userQualifierFilters?: QualifierFilter[]
+  recordsSummary: RecordSummary[]
+  recordsSummaryIndex?: RecordsSummaryIndex | null
+}
 
 const checkRootKeysSpecified = ({
   rootKeyDefs,
   rootKeyValuesFormatted,
 }: {
   rootKeyDefs: ArenaAnyNodeDef[]
-  rootKeyValuesFormatted: any
+  rootKeyValuesFormatted: unknown[]
 }) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
   if (emptyRootKeyValueIndex >= 0) {
@@ -49,9 +71,9 @@ const checkCanUpdateRecord = ({
   record,
   keyValues,
 }: {
-  context: any
+  context: RecordProviderContext
   record: ArenaRecord
-  keyValues: any
+  keyValues: string
 }) => {
   const { survey, updateRecordsInAnalysis, user, userQualifierFilters } = context
   if (
@@ -106,12 +128,12 @@ const buildRecordsSummaryIndex = ({
 }: {
   survey: ArenaSurvey
   rootKeyDefs: ArenaAnyNodeDef[]
-  recordsSummary: any
-}) => {
+  recordsSummary: RecordSummary[]
+}): RecordsSummaryIndex | null => {
   if (!rootKeyDefs.every((rootKeyDef) => NodeValues.isTypeFastIndexable(NodeDef.getType(rootKeyDef)))) {
     return null
   }
-  const index = new Map()
+  const index: RecordsSummaryIndex = new Map()
   recordsSummary.forEach((record) => {
     const { key: bucketKey } = getRecordSummaryKey({ survey, rootKeyDefs, record })
     if (bucketKey === null) return // record has an empty root key value: never matches, skip indexing it
@@ -134,7 +156,7 @@ const findRecordSummariesMatchingKeysByIndex = ({
   survey: ArenaSurvey
   rootKeyDefs: ArenaAnyNodeDef[]
   valuesByDefUuid: Record<string, any>
-  index: any
+  index: RecordsSummaryIndex
 }) => {
   const { key: bucketKey } = NodeValues.getFastEqualityCompositeKey({
     nodeDefs: rootKeyDefs,
@@ -158,8 +180,8 @@ const findRecordSummariesMatchingKeysByScan = ({
   survey: ArenaSurvey
   rootKeyDefs: ArenaAnyNodeDef[]
   valuesByDefUuid: Record<string, any>
-  recordsSummary: any
-}) =>
+  recordsSummary: RecordSummary[]
+}): RecordSummary[] =>
   recordsSummary.filter((record) =>
     rootKeyDefs.every((rootKeyDef) => {
       const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
@@ -182,10 +204,10 @@ const fetchOrCreateRecord = async ({
   currentRecord = null,
 }: {
   valuesByDefUuid: Record<string, any>
-  context: any
+  context: RecordProviderContext
   tx: DbClient
-  flushCallback: any
-  currentRecord?: any
+  flushCallback: () => Promise<void>
+  currentRecord?: ArenaRecord | null
 }) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
 

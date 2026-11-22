@@ -90,7 +90,7 @@ export default class RecordsImportSummaryJob extends Job<ArenaMobileDataImportJo
     }
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<{ [key: string]: unknown }> {
     return Promise.resolve({ items: this.items })
   }
 }

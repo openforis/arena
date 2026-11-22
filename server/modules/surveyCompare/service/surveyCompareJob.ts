@@ -79,7 +79,7 @@ export default class SurveyCompareJob extends Job {
     super(SurveyCompareJob.type, params, [new PrepareImportFileJob(), new SurveyCompareDiffJob()])
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<Record<string, unknown>> {
     const { sourceFileId, sourceSurveyId, resultFileId }: any = this.context
     return Promise.resolve({ sourceFileId, sourceSurveyId, resultFileId })
   }

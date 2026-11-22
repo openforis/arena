@@ -1,6 +1,6 @@
 import { setImmediate as waitForEventLoop } from 'node:timers/promises'
 
-import { Objects, RecordUpdateResult, type ArenaSurvey } from '@openforis/arena-core'
+import { Objects, RecordUpdateResult, type ArenaRecordNode, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -42,20 +42,22 @@ const determineAncestorMultipleEntityDefUuid = ({
   return NodeDef.getUuid(ancestorMultipleEntityDef)
 }
 
+type FlatDataFileReader = Awaited<ReturnType<typeof DataImportFlatDataFileReader.createReaderFromStream>>
+
 export default class FlatDataImportJob extends DataImportBaseJob {
   static readonly type: string = 'DataImportJob'
   ancestorMultipleEntityDefUuid: string
-  dataImportFileReader: any
-  entitiesCreated: any
-  entitiesWithMultipleAttributesClearedByUuid: Record<string, any>
-  entityKeysIndexCache: any
-  entityUuidTouchedByRecordUuid: Record<string, any>
-  filesToDeleteByUuid: Record<string, any>
-  flatDataReader: any
-  lastEventLoopYieldTime: any
-  nodesPendingDependentsUpdateByUuid: Record<string, any>
-  updatedFilesByName: Record<string, any>
-  updatedFilesByUuid: Record<string, any>
+  dataImportFileReader: DataImportFileReader | null
+  entitiesCreated: number
+  entitiesWithMultipleAttributesClearedByUuid: { [entityUuid: string]: boolean }
+  entityKeysIndexCache: Record.EntityKeysIndexCache
+  entityUuidTouchedByRecordUuid: { [recordUuid: string]: { [entityUuid: string]: boolean } }
+  filesToDeleteByUuid: { [fileUuid: string]: SurveyFile.SurveyFile }
+  flatDataReader: FlatDataFileReader | null
+  lastEventLoopYieldTime: number
+  nodesPendingDependentsUpdateByUuid: Map<string, ArenaRecordNode>
+  updatedFilesByName: { [fileName: string]: SurveyFile.SurveyFile }
+  updatedFilesByUuid: { [fileUuid: string]: SurveyFile.SurveyFile }
 
   constructor(params, type = FlatDataImportJob.type) {
     super(type, params)

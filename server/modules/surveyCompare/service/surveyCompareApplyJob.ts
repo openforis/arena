@@ -299,7 +299,7 @@ export default class SurveyCompareApplyJob extends Job {
     await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<Record<string, unknown>> {
     const { appliedIds = [], skippedIds = [] }: any = this.context
     return Promise.resolve({ appliedIds, skippedIds })
   }

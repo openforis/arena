@@ -10,7 +10,7 @@ import CategoriesExportJob from './jobs/CategoriesExportJob'
 import FilesExportJob from './jobs/FilesExportJob'
 import ZipCreationJob from './jobs/ZipCreationJob'
 
-const createInternalJobs = (params: any) => {
+const createInternalJobs = (params: Partial<JobParams>) => {
   const { options } = params ?? {}
   const { includeCategories, includeFiles } = options ?? {}
   return [

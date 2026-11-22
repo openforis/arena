@@ -4,6 +4,7 @@ import {
   Records,
   Surveys,
   type ArenaRecord,
+  type ArenaRecordNode,
   type ArenaSurvey,
   type ArenaAnyNodeDef,
 } from '@openforis/arena-core'
@@ -24,6 +25,9 @@ import { NodeValues } from '@core/record/nodeValues'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
+// record summary, with the root key values in props named after the camelized key node def names
+type RecordSummary = ArenaRecord & { [keyProp: string]: unknown }
+
 const formatKeyValue = async ({
   survey,
   cycle,
@@ -33,8 +37,8 @@ const formatKeyValue = async ({
   survey: ArenaSurvey
   cycle: string
   keyDef: ArenaAnyNodeDef
-  value: any
-}): Promise<any> => {
+  value: unknown
+}): Promise<string | null> => {
   // items of big categories and taxa of big taxonomies are not in the survey ref data
   if (NodeDef.isTaxon(keyDef) && value) {
     const taxonUuid = value[Node.valuePropsTaxon.taxonUuid]
@@ -45,8 +49,9 @@ const formatKeyValue = async ({
   const categoryItem = itemUuid
     ? await CategoryItemProviderDefault.getOrFetchItem({ survey, nodeDef: keyDef, itemUuid })
     : null
-  const node = categoryItem ? { refData: { categoryItem } } : null
-  return NodeValueFormatter.format({ survey, cycle, nodeDef: keyDef, node, value } as any)
+  // only the ref data of the node is used by the formatter
+  const node = categoryItem ? ({ refData: { categoryItem } } as unknown as ArenaRecordNode) : null
+  return NodeValueFormatter.format({ survey, cycle, nodeDef: keyDef, node, value })
 }
 
 /**
@@ -59,13 +64,13 @@ export const getRecordFormattedKeyValuesByDefUuid = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-}): Promise<{ [nodeDefUuid: string]: any }> => {
+}): Promise<{ [nodeDefUuid: string]: string | null }> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
   const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid(survey, recordRootEntity)(record)
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const cycle = Record.getCycle(record)
-  const keyValuesFormatted: { [nodeDefUuid: string]: any } = {}
+  const keyValuesFormatted: { [nodeDefUuid: string]: string | null } = {}
   for (const keyDef of keyDefs) {
     const nodeDefUuid = NodeDef.getUuid(keyDef)
     const value = recordKeyValuesByDefUuid[nodeDefUuid]
@@ -83,7 +88,7 @@ export const getRecordFormattedKeyValues = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-}): Promise<any[]> => Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
+}): Promise<(string | null)[]> => Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
 
 const findExistingRecordSummaryWithSameKeys = async ({
   survey,
@@ -92,13 +97,13 @@ const findExistingRecordSummaryWithSameKeys = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  existingRecordsSummary: any[]
-}): Promise<any> => {
+  existingRecordsSummary: RecordSummary[]
+}): Promise<RecordSummary | undefined> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const recordSummaryKeyProps = keyDefs.map((keyDef: ArenaAnyNodeDef) => A.camelize(NodeDef.getName(keyDef)))
   const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
-  return existingRecordsSummary.find((recordSummary: ArenaRecord) => {
+  return existingRecordsSummary.find((recordSummary) => {
     const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])
     return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
   })
@@ -116,12 +121,12 @@ export const findExistingRecordSummary = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  existingRecordsSummary: any[]
+  existingRecordsSummary: RecordSummary[]
   conflictResolutionStrategy: string
-}): Promise<any> => {
+}): Promise<RecordSummary | null | undefined> => {
   const recordUuid = Record.getUuid(record)
   const existingRecordWithSameUuid = existingRecordsSummary.find(
-    (recordSummary: ArenaRecord) => Record.getUuid(recordSummary) === recordUuid
+    (recordSummary) => Record.getUuid(recordSummary) === recordUuid
   )
   if (existingRecordWithSameUuid) {
     return existingRecordWithSameUuid
@@ -147,7 +152,7 @@ export const determineRecordAction = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  existingRecordSummary: any
+  existingRecordSummary: RecordSummary | null | undefined
   conflictResolutionStrategy: string
 }): Promise<{ action: RecordImportActionType; existingRecordUuid: string | null }> => {
   if (!existingRecordSummary) {
@@ -161,10 +166,7 @@ export const determineRecordAction = async ({
   }
 
   if (conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated) {
-    const willUpdate = Dates.isAfter(
-      Record.getDateModified(record) as any,
-      Record.getDateModified(existingRecordSummary) as any
-    )
+    const willUpdate = Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
     return { action: willUpdate ? RecordImportAction.overwrite : RecordImportAction.skip, existingRecordUuid }
   }
 
