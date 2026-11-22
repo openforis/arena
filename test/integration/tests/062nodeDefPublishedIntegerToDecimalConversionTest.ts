@@ -54,7 +54,7 @@ const fetchRdbDbh = async (surveyPublished: any) => {
   return row.dbh === null ? null : Number(row.dbh)
 }
 
-const convert = async (nodeDefName: string, toType: NodeDefType) =>
+const convert = (nodeDefName: string, toType: NodeDefType) =>
   NodeDefService.convertNodeDef({
     user: getContextUser(),
     surveyId: Survey.getId(survey),
