@@ -14,7 +14,7 @@ const canJoinWithMultipleAttributeTable = ({ nodeDef, viewNodeDef }: { nodeDef: 
   !NodeDef.isEqual(nodeDef)(viewNodeDef) &&
   NodeDef.isDescendantOf(viewNodeDef)(nodeDef)
 
-const _getSelectFieldNodeDefs = (viewDataNodeDef: any) =>
+const _getSelectFieldNodeDefs = (viewDataNodeDef: ViewDataNodeDef) =>
   viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) => {
     const { nodeDef: viewNodeDef, tableData, survey } = viewDataNodeDef
     const { nodeDef, name: colName, names: colNames, namesFull } = columnNodeDef
@@ -35,7 +35,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef: any) =>
     return namesFull
   })
 
-const _getSelectFieldKeys = (viewDataNodeDef: any) => {
+const _getSelectFieldKeys = (viewDataNodeDef: ViewDataNodeDef) => {
   const nodeDefKeys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
   const keys = nodeDefKeys.flatMap((nodeDef) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDef)
@@ -48,7 +48,7 @@ const _getJoinWithMultipleAttributeTable = ({
   viewDataNodeDef,
   multAttrColumnNodeDef,
 }: {
-  viewDataNodeDef: any
+  viewDataNodeDef: ViewDataNodeDef
   multAttrColumnNodeDef: any
 }) => {
   const { survey, tableData } = viewDataNodeDef
@@ -67,7 +67,7 @@ const _getJoinWithMultipleAttributeTable = ({
   ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
 }
 
-const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef: any) => {
+const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef: ViewDataNodeDef) => {
   const { columnNodeDefs, nodeDef: viewNodeDef } = viewDataNodeDef
 
   const multAttributeColumnNodeDefs = columnNodeDefs.filter((columnNodeDef) =>

@@ -1,4 +1,4 @@
-import type { ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -29,8 +29,8 @@ import { db, DbClient } from '@server/db/db'
 export const fetchRecordsWithDuplicateEntities = async (
   survey: ArenaSurvey,
   cycle: string,
-  nodeDefEntity: any,
-  nodeDefKeys: any,
+  nodeDefEntity: ArenaNodeDefEntity,
+  nodeDefKeys: ArenaAnyNodeDef[],
   client: DbClient
 ) => {
   const surveyId = Survey.getId(survey)

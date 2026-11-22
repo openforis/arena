@@ -67,7 +67,7 @@ const _getValuesByColumnName = ({
   record: ArenaRecord
   nodeDef: ArenaAnyNodeDef
   node: ArenaRecordNode
-  ancestorMultipleEntity: any
+  ancestorMultipleEntity: ArenaRecordNode
   type: any
 }) => {
   if (type !== types.insert) {
@@ -117,7 +117,7 @@ const _getRowUuid = ({
   node,
 }: {
   nodeDef: ArenaAnyNodeDef
-  ancestorMultipleEntity: any
+  ancestorMultipleEntity: ArenaRecordNode
   node: ArenaRecordNode
 }) => (_hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity))
 

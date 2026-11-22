@@ -1,3 +1,4 @@
+import type { UserGroupAccessFilters } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
 import type QueryStream from 'pg-query-stream'
 
 import {
@@ -68,12 +69,12 @@ export { clearOlapData, createOlapDataTable, insertOlapData } from '../repositor
 type FetchViewDataParams = {
   survey: ArenaSurvey
   cycle: string
-  query: any
+  query: Query.QueryItem
   columnNodeDefs?: boolean
   includeFileAttributeDefs?: boolean
   recordSteps?: string[] | null
   recordOwnerUuid?: string | null
-  userGroupAccessFilters?: any
+  userGroupAccessFilters?: UserGroupAccessFilters
   offset?: number
   limit?: number | null
   randomize?: boolean
@@ -725,7 +726,13 @@ export const countTable = (
     recordOwnerUuid,
     userGroupAccessFilters = null,
     query,
-  }: { survey: ArenaSurvey; cycle: string; recordOwnerUuid?: string | null; userGroupAccessFilters?: any; query: any },
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    recordOwnerUuid?: string | null
+    userGroupAccessFilters?: UserGroupAccessFilters
+    query: Query.QueryItem
+  },
   client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)
@@ -762,7 +769,7 @@ export const fetchTableRowsCountByEntityDefUuid = async (
     cycle: string
     entityDefUuids?: string[]
     recordOwnerUuid?: string | null
-    userGroupAccessFilters?: any
+    userGroupAccessFilters?: UserGroupAccessFilters
   },
   client: DbClient = db
 ) => {
