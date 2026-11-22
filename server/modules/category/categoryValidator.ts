@@ -89,10 +89,18 @@ const codeToKey = (code: string) => (code ?? '').toLocaleLowerCase()
 const groupItemsByParentAndCode = (items: ArenaCategoryItem[]) =>
   ObjectUtils.groupByProps(CategoryItem.getParentUuid, (item) => codeToKey(CategoryItem.getCode(item)))(items)
 
-const getSiblingItems = ({ itemsByParentAndCode, item }: { itemsByParentAndCode: any; item: ArenaCategoryItem }) =>
-  A.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
+// items by parent item uuid and code
+type ItemsByParentAndCode = ReturnType<typeof groupItemsByParentAndCode>
 
-const validateItemCodeUniqueness = (itemsByParentAndCode: any) => (_propName, item) => {
+const getSiblingItems = ({
+  itemsByParentAndCode,
+  item,
+}: {
+  itemsByParentAndCode: ItemsByParentAndCode
+  item: ArenaCategoryItem
+}) => A.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
+
+const validateItemCodeUniqueness = (itemsByParentAndCode: ItemsByParentAndCode) => (_propName, item) => {
   const siblingItems = getSiblingItems({ itemsByParentAndCode, item })
   const isUnique = siblingItems?.length === 1
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
@@ -111,7 +119,7 @@ const itemValidators = ({
   childrenCount = 0,
 }: {
   isLeaf: boolean
-  itemsByParentAndCode: any
+  itemsByParentAndCode: ItemsByParentAndCode
   childrenCount?: number
 }) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
