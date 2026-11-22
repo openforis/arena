@@ -6,6 +6,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import { replaceNodeHierarchyDisaggregatedViewIfExists } from '@server/modules/surveyRdb/repository/nodeHierarchyDisaggregatedViewRepository'
 import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
 
 export type SurveyDataMigrationStep = {
@@ -57,6 +58,13 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
     version: '2.10.9',
     migrate: async ({ surveyId, client }) => {
       await migrateTaxaExcelCellValues({ surveyId }, client)
+    },
+  },
+  {
+    // node meta hierarchy no longer stored (rebuilt from the parent uuids): the RDB node hierarchy view reads it no more
+    version: '2.11.3',
+    migrate: async ({ surveyId, client }) => {
+      await replaceNodeHierarchyDisaggregatedViewIfExists({ surveyId }, client)
     },
   },
   // future per-survey migration steps are appended here, each with its own version threshold

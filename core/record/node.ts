@@ -153,6 +153,8 @@ export const {
   getHierarchyCode,
   getMetaKeysWithDefaultValue,
   compactMeta,
+  toStoredMeta,
+  getStoredMetaKeysToDelete,
 } = NodeMeta
 
 // Hierarchy

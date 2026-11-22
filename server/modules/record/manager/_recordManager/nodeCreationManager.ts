@@ -68,7 +68,7 @@ export const insertNodesInBulk = async (
     Node.getParentUuid(node),
     Node.getNodeDefUuid(node),
     JSON.stringify(Node.getValue(node, null)),
-    Node.compactMeta(Node.getMeta(node)),
+    Node.toStoredMeta(Node.getMeta(node)),
   ])
 
   await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
