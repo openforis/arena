@@ -1,5 +1,5 @@
 import type { DbClient } from '@server/db/db'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefPropsAdvanced } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 import { DB, TableNodeDef, Schemata, NodeDefRepository as NodeDefRepositoryServer } from '@openforis/arena-server'
 
@@ -19,7 +19,7 @@ const dbTransformCallback = ({
 }: {
   row: any
   draft: boolean
-  advanced?: any
+  advanced?: boolean
   backup?: boolean
 }) => NodeDefRepositoryServer.rowTransformCallback({ draft, advanced, backup })(row)
 
@@ -173,7 +173,7 @@ export const fetchNodeDefsBySurveyId = (
     surveyId: number
     cycle: string
     draft: boolean
-    advanced?: any
+    advanced?: boolean
     includeDeleted?: boolean
     backup?: boolean
     includeAnalysis?: boolean
@@ -262,7 +262,7 @@ export const updateNodeDefProps = async (
     nodeDefUuid: string
     parentUuid: string
     props?: Record<string, any>
-    propsAdvanced?: any
+    propsAdvanced?: ArenaNodeDefPropsAdvanced
     meta?: any
   },
   client: DbClient = DB
@@ -341,7 +341,13 @@ export const updateNodeDefTypeAndProps = async (
     type,
     props = {},
     propsAdvanced = {},
-  }: { surveyId: number; nodeDefUuid: string; type: any; props?: Record<string, any>; propsAdvanced?: any },
+  }: {
+    surveyId: number
+    nodeDefUuid: string
+    type: any
+    props?: Record<string, any>
+    propsAdvanced?: ArenaNodeDefPropsAdvanced
+  },
   client: DbClient = DB
 ) => {
   checkNodeDefType(type)
@@ -367,8 +373,8 @@ export const updateNodeDefTypeAndProps = async (
 const copyNodeDefsCyclesLayout = async (
   surveyId: number,
   nodeDefUuid: string,
-  cycleStart: any,
-  cycles: any,
+  cycleStart: string,
+  cycles: string[],
   client: DbClient = DB
 ) => {
   // every new cycle gets a copy of the layout of the start cycle
@@ -387,7 +393,12 @@ const copyNodeDefsCyclesLayout = async (
   )
 }
 
-export const addNodeDefsCycles = async (surveyId: number, cycleStart: any, cycles: any, client: DbClient = DB) => {
+export const addNodeDefsCycles = async (
+  surveyId: number,
+  cycleStart: string,
+  cycles: string[],
+  client: DbClient = DB
+) => {
   // Add cycle to prop cycles
   await client.query(
     `
@@ -401,7 +412,12 @@ export const addNodeDefsCycles = async (surveyId: number, cycleStart: any, cycle
   await copyNodeDefsCyclesLayout(surveyId, null, cycleStart, cycles, client)
 }
 
-export const deleteNodeDefsCyclesLayout = (surveyId: number, nodeDefUuid: string, cycles: any, client: DbClient = DB) =>
+export const deleteNodeDefsCyclesLayout = (
+  surveyId: number,
+  nodeDefUuid: string,
+  cycles: string[],
+  client: DbClient = DB
+) =>
   client.query(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
@@ -412,7 +428,7 @@ export const deleteNodeDefsCyclesLayout = (surveyId: number, nodeDefUuid: string
     { cycles, nodeDefUuid }
   )
 
-export const deleteNodeDefsCycles = async (surveyId: number, cycles: any, client: DbClient = DB) => {
+export const deleteNodeDefsCycles = async (surveyId: number, cycles: string[], client: DbClient = DB) => {
   // Delete cycles from props
   await client.query(
     `
@@ -534,10 +550,10 @@ const _deleteNodeDefsProp = (surveyId: number, deletePath: any, client: DbClient
     { deletePath }
   )
 
-export const deleteNodeDefsLabels = (surveyId: number, langCode: any, client: DbClient = DB) =>
+export const deleteNodeDefsLabels = (surveyId: number, langCode: string, client: DbClient = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
 
-export const deleteNodeDefsDescriptions = (surveyId: number, langCode: any, client: DbClient = DB) =>
+export const deleteNodeDefsDescriptions = (surveyId: number, langCode: string, client: DbClient = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
 export const deleteNodeDefsValidationMessageLabels = async (surveyId: number, langs: any, client: DbClient = DB) => {

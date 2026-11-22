@@ -46,7 +46,7 @@ const prepareTaxonToCompare = (taxon: ArenaTaxon) =>
     }
   )(taxon)
 
-const isTaxonEqual = (taxonA: any) => (taxonB) =>
+const isTaxonEqual = (taxonA: ArenaTaxon) => (taxonB) =>
   Objects.isEqual(prepareTaxonToCompare(taxonA), prepareTaxonToCompare(taxonB))
 
 export const TaxonComparator = {

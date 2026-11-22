@@ -1,4 +1,4 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -268,18 +268,12 @@ export const { dissocNodeDef, mergeNodeDefs, cloneNodeDef } = SurveyNodeDefs
 
 // replace all the node defs in the survey with the specified ones
 export const assocNodeDefsSimple =
-  ({ nodeDefs }: { nodeDefs: Record<string, ArenaAnyNodeDef> }): SurveyUpdater =>
+  ({ nodeDefs }: { nodeDefs: ArenaNodeDefMap }): SurveyUpdater =>
   (survey) =>
     SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
 
 export const assocNodeDefs =
-  ({
-    nodeDefs,
-    updateDependencyGraph = false,
-  }: {
-    nodeDefs: Record<string, ArenaAnyNodeDef>
-    updateDependencyGraph?: boolean
-  }) =>
+  ({ nodeDefs, updateDependencyGraph = false }: { nodeDefs: ArenaNodeDefMap; updateDependencyGraph?: boolean }) =>
   async (survey: ArenaSurvey): Promise<ArenaSurvey> => {
     let surveyUpdated = assocNodeDefsSimple({ nodeDefs })(survey)
     if (updateDependencyGraph) {

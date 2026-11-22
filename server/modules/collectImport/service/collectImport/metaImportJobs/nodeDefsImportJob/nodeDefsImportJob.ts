@@ -1,4 +1,4 @@
-import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
@@ -101,7 +101,7 @@ export default class NodeDefsImportJob extends Job {
   static readonly type = 'NodeDefsImportJob'
   importIssues: any
   nodeDefUniqueNameGenerator: any
-  nodeDefs: { [nodeDefUuid: string]: ArenaAnyNodeDef }
+  nodeDefs: ArenaNodeDefMap
   nodeDefsInfoByCollectPath: Record<string, any>
 
   constructor(params?: any) {

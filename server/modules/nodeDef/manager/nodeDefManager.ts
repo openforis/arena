@@ -9,6 +9,9 @@ import {
   type ArenaSurvey,
   type ArenaNodeDefEntity,
   ArenaAnyNodeDef,
+  type ArenaNodeDefPropsAdvanced,
+  type NodeDefType,
+  type ArenaNodeDefMap,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -57,7 +60,7 @@ const _onAncestorCyclesUpdate = async (
     nodeDefAncestor,
     cycles,
     cyclesPrev,
-  }: { survey: ArenaSurvey; nodeDefAncestor: any; cycles: any; cyclesPrev: any },
+  }: { survey: ArenaSurvey; nodeDefAncestor: ArenaAnyNodeDef; cycles: string[]; cyclesPrev: any },
   client: DbClient = db
 ) => {
   const nodeDefsUpdated = {}
@@ -116,8 +119,8 @@ export const insertNodeDef = (
     survey: ArenaSurvey
     cycle?: string
     nodeDef: ArenaAnyNodeDef
-    system?: any
-    addLogs?: any
+    system?: boolean
+    addLogs?: boolean
   },
   client: DbClient = db
 ) =>
@@ -177,7 +180,7 @@ export const fetchNodeDefsBySurveyId = async (
     surveyCycles: any
     cycle?: string
     draft?: boolean
-    advanced?: any
+    advanced?: boolean
     includeDeleted?: boolean
     backup?: boolean
     includeAnalysis?: boolean
@@ -225,10 +228,10 @@ const _isNameOrLabelOrActiveChanged = ({
   props,
   propsAdvanced,
 }: {
-  nodeDefPrev: any
+  nodeDefPrev: ArenaAnyNodeDef
   nodeDef: ArenaAnyNodeDef
   props: Record<string, any>
-  propsAdvanced: any
+  propsAdvanced: ArenaNodeDefPropsAdvanced
 }) =>
   (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
   (NodeDef.propKeys.labels in props && !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef))) ||
@@ -244,10 +247,10 @@ const _updateAreaBasedEstimateOnPropsUpdate = (
     propsAdvanced,
   }: {
     survey: ArenaSurvey
-    nodeDefPrev: any
+    nodeDefPrev: ArenaAnyNodeDef
     nodeDef: ArenaAnyNodeDef
     props: Record<string, any>
-    propsAdvanced: any
+    propsAdvanced: ArenaNodeDefPropsAdvanced
   },
   t: DbClient
 ) => {
@@ -326,8 +329,8 @@ export const updateNodeDefProps = (
     nodeDefUuid: string
     parentUuid: string
     props?: Record<string, any>
-    propsAdvanced?: any
-    system?: any
+    propsAdvanced?: ArenaNodeDefPropsAdvanced
+    system?: boolean
     markSurveyAsDraft?: any
   },
   client: DbClient = db
@@ -339,7 +342,7 @@ export const updateNodeDefProps = (
 
     _assertRefPropsCanChange({ survey, nodeDefUuid, props })
 
-    const nodeDefsUpdated: Record<string, ArenaAnyNodeDef> = {}
+    const nodeDefsUpdated: ArenaNodeDefMap = {}
     let surveyUpdated = survey
 
     const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
@@ -431,9 +434,9 @@ const rebuildDescendantNodeDefHierarchy = ({
   nodeDefUpdated,
   nodeDefDescendant,
 }: {
-  nodeDefOriginal: any
-  nodeDefUpdated: any
-  nodeDefDescendant: any
+  nodeDefOriginal: ArenaAnyNodeDef
+  nodeDefUpdated: ArenaAnyNodeDef
+  nodeDefDescendant: ArenaAnyNodeDef
 }) => {
   const nodeDefUuid = NodeDef.getUuid(nodeDefUpdated)
   const newMetaHierarchyFirstPart = [...NodeDef.getMetaHierarchy(nodeDefUpdated), nodeDefUuid]
@@ -473,8 +476,8 @@ const updateDescendantsLayout = async ({
   t,
 }: {
   survey: ArenaSurvey
-  nodeDefSource: any
-  nodeDefUpdated: any
+  nodeDefSource: ArenaAnyNodeDef
+  nodeDefUpdated: ArenaAnyNodeDef
   t: DbClient
 }) => {
   const nodeDefsUpdatedByUuid = {}
@@ -617,7 +620,12 @@ export const moveNodeDef = (
   })
 
 export const convertNodeDef = (
-  { user, survey, nodeDefUuid, toType }: { user: ArenaUser; survey: ArenaSurvey; nodeDefUuid: string; toType: any },
+  {
+    user,
+    survey,
+    nodeDefUuid,
+    toType,
+  }: { user: ArenaUser; survey: ArenaSurvey; nodeDefUuid: string; toType: NodeDefType },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
