@@ -9,6 +9,13 @@ export const keys = {
   message: 'message',
 } as const
 
+// invitation of users (by email) to join a survey auth group
+export type UserGroupInvitation = {
+  emails: string[]
+  groupUuid: string
+  message?: string
+}
+
 // ===== CREATE
 export const newUserGroupInvitation = (email: string, groupUuid: string) => ({
   [keys.emails]: [email],

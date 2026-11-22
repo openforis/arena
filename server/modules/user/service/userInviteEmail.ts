@@ -1,6 +1,6 @@
 import { ArenaI18n } from '@openforis/arena-core'
 
-type MsgParams = {
+export type UserInviteEmailParams = {
   invitingUserName: string
   serverUrl: string
   surveyName: string
@@ -30,7 +30,7 @@ const getMsgParams = (params: {
   surveyLabel: string
   groupName: string
   message?: string
-}): MsgParams => {
+}): UserInviteEmailParams => {
   const { i18n, invitingUserName, serverUrl, surveyName, surveyLabel, groupName, message } = params
   // translated here: $t() in the param values would disable the nesting in the template (i18next skipOnVariables)
   return {

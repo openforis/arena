@@ -29,7 +29,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
-import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
+import { UserPasswordChangeForm, type UserPasswordChangeFormData } from '@core/user/userPasswordChangeForm'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
@@ -49,6 +49,8 @@ import * as UserPasswordUtils from './userPasswordUtils'
 import { SystemAdminUserValidator } from './systemAdminUserValidator'
 import * as UserInviteService from './userInviteService'
 import { UserRegistrationExpiredEmail } from './userRegistrationExpiredEmail'
+import type { UserAccessRequestAccept } from '@core/user/userAccessRequestAccept'
+import type { UploadedFile } from '@server/utils/file/uploadedFile'
 
 const Logger = Log.getLogger('UserService')
 
@@ -108,7 +110,11 @@ export const generateResetPasswordUuid = async (
   }
 }
 
-const _checkUserAccessRequest = async ({ userAccessRequest }: { userAccessRequest: any }) => {
+const _checkUserAccessRequest = async ({
+  userAccessRequest,
+}: {
+  userAccessRequest: UserAccessRequest.UserAccessRequestSubmission
+}) => {
   // verify reCaptcha
   const { reCaptchaToken } = userAccessRequest
   const reCaptchaVerified = await ReCaptchaUtils.verifyReCaptcha({ token: reCaptchaToken })
@@ -138,14 +144,14 @@ type UserAccessRequestInsertResult = {
   error?: string
   errorParams?: Record<string, unknown>
   validation?: ArenaValidation
-  requestInserted?: any
+  requestInserted?: UserAccessRequest.UserAccessRequest
 }
 
 export const insertUserAccessRequest = async ({
   userAccessRequest,
   serverUrl,
 }: {
-  userAccessRequest: any
+  userAccessRequest: UserAccessRequest.UserAccessRequestSubmission
   serverUrl: string
 }): Promise<UserAccessRequestInsertResult> => {
   const requestCheck = await _checkUserAccessRequest({ userAccessRequest })
@@ -236,7 +242,7 @@ export const acceptUserAccessRequest = async ({
 }: {
   user: ArenaUser
   serverUrl: string
-  accessRequestAccept: any
+  accessRequestAccept: UserAccessRequestAccept
 }): Promise<UserAccessRequestAcceptResult> => {
   const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
@@ -287,7 +293,8 @@ export const acceptUserAccessRequest = async ({
     return await db.tx(async (t) => {
       // 3) find group to associate to the user
       let group = null
-      if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
+      const systemGroupNames: string[] = [AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager]
+      if (systemGroupNames.includes(role)) {
         group = await AuthManager.fetchGroupByName({ name: role }, t)
       } else {
         const surveyGroups = await AuthManager.fetchSurveyGroups(surveyId, t)
@@ -456,7 +463,7 @@ export const insertUser = async ({
 }: {
   user: ArenaUser
   userToInsert: ArenaUser
-  profilePicture?: any
+  profilePicture?: Buffer | null
 }) => {
   const email = User.getEmail(userToInsert)
   const status = User.userStatus.ACCEPTED
@@ -604,7 +611,12 @@ const _checkCanUpdateUser = async ({
   }
 }
 
-export const updateUser = async (user: ArenaUser, surveyId: number, userToUpdate: ArenaUser, file: any) => {
+export const updateUser = async (
+  user: ArenaUser,
+  surveyId: number,
+  userToUpdate: ArenaUser,
+  file: UploadedFile | null
+) => {
   const userToUpdateUuid = User.getUuid(userToUpdate)
   const userToUpdateOld = surveyId ? await UserManager.fetchUserByUuid(userToUpdateUuid) : null
 
@@ -664,7 +676,7 @@ export const updateUserAuthGroupExtraProps = ({
 }: {
   surveyId: number
   userUuid: string
-  extraProps: any
+  extraProps: { [key: string]: unknown }
 }) => UserManager.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
 
 export const updateUserPassword = async ({
@@ -672,7 +684,7 @@ export const updateUserPassword = async ({
   passwordChangeForm,
 }: {
   user: ArenaUser
-  passwordChangeForm: any
+  passwordChangeForm: UserPasswordChangeFormData
 }) => {
   const userUuid = User.getUuid(user)
   const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm) ?? userUuid

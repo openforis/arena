@@ -1,5 +1,5 @@
 import type { ArenaUser } from '@openforis/arena-core'
-type UserServiceLike = { updateUserPrefs: (options: { userToUpdate: ArenaUser }) => Promise<any> }
+type UserServiceLike = { updateUserPrefs: (options: { userToUpdate: ArenaUser }) => Promise<unknown> }
 
 /**
  * Builds the user service with a working `updateUserPrefs`. The one arena-server registers throws, so a login with
@@ -12,7 +12,7 @@ type UserServiceLike = { updateUserPrefs: (options: { userToUpdate: ArenaUser })
  */
 export const createUserServiceWithPrefsUpdate = <S extends UserServiceLike>(
   baseService: S,
-  updateUserPrefs: (userToUpdate: ArenaUser) => Promise<any>
+  updateUserPrefs: (userToUpdate: ArenaUser) => Promise<unknown>
 ): S => ({
   ...baseService,
   updateUserPrefs: ({ userToUpdate }) => updateUserPrefs(userToUpdate),
