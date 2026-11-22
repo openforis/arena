@@ -209,7 +209,7 @@ export const cloneTaxonomyFromSurvey = async (
 
 // ============== READ
 
-export const fetchTaxonomyByUuid = (surveyId: number, uuid: any, draft: boolean = false, client: DbClient = db) =>
+export const fetchTaxonomyByUuid = (surveyId: number, uuid: string, draft: boolean = false, client: DbClient = db) =>
   client.one(
     `SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.taxonomy
      WHERE uuid = $1`,
@@ -509,7 +509,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
 }: {
   surveyId: number
   taxonomyUuid: string
-  vernacularLangCodes: any
+  vernacularLangCodes: string[]
   extraPropsDefs: any
   draft?: boolean
 }) => {
@@ -563,7 +563,7 @@ const findTaxaByCondition = (
   taxonomyUuid: string,
   whereCondition: any,
   searchValue: string | null,
-  orderByProp: any,
+  orderByProp: string,
   draft: boolean,
   client: DbClient
 ) =>
@@ -616,7 +616,7 @@ export const existsOtherTaxonWithScientificName = (
     taxonomyUuid,
     taxonUuid,
     scientificName,
-  }: { surveyId: number; taxonomyUuid: string; taxonUuid: string; scientificName: any },
+  }: { surveyId: number; taxonomyUuid: string; taxonUuid: string; scientificName: string },
   client: DbClient = db
 ) =>
   client.one(
@@ -765,7 +765,7 @@ export const findTaxaByVernacularName = (
 
 export const fetchTaxonVernacularNameByUuid = (
   surveyId: number,
-  uuid: any,
+  uuid: string,
   draft: boolean = false,
   client: DbClient = db
 ) =>
@@ -799,7 +799,7 @@ export const fetchTaxaWithVernacularNamesByTaxonUuid = (
     (record) => DB.transformCallback(record, draft, true)
   )
 
-export const fetchTaxonByUuid = (surveyId: number, uuid: any, draft: boolean = false, client: DbClient = db) =>
+export const fetchTaxonByUuid = (surveyId: number, uuid: string, draft: boolean = false, client: DbClient = db) =>
   client.one(
     `SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
      WHERE uuid = $1
@@ -827,7 +827,7 @@ export const fetchTaxonWithVernacularNamesByCode = async (
     taxonomyUuid,
     taxonCode,
     draft = false,
-  }: { surveyId: number; taxonomyUuid: string; taxonCode: any; draft?: boolean },
+  }: { surveyId: number; taxonomyUuid: string; taxonCode: string; draft?: boolean },
   client: DbClient = db
 ) => {
   const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, draft, client)

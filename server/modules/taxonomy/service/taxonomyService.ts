@@ -53,7 +53,7 @@ export const {
  * @returns {number} The survey id, converted to a number.
  * @throws {Error} If the value is not a positive integer.
  */
-const _validateSurveyId = ({ surveyId, paramName }: { surveyId: number; paramName: any }) => {
+const _validateSurveyId = ({ surveyId, paramName }: { surveyId: number; paramName: string }) => {
   if (!NumberUtils.isInteger(surveyId) || Number(surveyId) <= 0) {
     throw new Error(`${paramName} must be a positive integer`)
   }

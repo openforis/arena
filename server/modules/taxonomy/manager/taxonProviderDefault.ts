@@ -13,7 +13,7 @@ const getTaxonByCode = ({
 }: {
   survey: ArenaSurvey
   taxonomyUuid: string
-  taxonCode: any
+  taxonCode: string
   draft?: boolean
 }) => {
   const surveyId = Survey.getId(survey)

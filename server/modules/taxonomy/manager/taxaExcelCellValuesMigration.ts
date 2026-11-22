@@ -1,5 +1,5 @@
 import * as Taxon from '@core/survey/taxon'
-import { db } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import { ExcelReader } from '@server/utils/file/excelReader'
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
@@ -28,7 +28,7 @@ const assocScientificName =
  */
 export const migrateTaxaExcelCellValues = async (
   { surveyId }: { surveyId: number },
-  client: any = db
+  client: DbClient = db
 ): Promise<void> => {
   const taxa = await TaxonomyRepository.fetchTaxaWithExcelCellObjects({ surveyId }, client)
 

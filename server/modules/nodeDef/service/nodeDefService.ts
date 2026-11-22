@@ -5,6 +5,8 @@ import type {
   ArenaUser,
   ArenaValidation,
   ArenaAnyNodeDef,
+  ArenaNodeDefPropsAdvanced,
+  NodeDefType,
 } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
@@ -41,7 +43,7 @@ const _validateNodeDefs = async ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
-  updatedNodeDefs: any
+  updatedNodeDefs: { [nodeDefUuid: string]: ArenaAnyNodeDef }
   nodeDefsDependentByUuid: Record<string, any>
 }) => {
   const nodeDefsToValidateByUuid: Record<string, ArenaAnyNodeDef> = {}
@@ -77,7 +79,7 @@ const afterNodeDefUpdate = async ({
   survey: ArenaSurvey
   nodeDef?: ArenaAnyNodeDef
   nodeDefsDependentsUuids?: string[]
-  nodeDefsUpdated?: any
+  nodeDefsUpdated?: { [nodeDefUuid: string]: ArenaAnyNodeDef }
 }) => {
   const allUpdatedNodeDefs: Record<string, ArenaAnyNodeDef> = { ...nodeDefsUpdated }
   if (nodeDef && !allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)]) {
@@ -172,7 +174,7 @@ const _checkAggregateFunctions = async ({
 }: {
   survey: ArenaSurvey
   nodeDefUuid: string
-  propsAdvanced: any
+  propsAdvanced: ArenaNodeDefPropsAdvanced
 }) => {
   const aggregateFunctions = propsAdvanced[NodeDef.keysPropsAdvanced.aggregateFunctions]
   const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -211,8 +213,8 @@ export const updateNodeDefProps = (
     nodeDefUuid: string
     parentUuid: string
     props?: Record<string, any>
-    propsAdvanced?: any
-    system?: any
+    propsAdvanced?: ArenaNodeDefPropsAdvanced
+    system?: boolean
   },
   client: DbClient = db
 ) =>
@@ -280,7 +282,12 @@ export const moveNodeDef = (
   })
 
 export const convertNodeDef = (
-  { user, surveyId, nodeDefUuid, toType }: { user: ArenaUser; surveyId: number; nodeDefUuid: string; toType: any },
+  {
+    user,
+    surveyId,
+    nodeDefUuid,
+    toType,
+  }: { user: ArenaUser; surveyId: number; nodeDefUuid: string; toType: NodeDefType },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -319,10 +326,10 @@ export const resolveAndCloneNodeDefsCategoriesAndTaxonomies = async (
   }: {
     user: ArenaUser
     sourceSurveyId: number
-    sourceSurvey: any
+    sourceSurvey: ArenaSurvey
     targetSurveyId: number
-    targetSurvey: any
-    clonedNodeDefs: any
+    targetSurvey: ArenaSurvey
+    clonedNodeDefs: ArenaAnyNodeDef[]
   },
   client: DbClient = db
 ) => {
@@ -429,8 +436,8 @@ const _insertClonedNodeDefsAndUpdateLayout = async ({
 }: {
   survey: ArenaSurvey
   surveyId: number
-  clonedNodeDefs: any
-  rootClonedNodeDef: any
+  clonedNodeDefs: ArenaAnyNodeDef[]
+  rootClonedNodeDef: ArenaAnyNodeDef
   layoutRefParentNodeDefUuid: string
   layoutRefNodeDefUuid: string
   t: DbClient
@@ -507,7 +514,7 @@ export const fetchNodeDefsUpdatedAndValidated = async (
     surveyId,
     cycle,
     nodeDefsUpdated,
-  }: { user: ArenaUser; surveyId: number; cycle: string; nodeDefsUpdated: any },
+  }: { user: ArenaUser; surveyId: number; cycle: string; nodeDefsUpdated: { [nodeDefUuid: string]: ArenaAnyNodeDef } },
   client: DbClient = db
 ) => {
   const survey = await fetchSurvey({ surveyId, cycle }, client)
@@ -531,7 +538,7 @@ export const fetchNodeDefsUpdatedAndValidated = async (
  * @returns {Promise<object>} UUID-indexed map of the reindexed node defs (may be empty if no reindexing was needed).
  */
 const _reindexAnalysisNodeDefsAfterDelete = async (
-  { survey, surveyId, nodeDefDeleted }: { survey: ArenaSurvey; surveyId: number; nodeDefDeleted: any },
+  { survey, surveyId, nodeDefDeleted }: { survey: ArenaSurvey; surveyId: number; nodeDefDeleted: ArenaAnyNodeDef },
   client: DbClient
 ) => {
   const chainUuid = NodeDef.getChainUuid(nodeDefDeleted)

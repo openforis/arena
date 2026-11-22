@@ -47,7 +47,7 @@ export default class TaxonomyImportManager {
   taxonomy: ArenaTaxonomy
   tx: DbClient
   user: ArenaUser
-  vernacularLanguageCodes: any
+  vernacularLanguageCodes: string[]
 
   constructor({ user, surveyId, taxonomy, vernacularLanguageCodes, extraPropsDefs, tx }) {
     this.user = user
