@@ -11,6 +11,7 @@ import SystemError from '@core/systemError'
 import * as DbUtils from '@server/db/dbUtils'
 import Job from '@server/job/job'
 import { checkNodeDef, checkNodeDefProps } from '@server/modules/nodeDef/repository/nodeDefWriteCheck'
+import type RChain from '@server/modules/analysis/service/rChain/rChain'
 import RFile from '@server/modules/analysis/service/rChain/rFile'
 
 import * as SB from '../../utils/surveyBuilder'
@@ -95,7 +96,7 @@ describe('Node def names in the data tables SQL', () => {
 })
 
 describe('R files', () => {
-  const rChain = { dir: '/tmp/arena-r-chain' }
+  const rChain = { dir: '/tmp/arena-r-chain' } as unknown as RChain
 
   test('a file must be inside the R project folder', () => {
     expect(new RFile(rChain, '/tmp/arena-r-chain/user/001-plot', '001-plot_area').pathRelative).toBe(

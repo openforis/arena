@@ -27,7 +27,7 @@ export const selectSchemaExists = async (surveyId: number, client: DbClient = db
 }
 
 const dropDataTablesAndViewsWithPrefixes = async (
-  { surveyId, prefixes }: { surveyId: number; prefixes: any },
+  { surveyId, prefixes }: { surveyId: number; prefixes: string[] },
   client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurveyRdb(surveyId)

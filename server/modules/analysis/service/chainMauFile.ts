@@ -7,8 +7,15 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 const { SurveyFileType } = SurveyFile
 
 // cycle === undefined matches files associated to any cycle (e.g. when deleting a whole chain)
-const matchesChainAndCycle = ({ summary, chainUuid, cycle }: { summary: any; chainUuid: string; cycle?: string }) =>
-  SurveyFile.getChainUuid(summary) === chainUuid && (cycle === undefined || SurveyFile.getCycle(summary) === cycle)
+const matchesChainAndCycle = ({
+  summary,
+  chainUuid,
+  cycle,
+}: {
+  summary: SurveyFile.SurveyFile
+  chainUuid: string
+  cycle?: string
+}) => SurveyFile.getChainUuid(summary) === chainUuid && (cycle === undefined || SurveyFile.getCycle(summary) === cycle)
 
 export const fetchChainMauFileSummary = async (
   { surveyId, chainUuid, cycle }: { surveyId: number; chainUuid: string; cycle?: string },

@@ -7,7 +7,7 @@ import * as A from '@core/arena'
 import * as DB from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-export const transformCallback = (row: any) => {
+export const transformCallback = (row: { [column: string]: unknown } | null) => {
   if (!row) return {}
   return A.pipe(DB.mergeProps(), A.camelizePartial({ limitToLevel: 1 }))(row)
 }
@@ -21,7 +21,7 @@ export const transformCallback = (row: any) => {
  *
  * @returns {Promise<number>} - The result promise.
  */
-export const countChains = (params: any, client: DbClient = DB.client) => {
+export const countChains = (params: { surveyId: number }, client: DbClient = DB.client) => {
   const { surveyId } = params
   const tableChain = new TableChain(surveyId)
   return client.one(`${tableChain.getSelect({ count: true })}`, [], (row) => Number(row.count))
@@ -37,9 +37,12 @@ export const countChains = (params: any, client: DbClient = DB.client) => {
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
  * @param {BaseProtocol} [client=db] - The database client.
  *
- * @returns {Promise<any[]>} - The result promise.
+ * @returns {Promise<object[]>} - The result promise.
  */
-export const fetchChains = (params: any, client: DbClient = DB.client) => {
+export const fetchChains = (
+  params: { surveyId: number; offset?: number; limit?: number | null; includeScript?: boolean },
+  client: DbClient = DB.client
+) => {
   const { surveyId, offset = 0, limit = null, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)
@@ -65,7 +68,10 @@ export const fetchChains = (params: any, client: DbClient = DB.client) => {
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
-export const fetchChain = (params: any, client: DbClient = DB.client) => {
+export const fetchChain = (
+  params: { surveyId: number; chainUuid: string; includeScript?: boolean },
+  client: DbClient = DB.client
+) => {
   const { surveyId, chainUuid, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)

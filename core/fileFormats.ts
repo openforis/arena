@@ -5,6 +5,8 @@ export const FileFormats = {
   zip: 'zip',
 } as const
 
+export type FileFormat = (typeof FileFormats)[keyof typeof FileFormats]
+
 const extensionByFileFormat = {
   [FileFormats.csv]: 'csv',
   [FileFormats.gpkg]: 'gpkg',

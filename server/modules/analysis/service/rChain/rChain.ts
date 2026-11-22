@@ -1,4 +1,4 @@
-import type { ArenaAnyNodeDef, ArenaChain, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaChain, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
 import * as ProcessUtils from '@core/processUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -49,24 +49,24 @@ class RChain {
   _dirSampling: string
   _dirSystem: string
   _dirUser: string
-  _entities: any
-  _entitiesWithActiveQuantitativeVariables: any
-  _fileArena: any
-  _fileCalculateResults: any
-  _fileChainSummaryJsonPath: any
-  _fileClose: any
-  _fileCommon: any
-  _fileCommonEnd: any
-  _fileInit: any
-  _fileLogin: any
-  _filePersistResults: any
-  _filePersistUserScripts: any
-  _fileRProfile: any
-  _fileRStudioProject: any
-  _fileReadData: any
-  _fileStatisticalAnalysis: any
-  _listCategories: any
-  _listTaxonomies: any
+  _entities: ArenaNodeDefEntity[]
+  _entitiesWithActiveQuantitativeVariables: ArenaNodeDefEntity[]
+  _fileArena: string | null
+  _fileCalculateResults: RFile | null
+  _fileChainSummaryJsonPath: string | null
+  _fileClose: RFile | null
+  _fileCommon: RFile | null
+  _fileCommonEnd: RFile | null
+  _fileInit: RFile | null
+  _fileLogin: RFile | null
+  _filePersistResults: RFile | null
+  _filePersistUserScripts: RFile | null
+  _fileRProfile: string | null
+  _fileRStudioProject: string | null
+  _fileReadData: RFile | null
+  _fileStatisticalAnalysis: RFile | null
+  _listCategories: ListCategories | null
+  _listTaxonomies: ListTaxonomies | null
   _serverUrl: string
   _survey: ArenaSurvey
   _surveyId: number
