@@ -7,6 +7,7 @@ import type {
   ArenaAnyNodeDef,
   ArenaNodeDefPropsAdvanced,
   NodeDefType,
+  ArenaNodeDefMap,
 } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
@@ -43,10 +44,10 @@ const _validateNodeDefs = async ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
-  updatedNodeDefs: { [nodeDefUuid: string]: ArenaAnyNodeDef }
+  updatedNodeDefs: ArenaNodeDefMap
   nodeDefsDependentByUuid: Record<string, any>
 }) => {
-  const nodeDefsToValidateByUuid: Record<string, ArenaAnyNodeDef> = {}
+  const nodeDefsToValidateByUuid: ArenaNodeDefMap = {}
 
   // always re-validate parent entity (keys may have been changed)
   const nodeDefParent = !nodeDef || NodeDef.isRoot(nodeDef) ? null : Survey.getNodeDefParent(nodeDef)(survey)
@@ -79,9 +80,9 @@ const afterNodeDefUpdate = async ({
   survey: ArenaSurvey
   nodeDef?: ArenaAnyNodeDef
   nodeDefsDependentsUuids?: string[]
-  nodeDefsUpdated?: { [nodeDefUuid: string]: ArenaAnyNodeDef }
+  nodeDefsUpdated?: ArenaNodeDefMap
 }) => {
-  const allUpdatedNodeDefs: Record<string, ArenaAnyNodeDef> = { ...nodeDefsUpdated }
+  const allUpdatedNodeDefs: ArenaNodeDefMap = { ...nodeDefsUpdated }
   if (nodeDef && !allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)]) {
     allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)] = nodeDef
   }
@@ -514,7 +515,7 @@ export const fetchNodeDefsUpdatedAndValidated = async (
     surveyId,
     cycle,
     nodeDefsUpdated,
-  }: { user: ArenaUser; surveyId: number; cycle: string; nodeDefsUpdated: { [nodeDefUuid: string]: ArenaAnyNodeDef } },
+  }: { user: ArenaUser; surveyId: number; cycle: string; nodeDefsUpdated: ArenaNodeDefMap },
   client: DbClient = db
 ) => {
   const survey = await fetchSurvey({ surveyId, cycle }, client)

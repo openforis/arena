@@ -1,4 +1,4 @@
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaNodeDefMap } from '@openforis/arena-core'
 import type { Router } from 'express'
 import * as A from '@core/arena'
 
@@ -30,7 +30,7 @@ const sendRespNodeDefsAndValidation = async ({
   draft?: boolean
   advanced?: boolean
   validate?: boolean
-  nodeDefsUpdated?: { [nodeDefUuid: string]: ArenaAnyNodeDef }
+  nodeDefsUpdated?: ArenaNodeDefMap
   includeAnalysis?: boolean
 }) => {
   const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({

@@ -11,6 +11,7 @@ import {
   ArenaAnyNodeDef,
   type ArenaNodeDefPropsAdvanced,
   type NodeDefType,
+  type ArenaNodeDefMap,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -341,7 +342,7 @@ export const updateNodeDefProps = (
 
     _assertRefPropsCanChange({ survey, nodeDefUuid, props })
 
-    const nodeDefsUpdated: Record<string, ArenaAnyNodeDef> = {}
+    const nodeDefsUpdated: ArenaNodeDefMap = {}
     let surveyUpdated = survey
 
     const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
