@@ -1,3 +1,4 @@
+import type { Writable } from 'node:stream'
 import * as A from '@core/arena'
 
 import { Objects, type ArenaUser, type ArenaSurvey, type ArenaAuthGroup, type UserTitle } from '@openforis/arena-core'
@@ -382,7 +383,7 @@ export const exportUserAccessRequestsIntoStream = async ({
   outputStream,
   fileFormat,
 }: {
-  outputStream: any
+  outputStream: Writable
   fileFormat: string
 }) => {
   const fields = [

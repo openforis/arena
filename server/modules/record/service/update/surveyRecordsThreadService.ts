@@ -1,4 +1,4 @@
-import { ClusterBus, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { ClusterBus, type ClusterEvent, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
@@ -25,7 +25,7 @@ const threadTimeouts = {}
 const clusterEventTargetType = 'recordsUpdateThread'
 const clusterEventTypes = { surveyClear: 'surveyClear', recordClear: 'recordClear' }
 
-const handleClusterEvent = (event: any) => {
+const handleClusterEvent = (event: ClusterEvent) => {
   const { targetType, eventType, message } = event
   if (targetType !== clusterEventTargetType) return
 
@@ -170,7 +170,13 @@ const getOrCreatedThread = () => {
 
 const { assocSocket, dissocSocket, dissocSocketBySocketId } = RecordSocketsMap
 
-const notifyRecordUpdateToSockets = async ({ eventType, content }: { eventType: string; content: any }) => {
+const notifyRecordUpdateToSockets = async ({
+  eventType,
+  content,
+}: {
+  eventType: string
+  content: { recordUuid: string }
+}) => {
   const { recordUuid } = content
   const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   for (const socketId of socketIds) {
@@ -198,7 +204,13 @@ const notifyRecordUpdateToSocket = async ({
 }
 
 // forwards a message coming from the records update thread to the sockets interested in it
-const notifyThreadMessageToSockets = async ({ eventType, content }: { eventType: string; content: any }) => {
+const notifyThreadMessageToSockets = async ({
+  eventType,
+  content,
+}: {
+  eventType: string
+  content: { recordUuid: string; socketId?: string }
+}) => {
   if (eventType === WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm) {
     // only the user who requested the update has to confirm it
     await notifyRecordUpdateToSocket({ socketId: content.socketId, eventType, content })

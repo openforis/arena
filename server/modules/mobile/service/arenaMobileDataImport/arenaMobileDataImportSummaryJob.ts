@@ -1,3 +1,4 @@
+import type { ArenaMobileDataImportJobContext } from './arenaMobileDataImportJobContext'
 import { Surveys, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -16,7 +17,7 @@ import RecordsImportSummaryJob from './jobs/recordsImportSummaryJob'
  * writing anything to the database. The uploaded file is kept on disk afterwards (see onEnd) so that a
  * subsequent, real import request can reuse it instead of re-uploading it.
  */
-export default class ArenaMobileDataImportSummaryJob extends Job {
+export default class ArenaMobileDataImportSummaryJob extends Job<ArenaMobileDataImportJobContext> {
   static readonly type = 'ArenaMobileDataImportSummaryJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -30,7 +31,7 @@ export default class ArenaMobileDataImportSummaryJob extends Job {
   async onStart() {
     await super.onStart()
 
-    const context: any = this.context
+    const { context } = this
     const { surveyId } = context
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, this.tx)
@@ -50,7 +51,7 @@ export default class ArenaMobileDataImportSummaryJob extends Job {
 
     this.errors = this.combineInnerJobsErrors()
 
-    const context: any = this.context
+    const { context } = this
     const { arenaSurveyFileZip, filePath, fileId } = context
 
     if (arenaSurveyFileZip) {

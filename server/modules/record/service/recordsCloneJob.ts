@@ -17,7 +17,7 @@ import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 
 export default class RecordsCloneJob extends Job {
-  nodesInsertBatchPersister: any
+  nodesInsertBatchPersister: NodesInsertBatchPersister
 
   static readonly type: string = 'RecordsCloneJob'
 

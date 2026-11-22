@@ -6,6 +6,13 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 // see SurveyManager.fetchUserGroupAccessFilters
 export type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 
+// restrictions on the records a user can read
+export type RecordAccessFilters = {
+  ownerUuid?: string | null
+  qualifierNodeDefFilters?: QualifierFilter[]
+  readableQualifierNodeDefFilterSets?: QualifierFilter[][]
+}
+
 export type QualifierFiltersSqlConditions = {
   // matches the records of the user's own group (null when the user is unrestricted)
   ownCondition: string | null

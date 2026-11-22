@@ -1,3 +1,4 @@
+import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
 import * as readline from 'node:readline'
 import { Readable } from 'node:stream'
 
@@ -52,7 +53,7 @@ type SamplingPointFeature = {
  * a flat data (CSV) file with the sampling point data combined with the Whisp results.
  * The file path is stored in the job context (whispCategoryFilePath), with the names of the numeric columns.
  */
-export default class SamplingPointDataWhispAnalysisJob extends Job {
+export default class SamplingPointDataWhispAnalysisJob extends Job<SamplingPointDataWhispJobContext> {
   static readonly type = 'SamplingPointDataWhispAnalysisJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -60,7 +61,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
   }
 
   async execute() {
-    const { surveyId } = this.context as any
+    const { surveyId } = this.context
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, this.tx)
     const srsIndex = Survey.getSRSIndex(Survey.getSurveyInfo(survey))
 
@@ -142,7 +143,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
   }
 
   async fetchSamplingPointDataCategory() {
-    const { surveyId } = this.context as any
+    const { surveyId } = this.context
     const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, this.tx)
     const category = Object.values(categories ?? {}).find(Category.isSamplingPointDataCategory)
     if (!category) {

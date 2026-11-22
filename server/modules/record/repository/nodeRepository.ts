@@ -296,7 +296,7 @@ export const insertNode = async (surveyId: number, node: ArenaRecordNode, draft:
   return { ...nodeAdded, [Node.keys.created]: true }
 }
 
-export const insertNodesFromValues = (surveyId: number, nodeValues: any, client: DbClient = db) =>
+export const insertNodesFromValues = (surveyId: number, nodeValues: unknown[][], client: DbClient = db) =>
   client.none(DbUtils.insertAllQuery(Schemata.getSchemaSurvey(surveyId), 'node', tableColumnsInsert, nodeValues))
 
 export const insertNodesInBatch = async (

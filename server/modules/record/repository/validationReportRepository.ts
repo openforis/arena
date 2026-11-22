@@ -11,7 +11,7 @@ import { DbOrder } from '@server/db'
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { buildQualifierFiltersSqlConditions } from './qualifierFiltersSqlConditions'
+import { buildQualifierFiltersSqlConditions, type RecordAccessFilters } from './qualifierFiltersSqlConditions'
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
@@ -39,7 +39,7 @@ const getRootDataConditions = ({
   recordAccessFilters,
 }: {
   filterBySurveyAttrs: Record<string, any>
-  recordAccessFilters: any
+  recordAccessFilters: RecordAccessFilters | null
 }) => {
   const filter = filterBySurveyAttrs?.filter
   const { clause: filterClause = null, params: filterParams = {} } = filter
@@ -68,7 +68,7 @@ const getRootDataClause = ({
 }: {
   surveyRdbSchema: string
   rootDataViewName: string | null
-  rootDataConditions: any
+  rootDataConditions: string[]
 }) => {
   if (rootDataConditions.length === 0) return ''
   if (!rootDataViewName) {
@@ -85,7 +85,7 @@ const getRootDataClause = ({
 }
 
 // an empty selection (array) matches no rows, a missing one (null) doesn't filter
-const getSelectionFilterClause = ({ values, clause }: { values: any; clause: any }) => {
+const getSelectionFilterClause = ({ values, clause }: { values: unknown; clause: string }) => {
   if (!Array.isArray(values)) return ''
   return values.length === 0 ? 'AND 1 = 0' : clause
 }
@@ -103,7 +103,7 @@ const query = ({
   recordUuid: string
   rootDataViewName?: string | null
   filterBySurveyAttrs?: Record<string, any>
-  recordAccessFilters?: any
+  recordAccessFilters?: RecordAccessFilters | null
   sortBy?: string | null
   sortOrder?: string | null
 }) => {
@@ -236,7 +236,7 @@ export const fetchValidationReport = (
     recordUuid?: string
     rootDataViewName?: string | null
     filterBySurveyAttrs?: Record<string, any>
-    recordAccessFilters?: any
+    recordAccessFilters?: RecordAccessFilters | null
     sortBy: string | null
     sortOrder: string | null
   },
@@ -274,7 +274,7 @@ export const countValidationReportItems = (
     recordUuid?: string
     rootDataViewName?: string | null
     filterBySurveyAttrs?: Record<string, any>
-    recordAccessFilters?: any
+    recordAccessFilters?: RecordAccessFilters | null
   },
   client: DbClient = db
 ) => {
@@ -297,8 +297,8 @@ export const getValidationReportAsStream = (
     recordUuid?: string
     rootDataViewName?: string | null
     filterBySurveyAttrs?: Record<string, any>
-    recordAccessFilters?: any
-    processor: any
+    recordAccessFilters?: RecordAccessFilters | null
+    processor: DbUtils.StreamProcessor
   },
   client: DbClient = db
 ) => {

@@ -1,3 +1,4 @@
+import type { Writable } from 'node:stream'
 import { TraverseMethod } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -14,7 +15,7 @@ const exportLabels = async ({
   fileFormat,
 }: {
   surveyId: number
-  outputStream: any
+  outputStream: Writable
   fileFormat: string
 }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, includeAnalysis: false })

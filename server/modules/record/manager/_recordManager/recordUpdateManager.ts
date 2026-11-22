@@ -259,7 +259,7 @@ export const deleteRecordPreview = async (surveyId: number, recordUuid: string) 
     await RecordFileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
-export const deleteRecordsPreview = (surveyId: number, olderThan24Hours: any) =>
+export const deleteRecordsPreview = (surveyId: number, olderThan24Hours: boolean) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!A.isEmpty(recordUuids)) {
@@ -269,7 +269,7 @@ export const deleteRecordsPreview = (surveyId: number, olderThan24Hours: any) =>
     return recordUuids.length
   })
 
-export const deleteRecordsByCycles = async (surveyId: number, cycles: any, client: DbClient = db) => {
+export const deleteRecordsByCycles = async (surveyId: number, cycles: string[], client: DbClient = db) => {
   const recordUuids = await RecordRepository.deleteRecordsByCycles(surveyId, cycles, client)
   if (!A.isEmpty(recordUuids)) {
     await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, client)
@@ -306,8 +306,8 @@ export const persistNode = (
     survey: ArenaSurvey
     record: ArenaRecord
     node: ArenaRecordNode
-    timezoneOffset?: number
-    lang: string
+    timezoneOffset?: number | null
+    lang?: string | null
     nodesUpdateListener?: (nodes: NodesByUuid) => void
     nodesValidationListener?: (validation: ArenaValidation) => void
     system?: boolean
@@ -415,7 +415,13 @@ const _updateNodeAndValidateRecordUniqueness = (
     timezoneOffset?: number
     lang: string
     clearNonApplicableValues?: boolean
-    nodesUpdateFn: any
+    nodesUpdateFn: (
+      user: ArenaUser,
+      survey: ArenaSurvey,
+      record: ArenaRecord,
+      node: ArenaRecordNode,
+      t: DbClient
+    ) => Promise<{ record: ArenaRecord; nodes?: NodesByUuid }>
     nodesUpdateListener?: (nodes: NodesByUuid) => void
     nodesValidationListener?: (validation: ArenaValidation) => void
   },

@@ -1,3 +1,4 @@
+import type { Writable } from 'node:stream'
 import { Objects, Surveys, type ArenaSurvey, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import { AiLimits } from '@common/ai/limits'
@@ -421,7 +422,7 @@ export const exportSchemaSummary = async ({
 }: {
   surveyId: number
   cycle: string
-  outputStream: any
+  outputStream: Writable
   fileFormat: string
 }) => {
   const items = await generateSchemaSummaryItems({ surveyId, cycle })

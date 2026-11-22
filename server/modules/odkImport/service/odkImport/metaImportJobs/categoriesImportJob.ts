@@ -7,6 +7,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as ObjectUtils from '@core/objectUtils'
 
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 import BatchPersister from '@server/db/batchPersister'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
@@ -37,7 +38,7 @@ const sanitizeCategoryName = (rawName: string): string =>
  * are imported as flat, single-level categories (see the design spec's "Scope" section).
  * Mirrors collectImport's CategoriesImportJob (same BatchPersister-batched item insert).
  */
-export default class CategoriesImportJob extends Job {
+export default class CategoriesImportJob extends Job<OdkImportJobContext> {
   static readonly type = 'CategoriesImportJob'
 
   itemBatchPersister: BatchPersister
@@ -49,7 +50,7 @@ export default class CategoriesImportJob extends Job {
 
   async execute() {
     const { tx } = this
-    const context: any = this.context
+    const { context } = this
     const { xform, survey, defaultLanguage } = context
 
     const bodyControlsByPath = XForm.buildBodyControlsByPath(xform)

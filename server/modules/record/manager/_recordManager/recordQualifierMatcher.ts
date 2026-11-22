@@ -1,9 +1,11 @@
-import { Objects, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaRecord, type ArenaRecordNode, type ArenaSurvey } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValues } from '@core/record/nodeValues'
+
+import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
 
 /**
  * Checks whether a record's qualifier attribute values match the given qualifier filters.
@@ -46,9 +48,9 @@ export const recordMatchesQualifierFilters = ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  qualifierFilters: any
-  pendingNode?: any
-  canEditQualifierValue?: any
+  qualifierFilters: QualifierFilter[]
+  pendingNode?: ArenaRecordNode | null
+  canEditQualifierValue?: boolean
 }) => {
   if (qualifierFilters.length === 0) return true
   if (Record.getNodesArray(record).length === 0) return true

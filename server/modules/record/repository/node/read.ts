@@ -1,3 +1,6 @@
+import type { ArenaSurvey } from '@openforis/arena-core'
+
+import type { GetSelectParams } from '@common/model/db/tables/node/select'
 import type { DbClient } from '@server/db/db'
 import { TableNode } from '../../../../../common/model/db'
 
@@ -17,7 +20,7 @@ import { db } from '../../../../db/db'
  *
  * @returns {Promise<Node[]>} - The result promise.
  */
-export const fetchNodes = (params: any, client: DbClient = db) => {
+export const fetchNodes = (params: GetSelectParams & { survey: ArenaSurvey }, client: DbClient = db) => {
   const { survey, uuid, recordUuid, parentUuid, nodeDefUuid, draft } = params
   const table = new TableNode(survey)
   return client.map(

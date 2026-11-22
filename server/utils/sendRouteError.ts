@@ -1,3 +1,4 @@
+import type { Response as ExpressResponse } from 'express'
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -33,7 +34,7 @@ export const sendRouteError = ({
   retryAfterSeconds,
   logError = (message: string) => Logger.error(message),
 }: {
-  res: any
+  res: ExpressResponse
   error: any
   unexpectedKey?: string
   context?: string

@@ -24,7 +24,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSchemaSurvey } from '@common/model/db/schemata'
 import { ColumnNodeDef } from '@common/model/db'
 
-import { buildQualifierFiltersSqlConditions } from './qualifierFiltersSqlConditions'
+import { buildQualifierFiltersSqlConditions, type QualifierFilter } from './qualifierFiltersSqlConditions'
 
 const tableName = 'record'
 const tableColumns = [
@@ -161,8 +161,8 @@ export const countRecordsBySurveyId = async (
     search?: string | null
     ownerUuid?: string
     includeMerged?: boolean
-    qualifierNodeDefFilters?: any
-    readableQualifierNodeDefFilterSets?: any
+    qualifierNodeDefFilters?: QualifierFilter[]
+    readableQualifierNodeDefFilterSets?: QualifierFilter[][]
   },
   client: DbClient = db
 ) => {
@@ -314,8 +314,8 @@ const buildRecordsSummarySearchCondition = ({
   nodeDefKeysWhereConditions,
   summaryDefsWhereConditions,
 }: {
-  nodeDefKeysWhereConditions: any
-  summaryDefsWhereConditions: any
+  nodeDefKeysWhereConditions: string | null
+  summaryDefsWhereConditions: string | null
 }) => {
   const searchConditions = []
   if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
@@ -342,8 +342,8 @@ const buildRecordsSummarySelectWhereConditions = ({
   recordUuids: string[]
   includePreview: boolean
   includeMerged: boolean
-  nodeDefKeysWhereConditions: any
-  summaryDefsWhereConditions: any
+  nodeDefKeysWhereConditions: string | null
+  summaryDefsWhereConditions: string | null
 }) => {
   const conditions = []
   if (!includePreview) conditions.push('preview = FALSE')
@@ -393,8 +393,8 @@ export const fetchRecordsSummaryBySurveyId = (
     recordUuids?: string[]
     includePreview?: boolean
     includeMerged?: boolean
-    qualifierNodeDefFilters?: any
-    readableQualifierNodeDefFilterSets?: any
+    qualifierNodeDefFilters?: QualifierFilter[]
+    readableQualifierNodeDefFilterSets?: QualifierFilter[][]
   },
   client: DbClient = db
 ) => {
@@ -821,7 +821,7 @@ export const updateRecordsOwner = (
 
 export const updateRecordValidationsFromValues = (
   surveyId: number,
-  recordUuidAndValidationValues: any,
+  recordUuidAndValidationValues: unknown[][],
   client: DbClient = db
 ) =>
   client.none(
@@ -836,7 +836,7 @@ export const updateRecordValidationsFromValues = (
 
 export const updateRecordDateModifiedFromValues = (
   surveyId: number,
-  recordUuidAndDateModifiedValues: any,
+  recordUuidAndDateModifiedValues: unknown[][],
   client: DbClient = db
 ) =>
   client.none(

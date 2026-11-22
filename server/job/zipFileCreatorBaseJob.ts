@@ -1,3 +1,4 @@
+import type { ArenaJobContext } from '@openforis/arena-core'
 import { ZipArchive } from 'archiver'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -5,7 +6,13 @@ import * as ProcessUtils from '@core/processUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import Job from '@server/job/job'
 
-export default class ZipFileCreatorBaseJob extends Job {
+export interface ZipFileCreatorJobContext extends ArenaJobContext {
+  archive?: ZipArchive
+  outputFileName?: string
+  filePath?: string
+}
+
+export default class ZipFileCreatorBaseJob<C extends ZipFileCreatorJobContext = any> extends Job<C> {
   async onStart(): Promise<void> {
     await super.onStart()
     const { outputFileName: outputFileNameParam = null, surveyId } = this.context
@@ -22,7 +29,7 @@ export default class ZipFileCreatorBaseJob extends Job {
     const archive = new ZipArchive()
     archive.pipe(outputFileStream)
 
-    this.setContext({ archive, outputFileName, filePath: outputFilePath })
+    this.setContext({ archive, outputFileName, filePath: outputFilePath } as Partial<C>)
   }
 
   async beforeSuccess(): Promise<void> {

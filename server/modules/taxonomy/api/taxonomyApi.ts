@@ -1,4 +1,4 @@
-import type { Router } from 'express'
+import type { Router, Response as ExpressResponse } from 'express'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
@@ -16,7 +16,7 @@ import * as TaxonomyService from '../service/taxonomyService'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const sendTaxonomies = async (res: any, surveyId: number, draft: boolean, validate: boolean) => {
+const sendTaxonomies = async (res: ExpressResponse, surveyId: number, draft: boolean, validate: boolean) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
 
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })

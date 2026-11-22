@@ -1,3 +1,4 @@
+import type { Writable } from 'node:stream'
 import type { UserGroupAccessFilters } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
 import type QueryStream from 'pg-query-stream'
 
@@ -78,7 +79,7 @@ type FetchViewDataParams = {
   offset?: number
   limit?: number | null
   randomize?: boolean
-  outputStream?: any
+  outputStream?: Writable
   fileFormat?: string | null
   addCycle?: boolean
   includeCategoryItemsLabels?: boolean

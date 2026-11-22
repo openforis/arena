@@ -1,4 +1,4 @@
-import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express'
+import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
 import * as JobUtils from '@server/job/jobUtils'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as Request from '@server/utils/request'
@@ -9,7 +9,7 @@ import * as OdkDataImportService from '../service/odkDataImportService'
 // No preview/summary endpoint yet (deferred - see the Phase 2 plan doc); this starts the real import
 // directly, mirroring mobileApi.js's POST /mobile/survey/:surveyId shape minus the preview/reuse-file
 // params it doesn't need yet.
-export const init = (app: any) => {
+export const init = (app: Router) => {
   app.post(
     '/odk-import/survey/:surveyId',
     AuthMiddleware.requireRecordCreatePermission,
