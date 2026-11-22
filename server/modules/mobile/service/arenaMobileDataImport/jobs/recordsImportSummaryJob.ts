@@ -1,3 +1,4 @@
+import type { ArenaMobileDataImportJobContext } from '../arenaMobileDataImportJobContext'
 import SystemError from '@core/systemError'
 import * as Record from '@core/record/record'
 
@@ -16,7 +17,7 @@ import {
  * or matches an existing record, and what action would be taken on it (insert/overwrite/merge/skip),
  * without persisting anything. Used to generate an import preview/summary.
  */
-export default class RecordsImportSummaryJob extends Job {
+export default class RecordsImportSummaryJob extends Job<ArenaMobileDataImportJobContext> {
   static readonly type = 'RecordsImportSummaryJob'
 
   items: any[]
@@ -29,7 +30,7 @@ export default class RecordsImportSummaryJob extends Job {
   async onStart() {
     await super.onStart()
     const { tx } = this
-    const context: any = this.context
+    const { context } = this
     const { surveyId } = context
     const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId(
       {
@@ -45,7 +46,7 @@ export default class RecordsImportSummaryJob extends Job {
   async execute() {
     await super.execute()
 
-    const context: any = this.context
+    const { context } = this
     const { arenaSurveyFileZip, survey, existingRecordsSummary, conflictResolutionStrategy } = context
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)

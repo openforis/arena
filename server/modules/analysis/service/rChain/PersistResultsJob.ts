@@ -1,3 +1,4 @@
+import type FileZip from '@server/utils/file/fileZip'
 import type { JobParams } from '@server/job/job'
 import * as Record from '@core/record/record'
 
@@ -11,7 +12,7 @@ import { FileFormats } from '@core/fileFormats'
 
 export default class PersistResultsJob extends FlatDataImportJob {
   static readonly type: string = 'PersistResultsJob'
-  fileZip: any
+  fileZip: FileZip
   recordsProvider: any
   stream: any
 

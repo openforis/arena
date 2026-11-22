@@ -1,4 +1,5 @@
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from './odkImportJobContext'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
@@ -19,7 +20,7 @@ const createInnerJobs = () => [
   new SurveyRdbCreationJob(),
 ]
 
-export default class OdkDataImportJob extends Job {
+export default class OdkDataImportJob extends Job<OdkImportJobContext> {
   static readonly type = 'OdkDataImportJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -27,13 +28,13 @@ export default class OdkDataImportJob extends Job {
   }
 
   generateResult(): Promise<any> {
-    const context: any = this.context
+    const { context } = this
     return Promise.resolve({ submittedCount: context.submittedCount, skippedCount: context.skippedCount })
   }
 
   async onEnd() {
     await super.onEnd()
-    const context: any = this.context
+    const { context } = this
     if (context.filePath) {
       await FileUtils.deleteFileAsync(context.filePath)
     }

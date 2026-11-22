@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream'
 import camelize from 'camelize'
 
 import { db, type DbClient } from '@server/db/db'
@@ -57,7 +58,7 @@ export const fetchUserAccessRequests = (
   )
 
 export const fetchUserAccessRequestsAsStream = (
-  { processor }: { processor: (dbStream: any) => any },
+  { processor }: { processor: (dbStream: Readable) => any },
   client: DbClient = db
 ) => DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(userAccessRequestsSelect, []), client, processor })
 

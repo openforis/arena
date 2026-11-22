@@ -9,7 +9,7 @@ const pathSeparator = '/'
 
 export class DataImportFileReader {
   filePath: string
-  fileZip: any
+  fileZip: FileZip
   includeFiles: boolean
 
   constructor({ filePath, includeFiles }) {

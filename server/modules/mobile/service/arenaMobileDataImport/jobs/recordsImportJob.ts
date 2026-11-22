@@ -18,7 +18,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
-import { UploadedRecordAction } from '../../recordsUploadedFromMobileEmail'
+import { UploadedRecordAction, type UploadedRecordInfo } from '../../recordsUploadedFromMobileEmail'
 import { checkNodeIsValid } from './recordNodeChecks'
 import {
   getRecordFormattedKeyValues,
@@ -34,12 +34,12 @@ const resultKeys = {
 
 export default class RecordsImportJob extends DataImportBaseJob {
   static readonly type = 'RecordsImportJob'
-  mergedRecordsMap: any
+  mergedRecordsMap: { [recordUuid: string]: string }
   mergedSameRecordUuids: Set<string>
   recordsFileUuids: Set<string>
-  uploadedRecordsInfo: any
+  uploadedRecordsInfo: UploadedRecordInfo[]
   userNamesByUuid: Map<string, string>
-  userQualifierFilters: any
+  userQualifierFilters: Awaited<ReturnType<typeof SurveyManager.fetchUserQualifierFilters>> | undefined
 
   constructor(params?: Partial<JobParams>) {
     super(RecordsImportJob.type, params)

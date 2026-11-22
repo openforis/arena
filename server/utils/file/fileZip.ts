@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream'
 import StreamZip from 'node-stream-zip'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -66,10 +67,11 @@ export default class FileZip {
     return data ? data.toString('utf8') : null
   }
 
-  async getEntryStream(entryName: string): Promise<NodeJS.ReadableStream | null> {
+  async getEntryStream(entryName: string): Promise<Readable | null> {
     return this.hasEntry(entryName)
-      ? new Promise<NodeJS.ReadableStream>((resolve, reject) =>
-          this.streamZip.stream(entryName, (err, stm) => (err ? reject(err) : resolve(stm)))
+      ? new Promise<Readable>((resolve, reject) =>
+          // node-stream-zip declares NodeJS.ReadableStream, but returns a Readable
+          this.streamZip.stream(entryName, (err, stm) => (err ? reject(err) : resolve(stm as Readable)))
         )
       : null
   }

@@ -1,7 +1,7 @@
 import { AppInfo } from '@core/app/appInfo'
 import * as User from '@core/user/user'
 
-import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
+import ZipFileCreatorBaseJob, { type ZipFileCreatorJobContext } from '@server/job/zipFileCreatorBaseJob'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UsersBackupRepository from '@server/modules/user/repository/usersBackupRepository'
@@ -20,7 +20,13 @@ import { groupByUserUuid } from './usersBackupUtils'
  * that can be imported into another Arena server with UsersBackupImportJob.
  * 2FA devices, sessions, tokens, invitations and preferences are not exported.
  */
-export default class UsersBackupExportJob extends ZipFileCreatorBaseJob {
+interface UsersBackupExportJobContext extends ZipFileCreatorJobContext {
+  includePasswords?: boolean
+  emails?: string[] | null
+  serverUrl?: string
+}
+
+export default class UsersBackupExportJob extends ZipFileCreatorBaseJob<UsersBackupExportJobContext> {
   static readonly type = 'UsersBackupExportJob'
 
   constructor(params: any) {
@@ -29,7 +35,7 @@ export default class UsersBackupExportJob extends ZipFileCreatorBaseJob {
   }
 
   async execute() {
-    const { archive, user, includePasswords = true, emails = null, serverUrl } = this.context as any
+    const { archive, user, includePasswords = true, emails = null, serverUrl } = this.context
     const { tx } = this
 
     const users = await UsersBackupRepository.fetchUsersForBackup({ includePasswords, emails }, tx)

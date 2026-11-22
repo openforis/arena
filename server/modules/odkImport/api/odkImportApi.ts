@@ -1,4 +1,5 @@
-import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express'
+import type { Readable } from 'node:stream'
+import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
 import { FileFormats } from '@core/fileFormats'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
@@ -14,7 +15,7 @@ import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as OdkImportService from '../service/odkImportService'
 
-export const init = (app: any) => {
+export const init = (app: Router) => {
   // CREATE
 
   app.post(
@@ -79,7 +80,7 @@ export const init = (app: any) => {
 
         await DbUtils.stream({
           queryStream: reportItemsQueryStream,
-          processor: async (dbStream: any) =>
+          processor: async (dbStream: Readable) =>
             FlatDataWriter.writeItemsStreamToStream({
               stream: dbStream,
               outputStream: res,

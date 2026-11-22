@@ -1,3 +1,4 @@
+import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
 import type { JobParams } from '@server/job/job'
 import { FileFormats } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
@@ -21,7 +22,7 @@ export default class SamplingPointDataWhispCategoryImportJob extends CategoryImp
   }
 
   async getOrCreateSummary() {
-    const { whispCategoryFilePath: filePath, numericColumns = [] } = this.context as any
+    const { whispCategoryFilePath: filePath, numericColumns = [] } = this.context as SamplingPointDataWhispJobContext
     const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(this.survey))
     let summary = await CategoryImportSummaryGenerator.createImportSummary({
       filePath,

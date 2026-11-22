@@ -11,6 +11,7 @@ import * as Node from '@core/record/node'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import Job, { type JobParams } from '@server/job/job'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 import BatchPersister from '@server/db/batchPersister'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -67,7 +68,7 @@ const groupChildrenByName = (elements: XmlElement[]): Map<string, XmlElement[]> 
  * Every match is treated as skip, never as an actual overwrite/merge - those aren't implemented yet,
  * so no existing data is ever at risk of being silently altered.
  */
-export default class RecordsImportJob extends Job {
+export default class RecordsImportJob extends Job<OdkImportJobContext> {
   static readonly type = 'RecordsImportJob'
 
   batchPersister: BatchPersister
@@ -83,7 +84,7 @@ export default class RecordsImportJob extends Job {
 
   async execute() {
     const { surveyId, user, tx } = this
-    const context: any = this.context
+    const { context } = this
     const { submissionFileZip, submissionEntryNames, cycle = Survey.cycleOneKey } = context
 
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
@@ -170,7 +171,7 @@ export default class RecordsImportJob extends Job {
 
   async beforeSuccess() {
     await this.batchPersister.flush(this.tx)
-    const context: any = this.context
+    const { context } = this
     context.submissionFileZip?.close()
   }
 

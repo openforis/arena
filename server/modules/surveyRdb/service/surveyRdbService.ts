@@ -1,3 +1,4 @@
+import type { Writable } from 'node:stream'
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 import { Query } from '../../../../common/model/query'
@@ -128,7 +129,7 @@ type FetchViewDataParams = {
   limit?: number | null
   randomize?: boolean
   columnNodeDefs?: boolean
-  outputStream?: any
+  outputStream?: Writable
   addCycle?: boolean
   options?: Record<string, any>
 }

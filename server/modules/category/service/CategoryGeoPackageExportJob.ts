@@ -1,3 +1,5 @@
+import type { ArenaJobContext } from '@openforis/arena-core'
+import type { Readable } from 'node:stream'
 import type { ArenaCategory } from '@openforis/arena-core'
 import { GeoPackageAPI, GeometryColumns, FeatureColumn, GeometryType, GeoPackageDataType } from '@ngageoint/geopackage'
 import type { GeoPackage } from '@ngageoint/geopackage'
@@ -30,7 +32,13 @@ const sanitizeTableName = (name: string): string => (name || 'category').replace
  * Only leaf level items are exported; items without a valid 'location' extra property are skipped
  * and counted in the job result (skippedItems) instead of making the whole export fail.
  */
-export default class CategoryGeoPackageExportJob extends Job {
+interface CategoryGeoPackageExportJobContext extends ArenaJobContext {
+  categoryUuid: string
+  draft?: boolean
+  tempFileName?: string
+}
+
+export default class CategoryGeoPackageExportJob extends Job<CategoryGeoPackageExportJobContext> {
   static readonly type = 'CategoryGeoPackageExportJob'
 
   geoPackage: GeoPackage | null
@@ -73,7 +81,7 @@ export default class CategoryGeoPackageExportJob extends Job {
   }
 
   async execute() {
-    const context: any = this.context
+    const { context } = this
     const { surveyId, categoryUuid, draft } = context
 
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft }, this.tx)
@@ -132,7 +140,7 @@ export default class CategoryGeoPackageExportJob extends Job {
     await DbUtils.stream({
       client: this.tx,
       queryStream,
-      processor: async (dbStream: any) =>
+      processor: async (dbStream: Readable) =>
         new Promise<void>((resolve, reject) => {
           dbStream.on('data', (row: Record<string, any>) => {
             try {
@@ -176,7 +184,7 @@ export default class CategoryGeoPackageExportJob extends Job {
   // with R defaulting to undefined (Job, the untyped JS parent, never specializes it), so a concrete
   // object literal return type would fail the override-compatibility check against Promise<undefined>
   generateResult(): Promise<any> {
-    const { tempFileName } = this.context as any
+    const { tempFileName } = this.context
     return Promise.resolve({ tempFileName, skippedItems: this.skippedItems })
   }
 }

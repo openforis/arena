@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream'
 import Job, { type JobParams } from '@server/job/job'
 
 import * as DateUtils from '@core/dateUtils'
@@ -15,7 +16,7 @@ import { resolveValidationReportParams } from './validationReportParams'
 
 export default class VaidationReportGenerationJob extends Job {
   categoriesTempFolderName: any
-  dbStream: any
+  dbStream: Readable
 
   static readonly type: string = 'VaidationReportGenerationJob'
 

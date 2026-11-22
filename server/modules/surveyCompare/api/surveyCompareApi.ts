@@ -1,4 +1,4 @@
-import type { Request as ExpressRequest, Response as ExpressResponse } from 'express'
+import type { Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { SurveyCompareMaxFileSizeMB } from '@core/survey/surveyCompare/surveyCompareTypes'
 
@@ -42,7 +42,7 @@ const getSourceParams = async (req: ExpressRequest) => {
   return fileParams
 }
 
-export const init = (app: any) => {
+export const init = (app: Router) => {
   // starts the comparison with an uploaded survey file (or with the one uploaded before: sourceFileId)
   // or with another survey on this server (sourceSurveyId)
   app.post(

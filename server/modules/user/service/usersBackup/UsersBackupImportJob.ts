@@ -1,3 +1,5 @@
+import type { ArenaJobContext } from '@openforis/arena-core'
+import type FileZip from '@server/utils/file/fileZip'
 import { uuidv4 } from '@core/uuid'
 
 import Job from '@server/job/job'
@@ -17,10 +19,16 @@ const existingUserActions = new Set([UsersBackupUserAction.updateRoles, UsersBac
  * (by default new users are inserted and existing ones are skipped).
  * Users are matched by email; survey roles and user groups are matched by survey name and group name.
  */
-export default class UsersBackupImportJob extends Job {
+interface UsersBackupImportJobContext extends ArenaJobContext {
+  filePath: string
+  actionsByEmail?: Record<string, UsersBackupUserAction>
+  restorePasswordEmails?: string[] | null
+}
+
+export default class UsersBackupImportJob extends Job<UsersBackupImportJobContext> {
   static readonly type = 'UsersBackupImportJob'
 
-  fileZip: any = null
+  fileZip: FileZip = null
   authGroupsByKey: Record<string, AuthGroupRow> = {}
   authGroupsByUuid: Record<string, AuthGroupRow> = {}
   userGroupsByKey: Record<string, UserGroupRow> = {}
@@ -32,7 +40,7 @@ export default class UsersBackupImportJob extends Job {
 
   async onStart() {
     await super.onStart()
-    const { filePath } = this.context as any
+    const { filePath } = this.context
 
     this.fileZip = await UsersBackupFileReader.open(filePath)
 
@@ -77,14 +85,14 @@ export default class UsersBackupImportJob extends Job {
     await super.onEnd()
     this.fileZip?.close()
     // the uploaded backup contains password hashes: don't keep it in the temp folder
-    const { filePath } = this.context as any
+    const { filePath } = this.context
     if (filePath && FileUtils.exists(filePath)) {
       await FileUtils.deleteFileAsync(filePath)
     }
   }
 
   getUserAction({ user, existing }: { user: UsersBackupUser; existing: boolean }): UsersBackupUserAction {
-    const { actionsByEmail = {} } = this.context as any
+    const { actionsByEmail = {} } = this.context
     const action: UsersBackupUserAction | undefined = actionsByEmail[user.email]
     if (existing) {
       return existingUserActions.has(action) ? action : UsersBackupUserAction.skip
@@ -93,7 +101,7 @@ export default class UsersBackupImportJob extends Job {
   }
 
   shouldRestorePassword(user: UsersBackupUser): boolean {
-    const { restorePasswordEmails = null } = this.context as any
+    const { restorePasswordEmails = null } = this.context
     return !restorePasswordEmails || restorePasswordEmails.includes(user.email)
   }
 

@@ -1,3 +1,4 @@
+import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
 import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { CategoryValidationJob } from '@server/modules/category/service/CategoryValidationJob'
@@ -9,7 +10,7 @@ import SamplingPointDataWhispCategoryImportJob from './SamplingPointDataWhispCat
  * Generates the Whisp analysis for all the sampling point data items and stores it,
  * combined with the sampling point data, in the "sampling_point_data_whisp" category.
  */
-export default class SamplingPointDataWhispJob extends Job {
+export default class SamplingPointDataWhispJob extends Job<SamplingPointDataWhispJobContext> {
   static readonly type = 'SamplingPointDataWhispJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -22,14 +23,14 @@ export default class SamplingPointDataWhispJob extends Job {
 
   async beforeEnd() {
     await super.beforeEnd()
-    const { whispCategoryFilePath } = this.context as any
+    const { whispCategoryFilePath } = this.context
     if (whispCategoryFilePath && FileUtils.exists(whispCategoryFilePath)) {
       await FileUtils.deleteFileAsync(whispCategoryFilePath)
     }
   }
 
   generateResult(): Promise<any> {
-    const { category } = this.context as any
+    const { category } = this.context
     return Promise.resolve({ category })
   }
 }
