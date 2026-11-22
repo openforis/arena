@@ -1,3 +1,5 @@
+import type { ArenaCategoryItem } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -19,8 +21,9 @@ import * as CollectSurvey from '../model/collectSurvey'
  * Saves the list of inserted categories in the "categories" context property.
  */
 export default class CategoriesImportJob extends Job {
-  itemBatchPersister: any
-  qualifiableItemCodesByCategoryAndLevel: Record<string, any>
+  itemBatchPersister: BatchPersister<ArenaCategoryItem>
+  // codes of the qualifiable items, by category name and level index
+  qualifiableItemCodesByCategoryAndLevel: { [categoryName: string]: { [levelIndex: string]: string[] } }
 
   constructor(params?: Partial<JobParams>) {
     super('CategoriesImportJob', params)

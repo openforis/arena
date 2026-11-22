@@ -28,13 +28,13 @@ const fixedColumns = new Set(['id', 'parent_id', 'rank', 'no', 'code', 'scientif
  * Saves the list of inserted taxonomies in the "taxonomies" context property.
  */
 export default class TaxonomiesImportJob extends Job {
-  currentRow: any
+  currentRow: number
   extraPropsDefs: Record<string, { originalHeader: string } & Record<string, unknown>>
-  rowById: Record<string, any>
-  rowNumberByCode: Record<string, any>
-  rowNumberByScientificName: Record<string, any>
+  rowById: { [id: string]: { id: string; parent_id: string; rank: string; scientific_name: string } }
+  rowNumberByCode: { [code: string]: number }
+  rowNumberByScientificName: { [scientificName: string]: number }
   taxonomyCurrent: ArenaTaxonomy
-  taxonomyImportManager: any
+  taxonomyImportManager: TaxonomyImportManager | null
   vernacularLangCodes: string[]
 
   constructor(params?: Partial<JobParams>) {

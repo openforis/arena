@@ -1,3 +1,4 @@
+import type { NodeDefType } from '@openforis/arena-core'
 import type { Element } from 'xml-js'
 
 import * as A from '@core/arena'
@@ -7,6 +8,9 @@ import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
 
 // node definition of a Collect survey (survey IDML parsed by xml-js in non compact mode)
 export type CollectNodeDef = Element
+
+// element of the Collect survey XML (parsed by xml-js in non compact mode)
+export type CollectElement = Element
 
 const keys = {
   attributes: 'attributes',
@@ -32,7 +36,7 @@ const collectNodeDefTypes = {
 }
 
 // type (and field, for range attributes split into 2 node defs) of the node defs created for a Collect node def
-type CollectNodeDefField = { type: string; field?: string }
+type CollectNodeDefField = { type: NodeDefType; field?: string }
 
 const nodeDefFieldsExtractorByCollectType: Record<string, (collectNodeDef: CollectNodeDef) => CollectNodeDefField[]> = {
   [collectNodeDefTypes.boolean]: () => [{ type: nodeDefType.boolean }],
@@ -95,7 +99,7 @@ export const getElementsByName = (name: string) =>
     A.filter((el) => getElementName(el) === name)
   )
 
-export const getElementsByPath = (path: any) => (xml) =>
+export const getElementsByPath = (path: string[]) => (xml) =>
   A.reduce(
     (acc, pathPart) =>
       A.ifElse(
@@ -183,11 +187,24 @@ export const getNodeDefChildren = (collectNodeDef: CollectNodeDef) =>
 
 const _isNodeDefElement = A.pipe(getElementName, (name) => A.includes(name, A.keys(collectNodeDefTypes)))
 
-export const isCollectEarthSurvey = (collectSurvey: any) => getAttribute('collect:target', null)(collectSurvey) === 'CE'
+export const isCollectEarthSurvey = (collectSurvey: CollectNodeDef) =>
+  getAttribute('collect:target', null)(collectSurvey) === 'CE'
 
-export const getUri = (collectSurvey: any) => getChildElementText('uri')(collectSurvey)
+export const getUri = (collectSurvey: CollectNodeDef) => getChildElementText('uri')(collectSurvey)
 
-export const visitNodeDefs = ({ collectSurvey, visitor }: { collectSurvey: any; visitor: any }) => {
+export const visitNodeDefs = ({
+  collectSurvey,
+  visitor,
+}: {
+  collectSurvey: CollectNodeDef
+  visitor: (params: {
+    def: CollectNodeDef
+    name: string
+    path: string
+    parentPath: string
+    field: string | null
+  }) => void
+}) => {
   const stack = []
   const rootDef = getNodeDefRoot(collectSurvey)
   stack.push({ def: rootDef, parentPath: '' })
@@ -215,7 +232,7 @@ export const visitNodeDefs = ({ collectSurvey, visitor }: { collectSurvey: any; 
   }
 }
 
-export const generateArenaNodeDefNamesByPath = (collectSurvey: any) => {
+export const generateArenaNodeDefNamesByPath = (collectSurvey: CollectNodeDef) => {
   const namesByPath = {}
   const nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator()
 

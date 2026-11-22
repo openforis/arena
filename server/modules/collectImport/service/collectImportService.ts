@@ -26,7 +26,7 @@ export const startCollectImportJob = ({
   totalChunks?: number
   totalFileSize?: number
   newSurvey: ArenaSurvey
-  options: any
+  options: { includeData?: boolean }
 }) => {
   const job = new CollectImportJob({ user, filePath, fileId, totalChunks, totalFileSize, newSurvey, options })
 

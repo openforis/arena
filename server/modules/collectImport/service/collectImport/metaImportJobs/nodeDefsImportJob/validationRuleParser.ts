@@ -52,7 +52,7 @@ const operandConverterByNodeDefType = {
 
 const checkExpressionParserByType: Record<
   string,
-  (params: { collectCheck: any; nodeDef: ArenaAnyNodeDef }) => string | null
+  (params: { collectCheck: CollectSurvey.CollectElement; nodeDef: ArenaAnyNodeDef }) => string | null
 > = {
   [collectCheckType.compare]: ({ collectCheck, nodeDef }) => {
     const attributes = CollectSurvey.getAttributes(collectCheck)
@@ -94,7 +94,7 @@ const isUniqueCheckConvertible = ({
   nodeDefCurrent,
 }: {
   survey: ArenaSurvey
-  collectValidationRule: any
+  collectValidationRule: CollectSurvey.CollectElement
   nodeDefCurrent: ArenaAnyNodeDef
 }) => {
   const { expr } = CollectSurvey.getAttributes(collectValidationRule)
@@ -142,9 +142,9 @@ const convertCheckExpression = async ({
   nodeDefCurrent,
 }: {
   survey: ArenaSurvey
-  checkType: any
-  collectValidationRule: any
-  collectExpr: any
+  checkType: string
+  collectValidationRule: CollectSurvey.CollectElement
+  collectExpr: string
   nodeDefCurrent: ArenaAnyNodeDef
 }): Promise<{ exprConverted?: string | null; unique?: boolean }> => {
   const converter = checkExpressionConverterByType[checkType]
@@ -163,7 +163,7 @@ const parseValidationRule = async ({
   defaultLanguage,
 }: {
   survey: ArenaSurvey
-  collectValidationRule: any
+  collectValidationRule: CollectSurvey.CollectElement
   nodeDef: ArenaAnyNodeDef
   defaultLanguage: string
 }) => {
@@ -240,7 +240,7 @@ export const parseValidationRules = async ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
-  collectValidationRules: any
+  collectValidationRules: CollectSurvey.CollectElement[]
   defaultLanguage: string
 }) => {
   const validationRules = []

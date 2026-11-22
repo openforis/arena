@@ -1,4 +1,4 @@
-import type { ArenaNodeDefEntity, ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, ArenaAnyNodeDef, ArenaNodeDefMap, NodeDefType } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
@@ -55,12 +55,15 @@ const _extractTextProps = (collectNodeDef: CollectSurvey.CollectNodeDef) =>
     ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
     : {}
 
+// info (uuid and Collect field) of the node defs created for every Collect node def path
+type NodeDefsInfoByCollectPath = { [collectNodeDefPath: string]: { uuid: string; field?: string }[] }
+
 const _updateVisibilityLayoutProps = ({
   collectNodeDef,
   updateLayoutProp,
 }: {
   collectNodeDef: CollectSurvey.CollectNodeDef
-  updateLayoutProp: any
+  updateLayoutProp: (params: { propName: string; value: unknown }) => void
 }) => {
   const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
   if (hiddenWhenNotRelevant) {
@@ -81,10 +84,10 @@ const _addNodeDefInfoToCache = ({
   nodeDefUuid,
   field,
 }: {
-  nodeDefsInfoByCollectPath: Record<string, any>
+  nodeDefsInfoByCollectPath: NodeDefsInfoByCollectPath
   collectNodeDefPath: string
   nodeDefUuid: string
-  field: any
+  field: string | null
 }) => {
   let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
   if (!nodeDefsInfo) {
@@ -99,10 +102,10 @@ const _addNodeDefInfoToCache = ({
 
 export default class NodeDefsImportJob extends Job {
   static readonly type = 'NodeDefsImportJob'
-  importIssues: any
-  nodeDefUniqueNameGenerator: any
+  importIssues: CollectImportReportItem.CollectImportReportItem[]
+  nodeDefUniqueNameGenerator: NodeDefUniqueNameGenerator
   nodeDefs: ArenaNodeDefMap
-  nodeDefsInfoByCollectPath: Record<string, any>
+  nodeDefsInfoByCollectPath: NodeDefsInfoByCollectPath
 
   constructor(params?: Partial<JobParams>) {
     super(NodeDefsImportJob.type, params)
@@ -162,10 +165,10 @@ export default class NodeDefsImportJob extends Job {
   }: {
     parentNodeDef: ArenaNodeDefEntity
     collectNodeDef: CollectSurvey.CollectNodeDef
-    type: any
+    type: NodeDefType
     field: string | null
-    multiple: any
-    tableLayout: any
+    multiple: boolean
+    tableLayout: boolean
   }) {
     const { defaultLanguage } = this.context
     const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
@@ -220,7 +223,7 @@ export default class NodeDefsImportJob extends Job {
     parentNodeDef: ArenaNodeDefEntity | null,
     parentPath: string,
     collectNodeDef: CollectSurvey.CollectNodeDef,
-    type: string,
+    type: NodeDefType,
     field: string | null = null
   ) {
     const nodeDefsUpdated = {}
@@ -387,7 +390,7 @@ export default class NodeDefsImportJob extends Job {
     collectNodeDef,
   }: {
     nodeDef: ArenaAnyNodeDef
-    type: any
+    type: NodeDefType
     collectNodeDef: CollectSurvey.CollectNodeDef
   }) {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -472,8 +475,8 @@ export default class NodeDefsImportJob extends Job {
     collectNodeDef,
   }: {
     nodeDef: ArenaAnyNodeDef
-    type: any
-    multiple: any
+    type: NodeDefType
+    multiple: boolean
     collectNodeDef: CollectSurvey.CollectNodeDef
   }) {
     const requiredIfExpr = CollectSurvey.getAttribute('requiredIf')(collectNodeDef)
@@ -740,10 +743,14 @@ export default class NodeDefsImportJob extends Job {
   }
 }
 
-const _createNodeDef = (parentNodeDef: ArenaNodeDefEntity, type: any, props: Record<string, any>, propsAdvanced = {}) =>
-  NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
+const _createNodeDef = (
+  parentNodeDef: ArenaNodeDefEntity,
+  type: NodeDefType,
+  props: Record<string, any>,
+  propsAdvanced = {}
+) => NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
 
-const determineNodeDefPageUuid = (type: any, collectNodeDef: CollectSurvey.CollectNodeDef) => {
+const determineNodeDefPageUuid = (type: NodeDefType, collectNodeDef: CollectSurvey.CollectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {
     const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
     if (multiple) {

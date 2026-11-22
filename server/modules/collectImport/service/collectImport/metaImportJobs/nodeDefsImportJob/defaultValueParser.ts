@@ -23,7 +23,7 @@ const parseConstantValue = async ({
     const valueConverted = await CollectExpressionConverter.convert({
       survey,
       nodeDefCurrent: nodeDef,
-      expression: value,
+      expression: value as string,
     })
     return valueConverted ? JSON.stringify(valueConverted.trim()) : null
   }
@@ -39,7 +39,7 @@ const parseDefaultValue = async ({
   defaultLanguage,
 }: {
   survey: ArenaSurvey
-  collectDefaultValue: any
+  collectDefaultValue: CollectSurvey.CollectElement
   nodeDef: ArenaAnyNodeDef
   defaultLanguage: string
 }) => {
@@ -98,7 +98,7 @@ export const parseDefaultValues = async ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
-  collectDefaultValues: any
+  collectDefaultValues: CollectSurvey.CollectElement[]
   defaultLanguage: string
 }) => {
   const defaultValues = []
