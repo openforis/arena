@@ -27,6 +27,8 @@
     mail: '<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>',
     phone: '<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18h3"/>',
     list: '<path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/>',
+    layers: '<path d="M12 3l9 4.8-9 4.8-9-4.8z"/><path d="M3 12.2l9 4.8 9-4.8"/><path d="M3 16.4l9 4.8 9-4.8"/>',
+    map: '<path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
   }
   const svg = (name) => `<svg viewBox="0 0 24 24">${ICONS[name]}</svg>`
 
@@ -247,6 +249,53 @@
     aoiMap(it, scene) {
       return aoiMap(it, scene)
     },
+    track(it) {
+      return trackMap(it)
+    },
+  }
+
+  // ---------------------------------------------------------------------------------------------- position tracking map
+  function trackMap(it) {
+    const W = it.w, H = it.h
+    const d = 'M140 600 C 210 520, 160 430, 260 390 S 420 420, 470 330 S 520 170, 640 190 S 760 330, 830 260 S 860 120, 800 90'
+    const e = el('item aoiMap', `<div class="frame"><svg viewBox="0 0 ${W} ${H}">
+      <rect width="${W}" height="${H}" fill="#D7E2C9"/>${fieldsSvg()}
+      <path d="M-20 470 C 220 400, 420 620, 700 560 S 900 430, 990 470" stroke="#9FC3DA" stroke-width="30" fill="none" stroke-linecap="round"/>
+      <path d="M-20 150 L 980 330 M 380 -20 L 300 720" stroke="#F4F1E6" stroke-width="10" fill="none"/>
+      <path class="trk" d="${d}" fill="none" stroke="#1E7A52" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="140" cy="600" r="14" fill="#fff" stroke="#1E7A52" stroke-width="6"/>
+      <g class="head"><circle class="halo" r="34" fill="#2FA36B" fill-opacity=".25"/><circle r="17" fill="#fff"/><circle r="11" fill="#13302B"/></g>
+      </svg></div>`)
+    place(e, it.x, it.y, W, H)
+    const trk = e.querySelector('.trk'), head = e.querySelector('.head'), halo = e.querySelector('.halo')
+    let len = 0
+    return { e, update: (lt) => {
+      // measured once attached: a detached path has no geometry
+      if (!len) { len = trk.getTotalLength(); trk.setAttribute('stroke-dasharray', `${len} ${len}`) }
+      const p = prog(lt, 0, 1.0, ease.outQuart)
+      transform(e, { y: 60 * (1 - p), s: lerp(0.94, 1, p), o: clamp(p * 2) })
+      const walked = len * prog(lt, 1.0, it.walk ?? 10, (x) => x)
+      trk.setAttribute('stroke-dashoffset', len - walked)
+      const pt = trk.getPointAtLength(walked)
+      head.setAttribute('transform', `translate(${pt.x} ${pt.y})`)
+      halo.setAttribute('r', 26 + 10 * Math.abs(Math.sin(lt * 2.5)))
+    } }
+  }
+
+  // ---------------------------------------------------------------------------------------------- map backgrounds
+  function fieldsSvg() {
+    let fields = ''
+    let seed = 3
+    const rnd = () => {
+      seed = (seed * 16807) % 2147483647
+      return seed / 2147483647
+    }
+    for (let gx = -1; gx < 9; gx++) for (let gy = -1; gy < 7; gy++) {
+      const x = gx * 125 + rnd() * 30, y = gy * 115 + rnd() * 30
+      const shade = ['#CFDDC0', '#DCE5CF', '#C3D5B4', '#E4E8D5', '#BFD0AE'][Math.floor(rnd() * 5)]
+      fields += `<rect x="${x}" y="${y}" width="${110 + rnd() * 30}" height="${100 + rnd() * 25}" rx="6" fill="${shade}" transform="rotate(${-8 + rnd() * 6} ${x} ${y})"/>`
+    }
+    return fields
   }
 
   // ---------------------------------------------------------------------------------------------- AOI animated map
@@ -272,17 +321,7 @@
       return best
     }
     const colors = { inside: '#2FA36B', outside: '#D9534F', uncertain: '#F0A030' }
-    let fields = ''
-    let seed = 3
-    const rnd = () => {
-      seed = (seed * 16807) % 2147483647
-      return seed / 2147483647
-    }
-    for (let gx = -1; gx < 9; gx++) for (let gy = -1; gy < 7; gy++) {
-      const x = gx * 125 + rnd() * 30, y = gy * 115 + rnd() * 30
-      const shade = ['#CFDDC0', '#DCE5CF', '#C3D5B4', '#E4E8D5', '#BFD0AE'][Math.floor(rnd() * 5)]
-      fields += `<rect x="${x}" y="${y}" width="${110 + rnd() * 30}" height="${100 + rnd() * 25}" rx="6" fill="${shade}" transform="rotate(${-8 + rnd() * 6} ${x} ${y})"/>`
-    }
+    const fields = fieldsSvg()
     const polyStr = poly.map((p) => p.join(',')).join(' ')
     const perim = poly.reduce((s, a, i) => { const b = poly[(i + 1) % poly.length]; return s + Math.hypot(b[0] - a[0], b[1] - a[1]) }, 0)
     const pointSvg = pts.map((pt, i) => {
