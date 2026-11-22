@@ -15,7 +15,7 @@ export const insertOrUpdateResetPassword = async (userUuid: string, client: DbCl
     A.prop('uuid')
   )
 
-export const findResetPasswordUserUuidByUuid = async (uuid: any, client: DbClient = db) =>
+export const findResetPasswordUserUuidByUuid = async (uuid: string, client: DbClient = db) =>
   await client.oneOrNone(
     `SELECT user_uuid
      FROM user_reset_password
@@ -52,7 +52,7 @@ export const existResetPasswordValidByUserUuids = (userUuids: string[], client: 
   )
 }
 
-export const deleteUserResetPasswordByUuid = async (uuid: any, client: DbClient = db) =>
+export const deleteUserResetPasswordByUuid = async (uuid: string, client: DbClient = db) =>
   await client.none(`DELETE FROM user_reset_password WHERE uuid = $1`, [uuid])
 
 export const deleteUserResetPasswordExpired = async (client: DbClient = db) =>

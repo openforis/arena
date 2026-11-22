@@ -7,6 +7,9 @@ import {
   type ArenaSurvey,
   type ArenaMessage,
   type ArenaValidation,
+  type ArenaAuthGroup,
+  type ArenaI18n,
+  type UserTitle,
 } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
@@ -200,7 +203,7 @@ const _insertOrCloneSurvey = async ({
   templateUuid,
 }: {
   user: ArenaUser
-  surveyInfoTarget: any
+  surveyInfoTarget: ArenaSurvey
   templateUuid: string
 }) => {
   const templateId = templateUuid ? await _fetchSurveyTemplateId({ user, templateUuid }) : null
@@ -431,7 +434,7 @@ export const fetchResetPasswordUrl = async ({
   surveyId = null,
 }: {
   user: ArenaUser
-  serverUrl: any
+  serverUrl: string
   userUuid: string
   surveyId?: number
 }) => {
@@ -452,7 +455,7 @@ export const insertUser = async ({
   profilePicture = null,
 }: {
   user: ArenaUser
-  userToInsert: any
+  userToInsert: ArenaUser
   profilePicture?: any
 }) => {
   const email = User.getEmail(userToInsert)
@@ -490,8 +493,8 @@ const _canAssignGlobalRoles = ({
   authGroupsNew,
 }: {
   user: ArenaUser
-  userToUpdateOld: any
-  authGroupsNew: any
+  userToUpdateOld: ArenaUser
+  authGroupsNew: ArenaAuthGroup[]
 }) => {
   if (User.isSystemAdmin(user)) {
     return true
@@ -539,9 +542,9 @@ const _checkCanUpdateSurveyRoleAndEmail = async ({
 }: {
   user: ArenaUser
   surveyId: number
-  userToUpdateOld: any
+  userToUpdateOld: ArenaUser
   userToUpdate: ArenaUser
-  authGroupsNew: any
+  authGroupsNew: ArenaAuthGroup[]
 }) => {
   const surveyAuthGroupsNew = authGroupsNew.filter((authGroup) => AuthGroup.getSurveyId(authGroup) === surveyId)
   if (surveyAuthGroupsNew.length > 1) {
@@ -576,7 +579,7 @@ const _checkCanUpdateUser = async ({
   user: ArenaUser
   surveyId: number
   userToUpdate: ArenaUser
-  userToUpdateOld?: any
+  userToUpdateOld?: ArenaUser
 }) => {
   const userToUpdateOldData = userToUpdateOld || (await UserManager.fetchUserByUuid(User.getUuid(userToUpdate)))
   const authGroupsNew = await AuthManager.fetchGroupsByUuids(User.getAuthGroupsUuids(userToUpdate))
@@ -634,10 +637,10 @@ export const resetPassword = async ({
   password,
   title,
 }: {
-  uuid: any
+  uuid: string
   name: string
-  password: any
-  title: any
+  password: string
+  title: UserTitle
 }) => {
   const user = await findResetPasswordUserByUuid(resetPasswordUuid)
   if (user) {
@@ -716,7 +719,7 @@ export const deleteUserFromSurvey = async ({
   surveyId,
 }: {
   user: ArenaUser
-  userUuidToRemove: any
+  userUuidToRemove: string
   surveyId: number
 }) => {
   const userToDelete = await db.tx(async (t) => {
@@ -759,7 +762,7 @@ export const deleteUserFromSurvey = async ({
   return userToDelete
 }
 
-export const deleteUser = ({ user, userUuidToDelete }: { user: ArenaUser; userUuidToDelete: any }) =>
+export const deleteUser = ({ user, userUuidToDelete }: { user: ArenaUser; userUuidToDelete: string }) =>
   db.tx(async (t) => {
     if (User.getUuid(user) === userUuidToDelete) {
       throw new SystemError('appErrors:userCannotDeleteSelf', {}, StatusCodes.BAD_REQUEST)
@@ -869,7 +872,7 @@ const _notifyUserRegistrationExpired = async ({
 }: {
   user: ArenaUser
   surveys: { name: string; label?: string }[]
-  i18n: any
+  i18n: ArenaI18n
 }) => {
   const email = User.getEmail(user)
   try {

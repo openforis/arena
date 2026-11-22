@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Objects, type ArenaUser, type ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaUser, type ArenaSurvey, type ArenaAuthGroup, type UserTitle } from '@openforis/arena-core'
 
 import { db, DbClient } from '@server/db/db'
 
@@ -62,7 +62,7 @@ const _determineGroupsToAddTo = async (
     userToAdd,
     group,
     surveyInfo = null,
-  }: { user: ArenaUser; userToAdd: any; group: any; surveyInfo?: ArenaSurvey },
+  }: { user: ArenaUser; userToAdd: ArenaUser; group: ArenaAuthGroup; surveyInfo?: ArenaSurvey },
   client: DbClient = db
 ) => {
   const groupsToAdd = []
@@ -98,7 +98,7 @@ const _checkGroupBelongsToSurvey = ({
   surveyInfo,
 }: {
   user: ArenaUser
-  group: any
+  group: ArenaAuthGroup
   surveyInfo: ArenaSurvey
 }) => {
   if (
@@ -110,7 +110,12 @@ const _checkGroupBelongsToSurvey = ({
 }
 
 export const addUserToGroup = (
-  { user, surveyInfo, group, userToAdd }: { user: ArenaUser; surveyInfo: ArenaSurvey; group: any; userToAdd: any },
+  {
+    user,
+    surveyInfo,
+    group,
+    userToAdd,
+  }: { user: ArenaUser; surveyInfo: ArenaSurvey; group: ArenaAuthGroup; userToAdd: ArenaUser },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -147,14 +152,14 @@ export const insertUser = (
   }: {
     user: ArenaUser
     email: string
-    password: any
-    status: any
-    group: any
+    password: string
+    status: string
+    group: ArenaAuthGroup
     name?: string
-    title?: any
+    title?: UserTitle
     profilePicture?: any
     surveyInfo?: ArenaSurvey
-    surveyCycleKey?: any
+    surveyCycleKey?: string
   },
   client: DbClient = db
 ) =>
@@ -178,7 +183,10 @@ export const insertUser = (
     return newUser
   })
 
-export const insertSystemAdminUser = ({ email, password }: { email: string; password: any }, client: DbClient = db) =>
+export const insertSystemAdminUser = (
+  { email, password }: { email: string; password: string },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const status = User.userStatus.ACCEPTED
     const newUser = await UserRepository.insertUser({ email, password, status }, t)
@@ -351,7 +359,7 @@ export const fetchUsersBySurveyId = (
     return _attachAuthGroupsAndInvitationToUsers({ users: usersFiltered, invitationsByUserUuid, t })
   })
 
-export const findUserByEmailAndPassword = async (email: string, password: any, passwordCompareFn: any) => {
+export const findUserByEmailAndPassword = async (email: string, password: string, passwordCompareFn: any) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
@@ -431,7 +439,7 @@ const _insertOrDeleteUserGroup = async (
     authGroupsNew,
     userToUpdateOld,
     groupName,
-  }: { userUuid: string; authGroupsNew: any; userToUpdateOld: any; groupName: any },
+  }: { userUuid: string; authGroupsNew: ArenaAuthGroup[]; userToUpdateOld: ArenaUser; groupName: string },
   client: DbClient = db
 ) => {
   const group = User.getAuthGroupByName(groupName)(userToUpdateOld)
@@ -544,7 +552,7 @@ export const updateUserPrefsAndFetchGroups = async (user: ArenaUser) => ({
 // ==== DELETE
 
 export const deleteUserFromSurvey = (
-  { user, userUuidToRemove, survey }: { user: ArenaUser; userUuidToRemove: any; survey: ArenaSurvey },
+  { user, userUuidToRemove, survey }: { user: ArenaUser; userUuidToRemove: string; survey: ArenaSurvey },
   client: DbClient = db
 ) =>
   client.tx((t) => {

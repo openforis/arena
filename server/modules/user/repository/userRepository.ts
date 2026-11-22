@@ -1,4 +1,4 @@
-import type { ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser, UserTitle } from '@openforis/arena-core'
 import { db, DbClient } from '@server/db/db'
 
 import camelize from 'camelize'
@@ -59,11 +59,11 @@ export const importNewUser = (
     surveyId: number
     surveyCycleKey?: string
     name: string
-    uuid: any
+    uuid: string
     email: string
-    password: any
-    status: any
-    title: any
+    password: string
+    status: string
+    title: UserTitle
     profilePicture: any
   },
   client: DbClient = db
@@ -98,13 +98,13 @@ export const insertUser = (
     surveyCycleKey = null,
   }: {
     email: string
-    password: any
-    status: any
+    password: string
+    status: string
     name?: string
-    title?: any
+    title?: UserTitle
     profilePicture?: any
     surveyId?: number
-    surveyCycleKey?: any
+    surveyCycleKey?: string
   },
   client: DbClient = db
 ) =>
@@ -351,7 +351,7 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = (
   )
 }
 
-export const fetchUserByUuidWithPassword = (uuid: any, client: DbClient = db) =>
+export const fetchUserByUuidWithPassword = (uuid: string, client: DbClient = db) =>
   client.one(
     `
     SELECT ${columnsCommaSeparated}, u.password
@@ -361,7 +361,7 @@ export const fetchUserByUuidWithPassword = (uuid: any, client: DbClient = db) =>
     camelize
   )
 
-export const fetchUserByUuid = (uuid: any, client: DbClient = db) =>
+export const fetchUserByUuid = (uuid: string, client: DbClient = db) =>
   client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}
@@ -381,7 +381,7 @@ export const fetchUserByEmail = (email: string, client: DbClient = db) =>
     camelize
   )
 
-export const fetchUserSurveysCount = (uuid: any, client: DbClient = db) =>
+export const fetchUserSurveysCount = (uuid: string, client: DbClient = db) =>
   client.one(
     `SELECT
       (SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1 AND s.published)::int AS surveys_count_published,
@@ -400,7 +400,7 @@ export const fetchUserAndPasswordByEmail = (email: string, client: DbClient = db
     camelize
   )
 
-export const fetchUserProfilePicture = (uuid: any, client: DbClient = db) =>
+export const fetchUserProfilePicture = (uuid: string, client: DbClient = db) =>
   client.one(
     `
     SELECT profile_picture
@@ -478,7 +478,7 @@ export const updateUser = (
     userUuid: string
     name: string
     email: string
-    profilePictureSet?: any
+    profilePictureSet?: boolean
     profilePicture?: any
     props?: Record<string, any>
   },
@@ -505,7 +505,7 @@ export const updateNamePasswordAndStatus = (
     password,
     status,
     title,
-  }: { userUuid: string; name: string; password: any; status: any; title: any },
+  }: { userUuid: string; name: string; password: string; status: string; title: UserTitle },
   client: DbClient = db
 ) =>
   client.one(
@@ -518,7 +518,7 @@ export const updateNamePasswordAndStatus = (
     camelize
   )
 
-export const updatePassword = ({ userUuid, password }: { userUuid: string; password: any }, client: DbClient = db) =>
+export const updatePassword = ({ userUuid, password }: { userUuid: string; password: string }, client: DbClient = db) =>
   client.one(
     `
     UPDATE "user" u
@@ -617,7 +617,11 @@ export const deleteUserMapCustomLayersSurvey = (
  * @param cycleKeysDeleted
  * @param client
  */
-export const resetUsersPrefsSurveyCycle = async (surveyId: number, cycleKeysDeleted: any, client: DbClient = db) => {
+export const resetUsersPrefsSurveyCycle = async (
+  surveyId: number,
+  cycleKeysDeleted: string[],
+  client: DbClient = db
+) => {
   const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysSurveyPrefs.cycle}}'`
   await client.query(
     `
