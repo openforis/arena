@@ -4,7 +4,10 @@ import { db, DbClient } from '@server/db/db'
 
 const DATUM_NAME_REGEX = /DATUM\["([\w\s]+)"/
 
-const extractName = (row: any) => {
+// row of the PostGIS spatial_ref_sys table
+type SpatialRefSysRow = { srid: number; auth_name: string; auth_srid: number; srtext: string }
+
+const extractName = (row: SpatialRefSysRow) => {
   const { auth_name, auth_srid, srtext: wkt } = row
   const datumNameMatch = wkt.match(DATUM_NAME_REGEX)
 
@@ -17,7 +20,7 @@ const extractName = (row: any) => {
   return authNameAndCode
 }
 
-const rowToSrs = (row: any) => {
+const rowToSrs = (row: SpatialRefSysRow) => {
   const { srid: code, srtext: wkt } = row
   const name = extractName(row)
   return SRSFactory.createInstance({ code: String(code), name, wkt })

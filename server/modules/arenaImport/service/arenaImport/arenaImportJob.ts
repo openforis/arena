@@ -41,7 +41,7 @@ const createInnerJobs = (params: Partial<JobParams>) => {
   ]
 }
 
-const transformParams = (params: any) => {
+const transformParams = (params: Partial<JobParams>) => {
   const { backup: backupParam = true, options = { includeData: true }, ...paramsRest } = params
   const { includeData } = options
   const backup = backupParam && includeData

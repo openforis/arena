@@ -41,7 +41,7 @@ export const checkCanAccessS3Bucket = async () => {
   }
 }
 
-const createCommandParams = ({ getFileKey, params }: { getFileKey: any; params: any }) => ({
+const createCommandParams = <P>({ getFileKey, params }: { getFileKey: (params: P) => string; params: P }) => ({
   Bucket,
   Key: getFileKey(params),
 })
@@ -73,7 +73,7 @@ export const deleteObjectFromS3 = ({ key }: { key: string }) => {
   return _sendCommand(command)
 }
 
-export const createS3BucketRepository = ({ getFileKey }: { getFileKey: any }) => {
+export const createS3BucketRepository = <P>({ getFileKey }: { getFileKey: (params: P) => string }) => {
   const uploadFileContent = ({ content, ...params }) => {
     const command = new PutObjectCommand({
       ...createCommandParams({ getFileKey, params }),

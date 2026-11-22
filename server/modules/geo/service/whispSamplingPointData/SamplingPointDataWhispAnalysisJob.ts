@@ -2,7 +2,7 @@ import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJ
 import * as readline from 'node:readline'
 import { Readable } from 'node:stream'
 
-import { Points, type ArenaSurvey, type ArenaCategory } from '@openforis/arena-core'
+import { Points, type ArenaCategory, type ArenaSRSIndex, type ArenaSurvey } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import SystemError from '@core/systemError'
@@ -179,7 +179,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job<SamplingPoint
     srsIndex,
   }: {
     filePath: string
-    srsIndex: any
+    srsIndex: ArenaSRSIndex
   }): Promise<{ headers: string[]; points: SamplingPoints }> {
     let headers: string[] = []
     const points: SamplingPoints = { rowIndexes: [], coordinates: [] }
@@ -202,7 +202,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job<SamplingPoint
     return { headers, points }
   }
 
-  static toLatLong({ row, srsIndex }: { row: FlatRow; srsIndex: any }) {
+  static toLatLong({ row, srsIndex }: { row: FlatRow; srsIndex: ArenaSRSIndex }) {
     const [x, y, srs] = locationColumnNames.map((columnName: string) => row[columnName])
     if (!x || !y || !srs) return null
 

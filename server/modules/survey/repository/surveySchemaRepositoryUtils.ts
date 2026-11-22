@@ -74,7 +74,12 @@ export const bulkUpdateSurveySchemaTableProp = (
     tableName,
     updates,
     draftProps = true,
-  }: { surveyId: number; tableName: string; updates: any; draftProps?: boolean },
+  }: {
+    surveyId: number
+    tableName: string
+    updates: { recordUuid: string; key: string; value: unknown }[]
+    draftProps?: boolean
+  },
   client: DbClient = db
 ) => {
   if (!updates || updates.length === 0) {

@@ -20,7 +20,15 @@ import {
 export default class RecordsImportSummaryJob extends Job<ArenaMobileDataImportJobContext> {
   static readonly type = 'RecordsImportSummaryJob'
 
-  items: any[]
+  items: {
+    recordUuid: string
+    cycle: string
+    keyValues: { [nodeDefUuid: string]: string | null }
+    existingRecordUuid: string | null
+    action: string
+    dateModified: Date | null
+    existingDateModified: Date | null
+  }[]
 
   constructor(params?: Partial<JobParams>) {
     super(RecordsImportSummaryJob.type, params)
@@ -37,7 +45,7 @@ export default class RecordsImportSummaryJob extends Job<ArenaMobileDataImportJo
         surveyId,
         offset: 0,
         limit: null,
-      } as any,
+      },
       tx
     )
     this.setContext({ existingRecordsSummary: recordsSummary.list })

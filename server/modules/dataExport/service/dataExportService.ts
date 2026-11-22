@@ -3,6 +3,7 @@ import * as JobManager from '@server/job/jobManager'
 import DataExportJob from './dataExportJob'
 import DataMatrixExportJob from './DataMatrixExportJob'
 import DataSummaryExportJob from './DataSummaryExportJob'
+import type { DataExportOptions, DataMatrixExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 
 export const startCsvDataExportJob = ({
   user,
@@ -17,7 +18,7 @@ export const startCsvDataExportJob = ({
   cycle: string
   recordUuids: string[]
   search: string | null
-  options: any
+  options: DataExportOptions & { includeCategories?: boolean }
 }) => {
   const job = new DataExportJob({ user, surveyId, cycle, recordUuids, search, options })
   JobManager.enqueueJob(job)
@@ -33,7 +34,7 @@ export const startDataMatrixExportJob = ({
   user: ArenaUser
   surveyId: number
   cycle: string
-  options: any
+  options: DataMatrixExportOptions
 }) => {
   const job = new DataMatrixExportJob({ user, surveyId, cycle, options })
   JobManager.enqueueJob(job)
@@ -51,7 +52,7 @@ export const startDataSummaryExportJob = ({
   surveyId: number
   cycle: string
   lang: string
-  options: any
+  options: DataExportOptions
 }) => {
   const job = new DataSummaryExportJob({ user, surveyId, cycle, lang, options })
   JobManager.enqueueJob(job)
