@@ -1,4 +1,4 @@
-import type { ArenaUser } from '@openforis/arena-core'
+import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { db, DbClient } from '@server/db/db'
@@ -25,7 +25,7 @@ export const startCollectImportJob = ({
   fileId?: string
   totalChunks?: number
   totalFileSize?: number
-  newSurvey: any
+  newSurvey: ArenaSurvey
   options: any
 }) => {
   const job = new CollectImportJob({ user, filePath, fileId, totalChunks, totalFileSize, newSurvey, options })
@@ -51,7 +51,7 @@ export const updateReportItem = (
   surveyId: number,
   itemId: number,
   props: Record<string, any>,
-  resolved: any,
+  resolved: boolean,
   client: DbClient = db
 ) =>
   client.tx(async (tx) => {

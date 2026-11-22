@@ -1,3 +1,4 @@
+import type { ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -15,8 +16,8 @@ const isTemplate = ({
   surveyInfoTarget = null,
 }: {
   backup?: boolean
-  surveyInfoArenaSurvey: any
-  surveyInfoTarget?: any
+  surveyInfoArenaSurvey: ArenaSurvey
+  surveyInfoTarget?: ArenaSurvey
 }) => {
   if (backup) return Survey.isTemplate(surveyInfoArenaSurvey)
   if (surveyInfoTarget) return Survey.isTemplate(surveyInfoTarget)

@@ -1,3 +1,4 @@
+import type FileZip from '@server/utils/file/fileZip'
 import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import Job from '@server/job/job'
@@ -19,7 +20,12 @@ const _associateToGroup = async ({ userUuid, groupName }: { userUuid: string; gr
 }
 
 const _associateToSurveyGroup = async (
-  { survey, arenaSurvey, user, userUuid }: { survey: ArenaSurvey; arenaSurvey: any; user: ArenaUser; userUuid: string },
+  {
+    survey,
+    arenaSurvey,
+    user,
+    userUuid,
+  }: { survey: ArenaSurvey; arenaSurvey: ArenaSurvey; user: ArenaUser; userUuid: string },
   client: DbClient
 ) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -56,7 +62,7 @@ const insertUser = async (
     survey,
     arenaSurvey,
     arenaSurveyFileZip,
-  }: { user: ArenaUser; surveyId: number; survey: ArenaSurvey; arenaSurvey: any; arenaSurveyFileZip: any },
+  }: { user: ArenaUser; surveyId: number; survey: ArenaSurvey; arenaSurvey: ArenaSurvey; arenaSurveyFileZip: FileZip },
   client: DbClient
 ) => {
   let userAlreadyExisting = false
@@ -118,7 +124,7 @@ const insertInvitations = async (
     arenaSurveyFileZip,
     user,
     newUserUuidByOldUuid,
-  }: { survey: ArenaSurvey; arenaSurveyFileZip: any; user: ArenaUser; newUserUuidByOldUuid: Record<string, any> },
+  }: { survey: ArenaSurvey; arenaSurveyFileZip: FileZip; user: ArenaUser; newUserUuidByOldUuid: Record<string, any> },
   client: DbClient
 ) => {
   const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)

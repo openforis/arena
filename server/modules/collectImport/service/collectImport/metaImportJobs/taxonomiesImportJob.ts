@@ -1,3 +1,4 @@
+import type { ArenaTaxonomy } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -32,9 +33,9 @@ export default class TaxonomiesImportJob extends Job {
   rowById: Record<string, any>
   rowNumberByCode: Record<string, any>
   rowNumberByScientificName: Record<string, any>
-  taxonomyCurrent: any
+  taxonomyCurrent: ArenaTaxonomy
   taxonomyImportManager: any
-  vernacularLangCodes: any
+  vernacularLangCodes: string[]
 
   constructor(params?: any) {
     super('TaxonomiesImportJob', params)

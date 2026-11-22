@@ -94,7 +94,7 @@ const createReaderFromStream = ({
   onRowItem: any
   onTotalChange?: any
   includeAnalysis?: boolean
-  validateHeaders?: any
+  validateHeaders?: boolean
   includeFiles?: boolean
 }) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
