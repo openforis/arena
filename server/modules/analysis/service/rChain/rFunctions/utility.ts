@@ -1,9 +1,9 @@
 // an R expression (code, variable name or literal)
-type RExpression = string | number
+export type RExpression = string | number
 
 export const NA = 'NA'
 
-export const comment = (text: any) => `# ${text}`
+export const comment = (text: RExpression) => `# ${text}`
 
 export const tryCatch = ({
   code,
@@ -12,7 +12,7 @@ export const tryCatch = ({
 }: {
   code: string
   ignoreErrors?: boolean
-  errorFnName?: any
+  errorFnName?: string
 }) => {
   const tryCatchArguments = [code]
   if (!ignoreErrors) {
@@ -21,18 +21,18 @@ export const tryCatch = ({
   return `tryCatch(${tryCatchArguments.join(', ')})`
 }
 
-export const source = (path: any) => `source("${path}")`
-export const sourceWithTryCatch = (path: any, ignoreErrors: boolean = false) =>
+export const source = (path: RExpression) => `source("${path}")`
+export const sourceWithTryCatch = (path: RExpression, ignoreErrors: boolean = false) =>
   tryCatch({ code: source(path), ignoreErrors })
 
 export const setVar = (name: string, value: RExpression) => `${name} <- ${value}`
 
-export const dfVar = (dataFrame: any, varName: any) => `${dataFrame}$${varName}`
+export const dfVar = (dataFrame: RExpression, varName: RExpression) => `${dataFrame}$${varName}`
 
-export const merge = (x: any, y: any, by: any, allX = false) =>
+export const merge = (x: RExpression, y: RExpression, by: RExpression, allX = false) =>
   `merge(x = ${x}, y = ${y}, by="${by}" ${allX ? ', all.x=TRUE' : ''})`
 
-export const vector = (values = []) => `c(${values.join(', ')})`
+export const vector = (values: RExpression[] = []) => `c(${values.join(', ')})`
 
 export const list = (object: Record<string, RExpression>) => {
   const listValues = Object.entries(object)
@@ -41,28 +41,28 @@ export const list = (object: Record<string, RExpression>) => {
   return `list(${listValues})`
 }
 
-export const rm = (obj: any) => `rm(${obj})`
+export const rm = (obj: RExpression) => `rm(${obj})`
 
-export const sqldf = (query: any) => `sqldf('${query}')`
+export const sqldf = (query: RExpression) => `sqldf('${query}')`
 
 // this is r with (reserved keyword)
-export const withDF = (dfName: any, body: any) => `with(${dfName}, ${body})`
+export const withDF = (dfName: RExpression, body: RExpression) => `with(${dfName}, ${body})`
 
-export const ifElse = (test: any, yes: any, no: any) => `ifelse(${test}, ${yes}, ${no})`
+export const ifElse = (test: RExpression, yes: RExpression, no: RExpression) => `ifelse(${test}, ${yes}, ${no})`
 
-export const isNa = (x: any) => `is.na(${x})`
+export const isNa = (x: RExpression) => `is.na(${x})`
 
 // == files and directories
 
-export const unlink = (path: any) => `unlink('${path}' , recursive = T)`
+export const unlink = (path: RExpression) => `unlink('${path}' , recursive = T)`
 
 export const unlinkWd = `# unlink(getwd(), recursive = T)`
 
-export const dirCreate = (path: any) => `dir.create(path = '${path}', showWarnings = F, recursive = T)`
+export const dirCreate = (path: RExpression) => `dir.create(path = '${path}', showWarnings = F, recursive = T)`
 
 // == csv
 
-export const writeCsv = (x: any, file: any, rowNames = 'F') =>
+export const writeCsv = (x: RExpression, file: RExpression, rowNames = 'F') =>
   `write.csv(${x}, file = '${file}', row.names = ${rowNames})`
 
 // == converters
@@ -78,9 +78,9 @@ export const asNumeric = (value: RExpression, units = null) => {
 
 // == strings
 
-export const paste = (parts: any, separator = ' ') => `paste(${parts.join(', ')}, sep='${separator}')`
+export const paste = (parts: RExpression[], separator = ' ') => `paste(${parts.join(', ')}, sep='${separator}')`
 
-export const paste0 = (parts: any) => paste(parts, '')
+export const paste0 = (parts: RExpression[]) => paste(parts, '')
 
 // == system
 

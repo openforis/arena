@@ -9,7 +9,7 @@ const initFile = async ({
   chainUuid,
   cycle,
 }: {
-  dir: any
+  dir: string
   surveyId: number
   chainUuid: string
   cycle: string

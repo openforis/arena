@@ -47,8 +47,8 @@ export const uploadChainMauFile = async ({
   chainUuid: string
   cycle?: string
   filePath: string
-  fileName: any
-  fileSize: any
+  fileName: string
+  fileSize: number
 }) => {
   const existingSummary = await fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
 

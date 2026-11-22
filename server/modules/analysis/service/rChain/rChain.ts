@@ -1,3 +1,4 @@
+import type { ArenaAnyNodeDef, ArenaChain, ArenaSurvey } from '@openforis/arena-core'
 import * as ProcessUtils from '@core/processUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -38,16 +39,16 @@ const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_proje
 
 class RChain {
   static readonly dirNames = { user: 'user', system: 'system', sampling: 'sampling' }
-  _analysisNodeDefs: any
-  _chain: any
+  _analysisNodeDefs: ArenaAnyNodeDef[]
+  _chain: ArenaChain
   _chainUuid: string
-  _cycle: any
-  _dir: any
-  _dirNames: any
-  _dirResults: any
-  _dirSampling: any
-  _dirSystem: any
-  _dirUser: any
+  _cycle: string
+  _dir: string
+  _dirNames: { user: string; system: string; sampling: string }
+  _dirResults: string
+  _dirSampling: string
+  _dirSystem: string
+  _dirUser: string
   _entities: any
   _entitiesWithActiveQuantitativeVariables: any
   _fileArena: any
@@ -66,10 +67,10 @@ class RChain {
   _fileStatisticalAnalysis: any
   _listCategories: any
   _listTaxonomies: any
-  _serverUrl: any
-  _survey: any
+  _serverUrl: string
+  _survey: ArenaSurvey
   _surveyId: number
-  _token: any
+  _token: string
 
   constructor({ surveyId, cycle, chainUuid, serverUrl, token }) {
     this._surveyId = surveyId

@@ -9,11 +9,11 @@ import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ChainManager from '../manager'
-import { Objects, type ArenaChain, type ArenaSurvey } from '@openforis/arena-core'
+import { Objects, type ArenaChain, type ArenaSurvey, type ArenaAnyNodeDef } from '@openforis/arena-core'
 import { ArrayUtils } from '@core/arrayUtils'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
-const getCycleLabel = (cycleKey: any) => `${Number(cycleKey) + 1}`
+const getCycleLabel = (cycleKey: string) => `${Number(cycleKey) + 1}`
 
 const generateSurveySummary = ({ survey, lang }: { survey: ArenaSurvey; lang: string }) => ({
   surveyName: Survey.getName(survey),
@@ -32,7 +32,7 @@ const generateResultVariableSummary = ({
   lang,
 }: {
   survey: ArenaSurvey
-  analysisNodeDef: any
+  analysisNodeDef: ArenaAnyNodeDef
   lang: string
 }) => {
   const categoryName = NodeDef.isCode(analysisNodeDef)

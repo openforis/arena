@@ -1,3 +1,4 @@
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { quote } from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,9 +15,9 @@ const computedCategoryUuidCol = 'computed_category_uuid'
  * Class that models a data frame step results.
  */
 export default class DfResults {
-  _entity: any
+  _entity: ArenaNodeDefEntity
   _rChain: any
-  _scripts: any
+  _scripts: string[]
 
   constructor(rChain, entity) {
     this._rChain = rChain

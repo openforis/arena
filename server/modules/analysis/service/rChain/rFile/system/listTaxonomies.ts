@@ -6,9 +6,9 @@ import * as ApiRoutes from '@common/apiRoutes'
 import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
 export default class ListTaxonomies {
-  _name: any
+  _name: string
   _rChain: any
-  _scripts: any
+  _scripts: string[]
   _taxonomies: any
 
   constructor(rChain) {

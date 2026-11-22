@@ -18,7 +18,7 @@ const fileNamesInit = [
 ]
 
 export default class RFileInit extends RFileSystem {
-  dirInit: any
+  dirInit: string
 
   constructor(rChain) {
     super(rChain, 'init')
