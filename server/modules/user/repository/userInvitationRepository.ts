@@ -32,7 +32,7 @@ export const deleteUserInvitation = (
   )
 
 export const updateRemovedDate = (
-  { surveyUuid, userUuidToRemove }: { surveyUuid: string; userUuidToRemove: any },
+  { surveyUuid, userUuidToRemove }: { surveyUuid: string; userUuidToRemove: string },
   client: DbClient = db
 ) =>
   client.oneOrNone(
