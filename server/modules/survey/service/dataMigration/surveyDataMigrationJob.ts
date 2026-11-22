@@ -1,5 +1,4 @@
-import type { ArenaJobContext } from '@openforis/arena-core'
-import { Versions } from '@openforis/arena-core'
+import { Versions, type ArenaJobContext } from '@openforis/arena-core'
 
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
