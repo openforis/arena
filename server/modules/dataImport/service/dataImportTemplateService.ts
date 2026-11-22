@@ -1,3 +1,4 @@
+import type { Response as ExpressResponse } from 'express'
 import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { FlatDataExportModel, PointFactory } from '@openforis/arena-core'
 
@@ -98,7 +99,7 @@ const exportDataImportTemplate = async ({
   nodeDefUuid: string
   includeFiles: boolean
   fileFormat: string
-  res: any
+  res: ExpressResponse
 }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
@@ -120,7 +121,7 @@ const exportAllDataImportTemplates = async ({
   cycle: string
   includeFiles: boolean
   fileFormat: string
-  res: any
+  res: ExpressResponse
 }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 

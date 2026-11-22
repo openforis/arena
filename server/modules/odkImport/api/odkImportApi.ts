@@ -1,3 +1,4 @@
+import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express'
 import { FileFormats } from '@core/fileFormats'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
@@ -19,7 +20,7 @@ export const init = (app: any) => {
   app.post(
     '/survey/odk-import',
     AuthMiddleware.requireSurveyCreatePermission,
-    async (req: any, res: any, next: any) => {
+    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       try {
         const tempFile = await processChunkedFileForBackgroundMerge({ req })
         if (tempFile) {
@@ -42,7 +43,7 @@ export const init = (app: any) => {
   app.get(
     '/survey/:surveyId/odk-import/report',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: any, res: any, next: any) => {
+    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       try {
         const { surveyId, excludeResolved = false, offset, limit } = Request.getParams(req)
 
@@ -58,7 +59,7 @@ export const init = (app: any) => {
   app.get(
     '/survey/:surveyId/odk-import/report/export',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: any, res: any, next: any) => {
+    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       try {
         const { surveyId, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
@@ -96,7 +97,7 @@ export const init = (app: any) => {
   app.get(
     '/survey/:surveyId/odk-import/report/count',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: any, res: any, next: any) => {
+    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       try {
         const { surveyId, excludeResolved } = Request.getParams(req)
 
@@ -114,7 +115,7 @@ export const init = (app: any) => {
   app.post(
     '/survey/:surveyId/odk-import/report/:itemId/resolve',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: any, res: any, next: any) => {
+    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       try {
         const { surveyId, itemId, resolved } = Request.getParams(req)
 

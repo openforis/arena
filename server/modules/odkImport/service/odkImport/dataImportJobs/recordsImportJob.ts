@@ -1,3 +1,4 @@
+import type FileZip from '@server/utils/file/fileZip'
 import type { DbClient } from '@server/db/db'
 import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
@@ -189,7 +190,7 @@ export default class RecordsImportJob extends Job {
     parentPath: string
     submissionElement: XmlElement
     record: ArenaRecord
-    submissionFileZip: any
+    submissionFileZip: FileZip
     submissionDir: string
   }): Promise<any> {
     let recordUpdated = record
@@ -248,7 +249,7 @@ export default class RecordsImportJob extends Job {
     childPath: string
     childElement: XmlElement
     record: ArenaRecord
-    submissionFileZip: any
+    submissionFileZip: FileZip
     submissionDir: string
   }): Promise<any> {
     if (NodeDef.isEntity(nodeDef)) {
@@ -297,7 +298,7 @@ export default class RecordsImportJob extends Job {
     parentNode: ArenaRecordNode
     rawText: string | null
     record: ArenaRecord
-    submissionFileZip: any
+    submissionFileZip: FileZip
     submissionDir: string
   }): Promise<any> {
     if (NodeDef.getType(nodeDef) === NodeDef.nodeDefType.file) {
@@ -335,7 +336,7 @@ export default class RecordsImportJob extends Job {
     parentNode: ArenaRecordNode
     fileName: string | null
     record: ArenaRecord
-    submissionFileZip: any
+    submissionFileZip: FileZip
     submissionDir: string
   }): Promise<any> {
     if (!fileName) return record

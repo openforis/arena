@@ -1,4 +1,12 @@
-import { Dates, Objects, Records, Surveys, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
+import {
+  Dates,
+  Objects,
+  Records,
+  Surveys,
+  type ArenaRecord,
+  type ArenaSurvey,
+  type ArenaAnyNodeDef,
+} from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
@@ -24,7 +32,7 @@ const formatKeyValue = async ({
 }: {
   survey: ArenaSurvey
   cycle: string
-  keyDef: any
+  keyDef: ArenaAnyNodeDef
   value: any
 }): Promise<any> => {
   // items of big categories and taxa of big taxonomies are not in the survey ref data
@@ -88,7 +96,7 @@ const findExistingRecordSummaryWithSameKeys = async ({
 }): Promise<any> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
-  const recordSummaryKeyProps = keyDefs.map((keyDef: any) => A.camelize(NodeDef.getName(keyDef)))
+  const recordSummaryKeyProps = keyDefs.map((keyDef: ArenaAnyNodeDef) => A.camelize(NodeDef.getName(keyDef)))
   const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
   return existingRecordsSummary.find((recordSummary: ArenaRecord) => {
     const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])

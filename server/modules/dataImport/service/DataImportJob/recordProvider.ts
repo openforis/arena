@@ -1,5 +1,12 @@
 import type { DbClient } from '@server/db/db'
-import { Objects, RecordUpdater, SystemError, type ArenaSurvey, type ArenaRecord } from '@openforis/arena-core'
+import {
+  Objects,
+  RecordUpdater,
+  SystemError,
+  type ArenaSurvey,
+  type ArenaRecord,
+  type ArenaAnyNodeDef,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -19,7 +26,7 @@ const checkRootKeysSpecified = ({
   rootKeyDefs,
   rootKeyValuesFormatted,
 }: {
-  rootKeyDefs: any
+  rootKeyDefs: ArenaAnyNodeDef[]
   rootKeyValuesFormatted: any
 }) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
@@ -66,7 +73,7 @@ const getRecordSummaryKey = ({
   record,
 }: {
   survey: ArenaSurvey
-  rootKeyDefs: any
+  rootKeyDefs: ArenaAnyNodeDef[]
   record: ArenaRecord
 }) =>
   NodeValues.getFastEqualityCompositeKey({
@@ -98,7 +105,7 @@ const buildRecordsSummaryIndex = ({
   recordsSummary,
 }: {
   survey: ArenaSurvey
-  rootKeyDefs: any
+  rootKeyDefs: ArenaAnyNodeDef[]
   recordsSummary: any
 }) => {
   if (!rootKeyDefs.every((rootKeyDef) => NodeValues.isTypeFastIndexable(NodeDef.getType(rootKeyDef)))) {
@@ -125,7 +132,7 @@ const findRecordSummariesMatchingKeysByIndex = ({
   index,
 }: {
   survey: ArenaSurvey
-  rootKeyDefs: any
+  rootKeyDefs: ArenaAnyNodeDef[]
   valuesByDefUuid: Record<string, any>
   index: any
 }) => {
@@ -149,7 +156,7 @@ const findRecordSummariesMatchingKeysByScan = ({
   recordsSummary,
 }: {
   survey: ArenaSurvey
-  rootKeyDefs: any
+  rootKeyDefs: ArenaAnyNodeDef[]
   valuesByDefUuid: Record<string, any>
   recordsSummary: any
 }) =>

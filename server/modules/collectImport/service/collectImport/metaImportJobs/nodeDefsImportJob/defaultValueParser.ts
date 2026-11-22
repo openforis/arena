@@ -41,7 +41,7 @@ const parseDefaultValue = async ({
   survey: ArenaSurvey
   collectDefaultValue: any
   nodeDef: ArenaAnyNodeDef
-  defaultLanguage: any
+  defaultLanguage: string
 }) => {
   const { value, expr: collectExpr, if: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
 
@@ -99,7 +99,7 @@ export const parseDefaultValues = async ({
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
   collectDefaultValues: any
-  defaultLanguage: any
+  defaultLanguage: string
 }) => {
   const defaultValues = []
   const importIssues = []
