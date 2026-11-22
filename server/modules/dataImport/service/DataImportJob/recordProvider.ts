@@ -51,7 +51,7 @@ const checkRootKeysSpecified = ({
   rootKeyDefs: ArenaAnyNodeDef[]
   rootKeyValuesFormatted: unknown[]
 }) => {
-  const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
+  const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex((value) => Objects.isEmpty(value))
   if (emptyRootKeyValueIndex >= 0) {
     const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
     throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissingOrInvalid, { keyName })

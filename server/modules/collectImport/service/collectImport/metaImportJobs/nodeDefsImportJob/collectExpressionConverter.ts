@@ -124,10 +124,8 @@ const convert = async ({
       const flags = ['g']
       if (ignoreCase) flags.push('i')
       const regExp = new RegExp(pattern, flags.join(''))
-      // separate calls: String.replace has no overload accepting a string or replacer function union
-      return typeof replace === 'string'
-        ? expressionAcc.replace(regExp, replace)
-        : expressionAcc.replace(regExp, replace)
+      // String.replace has no overload accepting the union of a replacement string and a replacer function
+      return expressionAcc.replace(regExp, replace as (substring: string, ...args: string[]) => string)
     }, expression.trim())
     // remove extra spaces
     .replace(/\s+/g, ' ')
