@@ -1,3 +1,4 @@
+import type FileZip from '@server/utils/file/fileZip'
 import type { ArenaSurvey, ArenaRecordNode, ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
@@ -137,7 +138,7 @@ const extractFileValueAndMeta =
   (
     survey: ArenaSurvey,
     node: ArenaRecordNode,
-    collectSurveyFileZip: any,
+    collectSurveyFileZip: FileZip,
     collectNodeDef: CollectSurvey.CollectNodeDef,
     tx: DbClient
   ) =>
@@ -180,7 +181,7 @@ const findTaxonUuid = async ({
   survey: ArenaSurvey
   taxonProvider: any
   nodeDef: ArenaAnyNodeDef
-  taxonCode: any
+  taxonCode: string
 }) => {
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
   if (taxonUuid) return taxonUuid
@@ -241,7 +242,7 @@ type AttributeValueExtractParams = {
   nodeDef: ArenaAnyNodeDef
   record?: ArenaRecord
   node?: ArenaRecordNode
-  collectSurveyFileZip?: any
+  collectSurveyFileZip?: FileZip
   collectNodeDef?: CollectSurvey.CollectNodeDef
   collectNode: CollectRecord.CollectNode
   collectNodeField?: string

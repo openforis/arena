@@ -28,7 +28,7 @@ const checkCollectDataImportOptions = async ({
 }: {
   user: ArenaUser
   surveyId: number
-  deleteAllRecords?: any
+  deleteAllRecords?: boolean
 }) => {
   if (!deleteAllRecords) return
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
@@ -60,7 +60,7 @@ export const startCollectDataImportJob = async ({
   user: ArenaUser
   surveyId: number
   filePath: string
-  deleteAllRecords: any
+  deleteAllRecords: boolean
   cycle: string
   forceImport: any
 }) => {
@@ -94,7 +94,7 @@ export const checkFlatDataImportOptions = ({
 }: {
   user: ArenaUser
   includeFiles?: boolean
-  deleteExistingEntities?: any
+  deleteExistingEntities?: boolean
 }) => {
   if ((includeFiles || deleteExistingEntities) && !User.isSystemAdmin(user)) {
     throw new UnauthorizedError(User.getName(user))
@@ -131,9 +131,9 @@ export const startFlatDataImportJob = ({
   dryRun?: any
   insertNewRecords?: any
   insertMissingNodes?: any
-  updateRecordsInAnalysis?: any
+  updateRecordsInAnalysis?: boolean
   includeFiles?: boolean
-  deleteExistingEntities?: any
+  deleteExistingEntities?: boolean
   abortOnErrors?: any
 }) => {
   checkFlatDataImportOptions({ user, includeFiles, deleteExistingEntities })

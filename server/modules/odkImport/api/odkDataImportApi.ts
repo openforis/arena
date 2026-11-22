@@ -1,3 +1,4 @@
+import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express'
 import * as JobUtils from '@server/job/jobUtils'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as Request from '@server/utils/request'
@@ -12,7 +13,7 @@ export const init = (app: any) => {
   app.post(
     '/odk-import/survey/:surveyId',
     AuthMiddleware.requireRecordCreatePermission,
-    async (req: any, res: any, next: any) => {
+    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, cycle } = Request.getParams(req)

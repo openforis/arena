@@ -165,7 +165,7 @@ const parseValidationRule = async ({
   survey: ArenaSurvey
   collectValidationRule: any
   nodeDef: ArenaAnyNodeDef
-  defaultLanguage: any
+  defaultLanguage: string
 }) => {
   const checkType = CollectSurvey.getElementName(collectValidationRule)
   const checkExpressionParser = checkExpressionParserByType[checkType]
@@ -241,7 +241,7 @@ export const parseValidationRules = async ({
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
   collectValidationRules: any
-  defaultLanguage: any
+  defaultLanguage: string
 }) => {
   const validationRules = []
   const importIssues = []

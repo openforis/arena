@@ -11,7 +11,7 @@ const createInternalJobs = ({
   deleteExistingEntities,
 }: {
   includeFiles: boolean
-  deleteExistingEntities: any
+  deleteExistingEntities: boolean
 }) => [
   new PrepareImportFileJob(),
   new FlatDataImportJob({ keepReaderOpenOnEnd: true }),

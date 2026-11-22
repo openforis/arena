@@ -19,7 +19,7 @@ export const fetchItems = (
     excludeResolved = false,
     offset = 0,
     limit = null,
-  }: { surveyId: number; excludeResolved?: any; offset?: number; limit?: number | null },
+  }: { surveyId: number; excludeResolved?: boolean; offset?: number; limit?: number | null },
   client?: DbClient
 ) => ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
 
@@ -47,7 +47,7 @@ export const fetchItemsStream = ({ surveyId, messageLangCode }: { surveyId: numb
 }
 
 export const countItems = (
-  { surveyId, excludeResolved }: { surveyId: number; excludeResolved: any },
+  { surveyId, excludeResolved }: { surveyId: number; excludeResolved: boolean },
   client?: DbClient
 ) => ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
 
@@ -81,6 +81,6 @@ export const updateItem = (
   surveyId: number,
   itemId: number,
   props: Record<string, any>,
-  resolved: any,
+  resolved: boolean,
   client: DbClient
 ) => ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)
