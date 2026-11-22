@@ -10281,9 +10281,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^65.5.1":
-  version: 65.5.1
-  resolution: "eslint-plugin-jsdoc@npm:65.5.1"
+"eslint-plugin-jsdoc@npm:^65.5.2":
+  version: 65.5.2
+  resolution: "eslint-plugin-jsdoc@npm:65.5.2"
   dependencies:
     "@es-joy/escodegen": "npm:^5.0.1"
     "@es-joy/jsdoccomment": "npm:~1.2.0"
@@ -10307,7 +10307,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/7a861b1a013ee0aa5018df047930645833b0ff46f782551365fd2acdac822c6279b5088df0f1ec760978c3f2725b46319803749d7f9ae2891172a6fc03501322
+  checksum: 10c0/e0c4e75f0affceafa387d4af2863f2efb170d5303bc89951d4b9e609cf450e1f6597ef80b4a20601785156476c6d823c793dbadfcfd4dbb975f9aaf6bc224426
   languageName: node
   linkType: hard
 
@@ -13981,9 +13981,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^17.6.1":
-  version: 17.6.1
-  resolution: "lint-staged@npm:17.6.1"
+"lint-staged@npm:^17.6.2":
+  version: 17.6.2
+  resolution: "lint-staged@npm:17.6.2"
   dependencies:
     picomatch: "npm:^4.0.7"
     string-argv: "npm:^0.4.0"
@@ -13994,7 +13994,7 @@ __metadata:
       optional: true
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10c0/4c7433079bc174c531ccaab68bc7171f726a65c1961abbc9b26617f6d427bae76c926688124c2c2519c7540150755025207644dba50de0ba3ce65bfb1b05f7e8
+  checksum: 10c0/9a5831c45885ae2a3cf6c6eaf16c8313ee746512523d26a5e9d87a78e4d1a1835350f08623e1d34a8aa01e59ea3750d46d1b0a4d188d4ee1208a07d1977be7b5
   languageName: node
   linkType: hard
 
@@ -15537,7 +15537,7 @@ __metadata:
     eslint-plugin-chai-friendly: "npm:^1.2.1"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-jest: "npm:^29.17.1"
-    eslint-plugin-jsdoc: "npm:^65.5.1"
+    eslint-plugin-jsdoc: "npm:^65.5.2"
     eslint-plugin-jsx-a11y: "npm:^6.10.2"
     eslint-plugin-mocha: "npm:^12.0.2"
     eslint-plugin-playwright: "npm:^2.12.2"
@@ -15575,7 +15575,7 @@ __metadata:
     leaflet-geometryutil: "npm:^0.11.0"
     leaflet-side-by-side: "npm:^2.2.0"
     leaflet.markercluster: "npm:^1.5.3"
-    lint-staged: "npm:^17.6.1"
+    lint-staged: "npm:^17.6.2"
     maplibre-gl: "npm:6.19.0"
     marked: "npm:^18.2.1"
     mgrs: "npm:2.2.0"
