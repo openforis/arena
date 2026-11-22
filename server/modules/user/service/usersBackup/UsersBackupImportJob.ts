@@ -2,7 +2,7 @@ import type { ArenaJobContext } from '@openforis/arena-core'
 import type FileZip from '@server/utils/file/fileZip'
 import { uuidv4 } from '@core/uuid'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as UsersBackupRepository from '@server/modules/user/repository/usersBackupRepository'
 import type { AuthGroupRow, UserGroupRow } from '@server/modules/user/repository/usersBackupRepository'
@@ -34,7 +34,7 @@ export default class UsersBackupImportJob extends Job<UsersBackupImportJobContex
   userGroupsByKey: Record<string, UserGroupRow> = {}
   summary: UsersBackupImportSummary
 
-  constructor(params: any) {
+  constructor(params: Partial<JobParams>) {
     super(UsersBackupImportJob.type, params)
   }
 

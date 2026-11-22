@@ -2,6 +2,7 @@ import type { DbClient } from '@server/db/db'
 import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import type { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 const wgs84SrsId = '4326'
 
@@ -82,7 +83,7 @@ const extractCode = async ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
-  categoryItemProvider: { getItemByCode: (params: any) => Promise<any> }
+  categoryItemProvider: Pick<typeof CategoryItemProviderDefault, 'getItemByCode'>
   text: string
   tx: DbClient
 }): Promise<any> => {
@@ -123,7 +124,7 @@ export const extractAttributeValue = async ({
 }: {
   survey: ArenaSurvey
   nodeDef: ArenaAnyNodeDef
-  categoryItemProvider: { getItemByCode: (params: any) => Promise<any> }
+  categoryItemProvider: Pick<typeof CategoryItemProviderDefault, 'getItemByCode'>
   rawText: string | null
   tx: DbClient
 }): Promise<any> => {

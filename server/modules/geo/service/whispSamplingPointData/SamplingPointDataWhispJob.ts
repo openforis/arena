@@ -29,7 +29,7 @@ export default class SamplingPointDataWhispJob extends Job<SamplingPointDataWhis
     }
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<Record<string, unknown>> {
     const { category } = this.context
     return Promise.resolve({ category })
   }

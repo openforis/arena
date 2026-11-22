@@ -42,7 +42,7 @@ export default class ArenaMobileDataImportSummaryJob extends Job<ArenaMobileData
     this.setContext({ survey })
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<Record<string, unknown>> {
     return Promise.resolve(this.combineInnerJobsResults())
   }
 

@@ -3,7 +3,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 
 export class FileImportBaseJob extends Job {
   deletedFileUuids: string[]
@@ -11,7 +11,7 @@ export class FileImportBaseJob extends Job {
   missingFileSummaries: any
   updatedFileUuids: string[]
 
-  constructor(type: string, params?: any) {
+  constructor(type: string, params?: Partial<JobParams>) {
     super(type, params)
     this.insertedFileUuids = []
     this.updatedFileUuids = []

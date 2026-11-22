@@ -22,8 +22,8 @@ const convert = async ({
 }: {
   survey: ArenaSurvey
   nodeDefCurrent: ArenaAnyNodeDef
-  expression: any
-  advancedExpressionEditor?: any
+  expression: string
+  advancedExpressionEditor?: boolean
 }) => {
   const itemsToReplace = [
     // operators
@@ -123,7 +123,9 @@ const convert = async ({
       const { pattern, ignoreCase, replace } = item
       const flags = ['g']
       if (ignoreCase) flags.push('i')
-      return expressionAcc.replace(new RegExp(pattern, flags.join('')), replace)
+      const regExp = new RegExp(pattern, flags.join(''))
+      // String.replace has no overload accepting the union of a replacement string and a replacer function
+      return expressionAcc.replace(regExp, replace as (substring: string, ...args: string[]) => string)
     }, expression.trim())
     // remove extra spaces
     .replace(/\s+/g, ' ')

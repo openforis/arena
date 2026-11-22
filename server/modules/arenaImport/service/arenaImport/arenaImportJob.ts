@@ -17,7 +17,7 @@ import SurveyFilesImportJob from './jobs/surveyFilesImportJob'
 import CreateRdbJob from './jobs/createRdb'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
-const createInnerJobs = (params: any) => {
+const createInnerJobs = (params: Partial<JobParams>) => {
   const { backup = true, options = {} } = params
   const { includeData = true } = options
 

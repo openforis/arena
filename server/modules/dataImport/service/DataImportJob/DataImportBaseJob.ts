@@ -1,11 +1,11 @@
-import { Dates, type ArenaRecordNode } from '@openforis/arena-core'
+import { Dates, type ArenaRecord, type ArenaRecordNode } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 
-import Job from '@server/job/job'
+import Job, { type JobParams } from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import { RecordsDateModifiedBatchPersister } from '@server/modules/record/manager/RecordsDateModifiedBatchPersister'
@@ -16,19 +16,19 @@ import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesU
 import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
 
 export default class DataImportBaseJob extends Job {
-  currentRecord: any
+  currentRecord: ArenaRecord | null
   insertedRecordsUuids: Set<string>
-  nodesDeleteBatchPersister: any
-  nodesInsertBatchPersister: any
-  nodesUpdateBatchPersister: any
-  rdbUpdatesBatchPersister: any
-  recordsDateModifiedBatchPersister: any
-  recordsValidationBatchPersister: any
+  nodesDeleteBatchPersister: NodesDeleteBatchPersister | null
+  nodesInsertBatchPersister: NodesInsertBatchPersister | null
+  nodesUpdateBatchPersister: NodesUpdateBatchPersister | null
+  rdbUpdatesBatchPersister: RdbUpdatesBatchPersister | null
+  recordsDateModifiedBatchPersister: RecordsDateModifiedBatchPersister | null
+  recordsValidationBatchPersister: RecordsValidationBatchPersister | null
   skippedRecordsUuids: Set<string>
   updatedRecordsUuids: Set<string>
   updatedValues: number
 
-  constructor(type: string, params?: any) {
+  constructor(type: string, params?: Partial<JobParams>) {
     super(type, params)
 
     this.insertedRecordsUuids = new Set()
@@ -68,14 +68,15 @@ export default class DataImportBaseJob extends Job {
     const { context, currentRecord: record, tx } = this
     const { dryRun, survey } = context
 
-    record.dateModified = dateModified
+    // a Date, like in the records fetched from the DB (pg returns timestamps as Date)
+    record.dateModified = dateModified as unknown as string
 
     if (dryRun) return
 
     const recordUuid = Record.getUuid(record)
     await this.recordsValidationBatchPersister.addItem(recordUuid, Record.getValidation(record))
     if (dateModified) {
-      await this.recordsDateModifiedBatchPersister.addItem(recordUuid, dateModified, tx)
+      await this.recordsDateModifiedBatchPersister.addItem(recordUuid, dateModified)
     }
 
     const nodesArray = Object.values(nodesUpdated)
@@ -111,7 +112,7 @@ export default class DataImportBaseJob extends Job {
     await super.beforeSuccess()
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<{ [key: string]: unknown }> {
     const { errors, insertedRecordsUuids, processed, skippedRecordsUuids, updatedRecordsUuids, updatedValues } = this
 
     return Promise.resolve({

@@ -27,7 +27,7 @@ export default class OdkDataImportJob extends Job<OdkImportJobContext> {
     super(OdkDataImportJob.type, params, createInnerJobs())
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<Record<string, unknown>> {
     const { context } = this
     return Promise.resolve({ submittedCount: context.submittedCount, skippedCount: context.skippedCount })
   }

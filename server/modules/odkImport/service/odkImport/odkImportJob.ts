@@ -30,7 +30,7 @@ export default class OdkImportJob extends Job<OdkImportJobContext> {
     super(OdkImportJob.type, params, createInnerJobs())
   }
 
-  generateResult(): Promise<any> {
+  generateResult(): Promise<Record<string, unknown>> {
     const { context } = this
     return Promise.resolve({ surveyId: context.surveyId })
   }

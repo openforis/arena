@@ -38,7 +38,7 @@ export default class ZipFileCreatorBaseJob<C extends ZipFileCreatorJobContext = 
     await archive?.finalize()
   }
 
-  async generateResult(): Promise<any> {
+  async generateResult(): Promise<Record<string, unknown>> {
     const result = await super.generateResult()
     const { outputFileName } = this.context
     return {
