@@ -18,7 +18,7 @@ const extractValueFromRowResult = ({
 }: {
   rowResult: any
   nodeDef: ArenaAnyNodeDef
-  columnName: any
+  columnName: string
 }) => {
   const cellValue = rowResult[columnName]
 
