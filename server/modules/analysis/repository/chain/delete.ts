@@ -11,9 +11,9 @@ import { TableChain } from '../../../../../common/model/db'
  * @param {!string} [params.chainUuid] - The chain uuid to delete.
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  *
- * @returns {Promise<any[]>} - The result promise.
+ * @returns {Promise<object>} - The result promise.
  */
-export const deleteChain = (params: any, client: DbClient = DB.client) => {
+export const deleteChain = (params: { surveyId: number; chainUuid: string }, client: DbClient = DB.client) => {
   const { surveyId, chainUuid } = params
 
   const tableChain = new TableChain(surveyId)

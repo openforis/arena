@@ -15,7 +15,7 @@ import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/co
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as DbUtils from '@server/db/dbUtils'
-import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
+import { type RdbUpdate, RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
 
 const types = RdbUpdateTypes
 
@@ -68,7 +68,7 @@ const _getValuesByColumnName = ({
   nodeDef: ArenaAnyNodeDef
   node: ArenaRecordNode
   ancestorMultipleEntity: ArenaRecordNode
-  type: any
+  type: string
 }) => {
   if (type !== types.insert) {
     return _getValuesByColumnNameDefault({ survey, nodeDef, node })
@@ -162,7 +162,7 @@ export const generateRdbUpdates = ({
 
 // ==== execution
 
-const _update = (update: any, client: DbClient) => {
+const _update = (update: RdbUpdate, client: DbClient) => {
   const { schema, table, valuesByColumnName, rowUuid } = update
   const columnNames = Object.keys(valuesByColumnName).map((colName) => DbUtils.asName(colName))
   const values = Object.values(valuesByColumnName)
@@ -175,7 +175,7 @@ const _update = (update: any, client: DbClient) => {
   )
 }
 
-const _insert = (update: any, client: DbClient) => {
+const _insert = (update: RdbUpdate, client: DbClient) => {
   const { schema, table, valuesByColumnName } = update
   const columnNames = Object.keys(valuesByColumnName).map((colName) => DbUtils.asName(colName))
   const values = Object.values(valuesByColumnName)
@@ -189,7 +189,7 @@ const _insert = (update: any, client: DbClient) => {
   )
 }
 
-const _delete = (update: any, client: DbClient) => {
+const _delete = (update: RdbUpdate, client: DbClient) => {
   const { schema, table, rowUuid } = update
   return client.oneOrNone(
     `DELETE FROM ${schema}.${table} 
@@ -205,7 +205,7 @@ const queryByType = {
   [types.update]: _update,
 }
 
-export const updateTablesFromUpdates = async ({ rdbUpdates }: { rdbUpdates: any }, client: DbClient) => {
+export const updateTablesFromUpdates = async ({ rdbUpdates }: { rdbUpdates: RdbUpdates }, client: DbClient) => {
   // run the updates one at a time, in the order they have been generated (e.g. a row can be updated right after
   // being inserted); they share the same client (usually a transaction), where queries cannot run concurrently
   for (const update of rdbUpdates.getAll()) {

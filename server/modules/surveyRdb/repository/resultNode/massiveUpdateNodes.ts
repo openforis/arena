@@ -16,7 +16,7 @@ const extractValueFromRowResult = ({
   nodeDef,
   columnName,
 }: {
-  rowResult: any
+  rowResult: { [columnName: string]: unknown }
   nodeDef: ArenaAnyNodeDef
   columnName: string
 }) => {

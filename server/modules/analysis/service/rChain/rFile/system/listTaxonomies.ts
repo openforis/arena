@@ -1,3 +1,6 @@
+import type { ArenaTaxonomy } from '@openforis/arena-core'
+
+import type RChain from '../../rChain'
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -7,11 +10,11 @@ import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
 export default class ListTaxonomies {
   _name: string
-  _rChain: any
+  _rChain: RChain
   _scripts: string[]
-  _taxonomies: any
+  _taxonomies: ArenaTaxonomy[]
 
-  constructor(rChain) {
+  constructor(rChain: RChain) {
     this._rChain = rChain
     this._scripts = []
     this._name = 'taxonomies'

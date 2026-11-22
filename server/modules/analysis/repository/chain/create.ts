@@ -1,4 +1,5 @@
 import type { DbClient } from '@server/db/db'
+import type { ArenaChain } from '@openforis/arena-core'
 import { DB } from '@openforis/arena-server'
 
 import * as Chain from '@common/analysis/chain'
@@ -13,7 +14,9 @@ import { transformCallback } from './read'
  * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChain = (params: any, client: DbClient = DB) => {
+type ChainToInsert = Omit<ArenaChain, 'validation'> & { validation?: ArenaChain['validation'] }
+
+export const insertChain = (params: { surveyId: number; chain: ArenaChain }, client: DbClient = DB) => {
   const { surveyId, chain } = params
   const tableChain = new TableChain(surveyId)
 
@@ -38,7 +41,16 @@ export const insertChain = (params: any, client: DbClient = DB) => {
  * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<Chain>} - The result promise.
  */
-export const insertChainFull = (params: any, client: DbClient = DB) => {
+export const insertChainFull = (
+  params: {
+    surveyId: number
+    // a cloned chain has no validation yet
+    chain: ChainToInsert
+    scriptCommon?: string | null
+    scriptEnd?: string | null
+  },
+  client: DbClient = DB
+) => {
   const { surveyId, chain, scriptCommon = null, scriptEnd = null } = params
   const tableChain = new TableChain(surveyId)
 

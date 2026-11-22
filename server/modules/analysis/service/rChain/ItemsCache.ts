@@ -1,13 +1,16 @@
 import { Arrays } from '@openforis/arena-core'
 
-export class ItemsCache {
-  _itemsByKey: Record<string, any>
-  _itemsSizeByKey: Record<string, any>
+export class ItemsCache<T = unknown> {
+  _itemsByKey: { [key: string]: T }
+  _itemsSizeByKey: { [key: string]: number }
   _lastAccessedKeys: string[]
   _maxItems: number
-  _maxTotalItemsSize: number
+  _maxTotalItemsSize: number | null
 
-  constructor({ maxItems = 1000, maxTotalItemsSize = null } = {}) {
+  constructor({
+    maxItems = 1000,
+    maxTotalItemsSize = null,
+  }: { maxItems?: number; maxTotalItemsSize?: number | null } = {}) {
     this._maxItems = maxItems
     this._maxTotalItemsSize = maxTotalItemsSize
     this._itemsByKey = {}
@@ -15,7 +18,7 @@ export class ItemsCache {
     this._lastAccessedKeys = []
   }
 
-  add(key, item, itemSize = null) {
+  add(key: string, item: T, itemSize: number | null = null): void {
     this._itemsByKey[key] = item
     if (itemSize) {
       this._itemsSizeByKey[key] = itemSize
@@ -26,7 +29,7 @@ export class ItemsCache {
     this._keepLimits()
   }
 
-  _keepLimits() {
+  _keepLimits(): void {
     while (
       this._lastAccessedKeys.length > 1 && // keep at least one item
       (this._lastAccessedKeys.length > this._maxItems || // max items exceeded
@@ -38,31 +41,31 @@ export class ItemsCache {
     }
   }
 
-  _removeItem(key) {
+  _removeItem(key: string): void {
     delete this._itemsByKey[key]
     delete this._itemsSizeByKey[key]
   }
 
-  _updateLastAccessedKey(key) {
+  _updateLastAccessedKey(key: string): void {
     this._lastAccessedKeys = Arrays.removeItem(key)(this._lastAccessedKeys)
     this._lastAccessedKeys.unshift(key)
   }
 
-  has(key) {
+  has(key: string): boolean {
     return !!this.get(key)
   }
 
-  get(key) {
+  get(key: string): T | undefined {
     const item = this._itemsByKey[key]
     this._updateLastAccessedKey(key)
     return item
   }
 
-  getTotalItemsSize() {
+  getTotalItemsSize(): number {
     return Object.values(this._itemsSizeByKey).reduce((acc, size) => acc + size, 0)
   }
 
-  getItemSize(key) {
+  getItemSize(key: string): number | undefined {
     return this._itemsSizeByKey[key]
   }
 }

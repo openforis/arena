@@ -1,3 +1,4 @@
+import type RChain from '../../rChain'
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,9 +15,9 @@ const getSendResultsToServerScripts = ({
   entity,
   dfResults,
 }: {
-  rChain: any
+  rChain: RChain
   entity: ArenaNodeDefEntity
-  dfResults: any
+  dfResults: DfResults
 }) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
   const { name: dfResultName, dfSourceName } = dfResults

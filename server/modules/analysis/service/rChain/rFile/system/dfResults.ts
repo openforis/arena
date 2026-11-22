@@ -1,3 +1,4 @@
+import type RChain from '../../rChain'
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { quote } from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -16,10 +17,10 @@ const computedCategoryUuidCol = 'computed_category_uuid'
  */
 export default class DfResults {
   _entity: ArenaNodeDefEntity
-  _rChain: any
+  _rChain: RChain
   _scripts: string[]
 
-  constructor(rChain, entity) {
+  constructor(rChain: RChain, entity: ArenaNodeDefEntity) {
     this._rChain = rChain
     this._entity = entity
     this._scripts = []

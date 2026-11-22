@@ -22,7 +22,7 @@ export default class PersistOlapDataJob extends Job {
   chain: ArenaChain
   cycle: string
   fileZip: FileZip
-  reader: any
+  reader: FlatDataReader.FlatDataReader | null
   survey: ArenaSurvey
 
   constructor(params?: Partial<JobParams>) {

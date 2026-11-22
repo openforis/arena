@@ -8,7 +8,13 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as SQL from '@common/model/db/sql'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 
-const canJoinWithMultipleAttributeTable = ({ nodeDef, viewNodeDef }: { nodeDef: ArenaAnyNodeDef; viewNodeDef: any }) =>
+const canJoinWithMultipleAttributeTable = ({
+  nodeDef,
+  viewNodeDef,
+}: {
+  nodeDef: ArenaAnyNodeDef
+  viewNodeDef: ArenaAnyNodeDef
+}) =>
   NodeDef.isMultipleAttribute(nodeDef) &&
   NodeDef.canMultipleAttributeBeAggregated(nodeDef) &&
   !NodeDef.isEqual(nodeDef)(viewNodeDef) &&
@@ -49,7 +55,7 @@ const _getJoinWithMultipleAttributeTable = ({
   multAttrColumnNodeDef,
 }: {
   viewDataNodeDef: ViewDataNodeDef
-  multAttrColumnNodeDef: any
+  multAttrColumnNodeDef: ColumnNodeDef
 }) => {
   const { survey, tableData } = viewDataNodeDef
   const { nodeDef: multAttrDef, names: columnNames } = multAttrColumnNodeDef

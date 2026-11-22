@@ -90,7 +90,7 @@ export const updateChainStatusExec = ({
   user: ArenaUser
   surveyId: number
   chainUuid: string
-  statusExec: any
+  statusExec: string
 }) =>
   DB.client.tx((tx) => {
     const queryFns: (() => Promise<unknown>)[] = [
