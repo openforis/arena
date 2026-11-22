@@ -10,6 +10,7 @@ import {
   type ArenaNodeDefEntity,
   type ArenaSurvey,
   ArenaAnyNodeDef,
+  type ArenaNodeDefMap,
 } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
@@ -23,7 +24,6 @@ import * as SurveyInfo from './surveyInfo'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 
-type NodeDefsByUuid = Record<string, ArenaAnyNodeDef>
 type NodeDefPredicate = (nodeDef: ArenaAnyNodeDef) => boolean
 type NodeDefVisitor = (nodeDef: ArenaAnyNodeDef) => void
 type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
@@ -33,7 +33,8 @@ export type NodeDefHierarchyItem = ArenaAnyNodeDef & { children: NodeDefHierarch
 const nodeDefsKey = 'nodeDefs'
 
 // ====== READ
-export const getNodeDefs = (survey: ArenaSurvey): NodeDefsByUuid => A.propOr({}, nodeDefsKey)(survey) as NodeDefsByUuid
+export const getNodeDefs = (survey: ArenaSurvey): ArenaNodeDefMap =>
+  A.propOr({}, nodeDefsKey)(survey) as ArenaNodeDefMap
 
 export const getNodeDefsArray = (survey: ArenaSurvey): ArenaAnyNodeDef[] => Object.values(getNodeDefs(survey))
 
@@ -382,14 +383,14 @@ export const getNodeDefMaxDecimalDigits =
 // ====== UPDATE
 
 export const assocNodeDefs =
-  (nodeDefs: NodeDefsByUuid): SurveyUpdater =>
+  (nodeDefs: ArenaNodeDefMap): SurveyUpdater =>
   (survey) => {
     const surveyUpdated = A.assoc(nodeDefsKey, nodeDefs)(survey)
     return SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(surveyUpdated)
   }
 
 const updateNodeDefs =
-  (updateFn: (nodeDefs: NodeDefsByUuid) => NodeDefsByUuid): SurveyUpdater =>
+  (updateFn: (nodeDefs: ArenaNodeDefMap) => ArenaNodeDefMap): SurveyUpdater =>
   (survey) => {
     const nodeDefsPrev = getNodeDefs(survey)
     const nodeDefsUpdated = updateFn(nodeDefsPrev)
@@ -400,7 +401,7 @@ export const assocNodeDef = (nodeDef: ArenaAnyNodeDef): SurveyUpdater =>
   updateNodeDefs(A.assoc(NodeDef.getUuid(nodeDef), nodeDef))
 
 // merge the specified node defs with the ones already in the survey
-export const mergeNodeDefs = (nodeDefs: NodeDefsByUuid): SurveyUpdater =>
+export const mergeNodeDefs = (nodeDefs: ArenaNodeDefMap): SurveyUpdater =>
   updateNodeDefs((nodeDefsPrev) => ({ ...nodeDefsPrev, ...nodeDefs }))
 
 export const dissocNodeDef = (nodeDefUuid: string): SurveyUpdater => updateNodeDefs(A.dissoc(nodeDefUuid))
@@ -461,7 +462,7 @@ export const cloneNodeDef =
     const nodeDefDescendants = getNodeDefDescendants({ nodeDef })(survey)
 
     const newUuidByOldUuid: Record<string, string> = {}
-    const clonedNodeDefsByNewUuid: NodeDefsByUuid = {}
+    const clonedNodeDefsByNewUuid: ArenaNodeDefMap = {}
     const usedNames = new Set(existingNodeDefNames)
 
     // Helper to generate a unique name and track it

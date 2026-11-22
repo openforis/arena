@@ -35,12 +35,12 @@ export default class TaxonomyImportJob extends Job {
   fileFormat: string
   filePath: string
   flatDataReader: FlatDataReader.FlatDataReader
-  missingPublishedTaxaCodes: any
+  missingPublishedTaxaCodes: string[]
   taxonCSVParser: TaxonCSVParser
   taxonomy: ArenaTaxonomy
   taxonomyImportManager: TaxonomyImportManager
   taxonomyUuid: string
-  vernacularLanguageCodes: any
+  vernacularLanguageCodes: string[]
 
   static readonly maxMissingPublishedTaxaCodesPreview = 10
 

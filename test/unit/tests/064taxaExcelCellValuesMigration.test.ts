@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
 
 const surveyId = 1
@@ -38,7 +39,7 @@ describe('migrateTaxaExcelCellValues', () => {
       ],
     })
 
-    await migrateTaxaExcelCellValues({ surveyId }, client)
+    await migrateTaxaExcelCellValues({ surveyId }, client as unknown as DbClient)
 
     expect(client.updates).toEqual([
       {
@@ -59,7 +60,7 @@ describe('migrateTaxaExcelCellValues', () => {
   test('converts the draft props too', async () => {
     const client = newFakeClient({ taxa: [taxonRow({}, { code: 'Um', genus: { formula: 'A1', result: 'Ulmus' } })] })
 
-    await migrateTaxaExcelCellValues({ surveyId }, client)
+    await migrateTaxaExcelCellValues({ surveyId }, client as unknown as DbClient)
 
     expect(client.updates[0].propsDraft).toEqual({ code: 'Um', genus: 'Ulmus' })
   })
@@ -70,7 +71,7 @@ describe('migrateTaxaExcelCellValues', () => {
       scientificNameInUse: true,
     })
 
-    await migrateTaxaExcelCellValues({ surveyId }, client)
+    await migrateTaxaExcelCellValues({ surveyId }, client as unknown as DbClient)
 
     expect(client.updates[0].props.scientificName).toBe('Ulmus minor (Um)')
   })
@@ -81,7 +82,7 @@ describe('migrateTaxaExcelCellValues', () => {
       scientificNameInUse: true,
     })
 
-    await migrateTaxaExcelCellValues({ surveyId }, client)
+    await migrateTaxaExcelCellValues({ surveyId }, client as unknown as DbClient)
 
     expect(client.updates[0].props).toEqual({ code: 'Ug', scientificName: 'Ulmus glabra', genus: 'Ulmus' })
   })

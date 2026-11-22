@@ -83,7 +83,14 @@ export const insertTaxonomy = async (
     addLogs = true,
     system = false,
     backup = false,
-  }: { user: ArenaUser; surveyId: number; taxonomy: ArenaTaxonomy; addLogs?: any; system?: any; backup?: boolean },
+  }: {
+    user: ArenaUser
+    surveyId: number
+    taxonomy: ArenaTaxonomy
+    addLogs?: boolean
+    system?: boolean
+    backup?: boolean
+  },
   client: DbClient = db
 ) => {
   // async: an invalid taxonomy must reject, not throw
@@ -110,7 +117,7 @@ export const insertTaxa = ({
   user: ArenaUser
   surveyId: number
   taxa: ArenaTaxon[]
-  addLogs?: any
+  addLogs?: boolean
   backup?: boolean
   client?: DbClient
 }) =>
@@ -221,7 +228,7 @@ export const fetchTaxonomiesBySurveyId = async (
   }: {
     surveyId: number
     draft?: boolean
-    validate?: any
+    validate?: boolean
     backup?: boolean
     limit?: number | null
     offset?: number
@@ -246,7 +253,7 @@ export const { countTaxonomiesBySurveyId, countTaxaBySurveyId, countTaxaByTaxono
 
 const validateTaxonomy = async (
   surveyId: number,
-  taxonomies: any,
+  taxonomies: ArenaTaxonomy[],
   taxonomy: ArenaTaxonomy,
   draft: boolean,
   client: DbClient = db
@@ -315,8 +322,8 @@ const prepareTaxaAsResult = ({
   surveyId: number
   taxonomyUuid: string
   taxa: ArenaTaxon[]
-  includeUnlUnk: any
-  includeVerancularNameIfSingle: any
+  includeUnlUnk: boolean
+  includeVerancularNameIfSingle: boolean
   draft: boolean
   client: DbClient
 }) => {
@@ -345,8 +352,8 @@ export const findTaxaByCode = async (
     taxonomyUuid: string
     filterValue: string
     draft?: boolean
-    includeUnlUnk?: any
-    includeVerancularNameIfSingle?: any
+    includeUnlUnk?: boolean
+    includeVerancularNameIfSingle?: boolean
   },
   client: DbClient = db
 ) => {
@@ -375,8 +382,8 @@ export const findTaxaByScientificName = async (
     taxonomyUuid: string
     filterValue: string
     draft?: boolean
-    includeUnlUnk?: any
-    includeVerancularNameIfSingle?: any
+    includeUnlUnk?: boolean
+    includeVerancularNameIfSingle?: boolean
   },
   client: DbClient = db
 ) => {
@@ -405,8 +412,8 @@ export const findTaxaByCodeOrScientificName = async (
     taxonomyUuid: string
     filterValue: string
     draft?: boolean
-    includeUnlUnk?: any
-    includeVerancularNameIfSingle?: any
+    includeUnlUnk?: boolean
+    includeVerancularNameIfSingle?: boolean
   },
   client: DbClient = db
 ) => {
@@ -441,8 +448,8 @@ export const findTaxaByVernacularName = async (
     taxonomyUuid: string
     filterValue: string
     draft?: boolean
-    includeUnlUnk?: any
-    includeVerancularNameIfSingle?: any
+    includeUnlUnk?: boolean
+    includeVerancularNameIfSingle?: boolean
   },
   client: DbClient = db
 ) => {
@@ -566,7 +573,7 @@ const _updateTaxaExtraDefProp = async (
     propName,
     extraPropDef,
     deleted,
-  }: { surveyId: number; taxonomyUuid: string; propName: any; extraPropDef: any; deleted: any },
+  }: { surveyId: number; taxonomyUuid: string; propName: string; extraPropDef: any; deleted: boolean },
   t: DbClient
 ) => {
   const taxa = await TaxonomyRepository.fetchTaxa({ surveyId, taxonomyUuid, draft: true }, t)
@@ -595,7 +602,14 @@ export const updateTaxonomyExtraPropDef = (
     propName,
     extraPropDef = null,
     deleted = false,
-  }: { user: ArenaUser; surveyId: number; taxonomyUuid: string; propName: any; extraPropDef?: any; deleted?: any },
+  }: {
+    user: ArenaUser
+    surveyId: number
+    taxonomyUuid: string
+    propName: string
+    extraPropDef?: any
+    deleted?: boolean
+  },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {
@@ -632,7 +646,7 @@ export const deleteTaxonomy = (
     surveyId,
     taxonomyUuid,
     onlyIfEmpty = false,
-  }: { user: ArenaUser; surveyId: number; taxonomyUuid: string; onlyIfEmpty?: any },
+  }: { user: ArenaUser; surveyId: number; taxonomyUuid: string; onlyIfEmpty?: boolean },
   client: DbClient = db
 ) =>
   client.tx(async (t) => {

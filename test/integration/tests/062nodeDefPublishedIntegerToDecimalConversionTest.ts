@@ -1,3 +1,4 @@
+import type { NodeDefType } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -53,7 +54,7 @@ const fetchRdbDbh = async (surveyPublished: any) => {
   return row.dbh === null ? null : Number(row.dbh)
 }
 
-const convert = async (nodeDefName: string, toType: string) =>
+const convert = (nodeDefName: string, toType: NodeDefType) =>
   NodeDefService.convertNodeDef({
     user: getContextUser(),
     surveyId: Survey.getId(survey),

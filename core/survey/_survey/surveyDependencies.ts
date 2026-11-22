@@ -1,5 +1,10 @@
 import { Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
-import type { ArenaSurvey, ArenaSurveyDependencyGraph, SurveyDependencyType } from '@openforis/arena-core'
+import type {
+  ArenaSurvey,
+  ArenaSurveyDependencyGraph,
+  SurveyDependencyType,
+  ArenaNodeDefMap,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -86,7 +91,7 @@ export const addNodeDefDependencies =
     Surveys.addNodeDefDependencies({ nodeDef, survey })
 
 export const addNodeDefsDependencies =
-  (nodeDefsIndexedByUuid: Record<string, ArenaAnyNodeDef>) =>
+  (nodeDefsIndexedByUuid: ArenaNodeDefMap) =>
   async (survey: ArenaSurvey): Promise<ArenaSurvey> => {
     let surveyUpdated = survey
     for (const nodeDef of Object.values(nodeDefsIndexedByUuid)) {

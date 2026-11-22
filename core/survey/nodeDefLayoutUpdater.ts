@@ -3,6 +3,7 @@ import type {
   ArenaSurvey,
   ArenaNodeDefEntity,
   ArenaAnyNodeDef,
+  ArenaNodeDefMap,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -14,7 +15,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 import { NodeDefLayoutSizes } from './nodeDefLayoutSizes'
 
-type NodeDefsByUuid = Record<string, ArenaAnyNodeDef>
 type LayoutCycle = Record<string, any>
 // width and height to keep when adding a node def to the parent layout, by cycle
 type LayoutInParentByCycle = Record<string, { h?: number; w?: number }>
@@ -116,14 +116,14 @@ export const updateLayoutProp =
     key: string
     value: unknown
   }) =>
-  (survey: ArenaSurvey): NodeDefsByUuid => {
+  (survey: ArenaSurvey): ArenaNodeDefMap => {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const renderTypePrev = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev || nodeDef)
 
     let nodeDefUpdated = NodeDef.updateLayoutProp({ cycle: surveyCycleKey, prop: key, value })(nodeDef)
     nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
 
-    const nodeDefsUpdated: NodeDefsByUuid = { [nodeDefUuid]: nodeDefUpdated }
+    const nodeDefsUpdated: ArenaNodeDefMap = { [nodeDefUuid]: nodeDefUpdated }
     let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
 
     if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef) && value !== renderTypePrev) {
@@ -162,9 +162,9 @@ export const updateLayout = ({
   nodeDefUuid: string
   layout: Record<string, LayoutCycle>
   nodeDefPrev?: ArenaAnyNodeDef | null
-}): NodeDefsByUuid => {
+}): ArenaNodeDefMap => {
   let surveyUpdated = { ...survey }
-  const nodeDefsUpdated: NodeDefsByUuid = {}
+  const nodeDefsUpdated: ArenaNodeDefMap = {}
 
   for (const [surveyCycleKey, layoutCycle] of Object.entries(layout)) {
     for (const [key, value] of Object.entries(layoutCycle)) {
@@ -389,13 +389,13 @@ export const updateLayoutOnCyclesUpdate = ({
   nodeDefUuid: string
   cycles: string[]
   cyclesPrev: string[]
-}): NodeDefsByUuid => {
+}): ArenaNodeDefMap => {
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
 
   const cyclesAdded: string[] = A.difference(cycles, cyclesPrev)
   const cyclesDeleted: string[] = A.difference(cyclesPrev, cycles)
 
-  const nodeDefsUpdated: NodeDefsByUuid = {}
+  const nodeDefsUpdated: ArenaNodeDefMap = {}
 
   // Update nodeDef cycles layout
   if (cyclesAdded.length > 0) {
