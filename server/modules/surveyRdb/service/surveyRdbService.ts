@@ -20,6 +20,7 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
+import type { DataExportOptions, DataMatrixExportOptions } from '../manager/dataExportOptions'
 
 const Logger = Log.getLogger('SurveyRdbService')
 
@@ -304,7 +305,7 @@ export const exportViewDataToTempFile = async ({
   query: Query.QueryItem
   columnNodeDefs?: boolean
   addCycle?: boolean
-  options?: any
+  options?: DataExportOptions
 }) => {
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
@@ -316,7 +317,12 @@ export const exportViewDataToTempFile = async ({
 }
 
 export const exportDataMatrixToTempFile = async (
-  { user, survey, cycle, options }: { user: ArenaUser; survey: ArenaSurvey; cycle: string; options: any },
+  {
+    user,
+    survey,
+    cycle,
+    options,
+  }: { user: ArenaUser; survey: ArenaSurvey; cycle: string; options: DataMatrixExportOptions },
   client?: DbClient
 ) => {
   const { fileFormat } = options
@@ -349,7 +355,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   cycle: string
   recordUuids?: string[] | null
   search?: string | null
-  options: any
+  options: DataExportOptions
   outputDir: string
   callback?: (progress: Record<string, any>) => void
 }) => {
@@ -419,7 +425,7 @@ export const fetchEntitiesDataSummaryToFlatData = async ({
   survey: ArenaSurvey
   cycle: string
   lang: string
-  options: any
+  options: DataExportOptions
 }) => {
   const { fileFormat = FileFormats.xlsx } = options
   const items = []

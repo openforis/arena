@@ -49,7 +49,7 @@ const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef: ViewDataNodeD
  * @param {object} nodeDefCol - The time node definition column.
  * @returns {string} The TO_CHAR format, including seconds if the node definition includes them.
  */
-export const getTimeColumnToCharFormat = (nodeDefCol: any) =>
+export const getTimeColumnToCharFormat = (nodeDefCol: ArenaAnyNodeDef) =>
   NodeDef.isSecondsIncluded(nodeDefCol) ? 'HH24:MI:SS' : 'HH24:MI'
 
 // params of the transformation of the columns of a node def in the data view select
@@ -128,9 +128,9 @@ const _prepareSelectFields = ({
   includeFileAttributeDefs = true,
   includeDateCreated = false,
 }: {
-  queryBuilder: any
+  queryBuilder: SqlSelectBuilder
   viewDataNodeDef: ViewDataNodeDef
-  columnNodeDefs: ArenaAnyNodeDef[]
+  columnNodeDefs: boolean
   nodeDefCols: ArenaAnyNodeDef[]
   editMode: boolean
   streamMode: boolean
@@ -181,7 +181,7 @@ const _prepareFromClause = ({
   nodeDefCols,
   editMode,
 }: {
-  queryBuilder: any
+  queryBuilder: SqlSelectBuilder
   viewDataNodeDef: ViewDataNodeDef
   nodeDefCols: ArenaAnyNodeDef[]
   editMode: boolean
@@ -267,7 +267,7 @@ const _prepareRecordsWhereConditions = ({
   recordOwnerUuid,
   userGroupAccessFilters,
 }: {
-  queryBuilder: any
+  queryBuilder: SqlSelectBuilder
   viewDataNodeDef: ViewDataNodeDef
   cycle: string
   query: Query.QueryItem
@@ -329,7 +329,7 @@ const _getSampleNumericColumns = ({
       return `sample_base.${DbUtils.asName(name)}::double precision`
     })
 
-const _getSampleOutlierExpressions = ({ values }: { values: any }) => {
+const _getSampleOutlierExpressions = ({ values }: { values: string[] }) => {
   const conditions = []
   const scores = []
   for (const [idx, value] of values.entries()) {
@@ -365,7 +365,7 @@ const _createSampleWithOutliersSelect = ({
   viewDataNodeDef,
   nodeDefCols,
 }: {
-  baseSelect: any
+  baseSelect: string
   viewDataNodeDef: ViewDataNodeDef
   nodeDefCols: ArenaAnyNodeDef[]
 }) => {
@@ -399,7 +399,24 @@ const _createSampleWithOutliersSelect = ({
     LIMIT $/limit/`
 }
 
-const _createViewDataQuery = (params: any) => {
+// params of the data view queries
+export type ViewDataQueryParams = {
+  survey: ArenaSurvey
+  cycle: string
+  query: Query.QueryItem
+  columnNodeDefs?: boolean
+  includeFileAttributeDefs?: boolean
+  includeDateCreated?: boolean
+  recordSteps?: string[] | null
+  recordOwnerUuid?: string | null
+  userGroupAccessFilters?: UserGroupAccessFilters | null
+  offset?: number | null
+  limit?: number | null
+  randomize?: boolean
+  stream?: boolean
+}
+
+const _createViewDataQuery = (params: ViewDataQueryParams) => {
   const {
     survey,
     cycle,
@@ -502,7 +519,7 @@ const _createViewDataQuery = (params: any) => {
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewData = (params: any, client: DbClient = db) => {
+export const fetchViewData = (params: ViewDataQueryParams, client: DbClient = db) => {
   const { survey, query, stream = false } = params
 
   const editMode = Query.isModeRawEdit(query)
@@ -518,7 +535,7 @@ export const fetchViewData = (params: any, client: DbClient = db) => {
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
 }
 
-export const countViewData = async (params: any, client: DbClient = db) => {
+export const countViewData = async (params: ViewDataQueryParams, client: DbClient = db) => {
   const { select, selectFields, queryParams } = _createViewDataQuery(params)
   const query = DbUtils.formatQuery(select, queryParams)
   const countQuery = `SELECT COUNT(*) AS count FROM (${query}) AS count_query`
@@ -552,7 +569,7 @@ export const countDataTableRows = async (
     surveyId: number
     cycle: string
     tableName: string
-    filter?: any
+    filter?: Query.QueryItem['filter'] | null
     recordOwnerUuid?: string
     survey?: ArenaSurvey
     userGroupAccessFilters?: UserGroupAccessFilters

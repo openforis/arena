@@ -38,6 +38,7 @@ import * as DataTableRepository from '../repository/dataTable'
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewRepository from '../repository/dataView'
+import type { ViewDataAggQueryParams } from '../repository/dataView/readAgg'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
 import { buildDataMatrix } from './surveyRdbDataMatrix'
 
@@ -52,6 +53,7 @@ export {
   dropSchema,
   selectOlapDataTablesExists,
 } from '../repository/schemaRdbRepository'
+import type { DataExportOptions, DataMatrixExportOptions } from './dataExportOptions'
 
 // Data tables and views
 export const { createDataTable, createDataTableIndexes } = DataTableRepository
@@ -211,7 +213,15 @@ export const fetchViewData = async (params: FetchViewDataParams, client: DbClien
  * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = async (params: Record<string, any>, client: DbClient = db): Promise<any> => {
+export const fetchViewDataAgg = async (
+  params: ViewDataAggQueryParams & {
+    offset?: number | null
+    limit?: number | null
+    outputStream?: Writable | null
+    options?: DataExportOptions
+  },
+  client: DbClient = db
+) => {
   const {
     survey,
     cycle,
@@ -310,7 +320,7 @@ export const getEntityDefsToExport = ({
 }: {
   survey: ArenaSurvey
   cycle: string
-  options: any
+  options: DataExportOptions
 }) => {
   const { exportSingleEntitiesIntoSeparateFiles } = options
   return Survey.findDescendants({
@@ -338,8 +348,8 @@ const createEntityFetchParams = ({
   filterRecordUuids: string[] | null
   cycle: string
   recordOwnerUuid: string | null
-  uniqueFileNamesGenerator: any
-  options: any
+  uniqueFileNamesGenerator: UniqueFileNamesGenerator
+  options: DataExportOptions
   nodeDefContext: ArenaAnyNodeDef
   idx: number
 }) => {
@@ -475,7 +485,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     search?: string | null
     recordOwnerUuid?: string | null
     recordUuids?: string[] | null
-    options: any
+    options: DataExportOptions
     outputDir: string
     callback?: (progress: Record<string, any>) => void
   },
@@ -559,7 +569,15 @@ const getDataMatrixRecordKeyDefs = ({
   return rootKeyDefs.filter((keyDef) => recordKeyAttributeDefUuids.includes(NodeDef.getUuid(keyDef)))
 }
 
-const getDataMatrixDefs = ({ survey, cycle, options }: { survey: ArenaSurvey; cycle: string; options: any }) => {
+const getDataMatrixDefs = ({
+  survey,
+  cycle,
+  options,
+}: {
+  survey: ArenaSurvey
+  cycle: string
+  options: DataMatrixExportOptions
+}) => {
   const { entityDefUuid, rowAttributeDefUuids, valueAttributeDefUuid } = options
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   if (!entityDef || !NodeDef.isMultipleEntity(entityDef) || Objects.isEmpty(rowAttributeDefUuids)) {
@@ -586,7 +604,7 @@ const checkCanExportDataMatrix = ({
 }: {
   fileFormat: string
   fields: string[]
-  items: any[]
+  items: unknown[]
 }) => {
   const cellsCount = fields.length * (items.length + 1)
   if (
@@ -615,7 +633,13 @@ export const fetchEntityDataMatrix = async (
     cycle,
     recordOwnerUuid = null,
     options,
-  }: { user?: ArenaUser | null; survey: ArenaSurvey; cycle: string; recordOwnerUuid?: string | null; options: any },
+  }: {
+    user?: ArenaUser | null
+    survey: ArenaSurvey
+    cycle: string
+    recordOwnerUuid?: string | null
+    options: DataMatrixExportOptions
+  },
   client: DbClient = db
 ) => {
   // one column per record: records of different cycles could have the same keys

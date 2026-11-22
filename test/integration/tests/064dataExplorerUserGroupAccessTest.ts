@@ -15,6 +15,7 @@ import {
   registerUserGroupServiceTest,
   restoreUserGroupService,
 } from './_record/userGroupRecordsTestUtils'
+import type { DataExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 
 // Data Explorer queries, counts and exports include only the records of the user's group
 // and of the groups its group can read.
@@ -110,7 +111,7 @@ describe('Data Explorer user group access', () => {
       query: createRawQuery(),
       addCycle: true,
       // only the export options are used: the record owner filter is determined server-side
-      options: { fileFormat: FileFormats.csv, recordOwnerUuid: uuidv4() },
+      options: { fileFormat: FileFormats.csv, recordOwnerUuid: uuidv4() } as DataExportOptions,
     })
     const filePath = FileUtils.tempFilePath(tempFileName)
     const content = await FileUtils.readFile(filePath)

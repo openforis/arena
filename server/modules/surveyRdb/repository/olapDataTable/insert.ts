@@ -14,7 +14,13 @@ export const insertOlapData = async (
     chain,
     entityDef,
     values,
-  }: { survey: ArenaSurvey; cycle: string; chain: ArenaChain; entityDef: ArenaNodeDefEntity; values: any },
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    chain: ArenaChain
+    entityDef: ArenaNodeDefEntity
+    values: Record<string, unknown>[]
+  },
   client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)

@@ -3,7 +3,8 @@ import {
   Objects,
   type ArenaSurvey,
   type ArenaCategoryItem,
-  ArenaAnyNodeDef,
+  type ArenaAnyNodeDef,
+  type UniqueFileNamesGenerator,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -16,6 +17,7 @@ import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 
 import { toSafeFileName } from '@server/utils/file/fileNames'
+import type { DataExportOptions } from './dataExportOptions'
 
 // a column name, or a column name and its type
 type ExportField = string | { name: string; type: string }
@@ -138,7 +140,7 @@ const getCsvExportFieldsAgg = ({
 }: {
   survey: ArenaSurvey
   query: Query.QueryItem
-  options?: any
+  options?: DataExportOptions
 }) => {
   const { includeCategoryItemsLabels = false } = options
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
@@ -199,7 +201,7 @@ const getCsvObjectTransformerUniqueFileNames = ({
 }: {
   survey: ArenaSurvey
   query: Query.QueryItem
-  uniqueFileNamesGenerator: any
+  uniqueFileNamesGenerator: UniqueFileNamesGenerator
 }) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)

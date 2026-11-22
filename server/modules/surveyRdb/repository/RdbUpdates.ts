@@ -1,5 +1,16 @@
 export const RdbUpdateTypes = { insert: 'insert', update: 'update', delete: 'delete' }
 
+// insert, update or delete of a row of a data table
+export type RdbUpdate = {
+  type: string
+  schema: string
+  table: string
+  nodeDefUuid: string
+  nodeDefHierarchyLevel: number
+  rowUuid: string
+  valuesByColumnName?: { [columnName: string]: unknown }
+}
+
 const executionOrderByType = {
   [RdbUpdateTypes.delete]: 1,
   [RdbUpdateTypes.insert]: 2,
@@ -23,7 +34,7 @@ export class RdbUpdates {
     this.updatesBySchemaTableAndType = {}
   }
 
-  addUpdate(update) {
+  addUpdate(update: RdbUpdate): void {
     const { nodeDefUuid, nodeDefHierarchyLevel } = update
     const key = RdbUpdates.extractKey(update)
     let tableUpdates = this.updatesBySchemaTableAndType[key]
@@ -46,11 +57,11 @@ export class RdbUpdates {
     return Object.entries(this.updatesBySchemaTableAndType)
   }
 
-  getByKey(key) {
+  getByKey(key: string): RdbUpdatesForTable | undefined {
     return this.updatesBySchemaTableAndType[key]
   }
 
-  getAll() {
+  getAll(): RdbUpdate[] {
     return Object.entries(this.updatesBySchemaTableAndType)
       .sort(([keyA, tableUpdatesA], [keyB, tableUpdatesB]) => {
         // execute updates in order, according to the type (1. delete, 2. insert, 3. update) and hierarchy level
@@ -65,7 +76,7 @@ export class RdbUpdates {
       .flatMap(([_key, updates]) => updates.getAll())
   }
 
-  merge(updates: RdbUpdates) {
+  merge(updates: RdbUpdates): void {
     Object.entries(updates.updatesBySchemaTableAndType).forEach(([key, tableUpdates]) => {
       const oldTableUpdates = this.updatesBySchemaTableAndType[key]
       if (oldTableUpdates) {
@@ -78,11 +89,11 @@ export class RdbUpdates {
 }
 
 export class RdbUpdatesForTable {
-  nodeDefHierarchyLevel: any
+  nodeDefHierarchyLevel: number
   nodeDefUuid: string
-  updatesByRowUuid: Record<string, any>
+  updatesByRowUuid: { [rowUuid: string]: RdbUpdate }
 
-  constructor({ nodeDefUuid, nodeDefHierarchyLevel }) {
+  constructor({ nodeDefUuid, nodeDefHierarchyLevel }: { nodeDefUuid: string; nodeDefHierarchyLevel: number }) {
     this.nodeDefUuid = nodeDefUuid
     this.nodeDefHierarchyLevel = nodeDefHierarchyLevel
     this.updatesByRowUuid = {}
@@ -92,11 +103,11 @@ export class RdbUpdatesForTable {
     return Object.keys(this.updatesByRowUuid).length
   }
 
-  getAll() {
+  getAll(): RdbUpdate[] {
     return Object.values(this.updatesByRowUuid)
   }
 
-  addUpdate(update) {
+  addUpdate(update: RdbUpdate): void {
     const { rowUuid } = update
     const oldUpdate = this.updatesByRowUuid[rowUuid]
     if (oldUpdate) {
@@ -107,11 +118,11 @@ export class RdbUpdatesForTable {
     }
   }
 
-  addUpdates(updatesArray) {
+  addUpdates(updatesArray: RdbUpdate[]): void {
     updatesArray.forEach((update) => this.addUpdate(update))
   }
 
-  _mergeUpdates(oldUpdate, newUpdate) {
+  _mergeUpdates(oldUpdate: RdbUpdate, newUpdate: RdbUpdate): void {
     Object.assign(oldUpdate.valuesByColumnName, newUpdate.valuesByColumnName)
   }
 }

@@ -19,7 +19,7 @@ const getSelectQuery = ({
 }: {
   surveyId: number
   nodeDef: ArenaAnyNodeDef
-  nodeDefContext: any
+  nodeDefContext: ArenaAnyNodeDef
   nodeDefAncestorMultipleEntity: ArenaNodeDefEntity
   nodeDefColumnsUuids: string[]
 }) => {

@@ -14,19 +14,16 @@ import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAgg
 
 import { getUserGroupAccessCondition } from './userGroupAccessCondition'
 
-const _getSelectQuery = ({
-  survey,
-  cycle,
-  recordOwnerUuid,
-  userGroupAccessFilters,
-  query,
-}: {
+// params of the aggregated data view queries
+export type ViewDataAggQueryParams = {
   survey: ArenaSurvey
   cycle: string
-  recordOwnerUuid: string
-  userGroupAccessFilters: UserGroupAccessFilters
   query: Query.QueryItem
-}) => {
+  recordOwnerUuid?: string | null
+  userGroupAccessFilters?: UserGroupAccessFilters | null
+}
+
+const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilters, query }: ViewDataAggQueryParams) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -96,7 +93,7 @@ const _getSelectQuery = ({
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
-export const countViewDataAgg = (params: any, client: DbClient = db) => {
+export const countViewDataAgg = (params: ViewDataAggQueryParams, client: DbClient = db) => {
   const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null } = params
   const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
@@ -129,7 +126,10 @@ export const countViewDataAgg = (params: any, client: DbClient = db) => {
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = (params: any, client: DbClient = db) => {
+export const fetchViewDataAgg = (
+  params: ViewDataAggQueryParams & { offset?: number | null; limit?: number | null; stream?: boolean },
+  client: DbClient = db
+) => {
   const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null, limit, offset, stream } = params
   const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
