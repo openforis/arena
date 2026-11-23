@@ -1,0 +1,154 @@
+import type { ArenaCategoryItem } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+
+import { keys } from './keys'
+import { getCategory, getItems, getImportSummary } from './read'
+
+export const assocDirty = A.assoc(keys.dirty, true)
+
+export const dissocDirty = A.dissoc(keys.dirty)
+
+export const assocCategory = ({ category }) => A.assoc(keys.category, category)
+
+export const assocCategoryProp =
+  ({ key, value }) =>
+  (state) => {
+    const category = getCategory(state)
+    const categoryUpdated = Category.assocProp({ key, value })(category)
+    return assocCategory({ category: categoryUpdated })(state)
+  }
+
+export const assocLevelProp =
+  ({ levelIndex, key, value }) =>
+  (state) => {
+    const category = getCategory(state)
+    const level = Category.getLevelByIndex(levelIndex)(category)
+    const levelUpdated = CategoryLevel.assocProp({ key, value })(level)
+    const categoryUpdated = Category.assocLevel({ level: levelUpdated })(category)
+    return assocCategory({ category: categoryUpdated })(state)
+  }
+
+const _calculateItemsArray = ({ levelIndex }) =>
+  A.pipe(
+    getItems({ levelIndex }),
+    A.values,
+    A.sort((a, b) => CategoryItem.getIndex(a) - CategoryItem.getIndex(b))
+  )
+
+const _refreshItemsArray =
+  ({ levelIndex }) =>
+  (state) => {
+    const itemsArray = _calculateItemsArray({ levelIndex })(state)
+    return A.assocPath([keys.itemsArray, String(levelIndex)], itemsArray)(state)
+  }
+
+export const assocItems = ({ levelIndex, items }) =>
+  A.pipe(A.assocPath([keys.items, String(levelIndex)], items), _refreshItemsArray({ levelIndex }))
+
+export const dissocItems = ({ levelIndex }) =>
+  A.pipe(A.dissocPath([keys.items, String(levelIndex)]), A.dissocPath([keys.itemsArray, String(levelIndex)]))
+
+export const assocItem =
+  ({ levelIndex, item }) =>
+  (state) => {
+    const items = getItems({ levelIndex })(state)
+    const itemsUpdated = A.assoc(CategoryItem.getUuid(item), item)(items)
+    return assocItems({ levelIndex, items: itemsUpdated })(state)
+  }
+
+export const assocItemProp =
+  ({ levelIndex, itemUuid, key, value }) =>
+  (state) => {
+    const items = getItems({ levelIndex })(state)
+    const item = A.prop(itemUuid, items)
+    const itemUpdated = CategoryItem.assocProp({ key, value })(item)
+    let stateUpdated = assocItem({ levelIndex, item: itemUpdated })(state)
+    if (key === CategoryItem.keysProps.index) {
+      stateUpdated = _refreshItemsArray({ levelIndex })(stateUpdated)
+    }
+    return stateUpdated
+  }
+
+const _resetNextLevelsByProp =
+  ({ levelIndex, prop }) =>
+  (state) => {
+    const nextIndexes = A.pipe(
+      A.prop(prop),
+      A.keys,
+      A.map(Number),
+      A.filter((idx) => idx > levelIndex)
+    )(state)
+
+    return nextIndexes.reduce((accState, idx) => A.dissocPath([prop, idx], accState), state)
+  }
+
+const _resetNextLevels = ({ levelIndex }) =>
+  A.pipe(
+    _resetNextLevelsByProp({ levelIndex, prop: keys.items }),
+    _resetNextLevelsByProp({ levelIndex, prop: keys.itemsLoading }),
+    _resetNextLevelsByProp({ levelIndex, prop: keys.itemsArray }),
+    _resetNextLevelsByProp({ levelIndex, prop: keys.itemsActive })
+  )
+
+export const assocItemsLoading = ({ levelIndex, loading = true }) =>
+  A.assocPath([keys.itemsLoading, String(levelIndex)], loading)
+
+export const dissocItemsLoading = ({ levelIndex }) => A.dissocPath([keys.itemsLoading, String(levelIndex)])
+
+export const assocItemActive = ({ levelIndex, itemUuid }) =>
+  A.pipe(_resetNextLevels({ levelIndex }), A.assocPath([keys.itemsActive, String(levelIndex)], itemUuid))
+
+export const dissocItemActive = ({ levelIndex }) =>
+  A.pipe(_resetNextLevels({ levelIndex }), A.dissocPath([keys.itemsActive, levelIndex]))
+
+export const dissocItemsActive = A.dissoc(keys.itemsActive)
+
+export const dissocItem = ({ levelIndex, itemUuid }) =>
+  A.pipe(
+    dissocItemActive({ levelIndex }),
+    A.dissocPath([keys.items, levelIndex, itemUuid]),
+    _refreshItemsArray({ levelIndex })
+  )
+
+export const updateSiblingItemIndexesAfterDelete =
+  ({ levelIndex, deletedItemIndex }) =>
+  (state) => {
+    const items = getItems({ levelIndex })(state)
+    const itemsUpdated = {}
+    for (const [uuid, item] of Object.entries(items as Record<string, ArenaCategoryItem>)) {
+      const itemIndex = CategoryItem.getIndex(item)
+      let itemUpdated = item
+      if (itemIndex > deletedItemIndex) {
+        itemUpdated = CategoryItem.assocProp({
+          key: CategoryItem.keysProps.index,
+          value: itemIndex - 1,
+        })(item)
+      }
+      itemsUpdated[uuid] = itemUpdated
+    }
+    return assocItems({ levelIndex, items: itemsUpdated })(state)
+  }
+
+export const assocFileFormat = ({ fileFormat }) => A.assoc(keys.fileFormat, fileFormat)
+
+export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
+
+export const assocImportSummaryItemDataType =
+  ({ key, dataType }) =>
+  (state) => {
+    const summary = getImportSummary(state)
+    const summaryUpdated = CategoryImportSummary.assocItemDataType(key, dataType)(summary)
+    return assocImportSummary({ summary: summaryUpdated })(state)
+  }
+
+export const dissocImportSummary = A.dissoc(keys.importSummary)
+
+export const assocCleaned = A.assoc(keys.cleaned, true)
+
+export const assocEditingItemExtraDefs = A.assoc(keys.editingItemExtraDefs)

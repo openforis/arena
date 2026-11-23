@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { useAppDispatch } from '@webapp/store'
 
 /**
  * Returns a function that (after confirmation) starts the job generating the Whisp analysis
@@ -13,7 +13,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
  * @returns {Function} The function starting the job.
  */
 export const useGenerateSamplingPointDataWhisp = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
 
   const startJob = useCallback(async () => {
