@@ -7,27 +7,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 import NodeDefFormItemLabel from './NodeDefFormItemLabel'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+import type { NodeDefComponentProps, NodeDefFieldLockProps } from '../nodeDefComponentProps'
 
-type NodeDefFormItemProps = {
-  edit: boolean
-  entry: boolean
-  label: string
-  lang: string
-  keyFieldLocked?: boolean
-  keyFieldLockVisible?: boolean
-  nodeDef: ArenaAnyNodeDef
-  nodes?: any[]
-  onKeyFieldBlur?: (...args: any[]) => any
-  onKeyFieldFocus?: (...args: any[]) => any
-  onKeyFieldLockToggle?: (...args: any[]) => any
-  onQualifierFieldBlur?: (...args: any[]) => any
-  onQualifierFieldFocus?: (...args: any[]) => any
-  onQualifierFieldLockToggle?: (...args: any[]) => any
-  parentNode?: ArenaRecordNode
-  qualifierFieldLocked?: boolean
-  qualifierFieldLockVisible?: boolean
-}
+type NodeDefFormItemProps = Omit<NodeDefComponentProps, 'updateNode'> &
+  NodeDefFieldLockProps & {
+    edit: boolean
+    entry: boolean
+    label: string
+    lang: string
+  }
 
 const NodeDefFormItem = (props: NodeDefFormItemProps) => {
   const {

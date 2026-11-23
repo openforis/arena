@@ -6,22 +6,14 @@ import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 import NodeDefAttributeLockToggle from '../NodeDefAttributeLockToggle'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+import type { NodeDefComponentProps, NodeDefFieldLockProps } from '../nodeDefComponentProps'
 
-type NodeDefFormItemLabelProps = {
-  edit: boolean
-  keyFieldLocked?: boolean
-  keyFieldLockVisible?: boolean
-  label: string
-  lang: string
-  nodeDef: ArenaAnyNodeDef
-  nodes?: any[]
-  onKeyFieldLockToggle?: (...args: any[]) => any
-  onQualifierFieldLockToggle?: (...args: any[]) => any
-  parentNode?: ArenaRecordNode
-  qualifierFieldLocked?: boolean
-  qualifierFieldLockVisible?: boolean
-}
+type NodeDefFormItemLabelProps = Omit<NodeDefComponentProps, 'updateNode'> &
+  NodeDefFieldLockProps & {
+    edit: boolean
+    label: string
+    lang: string
+  }
 
 const NodeDefFormItemLabel = (props: NodeDefFormItemLabelProps) => {
   const {

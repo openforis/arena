@@ -12,37 +12,25 @@ import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 import NodeDefAttributeLockToggle from './NodeDefAttributeLockToggle'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+import type { ArenaRecordNode } from '@openforis/arena-core'
+import type { NodeDefComponentProps, NodeDefFieldLockProps } from './nodeDefComponentProps'
 
-type NodeDefTableCellBodyProps = {
-  // other props are passed through to the node def component
-  [key: string]: any
-  canEditRecord: boolean
-  edit: boolean
-  entry: boolean
-  entryDataQuery?: boolean
-  keyFieldLocked?: boolean
-  keyFieldLockVisible?: boolean
-  label?: string
-  nodeDef: ArenaAnyNodeDef
-  nodes: any[]
-  onKeyFieldBlur?: (...args: any[]) => any
-  onKeyFieldFocus?: (...args: any[]) => any
-  onKeyFieldLockToggle?: (...args: any[]) => any
-  onQualifierFieldBlur?: (...args: any[]) => any
-  onQualifierFieldFocus?: (...args: any[]) => any
-  onQualifierFieldLockToggle?: (...args: any[]) => any
-  parentNode: ArenaRecordNode
-  qualifierFieldLocked?: boolean
-  qualifierFieldLockVisible?: boolean
-  readOnly?: boolean
-  renderType: string
-  surveyCycleKey: string
-  surveyInfo: Record<string, any>
-  removeNode: (...args: any[]) => any
-  createNodePlaceholder: (...args: any[]) => any
-  updateNode: (...args: any[]) => any
-}
+type NodeDefTableCellBodyProps = NodeDefComponentProps &
+  NodeDefFieldLockProps & {
+    // other props are passed through to the node def component
+    [key: string]: any
+    canEditRecord: boolean
+    edit: boolean
+    entry: boolean
+    label?: string
+    nodes: ArenaRecordNode[]
+    parentNode: ArenaRecordNode
+    renderType: string
+    surveyCycleKey: string
+    surveyInfo: Record<string, any>
+    removeNode: (...args: any[]) => any
+    createNodePlaceholder: (...args: any[]) => any
+  }
 
 const NodeDefTableCellBody = (props: NodeDefTableCellBodyProps) => {
   const {
