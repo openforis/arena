@@ -1,0 +1,40 @@
+import type React from 'react'
+
+import { PanelRight } from '@webapp/components'
+import { useI18n } from '@webapp/store/system'
+
+import { ExtraPropDefsEditor } from './ExtraPropDefsEditor'
+
+type ExtraPropDefsEditorPanelProps = React.ComponentProps<typeof ExtraPropDefsEditor> & {
+  toggleEditExtraPropsPanel: (...args: any[]) => any
+}
+
+export const ExtraPropDefsEditorPanel = (props: ExtraPropDefsEditorPanelProps) => {
+  const {
+    canAdd = true,
+    extraPropDefs,
+    isExtraPropDefReadOnly,
+    onExtraPropDefDelete,
+    onExtraPropDefUpdate,
+    toggleEditExtraPropsPanel,
+  } = props
+
+  const i18n = useI18n()
+
+  return (
+    <PanelRight
+      className="extra-prop-defs-editor-panel"
+      header={i18n.t('extraProp.label_other')}
+      width="52rem"
+      onClose={toggleEditExtraPropsPanel}
+    >
+      <ExtraPropDefsEditor
+        canAdd={canAdd}
+        extraPropDefs={extraPropDefs}
+        isExtraPropDefReadOnly={isExtraPropDefReadOnly}
+        onExtraPropDefDelete={onExtraPropDefDelete}
+        onExtraPropDefUpdate={onExtraPropDefUpdate}
+      />
+    </PanelRight>
+  )
+}
