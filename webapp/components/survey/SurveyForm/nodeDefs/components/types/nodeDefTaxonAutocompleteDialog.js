@@ -43,6 +43,10 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
 
   const taxa = useTaxa({ nodeDef, parentNode, draft, entryDataQuery, field, fieldValue })
 
+  // inside a modal (e.g. the edit dialog of a multiple attribute in a table) the list must be above it
+  // eslint-disable-next-line react-hooks/refs -- rendered only after a change event of the input, so the ref is set
+  const container = inputRef.current?.closest('.modal') ?? document.body
+
   return ReactDOM.createPortal(
     <AutocompleteDialog
       className="survey-form__node-def-taxon-autocomplete-list"
@@ -55,7 +59,7 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
       onClose={onClose}
       sourceElement={autocompleteSourceElement}
     />,
-    document.body
+    container
   )
 }
 

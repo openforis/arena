@@ -17,6 +17,8 @@ import * as StringUtils from '@core/stringUtils'
 import { TestId } from '@webapp/utils/testId'
 import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon
@@ -101,7 +103,7 @@ const NodeDefTaxon = (props) => {
   const onChangeSelectionField = useCallback(
     (field, value) => {
       if (StringUtils.isBlank(value)) {
-        if (Node.isValueBlank(node)) {
+        if (Node.isPlaceholder(node) || Node.isValueBlank(node)) {
           setSelection(selectionDefault)
         } else if (field === vernacularName && selection[code] === Taxon.unlistedCode) {
           // If current code is UNL and vernacular name is reset, do not clear node value
@@ -185,17 +187,58 @@ const NodeDefTaxon = (props) => {
 
 const mapStateToProps = (state, props) => {
   const surveyId = SurveyState.getSurveyId(state)
-  const { nodeDef, edit, preview, nodes } = props
+  const { nodeDef, edit, preview, node, nodes } = props
 
   return {
     taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
     surveyId,
     draft: preview,
-    node: edit ? null : nodes[0],
+    node: edit ? null : (node ?? nodes[0]),
   }
 }
 
-export default connect(mapStateToProps)(NodeDefTaxon)
+const NodeDefTaxonConnected = connect(mapStateToProps)(NodeDefTaxon)
+
+const MultipleTaxonInput = (props) => {
+  const { canDeleteNode = false, canEditRecord = false, nodeDef, nodes, parentNode = null } = props
+
+  return nodes.map((node) =>
+    !Node.isPlaceholder(node) || canEditRecord ? (
+      <div key={Node.getUuid(node)} className="survey-form__node-def-taxon-multiple-item">
+        <NodeDefErrorBadge nodeDef={nodeDef} parentNode={parentNode} node={node} />
+        {/* fields with their labels also in the edit dialog of a table cell (renderType tableBody) */}
+        <NodeDefTaxonConnected {...props} node={node} renderType={null} />
+        {!Node.isPlaceholder(node) && canDeleteNode && <NodeDeleteButton nodeDef={nodeDef} node={node} />}
+      </div>
+    ) : null
+  )
+}
+
+MultipleTaxonInput.propTypes = {
+  canDeleteNode: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  nodeDef: PropTypes.object.isRequired,
+  nodes: PropTypes.array.isRequired,
+  parentNode: PropTypes.object,
+}
+
+const NodeDefTaxonSwitch = (props) => {
+  const { edit, entryDataQuery, nodeDef } = props
+
+  return !edit && !entryDataQuery && NodeDef.isMultiple(nodeDef) ? (
+    <MultipleTaxonInput {...props} />
+  ) : (
+    <NodeDefTaxonConnected {...props} />
+  )
+}
+
+NodeDefTaxonSwitch.propTypes = {
+  edit: PropTypes.bool,
+  entryDataQuery: PropTypes.bool,
+  nodeDef: PropTypes.object.isRequired,
+}
+
+export default NodeDefTaxonSwitch
 
 NodeDefTaxon.propTypes = {
   canEditRecord: PropTypes.bool,

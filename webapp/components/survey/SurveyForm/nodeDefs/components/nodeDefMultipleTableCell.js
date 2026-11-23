@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
@@ -20,6 +21,12 @@ const getNodeValues = (nodeDef, nodes, lang) => {
 
     if (NodeDef.isFile(nodeDef)) {
       return Node.getFileName(node)
+    }
+
+    if (NodeDef.isTaxon(nodeDef)) {
+      const taxon = NodeRefData.getTaxon(node)
+      // unlisted/unknown taxa can have a scientific name entered by the user
+      return Node.getScientificName(node) || (taxon ? Taxon.getScientificName(taxon) : '')
     }
 
     return Node.getValue(node)
