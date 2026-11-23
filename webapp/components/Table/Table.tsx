@@ -59,7 +59,6 @@ const Table = (props) => {
     count,
     totalCount,
     initData,
-    onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
     selectAllItems,
@@ -121,7 +120,6 @@ const Table = (props) => {
         offset={offset}
         onItemSelectToggle={toggleItemSelection}
         onRowOpen={onRowOpen}
-        onRowsScroll={onRowsScroll}
         rowComponent={rowComponent}
         rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}

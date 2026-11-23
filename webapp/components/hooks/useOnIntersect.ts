@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
-const useOnIntersect = (effect, { root = null, rootMargin, threshold = 0 } = {}) => {
+const useOnIntersect = (
+  effect: (entry: IntersectionObserverEntry) => void,
+  {
+    root = null,
+    rootMargin = undefined,
+    threshold = 0,
+  }: { root?: Element | null; rootMargin?: string; threshold?: number } = {}
+) => {
   const [target, setTarget] = useState(null)
   const observer = useRef(null)
 

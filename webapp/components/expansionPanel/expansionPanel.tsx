@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 
 const closeClassName = 'close'
 
@@ -17,7 +17,7 @@ const ExpansionPanel = (props) => {
     showHeader = true,
     startClosed = false,
   } = props
-  const i18n = useI18n()
+  const t = useI18nT()
   const panelRef = useRef(null)
   const contentRef = useRef(null)
 
@@ -49,7 +49,7 @@ const ExpansionPanel = (props) => {
           <span className="btn-toggle">
             <span className="icon icon-play3 icon-10px" />
           </span>
-          {i18n.t(buttonLabel, buttonLabelParams)}
+          {t(buttonLabel, buttonLabelParams)}
         </button>
       )}
 

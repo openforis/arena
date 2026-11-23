@@ -15,7 +15,19 @@ const actionHandlersByType = {
   [ACTION_TYPES.error]: (error) => ({ error, loading: false, loaded: false }),
 }
 
-const useAsync = ({ method, url, data, params, ...rest }) => {
+const useAsync = ({
+  method,
+  url,
+  data = undefined,
+  params = undefined,
+  ...rest
+}: {
+  method: string
+  url: string
+  data?: unknown
+  params?: object
+  [key: string]: unknown
+}) => {
   const [state, _dispatch] = useReducer((_state, { type, payload }) => actionHandlersByType[type](payload), {
     loading: false,
     loaded: false,

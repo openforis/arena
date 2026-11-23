@@ -43,7 +43,7 @@ const loadSurveyDefs =
 
 export const initSurveyDefs =
   ({ navigate, draft = false, includeAnalysis = true, validate = false }) =>
-  async (dispatch, getState) => {
+  (dispatch, getState) => {
     const state = getState()
 
     if (!SurveyStatusState.isFetchedWithSameParams({ draft, includeAnalysis, validate })(state)) {
@@ -67,7 +67,7 @@ const fetchAndAssocCategoryItemsCounts = async ({ survey, draft }) => {
 
 export const refreshSurveyDefs =
   ({ navigate }) =>
-  async (dispatch, getState) => {
+  (dispatch, getState) => {
     const state = getState()
     if (SurveyStatusState.isFetched(state)) {
       const draft = SurveyStatusState.isDraft(state)
