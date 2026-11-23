@@ -1,7 +1,6 @@
 import './VirtualizedList.scss'
 
 import { forwardRef, type ReactNode, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { debounce } from '@core/functionsDefer'
@@ -160,15 +159,3 @@ export const VirtualizedList = forwardRef<unknown, VirtualizedListProps>((props,
 })
 
 VirtualizedList.displayName = 'VirtualizedList'
-
-VirtualizedList.propTypes = {
-  className: PropTypes.string,
-  id: PropTypes.string.isRequired,
-  overscanRowCount: PropTypes.number,
-  placeholderRenderer: PropTypes.func,
-  rowCount: PropTypes.number.isRequired,
-  rowHeight: PropTypes.number.isRequired,
-  rowRenderer: PropTypes.func.isRequired,
-  showScrollingPlaceholders: PropTypes.bool,
-  virtualizationThreshold: PropTypes.number, // threshold to consider before virtualizing the rendering
-}

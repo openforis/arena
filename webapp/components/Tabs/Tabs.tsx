@@ -1,14 +1,21 @@
 import './Tabs.scss'
 
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import MuiTabs from '@mui/material/Tabs'
 import MuiTab from '@mui/material/Tab'
 
 import { useI18n } from '@webapp/store/system'
 
-export const Tabs = (props) => {
+type TabsProps = {
+  fullWidth?: boolean
+  items: any[]
+  onChange?: (...args: any[]) => any
+  orientation?: 'vertical' | 'horizontal'
+  selectedItemKey?: string
+}
+
+export const Tabs = (props: TabsProps) => {
   const { fullWidth = false, items, onChange: onChangeProp, orientation = 'horizontal', selectedItemKey } = props
 
   const [selectedIndexState, setSelectedIndexState] = useState(0)
@@ -53,12 +60,4 @@ export const Tabs = (props) => {
       )}
     </div>
   )
-}
-
-Tabs.propTypes = {
-  fullWidth: PropTypes.bool,
-  items: PropTypes.array.isRequired,
-  onChange: PropTypes.func,
-  orientation: PropTypes.oneOf(['vertical', 'horizontal']),
-  selectedItemKey: PropTypes.string,
 }

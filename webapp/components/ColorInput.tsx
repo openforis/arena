@@ -1,11 +1,16 @@
 import './ColorInput.scss'
 
-import PropTypes from 'prop-types'
 import { MuiColorInput } from 'mui-color-input'
 
 import { ButtonIconClose } from './buttons'
 
-export const ColorInput = (props) => {
+type ColorInputProps = {
+  disabled?: boolean
+  onChange: (...args: any[]) => any
+  value?: string
+}
+
+export const ColorInput = (props: ColorInputProps) => {
   const { disabled = false, onChange, value = '' } = props
 
   const onClear = () => onChange('')
@@ -26,12 +31,6 @@ export const ColorInput = (props) => {
       {value && <ButtonIconClose disabled={disabled} label="common.clear" onClick={onClear} />}
     </div>
   )
-}
-
-ColorInput.propTypes = {
-  disabled: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 }
 
 export default ColorInput

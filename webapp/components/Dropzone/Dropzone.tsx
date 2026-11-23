@@ -1,7 +1,6 @@
 import './Dropzone.scss'
 
 import { useCallback, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'
 
@@ -11,7 +10,16 @@ import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { Alert } from '../Alert'
 
-const Dropzone = (props) => {
+type DropzoneProps = {
+  accept?: string | Record<string, any>
+  disabled?: boolean
+  maxSize?: number // max file size in MB
+  multiple?: boolean
+  onDrop: (...args: any[]) => any
+  droppedFiles?: any[]
+}
+
+const Dropzone = (props: DropzoneProps) => {
   const {
     accept: acceptProp = {},
     disabled = false,
@@ -143,15 +151,6 @@ const Dropzone = (props) => {
       )}
     </ReactDropzone>
   )
-}
-
-Dropzone.propTypes = {
-  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  disabled: PropTypes.bool,
-  maxSize: PropTypes.number, // max file size in MB
-  multiple: PropTypes.bool,
-  onDrop: PropTypes.func.isRequired,
-  droppedFiles: PropTypes.array,
 }
 
 export default Dropzone

@@ -1,7 +1,6 @@
 import './TooltipNew.scss'
 
-import { useCallback, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import classNames from 'classnames'
 import { Tooltip } from '@mui/material'
 
@@ -11,7 +10,21 @@ import { useI18nT } from '@webapp/store/system'
 
 import Markdown from '../markdown'
 
-export const TooltipNew = (props) => {
+type TooltipNewProps = {
+  children: ReactNode
+  className?: string
+  closeOnClick?: boolean
+  disableFocusListener?: boolean
+  isTitleMarkdown?: boolean
+  markdownClassName?: string
+  maxWidth?: string | number
+  renderTitle?: (...args: any[]) => any
+  // another element shows the same content: no tooltip meanwhile
+  suppressed?: boolean
+  title?: string
+}
+
+export const TooltipNew = (props: TooltipNewProps) => {
   const {
     children,
     className,
@@ -97,18 +110,4 @@ export const TooltipNew = (props) => {
       </span>
     </Tooltip>
   )
-}
-
-TooltipNew.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  closeOnClick: PropTypes.bool,
-  disableFocusListener: PropTypes.bool,
-  isTitleMarkdown: PropTypes.bool,
-  markdownClassName: PropTypes.string,
-  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  renderTitle: PropTypes.func,
-  // another element shows the same content: no tooltip meanwhile
-  suppressed: PropTypes.bool,
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }

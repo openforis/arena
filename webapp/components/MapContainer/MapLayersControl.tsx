@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
@@ -21,7 +20,16 @@ import { getSelectableBaseLayers } from './workspace/toolbar/baseMapItems'
 
 const EMPTY_CONTROL_CLASS = 'map-layers-control--empty'
 
-export const MapLayersControl = (props) => {
+type MapLayersControlProps = {
+  baseLayersLabel?: string
+  layers?: any[]
+  overlayGroups?: {
+    label: string
+    count: number
+  }[]
+}
+
+export const MapLayersControl = (props: MapLayersControlProps) => {
   const { layers = [], baseLayersLabel, overlayGroups = [] } = props
 
   const user = useUser()
@@ -151,15 +159,4 @@ export const MapLayersControl = (props) => {
       )}
     </>
   )
-}
-
-MapLayersControl.propTypes = {
-  baseLayersLabel: PropTypes.string,
-  layers: PropTypes.array,
-  overlayGroups: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      count: PropTypes.number.isRequired,
-    })
-  ),
 }

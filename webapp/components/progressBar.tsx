@@ -1,12 +1,18 @@
 import './progressBar.scss'
 
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 import { LinearProgress } from '@mui/material'
 
 import { useI18n } from '@webapp/store/system'
 
-const ProgressBarWithLabel = (props) => {
+type ProgressBarWithLabelProps = {
+  className?: string
+  color?: 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' | 'inherit'
+  textKey?: string
+  value?: number
+}
+
+const ProgressBarWithLabel = (props: ProgressBarWithLabelProps) => {
   const { className, color, textKey = null, value } = props
 
   const i18n = useI18n()
@@ -21,14 +27,16 @@ const ProgressBarWithLabel = (props) => {
   )
 }
 
-ProgressBarWithLabel.propTypes = {
-  className: PropTypes.string,
-  color: PropTypes.oneOf(['primary', 'secondary', 'error', 'info', 'success', 'warning', 'inherit']),
-  textKey: PropTypes.string,
-  value: PropTypes.number,
+type ProgressBarProps = {
+  className?: string
+  color?: 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' | 'inherit'
+  indeterminate?: boolean
+  progress?: number
+  showText?: boolean
+  textKey?: string
 }
 
-const ProgressBar = (props) => {
+const ProgressBar = (props: ProgressBarProps) => {
   const { className: classNameProp, color, indeterminate = true, progress = 0, showText = true, textKey = null } = props
 
   const className = classNames('progress-bar', classNameProp)
@@ -40,15 +48,6 @@ const ProgressBar = (props) => {
     return <ProgressBarWithLabel className={className} color={color} textKey={textKey} value={progress} />
   }
   return <LinearProgress className={className} color={color} variant="determinate" value={progress} />
-}
-
-ProgressBar.propTypes = {
-  className: PropTypes.string,
-  color: PropTypes.oneOf(['primary', 'secondary', 'error', 'info', 'success', 'warning', 'inherit']),
-  indeterminate: PropTypes.bool,
-  progress: PropTypes.number,
-  showText: PropTypes.bool,
-  textKey: PropTypes.string,
 }
 
 export default ProgressBar

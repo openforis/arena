@@ -1,7 +1,6 @@
 import './AiExplainPanel.scss'
 
 import { useCallback, useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 
 import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
@@ -12,7 +11,13 @@ import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
-const AiExplainPanel = ({ expression, nodeDefUuid, onClose }) => {
+type AiExplainPanelProps = {
+  expression: string
+  nodeDefUuid?: string
+  onClose: (...args: any[]) => any
+}
+
+const AiExplainPanel = ({ expression, nodeDefUuid, onClose }: AiExplainPanelProps) => {
   const i18n = useI18n()
   // See AiActivityLogSummary: i18next escapes {{message}} by default,
   // which mangles quoted identifiers (e.g. Postgres column names) in
@@ -60,12 +65,6 @@ const AiExplainPanel = ({ expression, nodeDefUuid, onClose }) => {
       </ModalBody>
     </Modal>
   )
-}
-
-AiExplainPanel.propTypes = {
-  expression: PropTypes.string.isRequired,
-  nodeDefUuid: PropTypes.string,
-  onClose: PropTypes.func.isRequired,
 }
 
 export default AiExplainPanel

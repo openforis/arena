@@ -2,7 +2,6 @@ import '../aiTextarea.scss'
 import './AiExpressionPopup.scss'
 
 import { useEffect, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
@@ -40,7 +39,14 @@ const unusableErrorKeys = new Set([
  * @param {!object} props.i18n - The i18n instance.
  * @returns {React.ReactElement} - The rendered result.
  */
-const ExpressionResult = ({ result, validationError = null, isValid, i18n }) => (
+type ExpressionResultProps = {
+  result: Record<string, any>
+  validationError?: Record<string, any>
+  isValid: boolean
+  i18n: Record<string, any>
+}
+
+const ExpressionResult = ({ result, validationError = null, isValid, i18n }: ExpressionResultProps) => (
   <>
     <div className={`ai-expression-popup__result${isValid ? '' : ' ai-expression-popup__result--invalid'}`}>
       {result.expression}
@@ -59,14 +65,15 @@ const ExpressionResult = ({ result, validationError = null, isValid, i18n }) => 
   </>
 )
 
-ExpressionResult.propTypes = {
-  result: PropTypes.object.isRequired,
-  validationError: PropTypes.object,
-  isValid: PropTypes.bool.isRequired,
-  i18n: PropTypes.object.isRequired,
+type AiExpressionPopupProps = {
+  excludeCurrentNodeDef?: boolean
+  qualifier?: string
+  nodeDefUuid?: string
+  onCancel: (...args: any[]) => any
+  onApply: (...args: any[]) => any
 }
 
-const AiExpressionPopup = (props) => {
+const AiExpressionPopup = (props: AiExpressionPopupProps) => {
   const { excludeCurrentNodeDef = true, qualifier, nodeDefUuid, onCancel, onApply } = props
 
   const i18n = useI18n()
@@ -190,14 +197,6 @@ const AiExpressionPopup = (props) => {
       </ModalFooter>
     </Modal>
   )
-}
-
-AiExpressionPopup.propTypes = {
-  excludeCurrentNodeDef: PropTypes.bool,
-  qualifier: PropTypes.string,
-  nodeDefUuid: PropTypes.string,
-  onCancel: PropTypes.func.isRequired,
-  onApply: PropTypes.func.isRequired,
 }
 
 export default AiExpressionPopup

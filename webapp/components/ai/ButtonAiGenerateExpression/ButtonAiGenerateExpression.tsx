@@ -1,8 +1,14 @@
-import PropTypes from 'prop-types'
-
 import { Button } from '@webapp/components/buttons'
 
-const ButtonAiGenerateExpression = (props) => {
+type ButtonAiGenerateExpressionProps = {
+  disabled?: boolean
+  id?: string
+  onClick: (...args: any[]) => any
+  testId?: string
+  variant?: 'contained' | 'outlined' | 'text'
+}
+
+const ButtonAiGenerateExpression = (props: ButtonAiGenerateExpressionProps) => {
   const { disabled = false, id, onClick, testId, variant } = props
 
   return (
@@ -17,14 +23,6 @@ const ButtonAiGenerateExpression = (props) => {
       variant={variant}
     />
   )
-}
-
-ButtonAiGenerateExpression.propTypes = {
-  disabled: PropTypes.bool,
-  id: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
-  testId: PropTypes.string,
-  variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
 
 export default ButtonAiGenerateExpression

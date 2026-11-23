@@ -1,8 +1,18 @@
-import PropTypes from 'prop-types'
-
 import { ContentHeader } from './ContentHeader'
 
-export const ContentHeaders = (props) => {
+type ContentHeadersProps = {
+  columns?: any[]
+  deselectAllItems?: (...args: any[]) => any
+  expandableRows?: boolean
+  handleSortBy?: (...args: any[]) => any
+  selectAllItems?: (...args: any[]) => any
+  selectedItemsCount?: number
+  sort?: Record<string, any>
+  totalCount?: number
+  allVisibleItemsSelected?: boolean
+}
+
+export const ContentHeaders = (props: ContentHeadersProps) => {
   const {
     columns,
     deselectAllItems,
@@ -34,16 +44,4 @@ export const ContentHeaders = (props) => {
       ))}
     </>
   )
-}
-
-ContentHeaders.propTypes = {
-  columns: PropTypes.array,
-  deselectAllItems: PropTypes.func,
-  expandableRows: PropTypes.bool,
-  handleSortBy: PropTypes.func,
-  selectAllItems: PropTypes.func,
-  selectedItemsCount: PropTypes.number,
-  sort: PropTypes.object,
-  totalCount: PropTypes.number,
-  allVisibleItemsSelected: PropTypes.bool,
 }

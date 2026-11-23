@@ -1,5 +1,5 @@
+import type React from 'react'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -15,7 +15,37 @@ const defaultKeyExtractor = ({ item }) => ObjectUtils.getUuid(item)
 const defaultIsRowExpandable = () => true
 const emptyProps = {}
 
-const Table = (props) => {
+type TableProps = {
+  cellProps?: Record<string, any>
+  cellTestIdExtractor?: (...args: any[]) => any
+  className?: string
+  columns?: any[]
+  expandableRows?: boolean
+  gridTemplateColumns?: string
+  headerLeftComponent?: React.ElementType
+  headerProps?: Record<string, any>
+  isRowActive?: (...args: any[]) => any // Checks whether a row must be highlighted
+  isRowExpandable?: (...args: any[]) => any // Checks if a row rendering an item can be expanded
+  isRowOpenable?: (...args: any[]) => any // Checks if the item of a row can be opened (onRowOpen); rows that cannot be opened do nothing on click
+  keepSelectionOnSearch?: boolean // if true, selected items are kept when the search text changes
+  keyExtractor?: (...args: any[]) => any
+  module: string
+  moduleApiUri?: string
+  noItemsLabelKey?: string
+  noItemsLabelForSearchKey?: string
+  onRowOpen?: (...args: any[]) => any // Opens (views or edits) the item of a row: on click, or on double click if the table is selectable
+  restParams?: Record<string, any>
+  rowComponent?: React.ElementType
+  rowExpandedComponent?: React.ElementType
+  rowHeaderComponent?: React.ElementType
+  rowProps?: Record<string, any>
+  selectable?: boolean // if true, a row click selects the row and selectedItems is passed to the HeaderLeft component
+  showFooter?: boolean
+  showHeader?: boolean
+  visibleColumnsSelectionEnabled?: boolean // if true, visible columns selection menu button will be shown
+}
+
+const Table = (props: TableProps) => {
   const {
     cellProps = emptyProps,
     cellTestIdExtractor = null,
@@ -113,7 +143,6 @@ const Table = (props) => {
         loading={loadingData}
         maxRows={limit}
         module={module}
-        count={count}
         totalCount={totalCount}
         noItemsLabelKey={noItemsLabelKey}
         noItemsLabelForSearchKey={noItemsLabelForSearchKey}
@@ -150,35 +179,5 @@ const Table = (props) => {
 }
 
 const DummyComponent = () => <div />
-
-Table.propTypes = {
-  cellProps: PropTypes.object,
-  cellTestIdExtractor: PropTypes.func,
-  className: PropTypes.string,
-  columns: PropTypes.array,
-  expandableRows: PropTypes.bool,
-  gridTemplateColumns: PropTypes.string,
-  headerLeftComponent: PropTypes.elementType,
-  headerProps: PropTypes.object,
-  isRowActive: PropTypes.func, // Checks whether a row must be highlighted
-  isRowExpandable: PropTypes.func, // Checks if a row rendering an item can be expanded
-  isRowOpenable: PropTypes.func, // Checks if the item of a row can be opened (onRowOpen); rows that cannot be opened do nothing on click
-  keepSelectionOnSearch: PropTypes.bool, // if true, selected items are kept when the search text changes
-  keyExtractor: PropTypes.func,
-  module: PropTypes.string.isRequired,
-  moduleApiUri: PropTypes.string,
-  noItemsLabelKey: PropTypes.string,
-  noItemsLabelForSearchKey: PropTypes.string,
-  onRowOpen: PropTypes.func, // Opens (views or edits) the item of a row: on click, or on double click if the table is selectable
-  restParams: PropTypes.object,
-  rowComponent: PropTypes.elementType,
-  rowExpandedComponent: PropTypes.elementType,
-  rowHeaderComponent: PropTypes.elementType,
-  rowProps: PropTypes.object,
-  selectable: PropTypes.bool, // if true, a row click selects the row and selectedItems is passed to the HeaderLeft component
-  showFooter: PropTypes.bool,
-  showHeader: PropTypes.bool,
-  visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
-}
 
 export default Table

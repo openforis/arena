@@ -2,7 +2,6 @@ import './panelRight.scss'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18nT } from '@webapp/store/system'
@@ -10,7 +9,17 @@ import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonIconClose } from '../buttons'
 
-const PanelRight = (props) => {
+type PanelRightProps = {
+  className?: string
+  children: React.ReactNode | React.ReactNode[]
+  header?: string
+  headerParams?: Record<string, unknown>
+  onClose: (...args: any[]) => any
+  showFooter?: boolean
+  width?: string // width of the panel (e.g. '1000px' or '90vw')
+}
+
+const PanelRight = (props: PanelRightProps) => {
   const { children, className, header = '', headerParams, onClose, showFooter = false, width = '500px' } = props
 
   const t = useI18nT()
@@ -36,15 +45,6 @@ const PanelRight = (props) => {
     </div>,
     document.body
   )
-}
-
-PanelRight.propTypes = {
-  className: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]).isRequired,
-  header: PropTypes.string,
-  onClose: PropTypes.func.isRequired,
-  showFooter: PropTypes.bool,
-  width: PropTypes.string, // width of the panel (e.g. '1000px' or '90vw')
 }
 
 export default PanelRight

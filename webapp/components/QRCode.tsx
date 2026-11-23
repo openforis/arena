@@ -1,12 +1,11 @@
 import { QRCodeCanvas } from 'qrcode.react'
-import PropTypes from 'prop-types'
 
-export const QRCode = (props) => {
-  const { value, size = 200 } = props
-  return <QRCodeCanvas value={value} size={size} />
+type QRCodeProps = {
+  value: string
+  size?: number
 }
 
-QRCode.propTypes = {
-  value: PropTypes.string.isRequired,
-  size: PropTypes.number,
+export const QRCode = (props: QRCodeProps) => {
+  const { value, size = 200 } = props
+  return <QRCodeCanvas value={value} size={size} />
 }

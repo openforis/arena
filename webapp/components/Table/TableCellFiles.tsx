@@ -1,11 +1,14 @@
 import { useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 
-export const TableCellFiles = (props) => {
+type TableCellFilesProps = {
+  item: Record<string, any>
+}
+
+export const TableCellFiles = (props: TableCellFilesProps) => {
   const { item } = props
 
   const i18n = useI18n()
@@ -31,8 +34,4 @@ export const TableCellFiles = (props) => {
       )}
     </>
   )
-}
-
-TableCellFiles.propTypes = {
-  item: PropTypes.object.isRequired,
 }

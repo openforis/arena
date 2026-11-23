@@ -1,6 +1,15 @@
-import PropTypes from 'prop-types'
+type ContentRowCellProps = {
+  active?: boolean
+  cellTestIdExtractor?: (...args: any[]) => any
+  column: Record<string, any>
+  item: Record<string, any>
+  itemPosition: number
+  itemSelected: boolean
+  initData: (...args: any[]) => any
+  onItemSelectToggle: (...args: any[]) => any
+}
 
-export const ContentRowCell = (props) => {
+export const ContentRowCell = (props: ContentRowCellProps) => {
   const {
     active,
     cellTestIdExtractor,
@@ -22,15 +31,4 @@ export const ContentRowCell = (props) => {
       {renderItem({ ...otherProps, active, item, itemPosition, itemSelected, initData, onItemSelectToggle })}
     </div>
   )
-}
-
-ContentRowCell.propTypes = {
-  active: PropTypes.bool,
-  cellTestIdExtractor: PropTypes.func,
-  column: PropTypes.object.isRequired,
-  item: PropTypes.object.isRequired,
-  itemPosition: PropTypes.number.isRequired,
-  itemSelected: PropTypes.bool.isRequired,
-  initData: PropTypes.func.isRequired,
-  onItemSelectToggle: PropTypes.func.isRequired,
 }
