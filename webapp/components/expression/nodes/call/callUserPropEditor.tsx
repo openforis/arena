@@ -8,9 +8,9 @@ import * as Expression from '@core/expressionParser/expression'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
-export const CallUserPropEditor = (props) => {
+export const CallUserPropEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp } = props
 
   const initialValue = expressionNode?.arguments?.[0]?.value
@@ -37,5 +37,3 @@ export const CallUserPropEditor = (props) => {
     </div>
   )
 }
-
-CallUserPropEditor.propTypes = CallEditorPropTypes

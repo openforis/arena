@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
@@ -38,7 +37,21 @@ const toUiOperandExpressionType = (type) => {
   return type
 }
 
-const BinaryOperand = (props) => {
+type BinaryOperandProps = {
+  isBoolean?: boolean
+  node: any
+  nodeDefCurrent?: any
+  onChange: (...args: any[]) => any
+  type: string
+  renderNode: (...args: any[]) => any
+  // ExpressionNode props
+  canDelete?: boolean
+  level?: number
+  onDelete?: (...args: any[]) => any
+  variables?: any[]
+}
+
+const BinaryOperand = (props: BinaryOperandProps) => {
   const {
     canDelete = false,
     isBoolean = false,
@@ -116,20 +129,6 @@ const BinaryOperand = (props) => {
       })}
     </div>
   )
-}
-
-BinaryOperand.propTypes = {
-  isBoolean: PropTypes.bool,
-  node: PropTypes.any.isRequired,
-  nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func.isRequired,
-  type: PropTypes.string.isRequired,
-  renderNode: PropTypes.func.isRequired,
-  // ExpressionNode props
-  canDelete: PropTypes.bool,
-  level: PropTypes.number,
-  onDelete: PropTypes.func,
-  variables: PropTypes.array,
 }
 
 export default BinaryOperand

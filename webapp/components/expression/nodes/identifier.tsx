@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -41,7 +39,23 @@ const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
   }, [])
 }
 
-const Identifier = ({ disabled = false, node, onChange, variables = [], variablesFilterFn = null }) => {
+type IdentifierProps = {
+  disabled?: boolean
+  // Common props
+  node: any
+  onChange: (...args: any[]) => any
+  // Identifier / Member / Call
+  variables?: any[]
+  variablesFilterFn?: (...args: any[]) => any
+}
+
+const Identifier = ({
+  disabled = false,
+  node,
+  onChange,
+  variables = [],
+  variablesFilterFn = null,
+}: IdentifierProps) => {
   // exclude entities from basic expression editor identifiers
   const variablesFiltered = filterVariablesOrGroups({ variables, variablesFilterFn })
 
@@ -58,16 +72,6 @@ const Identifier = ({ disabled = false, node, onChange, variables = [], variable
       selection={getSelectedVariable({ variables: variablesFiltered, node })}
     />
   )
-}
-
-Identifier.propTypes = {
-  disabled: PropTypes.bool,
-  // Common props
-  node: PropTypes.any.isRequired,
-  onChange: PropTypes.func.isRequired,
-  // Identifier / Member / Call
-  variables: PropTypes.array,
-  variablesFilterFn: PropTypes.func,
 }
 
 export default Identifier

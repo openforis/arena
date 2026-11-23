@@ -1,13 +1,19 @@
 import './TimeInput.scss'
 
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { TimePicker } from '@mui/x-date-pickers/TimePicker'
 
 import * as DateUtils from '@core/dateUtils'
 import { useDateTimeInput } from './useDateTimeInput'
 
-const TimeInput = (props) => {
+type TimeInputProps = {
+  disabled?: boolean
+  value?: string
+  onChange: (...args: any[]) => any
+  withSeconds?: boolean
+}
+
+const TimeInput = (props: TimeInputProps) => {
   const { disabled = false, onChange, value, withSeconds = false } = props
 
   const valueFormat = withSeconds ? DateUtils.formats.timeWithSeconds : DateUtils.formats.timeStorage
@@ -31,13 +37,6 @@ const TimeInput = (props) => {
       views={withSeconds ? ['hours', 'minutes', 'seconds'] : ['hours', 'minutes']}
     />
   )
-}
-
-TimeInput.propTypes = {
-  disabled: PropTypes.bool,
-  value: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  withSeconds: PropTypes.bool,
 }
 
 export default TimeInput

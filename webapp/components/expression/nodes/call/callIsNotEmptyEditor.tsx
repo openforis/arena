@@ -1,9 +1,9 @@
 import * as Expression from '@core/expressionParser/expression'
 
 import { CallSingleParameterEditor } from './callSingleParameterEditor'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
-export const CallIsNotEmptyEditor = (props) => {
+export const CallIsNotEmptyEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm, variables } = props
   return (
     <CallSingleParameterEditor
@@ -14,5 +14,3 @@ export const CallIsNotEmptyEditor = (props) => {
     />
   )
 }
-
-CallIsNotEmptyEditor.propTypes = CallEditorPropTypes

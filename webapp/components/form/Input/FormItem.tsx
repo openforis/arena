@@ -1,5 +1,5 @@
+import type React from 'react'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -16,7 +16,25 @@ const getLabel = ({ appendColonToLabel, labelProp, labelParams, i18n }) => {
   }
 }
 
-export const FormItem = (props) => {
+type FormItemProps = {
+  appendColonToLabel?: boolean
+  className?: string
+  children: string | number | React.ReactElement | React.ReactElement[]
+  hideLabelInMobile?: boolean
+  // id of the labelled input
+  htmlFor?: string
+  info?: string
+  isInfoMarkdown?: boolean
+  infoTitleClassName?: string
+  infoTitleMarkdownClassName?: string
+  infoTitleMaxWidth?: string | number
+  label?: string | React.ReactElement
+  labelParams?: Record<string, any>
+  onInfoClick?: (...args: any[]) => any
+  required?: boolean
+}
+
+export const FormItem = (props: FormItemProps) => {
   const {
     appendColonToLabel = false,
     children,
@@ -67,27 +85,4 @@ export const FormItem = (props) => {
       {children}
     </div>
   )
-}
-
-FormItem.propTypes = {
-  appendColonToLabel: PropTypes.bool,
-  className: PropTypes.string,
-  children: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.element,
-    PropTypes.arrayOf(PropTypes.element),
-  ]).isRequired,
-  hideLabelInMobile: PropTypes.bool,
-  // id of the labelled input
-  htmlFor: PropTypes.string,
-  info: PropTypes.string,
-  isInfoMarkdown: PropTypes.bool,
-  infoTitleClassName: PropTypes.string,
-  infoTitleMarkdownClassName: PropTypes.string,
-  infoTitleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  labelParams: PropTypes.object,
-  onInfoClick: PropTypes.func,
-  required: PropTypes.bool,
 }

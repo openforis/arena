@@ -4,7 +4,6 @@ import { useState, useCallback, useMemo } from 'react'
 import ReactCodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
-import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
@@ -14,6 +13,7 @@ import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { useAutocompletionSource } from './useAutocompletionSource'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
 
@@ -32,7 +32,18 @@ const completionsCompareFn = (contextUuid) => (completionA, completionB) => {
   return typeComparison || labelA.localeCompare(labelB)
 }
 
-const AdvancedExpressionEditorPopup = (props) => {
+type AdvancedExpressionEditorPopupProps = {
+  excludeCurrentNodeDef?: boolean
+  includeAnalysis?: boolean
+  isContextParent?: boolean
+  mode?: string
+  nodeDefCurrent?: ArenaAnyNodeDef
+  query?: string // String representing the expression
+  textSearchHelpVisible?: boolean
+  updateDraftQuery: (...args: any[]) => any
+}
+
+const AdvancedExpressionEditorPopup = (props: AdvancedExpressionEditorPopupProps) => {
   const {
     excludeCurrentNodeDef = true,
     includeAnalysis = false,
@@ -133,17 +144,6 @@ const AdvancedExpressionEditorPopup = (props) => {
       </div>
     </>
   )
-}
-
-AdvancedExpressionEditorPopup.propTypes = {
-  excludeCurrentNodeDef: PropTypes.bool,
-  includeAnalysis: PropTypes.bool,
-  isContextParent: PropTypes.bool,
-  mode: PropTypes.string,
-  nodeDefCurrent: PropTypes.object,
-  query: PropTypes.string, // String representing the expression
-  textSearchHelpVisible: PropTypes.bool,
-  updateDraftQuery: PropTypes.func.isRequired,
 }
 
 export default AdvancedExpressionEditorPopup

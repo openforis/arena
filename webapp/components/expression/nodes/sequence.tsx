@@ -1,10 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import EditButtons from './editButtons'
 
-const Sequence = (props) => {
+type SequenceProps = {
+  node: any
+  onChange: (...args: any[]) => any
+  renderNode: React.ElementType
+  level?: number
+  // ExpressionNode props
+  canDelete?: boolean
+  onDelete?: (...args: any[]) => any
+  nodeDefCurrent?: any
+  isBoolean?: boolean
+  type?: string
+  variables?: any[]
+}
+
+const Sequence = (props: SequenceProps) => {
   const {
     canDelete = false,
     isBoolean = false,
@@ -40,20 +53,6 @@ const Sequence = (props) => {
       </div>
     </div>
   )
-}
-
-Sequence.propTypes = {
-  node: PropTypes.any.isRequired,
-  onChange: PropTypes.func.isRequired,
-  renderNode: PropTypes.elementType.isRequired,
-  level: PropTypes.number,
-  // ExpressionNode props
-  canDelete: PropTypes.bool,
-  onDelete: PropTypes.func,
-  nodeDefCurrent: PropTypes.any,
-  isBoolean: PropTypes.bool,
-  type: PropTypes.string,
-  variables: PropTypes.array,
 }
 
 export default Sequence

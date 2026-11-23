@@ -1,13 +1,24 @@
 import './AutocompleteDialog.scss'
 
 import { useCallback, useRef, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 
 import { useLocalState, State } from './store'
 
-const AutocompleteDialog = (props) => {
+type AutocompleteDialogProps = {
+  inputField?: any
+  sourceElement?: any
+  items?: any[]
+  itemRenderer?: any
+  itemLabel?: string | ((...args: any[]) => any) // item label function or label property name
+  itemKey?: string | ((...args: any[]) => any)
+  className?: string
+  onItemSelect?: (...args: any[]) => any
+  onClose?: (...args: any[]) => any
+}
+
+const AutocompleteDialog = (props: AutocompleteDialogProps) => {
   const {
     className = '',
     inputField = null,
@@ -22,7 +33,7 @@ const AutocompleteDialog = (props) => {
   const list = useRef(null)
 
   const itemLabelFunction = useCallback(
-    (item) => (itemLabel.constructor === String ? A.prop(itemLabel, item) : itemLabel(item)),
+    (item) => (typeof itemLabel === 'string' ? A.prop(itemLabel, item) : itemLabel(item)),
     [itemLabel]
   )
 
@@ -59,18 +70,6 @@ const AutocompleteDialog = (props) => {
       ))}
     </div>
   )
-}
-
-AutocompleteDialog.propTypes = {
-  inputField: PropTypes.any,
-  sourceElement: PropTypes.any,
-  items: PropTypes.array,
-  itemRenderer: PropTypes.any,
-  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or label property name
-  itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  className: PropTypes.string,
-  onItemSelect: PropTypes.func,
-  onClose: PropTypes.func,
 }
 
 export default AutocompleteDialog

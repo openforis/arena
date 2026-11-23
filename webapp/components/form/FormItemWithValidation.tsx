@@ -1,8 +1,17 @@
-import PropTypes from 'prop-types'
+import type React from 'react'
 import ValidationTooltip from '../validationTooltip'
 import { FormItem } from './Input'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-export const FormItemWithValidation = (props) => {
+type FormItemWithValidationProps = {
+  children: React.ReactNode
+  hideLabelInMobile?: boolean
+  label?: string
+  labelParams?: Record<string, any>
+  validation?: ArenaValidation
+}
+
+export const FormItemWithValidation = (props: FormItemWithValidationProps) => {
   const { children, hideLabelInMobile, label, labelParams, validation } = props
 
   return (
@@ -10,12 +19,4 @@ export const FormItemWithValidation = (props) => {
       <ValidationTooltip validation={validation}>{children}</ValidationTooltip>
     </FormItem>
   )
-}
-
-FormItemWithValidation.propTypes = {
-  children: PropTypes.node.isRequired,
-  hideLabelInMobile: PropTypes.bool,
-  label: PropTypes.string,
-  labelParams: PropTypes.object,
-  validation: PropTypes.object,
 }

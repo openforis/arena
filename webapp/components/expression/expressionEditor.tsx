@@ -1,7 +1,6 @@
 import './expressionEditor.scss'
 
 import { useCallback, useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -20,7 +19,27 @@ import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeature
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 
-const ExpressionEditor = (props) => {
+type ExpressionEditorProps = {
+  index?: number // used when rendering multiple expression editor elements
+  qualifier: string // used to generate test ids
+  placeholder?: boolean // true if the element is a placeholder
+  query?: string // String representing the expression
+  nodeDefUuidContext?: string // Entity
+  nodeDefUuidCurrent?: string // Attribute
+  excludeCurrentNodeDef?: boolean
+  mode?: any
+  types?: any[] // allowed expression types
+  isContextParent?: boolean
+  canBeCall?: boolean
+  canBeConstant?: boolean
+  isBoolean?: boolean
+  onChange?: (...args: any[]) => any
+  onCancel?: (...args: any[]) => any
+  onEditChange?: (...args: any[]) => any
+  readOnly?: boolean
+}
+
+const ExpressionEditor = (props: ExpressionEditorProps) => {
   const {
     canBeCall = false,
     canBeConstant = false,
@@ -103,7 +122,6 @@ const ExpressionEditor = (props) => {
     <div className="expression-editor">
       {edit ? (
         <ExpressionEditorPopup
-          qualifier={qualifier}
           query={query}
           nodeDefUuidContext={nodeDefUuidContext}
           nodeDefUuidCurrent={nodeDefUuidCurrent}
@@ -171,26 +189,6 @@ const ExpressionEditor = (props) => {
       {explainOpen && <AiExplainPanel expression={query} nodeDefUuid={nodeDefUuidCurrent} onClose={onExplainClose} />}
     </div>
   )
-}
-
-ExpressionEditor.propTypes = {
-  index: PropTypes.number, // used when rendering multiple expression editor elements
-  qualifier: PropTypes.string.isRequired, // used to generate test ids
-  placeholder: PropTypes.bool, // true if the element is a placeholder
-  query: PropTypes.string, // String representing the expression
-  nodeDefUuidContext: PropTypes.string, // Entity
-  nodeDefUuidCurrent: PropTypes.string, // Attribute
-  excludeCurrentNodeDef: PropTypes.bool,
-  mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
-  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
-  isContextParent: PropTypes.bool,
-  canBeCall: PropTypes.bool,
-  canBeConstant: PropTypes.bool,
-  isBoolean: PropTypes.bool,
-  onChange: PropTypes.func,
-  onCancel: PropTypes.func,
-  onEditChange: PropTypes.func,
-  readOnly: PropTypes.bool,
 }
 
 export default ExpressionEditor

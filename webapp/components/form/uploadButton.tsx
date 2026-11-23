@@ -1,7 +1,6 @@
 import './uploadButton.scss'
 
 import { useRef } from 'react'
-import PropTypes from 'prop-types'
 
 import { Button } from '../buttons/Button'
 
@@ -10,7 +9,21 @@ const checkFilesSize = (files: FileList, maxSizeMB: number) =>
     ? alert(`File exceeds maximum size (${maxSizeMB}MB)`)
     : true
 
-const UploadButton = (props) => {
+type UploadButtonProps = {
+  accept?: string
+  className?: string
+  disabled?: boolean
+  inputFieldId?: string
+  label?: string
+  maxSize?: number
+  onChange?: (...args: any[]) => any
+  showIcon?: boolean
+  showLabel?: boolean
+  title?: string
+  variant?: 'contained' | 'outlined' | 'text'
+}
+
+const UploadButton = (props: UploadButtonProps) => {
   const {
     accept = null, // E.g. .txt, .xls (null = all type of files are accepted)
     className = 'btn', // Custom css class
@@ -62,20 +75,6 @@ const UploadButton = (props) => {
       />
     </>
   )
-}
-
-UploadButton.propTypes = {
-  accept: PropTypes.string,
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
-  inputFieldId: PropTypes.string,
-  label: PropTypes.string,
-  maxSize: PropTypes.number,
-  onChange: PropTypes.func,
-  showIcon: PropTypes.bool,
-  showLabel: PropTypes.bool,
-  title: PropTypes.string,
-  variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
 
 export default UploadButton

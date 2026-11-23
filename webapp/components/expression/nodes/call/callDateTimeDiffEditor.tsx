@@ -9,7 +9,7 @@ import { Button } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
 
 import Identifier from '../identifier'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
 const dateVariablesFilterFn = (variable) => variable.root || variable.nodeDefType === NodeDef.nodeDefType.date
 const timeVariablesFilterFn = (variable) => variable.root || variable.nodeDefType === NodeDef.nodeDefType.time
@@ -24,7 +24,7 @@ const labelByParameterIndex = [
   'secondTimeAttribute',
 ].map((label) => `${labelPrefix}${label}`)
 
-export const CallDateTimeDiffEditor = (props) => {
+export const CallDateTimeDiffEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const identifierArguments = expressionNode?.arguments ?? []
@@ -84,5 +84,3 @@ export const CallDateTimeDiffEditor = (props) => {
     </div>
   )
 }
-
-CallDateTimeDiffEditor.propTypes = CallEditorPropTypes

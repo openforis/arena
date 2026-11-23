@@ -1,6 +1,5 @@
 import './expressionEditorPopup.scss'
 
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -16,7 +15,28 @@ import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
 
-const ExpressionEditorPopup = (props) => {
+type ExpressionEditorPopupProps = {
+  canBeCall?: boolean // True if expression can be a function call
+  canBeConstant?: boolean // True if expression can be a constant value like a number or a string
+  excludeCurrentNodeDef?: boolean
+  expr?: Record<string, any> // AST expression
+  header?: string
+  includeAnalysis?: boolean
+  isBoolean?: boolean // True if expression returns a boolean condition
+  isContextParent?: boolean // True if the context node def is the parent of the current node def
+  mode?: any
+  // NOTE: One of the two above is passed on component creation
+  nodeDefUuidContext?: string // Entity
+  nodeDefUuidCurrent?: string // Attribute
+  onChange?: (...args: any[]) => any
+  onClose?: (...args: any[]) => any
+  onGenerateWithAi?: (...args: any[]) => any // if set, shows a button to generate the expression from a description via AI
+  query?: string // String representing the expression
+  textSearchHelpVisible?: boolean // True to show how to search text values (e.g. in the Data Explorer filter)
+  types?: any[] // allowed expression types
+}
+
+const ExpressionEditorPopup = (props: ExpressionEditorPopupProps) => {
   const {
     canBeCall = false,
     canBeConstant = false,
@@ -101,8 +121,6 @@ const ExpressionEditorPopup = (props) => {
             exprDraftValid={exprDraftValid}
             isBoolean={isBoolean}
             nodeDefCurrent={nodeDefCurrent}
-            excludeCurrentNodeDef={excludeCurrentNodeDef}
-            query={query}
             queryDraft={queryDraft}
             updateDraftExpr={updateDraftExpr}
             variables={variables}
@@ -134,27 +152,6 @@ const ExpressionEditorPopup = (props) => {
       </div>
     </PanelRight>
   )
-}
-
-ExpressionEditorPopup.propTypes = {
-  canBeCall: PropTypes.bool, // True if expression can be a function call
-  canBeConstant: PropTypes.bool, // True if expression can be a constant value like a number or a string
-  excludeCurrentNodeDef: PropTypes.bool,
-  expr: PropTypes.object, // AST expression
-  header: PropTypes.node,
-  includeAnalysis: PropTypes.bool,
-  isBoolean: PropTypes.bool, // True if expression returns a boolean condition
-  isContextParent: PropTypes.bool, // True if the context node def is the parent of the current node def
-  mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
-  // NOTE: One of the two above is passed on component creation
-  nodeDefUuidContext: PropTypes.string, // Entity
-  nodeDefUuidCurrent: PropTypes.string, // Attribute
-  onChange: PropTypes.func,
-  onClose: PropTypes.func,
-  onGenerateWithAi: PropTypes.func, // if set, shows a button to generate the expression from a description via AI
-  query: PropTypes.string, // String representing the expression
-  textSearchHelpVisible: PropTypes.bool, // True to show how to search text values (e.g. in the Data Explorer filter)
-  types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
 }
 
 export default ExpressionEditorPopup
