@@ -73,7 +73,9 @@
   // header background and accent line span the whole table width, like in the data grids
   min-width: 100%;
   min-height: $formTableRowHeaderHeight;
-  background: $tableHeaderAccent bottom / 100% 2px no-repeat, $colorPrimaryContainerLow;
+  background:
+    $tableHeaderAccent bottom / 100% 2px no-repeat,
+    $colorPrimaryContainerLow;
 
   &.drag-in-progress .draggable-item * {
     pointer-events: none;

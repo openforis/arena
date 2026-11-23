@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router'
 
-export const useQuery = () => {
+export const useQuery = (): Record<string, string> => {
   const params = new URLSearchParams(useLocation().search)
-  return [...params].reduce((acc, param) => ({ ...acc, [param[0]]: param[1] }), {})
+  return Object.fromEntries(params)
 }
