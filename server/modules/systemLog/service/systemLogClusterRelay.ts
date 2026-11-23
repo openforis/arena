@@ -1,10 +1,10 @@
+import type { ClusterEvent } from '@openforis/arena-server'
+
 import { uuidv4 } from '@core/uuid'
 
 import { SystemLogMessage } from '@common/systemLog/systemLogConstants'
 
 import { LogFileStream, LogFileTailOptionsSubset, startLogFileStream } from './logFileStream'
-
-type ClusterEvent = { targetType: string; targetId: string; eventType: string; message: any }
 
 export type ClusterBusLike = {
   publish: (event: ClusterEvent) => Promise<void>
