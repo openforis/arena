@@ -239,7 +239,7 @@ export const useDataQueriesPanel = () => {
           DialogConfirmActions.showDialogConfirm({
             key: 'dataView:dataQuery.replaceQueryConfirmMessage',
             params: { name: DataQuerySummaries.getName(editedQuerySummary) },
-            onOk: async () => doQuerySummarySelection(selectedQuerySummary),
+            onOk: () => doQuerySummarySelection(selectedQuerySummary),
           })
         )
       } else {

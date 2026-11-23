@@ -72,7 +72,7 @@ export const useCustomAggregateFunctionsEditor = (props) => {
   )
 
   const onDeleteConfirm = useCallback(
-    async (fnToDelete) => {
+    (fnToDelete) => {
       const { uuid } = fnToDelete
       onSelectionChange({ [uuid]: false })
       const customAggregateFunctionsUpdated = A.dissoc(uuid)(customAggregateFunctions)

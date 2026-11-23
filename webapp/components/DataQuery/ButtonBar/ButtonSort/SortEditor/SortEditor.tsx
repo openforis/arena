@@ -2,11 +2,10 @@ import './sortEditor.scss'
 
 import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
-import { Sort, SortCriteria } from '@common/model/query'
+import { Query, Sort, SortCriteria } from '@common/model/query'
 
 import { useSortEditor } from './store'
 import SortCriteriaEditor from './SortCriteriaEditor'
-import { Query } from '@common/model/query'
 
 type SortEditorProps = {
   onChange: (...args: any[]) => any
