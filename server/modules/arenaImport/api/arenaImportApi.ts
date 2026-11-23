@@ -11,30 +11,26 @@ import * as ArenaImportService from '../service/arenaImportService'
 export const init = (app: Router) => {
   // CREATE
 
-  app.post('/survey/arena-import', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {
-    try {
-      const tempFile = await processChunkedFileForBackgroundMerge({ req })
-      if (tempFile) {
-        const user = Request.getUser(req)
-        const newSurveyParams = Request.getJsonParam(req, 'survey')
+  app.post('/survey/arena-import', AuthMiddleware.requireSurveyCreatePermission, async (req, res) => {
+    const tempFile = await processChunkedFileForBackgroundMerge({ req })
+    if (tempFile) {
+      const user = Request.getUser(req)
+      const newSurveyParams = Request.getJsonParam(req, 'survey')
 
-        const { name, options } = newSurveyParams
+      const { name, options } = newSurveyParams
 
-        const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
+      const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
 
-        const job = ArenaImportService.startArenaImportJob({
-          user,
-          ...tempFile,
-          surveyInfoTarget,
-          options,
-        })
+      const job = ArenaImportService.startArenaImportJob({
+        user,
+        ...tempFile,
+        surveyInfoTarget,
+        options,
+      })
 
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } else {
-        res.json({ chunkProcessing: true })
-      }
-    } catch (error) {
-      next(error)
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } else {
+      res.json({ chunkProcessing: true })
     }
   })
 }

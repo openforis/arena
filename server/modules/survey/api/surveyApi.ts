@@ -67,144 +67,120 @@ export const init = (app: Router) => {
     '/survey',
     AuthMiddleware.requireSurveyCreatePermission,
     AuthMiddleware.requireSurveyCloneFromViewPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const surveyReq = Request.getBody(req)
-        const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const surveyReq = Request.getBody(req)
+      const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
 
-        const validation = cloneFrom
-          ? await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
-          : await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
+      const validation = cloneFrom
+        ? await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
+        : await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
 
-        if (Validation.isValid(validation)) {
-          const surveyInfoTarget = Survey.newSurvey({
-            ownerUuid: User.getUuid(user),
-            name,
-            label,
-            languages: [lang],
-            template,
+      if (Validation.isValid(validation)) {
+        const surveyInfoTarget = Survey.newSurvey({
+          ownerUuid: User.getUuid(user),
+          name,
+          label,
+          languages: [lang],
+          template,
+        })
+
+        if (cloneFrom) {
+          const job = SurveyService.cloneSurvey({
+            surveyId: cloneFrom,
+            cycle: cloneFromCycle,
+            surveyInfoTarget,
+            user,
           })
-
-          if (cloneFrom) {
-            const job = SurveyService.cloneSurvey({
-              surveyId: cloneFrom,
-              cycle: cloneFromCycle,
-              surveyInfoTarget,
-              user,
-            })
-            res.json({ job })
-            return
-          }
-          const job = SurveyService.startCreateSurveyJob({ user, surveyInfo: surveyInfoTarget })
           res.json({ job })
-        } else {
-          res.json({ validation })
+          return
         }
-      } catch (error) {
-        next(error)
+        const job = SurveyService.startCreateSurveyJob({ user, surveyInfo: surveyInfoTarget })
+        res.json({ job })
+      } else {
+        res.json({ validation })
       }
     }
   )
 
   // ==== READ
-  app.get('/surveys', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const {
-        draft = true,
-        template = false,
-        offset,
-        limit,
-        lang,
-        search,
-        sortBy,
-        sortOrder,
-        includeCounts = false,
-        onlyOwn = false,
-        withChains = false,
-      } = Request.getParams(req)
+  app.get('/surveys', AuthMiddleware.requireLoggedInUser, async (req, res) => {
+    const user = Request.getUser(req)
+    const {
+      draft = true,
+      template = false,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeCounts = false,
+      onlyOwn = false,
+      withChains = false,
+    } = Request.getParams(req)
 
-      const list = await SurveyService.fetchUserSurveysInfo({
-        user,
-        draft,
-        template,
-        offset,
-        limit,
-        lang,
-        search,
-        sortBy,
-        sortOrder,
-        includeCounts,
-        onlyOwn,
-        withChains,
-      })
+    const list = await SurveyService.fetchUserSurveysInfo({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeCounts,
+      onlyOwn,
+      withChains,
+    })
 
-      res.json({ list })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ list })
   })
 
-  app.get('/surveys/count', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { draft = true, template = false, search = null, lang = null, onlyOwn = false } = Request.getParams(req)
+  app.get('/surveys/count', AuthMiddleware.requireLoggedInUser, async (req, res) => {
+    const user = Request.getUser(req)
+    const { draft = true, template = false, search = null, lang = null, onlyOwn = false } = Request.getParams(req)
 
-      const count = await SurveyService.countUserSurveys({ user, draft, template, search, lang, onlyOwn })
+    const count = await SurveyService.countUserSurveys({ user, draft, template, search, lang, onlyOwn })
 
-      res.json({ count })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ count })
   })
 
   // surveys list export
-  app.post('/surveys/export', AuthMiddleware.requireCanExportSurveysList, (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { draft = true, template = false } = Request.getParams(req)
-      const job = SurveyService.startSurveysListExport({ user, draft, template })
-      res.json({ job })
-    } catch (error) {
-      next(error)
-    }
+  app.post('/surveys/export', AuthMiddleware.requireCanExportSurveysList, (req, res) => {
+    const user = Request.getUser(req)
+    const { draft = true, template = false } = Request.getParams(req)
+    const job = SurveyService.startSurveysListExport({ user, draft, template })
+    res.json({ job })
   })
 
   // surveys list export (download generated zip file)
-  app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, (req, res, next) => {
-    try {
-      const { tempFileName, fileFormat } = Request.getParams(req)
-      FileUtils.checkIsValidTempFileName(tempFileName)
-      const exportedFilePath = FileUtils.tempFilePath(tempFileName)
-      const date = DateUtils.nowFormatDefault()
-      const name = `arena_surveys_${date}.xlsx`
+  app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, (req, res) => {
+    const { tempFileName, fileFormat } = Request.getParams(req)
+    FileUtils.checkIsValidTempFileName(tempFileName)
+    const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+    const date = DateUtils.nowFormatDefault()
+    const name = `arena_surveys_${date}.xlsx`
 
-      Response.sendFile({
-        res,
-        path: exportedFilePath,
-        name,
-        fileFormat,
-      })
-    } catch (error) {
-      next(error)
-    }
+    Response.sendFile({
+      res,
+      path: exportedFilePath,
+      name,
+      fileFormat,
+    })
   })
 
-  app.get('/surveyTemplates', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
+  app.get('/surveyTemplates', async (req, res) => {
+    const user = Request.getUser(req)
 
-      const list = await SurveyService.fetchUserSurveysInfo({
-        user,
-        draft: false,
-        template: true,
-      })
+    const list = await SurveyService.fetchUserSurveysInfo({
+      user,
+      draft: false,
+      template: true,
+    })
 
-      res.json({ list })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ list })
   })
 
   const _sendSurvey = async ({ survey, user, res }) => {
@@ -215,146 +191,118 @@ export const init = (app: Router) => {
     res.json({ survey: surveyUpdated })
   }
 
-  app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, draft, validate } = Request.getParams(req)
-      const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+  app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId, draft, validate } = Request.getParams(req)
+    const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
-      const [survey] = await Promise.all([
-        SurveyService.fetchSurveyById({ surveyId, draft, validate }),
-        UserService.updateUserPrefs(user),
-      ])
+    const [survey] = await Promise.all([
+      SurveyService.fetchSurveyById({ surveyId, draft, validate }),
+      UserService.updateUserPrefs(user),
+    ])
 
-      await _sendSurvey({ survey, user, res })
-    } catch (error) {
-      next(error)
-    }
+    await _sendSurvey({ survey, user, res })
   })
 
-  app.get('/survey/:surveyId/full', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const {
+  app.get('/survey/:surveyId/full', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const {
+      surveyId,
+      cycle,
+      draft,
+      advanced,
+      includeAnalysis,
+      validate,
+      updateUserPrefs = false,
+    } = Request.getParams(req)
+    const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+
+    const promises = [
+      SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
         surveyId,
         cycle,
         draft,
         advanced,
         includeAnalysis,
         validate,
-        updateUserPrefs = false,
-      } = Request.getParams(req)
-      const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
-
-      const promises = [
-        SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-          surveyId,
-          cycle,
-          draft,
-          advanced,
-          includeAnalysis,
-          validate,
-        }),
-      ]
-      if (updateUserPrefs) {
-        promises.push(UserService.updateUserPrefs(user))
-      }
-      const [survey] = await Promise.all(promises)
-      await _sendSurvey({ survey, user, res })
-    } catch (error) {
-      next(error)
+      }),
+    ]
+    if (updateUserPrefs) {
+      promises.push(UserService.updateUserPrefs(user))
     }
+    const [survey] = await Promise.all(promises)
+    await _sendSurvey({ survey, user, res })
   })
 
-  app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyExportPermission, async (req, res, next) => {
-    try {
-      const {
-        surveyId,
-        includeData = true,
-        includeResultAttributes = true,
-        includeActivityLog = true,
-      } = Request.getParams(req)
+  app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyExportPermission, async (req, res) => {
+    const {
+      surveyId,
+      includeData = true,
+      includeResultAttributes = true,
+      includeActivityLog = true,
+    } = Request.getParams(req)
 
-      const user = Request.getUser(req)
+    const user = Request.getUser(req)
 
-      const { job } = await SurveyService.exportSurvey({
-        surveyId,
-        user,
-        includeData,
-        includeResultAttributes,
-        includeActivityLog,
-      })
-      res.json({ job })
-    } catch (error) {
-      next(error)
-    }
+    const { job } = await SurveyService.exportSurvey({
+      surveyId,
+      user,
+      includeData,
+      includeResultAttributes,
+      includeActivityLog,
+    })
+    res.json({ job })
   })
 
   // download generated survey export file
-  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, (req, res, next) => {
-    try {
-      const downloadFileName = Request.getDownloadFileName(req)
-      const {
-        surveyName,
-        includeData = true,
-        includeResultAttributes = true,
-        includeActivityLog = true,
-      } = Request.getParams(req)
+  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, (req, res) => {
+    const downloadFileName = Request.getDownloadFileName(req)
+    const {
+      surveyName,
+      includeData = true,
+      includeResultAttributes = true,
+      includeActivityLog = true,
+    } = Request.getParams(req)
 
-      const path = FileUtils.join(ProcessUtils.ENV.tempFolder, downloadFileName)
+    const path = FileUtils.join(ProcessUtils.ENV.tempFolder, downloadFileName)
 
-      const outputFileNameParts = [includeData ? 'arena_backup' : 'arena_survey']
-      if (includeData) {
-        if (!includeActivityLog) {
-          outputFileNameParts.push('no_log')
-        }
-        if (!includeResultAttributes) {
-          outputFileNameParts.push('no_result_attributes')
-        }
+    const outputFileNameParts = [includeData ? 'arena_backup' : 'arena_survey']
+    if (includeData) {
+      if (!includeActivityLog) {
+        outputFileNameParts.push('no_log')
       }
-      const date = DateUtils.nowFormatDefault()
-      outputFileNameParts.push(surveyName, date)
-      const outputFileName = `${outputFileNameParts.join('_')}.zip`
-
-      Response.sendFile({ res, path, name: outputFileName })
-    } catch (error) {
-      next(error)
+      if (!includeResultAttributes) {
+        outputFileNameParts.push('no_result_attributes')
+      }
     }
+    const date = DateUtils.nowFormatDefault()
+    outputFileNameParts.push(surveyName, date)
+    const outputFileName = `${outputFileNameParts.join('_')}.zip`
+
+    Response.sendFile({ res, path, name: outputFileName })
   })
 
-  app.get('/survey/:surveyId/export/docx', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, draft, cycle, lang } = Request.getParams(req)
+  app.get('/survey/:surveyId/export/docx', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId, draft, cycle, lang } = Request.getParams(req)
 
-      await SurveyService.exportSurveyDocx({ user, surveyId, draft, cycle, lang, outputStream: res })
-    } catch (error) {
-      next(error)
-    }
+    await SurveyService.exportSurveyDocx({ user, surveyId, draft, cycle, lang, outputStream: res })
   })
 
-  app.get('/survey/:surveyId/export/pdf', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, draft, cycle, lang } = Request.getParams(req)
+  app.get('/survey/:surveyId/export/pdf', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId, draft, cycle, lang } = Request.getParams(req)
 
-      await SurveyService.exportSurveyPdf({ user, surveyId, draft, cycle, lang, outputStream: res })
-    } catch (error) {
-      next(error)
-    }
+    await SurveyService.exportSurveyPdf({ user, surveyId, draft, cycle, lang, outputStream: res })
   })
 
   // schema summary export (used by R chain — direct synchronous download without AI descriptions)
-  app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+  app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
-      Response.setContentTypeFile({ res, fileName, fileFormat })
+    const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+    const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
+    Response.setContentTypeFile({ res, fileName, fileFormat })
 
-      await SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
-    } catch (error) {
-      next(error)
-    }
+    await SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
   })
 
   // schema summary: the node defs that need an AI description (described in the browser, see
@@ -401,30 +349,22 @@ export const init = (app: Router) => {
   app.get(
     '/survey/:surveyId/schema-summary/export/download',
     AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, fileFormat = FileFormats.xlsx, tempFileName } = Request.getParams(req)
-        FileUtils.checkIsValidTempFileName(tempFileName)
-        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-        const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
-        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
-        Response.sendFile({ res, path: exportedFilePath, name: fileName, fileFormat })
-      } catch (error) {
-        next(error)
-      }
+    async (req, res) => {
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx, tempFileName } = Request.getParams(req)
+      FileUtils.checkIsValidTempFileName(tempFileName)
+      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
+      const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+      Response.sendFile({ res, path: exportedFilePath, name: fileName, fileFormat })
     }
   )
 
-  app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, fileFormat } = Request.getParams(req)
-      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels', fileFormat })
-      Response.setContentTypeFile({ res, fileName, fileFormat })
-      await SurveyService.exportLabels({ surveyId, outputStream: res, fileFormat })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId, fileFormat } = Request.getParams(req)
+    const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+    const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels', fileFormat })
+    Response.setContentTypeFile({ res, fileName, fileFormat })
+    await SurveyService.exportLabels({ surveyId, outputStream: res, fileFormat })
   })
 
   app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
@@ -443,43 +383,35 @@ export const init = (app: Router) => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const props = Request.getBody(req)
+  app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const props = Request.getBody(req)
 
-      const { surveyId } = Request.getParams(req)
+    const { surveyId } = Request.getParams(req)
 
-      const survey = await SurveyService.updateSurveyProps(user, surveyId, props)
+    const survey = await SurveyService.updateSurveyProps(user, surveyId, props)
 
-      res.json(survey)
-    } catch (error) {
-      next(error)
-    }
+    res.json(survey)
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const {
-        surveyId,
-        cleanupRecords = false,
-        updateRecordValues = false,
-        skipDataUpdate = false,
-      } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const {
+      surveyId,
+      cleanupRecords = false,
+      updateRecordValues = false,
+      skipDataUpdate = false,
+    } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-      const { job, recordValuesUpdateWarning } = await SurveyService.startPublishJob({
-        user,
-        surveyId,
-        cleanupRecords,
-        updateRecordValues,
-        skipDataUpdate,
-      })
+    const { job, recordValuesUpdateWarning } = await SurveyService.startPublishJob({
+      user,
+      surveyId,
+      cleanupRecords,
+      updateRecordValues,
+      skipDataUpdate,
+    })
 
-      res.json(recordValuesUpdateWarning ? { recordValuesUpdateWarning } : { job: JobUtils.jobToJSON(job) })
-    } catch (error) {
-      next(error)
-    }
+    res.json(recordValuesUpdateWarning ? { recordValuesUpdateWarning } : { job: JobUtils.jobToJSON(job) })
   })
 
   app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
@@ -500,68 +432,48 @@ export const init = (app: Router) => {
     res.json({ job: JobUtils.jobToJSON(job) })
   })
 
-  app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const filePath = Request.getFilePath(req)
-      const { surveyId, fileFormat } = Request.getParams(req)
+  app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const user = Request.getUser(req)
+    const filePath = Request.getFilePath(req)
+    const { surveyId, fileFormat } = Request.getParams(req)
 
-      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath, fileFormat })
+    const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath, fileFormat })
 
-      res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ job: JobUtils.jobToJSON(job) })
   })
 
-  app.put('/survey/:surveyId/config', AuthMiddleware.requireSurveyConfigEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { key, value } = Request.getBody(req)
-      const { surveyId } = Request.getParams(req)
-      const survey = await SurveyService.updateSurveyConfigurationProp({ surveyId, key, value })
-      await _sendSurvey({ survey, user, res })
-    } catch (error) {
-      next(error)
-    }
+  app.put('/survey/:surveyId/config', AuthMiddleware.requireSurveyConfigEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { key, value } = Request.getBody(req)
+    const { surveyId } = Request.getParams(req)
+    const survey = await SurveyService.updateSurveyConfigurationProp({ surveyId, key, value })
+    await _sendSurvey({ survey, user, res })
   })
 
-  app.put('/survey/:surveyId/owner', AuthMiddleware.requireSurveyOwnerEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, ownerUuid } = Request.getParams(req)
-      await SurveyService.updateSurveyOwner({ user, surveyId, ownerUuid })
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+  app.put('/survey/:surveyId/owner', AuthMiddleware.requireSurveyOwnerEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId, ownerUuid } = Request.getParams(req)
+    await SurveyService.updateSurveyOwner({ user, surveyId, ownerUuid })
+    Response.sendOk(res)
   })
 
-  app.post('/survey/:surveyId/file', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const filePath = Request.getFilePath(req)
-      const { surveyId } = Request.getParams(req)
-      const surveyFile = Request.getJsonParam(req, 'surveyFile')
+  app.post('/survey/:surveyId/file', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const filePath = Request.getFilePath(req)
+    const { surveyId } = Request.getParams(req)
+    const surveyFile = Request.getJsonParam(req, 'surveyFile')
 
-      await SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })
+    await SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })
 
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+    Response.sendOk(res)
   })
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
+  app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const { surveyId } = Request.getParams(req)
 
-      await SurveyService.deleteSurvey(surveyId)
+    await SurveyService.deleteSurvey(surveyId)
 
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+    Response.sendOk(res)
   })
 }

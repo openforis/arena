@@ -26,7 +26,7 @@ import {
 
 import { getContextUser } from '../config/context'
 
-import { createFakeResponse } from '../../unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '../../unit/utils/fakeExpress'
 
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
@@ -74,7 +74,7 @@ const callRoute = async ({
   const route = collectRoutes(init).find((r) => r.method === method && r.path === path)
   const res = createFakeResponse()
   const next = jest.fn()
-  await route!.handlers.at(-1)({ params: { surveyId: '1' }, query: { cycle: '0' }, body, user }, res, next)
+  await callHandler(route!.handlers.at(-1), { params: { surveyId: '1' }, query: { cycle: '0' }, body, user }, res, next)
   return { res, next }
 }
 
@@ -429,7 +429,12 @@ describe('Routes do not send the text of an unexpected error (059)', () => {
     try {
       const route = collectRoutes(init).find((r) => r.method === method && r.path === path)
       const res = createFakeResponse()
-      await route!.handlers.at(-1)({ params: { surveyId }, query: { cycle: '0' }, body, user: aiUser }, res, jest.fn())
+      await callHandler(
+        route!.handlers.at(-1),
+        { params: { surveyId }, query: { cycle: '0' }, body, user: aiUser },
+        res,
+        jest.fn()
+      )
       return res
     } finally {
       aiOn.restore()

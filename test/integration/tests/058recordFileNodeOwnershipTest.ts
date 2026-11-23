@@ -21,7 +21,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 
 import { getContextUser } from '@test/integration/config/context'
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 import * as SB from '@test/utils/surveyBuilder'
 import * as RB from '@test/utils/recordBuilder'
 import * as RecordUtils from '@test/utils/recordUtils'
@@ -46,7 +46,7 @@ const runChain = async (route: Route, req: any, res: any): Promise<{ error: any;
   for (const handler of route.handlers) {
     let calledNext = false
     // the last handler (the route itself) answers through res or next(error)
-    await handler(req, res, (nextError?: any) => {
+    await callHandler(handler, req, res, (nextError?: any) => {
       calledNext = true
       error = nextError
     })

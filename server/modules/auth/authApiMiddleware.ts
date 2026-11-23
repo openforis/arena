@@ -86,19 +86,15 @@ export const requireSurveyUserExtraPropsEditPermission = async (
   res: ExpressResponse,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const { surveyId, userUuid } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
-    const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-    if (userToUpdate && Authorizer.canEditUserAuthGroupExtraProps(user, surveyInfo, userToUpdate)) {
-      next()
-      return
-    }
-    return sendForbiddenError({ req, res })
-  } catch (error) {
-    next(error)
+  const { surveyId, userUuid } = Request.getParams(req)
+  const user = Request.getUser(req)
+  const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+  if (userToUpdate && Authorizer.canEditUserAuthGroupExtraProps(user, surveyInfo, userToUpdate)) {
+    next()
+    return
   }
+  return sendForbiddenError({ req, res })
 }
 
 /**
@@ -112,18 +108,14 @@ export const createRequireSurveyAiPolicyEditPermission =
     fetchSurveyInfo = (surveyId: number) => SurveyManager.fetchSurveyById({ surveyId }),
   }: { fetchSurveyInfo?: (surveyId: number) => Promise<ArenaSurvey> } = {}) =>
   async (req: ExpressRequest, res: ExpressResponse, next: NextFunction): Promise<void> => {
-    try {
-      const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const surveyInfo = await fetchSurveyInfo(surveyId)
-      if (canEditSurveyAiPolicy(user, surveyInfo)) {
-        next()
-        return
-      }
-      sendForbiddenError({ req, res })
-    } catch (error) {
-      next(error)
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const surveyInfo = await fetchSurveyInfo(surveyId)
+    if (canEditSurveyAiPolicy(user, surveyInfo)) {
+      next()
+      return
     }
+    sendForbiddenError({ req, res })
   }
 
 export const requireSurveyAiPolicyEditPermission = createRequireSurveyAiPolicyEditPermission()
@@ -133,23 +125,19 @@ export const requireSurveyCloneFromViewPermission = async (
   res: ExpressResponse,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const { cloneFrom } = Request.getBody(req)
-    if (!cloneFrom) {
-      next()
-      return
-    }
-    const user = Request.getUser(req)
-    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
-    // published templates can be cloned by any user allowed to create surveys
-    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
-      next()
-      return
-    }
-    sendForbiddenError({ req, res })
-  } catch (error) {
-    next(error)
+  const { cloneFrom } = Request.getBody(req)
+  if (!cloneFrom) {
+    next()
+    return
   }
+  const user = Request.getUser(req)
+  const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
+  // published templates can be cloned by any user allowed to create surveys
+  if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+    next()
+    return
+  }
+  sendForbiddenError({ req, res })
 }
 
 // survey export: what the export includes depends also on the user role (see SurveyService.createSurveyExportJob)
@@ -158,18 +146,14 @@ export const requireSurveyExportPermission = async (
   res: ExpressResponse,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const { surveyId } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
-    if (Authorizer.canExportSurvey(user, surveyInfo)) {
-      next()
-      return
-    }
-    sendForbiddenError({ req, res })
-  } catch (error) {
-    next(error)
+  const { surveyId } = Request.getParams(req)
+  const user = Request.getUser(req)
+  const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+  if (Authorizer.canExportSurvey(user, surveyInfo)) {
+    next()
+    return
   }
+  sendForbiddenError({ req, res })
 }
 
 // survey compare: the survey used as source must be visible to the user (published templates included)
@@ -178,22 +162,18 @@ export const requireSurveyCompareSourceViewPermission = async (
   res: ExpressResponse,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const { sourceSurveyId } = Request.getParams(req)
-    if (!sourceSurveyId) {
-      next()
-      return
-    }
-    const user = Request.getUser(req)
-    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: Number(sourceSurveyId) })
-    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
-      next()
-      return
-    }
-    sendForbiddenError({ req, res })
-  } catch (error) {
-    next(error)
+  const { sourceSurveyId } = Request.getParams(req)
+  if (!sourceSurveyId) {
+    next()
+    return
   }
+  const user = Request.getUser(req)
+  const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: Number(sourceSurveyId) })
+  if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+    next()
+    return
+  }
+  sendForbiddenError({ req, res })
 }
 
 // records merge: the user must be able to edit both the source and the target record
@@ -202,23 +182,19 @@ export const requireRecordsMergePermission = async (
   res: ExpressResponse,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const { surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const recordService = ServiceRegistry.getInstance().getService(ServiceType.record)
-    const records = await recordService.getManyByUuids({ surveyId, uuids: [sourceRecordUuid, targetRecordUuid] })
-    if (
-      sourceRecordUuid !== targetRecordUuid &&
-      records.length === 2 &&
-      records.every((record) => Authorizer.canEditRecord(user, record))
-    ) {
-      next()
-      return
-    }
-    sendForbiddenError({ req, res })
-  } catch (error) {
-    next(error)
+  const { surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+  const user = Request.getUser(req)
+  const recordService = ServiceRegistry.getInstance().getService(ServiceType.record)
+  const records = await recordService.getManyByUuids({ surveyId, uuids: [sourceRecordUuid, targetRecordUuid] })
+  if (
+    sourceRecordUuid !== targetRecordUuid &&
+    records.length === 2 &&
+    records.every((record) => Authorizer.canEditRecord(user, record))
+  ) {
+    next()
+    return
   }
+  sendForbiddenError({ req, res })
 }
 
 // Survey

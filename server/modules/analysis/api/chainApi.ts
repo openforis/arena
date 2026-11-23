@@ -10,17 +10,13 @@ import * as AnalysisService from '../service'
 export const init = (app: Router) => {
   // ====== CREATE - Chain
 
-  app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-      const chain = await AnalysisService.create({ user, surveyId })
+    const chain = await AnalysisService.create({ user, surveyId })
 
-      res.json(chain)
-    } catch (error) {
-      next(error)
-    }
+    res.json(chain)
   })
 
   // ====== CLONE - Chain from another survey
@@ -28,241 +24,173 @@ export const init = (app: Router) => {
   app.post(
     '/survey/:surveyId/chain/clone-from-survey',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const { skipMissingEntityAttributes = false } = Request.getBody(req)
-        const user = Request.getUser(req)
+    async (req, res) => {
+      const { surveyId } = Request.getParams(req)
+      const { skipMissingEntityAttributes = false } = Request.getBody(req)
+      const user = Request.getUser(req)
 
-        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
-        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
+      const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+      const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
 
-        const chain = await AnalysisService.cloneChainFromSurvey({
-          user,
-          surveyId,
-          sourceSurveyId,
-          sourceChainUuid,
-          skipMissingEntityAttributes,
-        })
+      const chain = await AnalysisService.cloneChainFromSurvey({
+        user,
+        surveyId,
+        sourceSurveyId,
+        sourceChainUuid,
+        skipMissingEntityAttributes,
+      })
 
-        res.json(chain)
-      } catch (error) {
-        next(error)
-      }
+      res.json(chain)
     }
   )
 
   app.get(
     '/survey/:surveyId/chain/clone-from-survey/chains',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
 
-        const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
+      const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
 
-        res.json({ list })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ list })
     }
   )
 
   app.get(
     '/survey/:surveyId/chain/clone-from-survey/entities',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
-        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+      const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
 
-        const entityNames = await AnalysisService.fetchChainSourceEntityNames({
-          user,
-          sourceSurveyId,
-          sourceChainUuid,
-        })
+      const entityNames = await AnalysisService.fetchChainSourceEntityNames({
+        user,
+        sourceSurveyId,
+        sourceChainUuid,
+      })
 
-        res.json({ entityNames })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ entityNames })
     }
   )
 
   // ====== READ - Chains
 
-  app.get(
-    '/survey/:surveyId/processing-chains',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, offset, limit } = Request.getParams(req)
+  app.get('/survey/:surveyId/processing-chains', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId, offset, limit } = Request.getParams(req)
 
-        const list = await AnalysisService.fetchChains({ surveyId, offset, limit })
+    const list = await AnalysisService.fetchChains({ surveyId, offset, limit })
 
-        res.json({ list })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    res.json({ list })
+  })
 
   app.get(
     '/survey/:surveyId/processing-chains/count',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId } = Request.getParams(req)
 
-        const count = await AnalysisService.countChains({ surveyId })
+      const count = await AnalysisService.countChains({ surveyId })
 
-        res.json({ count })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ count })
     }
   )
 
   // ====== READ - Chain
 
-  app.get(
-    '/survey/:surveyId/chain/:chainUuid',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+  app.get('/survey/:surveyId/chain/:chainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId, chainUuid } = Request.getParams(req)
 
-        const chain = await AnalysisService.fetchChain({ surveyId, chainUuid })
+    const chain = await AnalysisService.fetchChain({ surveyId, chainUuid })
 
-        res.json(chain)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    res.json(chain)
+  })
 
   app.get(
     '/survey/:surveyId/chain/:chainUuid/summary',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid, cycle, lang } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId, chainUuid, cycle, lang } = Request.getParams(req)
 
-        const chainSummary = await AnalysisService.generateChainSummary({ surveyId, chainUuid, cycle, lang })
+      const chainSummary = await AnalysisService.generateChainSummary({ surveyId, chainUuid, cycle, lang })
 
-        Response.setContentTypeFile({ res, fileName: 'chain_summary.json' })
-        res.json(chainSummary)
-      } catch (error) {
-        next(error)
-      }
+      Response.setContentTypeFile({ res, fileName: 'chain_summary.json' })
+      res.json(chainSummary)
     }
   )
 
   // ====== UPDATE - Chain
 
-  app.put('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
+  app.put('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId } = Request.getParams(req)
 
-      const user = Request.getUser(req)
+    const user = Request.getUser(req)
 
-      const { chain } = Request.getBody(req)
+    const { chain } = Request.getBody(req)
 
-      const chainUpdated = await AnalysisService.update({ user, surveyId, chain })
+    const chainUpdated = await AnalysisService.update({ user, surveyId, chain })
 
-      res.json(chainUpdated)
-    } catch (error) {
-      next(error)
-    }
+    res.json(chainUpdated)
   })
 
-  app.put(
-    '/survey/:surveyId/chain/validate',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+  app.put('/survey/:surveyId/chain/validate', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId, chainUuid } = Request.getParams(req)
 
-        const chainUpdated = await AnalysisService.validate({ surveyId, chainUuid })
+    const chainUpdated = await AnalysisService.validate({ surveyId, chainUuid })
 
-        res.json(chainUpdated)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    res.json(chainUpdated)
+  })
 
   // ====== DELETE - Chain
 
-  app.get('/survey/:surveyId/chains-clean', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.get('/survey/:surveyId/chains-clean', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-      await AnalysisService.cleanChains({ user, surveyId })
+    await AnalysisService.cleanChains({ user, surveyId })
 
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+    Response.sendOk(res)
   })
 
-  app.delete(
-    '/survey/:surveyId/chain/:chainUuid',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid } = Request.getParams(req)
-        const user = Request.getUser(req)
+  app.delete('/survey/:surveyId/chain/:chainUuid', AuthMiddleware.requireRecordAnalysisPermission, async (req, res) => {
+    const { surveyId, chainUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-        await AnalysisService.deleteChain({ user, surveyId, chainUuid })
+    await AnalysisService.deleteChain({ user, surveyId, chainUuid })
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    Response.sendOk(res)
+  })
 
   // === GENERATE R SCRIPTS
   app.post(
     '/survey/:surveyId/chain/:chainUuid/script',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
-        const serverUrl = Request.getServerUrl(req)
-        const token = AnalysisService.generateRStudioToken({ chainUuid })
-        await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl, token })
-        res.json({ token, serverUrl })
-      } catch (error) {
-        next(error)
-      }
+    async (req, res) => {
+      const { surveyId, surveyCycleKey, chainUuid } = Request.getParams(req)
+      const serverUrl = Request.getServerUrl(req)
+      const token = AnalysisService.generateRStudioToken({ chainUuid })
+      await AnalysisService.generateScript({ surveyId, cycle: surveyCycleKey, chainUuid, serverUrl, token })
+      res.json({ token, serverUrl })
     }
   )
 
   // === Download R SCRIPTS
-  app.get('/public/survey/:surveyId/chain/:chainUuid/script', async (req, res, next) => {
-    try {
-      const { surveyId, surveyCycleKey, chainUuid, token } = Request.getParams(req)
+  app.get('/public/survey/:surveyId/chain/:chainUuid/script', async (req, res) => {
+    const { surveyId, surveyCycleKey, chainUuid, token } = Request.getParams(req)
 
-      AnalysisService.checkRStudioToken({ token, chainUuid })
+    AnalysisService.checkRStudioToken({ token, chainUuid })
 
-      const serverUrl = Request.getServerUrl(req)
-      const rChain = await AnalysisService.generateScript({
-        token,
-        surveyId,
-        cycle: surveyCycleKey,
-        chainUuid,
-        serverUrl,
-      })
-      const name = `${chainUuid}.zip`
-      Response.sendDirAsZip({ res, dir: rChain._dir, name })
-    } catch (error) {
-      next(error)
-    }
+    const serverUrl = Request.getServerUrl(req)
+    const rChain = await AnalysisService.generateScript({
+      token,
+      surveyId,
+      cycle: surveyCycleKey,
+      chainUuid,
+      serverUrl,
+    })
+    const name = `${chainUuid}.zip`
+    Response.sendDirAsZip({ res, dir: rChain._dir, name })
   })
 
   // === MAU file
@@ -270,85 +198,69 @@ export const init = (app: Router) => {
   app.get(
     '/survey/:surveyId/chain/:chainUuid/mau',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        const file = await AnalysisService.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
+      const file = await AnalysisService.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
 
-        res.json({ file })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ file })
     }
   )
 
   app.post(
     '/survey/:surveyId/chain/:chainUuid/mau',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid, cycle } = Request.getParams(req)
-        const upload = Request.getFile(req)
-        const filePath = Request.getFilePath(req)
-        if (!upload || !filePath) {
-          res.sendStatus(400)
-          return
-        }
-        const { name: fileName, size: fileSize } = upload
-
-        const file = await AnalysisService.uploadChainMauFile({
-          surveyId,
-          chainUuid,
-          cycle,
-          filePath,
-          fileName,
-          fileSize,
-        })
-
-        res.json({ file })
-      } catch (error) {
-        next(error)
+    async (req, res) => {
+      const { surveyId, chainUuid, cycle } = Request.getParams(req)
+      const upload = Request.getFile(req)
+      const filePath = Request.getFilePath(req)
+      if (!upload || !filePath) {
+        res.sendStatus(400)
+        return
       }
+      const { name: fileName, size: fileSize } = upload
+
+      const file = await AnalysisService.uploadChainMauFile({
+        surveyId,
+        chainUuid,
+        cycle,
+        filePath,
+        fileName,
+        fileSize,
+      })
+
+      res.json({ file })
     }
   )
 
   app.get(
     '/survey/:surveyId/chain/:chainUuid/mau/content',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        const result = await AnalysisService.fetchChainMauFileContent({ surveyId, chainUuid, cycle })
-        if (!result) {
-          res.sendStatus(404)
-          return
-        }
-        const { summary, contentStream } = result
-        const fileName = SurveyFile.getName(summary)
-        const fileSize = SurveyFile.getSize(summary)
-        Response.setContentTypeFile({ res, fileName, fileSize, contentType: Response.contentTypes.zip })
-        contentStream.pipe(res)
-      } catch (error) {
-        next(error)
+      const result = await AnalysisService.fetchChainMauFileContent({ surveyId, chainUuid, cycle })
+      if (!result) {
+        res.sendStatus(404)
+        return
       }
+      const { summary, contentStream } = result
+      const fileName = SurveyFile.getName(summary)
+      const fileSize = SurveyFile.getSize(summary)
+      Response.setContentTypeFile({ res, fileName, fileSize, contentType: Response.contentTypes.zip })
+      contentStream.pipe(res)
     }
   )
 
   app.delete(
     '/survey/:surveyId/chain/:chainUuid/mau',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        await AnalysisService.deleteChainMauFile({ surveyId, chainUuid, cycle })
+      await AnalysisService.deleteChainMauFile({ surveyId, chainUuid, cycle })
 
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
+      Response.sendOk(res)
     }
   )
 }

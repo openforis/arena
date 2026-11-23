@@ -66,12 +66,8 @@ const streamLogFiles = async ({ res, maxLines }): Promise<void> => {
 }
 
 export const init = (app) => {
-  app.get('/admin/logs/stream', ApiAuthMiddleware.requireAdminPermission, async (req, res, next) => {
-    try {
-      const { maxLines } = Request.getParams(req)
-      await streamLogFiles({ res, maxLines: parseMaxLines(maxLines) })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/admin/logs/stream', ApiAuthMiddleware.requireAdminPermission, async (req, res) => {
+    const { maxLines } = Request.getParams(req)
+    await streamLogFiles({ res, maxLines: parseMaxLines(maxLines) })
   })
 }
