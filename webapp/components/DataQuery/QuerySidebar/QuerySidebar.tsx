@@ -8,6 +8,7 @@ import { useIsAppSaving } from '@webapp/store/app'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import QueryNodeDefsSelector from '../QueryNodeDefsSelector'
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 const { modes } = Query
 
@@ -24,7 +25,7 @@ const uiModeByQueryMode = {
 }
 
 type Props = {
-  nodeDefLabelType: string
+  nodeDefLabelType: NodeDefLabelType
 }
 
 /**

@@ -1,13 +1,12 @@
-import { useDispatch } from 'react-redux'
-
 import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
+import { useAppDispatch } from '@webapp/store'
 
 type Props = {
-  nodeDefLabelType: string
+  nodeDefLabelType: NodeDef.NodeDefLabelType
   onNodeDefLabelTypeChange: () => void
 }
 
@@ -19,7 +18,7 @@ type Props = {
 export const ButtonViewOptions = (props: Props) => {
   const { nodeDefLabelType, onNodeDefLabelTypeChange } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const query = DataExplorerSelectors.useQuery()
   const codesVisible = DataExplorerSelectors.useCodesVisible()

@@ -3,7 +3,6 @@ import './DataMatrixExportForm.scss'
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { getDataMatrixAttributeDefs } from '@common/dataExport/dataMatrixExport'
 import { Query } from '@common/model/query'
@@ -24,6 +23,7 @@ import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { DataMatrixExportDownloadButton } from './DataMatrixExportDownloadButton'
+import { useAppDispatch } from '@webapp/store'
 
 const fileFormats = [FileFormats.xlsx, FileFormats.csv]
 const previewRecordNumbers = [1, 2]
@@ -126,7 +126,7 @@ type Props = {
 export const DataMatrixExportForm = (props: Props) => {
   const { onClose } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
