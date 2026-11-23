@@ -55,7 +55,8 @@ const NodeDefTableCellHeader = (props) => {
         <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
       </div>
 
-      {fields.length > 1 && (
+      {/* multiple attributes show a summary of their values, not their fields */}
+      {fields.length > 1 && NodeDef.isSingle(nodeDef) && (
         <div className="subfields-labels-wrapper">
           {fields.map((field) => (
             <div

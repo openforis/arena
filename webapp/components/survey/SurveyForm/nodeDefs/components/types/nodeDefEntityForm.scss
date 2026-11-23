@@ -68,6 +68,23 @@
     .grid-item {
       display: grid;
       padding: 0.2rem;
+
+      // the content fits the item height (e.g. the values of a multiple attribute scroll inside it)
+      &.fixed-height {
+        grid-template-rows: minmax(0, 1fr);
+
+        .survey-form__node-def-page-item {
+          grid-template-rows: minmax(0, 1fr);
+        }
+
+        .survey-form__node-def-form-item {
+          grid-template-rows: 30px minmax(0, 1fr);
+        }
+
+        .survey-form__node-def-form-item-content {
+          height: 100%;
+        }
+      }
     }
   }
 }

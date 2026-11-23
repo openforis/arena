@@ -157,14 +157,18 @@ const NodeDefEntityFormGrid = (props) => {
       const gridColumnStart = x + 1
       const gridColumnEnd = gridColumnStart + w
 
-      acc[i] = { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, minHeight }
+      const childDef = Survey.getNodeDefByUuid(i)(survey)
+      // a multiple taxon attribute keeps the height set in the designer: its values scroll inside it
+      const height = childDef && NodeDef.isTaxon(childDef) && NodeDef.isMultiple(childDef) ? minHeight : undefined
+
+      acc[i] = { gridColumnStart, gridColumnEnd, gridRowStart, gridRowEnd, minHeight, height }
 
       currentRowMaxRowEnd = newRow ? gridRowEnd : Math.max(currentRowMaxRowEnd, gridRowEnd)
       lastColumnEnd = gridColumnEnd
       lastRowOffset = rowOffset
       return acc
     }, {})
-  }, [entry, rdgLayout])
+  }, [entry, rdgLayout, survey])
 
   const visibleNodeDefsComponents = useMemo(
     () =>
@@ -172,7 +176,7 @@ const NodeDefEntityFormGrid = (props) => {
         const nodeDefUuid = NodeDef.getUuid(childDef)
         const style = styleByNodeDefUuid[nodeDefUuid]
         return (
-          <div key={nodeDefUuid} className="grid-item" style={style}>
+          <div key={nodeDefUuid} className={classNames('grid-item', { 'fixed-height': !!style?.height })} style={style}>
             <NodeDefSwitch
               edit={edit}
               entry={entry}
