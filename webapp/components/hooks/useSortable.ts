@@ -15,7 +15,7 @@ export const useSortable = ({ containerRef, draggableClassName, handleClassName,
           constrainDimensions: true,
         },
       }).on('sortable:stop', (event) => {
-        const { newIndex, oldIndex } = event.data
+        const { newIndex, oldIndex } = event
         if (newIndex === oldIndex) return
 
         const draggedItem = items[oldIndex]

@@ -1,3 +1,4 @@
+import type { LatLngBoundsExpression } from 'leaflet'
 import './Map.scss'
 
 import { useEffect } from 'react'
@@ -24,19 +25,22 @@ import { useMapRailTabs } from './workspace/rail/useMapRailTabs'
 
 // start of workaround to show leaflet marker icon
 import L from 'leaflet'
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [10, 41],
   popupAnchor: [2, -40],
-  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 })
 // markers using the default icon (e.g. KML points without icon style): image URLs are the bundled ones, not prefixed
 L.Icon.Default.imagePath = ''
 L.Icon.Default.mergeOptions({
-  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
 })
 // end of workaround
 
@@ -51,7 +55,7 @@ L.Icon.Default.mergeOptions({
 // Imagery); layers with a lower native maxZoom (e.g. ESRI Terrain's 9) still stop
 // fetching new tiles at their own maxZoom and show stretched tiles beyond it - same as
 // normal over-zoom behavior, this doesn't change what tiles are available.
-const MAP_MAX_BOUNDS = [
+const MAP_MAX_BOUNDS: LatLngBoundsExpression = [
   [180, -Infinity],
   [-180, Infinity],
 ]

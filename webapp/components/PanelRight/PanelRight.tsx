@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonIconClose } from '../buttons'
@@ -13,8 +13,8 @@ import { Button, ButtonIconClose } from '../buttons'
 const PanelRight = (props) => {
   const { children, className, header = '', headerParams, onClose, showFooter = false, width = '500px' } = props
 
-  const i18n = useI18n()
-  const headerText = i18n.t(header, headerParams)
+  const t = useI18nT()
+  const headerText = t(header, headerParams)
 
   return ReactDOM.createPortal(
     <div

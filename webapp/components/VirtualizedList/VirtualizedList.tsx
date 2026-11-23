@@ -1,6 +1,6 @@
 import './VirtualizedList.scss'
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, type ReactNode, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -9,7 +9,19 @@ import { uuidv4 } from '@core/uuid'
 
 import { LoadingBar } from '@webapp/components'
 
-export const VirtualizedList = forwardRef((props, ref) => {
+type VirtualizedListProps = {
+  className?: string | null
+  id?: string
+  overscanRowCount?: number
+  placeholderRenderer?: (params: { index: number }) => ReactNode
+  rowCount: number
+  rowHeight: number
+  rowRenderer: (params: { index: number }) => ReactNode
+  showScrollingPlaceholders?: boolean
+  virtualizationThreshold?: number
+}
+
+export const VirtualizedList = forwardRef<unknown, VirtualizedListProps>((props, ref) => {
   const {
     className = null,
     id,

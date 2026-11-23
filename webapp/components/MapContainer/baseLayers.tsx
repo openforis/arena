@@ -1,3 +1,4 @@
+import type { StyleSpecification } from 'maplibre-gl'
 import * as StringUtils from '@core/stringUtils'
 
 import { equalEarthMapStyle } from './equalEarthMapStyle'
@@ -46,7 +47,20 @@ export const baseLayerUrlByProviderFunction = {
 
 // crossOrigin: true only for hosts verified to send CORS headers. Without it a screenshot still works, with those tiles
 // left out. With it on a host without CORS, the map display itself breaks (blank base map for everyone).
-export const baseLayers = [
+export type BaseLayerDef = {
+  key: string
+  name: string
+  provider?: string
+  type?: string
+  attribution?: string
+  maxZoom?: number
+  url?: string
+  style?: StyleSpecification
+  crossOrigin?: boolean
+  apiKeyRequired?: boolean
+}
+
+export const baseLayers: BaseLayerDef[] = [
   {
     key: 'ESRI World Imagery',
     name: 'ESRI World Imagery (satellite)',

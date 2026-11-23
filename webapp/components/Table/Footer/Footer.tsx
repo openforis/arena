@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@webapp/store/hooks'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -14,7 +14,7 @@ export const Footer = (props) => {
   const { count, limit, list, module, offset, selectedItemsCount = 0 } = props
 
   const i18n = useI18n()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   return (
