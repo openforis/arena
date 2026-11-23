@@ -1491,7 +1491,7 @@
         "11. Rôles des utilisateurs et invitation à accéder à un formulaire"
       ],
       "text": "Pour modifier un utilisateur du formulaire actuel, ouvrez Utilisateurs > Liste des utilisateurs et cliquez sur l'utilisateur. La page affiche en haut un résumé de l'utilisateur (nom, e-mail, rôle et état de l'invitation) et les sections suivantes :\n- Informations personnelles : titre, nom, e-mail et propriétés supplémentaires de l'utilisateur ;\n- Accès et autorisations : le Rôle dans le formulaire actuel et, pour les administrateurs système, les autorisations Administrateur système et Gestionnaire de formulaire ainsi que le Nombre maximum de formulaires que l'utilisateur peut créer ;\n- Connexion et sécurité (administrateurs système uniquement) : les méthodes de connexion de l'utilisateur, avec Changer le mot de passe et Délier ;\n- Retirer du formulaire : retire à l'utilisateur l'accès au formulaire, après une confirmation.\nCliquez sur Sauvegarder dans la barre en bas de la page pour enregistrer les modifications.\nSi l'utilisateur n'a pas accepté l'invitation à temps, la page indique que l'invitation a expiré : cliquez sur Envoyer une nouvelle invitation pour l'envoyer à nouveau.",
-      "anchor": "nameddest=5Fdi8o7oxt4z7q"
+      "anchor": "nameddest=5Fediting5Fsurvey5Fuser"
     },
     {
       "id": "12",

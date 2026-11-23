@@ -1422,7 +1422,7 @@
         "11. User roles and invitation to access a survey"
       ],
       "text": "To edit a user of the current survey, open Users > Users list and click the user. The page shows a summary of the user at the top (name, email, role and invitation status) and the following sections:\n- Personal information: title, name, email and extra properties of the user;\n- Access & permissions: the Role in current survey and, for system administrators, the System administrator and Survey manager permissions and the Max surveys user can create;\n- Sign-in & security (system administrators only): the sign-in methods of the user, with Change password and Unlink;\n- Remove from survey: revokes the access of the user to the survey, after a confirmation.\nClick Save in the bar at the bottom of the page to save the changes.\nWhen the user has not accepted the invitation in time, the page shows that the invitation expired: click Send new invitation to send it again.",
-      "anchor": "nameddest=5Fdi8o7oxt4z7q"
+      "anchor": "nameddest=5Fediting5Fsurvey5Fuser"
     },
     {
       "id": "12",
