@@ -1,5 +1,8 @@
 import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import { extractAttributeValue } from '@server/modules/odkImport/service/odkImport/dataImportJobs/odkAttributeValueExtractor'
+import {
+  extractAttributeValue,
+  type GeoFeature,
+} from '@server/modules/odkImport/service/odkImport/dataImportJobs/odkAttributeValueExtractor'
 
 const geoNodeDef = { type: 'geo' } as ArenaAnyNodeDef
 
@@ -10,7 +13,7 @@ const extractGeo = (rawText: string) =>
     categoryItemProvider: { getItemByCode: async () => null },
     rawText,
     tx: null,
-  })
+  }) as Promise<GeoFeature | null>
 
 describe('odkAttributeValueExtractor / geotrace-geoshape', () => {
   test('an open path of points (geotrace) becomes a GeoJSON LineString', async () => {

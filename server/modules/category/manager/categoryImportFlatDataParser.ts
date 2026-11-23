@@ -12,7 +12,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
-const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: any; columnName: string }) => {
+const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: string; columnName: string }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveySrss = Survey.getSRS(surveyInfo)
   if (!surveySrss.some((surveySrs) => Srs.getCode(surveySrs) === srs)) {
@@ -75,8 +75,15 @@ export const createRowsReaderFromStream = ({
   stream: Readable
   survey: ArenaSurvey
   summary: CategoryImportSummary.CategoryImportSummary
-  onRowItem: any
-  onTotalChange: any
+  onRowItem: (item: {
+    levelIndex?: number
+    codes?: string[]
+    labelsByLang?: { [lang: string]: string }
+    descriptionsByLang?: { [lang: string]: string }
+    extra?: { [key: string]: unknown }
+    error?: unknown
+  }) => Promise<void> | void
+  onTotalChange: ((total: number) => void) | null
 }) => {
   const fileFormat = CategoryImportSummary.getFileFormat(summary)
   const items = CategoryImportSummary.getItems(summary)

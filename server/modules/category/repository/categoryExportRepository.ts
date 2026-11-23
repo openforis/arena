@@ -47,7 +47,13 @@ const getExtraPropColumn = ({
 }) =>
   `(${DbUtils.getPropColCombined(CategoryItem.keysProps.extra, draft, columnPrefix, false)}) ->> ${extraPropNameParam}`
 
-const getSelectCumulativeAreaSubquery = ({ params, draft = true }: { params: any; draft?: boolean }) => {
+const getSelectCumulativeAreaSubquery = ({
+  params,
+  draft = true,
+}: {
+  params: ReturnType<typeof DbUtils.newQueryParams>
+  draft?: boolean
+}) => {
   const areaColumn = getExtraPropColumn({ columnPrefix: 'ext.', extraPropNameParam: params.add(areaPropName), draft })
   return `COALESCE((
     SELECT SUM (COALESCE((${areaColumn})::numeric, 0))

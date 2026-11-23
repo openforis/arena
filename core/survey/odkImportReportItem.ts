@@ -53,6 +53,8 @@ export const newReportItem = ({
   [keys.resolved]: resolved,
 })
 
+export type OdkImportReportItem = ReturnType<typeof newReportItem>
+
 export const { getId } = ObjectUtils
 export const isResolved = A.propOr(false, keys.resolved)
 export const getNodeDefUuid = A.prop(keys.nodeDefUuid)

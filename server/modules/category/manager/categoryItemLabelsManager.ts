@@ -2,7 +2,7 @@
  * Category item labels for the assistant (suggestion 6): missing-label counts and pages, and the atomic labels
  * update. Every request error is a 400 `appErrors:categoryItemLabelsInvalid` with the reason.
  */
-import type { ArenaUser } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaUser } from '@openforis/arena-core'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Survey from '@core/survey/survey'
@@ -240,7 +240,7 @@ const writeUpdates = async (
   const rowsByUuid = new Map(rows.map((row) => [row.uuid, row]))
   const applied: CategoryItemLabelsUpdateAnswer['applied'] = []
   const conflicts: CategoryItemLabelConflict[] = []
-  const activities: any[] = []
+  const activities: ActivityLog.ActivityLog[] = []
   const categoryUuids = new Set<string>()
   const labelsByItemUuid = new Map<string, Record<string, string>>()
   for (const update of updates) {
@@ -286,7 +286,7 @@ export const updateItemsLabels = (
       await SurveyRepository.markSurveyDraft(surveyId, tx)
       await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
     }
-    const categories: any[] = []
+    const categories: ArenaCategory[] = []
     for (const categoryUuid of categoryUuids) {
       categories.push(
         /* NOSONAR: queries of one transaction run one at a time */ await CategoryRepository.fetchCategoryAndLevelsByUuid(

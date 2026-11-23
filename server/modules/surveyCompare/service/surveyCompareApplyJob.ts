@@ -27,6 +27,7 @@ import * as DbUtils from '@server/db/dbUtils'
 
 import { SurveyCompareSource, withSource } from './surveyCompareSource'
 import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
+import type { SurveyCompareJobContext } from './surveyCompareJobContext'
 
 /**
  * Applies the selected changes of a survey comparison to the survey with the specified id.
@@ -34,7 +35,7 @@ import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
  * Survey info and survey files are applied first (e.g. new cycles), then the comparison is computed again and the
  * other changes are applied: categories and taxonomies, node defs, then deletions.
  */
-export default class SurveyCompareApplyJob extends Job {
+export default class SurveyCompareApplyJob extends Job<SurveyCompareJobContext> {
   static readonly type = 'SurveyCompareApplyJob'
 
   /**
@@ -52,12 +53,12 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async execute() {
-    const { sourceFileId, sourceSurveyId }: any = this.context
+    const { sourceFileId, sourceSurveyId } = this.context
     await withSource({ sourceFileId, sourceSurveyId }, (source) => this.applyChanges(source), this.tx)
   }
 
   async applyChanges(source: SurveyCompareSource) {
-    const { surveyId, selectedIds = [] }: any = this.context
+    const { surveyId, selectedIds = [] } = this.context
     // the comparison is computed again: the survey could have been changed in the meantime
     let params = await this.fetchCompareParams(source)
     const surveyInfoAppliedIds = await this.applySurveyInfoChanges({ params, selectedIds, source })
@@ -92,7 +93,7 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async fetchCompareParams(source: SurveyCompareSource): Promise<SurveyCompareParams & { usedNodeDefUuids: string[] }> {
-    const { surveyId, manualMatches = {} }: any = this.context
+    const { surveyId, manualMatches = {} } = this.context
     const target = await fetchSurveyFromDb({ surveyId }, this.tx)
     return {
       sourceSurvey: source.survey,
@@ -107,7 +108,7 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async applySurveyInfoChanges({ params, selectedIds, source }): Promise<string[]> {
-    const { user, surveyId }: any = this.context
+    const { user, surveyId } = this.context
     const result = compareSurveys(params)
     const { appliedIds } = expandSelection({ result, selectedIds })
     const plan = buildSurveyInfoApplyPlan({
@@ -147,10 +148,10 @@ export default class SurveyCompareApplyJob extends Job {
     files,
     source,
   }: {
-    files: { sourceUuid: string; file: any }[]
+    files: { sourceUuid: string; file: SurveyFile.SurveyFile }[]
     source: SurveyCompareSource
   }) {
-    const { surveyId }: any = this.context
+    const { surveyId } = this.context
     for (const { sourceUuid, file } of files) {
       const content = await source.readSurveyFileContent(sourceUuid) // NOSONAR
       if (!content) {
@@ -162,7 +163,7 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async applyCategoriesChanges(plan: SurveyCompareApplyPlan) {
-    const { user, surveyId }: any = this.context
+    const { user, surveyId } = this.context
     const tx = this.tx
     const activities = []
     const categoryUuidsWithInsertedItems = new Set<string>()
@@ -211,7 +212,7 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async applyTaxonomiesChanges(plan: SurveyCompareApplyPlan) {
-    const { user, surveyId }: any = this.context
+    const { user, surveyId } = this.context
     const tx = this.tx
     const activities = []
     for (const { taxonomy, taxa } of plan.taxonomiesToInsert) {
@@ -235,7 +236,7 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async applyNodeDefsChanges(plan: SurveyCompareApplyPlan) {
-    const { user, surveyId }: any = this.context
+    const { user, surveyId } = this.context
     const tx = this.tx
     const activities = []
 
@@ -268,7 +269,7 @@ export default class SurveyCompareApplyJob extends Job {
 
   // node defs first: categories and taxonomies can be deleted only when not used anymore
   async applyDeletions(plan: SurveyCompareApplyPlan) {
-    const { user, surveyId }: any = this.context
+    const { user, surveyId } = this.context
     const tx = this.tx
     const activities = []
     for (const nodeDefUuid of plan.nodeDefUuidsToDelete) {
@@ -300,7 +301,7 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   generateResult(): Promise<Record<string, unknown>> {
-    const { appliedIds = [], skippedIds = [] }: any = this.context
+    const { appliedIds = [], skippedIds = [] } = this.context
     return Promise.resolve({ appliedIds, skippedIds })
   }
 }

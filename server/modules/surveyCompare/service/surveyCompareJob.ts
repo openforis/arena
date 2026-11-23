@@ -7,6 +7,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { SurveyCompareSourceRef, keepFile, keepJson, withSource } from './surveyCompareSource'
 import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
+import type { SurveyCompareJobContext } from './surveyCompareJobContext'
 import { computeSurveyFingerprint } from './surveyFingerprintService'
 
 /**
@@ -14,7 +15,7 @@ import { computeSurveyFingerprint } from './surveyFingerprintService'
  * The uploaded file and the result are kept in the shared temp storage, so they can be used later on any server
  * instance (e.g. to apply the changes).
  */
-class SurveyCompareDiffJob extends Job {
+class SurveyCompareDiffJob extends Job<SurveyCompareJobContext> {
   static readonly type = 'SurveyCompareDiffJob'
 
   constructor(params?: Partial<JobParams>) {
@@ -22,7 +23,7 @@ class SurveyCompareDiffJob extends Job {
   }
 
   async getSourceRef(): Promise<SurveyCompareSourceRef> {
-    const { filePath, sourceFileId, sourceSurveyId }: any = this.context
+    const { filePath, sourceFileId, sourceSurveyId } = this.context
     if (sourceSurveyId) return { sourceSurveyId: Number(sourceSurveyId) }
     if (sourceFileId) return { sourceFileId }
     // the uploaded file is moved into the shared temp storage
@@ -30,7 +31,7 @@ class SurveyCompareDiffJob extends Job {
   }
 
   async execute() {
-    const { surveyId, manualMatches = {} }: any = this.context
+    const { surveyId, manualMatches = {} } = this.context
     const sourceRef = await this.getSourceRef()
     const result = await withSource(
       sourceRef,
@@ -62,7 +63,7 @@ class SurveyCompareDiffJob extends Job {
   }
 }
 
-export default class SurveyCompareJob extends Job {
+export default class SurveyCompareJob extends Job<SurveyCompareJobContext> {
   static readonly type = 'SurveyCompareJob'
 
   /**
@@ -80,14 +81,14 @@ export default class SurveyCompareJob extends Job {
   }
 
   generateResult(): Promise<Record<string, unknown>> {
-    const { sourceFileId, sourceSurveyId, resultFileId }: any = this.context
+    const { sourceFileId, sourceSurveyId, resultFileId } = this.context
     return Promise.resolve({ sourceFileId, sourceSurveyId, resultFileId })
   }
 
   async onEnd() {
     await super.onEnd()
     // the uploaded file is left only if the job failed before keeping it
-    const { filePath }: any = this.context
+    const { filePath } = this.context
     if (filePath && FileUtils.exists(filePath)) {
       await FileUtils.deleteFileAsync(filePath)
     }

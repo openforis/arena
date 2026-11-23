@@ -1,10 +1,10 @@
-import type { ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
 export interface XFormNodeDefPathIndex {
-  get(path: string): any
+  get(path: string): ArenaAnyNodeDef | undefined
 }
 
 /**
@@ -127,7 +127,7 @@ const convert = async ({
   expression,
 }: {
   survey: ArenaSurvey
-  nodeDefCurrent: any
+  nodeDefCurrent: ArenaAnyNodeDef
   currentXFormPath: string
   nodeDefsByXFormPath: XFormNodeDefPathIndex
   expression: string
