@@ -76,11 +76,11 @@ export const fetchElevation = async ({ surveyId, lat, lng }) => {
   }
 }
 
-export const testMapApiKey = async ({ provider }: { provider: string; apiKey: string }) => {
+export const testMapApiKey = ({ provider }: { provider: string; apiKey: string }): boolean => {
   try {
-    // the API key is not used yet to fetch the periods
-    const mosaics = await fetchAvailableMapPeriods({ provider })
-    return mosaics.length > 0
+    // the API key is not used yet to fetch the periods (null for the providers other than Planet)
+    const mosaics = fetchAvailableMapPeriods({ provider })
+    return (mosaics?.length ?? 0) > 0
   } catch {
     // invalid API key or provider not reachable
     return false
