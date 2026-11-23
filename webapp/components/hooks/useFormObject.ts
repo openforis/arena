@@ -1,3 +1,4 @@
+import type { ArenaValidation } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import { useState, useEffect, useCallback } from 'react'
@@ -6,7 +7,8 @@ import * as Validation from '@core/validation/validation'
 
 const useFormObject = (obj, validatorFn = null, validationEnabled = false) => {
   const [state, setState] = useState({
-    validation: {},
+    // empty validation: no errors
+    validation: {} as ArenaValidation,
     validationEnabled,
     obj,
   })

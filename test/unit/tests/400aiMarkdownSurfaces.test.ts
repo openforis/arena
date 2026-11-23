@@ -5,8 +5,8 @@ const read = (file: string): string => fs.readFileSync(path.resolve(process.cwd(
 
 // every place that renders model output as Markdown (the plain Markdown component loads remote images)
 const surfaces = [
-  'webapp/components/ai/AiExplainPanel/AiExplainPanel.js',
-  'webapp/components/ai/AiActivityLogSummaryModal/AiActivityLogSummaryModal.js',
+  'webapp/components/ai/AiExplainPanel/AiExplainPanel.tsx',
+  'webapp/components/ai/AiActivityLogSummaryModal/AiActivityLogSummaryModal.tsx',
   'webapp/components/ai/Assistant/AssistantMessage.tsx',
 ]
 

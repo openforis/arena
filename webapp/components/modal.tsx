@@ -6,7 +6,7 @@ import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
 
 import { TestId } from '@webapp/utils/testId'
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 import { Button } from './buttons'
 
 export const ModalClose = ({ onClose }) => (
@@ -53,7 +53,7 @@ export const Modal = (props) => {
     titleParams,
   } = props
 
-  const i18n = useI18n()
+  const t = useI18nT()
   const titleId = useId()
 
   const onClose = useCallback(
@@ -66,26 +66,22 @@ export const Modal = (props) => {
   // a click on the backdrop or the Escape key: onDismiss(reason) when given, else onClose
   const onBackdropOrEscape = useCallback(
     (event, reason) => {
+      // MUI 9 removed disableEscapeKeyDown: Escape is ignored here when closeOnEsc is false
+      if (reason === 'escapeKeyDown' && !closeOnEsc) return
       if (onDismiss) onDismiss(reason)
       else onClose(event)
     },
-    [onClose, onDismiss]
+    [closeOnEsc, onClose, onDismiss]
   )
 
   return (
-    <MuiModal
-      className={`modal ${className}`}
-      data-testid={TestId.modal.modal}
-      disableEscapeKeyDown={!closeOnEsc}
-      onClose={onBackdropOrEscape}
-      open
-    >
+    <MuiModal className={`modal ${className}`} data-testid={TestId.modal.modal} onClose={onBackdropOrEscape} open>
       <Fade in timeout={500}>
         {/* a native dialog shown open: MUI Modal handles the focus trap, the backdrop and Escape */}
         <dialog className="modal-content" open aria-modal="true" aria-labelledby={title ? titleId : undefined}>
           {(title || showCloseButton) && (
             <ModalHeader>
-              {title && <span id={titleId}>{i18n.t(title, titleParams)}</span>}
+              {title && <span id={titleId}>{t(title, titleParams)}</span>}
               {showCloseButton && <ModalClose onClose={onClose} />}
             </ModalHeader>
           )}
