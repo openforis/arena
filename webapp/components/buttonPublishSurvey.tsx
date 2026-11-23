@@ -1,4 +1,4 @@
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@webapp/store/hooks'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -17,7 +17,7 @@ import './buttonPublishSurvey.scss'
 const ButtonPublishSurvey = (props) => {
   const { className, disabled = false, variant = 'outlined' } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyInfo = useSurveyInfo()
   const surveyIsDirty = useIsSurveyDirty()
   const lang = useSurveyPreferredLang()

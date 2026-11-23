@@ -1,10 +1,10 @@
 import './warningBadge.scss'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 
 const WarningBadge = ({ label = null, show = true, showLabel = true, title = undefined, titleParams = undefined }) => {
-  const i18n = useI18n()
-  const titleText = title ? i18n.t(title, titleParams) : undefined
+  const t = useI18nT()
+  const titleText = title ? t(title, titleParams) : undefined
 
   return show ? (
     <div className="badge warning-badge" title={titleText}>

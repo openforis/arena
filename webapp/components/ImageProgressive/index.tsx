@@ -12,7 +12,7 @@ const fetchImage = async (url) => {
     return { url }
   }
   try {
-    const headers = {}
+    const headers: Record<string, string> = {}
     const authToken = ApiConstants.getAuthToken()
     if (authToken) {
       headers.Authorization = `Bearer ${authToken}`

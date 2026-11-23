@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useLayoutEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@webapp/store/hooks'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import { SortOrder } from '@core/sortOrder'
@@ -18,7 +18,7 @@ export const useTable = ({
   restParams,
   keepSelectionOnSearch = false,
 }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [totalCount, setTotalCount] = useState(0)
 
@@ -94,7 +94,7 @@ export const useTable = ({
   const handleSortBy = useCallback(
     (orderByField) => {
       const currentOrder = sort.by === orderByField ? sort.order : null
-      let order = SortOrder.asc
+      let order: SortOrder | null = SortOrder.asc
       if (currentOrder === SortOrder.asc) {
         order = SortOrder.desc
       } else if (currentOrder === SortOrder.desc) {

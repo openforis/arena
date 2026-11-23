@@ -28,10 +28,10 @@ export const ScriptEditor = (props) => {
     width = 'inherit',
   } = props
 
-  const editorRef = useRef()
+  const editorRef = useRef<AceEditor>(null)
 
   useEffect(() => {
-    const { editor } = editorRef.current
+    const { editor } = editorRef.current as AceEditor & { editor: ace.Ace.Editor & { completers: unknown[] } }
 
     // reset completers
     editor.completers = [...defaultCompleters]
