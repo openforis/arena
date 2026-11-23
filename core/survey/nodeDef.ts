@@ -989,6 +989,7 @@ export const canNodeDefBeMultiple = (nodeDef: ArenaAnyNodeDef): boolean =>
       nodeDefType.code,
       nodeDefType.file,
       nodeDefType.integer,
+      nodeDefType.taxon,
       nodeDefType.text,
     ]))
 

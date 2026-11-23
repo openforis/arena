@@ -1,3 +1,5 @@
+@use '../../../SurveyFormVars' as *;
+
 .survey-form__node-def-taxon {
   display: grid;
   row-gap: 0.2rem;
@@ -5,6 +7,20 @@
   .form-item {
     grid-template-columns: 125px 1fr;
     padding: 0;
+  }
+}
+
+// one item (taxon fields and delete button) of a multiple taxon attribute
+.survey-form__node-def-taxon-multiple-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 0.3rem;
+  padding: 0.3rem 0;
+  border-bottom: $formBorder;
+
+  .survey-form__node-def-error-badge {
+    position: absolute;
   }
 }
 
