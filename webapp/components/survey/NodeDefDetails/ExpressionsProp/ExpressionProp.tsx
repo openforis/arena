@@ -13,8 +13,7 @@ import { ButtonIconDelete } from '@webapp/components/buttons'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/validationTooltip'
-import type { ArenaValidation } from '@openforis/arena-core'
-import type { ArenaNodeDefExpression } from '@openforis/arena-core'
+import type { ArenaValidation, ArenaNodeDefExpression } from '@openforis/arena-core'
 
 type ExpressionPropProps = {
   index: number // used to generate test ids

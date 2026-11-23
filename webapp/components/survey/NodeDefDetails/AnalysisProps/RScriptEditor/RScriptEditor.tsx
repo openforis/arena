@@ -10,8 +10,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
-import type { ArenaCategoryItem } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaCategoryItem } from '@openforis/arena-core'
 
 const codesTextPrefix = '# __CODES__'
 const maxCodesLineLength = 200
