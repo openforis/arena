@@ -41,7 +41,7 @@ const getVariableCompletion = ({ group = null, variable }) => {
   }
 }
 
-const getFunctionCompletion = ({ mode, i18n, fnName, functionExample }) => {
+const getFunctionCompletion = ({ i18n, fnName, functionExample }) => {
   const description = i18n.t(`nodeDefEdit:functionDescriptions.${fnName}`)
   // const label = `${i18n.t('nodeDefEdit:function')}: ${fnName}: ${exampleUsage}`
   const completion = {
@@ -89,7 +89,7 @@ const getCompletions = ({
     for (const fnName in availableFunctionExamples[mode]) {
       if (fnName.toLowerCase().includes(tokenText)) {
         const functionExample = availableFunctionExamples[mode][fnName]
-        completions.push(getFunctionCompletion({ mode, i18n, fnName, functionExample }))
+        completions.push(getFunctionCompletion({ i18n, fnName, functionExample }))
       }
     }
   }
@@ -104,7 +104,7 @@ const findNodeDefContext = async ({ survey, nodeDefCurrent, nodeDefContextPath }
       nodeDef: nodeDefCurrent,
       exprString: nodeDefContextPath,
     })
-  } catch (e) {
+  } catch {
     // ignore it
   }
   return nodeDefContext
