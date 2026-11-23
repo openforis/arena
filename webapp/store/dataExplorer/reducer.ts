@@ -21,23 +21,26 @@ const initialState = {
   [DataExplorerState.keys.totalsVisible]: false,
 }
 
-const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, { dispatch, getState }) => {
-  const state = getState()
-  const surveyId = SurveyState.getSurveyId(state)
-  const cycle = SurveyState.getSurveyCycleKey(state)
-  const query = DataExplorerState.getQuery(state)
-  const entityDefUuid = Query.getEntityDefUuid(query)
-  const options = { ...defaultDataExportOptionsSelection, ...params }
-  const { fileFormat } = options
-  try {
-    const { downloadToken } = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
-    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, downloadToken, fileFormat })
-  } catch (error) {
-    const key =
-      fileFormat === FileFormats.xlsx ? 'appErrors:dataExport.excelMaxCellsLimitExceeded' : 'dataExportView:error'
-    dispatch(notifyWarning({ key, params: { details: String(error) } }))
+const exportQueryData = createAsyncThunk(
+  'dataQuery/exportData',
+  async (params: Record<string, unknown>, { dispatch, getState }) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
+    const query = DataExplorerState.getQuery(state)
+    const entityDefUuid = Query.getEntityDefUuid(query)
+    const options = { ...defaultDataExportOptionsSelection, ...params }
+    const { fileFormat } = options
+    try {
+      const { downloadToken } = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
+      API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, downloadToken, fileFormat })
+    } catch (error) {
+      const key =
+        fileFormat === FileFormats.xlsx ? 'appErrors:dataExport.excelMaxCellsLimitExceeded' : 'dataExportView:error'
+      dispatch(notifyWarning({ key, params: { details: String(error) } }))
+    }
   }
-})
+)
 
 export const slice = createSlice({
   name: 'dataQuery',

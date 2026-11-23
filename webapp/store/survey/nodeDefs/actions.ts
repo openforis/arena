@@ -196,7 +196,15 @@ const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDe
 
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate =
-  ({ nodeDefsUpdated, nodeDefsValidation, dependencyGraph }) =>
+  ({
+    nodeDefsUpdated,
+    nodeDefsValidation,
+    dependencyGraph = null,
+  }: {
+    nodeDefsUpdated: object
+    nodeDefsValidation: object
+    dependencyGraph?: object | null
+  }) =>
   (dispatch) => {
     dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
@@ -280,7 +288,7 @@ export const postNodeDef =
     dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
   }
 
-const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
+const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced = undefined) =>
   debounceAction(
     putNodeDefProps({
       nodeDefUuid: NodeDef.getUuid(nodeDef),
