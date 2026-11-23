@@ -68,11 +68,10 @@ CategoryLevelVariable.propTypes = {
 }
 
 const createInitialState = ({ initialCategory, initialCategoryPropKey, initialAttributeDefs }) => {
-  const initialAttributeUuidsByLevelUuid = Category.getLevelsArray(initialCategory).reduce((acc, level, index) => {
-    const attributeDef = initialAttributeDefs[index]
-    acc[CategoryLevel.getUuid(level)] = NodeDef.getUuid(attributeDef)
-    return acc
-  }, {})
+  const initialAttributeUuidsByLevelUuid: Record<string, string> = {}
+  for (const [index, level] of Category.getLevelsArray(initialCategory).entries()) {
+    initialAttributeUuidsByLevelUuid[CategoryLevel.getUuid(level)] = NodeDef.getUuid(initialAttributeDefs[index])
+  }
 
   return {
     categoryUuid: Category.getUuid(initialCategory),

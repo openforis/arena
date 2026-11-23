@@ -17,7 +17,6 @@ const InputChipsText = (props) => {
     disabled = false,
     idInput,
     isInputFieldValueValid = () => true,
-    minCharactersToAutocomplete = 0,
     onChange = null, // Callback to receive all selection change
     onItemAdd = null, // Callback to receive added item
     onItemRemove = null, // Callback to receive removed item
@@ -46,7 +45,7 @@ const InputChipsText = (props) => {
           <Chip
             key={item}
             label={State.getItemLabel(state)(item)}
-            onDelete={() => Actions.removeItem({ selection, state })(item)}
+            onDelete={() => Actions.removeItem({ selection })(item)}
             readOnly={readOnly || selection.length <= requiredItems}
           />
         ))}
@@ -60,7 +59,6 @@ const InputChipsText = (props) => {
               onBlur={() => {
                 if (canAddItem) Actions.onItemAddClick({ selection })
               }}
-              minCharactersToAutocomplete={minCharactersToAutocomplete}
               disabled={disabled}
               textTransformFunction={textTransformFunction}
               value={State.getInputFieldValue(state)}
@@ -81,7 +79,6 @@ InputChipsText.propTypes = {
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
 
   requiredItems: PropTypes.number,
-  minCharactersToAutocomplete: PropTypes.number,
   readOnly: PropTypes.bool,
   disabled: PropTypes.bool,
   validation: PropTypes.object,

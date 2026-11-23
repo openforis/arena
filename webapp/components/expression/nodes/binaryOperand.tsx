@@ -27,8 +27,8 @@ export const BinaryOperandType = {
   left: 'left',
   right: 'right',
 }
-BinaryOperandType.isLeft = (type) => type === BinaryOperandType.left
-BinaryOperandType.isRight = (type) => type === BinaryOperandType.right
+export const isLeftOperand = (type: string): boolean => type === BinaryOperandType.left
+export const isRightOperand = (type: string): boolean => type === BinaryOperandType.right
 
 const toUiOperandExpressionType = (type) => {
   if (type === types.UnaryExpression) {
@@ -54,7 +54,7 @@ const BinaryOperand = (props) => {
 
   const nodeOperand = node[type]
   const operandExpressionType = toUiOperandExpressionType(Expression.getType(nodeOperand))
-  const isLeft = BinaryOperandType.isLeft(type)
+  const isLeft = isLeftOperand(type)
   const currentNodeDefIsBoolean = NodeDef.isBoolean(nodeDefCurrent)
 
   const canOperandExpressionBeOfType = useCallback(
