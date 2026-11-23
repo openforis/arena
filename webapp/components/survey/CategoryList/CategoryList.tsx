@@ -1,0 +1,185 @@
+import './CategoryList.scss'
+
+import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Validation from '@core/validation/validation'
+
+import Table from '@webapp/components/Table'
+import type { TableColumn } from '@webapp/components/Table/tableColumn'
+import ErrorBadge from '@webapp/components/errorBadge'
+import WarningBadge from '@webapp/components/warningBadge'
+
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+
+import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components'
+
+import TableHeaderLeft from './TableHeaderLeft'
+
+import { State, useActions, useLocalState } from './store'
+
+const getStructure = ({ category }) => (Category.isHierarchical(category) ? 'hierarchical' : 'flat')
+
+const getKind = ({ category }) => {
+  if (Category.getName(category) === Category.samplingPointDataCategoryName) return 'samplingPointData'
+  if (Category.isReportingData(category)) return 'reportingData'
+  return null
+}
+type CategoryListProps = {
+  canSelect?: boolean
+  onCategoryCreated?: (...args: any[]) => any
+  onCategoryOpen?: (...args: any[]) => any
+  onSelect?: (...args: any[]) => any
+  selectedItemUuid?: string
+}
+
+const CategoryList = (props: CategoryListProps) => {
+  const { canSelect = false, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
+
+  const i18n = useI18n()
+
+  const { state, setState } = useLocalState({
+    canSelect,
+    onCategoryCreated,
+    onCategoryOpen,
+    onSelect,
+    selectedItemUuid,
+  })
+
+  const Actions = useActions({ setState })
+
+  const canEdit = useAuthCanEditSurvey()
+  const survey = useSurvey()
+  const requestedAt = State.getCategoriesRequestedAt(state)
+
+  const columns: TableColumn[] = [
+    // POSITION
+    { key: 'position', header: '#', renderItem: ({ itemPosition }) => itemPosition, width: '50px' },
+    // NAME
+    {
+      key: 'name',
+      header: 'common.name',
+      renderItem: ({ item: category }) => Category.getName(category),
+      width: '1fr',
+    },
+    // TYPE (reporting data / Sampling Point Data / blank for a plain category)
+    {
+      key: 'type',
+      header: 'common.type',
+      renderItem: ({ item: category }) => {
+        const kind = getKind({ category })
+        return kind ? i18n.t(`categoryList.types.${kind}`) : null
+      },
+      width: '12rem',
+    },
+    // Extra props
+    {
+      key: 'extraProps',
+      header: 'extraProp.label_other',
+      renderItem: ({ item: category }) =>
+        Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
+      width: '8rem',
+    },
+    // STRUCTURE (flat / hierarchical)
+    {
+      key: 'structure',
+      header: 'categoryList.structure',
+      renderItem: ({ item: category }) => i18n.t(`categoryList.types.${getStructure({ category })}`),
+      width: '10rem',
+    },
+    // Items count
+    {
+      key: 'itemsCount',
+      header: 'categoryList.itemsCount',
+      renderItem: ({ item: category }) => {
+        const levels = Category.getLevelsArray(category)
+        return levels.map((level) => CategoryLevel.getItemsCount(level)).join(' / ')
+      },
+      width: '10rem',
+    },
+  ]
+
+  if (canEdit) {
+    // ERROR / WARNING
+    columns.push(
+      {
+        key: 'error',
+        renderItem: ({ item: category }) => {
+          const validation = Category.getValidation(category)
+          if (Validation.isValid(validation) || !Validation.isError(validation)) return null
+          return <ErrorBadge validation={validation} />
+        },
+        width: '85px',
+      },
+      {
+        key: 'warning',
+        renderItem: ({ item: category }) => {
+          if (Survey.isCategoryUnused(category)(survey)) {
+            return <WarningBadge label={i18n.t('itemsTable.unused')} />
+          }
+          const validation = Category.getValidation(category)
+          if (Validation.isValid(validation) || Validation.isError(validation)) return null
+
+          return <ErrorBadge showIcon showLabel={false} validation={validation} />
+        },
+        width: '85px',
+      }
+    )
+  }
+  if (canSelect) {
+    // SELECT
+    columns.push({
+      key: 'select',
+      renderItem: ({ item: category }) => {
+        const selected = selectedItemUuid && selectedItemUuid === Category.getUuid(category)
+        return (
+          <Button
+            className={`btn btn-s${selected ? ' active' : ''}`}
+            onClick={() => Actions.select({ category })}
+            iconClassName={`icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}
+            label={selected ? 'common.selected' : 'common.select'}
+          />
+        )
+      },
+      width: '80px',
+    })
+  }
+
+  // DETAILS
+  columns.push({
+    key: 'details',
+    renderItem: ({ item: category }) => (
+      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} />
+    ),
+    width: '50px',
+  })
+
+  if (canEdit) {
+    columns.push(
+      // DELETE
+      {
+        key: 'delete',
+        renderItem: ({ initData, item: category }) => (
+          <ButtonIconDelete onClick={() => Actions.delete({ category, initData })} />
+        ),
+        width: '30px',
+      }
+    )
+  }
+
+  return (
+    <Table
+      className="categories"
+      module="categories"
+      restParams={{ draft: canEdit, requestedAt, validate: canEdit }}
+      headerLeftComponent={TableHeaderLeft}
+      headerProps={{ state, setState }}
+      columns={columns}
+      onRowOpen={(category) => Actions.edit({ category })}
+    />
+  )
+}
+
+export default CategoryList
