@@ -10,8 +10,8 @@ export const contentTypes = {
 export const objectToFormData = (object: Record<string, unknown>): FormData => {
   const formData = new FormData()
   for (const [key, value] of Object.entries(object)) {
-    // FormData converts any value but a Blob (or File) to a string
-    formData.append(key, value instanceof Blob ? value : String(value))
+    // the values are files or primitives: FormData converts the primitives to strings
+    formData.append(key, value instanceof Blob ? value : String(value as string | number | boolean))
   }
   return formData
 }

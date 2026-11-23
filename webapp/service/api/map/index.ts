@@ -54,7 +54,7 @@ const generateBiannualPeriods = () => {
   return periods
 }
 
-export const fetchAvailableMapPeriods = async ({ provider, periodType }: { provider: string; periodType?: string }) => {
+export const fetchAvailableMapPeriods = ({ provider, periodType }: { provider: string; periodType?: string }) => {
   if (provider === MapUtils.mapProviders.planet) {
     // const { data } = await axios.get(`/api/geo/map/${provider}/available_montly_periods`)
     // return data
