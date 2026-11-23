@@ -7,7 +7,7 @@ import * as RecordApi from '@server/modules/record/api/recordApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { requireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
 
-import { createFakeResponse } from '../../unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '../../unit/utils/fakeExpress'
 
 import { getContextUser } from '../config/context'
 
@@ -52,7 +52,7 @@ describe('Per-node endpoint: node of another record', () => {
       user: getContextUser(),
     }
     const next = jest.fn()
-    await handler(req, createFakeResponse(), next)
+    await callHandler(handler, req, createFakeResponse(), next)
     return next
   }
 

@@ -3,7 +3,7 @@ import type { ArenaRecordNode } from '@openforis/arena-core'
 import { createRequireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
 import { getPendingNodeFromBody } from '@server/modules/record/api/recordQualifierMiddleware'
 
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const nodeOf = (recordUuid: string | undefined) =>
   ({ uuid: 'node-1', recordUuid, value: 5 }) as unknown as ArenaRecordNode
@@ -31,7 +31,7 @@ describe('delete endpoint: the node uuid must belong to the record of the URL', 
     const req: any = { params: { surveyId: '1', recordUuid: 'record-a', nodeUuid: uuid }, query: {}, body: {} }
     const res = createFakeResponse()
     const next = jest.fn()
-    await middleware(req, res, next)
+    await callHandler(middleware, req, res, next)
     return { res, next, fetchNodeRecordUuid }
   }
 

@@ -11,7 +11,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as Response from '@server/utils/response'
 
-import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 /**
  * Builds a user that belongs to no group (cannot edit any survey).
@@ -104,7 +104,7 @@ export const checkRouteAccess = async ({
   let nextCalled = false
   let error: any
   const req = { params: { surveyId: String(surveyId) }, query: {}, body, user }
-  await route.handlers[handlerIndex](req, res, (nextError?: any) => {
+  await callHandler(route.handlers[handlerIndex], req, res, (nextError?: any) => {
     nextCalled = true
     error = nextError
   })
@@ -253,7 +253,7 @@ export const runRouteChain = async ({
   for (const handler of route.handlers) {
     let nextCalled = false
     let error: any
-    await handler(req, res, (nextError?: any) => {
+    await callHandler(handler, req, res, (nextError?: any) => {
       nextCalled = true
       error = nextError
     })

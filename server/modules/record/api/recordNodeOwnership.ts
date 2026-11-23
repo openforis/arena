@@ -19,23 +19,19 @@ type FetchNodeRecordUuid = (surveyId: number, nodeUuid: string) => Promise<strin
 export const createRequireNodeUuidBelongsToRecord =
   (fetchNodeRecordUuid: FetchNodeRecordUuid) =>
   async (req: ExpressRequest, res: ExpressResponse, next: (error?: unknown) => void): Promise<void> => {
-    try {
-      const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
-      // a malformed uuid is refused before querying the database
-      const validUuid = isUuid(String(nodeUuid))
-      const nodeRecordUuid = validUuid ? await fetchNodeRecordUuid(surveyId, nodeUuid) : null
-      // a node not found is let through: its create may still be queued in the records thread
-      if (!validUuid || (nodeRecordUuid && nodeRecordUuid !== recordUuid)) {
-        Response.sendErr(
-          res,
-          new SystemError(NodesBatchMessageKeys.nodeNotInRecord, { recordUuid }, StatusCodes.BAD_REQUEST)
-        )
-        return
-      }
-      next()
-    } catch (error) {
-      next(error)
+    const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
+    // a malformed uuid is refused before querying the database
+    const validUuid = isUuid(String(nodeUuid))
+    const nodeRecordUuid = validUuid ? await fetchNodeRecordUuid(surveyId, nodeUuid) : null
+    // a node not found is let through: its create may still be queued in the records thread
+    if (!validUuid || (nodeRecordUuid && nodeRecordUuid !== recordUuid)) {
+      Response.sendErr(
+        res,
+        new SystemError(NodesBatchMessageKeys.nodeNotInRecord, { recordUuid }, StatusCodes.BAD_REQUEST)
+      )
+      return
     }
+    next()
   }
 
 export const requireNodeUuidBelongsToRecord = createRequireNodeUuidBelongsToRecord((surveyId, nodeUuid) =>

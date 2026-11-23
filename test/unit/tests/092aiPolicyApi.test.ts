@@ -11,7 +11,7 @@ import {
 } from '@server/modules/auth/authApiMiddleware'
 import * as Response from '@server/utils/response'
 
-import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const surveyUuid = 'survey-1'
 const surveyInfo = { ...SurveyFactory.createInstance({ ownerUuid: 'owner-uuid', name: 'survey' }), uuid: surveyUuid }
@@ -60,7 +60,7 @@ const runChain = async (
   const res = createFakeResponse()
   for (const handler of handlers) {
     const outcome: { called: boolean; error?: unknown } = { called: false }
-    await handler(req, res, (error?: unknown) => {
+    await callHandler(handler, req, res, (error?: unknown) => {
       outcome.called = true
       outcome.error = error
     })

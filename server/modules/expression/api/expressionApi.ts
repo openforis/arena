@@ -29,88 +29,80 @@ const toItem =
 
 export const init = (app: Router): void => {
   // ==== READ
-  app.get('/expression/literal/item', async (req, res, next) => {
-    try {
-      const { surveyId, type, value } = Request.getParams(req)
+  app.get('/expression/literal/item', async (req, res) => {
+    const { surveyId, type, value } = Request.getParams(req)
 
-      if (NodeDef.nodeDefType.code === type) {
-        const { categoryUuid, lang } = Request.getParams(req)
+    if (NodeDef.nodeDefType.code === type) {
+      const { categoryUuid, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
-          surveyId,
-          categoryUuid,
-          levelIndex: 0,
-          draft: true,
-        })
+      const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
+        surveyId,
+        categoryUuid,
+        levelIndex: 0,
+        draft: true,
+      })
 
-        const item = A.pipe(
-          A.find((_item) => CategoryItem.getCode(_item) === value),
-          toItem(type, lang)
-        )(itemsDb)
+      const item = A.pipe(
+        A.find((_item) => CategoryItem.getCode(_item) === value),
+        toItem(type, lang)
+      )(itemsDb)
 
-        res.json({ item })
-      } else if (NodeDef.nodeDefType.taxon === type) {
-        const { taxonomyUuid } = Request.getParams(req)
+      res.json({ item })
+    } else if (NodeDef.nodeDefType.taxon === type) {
+      const { taxonomyUuid } = Request.getParams(req)
 
-        const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
+      const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
 
-        res.json({ item: toItem(type)(itemDb) })
-      } else {
-        throw new SystemError('invalidType', { type })
-      }
-    } catch (error) {
-      next(error)
+      res.json({ item: toItem(type)(itemDb) })
+    } else {
+      throw new SystemError('invalidType', { type })
     }
   })
 
-  app.get('/expression/literal/items', async (req, res, next) => {
-    try {
-      const { surveyId, type, value } = Request.getParams(req)
+  app.get('/expression/literal/items', async (req, res) => {
+    const { surveyId, type, value } = Request.getParams(req)
 
-      if (NodeDef.nodeDefType.code === type) {
-        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
+    if (NodeDef.nodeDefType.code === type) {
+      const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
 
-        const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
-          surveyId,
-          categoryUuid,
-          levelIndex: Number(categoryLevelIndex),
-          draft: true,
-        })
+      const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
+        surveyId,
+        categoryUuid,
+        levelIndex: Number(categoryLevelIndex),
+        draft: true,
+      })
 
-        const items = A.pipe(
-          A.ifElse(
-            A.always(isBlank(value)),
-            A.identity,
-            A.filter((item) => {
-              const code = CategoryItem.getCode(item)
-              const label = CategoryItem.getLabel(lang)(item)
-              return contains(value, code) || contains(value, label)
-            })
-          ),
-          A.sort((a, b) => Number(a.id) - Number(b.id)),
-          A.take(25),
-          A.map(toItem(type, lang))
-        )(itemsDb)
+      const items = A.pipe(
+        A.ifElse(
+          A.always(isBlank(value)),
+          A.identity,
+          A.filter((item) => {
+            const code = CategoryItem.getCode(item)
+            const label = CategoryItem.getLabel(lang)(item)
+            return contains(value, code) || contains(value, label)
+          })
+        ),
+        A.sort((a, b) => Number(a.id) - Number(b.id)),
+        A.take(25),
+        A.map(toItem(type, lang))
+      )(itemsDb)
 
-        res.json({ items })
-      } else if (NodeDef.nodeDefType.taxon === type) {
-        const { taxonomyUuid } = Request.getParams(req)
+      res.json({ items })
+    } else if (NodeDef.nodeDefType.taxon === type) {
+      const { taxonomyUuid } = Request.getParams(req)
 
-        const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName({
-          surveyId,
-          taxonomyUuid,
-          filterValue: value,
-          draft: true,
-        })
+      const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName({
+        surveyId,
+        taxonomyUuid,
+        filterValue: value,
+        draft: true,
+      })
 
-        const items = itemsDb.map(toItem(type))
+      const items = itemsDb.map(toItem(type))
 
-        res.json({ items })
-      } else {
-        throw new SystemError('invalidType', { type })
-      }
-    } catch (error) {
-      next(error)
+      res.json({ items })
+    } else {
+      throw new SystemError('invalidType', { type })
     }
   })
 }

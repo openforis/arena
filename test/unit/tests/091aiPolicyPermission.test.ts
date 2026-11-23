@@ -5,7 +5,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import { createRequireSurveyAiPolicyEditPermission } from '@server/modules/auth/authApiMiddleware'
 
-import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const surveyUuid = 'survey-1'
 const surveyInfo = { ...SurveyFactory.createInstance({ ownerUuid: 'owner-uuid', name: 'survey' }), uuid: surveyUuid }
@@ -50,7 +50,7 @@ describe('requireSurveyAiPolicyEditPermission', () => {
     req.user = user
     const res = createFakeResponse()
     const nextCalls: unknown[] = []
-    await middleware(req, res, (error?: unknown) => nextCalls.push(error))
+    await callHandler(middleware, req, res, (error?: unknown) => nextCalls.push(error))
     return { res, nextCalls }
   }
 

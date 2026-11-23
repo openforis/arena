@@ -128,27 +128,23 @@ export const getPendingNodeFromBody = (req: ExpressRequest): ArenaRecordNode | n
 const _requireRecordAccess =
   (accessType: RecordAccessType) =>
   async (req: ExpressRequest, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { surveyId, recordUuid } = Request.getParams(req)
-      const user = Request.getUser(req)
-      // a node to be created/updated is checked too, so an edit can't move the record out of the user's group
-      const pendingNode = accessType === 'editable' ? getPendingNodeFromBody(req) : null
+    const { surveyId, recordUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
+    // a node to be created/updated is checked too, so an edit can't move the record out of the user's group
+    const pendingNode = accessType === 'editable' ? getPendingNodeFromBody(req) : null
 
-      const access = await _determineRecordAccessByUserGroup({
-        user,
-        surveyId,
-        recordUuid,
-        pendingNode,
-        fetchSurveyAndAccessFiltersByCycle: _fetchSurveyAndAccessFiltersByCycleCached({ surveyId, user }),
-      })
-      if (access[accessType]) {
-        next()
-        return
-      }
-      sendForbiddenError(req, res)
-    } catch (error) {
-      next(error)
+    const access = await _determineRecordAccessByUserGroup({
+      user,
+      surveyId,
+      recordUuid,
+      pendingNode,
+      fetchSurveyAndAccessFiltersByCycle: _fetchSurveyAndAccessFiltersByCycleCached({ surveyId, user }),
+    })
+    if (access[accessType]) {
+      next()
+      return
     }
+    sendForbiddenError(req, res)
   }
 
 const _getRecordUuidsParam = (req: ExpressRequest): string[] => Requests.getArrayParam('recordUuids')(req) as string[]
@@ -161,34 +157,30 @@ const _getMergeRecordUuidsParams = (req: ExpressRequest): string[] => {
 const _requireRecordsAccess =
   (accessType: RecordAccessType, getRecordUuids: (req: ExpressRequest) => string[] = _getRecordUuidsParam) =>
   async (req: ExpressRequest, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { surveyId } = Request.getParams(req)
-      const recordUuids = getRecordUuids(req)
+    const { surveyId } = Request.getParams(req)
+    const recordUuids = getRecordUuids(req)
 
-      if (recordUuids.length === 0) {
-        next()
+    if (recordUuids.length === 0) {
+      next()
+      return
+    }
+
+    const user = Request.getUser(req)
+    const fetchSurveyAndAccessFiltersByCycle = _fetchSurveyAndAccessFiltersByCycleCached({ surveyId, user })
+
+    for (const recordUuid of recordUuids) {
+      const access = await _determineRecordAccessByUserGroup({
+        user,
+        surveyId,
+        recordUuid,
+        fetchSurveyAndAccessFiltersByCycle,
+      })
+      if (!access[accessType]) {
+        sendForbiddenError(req, res)
         return
       }
-
-      const user = Request.getUser(req)
-      const fetchSurveyAndAccessFiltersByCycle = _fetchSurveyAndAccessFiltersByCycleCached({ surveyId, user })
-
-      for (const recordUuid of recordUuids) {
-        const access = await _determineRecordAccessByUserGroup({
-          user,
-          surveyId,
-          recordUuid,
-          fetchSurveyAndAccessFiltersByCycle,
-        })
-        if (!access[accessType]) {
-          sendForbiddenError(req, res)
-          return
-        }
-      }
-      next()
-    } catch (error) {
-      next(error)
     }
+    next()
   }
 
 /**

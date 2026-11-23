@@ -66,91 +66,63 @@ const sendUserSurvey = async (res, user, surveyId) => {
 }
 
 export const init = (app: Router): void => {
-  app.get('/api/version', async (_req, res, next) => {
-    try {
-      const packageJson = JSON.parse(await FileUtils.readFile('package.json'))
-      const { version } = packageJson
-      res.json({ version, minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload })
-    } catch (error) {
-      next(error)
+  app.get('/api/version', async (_req, res) => {
+    const packageJson = JSON.parse(await FileUtils.readFile('package.json'))
+    const { version } = packageJson
+    res.json({ version, minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload })
+  })
+
+  app.get('/api/changelog', AuthMiddleware.requireAdminPermission, async (_req, res) => {
+    const content = await FileUtils.readFile('CHANGELOG.md')
+    res.json({ content })
+  })
+
+  app.get('/auth/user', async (req, res) => {
+    // the request user is loaded with every pref: the server-only ones never go back to the browser
+    const user = omitServerOnlyPrefsFromUser(Request.getUser(req))
+    const surveysCount = await UserService.fetchUserSurveysCount(User.getUuid(user))
+    const userWithCounts = { ...user, ...surveysCount }
+    const surveyId = User.getPrefSurveyCurrent(user)
+
+    if (surveyId) {
+      await sendUserSurvey(res, userWithCounts, surveyId)
+    } else {
+      sendResponse(res, userWithCounts)
     }
   })
 
-  app.get('/api/changelog', AuthMiddleware.requireAdminPermission, async (_req, res, next) => {
-    try {
-      const content = await FileUtils.readFile('CHANGELOG.md')
-      res.json({ content })
-    } catch (error) {
-      next(error)
-    }
-  })
+  app.post('/auth/logout', async (req, res) => {
+    // Before logout checkOut record if there's an opened thread
+    const socketId = Request.getSocketId(req)
+    await RecordService.dissocSocketFromUpdateThread(socketId)
 
-  app.get('/auth/user', async (req, res, next) => {
-    try {
-      // the request user is loaded with every pref: the server-only ones never go back to the browser
-      const user = omitServerOnlyPrefsFromUser(Request.getUser(req))
-      const surveysCount = await UserService.fetchUserSurveysCount(User.getUuid(user))
-      const userWithCounts = { ...user, ...surveysCount }
-      const surveyId = User.getPrefSurveyCurrent(user)
-
-      if (surveyId) {
-        await sendUserSurvey(res, userWithCounts, surveyId)
-      } else {
-        sendResponse(res, userWithCounts)
-      }
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.post('/auth/logout', async (req, res, next) => {
-    try {
-      // Before logout checkOut record if there's an opened thread
-      const socketId = Request.getSocketId(req)
-      await RecordService.dissocSocketFromUpdateThread(socketId)
-
-      res.clearCookie('refreshToken', {
-        httpOnly: true,
-        path: ApiEndpoint.auth.tokenRefresh(),
-        sameSite: 'strict',
-        secure: ProcessUtils.isEnvProduction,
-      })
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      path: ApiEndpoint.auth.tokenRefresh(),
+      sameSite: 'strict',
+      secure: ProcessUtils.isEnvProduction,
+    })
+    Response.sendOk(res)
   })
 
   // ===== RESET PASSWORD
-  app.post('/auth/reset-password', async (req, res, next) => {
-    try {
-      const { email } = Request.getParams(req)
-      const serverUrl = Request.getPublicServerUrl(req)
-      // never return the reset token: it is only sent by email
-      const { error } = await UserService.generateResetPasswordUuid(email, serverUrl)
-      res.json({ error })
-    } catch (error) {
-      next(error)
-    }
+  app.post('/auth/reset-password', async (req, res) => {
+    const { email } = Request.getParams(req)
+    const serverUrl = Request.getPublicServerUrl(req)
+    // never return the reset token: it is only sent by email
+    const { error } = await UserService.generateResetPasswordUuid(email, serverUrl)
+    res.json({ error })
   })
 
-  app.get('/auth/reset-password/:uuid', async (req, res, next) => {
-    try {
-      const { uuid } = Request.getParams(req)
-      const user = await UserService.findResetPasswordUserByUuid(uuid)
-      res.json({ user })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/auth/reset-password/:uuid', async (req, res) => {
+    const { uuid } = Request.getParams(req)
+    const user = await UserService.findResetPasswordUserByUuid(uuid)
+    res.json({ user })
   })
 
-  app.put('/auth/reset-password/:uuid', async (req, res, next) => {
-    try {
-      const { uuid, name, password, title } = Request.getParams(req)
-      await UserService.resetPassword({ uuid, name, password, title })
-      res.json({ result: true })
-    } catch (error) {
-      next(error)
-    }
+  app.put('/auth/reset-password/:uuid', async (req, res) => {
+    const { uuid, name, password, title } = Request.getParams(req)
+    await UserService.resetPassword({ uuid, name, password, title })
+    res.json({ result: true })
   })
 }

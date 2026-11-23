@@ -78,3 +78,24 @@ export const createFakeRequest = (body: unknown) => {
   req.params = {}
   return req
 }
+
+/**
+ * Calls a route handler or middleware as Express 5 does: an error it throws (a rejected promise) goes to next.
+ * @param {Function} handler - The handler.
+ * @param {object} req - The request.
+ * @param {object} res - The response.
+ * @param {Function} next - The next function.
+ * @returns {Promise<void>} Settles when the handler does.
+ */
+export const callHandler = async (
+  handler: (req: any, res: any, next: (error?: any) => void) => unknown,
+  req: any,
+  res: any,
+  next: (error?: any) => void
+): Promise<void> => {
+  try {
+    await handler(req, res, next)
+  } catch (error) {
+    next(error)
+  }
+}
