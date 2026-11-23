@@ -1,7 +1,7 @@
 # Developer documentation
 
 Documentation for people working on the Arena code. User documentation: the [user manual](user-manual/)
-(Open Foris Arena Handbook) and the [Open Foris Arena website](https://openforis.org/tools/arena/).
+(Open Foris Arena User Manual) and the [Open Foris Arena website](https://openforis.org/tools/arena/).
 
 ## Guides
 
