@@ -1472,7 +1472,7 @@
         "11. Roles de usuario e invitación para acceder a una encuesta"
       ],
       "text": "Para editar un usuario de la encuesta actual, abra Usuarios > Lista de usuarios y haga clic en el usuario. La página muestra arriba un resumen del usuario (nombre, correo electrónico, rol y estado de la invitación) y las siguientes secciones:\n- Información personal: título, nombre, correo electrónico y propiedades extra del usuario;\n- Acceso y permisos: el Rol en la encuesta actual y, para los administradores del sistema, los permisos Administrador del sistema y Gestor de encuestas y el Máximo de encuestas que el usuario puede crear;\n- Inicio de sesión y seguridad (solo administradores del sistema): los métodos de inicio de sesión del usuario, con Cambiar contraseña y Desvincular;\n- Eliminar de la encuesta: revoca el acceso del usuario a la encuesta, tras una confirmación.\nHaga clic en Guardar en la barra de la parte inferior de la página para guardar los cambios.\nSi el usuario no ha aceptado la invitación a tiempo, la página indica que la invitación ha caducado: haga clic en Enviar nueva invitación para enviarla de nuevo.",
-      "anchor": "nameddest=5Fdi8o7oxt4z7q"
+      "anchor": "nameddest=5Fediting5Fsurvey5Fuser"
     },
     {
       "id": "12",
