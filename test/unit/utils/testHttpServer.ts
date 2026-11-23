@@ -42,9 +42,14 @@ export const createTestHttpServer = () => {
      */
     untilClientClosed: async (maxMs: number) => {
       const start = Date.now()
-      while (testServer.closedRequests === 0 && Date.now() - start < maxMs) {
-        await new Promise((resolve) => setTimeout(resolve, 10))
-      }
+      await new Promise<void>((resolve) => {
+        const timer = setInterval(() => {
+          if (testServer.closedRequests > 0 || Date.now() - start >= maxMs) {
+            clearInterval(timer)
+            resolve()
+          }
+        }, 10)
+      })
       expect(testServer.closedRequests).toBeGreaterThan(0)
     },
   }

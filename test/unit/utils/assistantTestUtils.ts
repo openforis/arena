@@ -123,10 +123,10 @@ export const textStream = (text: string): any =>
  * @param {unknown} [input] - Tool input (default: the tool name as summary).
  * @returns {ReadableStream} The stream.
  */
-export const toolCallStream = (toolCallId: string, toolName: string, input: unknown = { summary: toolName }): any =>
+export const toolCallStream = (toolCallId: string, toolName: string, input?: unknown): any =>
   convertArrayToReadableStream([
     { type: 'stream-start', warnings: [] },
-    { type: 'tool-call', toolCallId, toolName, input: JSON.stringify(input) },
+    { type: 'tool-call', toolCallId, toolName, input: JSON.stringify(input ?? { summary: toolName }) },
     finish('tool-calls'),
   ] as any[])
 
@@ -138,7 +138,7 @@ export const toolCallStream = (toolCallId: string, toolName: string, input: unkn
 export const scriptedModel = (...streams: (() => any)[]): MockLanguageModelV4 => {
   let call = 0
   return new MockLanguageModelV4({
-    doStream: async () => ({ stream: streams[Math.min(call++, streams.length - 1)]() }) as any,
+    doStream: () => Promise.resolve({ stream: streams[Math.min(call++, streams.length - 1)]() }) as any,
   })
 }
 

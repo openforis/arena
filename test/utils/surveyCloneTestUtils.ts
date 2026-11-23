@@ -18,12 +18,14 @@ export const createCloneTargetSurvey = (user: any, rootEntityName: string): Prom
   ).buildAndStore()
 
 /**
- * Deletes the surveys, skipping the ones not created.
+ * Deletes the surveys one at a time (each drops its schemas), skipping the ones not created.
  * @param {object[]} surveys - The surveys.
  * @returns {Promise<void>} Resolves when deleted.
  */
-export const deleteSurveys = async (surveys: any[]): Promise<void> => {
-  for (const survey of surveys) {
-    if (survey) await SurveyManager.deleteSurvey(Survey.getId(survey))
-  }
-}
+export const deleteSurveys = (surveys: any[]): Promise<void> =>
+  surveys
+    .filter(Boolean)
+    .reduce(
+      (previous: Promise<void>, survey) => previous.then(() => SurveyManager.deleteSurvey(Survey.getId(survey))),
+      Promise.resolve()
+    )
