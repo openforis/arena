@@ -13,26 +13,14 @@ import { ButtonIconDelete } from '@webapp/components/buttons'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/validationTooltip'
-import type { ArenaValidation, ArenaNodeDefExpression } from '@openforis/arena-core'
+import type { ArenaNodeDefExpression } from '@openforis/arena-core'
 
-type ExpressionPropProps = {
+import type { ExpressionEditorSettingsProps } from './expressionPropTypes'
+
+type ExpressionPropProps = ExpressionEditorSettingsProps & {
   index: number // used to generate test ids
-  qualifier: string // used to generate test ids
-  nodeDefUuidContext?: string
-  nodeDefUuidCurrent?: string
-  excludeCurrentNodeDef?: boolean
-  validation?: ArenaValidation
   expression: ArenaNodeDefExpression
-  applyIf?: boolean
-  severity?: boolean
-  showLabels?: boolean
-  readOnly?: boolean
-  isContextParent?: boolean
   canBeCall?: boolean
-  canBeConstant?: boolean
-  isBoolean?: boolean
-  hideAdvanced?: boolean
-  mode?: any
   onUpdate?: (...args: any[]) => any
   onDelete?: (...args: any[]) => any
 }

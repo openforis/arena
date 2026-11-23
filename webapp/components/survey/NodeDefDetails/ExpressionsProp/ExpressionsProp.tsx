@@ -23,6 +23,8 @@ import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
 import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+
+import type { ExpressionEditorSettingsProps } from './expressionPropTypes'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 
 import ExpressionProp from './ExpressionProp'
@@ -74,26 +76,12 @@ const ExpressionsWrapper = (props: ExpressionsWrapperProps) => {
   )
 }
 
-type ExpressionsPropProps = {
-  applyIf?: boolean
-  canBeConstant?: boolean
+export type ExpressionsPropProps = ExpressionEditorSettingsProps & {
   determineValueType?: (...args: any[]) => any
-  excludeCurrentNodeDef?: boolean
-  hideAdvanced?: boolean
   info?: string
-  isBoolean?: boolean
-  isContextParent?: boolean
   label?: string
-  mode?: any
   multiple?: boolean
-  nodeDefUuidContext?: string
-  nodeDefUuidCurrent?: string
   onChange: (...args: any[]) => any
-  qualifier: string // used to generate test ids
-  readOnly?: boolean
-  severity?: boolean
-  showLabels?: boolean
-  validation?: ArenaValidation
   values?: any[] // Array of expressions
   valueTypeSelection?: boolean
   valueConstantEditorNumberFormat?: Record<string, any>

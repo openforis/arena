@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
-import ExpressionsProp from './ExpressionsProp'
+import ExpressionsProp, { type ExpressionsPropProps } from './ExpressionsProp'
 import { Fieldset } from '@webapp/components/Fieldset'
 import Radiobox from '@webapp/components/form/radiobox'
 import { TestId } from '@webapp/utils/testId'
@@ -17,7 +17,11 @@ const defaultRadioModes = {
   defined: 'defined',
 }
 
-type NodeDefExpressionsPropProps = {
+// the expressions editor props, but values, validation and current node def are taken from the node def being edited
+type NodeDefExpressionsPropProps = Omit<
+  ExpressionsPropProps,
+  'values' | 'validation' | 'nodeDefUuidCurrent' | 'onChange'
+> & {
   children?: ReactNode
   radioMode?: boolean
   radioModes?: any[]
@@ -26,29 +30,11 @@ type NodeDefExpressionsPropProps = {
   determineRadioMode?: (...args: any[]) => any
   onRadioModeChange?: (...args: any[]) => any
   isRadioModeDisabled?: (...args: any[]) => any
-  qualifier: string // used to generate test ids
   state: Record<string, any>
   Actions: Record<string, any>
   onChange?: (...args: any[]) => any
-  nodeDefUuidContext?: string
   propName?: string
   propExtractor?: (...args: any[]) => any
-  info?: string
-  label?: string
-  mode?: string
-  applyIf?: boolean
-  severity?: boolean
-  showLabels?: boolean
-  multiple?: boolean
-  readOnly?: boolean
-  isContextParent?: boolean
-  canBeConstant?: boolean
-  isBoolean?: boolean
-  hideAdvanced?: boolean
-  excludeCurrentNodeDef?: boolean
-  valueTypeSelection?: boolean
-  determineValueType?: (...args: any[]) => any
-  valueConstantEditorNumberFormat?: Record<string, any>
 }
 
 const NodeDefExpressionsProp = (props: NodeDefExpressionsPropProps) => {
