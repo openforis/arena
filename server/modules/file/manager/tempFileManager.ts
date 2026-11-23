@@ -26,17 +26,17 @@ export const chunkMergeFunctionByStorageType = {
 // param exists purely as a test seam (this repo's webpack-bundled unit tests can't jest.mock()
 // local modules, so tests call this directly with an explicit storageType instead). Production
 // code should never pass it explicitly.
-export const getStorageFunctionOrThrow = ({
+export const getStorageFunctionOrThrow = <F>({
   functionByStorageType,
   operation,
   defaultFn = null,
   storageType = getFileContentStorageType(),
 }: {
-  functionByStorageType: Record<string, any>
-  operation: any
-  defaultFn?: any
-  storageType?: any
-}) => {
+  functionByStorageType: Record<string, F>
+  operation: string
+  defaultFn?: F | null
+  storageType?: string
+}): F => {
   const tempFileStorageType =
     storageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : storageType
   const fn = functionByStorageType[tempFileStorageType] ?? defaultFn

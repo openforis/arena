@@ -11,7 +11,15 @@ import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
 const errorPrefix = `validationErrors:surveyLabelsImport.`
 
-const extractLabels = ({ row, langCodes, columnPrefix }: { row: any; langCodes: string[]; columnPrefix: string }) =>
+const extractLabels = ({
+  row,
+  langCodes,
+  columnPrefix,
+}: {
+  row: { [header: string]: string }
+  langCodes: string[]
+  columnPrefix: string
+}) =>
   langCodes.reduce((acc, langCode) => {
     const value = row[`${columnPrefix}${langCode}`]
     if (StringUtils.isNotBlank(value)) {
@@ -21,7 +29,7 @@ const extractLabels = ({ row, langCodes, columnPrefix }: { row: any; langCodes: 
   }, {})
 
 export default class SurveyLabelsImportJob extends Job {
-  flatDataReader: any
+  flatDataReader: FlatDataReader.FlatDataReader | null
 
   static readonly type: string = 'SurveyLabelsImportJob'
 

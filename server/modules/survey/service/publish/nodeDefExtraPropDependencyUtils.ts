@@ -15,9 +15,7 @@ type ExtraPropDefsMap = Record<string, any>
 type ExtraValueRow = Record<string, any>
 type ChangedEntity = { name: string; changedPropNames: Set<string> }
 
-// ExtraPropDef.getDataType is a Ramda-style curried function typed as `unknown` by its curry helper -
-// cast once here rather than at every call site.
-const getExtraPropDefDataType = ExtraPropDef.getDataType as (extraPropDef: any) => string
+const getExtraPropDefDataType = ExtraPropDef.getDataType
 
 // Compares two raw extra-prop-def maps (name -> { dataType, index, locked }) and returns the set of
 // prop names that were added, removed, or retyped between them. Reordering (index) and locked flips

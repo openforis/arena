@@ -1,4 +1,4 @@
-import type { ArenaTaxonomy, ArenaUser } from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaTaxonomy, ArenaUser } from '@openforis/arena-core'
 
 import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
@@ -34,15 +34,15 @@ const createPredefinedTaxa = (taxonomy: ArenaTaxonomy) => [
 const predefinedCodes = new Set([Taxon.unknownCode, Taxon.unlistedCode])
 
 export default class TaxonomyImportManager {
-  batchPersisterInsert: any
-  batchPersisterUpdate: any
-  existingTaxa: any
-  existingTaxaByCode: any
-  existingTaxaByScientificName: any
+  batchPersisterInsert: BatchPersister<ArenaTaxon>
+  batchPersisterUpdate: BatchPersister<ArenaTaxon>
+  existingTaxa: ArenaTaxon[]
+  existingTaxaByCode: { [code: string]: ArenaTaxon }
+  existingTaxaByScientificName: { [scientificName: string]: ArenaTaxon }
   extraPropsDefs: Record<string, Record<string, unknown>>
-  insertedCodes: any
-  insertedScientificNames: any
-  seenCodes: any
+  insertedCodes: Set<string>
+  insertedScientificNames: Set<string>
+  seenCodes: Set<string>
   surveyId: number
   taxonomy: ArenaTaxonomy
   tx: DbClient

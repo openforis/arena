@@ -30,7 +30,7 @@ export const validateTaxonomy = (
 
 // ====== TAXON
 
-const _validateVernacularNames = (_: any, taxon: ArenaTaxon) => {
+const _validateVernacularNames = (_propName: string, taxon: ArenaTaxon) => {
   const vernacularNamesByLang = Taxon.getVernacularNames(taxon)
   const vernacularNamesDuplicate = Object.values(vernacularNamesByLang).reduce(
     (duplicatesAcc, vernacularNamesPerLang) => {

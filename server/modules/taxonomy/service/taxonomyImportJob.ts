@@ -25,13 +25,13 @@ import SystemError from '@core/systemError'
 const requiredColumns = ['code', 'scientific_name']
 const fixedColumns = new Set([...requiredColumns, 'family', 'genus'])
 
-const filterExtraPropsColumns = (columns: any) =>
+const filterExtraPropsColumns = (columns: string[]) =>
   columns.filter((column) => !fixedColumns.has(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
   static readonly type = 'TaxonomyImportJob'
-  currentRow: any
-  extraPropsDefs: any
+  currentRow: number
+  extraPropsDefs: Record<string, Record<string, unknown>> | null
   fileFormat: string
   filePath: string
   flatDataReader: FlatDataReader.FlatDataReader

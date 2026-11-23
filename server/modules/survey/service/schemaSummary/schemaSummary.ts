@@ -57,7 +57,7 @@ const getExpressionsSummary = ({
   expressions,
   includeSeverity = false,
 }: {
-  expressions: any
+  expressions: { expression?: string; applyIf?: string; severity?: string }[]
   includeSeverity?: boolean
 }) =>
   expressions
