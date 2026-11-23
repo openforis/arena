@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout/legacy'
@@ -16,6 +16,8 @@ import { useIsMountedRef } from '@webapp/components/hooks'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+
+import { pushDownItemsOverlappingResizedItem } from './gridLayoutPushDown'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -38,6 +40,8 @@ const NodeDefEntityFormGrid = (props) => {
 
   const editWrapperRef = useRef(null)
   const entryContainerRef = useRef(null)
+  const layoutAtResizeStartRef = useRef(null)
+  const [resizing, setResizing] = useState(false)
 
   const survey = useSelector(SurveyState.getSurvey)
   const record = useRecord()
@@ -68,6 +72,31 @@ const NodeDefEntityFormGrid = (props) => {
       }
     },
     [dispatch, nodeDef]
+  )
+
+  const onResizeStart = useCallback((layout) => {
+    layoutAtResizeStartRef.current = layout.map((item) => ({ ...item }))
+    // collisions are prevented only when dragging: when resizing, the items below are pushed down
+    setResizing(true)
+  }, [])
+
+  const onResize = useCallback((layout, _oldItem, resizedItem) => {
+    const layoutAtResizeStart = layoutAtResizeStartRef.current
+    if (!layoutAtResizeStart) return
+    const layoutUpdated = pushDownItemsOverlappingResizedItem({ layout, resizedItem, layoutAtResizeStart })
+    // react-grid-layout ignores the returned value but uses this (new) layout array to update its state
+    for (const [index, item] of layoutUpdated.entries()) {
+      layout[index] = item
+    }
+  }, [])
+
+  const onResizeStop = useCallback(
+    (layout) => {
+      layoutAtResizeStartRef.current = null
+      setResizing(false)
+      onChangeLayout(layout)
+    },
+    [onChangeLayout]
   )
 
   const columns = NodeDefLayout.getColumnsNo(cycle)(nodeDef)
@@ -195,11 +224,13 @@ const NodeDefEntityFormGrid = (props) => {
           draggableCancel=".survey-form__node-def-edit-buttons, .survey-form__node-def-entity-table-cell"
           isResizable={canEditDef}
           compactType={null}
-          preventCollision
+          preventCollision={!resizing}
           // eslint-disable-next-line react-hooks/refs -- mountedRef only flips after the initial render (pre-existing)
           className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
           onDragStop={onChangeLayout}
-          onResizeStop={onChangeLayout}
+          onResizeStart={onResizeStart}
+          onResize={onResize}
+          onResizeStop={onResizeStop}
           useCSSTransforms={false}
         >
           {visibleNodeDefsComponents}
