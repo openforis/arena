@@ -1,9 +1,8 @@
 import type { LatLngBoundsExpression } from 'leaflet'
 import './Map.scss'
 
-import { useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { GeoJSON, MapContainer as RLMapContainer, ZoomControl, useMap as useLeafletMap } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import { ButtonSave } from '@webapp/components'
 
@@ -28,6 +27,8 @@ import L from 'leaflet'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+import type { GeoJsonObject } from 'geojson'
+import type { MapRailTab, MapWorkspaceRecords } from './workspace/mapWorkspaceTypes'
 L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [10, 41],
@@ -80,7 +81,24 @@ const MapResizeHandler = () => {
   return null
 }
 
-export const MapContainer = (props) => {
+type MapContainerProps = {
+  baseLayersLabel?: string
+  centerPoint?: Record<string, any>
+  // rendered inside the Leaflet map (e.g. layers using react-leaflet's useMap)
+  children?: ReactNode
+  editable?: boolean
+  extraRailTabs?: MapRailTab[]
+  geoJson?: GeoJsonObject
+  layers?: any[]
+  markerPoint?: Record<string, any>
+  markerTitle?: string
+  onMarkerPointChange?: (...args: any[]) => any
+  overlayGroups?: any[]
+  records?: MapWorkspaceRecords
+  variant?: 'full' | 'compact'
+}
+
+export const MapContainer = (props: MapContainerProps) => {
   const {
     baseLayersLabel,
     centerPoint,
@@ -167,21 +185,4 @@ export const MapContainer = (props) => {
       )}
     </div>
   )
-}
-
-MapContainer.propTypes = {
-  baseLayersLabel: PropTypes.string,
-  centerPoint: PropTypes.object,
-  // rendered inside the Leaflet map (e.g. layers using react-leaflet's useMap)
-  children: PropTypes.node,
-  editable: PropTypes.bool,
-  extraRailTabs: PropTypes.array,
-  geoJson: PropTypes.object,
-  layers: PropTypes.array,
-  markerPoint: PropTypes.object,
-  markerTitle: PropTypes.string,
-  onMarkerPointChange: PropTypes.func,
-  overlayGroups: PropTypes.array,
-  records: PropTypes.shape({ candidates: PropTypes.array, onSelect: PropTypes.func }),
-  variant: PropTypes.oneOf(['full', 'compact']),
 }

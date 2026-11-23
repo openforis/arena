@@ -1,10 +1,16 @@
 import { useCallback } from 'react'
 import { FormControlLabel as MuiFormControlLabel, Switch as MUISwitch } from '@mui/material'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 
-export const Switch = (props) => {
+type SwitchProps = {
+  checked?: boolean
+  disabled?: boolean
+  label?: string
+  onChange?: (...args: any[]) => any
+}
+
+export const Switch = (props: SwitchProps) => {
   const { checked = false, disabled = false, label = null, onChange: onChangeProp } = props
 
   const i18n = useI18n()
@@ -19,11 +25,4 @@ export const Switch = (props) => {
   const control = <MUISwitch checked={checked} disabled={disabled} onChange={onChange} />
 
   return label ? <MuiFormControlLabel control={control} label={i18n.t(label)} /> : control
-}
-
-Switch.propTypes = {
-  checked: PropTypes.bool,
-  disabled: PropTypes.bool,
-  label: PropTypes.string,
-  onChange: PropTypes.func,
 }

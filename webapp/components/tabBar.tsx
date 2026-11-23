@@ -1,12 +1,26 @@
 import './tabBar.scss'
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
 import { Button } from './buttons'
 
-const TabBarButtons = ({ tabs, selection, onClick }) => (
+type Tab = {
+  id?: string
+  label: string
+  icon?: string
+  disabled?: boolean
+  component?: React.ElementType
+  props?: Record<string, unknown>
+}
+
+type TabBarButtonsProps = {
+  tabs: Tab[]
+  selection: number
+  onClick: (...args: any[]) => any
+}
+
+const TabBarButtons = ({ tabs, selection, onClick }: TabBarButtonsProps) => (
   <div className="flex-center tab-bar__header">
     {tabs.map((tab, i) => (
       <Button
@@ -23,20 +37,16 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
   </div>
 )
 
-const TabPropType = PropTypes.shape({
-  id: PropTypes.string,
-  label: PropTypes.string.isRequired,
-  icon: PropTypes.string,
-  disabled: PropTypes.bool,
-})
-
-TabBarButtons.propTypes = {
-  tabs: PropTypes.arrayOf(TabPropType).isRequired,
-  selection: PropTypes.number.isRequired,
-  onClick: PropTypes.func.isRequired,
+type TabBarProps = {
+  className?: string
+  onClick?: (...args: any[]) => any
+  renderer?: (...args: any[]) => any
+  selection?: number
+  showTabs?: boolean
+  tabs: Tab[]
 }
 
-const TabBar = (props) => {
+const TabBar = (props: TabBarProps) => {
   const { className = '', onClick = null, renderer = null, selection = 0, showTabs = true, tabs = [] } = props
 
   const [selectionState, setSelectionState] = useState(selection)
@@ -65,15 +75,6 @@ const TabBar = (props) => {
         : React.createElement(selectedTab.component, { ...selectedTab.props, ...props })}
     </div>
   )
-}
-
-TabBar.propTypes = {
-  className: PropTypes.string,
-  onClick: PropTypes.func,
-  renderer: PropTypes.func,
-  selection: PropTypes.number,
-  showTabs: PropTypes.bool,
-  tabs: PropTypes.arrayOf(TabPropType).isRequired,
 }
 
 export default TabBar

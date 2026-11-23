@@ -2,7 +2,6 @@ import './ImageProgressive.scss'
 
 import { useCallback, useEffect, useState } from 'react'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
@@ -32,7 +31,15 @@ const fetchImage = async (url) => {
   }
 }
 
-const ImageProgressive = (props) => {
+type ImageProgressiveProps = {
+  alt?: string
+  altSrc?: string
+  className?: string
+  placeholderSrc: string
+  src: string
+}
+
+const ImageProgressive = (props: ImageProgressiveProps) => {
   const { alt, altSrc, className, placeholderSrc, src: srcProp } = props
 
   const [state, setState] = useState({ loading: true, error: false, mainUrlOrBlobUrl: null, altUrlOrBlobUrl: null })
@@ -111,14 +118,6 @@ const ImageProgressive = (props) => {
       )}
     </>
   )
-}
-
-ImageProgressive.propTypes = {
-  alt: PropTypes.string,
-  altSrc: PropTypes.string,
-  className: PropTypes.string,
-  placeholderSrc: PropTypes.string.isRequired,
-  src: PropTypes.string.isRequired,
 }
 
 export default ImageProgressive

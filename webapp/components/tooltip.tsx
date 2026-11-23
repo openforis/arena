@@ -1,8 +1,7 @@
 import './tooltip.scss'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import ReactDom from 'react-dom'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { Objects } from '@openforis/arena-core'
@@ -23,7 +22,20 @@ const determineElementIsInsideModal = (element) => {
   return false
 }
 
-const Tooltip = (props) => {
+type TooltipProps = {
+  children: ReactNode
+  className?: string
+  id?: string
+  insideTable?: boolean
+  messages?: any[]
+  messageComponent?: ReactNode
+  position?: 'bottom' | 'top'
+  showContent?: boolean
+  testId?: string
+  type?: 'info' | 'error' | 'warning'
+}
+
+const Tooltip = (props: TooltipProps) => {
   const {
     children,
     className = null,
@@ -122,19 +134,6 @@ const Tooltip = (props) => {
       {messageElement && ReactDom.createPortal(messageElement, document.body)}
     </div>
   )
-}
-
-Tooltip.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  insideTable: PropTypes.bool,
-  messages: PropTypes.array,
-  messageComponent: PropTypes.node,
-  position: PropTypes.oneOf(['bottom', 'top']),
-  showContent: PropTypes.bool,
-  testId: PropTypes.string,
-  type: PropTypes.oneOf(['info', 'error', 'warning']),
 }
 
 export default Tooltip

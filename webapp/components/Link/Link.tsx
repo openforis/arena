@@ -1,9 +1,16 @@
+import type React from 'react'
 import MuiLink from '@mui/material/Link'
-import PropTypes from 'prop-types'
 
 const isUrlSafe = (url) => url && (url.startsWith('http://') || url.startsWith('https://'))
 
-export const Link = (props) => {
+type LinkProps = {
+  children?: React.ReactNode
+  disabled?: boolean
+  href: string
+  label?: string
+}
+
+export const Link = (props: LinkProps) => {
   const { children = null, disabled = false, href, label = undefined } = props
   // Validate href to prevent XSS attacks
   const hrefIsSafe = isUrlSafe(href)
@@ -26,11 +33,4 @@ export const Link = (props) => {
       {children ?? label ?? href}
     </MuiLink>
   )
-}
-
-Link.propTypes = {
-  children: PropTypes.node,
-  disabled: PropTypes.bool,
-  href: PropTypes.string.isRequired,
-  label: PropTypes.string,
 }

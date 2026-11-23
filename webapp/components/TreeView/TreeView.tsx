@@ -1,7 +1,6 @@
 import './TreeView.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem as MuiTreeItem } from '@mui/x-tree-view/TreeItem'
@@ -11,17 +10,24 @@ import { ArrayUtils } from '@core/arrayUtils'
 
 import { LabelWithTooltip } from '../form/LabelWithTooltip'
 
-const TreeItemPropTypes = PropTypes.shape({
-  key: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  hasSubPages: PropTypes.bool,
-  icon: PropTypes.any,
-  items: PropTypes.array,
-  label: PropTypes.string.isRequired,
-  testId: PropTypes.string,
-})
+type TreeItem = {
+  key: string
+  disabled?: boolean
+  hasSubPages?: boolean
+  icon?: any
+  items?: TreeItem[]
+  label: string
+  testId?: string
+}
 
-const TreeItemView = (props) => {
+type TreeItemViewProps = {
+  item?: TreeItem
+  renderItemPrefix?: (...args: any[]) => any
+  renderItemSuffix?: (...args: any[]) => any
+  expandedItemKeys?: any[]
+}
+
+const TreeItemView = (props: TreeItemViewProps) => {
   const { item, renderItemPrefix, renderItemSuffix, expandedItemKeys } = props
   const { key, disabled, hasSubPages, icon, label, items, testId } = item
   const isExpanded = Boolean(expandedItemKeys?.includes(key))
@@ -60,14 +66,18 @@ const TreeItemView = (props) => {
   )
 }
 
-TreeItemView.propTypes = {
-  item: TreeItemPropTypes,
-  renderItemPrefix: PropTypes.func,
-  renderItemSuffix: PropTypes.func,
-  expandedItemKeys: PropTypes.array,
+type TreeViewProps = {
+  disableSelection?: boolean
+  expadedItemKeys?: any[]
+  items: TreeItem[]
+  onExpandedItemKeysChange?: (...args: any[]) => any
+  onSelectedItemKeysChange?: (...args: any[]) => any
+  selectedItemKeys?: any[]
+  renderItemPrefix?: (...args: any[]) => any
+  renderItemSuffix?: (...args: any[]) => any
 }
 
-export const TreeView = (props) => {
+export const TreeView = (props: TreeViewProps) => {
   const {
     disableSelection,
     items,
@@ -124,15 +134,4 @@ export const TreeView = (props) => {
       ))}
     </SimpleTreeView>
   )
-}
-
-TreeView.propTypes = {
-  disableSelection: PropTypes.bool,
-  expadedItemKeys: PropTypes.array,
-  items: PropTypes.arrayOf(TreeItemPropTypes).isRequired,
-  onExpandedItemKeysChange: PropTypes.func,
-  onSelectedItemKeysChange: PropTypes.func,
-  selectedItemKeys: PropTypes.array,
-  renderItemPrefix: PropTypes.func,
-  renderItemSuffix: PropTypes.func,
 }

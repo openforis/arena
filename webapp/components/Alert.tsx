@@ -1,11 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
 import MuiAlert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 
 import { useI18n } from '@webapp/store/system'
 
-export const Alert = (props) => {
+type AlertProps = {
+  autoDismiss?: boolean
+  autoDismissInterval?: number
+  severity?: 'error' | 'info' | 'success' | 'warning'
+  text: string
+  title?: string
+  onDismiss?: (...args: any[]) => any
+}
+
+export const Alert = (props: AlertProps) => {
   const {
     autoDismiss = false,
     autoDismissInterval = 3000,
@@ -45,13 +53,4 @@ export const Alert = (props) => {
       {text}
     </MuiAlert>
   )
-}
-
-Alert.propTypes = {
-  autoDismiss: PropTypes.bool,
-  autoDismissInterval: PropTypes.number,
-  severity: PropTypes.oneOf(['error', 'info', 'success', 'warning']),
-  text: PropTypes.string.isRequired,
-  title: PropTypes.string,
-  onDismiss: PropTypes.func,
 }

@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 
@@ -14,7 +13,11 @@ import { ContentRow } from './ContentRow'
 // placeholder rows have no identity: give them positional ids
 const getLoadingRowIds = (rows) => Array.from({ length: rows }, (_item, index) => `loading-row-${index}`)
 
-const LoadingRows = ({ rows }) => (
+type LoadingRowsProps = {
+  rows: number
+}
+
+const LoadingRows = ({ rows }: LoadingRowsProps) => (
   <div className="table__rows">
     {getLoadingRowIds(rows).map((rowId) => (
       <div className="table__row" key={rowId}>
@@ -24,17 +27,47 @@ const LoadingRows = ({ rows }) => (
   </div>
 )
 
-LoadingRows.propTypes = {
-  rows: PropTypes.number.isRequired,
-}
-
 // default props as constants: new objects at every render would re-render all the (memoized) rows
 const emptyProps = {}
 
 const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
   [...(expandableRows ? ['40px'] : []), ...columns.map((column) => column.width || '1fr')].join(' ')
 
-const Content = (props) => {
+type ContentProps = {
+  cellProps?: Record<string, any>
+  cellTestIdExtractor?: (...args: any[]) => any
+  columns?: any[]
+  deselectAllItems?: (...args: any[]) => any
+  expandableRows?: boolean
+  gridTemplateColumns: string
+  handleSortBy: (...args: any[]) => any
+  isRowActive?: (...args: any[]) => any
+  keyExtractor: (...args: any[]) => any
+  list: any[]
+  loading?: boolean
+  maxRows: number
+  module: string
+  noItemsLabelKey: string
+  noItemsLabelForSearchKey: string
+  offset: number
+  isRowExpandable?: (...args: any[]) => any
+  isRowOpenable?: (...args: any[]) => any
+  onItemSelectToggle: (...args: any[]) => any
+  onRowOpen?: (...args: any[]) => any
+  initData?: (...args: any[]) => any
+  rowHeaderComponent: React.ElementType
+  rowComponent: React.ElementType
+  rowExpandedComponent?: React.ElementType
+  rowProps?: Record<string, any>
+  selectable?: boolean
+  selectedItems?: any[]
+  selectAllItems?: (...args: any[]) => any
+  sort: Record<string, any>
+  totalCount?: number
+  allVisibleItemsSelected?: boolean
+}
+
+const Content = (props: ContentProps) => {
   const {
     cellProps,
     cellTestIdExtractor,
@@ -161,40 +194,6 @@ const Content = (props) => {
       )}
     </div>
   )
-}
-
-Content.propTypes = {
-  cellProps: PropTypes.object,
-  cellTestIdExtractor: PropTypes.func,
-  columns: PropTypes.array,
-  deselectAllItems: PropTypes.func,
-  expandableRows: PropTypes.bool,
-  gridTemplateColumns: PropTypes.string.isRequired,
-  handleSortBy: PropTypes.func.isRequired,
-  isRowActive: PropTypes.func,
-  keyExtractor: PropTypes.func.isRequired,
-  list: PropTypes.array.isRequired,
-  loading: PropTypes.bool,
-  maxRows: PropTypes.number.isRequired,
-  module: PropTypes.string.isRequired,
-  noItemsLabelKey: PropTypes.string.isRequired,
-  noItemsLabelForSearchKey: PropTypes.string.isRequired,
-  offset: PropTypes.number.isRequired,
-  isRowExpandable: PropTypes.func,
-  isRowOpenable: PropTypes.func,
-  onItemSelectToggle: PropTypes.func.isRequired,
-  onRowOpen: PropTypes.func,
-  initData: PropTypes.func,
-  rowHeaderComponent: PropTypes.elementType.isRequired,
-  rowComponent: PropTypes.elementType.isRequired,
-  rowExpandedComponent: PropTypes.elementType,
-  rowProps: PropTypes.object,
-  selectable: PropTypes.bool,
-  selectedItems: PropTypes.array,
-  selectAllItems: PropTypes.func,
-  sort: PropTypes.object.isRequired,
-  totalCount: PropTypes.number,
-  allVisibleItemsSelected: PropTypes.bool,
 }
 
 export default Content

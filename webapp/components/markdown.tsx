@@ -1,9 +1,16 @@
-import { useMemo } from 'react'
-import PropTypes from 'prop-types'
+import { type JSX, useMemo } from 'react'
 
 import { parseMarkdown } from '@core/markdownUtils'
 
-const Markdown = (props) => {
+type MarkdownProps = {
+  source: string // Markdown text to render
+  container?: keyof JSX.IntrinsicElements // The container element to use
+  className?: string // The class name to apply to the container element
+  sanitize?: boolean // Whether to sanitize the HTML output
+  openLinksInNewTab?: boolean // Whether links open in a new browser tab
+}
+
+const Markdown = (props: MarkdownProps) => {
   const {
     container: Container = 'div',
     className = undefined,
@@ -18,14 +25,6 @@ const Markdown = (props) => {
   )
 
   return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />
-}
-
-Markdown.propTypes = {
-  source: PropTypes.string.isRequired, // Markdown text to render
-  container: PropTypes.string, // The container element to use
-  className: PropTypes.string, // The class name to apply to the container element
-  sanitize: PropTypes.bool, // Whether to sanitize the HTML output
-  openLinksInNewTab: PropTypes.bool, // Whether links open in a new browser tab
 }
 
 export default Markdown

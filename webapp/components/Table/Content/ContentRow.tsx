@@ -1,5 +1,4 @@
 import React, { memo, useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { isEventFromInteractiveChild } from '@webapp/utils/domUtils'
@@ -13,7 +12,30 @@ const isEventFromRowCells = (event) => {
   return !expandedPanel || !event.currentTarget.contains(expandedPanel)
 }
 
-const ContentRowComponent = (props) => {
+type ContentRowComponentProps = {
+  cellProps?: Record<string, any>
+  cellTestIdExtractor?: (...args: any[]) => any
+  columns?: any[]
+  expandableRows?: boolean
+  gridTemplateColumns?: string
+  index: number
+  initData?: (...args: any[]) => any
+  isRowActive?: (...args: any[]) => any
+  isRowExpandable?: (...args: any[]) => any
+  isRowOpenable?: (...args: any[]) => any
+  item: Record<string, any>
+  module?: string
+  offset?: number
+  onItemSelectToggle: (...args: any[]) => any
+  onRowOpen?: (...args: any[]) => any
+  rowComponent: React.ElementType
+  rowExpandedComponent?: React.ElementType
+  rowProps?: Record<string, any>
+  selectable?: boolean
+  selected?: boolean
+}
+
+const ContentRowComponent = (props: ContentRowComponentProps) => {
   const {
     cellProps,
     cellTestIdExtractor,
@@ -133,29 +155,6 @@ const ContentRowComponent = (props) => {
       )}
     </div>
   )
-}
-
-ContentRowComponent.propTypes = {
-  cellProps: PropTypes.object,
-  cellTestIdExtractor: PropTypes.func,
-  columns: PropTypes.array,
-  expandableRows: PropTypes.bool,
-  gridTemplateColumns: PropTypes.string,
-  index: PropTypes.number.isRequired,
-  initData: PropTypes.func,
-  isRowActive: PropTypes.func,
-  isRowExpandable: PropTypes.func,
-  isRowOpenable: PropTypes.func,
-  item: PropTypes.object.isRequired,
-  module: PropTypes.string,
-  offset: PropTypes.number,
-  onItemSelectToggle: PropTypes.func.isRequired,
-  onRowOpen: PropTypes.func,
-  rowComponent: PropTypes.elementType.isRequired,
-  rowExpandedComponent: PropTypes.elementType,
-  rowProps: PropTypes.object,
-  selectable: PropTypes.bool,
-  selected: PropTypes.bool,
 }
 
 // memoized: a change in the table (e.g. a row selected) re-renders only the rows whose props changed

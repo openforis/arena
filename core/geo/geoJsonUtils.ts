@@ -15,7 +15,7 @@ const Type = {
 
 const centroidFeature = turfCentroid
 
-const countVertices = (geoJsonOrGeometry: Record<string, unknown>): number => {
+const countVertices = (geoJsonOrGeometry: { type?: string; geometry?: unknown }): number => {
   const geometry = geoJsonOrGeometry.type === Type.Feature ? geoJsonOrGeometry.geometry : geoJsonOrGeometry
   const coords = geometry as { coordinates?: unknown[][] } | null | undefined
   return (coords?.coordinates?.[0] as unknown[] | undefined)?.length ?? 0

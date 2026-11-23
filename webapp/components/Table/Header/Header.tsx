@@ -1,9 +1,26 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import { VisibleColumnsMenu } from './VisibleColumnsMenu'
 
-const Header = (props) => {
+type HeaderProps = {
+  // search, handleSearch and selectedItems are passed through to headerLeftComponent
+  search?: string
+  handleSearch?: (...args: any[]) => any
+  selectedItems?: any[]
+  columns?: any[]
+  count: number
+  headerLeftComponent: React.ElementType
+  headerProps?: Record<string, any>
+  limit: number
+  list: any[]
+  offset: number
+  onVisibleColumnsChange: (...args: any[]) => any
+  totalCount: number
+  visibleColumnsSelectionEnabled?: boolean
+  visibleColumnKeys: any[]
+}
+
+const Header = (props: HeaderProps) => {
   const {
     columns,
     count,
@@ -30,20 +47,6 @@ const Header = (props) => {
       )}
     </div>
   )
-}
-
-Header.propTypes = {
-  columns: PropTypes.array,
-  count: PropTypes.number.isRequired,
-  headerLeftComponent: PropTypes.elementType.isRequired,
-  headerProps: PropTypes.object,
-  limit: PropTypes.number.isRequired,
-  list: PropTypes.array.isRequired,
-  offset: PropTypes.number.isRequired,
-  onVisibleColumnsChange: PropTypes.func.isRequired,
-  totalCount: PropTypes.number.isRequired,
-  visibleColumnsSelectionEnabled: PropTypes.bool,
-  visibleColumnKeys: PropTypes.array.isRequired,
 }
 
 export default Header

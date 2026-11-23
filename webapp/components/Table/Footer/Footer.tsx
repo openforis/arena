@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router'
 import { useAppDispatch } from '@webapp/store/hooks'
-import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -10,7 +9,16 @@ import Paginator from './Paginator'
 import { TablesActions } from '@webapp/store/ui/tables'
 import { useI18n } from '@webapp/store/system'
 
-export const Footer = (props) => {
+type FooterProps = {
+  count: number
+  limit: number
+  list?: any[]
+  module: string
+  offset: number
+  selectedItemsCount?: number
+}
+
+export const Footer = (props: FooterProps) => {
   const { count, limit, list, module, offset, selectedItemsCount = 0 } = props
 
   const i18n = useI18n()
@@ -38,13 +46,4 @@ export const Footer = (props) => {
       )}
     </div>
   )
-}
-
-Footer.propTypes = {
-  count: PropTypes.number.isRequired,
-  limit: PropTypes.number.isRequired,
-  list: PropTypes.array,
-  module: PropTypes.string.isRequired,
-  offset: PropTypes.number.isRequired,
-  selectedItemsCount: PropTypes.number,
 }

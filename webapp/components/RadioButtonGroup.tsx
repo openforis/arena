@@ -1,13 +1,20 @@
 import './RadioButtonGroup.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import { RadioGroup } from '@mui/material'
 import classNames from 'classnames'
 
 import { RadioButton } from './RadioButton'
 
-export const RadioButtonGroup = (props) => {
+type RadioButtonGroupProps = {
+  className?: string
+  items: any[]
+  onChange: (...args: any[]) => any
+  row?: boolean
+  value?: string
+}
+
+export const RadioButtonGroup = (props: RadioButtonGroupProps) => {
   const { className, items, onChange: onChangeProp, row = false, value } = props
 
   const onChange = useCallback((e) => onChangeProp(e.target.value), [onChangeProp])
@@ -20,12 +27,4 @@ export const RadioButtonGroup = (props) => {
       })}
     </RadioGroup>
   )
-}
-
-RadioButtonGroup.propTypes = {
-  className: PropTypes.string,
-  items: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  row: PropTypes.bool,
-  value: PropTypes.string,
 }

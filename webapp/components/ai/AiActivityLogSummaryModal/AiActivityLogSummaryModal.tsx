@@ -1,7 +1,6 @@
 import './AiActivityLogSummaryModal.scss'
 
 import { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
@@ -14,7 +13,11 @@ import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 
-const AiActivityLogSummaryModal = ({ onClose }) => {
+type AiActivityLogSummaryModalProps = {
+  onClose: (...args: any[]) => any
+}
+
+const AiActivityLogSummaryModal = ({ onClose }: AiActivityLogSummaryModalProps) => {
   const i18n = useI18n()
   // Server-side error messages may contain quoted identifiers (Postgres
   // column names, etc.) which i18next escapes by default — appears as
@@ -62,10 +65,6 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
       </ModalBody>
     </Modal>
   )
-}
-
-AiActivityLogSummaryModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
 }
 
 export default AiActivityLogSummaryModal

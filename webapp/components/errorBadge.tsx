@@ -1,13 +1,27 @@
 import './errorBadge.scss'
-import PropTypes from 'prop-types'
+
+import type React from 'react'
 import classNames from 'classnames'
 
 import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 
 import ValidationTooltip from './validationTooltip'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const ErrorBadge = (props) => {
+type ErrorBadgeProps = {
+  children?: React.ReactNode
+  className?: string
+  id?: string
+  insideTable?: boolean
+  labelKey?: string
+  showIcon?: boolean
+  showKeys?: boolean
+  showLabel?: boolean
+  validation?: ArenaValidation
+}
+
+const ErrorBadge = (props: ErrorBadgeProps) => {
   const {
     children = null,
     className = '',
@@ -45,18 +59,6 @@ const ErrorBadge = (props) => {
       </div>
     </ValidationTooltip>
   )
-}
-
-ErrorBadge.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  insideTable: PropTypes.bool,
-  labelKey: PropTypes.string,
-  showIcon: PropTypes.bool,
-  showKeys: PropTypes.bool,
-  showLabel: PropTypes.bool,
-  validation: PropTypes.object,
 }
 
 export default ErrorBadge

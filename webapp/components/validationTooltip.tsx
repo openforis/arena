@@ -1,12 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import Tooltip from './tooltip'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const ValidationTooltip = (props) => {
+type ValidationTooltipProps = {
+  children: React.ReactNode
+  className?: string
+  id?: string
+  insideTable?: boolean
+  position?: 'bottom' | 'top'
+  showKeys?: boolean
+  testId?: string
+  validation?: ArenaValidation
+}
+
+const ValidationTooltip = (props: ValidationTooltipProps) => {
   const { children, className, id, insideTable, position = 'bottom', showKeys = false, testId, validation } = props
 
   const isValid = Validation.isValid(validation)
@@ -33,17 +44,6 @@ const ValidationTooltip = (props) => {
       {children}
     </Tooltip>
   )
-}
-
-ValidationTooltip.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  insideTable: PropTypes.bool,
-  position: PropTypes.oneOf(['bottom', 'top']),
-  showKeys: PropTypes.bool,
-  testId: PropTypes.string,
-  validation: PropTypes.object,
 }
 
 export default ValidationTooltip

@@ -1,13 +1,22 @@
 import './expansionPanel.scss'
 import React, { useEffect, useMemo, useRef } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18nT } from '@webapp/store/system'
 
 const closeClassName = 'close'
 
-const ExpansionPanel = (props) => {
+type ExpansionPanelProps = {
+  buttonLabel?: string
+  buttonLabelParams?: Record<string, any>
+  children?: React.ReactNode
+  className?: string
+  open?: boolean
+  showHeader?: boolean
+  startClosed?: boolean
+}
+
+const ExpansionPanel = (props: ExpansionPanelProps) => {
   const {
     buttonLabel = '',
     buttonLabelParams = undefined,
@@ -58,16 +67,6 @@ const ExpansionPanel = (props) => {
       </div>
     </div>
   )
-}
-
-ExpansionPanel.propTypes = {
-  buttonLabel: PropTypes.string,
-  buttonLabelParams: PropTypes.object,
-  children: PropTypes.node,
-  className: PropTypes.string,
-  open: PropTypes.bool,
-  showHeader: PropTypes.bool,
-  startClosed: PropTypes.bool,
 }
 
 export default ExpansionPanel
