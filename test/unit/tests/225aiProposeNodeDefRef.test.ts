@@ -4,13 +4,14 @@ import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
-import { applyChangeSet, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import type { ChangeSet, NodeDefUpdateOperation } from '@webapp/ai/changeSets/types'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
 import { runTool } from '@webapp/ai/tools/registry'
 import { buildCardRows } from '@webapp/components/ai/Assistant/changeSetCardModel'
 import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { createRecordingApplierDeps } from '@test/unit/utils/categoryLabelsTestUtils'
 import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
@@ -57,26 +58,10 @@ const withoutCategory = (target: any, name: string) => {
 
 // the designer's save, faked: the survey changes as the reducers would change it
 const applyWithFakeDeps = async (start: any, changeSet: ChangeSet) => {
-  let current = start
-  const puts: any[] = []
-  const deps: ApplierDeps = {
-    getSurvey: () => current,
-    isSurveyDirty: () => false,
-    postNodeDef: async () => undefined,
-    putNodeDefProps: async (params) => {
-      puts.push(params)
-    },
-    onNodeDefCreated: (nodeDef) => {
-      current = Survey.assocNodeDef({ nodeDef })(current)
-    },
-    onNodeDefUpdated: (nodeDef) => {
-      current = Survey.assocNodeDef({ nodeDef })(current)
-    },
-    onNodeDefSaved: () => undefined,
-  }
+  const { deps, puts } = createRecordingApplierDeps(start)
   const operationIds = changeSet.operations.map((op) => op.id)
   const results = await applyChangeSet({ changeSet, operationIds, deps })
-  return { results, puts, survey: current }
+  return { results, puts, survey: deps.getSurvey() }
 }
 
 describe('nodeDef_proposeUpdate with categoryName / taxonomyName (225)', () => {

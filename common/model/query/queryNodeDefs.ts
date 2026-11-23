@@ -59,7 +59,8 @@ const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: ArenaSurvey;
     if (!NodeDef.isVirtual(nodeDef)) {
       const childEntityDefs = Survey.getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter(NodeDef.isEntity)
       // pushed in reverse order so that they are visited in their sorted order (depth-first, pre-order)
-      stack.push(...childEntityDefs.reverse())
+      childEntityDefs.reverse()
+      stack.push(...childEntityDefs)
     }
   }
   return result

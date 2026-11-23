@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
 
-import { applyChangeSet, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
@@ -13,6 +13,7 @@ import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefPropose
 import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
 import { runTool } from '@webapp/ai/tools/registry'
 import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { createRecordingApplierDeps } from '@test/unit/utils/categoryLabelsTestUtils'
 import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
@@ -39,29 +40,10 @@ const propose = async (tool: any, input: object, target: any = survey) => {
 
 // the designer's save, faked: the survey changes as the reducers would change it
 const applyWithFakeDeps = async (start: any, changeSet: ChangeSet, operationIds?: string[]) => {
-  let current = start
-  const puts: any[] = []
-  const posts: any[] = []
-  const deps: ApplierDeps = {
-    getSurvey: () => current,
-    isSurveyDirty: () => false,
-    postNodeDef: async (nodeDef) => {
-      posts.push(nodeDef)
-    },
-    putNodeDefProps: async (params) => {
-      puts.push(params)
-    },
-    onNodeDefCreated: (nodeDef) => {
-      current = Survey.assocNodeDef({ nodeDef })(current)
-    },
-    onNodeDefUpdated: (nodeDef) => {
-      current = Survey.assocNodeDef({ nodeDef })(current)
-    },
-    onNodeDefSaved: () => undefined,
-  }
+  const { deps, puts, posts } = createRecordingApplierDeps(start)
   const ids = operationIds ?? changeSet.operations.map((op) => op.id)
   const results = await applyChangeSet({ changeSet, operationIds: ids, deps })
-  return { results, puts, posts, survey: current }
+  return { results, puts, posts, survey: deps.getSurvey() }
 }
 
 describe('Apply re-runs the designer guards (380)', () => {

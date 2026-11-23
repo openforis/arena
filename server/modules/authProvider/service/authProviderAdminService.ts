@@ -156,7 +156,8 @@ export const testProviderConnection = async ({ id }: { id: string }) => {
   const start = Date.now()
   try {
     const metadata = await fetchJson(`${issuer}/.well-known/openid-configuration`)
-    const jwks = metadata.jwks_uri ? await fetchJson(metadata.jwks_uri as string) : {}
+    const jwksUri = metadata.jwks_uri
+    const jwks = typeof jwksUri === 'string' && jwksUri ? await fetchJson(jwksUri) : {}
     return {
       ok: true,
       issuer: metadata.issuer,

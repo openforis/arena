@@ -52,32 +52,26 @@ describe('nodeValueParser: parseNodeValueProps (the import layer)', () => {
     expect(VALUE_PROP_DEFAULT).toBe('value')
   })
 
-  test('numbers', async () => {
-    expect((await parse('cluster_id', { value: '12' })).value).toBe(12)
-    expect((await parse('cluster_size', { value: '12.5' })).value).toBe(12.5)
-    await expect(parse('cluster_size', { value: 'abc' })).rejects.toMatchObject({
-      key: 'validationErrors:dataImport.invalidNumber',
-    })
+  // booleans accept the import synonyms, dates and times use the import formats
+  test.each([
+    ['cluster_id', '12', 12],
+    ['cluster_size', '12.5', 12.5],
+    ['cluster_accessible', 'yes', 'true'],
+    ['cluster_accessible', '0', 'false'],
+    ['cluster_date', '05/03/2024', '2024-03-05'],
+    ['cluster_date', '2024-03-05', '2024-03-05'],
+    ['cluster_time', '9:05', '09:05'],
+  ])('%s: "%s" is parsed as %p', async (name, value, expected) => {
+    expect((await parse(name, { value })).value).toBe(expected)
   })
 
-  test('booleans accept the import synonyms', async () => {
-    expect((await parse('cluster_accessible', { value: 'yes' })).value).toBe('true')
-    expect((await parse('cluster_accessible', { value: '0' })).value).toBe('false')
-    await expect(parse('cluster_accessible', { value: 'maybe' })).rejects.toMatchObject({
-      key: 'validationErrors:dataImport.invalidBoolean',
-    })
-  })
-
-  test('dates and times use the import formats', async () => {
-    expect((await parse('cluster_date', { value: '05/03/2024' })).value).toBe('2024-03-05')
-    expect((await parse('cluster_date', { value: '2024-03-05' })).value).toBe('2024-03-05')
-    await expect(parse('cluster_date', { value: '2024-13-45' })).rejects.toMatchObject({
-      key: 'validationErrors:dataImport.invalidDate',
-    })
-    expect((await parse('cluster_time', { value: '9:05' })).value).toBe('09:05')
-    await expect(parse('cluster_time', { value: '25:99' })).rejects.toMatchObject({
-      key: 'validationErrors:dataImport.invalidTime',
-    })
+  test.each([
+    ['cluster_size', 'abc', 'invalidNumber'],
+    ['cluster_accessible', 'maybe', 'invalidBoolean'],
+    ['cluster_date', '2024-13-45', 'invalidDate'],
+    ['cluster_time', '25:99', 'invalidTime'],
+  ])('%s: "%s" is refused with %s', async (name, value, errorKey) => {
+    await expect(parse(name, { value })).rejects.toMatchObject({ key: `validationErrors:dataImport.${errorKey}` })
   })
 
   test('codes of a flat category are found in the survey index, with the item as ref data', async () => {

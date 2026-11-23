@@ -7,6 +7,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
 
 import * as SB from '../../utils/surveyBuilder'
+import { createCloneTargetSurvey, deleteSurveys } from '../../utils/surveyCloneTestUtils'
 
 import { getContextUser } from '../config/context'
 
@@ -35,15 +36,11 @@ describe('Clone node def from another survey - category/taxonomy resolution', ()
       .taxonomies(SB.taxonomy('tax_shared').taxa(SB.taxon('AAA', 'Fam', 'Gen', 'Gen sp')))
       .buildAndStore()
 
-    targetSurvey = await SB.survey(
-      user,
-      SB.entity('cluster_tgt', SB.attribute('cluster_id_tgt', nodeDefType.integer).key())
-    ).buildAndStore()
+    targetSurvey = await createCloneTargetSurvey(user, 'cluster_tgt')
   })
 
   afterAll(async () => {
-    if (sourceSurvey) await SurveyManager.deleteSurvey(Survey.getId(sourceSurvey))
-    if (targetSurvey) await SurveyManager.deleteSurvey(Survey.getId(targetSurvey))
+    await deleteSurveys([sourceSurvey, targetSurvey])
   })
 
   test('Cloning an entity with code/taxon attributes also clones the referenced category/taxonomy', async () => {

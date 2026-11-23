@@ -84,7 +84,7 @@ const parseDefaultValue = async ({
     defaultValue: success
       ? NodeDefExpression.createExpression({
           expression: exprConverted,
-          applyIf: applyIfConverted === null ? '' : applyIfConverted,
+          applyIf: applyIfConverted ?? '',
         })
       : null,
   }

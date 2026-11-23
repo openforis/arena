@@ -1,4 +1,3 @@
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
 import { z } from 'zod'
 
 import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
@@ -11,38 +10,16 @@ import {
   CATEGORY_ITEM_REFS_MAX_ENTRIES,
 } from '@webapp/ai/tools/design/categoryItemRefs'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
-
-const usage = { inputTokens: { total: 1 }, outputTokens: { total: 1 } }
-const finish = (unified: string) => ({ type: 'finish', finishReason: { unified, raw: undefined }, usage })
-
-const textStream = (text: string): any =>
-  convertArrayToReadableStream([
-    { type: 'stream-start', warnings: [] },
-    { type: 'text-start', id: 't' },
-    { type: 'text-delta', id: 't', delta: text },
-    { type: 'text-end', id: 't' },
-    finish('stop'),
-  ] as any[])
-
-const toolCallStream = (toolCallId: string, toolName: string): any =>
-  convertArrayToReadableStream([
-    { type: 'stream-start', warnings: [] },
-    { type: 'tool-call', toolCallId, toolName, input: JSON.stringify({ summary: toolName }) },
-    finish('tool-calls'),
-  ] as any[])
-
-// one stream per model call, in order (the last one repeats)
-const scriptedModel = (...streams: (() => any)[]) => {
-  let call = 0
-  return new MockLanguageModelV4({
-    doStream: async () => ({ stream: streams[Math.min(call++, streams.length - 1)]() }) as any,
-  })
-}
+import {
+  cloudAccess,
+  createToolContext,
+  scriptedModel,
+  textStream,
+  toolCallStream,
+} from '@test/unit/utils/assistantTestUtils'
 
 const KEY = { surveyId: 7, categoryUuid: 'cat-1', ref: '2.14' }
 const ENTRY = { itemUuid: 'item-2.14', levelName: 'species', labels: { en: 'Pinus nigra' } }
-const cloudAccess = { effective: { schema: 'cloud', data: 'onDevice' } as any, hostingClass: 'cloud' as const }
 
 /**
  * Runs a turn where the model calls one tool, which gets the turn's context.

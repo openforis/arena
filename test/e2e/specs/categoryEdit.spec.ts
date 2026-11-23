@@ -112,13 +112,7 @@ test.describe('Category edit', () => {
     survey: _,
   }, testInfo) => {
     const designer = new FormDesigner(page)
-    await designer.goto()
-
-    // root entity with a key attribute (required to publish the survey)
-    await designer.edit('root_entity')
-    await designer.fillDetails({ name: 'cluster', label: 'Cluster' })
-    await designer.saveAndBack('Cluster')
-    await designer.addChildWithDetails('cluster', 'integer', { name: 'cluster_id', label: 'Cluster id', key: true })
+    await designer.gotoWithClusterRootEntity()
 
     await designer.addChild('cluster', 'code')
     await designer.fillDetails({ name: 'cluster_country', label: 'Cluster country' })
