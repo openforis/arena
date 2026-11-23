@@ -15,7 +15,7 @@ import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/
 
 import { useColumn } from './store'
 import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
 import { Query } from '@common/model/query'
 
 type ColumnDataEditProps = {
@@ -53,10 +53,12 @@ const ColumnDataEdit = (props: ColumnDataEditProps) => {
             surveyInfo={surveyInfo}
             surveyCycleKey={surveyCycleKey}
             nodeDef={nodeDef}
-            parentNode={{
-              [Node.keys.recordUuid]: Record.getUuid(record),
-              [Node.keys.parentUuid]: cell.parentUuid,
-            }}
+            parentNode={
+              {
+                [Node.keys.recordUuid]: Record.getUuid(record),
+                [Node.keys.parentUuid]: cell.parentUuid,
+              } as ArenaRecordNode
+            }
             nodes={[node]}
             entry
             entryDataQuery

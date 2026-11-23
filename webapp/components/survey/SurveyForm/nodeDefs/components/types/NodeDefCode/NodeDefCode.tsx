@@ -1,0 +1,160 @@
+import './NodeDefCode.scss'
+
+import { useCallback, useMemo } from 'react'
+
+import { Surveys, type ArenaAnyNodeDef, type ArenaRecordNode } from '@openforis/arena-core'
+
+import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
+
+import { useItems } from './store'
+import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
+import NodeDefCodeDropdown from './NodeDefCodeDropdown'
+
+type NodeDefCodeProps = {
+  canEditRecord?: boolean
+  edit?: boolean
+  entryDataQuery?: boolean
+  insideTable?: boolean
+  nodeDef: ArenaAnyNodeDef
+  nodes?: ArenaRecordNode[]
+  parentNode?: ArenaRecordNode
+  readOnly?: boolean
+  removeNode: (...args: any[]) => any
+  updateNode: (...args: any[]) => any
+}
+
+const NodeDefCode = (props: NodeDefCodeProps) => {
+  const {
+    canEditRecord = false,
+    edit = false,
+    entryDataQuery = false,
+    insideTable = false,
+    nodeDef,
+    nodes = [],
+    parentNode = null,
+    readOnly: readOnlyProp = false,
+    removeNode,
+    updateNode,
+  } = props
+
+  const survey = useSurvey()
+  const surveyCycleKey = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const draft = Survey.isDraft(surveyInfo)
+
+  const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
+  const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
+  const readOnly = readOnlyProp || enumerator
+  const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
+
+  const itemsNeeded = !readOnly && canEditRecord
+  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded })
+  const autocomplete = typeof items === 'function'
+  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) ?? NodeDefLayout.renderType.dropdown
+
+  const selectedItems = useMemo(
+    () => (edit ? [] : nodes.map((node) => NodeRefData.getCategoryItem(node)).filter(Boolean)),
+    [edit, nodes]
+  )
+
+  const onItemAdd = useCallback(
+    (item) => {
+      const existingNode = singleNode ? nodes[0] : null
+      const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+
+      const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
+      const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
+      const refData = { [NodeRefData.keys.categoryItem]: item }
+
+      updateNode(nodeDef, node, value, null, meta, refData)
+    },
+    [codeAttributesUuidsHierarchy, nodeDef, nodes, parentNode, singleNode, updateNode]
+  )
+
+  const onItemRemove = useCallback(
+    (item) => {
+      if (singleNode) {
+        updateNode(nodeDef, nodes[0], {}, null, {}, {})
+      } else {
+        const nodeToRemove = nodes.find((node) => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
+        removeNode(nodeDef, nodeToRemove)
+      }
+    },
+    [nodeDef, nodes, removeNode, singleNode, updateNode]
+  )
+
+  const itemLabelFunction = useCallback(
+    (item) =>
+      NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)
+        ? CategoryItem.getLabelWithCode(lang)(item)
+        : CategoryItem.getLabel(lang)(item),
+    [lang, nodeDef, surveyCycleKey]
+  )
+
+  if (!edit && (readOnly || !canEditRecord)) {
+    const nodesValueSummary = nodes
+      .map((node) =>
+        NodeValueFormatter.format({
+          survey,
+          cycle: surveyCycleKey,
+          nodeDef,
+          node,
+          value: Node.getValue(node),
+          showLabel: true,
+          lang,
+        })
+      )
+      .join(', ')
+    // in table cells show the value in a single line (ellipsis + tooltip) to avoid wrapping
+    return insideTable ? (
+      <div className="value-preview survey-form__node-def-table-cell-value">
+        <LabelWithTooltip label={nodesValueSummary} />
+      </div>
+    ) : (
+      <span className="value-preview">{nodesValueSummary}</span>
+    )
+  }
+
+  if (renderType === NodeDefLayout.renderType.dropdown || entryDataQuery || autocomplete) {
+    return (
+      <NodeDefCodeDropdown
+        canEditRecord={canEditRecord}
+        edit={edit}
+        entryDataQuery={entryDataQuery}
+        itemLabelFunction={itemLabelFunction}
+        items={items}
+        nodeDef={nodeDef}
+        onItemAdd={onItemAdd}
+        onItemRemove={onItemRemove}
+        readOnly={readOnly}
+        selectedItems={selectedItems}
+      />
+    )
+  }
+  return (
+    <NodeDefCodeCheckbox
+      canEditRecord={canEditRecord}
+      edit={edit}
+      itemLabelFunction={itemLabelFunction}
+      items={items}
+      onItemAdd={onItemAdd}
+      onItemRemove={onItemRemove}
+      readOnly={readOnly}
+      selectedItems={selectedItems}
+    />
+  )
+}
+
+export default NodeDefCode
