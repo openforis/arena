@@ -47,7 +47,7 @@ $rowHeaderHeight: 45px;
   .table__row-header {
     display: flex;
 
-    >div {
+    > div {
       text-align: center;
     }
   }
@@ -139,7 +139,7 @@ $rowHeaderHeight: 45px;
     .table__cell {
       padding: 0;
 
-      >* {
+      > * {
         width: 100%;
         height: 100%;
       }

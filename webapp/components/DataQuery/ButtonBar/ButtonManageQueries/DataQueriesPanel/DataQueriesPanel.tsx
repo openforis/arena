@@ -1,0 +1,98 @@
+import './DataQueriesPanel.scss'
+
+import { useMemo } from 'react'
+
+import { DataQuerySummaries } from '@openforis/arena-core'
+
+import { Query } from '@common/model/query'
+
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+
+import PanelRight from '@webapp/components/PanelRight'
+import Table from '@webapp/components/Table'
+
+import { DataQueryEditForm } from './DataQueryEditForm'
+import { useDataQueriesPanel } from './useDataQueriesPanel'
+
+const dataQueriesModuleName = 'data_queries'
+
+type DataQueriesPanelProps = {
+  onClose: (...args: any[]) => any
+}
+
+const DataQueriesPanel = (props: DataQueriesPanelProps) => {
+  const { onClose } = props
+
+  const {
+    draft,
+    editedQuerySummary,
+    isTableRowActive,
+    onAiSuggestSummary,
+    onNew,
+    onSave,
+    onDelete,
+    onTableRowClick,
+    query,
+    queriesRequestedAt,
+    setEditedQuerySummary,
+    summarizing,
+    validating,
+  } = useDataQueriesPanel()
+
+  const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
+
+  const columns = useMemo(
+    () => [
+      { key: 'position', header: '#', renderItem: ({ itemPosition }) => itemPosition, width: '50px' },
+      {
+        key: 'name',
+        header: 'common.name',
+        renderItem: ({ item }) => DataQuerySummaries.getName(item),
+        width: '1fr',
+      },
+      {
+        key: 'label',
+        header: 'common.label',
+        renderItem: ({ item }) => DataQuerySummaries.getLabel(lang)(item),
+        width: '1fr',
+      },
+    ],
+    [lang]
+  )
+
+  return (
+    <PanelRight
+      className="data-queries-panel"
+      onClose={onClose}
+      width="50vw"
+      header={i18n.t('dataView:dataQuery.manageQueries')}
+    >
+      {Query.hasSelection(query) && (
+        <DataQueryEditForm
+          draft={draft}
+          onAiSuggestSummary={onAiSuggestSummary}
+          onDelete={onDelete}
+          onNew={onNew}
+          onSave={onSave}
+          querySummary={editedQuerySummary}
+          setQuerySummary={setEditedQuerySummary}
+          summarizing={summarizing}
+          validating={validating}
+        />
+      )}
+      <Table
+        className="data-queries-table"
+        columns={columns}
+        isRowActive={isTableRowActive}
+        module={dataQueriesModuleName}
+        onRowOpen={onTableRowClick}
+        restParams={{ requestedAt: queriesRequestedAt }}
+        showFooter={false}
+      />
+    </PanelRight>
+  )
+}
+
+export default DataQueriesPanel
