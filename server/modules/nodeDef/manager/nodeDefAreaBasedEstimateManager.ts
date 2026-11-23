@@ -8,7 +8,11 @@ import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
 
 const insertNodeDefAreaBasedEstimate = (
-  { survey, chainUuid, estimatedOfNodeDef }: { survey: ArenaSurvey; chainUuid: string; estimatedOfNodeDef: any },
+  {
+    survey,
+    chainUuid,
+    estimatedOfNodeDef,
+  }: { survey: ArenaSurvey; chainUuid: string; estimatedOfNodeDef: ArenaAnyNodeDef },
   client: DbClient = db
 ) => {
   const nodeDef = AreaBasedEstimatedOfNodeDef.newNodeDef({

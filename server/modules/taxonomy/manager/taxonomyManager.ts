@@ -25,6 +25,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
+import type { ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 // vernacular language codes and extra prop names are used as export column names and in expressions:
 // check them before saving
@@ -573,7 +574,13 @@ const _updateTaxaExtraDefProp = async (
     propName,
     extraPropDef,
     deleted,
-  }: { surveyId: number; taxonomyUuid: string; propName: string; extraPropDef: any; deleted: boolean },
+  }: {
+    surveyId: number
+    taxonomyUuid: string
+    propName: string
+    extraPropDef: ExtraPropDefItem | null
+    deleted: boolean
+  },
   t: DbClient
 ) => {
   const taxa = await TaxonomyRepository.fetchTaxa({ surveyId, taxonomyUuid, draft: true }, t)
@@ -607,7 +614,7 @@ export const updateTaxonomyExtraPropDef = (
     surveyId: number
     taxonomyUuid: string
     propName: string
-    extraPropDef?: any
+    extraPropDef?: ExtraPropDefItem | null
     deleted?: boolean
   },
   client: DbClient = db

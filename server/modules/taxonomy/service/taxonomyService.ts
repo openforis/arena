@@ -20,6 +20,7 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as TaxonomyManager from '../manager/taxonomyManager'
 import { TaxonomyImportTemplateGenerator } from '../manager/taxonomyImportTemplateGenerator'
 import TaxonomyImportJob from './taxonomyImportJob'
+import type { DataImportTemplateType } from '@core/dataImport/dataImportTemplateTypes'
 
 export const {
   // Create
@@ -144,7 +145,7 @@ export const exportTaxaImportTemplate = async ({
   draft: boolean
   res: ExpressResponse
   fileFormat: string
-  templateType: any
+  templateType: DataImportTemplateType
 }) => {
   const [survey, taxonomy] = await Promise.all([
     SurveyManager.fetchSurveyById({ surveyId, draft }),

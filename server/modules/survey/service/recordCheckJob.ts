@@ -30,8 +30,8 @@ import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './
 const VERBOSE_LOGGING = false
 
 export default class RecordCheckJob extends Job {
-  nodesBatchInserter: any
-  nodesBatchUpdater: any
+  nodesBatchInserter: BatchPersister<ArenaRecordNode>
+  nodesBatchUpdater: BatchPersister<ArenaRecordNode>
   surveyAndNodeDefsByCycle: Record<string, any>
 
   static readonly type: string = 'RecordCheckJob'

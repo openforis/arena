@@ -142,7 +142,7 @@ export const deleteFilesContentByUuids = async ({
   fileSummaries,
 }: {
   surveyId: number
-  fileSummaries: any
+  fileSummaries: SurveyFile.SurveyFile[]
 }) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
@@ -156,7 +156,7 @@ export const deleteFilesContentByUuids = async ({
 }
 
 export const deleteFilesAndContent = async (
-  { surveyId, fileSummaries }: { surveyId: number; fileSummaries: any },
+  { surveyId, fileSummaries }: { surveyId: number; fileSummaries: SurveyFile.SurveyFile[] },
   client: DbClient = db
 ) => {
   await deleteFilesContentByUuids({ surveyId, fileSummaries })
@@ -178,7 +178,7 @@ export const deleteFilesAndContentByUuids = async (
     surveyId,
     fileUuids,
     fallbackFileSummaries = [],
-  }: { surveyId: number; fileUuids: string[]; fallbackFileSummaries?: any },
+  }: { surveyId: number; fileUuids: string[]; fallbackFileSummaries?: SurveyFile.SurveyFile[] },
   client: DbClient = db
 ) => {
   if (fileUuids.length === 0) return

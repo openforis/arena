@@ -6,7 +6,7 @@ const _getJson = async (zipFile: FileZip, entryName: string, defaultValue = null
   return content ? JSON.parse(content.toString()) : defaultValue
 }
 
-const _getPartsCount = (zipFile: FileZip, partFileNameGetter: any) => {
+const _getPartsCount = (zipFile: FileZip, partFileNameGetter: (index: number) => string) => {
   let count = 0
   while (zipFile.hasEntry(partFileNameGetter(count))) {
     count = count + 1
@@ -24,8 +24,15 @@ export const getSurvey = (zipFile: FileZip) => _getJson(zipFile, ExportFile.surv
 export const getTaxonomies = (zipFile: FileZip) => _getJson(zipFile, ExportFile.taxonomies, [])
 export const getTaxa = (zipFile: FileZip, taxonomyUuid: string) =>
   _getJson(zipFile, ExportFile.taxa({ taxonomyUuid }), [])
-export const getTaxaPart = ({ zipFile, taxonomyUuid, index }: { zipFile: FileZip; taxonomyUuid: string; index: any }) =>
-  _getJson(zipFile, ExportFile.taxaPart({ taxonomyUuid, index }), [])
+export const getTaxaPart = ({
+  zipFile,
+  taxonomyUuid,
+  index,
+}: {
+  zipFile: FileZip
+  taxonomyUuid: string
+  index: number
+}) => _getJson(zipFile, ExportFile.taxaPart({ taxonomyUuid, index }), [])
 export const getTaxaPartsCount = ({ zipFile, taxonomyUuid }: { zipFile: FileZip; taxonomyUuid: string }) =>
   _getPartsCount(zipFile, (index) => ExportFile.taxaPart({ taxonomyUuid, index }))
 
@@ -40,7 +47,7 @@ export const getCategoryItemsPart = ({
 }: {
   zipFile: FileZip
   categoryUuid: string
-  index?: any
+  index?: number
 }) => _getJson(zipFile, ExportFile.categoryItemsPart({ categoryUuid, index }), [])
 export const getCategoryItemsPartsCount = ({ zipFile, categoryUuid }: { zipFile: FileZip; categoryUuid: string }) =>
   _getPartsCount(zipFile, (index) => ExportFile.categoryItemsPart({ categoryUuid, index }))

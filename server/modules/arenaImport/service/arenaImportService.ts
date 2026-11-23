@@ -19,7 +19,7 @@ export const startArenaImportJob = ({
   totalChunks?: number
   totalFileSize?: number
   surveyInfoTarget: ArenaSurvey
-  options: any
+  options: { includeData?: boolean }
 }) => {
   const job = new ArenaImportJob({
     user,

@@ -14,15 +14,15 @@ export const getFileContentStorageType = () => {
   return fileContentStorageTypes.db
 }
 
-export const getStorageFunctionOrThrow = ({
+export const getStorageFunctionOrThrow = <F>({
   functionByStorageType,
   operation,
   defaultFn = null,
 }: {
-  functionByStorageType: Record<string, any>
-  operation: any
-  defaultFn?: any
-}) => {
+  functionByStorageType: Record<string, F>
+  operation: string
+  defaultFn?: F | null
+}): F => {
   const storageType = getFileContentStorageType()
   const fn = functionByStorageType[storageType] ?? defaultFn
   if (!fn) {

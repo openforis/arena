@@ -1,4 +1,4 @@
-import type { ArenaTaxon, ArenaTaxonomy } from '@openforis/arena-core'
+import type { ArenaTaxon, ArenaTaxonomy, ArenaVernacularName } from '@openforis/arena-core'
 import toSnakeCase from 'to-snake-case'
 
 import { Objects } from '@openforis/arena-core'
@@ -18,6 +18,7 @@ import {
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
+import type { ExtraPropDefItems } from '@core/survey/extraPropDef'
 
 const searchTypes = {
   equals: 'equals',
@@ -94,7 +95,7 @@ const _insertOrUpdateVernacularNames = ({
 }: {
   surveyId: number
   taxonUuid: string
-  vernacularNames: Record<string, any[]>
+  vernacularNames: Record<string, ArenaVernacularName[]>
   backup?: boolean
   client?: DbClient
 }) =>
@@ -406,7 +407,7 @@ export const fetchTaxaWithVernacularNames = async (
     taxonomyUuid?: string
     taxonUuid?: string
     draft?: boolean
-    includeBigTaxonomies?: any
+    includeBigTaxonomies?: boolean
     backup?: boolean
     limit?: number | null
     offset?: number
@@ -510,7 +511,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
   surveyId: number
   taxonomyUuid: string
   vernacularLangCodes: string[]
-  extraPropsDefs: any
+  extraPropsDefs: ExtraPropDefItems
   draft?: boolean
 }) => {
   // language codes and extra prop names are passed as parameters (values and quoted column aliases)
@@ -561,7 +562,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
 const findTaxaByCondition = (
   surveyId: number,
   taxonomyUuid: string,
-  whereCondition: any,
+  whereCondition: string,
   searchValue: string | null,
   orderByProp: string,
   draft: boolean,
@@ -653,7 +654,7 @@ export const fetchTaxonByCode = async (
 const findTaxaByPropLike = (
   surveyId: number,
   taxonomyUuid: string,
-  filterProp: any,
+  filterProp: string,
   filterValue: string,
   draft: boolean = false,
   client: DbClient = db
@@ -690,9 +691,9 @@ export const findTaxaFilteringFields = ({
 }: {
   surveyId: number
   taxonomyUuid: string
-  filterFields: any
+  filterFields: string[]
   filterValue: string
-  orderByFields: any
+  orderByFields: string[]
   draft?: boolean
   client?: DbClient
 }) => {

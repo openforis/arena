@@ -60,7 +60,7 @@ const _onAncestorCyclesUpdate = async (
     nodeDefAncestor,
     cycles,
     cyclesPrev,
-  }: { survey: ArenaSurvey; nodeDefAncestor: ArenaAnyNodeDef; cycles: string[]; cyclesPrev: any },
+  }: { survey: ArenaSurvey; nodeDefAncestor: ArenaAnyNodeDef; cycles: string[]; cyclesPrev: string[] },
   client: DbClient = db
 ) => {
   const nodeDefsUpdated = {}
@@ -177,7 +177,7 @@ export const fetchNodeDefsBySurveyId = async (
     includeAnalysis = true,
   }: {
     surveyId: number
-    surveyCycles: any
+    surveyCycles: string[]
     cycle?: string
     draft?: boolean
     advanced?: boolean
@@ -331,7 +331,7 @@ export const updateNodeDefProps = (
     props?: Record<string, any>
     propsAdvanced?: ArenaNodeDefPropsAdvanced
     system?: boolean
-    markSurveyAsDraft?: any
+    markSurveyAsDraft?: boolean
   },
   client: DbClient = db
 ) =>
@@ -539,7 +539,7 @@ export const addOrRemoveNodeDefInParentLayout = async (
   }: {
     survey: ArenaSurvey
     nodeDef: ArenaAnyNodeDef
-    add?: any
+    add?: boolean
     layoutInParentByCycle?: Record<string, any>
   },
   client: DbClient = db
@@ -670,7 +670,7 @@ export const convertNodeDef = (
     return nodeDefUpdated
   })
 
-export const publishNodeDefsProps = async (surveyId: number, langsDeleted: any, client: DbClient = db) => {
+export const publishNodeDefsProps = async (surveyId: number, langsDeleted: string[], client: DbClient = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
   if (!A.isEmpty(langsDeleted)) {
