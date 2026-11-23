@@ -1,3 +1,4 @@
+import type { LatLngTuple } from 'leaflet'
 import { useCallback, useMemo, useState } from 'react'
 
 import { PointFactory, Points } from '@openforis/arena-core'
@@ -37,7 +38,8 @@ export const useMap = (props) => {
       if (Points.isValid(point, srsIndex)) {
         const pointLatLong = Points.toLatLong(point, srsIndex)
         const { x, y } = pointLatLong
-        return [y, x]
+        const latLon: LatLngTuple = [y, x]
+        return latLon
       }
       return null
     },

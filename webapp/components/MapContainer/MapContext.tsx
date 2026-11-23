@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey'
 
-import { defaultBaseLayer } from './baseLayers'
+import { type BaseLayerDef, defaultBaseLayer } from './baseLayers'
 import { MapOptions } from './mapOptions'
 
 const createInitialState = ({ sampleBasedImageInterpretationEnabled }) => ({
@@ -13,7 +13,13 @@ const createInitialState = ({ sampleBasedImageInterpretationEnabled }) => ({
   options: MapOptions.createDefaultOptions({ sampleBasedImageInterpretationEnabled }),
 })
 
-const MapContext = React.createContext({})
+type MapContextValue = {
+  contextObject?: { baseLayer: BaseLayerDef | null; options: ReturnType<typeof MapOptions.createDefaultOptions> }
+  onOptionUpdate?: (params: { option: string; value: unknown }) => void
+  onBaseLayerUpdate?: (baseLayer: BaseLayerDef) => void
+}
+
+const MapContext = React.createContext<MapContextValue>({})
 
 // Consumer
 const MapContextConsumer = ({ children }) => <MapContext.Consumer>{(context) => children(context)}</MapContext.Consumer>

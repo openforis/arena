@@ -1,17 +1,17 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@webapp/store/hooks'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 export const useConfirm = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   return useCallback(
     ({
       key,
       params = {},
       onOk,
-      onCancel,
+      onCancel = undefined,
       okButtonLabel = undefined,
       okButtonClass = undefined,
       okButtonIconClass = undefined,
@@ -43,7 +43,7 @@ export const useConfirm = () => {
 }
 
 export const useConfirmAsync = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   return useCallback(
     ({
       key,

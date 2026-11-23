@@ -1,3 +1,5 @@
+import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
+
 /**
  * The session-wide cache of the user's AI settings (GET /api/ai/settings): one fetch shared by every consumer, with
  * in-flight dedupe. Pure factory (the transport is injected); the app instance is in useAiFeatureEnabled.js.
@@ -6,10 +8,11 @@
 // what a consumer gets while the AI is off for it: every category reads as disabled
 const FORCE_OFF = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [] }
 
-export type AiSettingsResponse = Record<string, unknown> & {
-  // set on the stand-in returned when the fetch failed for a reason that may pass (network, server error)
-  _fetchError?: boolean
-}
+export type AiSettingsResponse = AiFeatureSwitches &
+  Record<string, unknown> & {
+    // set on the stand-in returned when the fetch failed for a reason that may pass (network, server error)
+    _fetchError?: boolean
+  }
 
 export type AiSettingsCacheDeps = {
   fetchSettings: () => Promise<AiSettingsResponse>

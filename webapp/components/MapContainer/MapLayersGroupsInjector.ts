@@ -21,7 +21,7 @@ export const MapLayersGroupsInjector = ({ control, baseLayersLabel, overlayGroup
     if (!container) return undefined
     const injected = []
 
-    const injectLabel = (label, referenceNode, parentNode) => {
+    const injectLabel = (label: string, referenceNode: Element | undefined, parentNode: Element | null = null) => {
       const el = document.createElement('div')
       el.className = GROUP_LABEL_CLASS
       el.textContent = label
