@@ -24,41 +24,29 @@ const RStudioApi = async ({ command }: { command: RStudioCommand }) =>
   })
 
 export const init = (app: Router): void => {
-  app.post('/rstudio', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const userUuid = User.getUuid(user)
-      const data = await RStudioApi({ command: RStudioCommands.requestInstance({ payload: { userId: userUuid } }) })
-      res.json(data)
-    } catch (error) {
-      next(error)
-    }
+  app.post('/rstudio', async (req, res) => {
+    const user = Request.getUser(req)
+    const userUuid = User.getUuid(user)
+    const data = await RStudioApi({ command: RStudioCommands.requestInstance({ payload: { userId: userUuid } }) })
+    res.json(data)
   })
 
-  app.get('/rstudio', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const userUuid = User.getUuid(user)
-      const data = await RStudioApi({ command: RStudioCommands.checkInstances({ payload: { userId: userUuid } }) })
-      res.json(data)
-    } catch (error) {
-      next(error)
-    }
+  app.get('/rstudio', async (req, res) => {
+    const user = Request.getUser(req)
+    const userUuid = User.getUuid(user)
+    const data = await RStudioApi({ command: RStudioCommands.checkInstances({ payload: { userId: userUuid } }) })
+    res.json(data)
   })
 
-  app.delete('/rstudio', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const userUuid = User.getUuid(user)
+  app.delete('/rstudio', async (req, res) => {
+    const user = Request.getUser(req)
+    const userUuid = User.getUuid(user)
 
-      const { instanceId } = Request.getParams(req)
+    const { instanceId } = Request.getParams(req)
 
-      const data = await RStudioApi({
-        command: RStudioCommands.closeInstance({ payload: { userId: userUuid, instanceId } }),
-      })
-      res.json(data)
-    } catch (error) {
-      next(error)
-    }
+    const data = await RStudioApi({
+      command: RStudioCommands.closeInstance({ payload: { userId: userUuid, instanceId } }),
+    })
+    res.json(data)
   })
 }

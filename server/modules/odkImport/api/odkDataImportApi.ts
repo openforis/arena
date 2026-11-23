@@ -1,4 +1,4 @@
-import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
+import type { Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
 import * as JobUtils from '@server/job/jobUtils'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as Request from '@server/utils/request'
@@ -13,20 +13,16 @@ export const init = (app: Router) => {
   app.post(
     '/odk-import/survey/:surveyId',
     AuthMiddleware.requireRecordCreatePermission,
-    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, cycle } = Request.getParams(req)
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      const user = Request.getUser(req)
+      const { surveyId, cycle } = Request.getParams(req)
 
-        const tempFile = await processChunkedFileForBackgroundMerge({ req })
-        if (tempFile) {
-          const job = OdkDataImportService.startOdkDataImportJob({ user, surveyId, cycle, ...tempFile })
-          res.json({ job: JobUtils.jobToJSON(job) })
-        } else {
-          res.json({ chunkProcessing: true })
-        }
-      } catch (error) {
-        next(error)
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
+        const job = OdkDataImportService.startOdkDataImportJob({ user, surveyId, cycle, ...tempFile })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ chunkProcessing: true })
       }
     }
   )

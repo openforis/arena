@@ -52,269 +52,213 @@ const sendRespNodeDefsAndValidation = async ({
 export const init = (app: Router) => {
   // ==== CREATE
 
-  app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
-      const { surveyCycleKey, nodeDef } = Request.getBody(req)
+  app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId } = Request.getParams(req)
+    const { surveyCycleKey, nodeDef } = Request.getBody(req)
 
-      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.insertNodeDef({
-        user,
-        surveyId,
-        cycle: surveyCycleKey,
-        nodeDef,
-      })
-      res.json({ nodeDefsUpdated: A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
-    } catch (error) {
-      next(error)
-    }
+    const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.insertNodeDef({
+      user,
+      surveyId,
+      cycle: surveyCycleKey,
+      nodeDef,
+    })
+    res.json({ nodeDefsUpdated: A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
   })
 
-  app.post('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
-      const { surveyCycleKey, nodeDefs } = Request.getBody(req)
+  app.post('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId } = Request.getParams(req)
+    const { surveyCycleKey, nodeDefs } = Request.getBody(req)
 
-      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.insertNodeDefs({
-        user,
-        surveyId,
-        cycle: surveyCycleKey,
-        nodeDefs,
-      })
-      res.json({ nodeDefsUpdated, nodeDefsValidation })
-    } catch (error) {
-      next(error)
-    }
+    const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.insertNodeDefs({
+      user,
+      surveyId,
+      cycle: surveyCycleKey,
+      nodeDefs,
+    })
+    res.json({ nodeDefsUpdated, nodeDefsValidation })
   })
 
   // ==== READ
 
-  app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, draft, validate, includeAnalysis } = Request.getParams(req)
-      const advanced = true // always fetch advanced props: some of them (e.g. min/max count) are needed in data entry
-      const sendNodeDefs = true
+  app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId, cycle, draft, validate, includeAnalysis } = Request.getParams(req)
+    const advanced = true // always fetch advanced props: some of them (e.g. min/max count) are needed in data entry
+    const sendNodeDefs = true
 
-      await sendRespNodeDefsAndValidation({
-        res,
-        surveyId,
-        cycle,
-        sendNodeDefs,
-        draft,
-        advanced,
-        validate,
-        includeAnalysis,
-      })
-    } catch (error) {
-      next(error)
-    }
+    await sendRespNodeDefsAndValidation({
+      res,
+      surveyId,
+      cycle,
+      sendNodeDefs,
+      draft,
+      advanced,
+      validate,
+      includeAnalysis,
+    })
   })
 
-  app.get(
-    '/survey/:surveyId/nodeDef/:nodeDefUuid',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, draft = true, advanced = true, nodeDefUuid } = Request.getParams(req)
-        const nodeDef = await NodeDefService.fetchNodeDef({ surveyId, draft, advanced, nodeDefUuid })
-        res.json({ nodeDef })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+  app.get('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId, draft = true, advanced = true, nodeDefUuid } = Request.getParams(req)
+    const nodeDef = await NodeDefService.fetchNodeDef({ surveyId, draft, advanced, nodeDefUuid })
+    res.json({ nodeDef })
+  })
 
   // ==== UPDATE
 
   app.put(
     '/survey/:surveyId/nodeDef/:nodeDefUuid/props',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { props, propsAdvanced } = Request.getBody(req)
-        const { surveyId, cycle, nodeDefUuid, parentUuid } = Request.getParams(req)
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const { props, propsAdvanced } = Request.getBody(req)
+      const { surveyId, cycle, nodeDefUuid, parentUuid } = Request.getParams(req)
 
-        const { dependencyGraph, nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.updateNodeDefProps({
-          user,
-          surveyId,
-          cycle,
-          nodeDefUuid,
-          parentUuid,
-          props,
-          propsAdvanced,
-        })
+      const { dependencyGraph, nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.updateNodeDefProps({
+        user,
+        surveyId,
+        cycle,
+        nodeDefUuid,
+        parentUuid,
+        props,
+        propsAdvanced,
+      })
 
-        // do not send updated node def back to client (node def already updated client side)
-        delete nodeDefsUpdated[nodeDefUuid]
-        res.json({ dependencyGraph, nodeDefsUpdated, nodeDefsValidation })
-      } catch (error) {
-        next(error)
-      }
+      // do not send updated node def back to client (node def already updated client side)
+      delete nodeDefsUpdated[nodeDefUuid]
+      res.json({ dependencyGraph, nodeDefsUpdated, nodeDefsValidation })
     }
   )
 
-  app.put('/survey/:surveyId/nodeDefs/props', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
-      const { nodeDefs, cycle } = Request.getBody(req)
+  app.put('/survey/:surveyId/nodeDefs/props', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId } = Request.getParams(req)
+    const { nodeDefs, cycle } = Request.getBody(req)
 
-      const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
-      const _nodeDefsUpdated = ObjectUtils.toUuidIndexedObj(_nodeDefsUpdatedArray)
+    const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
+    const _nodeDefsUpdated = ObjectUtils.toUuidIndexedObj(_nodeDefsUpdatedArray)
 
-      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({
-        cycle,
-        surveyId,
-        user,
-        nodeDefsUpdated: _nodeDefsUpdated,
-      })
+    const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({
+      cycle,
+      surveyId,
+      user,
+      nodeDefsUpdated: _nodeDefsUpdated,
+    })
 
-      res.json({ nodeDefsUpdated, nodeDefsValidation })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ nodeDefsUpdated, nodeDefsValidation })
   })
 
   app.put(
     '/survey/:surveyId/nodeDef/:nodeDefUuid/move',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, nodeDefUuid, targetParentNodeDefUuid } = Request.getParams(req)
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const { surveyId, nodeDefUuid, targetParentNodeDefUuid } = Request.getParams(req)
 
-        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.moveNodeDef({
-          user,
-          surveyId,
-          nodeDefUuid,
-          targetParentNodeDefUuid,
-        })
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.moveNodeDef({
+        user,
+        surveyId,
+        nodeDefUuid,
+        targetParentNodeDefUuid,
+      })
 
-        res.json({ nodeDefsUpdated, nodeDefsValidation })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
     }
   )
 
   app.put(
     '/survey/:surveyId/nodeDef/:nodeDefUuid/convert',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, nodeDefUuid, toType } = Request.getParams(req)
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const { surveyId, nodeDefUuid, toType } = Request.getParams(req)
 
-        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.convertNodeDef({
-          user,
-          surveyId,
-          nodeDefUuid,
-          toType,
-        })
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.convertNodeDef({
+        user,
+        surveyId,
+        nodeDefUuid,
+        toType,
+      })
 
-        res.json({ nodeDefsUpdated, nodeDefsValidation })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
     }
   )
 
   app.post(
     '/survey/:surveyId/nodeDef/clone-from-survey',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const user = Request.getUser(req)
+    async (req, res) => {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
-        const sourceNodeDefUuid = Request.getRequiredParam(req, 'sourceNodeDefUuid')
-        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
+      const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+      const sourceNodeDefUuid = Request.getRequiredParam(req, 'sourceNodeDefUuid')
+      const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
 
-        const { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned } =
-          await NodeDefService.cloneNodeDefFromSurvey({
-            user,
-            sourceSurveyId,
-            sourceNodeDefUuid,
-            targetSurveyId: surveyId,
-            targetParentNodeDefUuid,
-          })
-        res.json({ nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned })
-      } catch (error) {
-        next(error)
-      }
+      const { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned } =
+        await NodeDefService.cloneNodeDefFromSurvey({
+          user,
+          sourceSurveyId,
+          sourceNodeDefUuid,
+          targetSurveyId: surveyId,
+          targetParentNodeDefUuid,
+        })
+      res.json({ nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned })
     }
   )
 
   app.post(
     '/survey/:surveyId/nodeDef/:nodeDefUuid/clone',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId } = Request.getParams(req)
 
-        const nodeDefUuid = Request.getRequiredParam(req, 'nodeDefUuid')
-        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
+      const nodeDefUuid = Request.getRequiredParam(req, 'nodeDefUuid')
+      const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
 
-        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.cloneNodeDef({
-          surveyId,
-          nodeDefUuid,
-          targetParentNodeDefUuid,
-        })
-        res.json({ nodeDefsUpdated, nodeDefsValidation })
-      } catch (error) {
-        next(error)
-      }
+      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.cloneNodeDef({
+        surveyId,
+        nodeDefUuid,
+        targetParentNodeDefUuid,
+      })
+      res.json({ nodeDefsUpdated, nodeDefsValidation })
     }
   )
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, surveyCycleKey: cycle, nodeDefUuids } = Request.getParams(req)
+  app.delete('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId, surveyCycleKey: cycle, nodeDefUuids } = Request.getParams(req)
 
-      const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefsDeleted({
-        user,
-        surveyId,
-        cycle,
-        nodeDefUuids,
-      })
+    const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefsDeleted({
+      user,
+      surveyId,
+      cycle,
+      nodeDefUuids,
+    })
 
-      // do not send updated node def back to client (node def already updated client side)
-      nodeDefUuids.forEach((nodeDefUuid) => {
-        delete nodeDefsUpdated[nodeDefUuid]
-      })
-      res.json({ nodeDefsUpdated, nodeDefsValidation })
-    } catch (error) {
-      next(error)
-    }
+    // do not send updated node def back to client (node def already updated client side)
+    nodeDefUuids.forEach((nodeDefUuid) => {
+      delete nodeDefsUpdated[nodeDefUuid]
+    })
+    res.json({ nodeDefsUpdated, nodeDefsValidation })
   })
 
-  app.delete(
-    '/survey/:surveyId/nodeDef/:nodeDefUuid',
-    AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, surveyCycleKey: cycle, nodeDefUuid } = Request.getParams(req)
+  app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId, surveyCycleKey: cycle, nodeDefUuid } = Request.getParams(req)
 
-        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefDeleted({
-          user,
-          surveyId,
-          cycle,
-          nodeDefUuid,
-        })
+    const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.markNodeDefDeleted({
+      user,
+      surveyId,
+      cycle,
+      nodeDefUuid,
+    })
 
-        // do not send updated node def back to client (node def already updated client side)
-        delete nodeDefsUpdated[nodeDefUuid]
-        res.json({ nodeDefsUpdated, nodeDefsValidation })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    // do not send updated node def back to client (node def already updated client side)
+    delete nodeDefsUpdated[nodeDefUuid]
+    res.json({ nodeDefsUpdated, nodeDefsValidation })
+  })
 }

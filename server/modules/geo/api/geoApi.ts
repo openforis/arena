@@ -33,16 +33,12 @@ const getMapTileForwardUrl = (req: ExpressRequest) => {
 
 export const init = (app: Router) => {
   // ==== READ
-  app.get(`${uriPrefix}srs/find`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { codeOrName } = Request.getParams(req)
+  app.get(`${uriPrefix}srs/find`, AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { codeOrName } = Request.getParams(req)
 
-      const srss = await SrsManager.findSRSByCodeOrName(codeOrName)
+    const srss = await SrsManager.findSRSByCodeOrName(codeOrName)
 
-      res.json({ srss })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ srss })
   })
 
   app.get(
@@ -111,33 +107,21 @@ export const init = (app: Router) => {
     }
   })
 
-  app.post(
-    `${uriPrefix}whisp/sampling-point-data/start`,
-    AuthMiddleware.requireSurveyEditPermission,
-    (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId } = Request.getParams(req)
-        const job = GeoService.startSamplingPointDataWhispJob({ user, surveyId })
-        res.json(JobUtils.jobToJSON(job))
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+  app.post(`${uriPrefix}whisp/sampling-point-data/start`, AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId } = Request.getParams(req)
+    const job = GeoService.startSamplingPointDataWhispJob({ user, surveyId })
+    res.json(JobUtils.jobToJSON(job))
+  })
 
   app.post(
     `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,
     AuthMiddleware.requireMapUsePermission,
-    (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, cycle, attributeDefUuid } = Request.getParams(req)
-        const job = GeoService.startGeoJsonCoordinateFeaturesGenerationJob({ user, surveyId, cycle, attributeDefUuid })
-        res.json(JobUtils.jobToJSON(job))
-      } catch (error) {
-        next(error)
-      }
+    (req, res) => {
+      const user = Request.getUser(req)
+      const { surveyId, cycle, attributeDefUuid } = Request.getParams(req)
+      const job = GeoService.startGeoJsonCoordinateFeaturesGenerationJob({ user, surveyId, cycle, attributeDefUuid })
+      res.json(JobUtils.jobToJSON(job))
     }
   )
 

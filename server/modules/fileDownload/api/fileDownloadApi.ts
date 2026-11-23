@@ -37,23 +37,19 @@ export const sendTempFileToResponse = ({
 }
 
 export const init = (app: Router): void => {
-  app.get('/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
-    try {
-      const downloadFileName = Request.getDownloadFileName(req)
-      const { surveyId, cycle, fileType, fileFormat } = Request.getParams(req)
+  app.get('/download', AuthMiddleware.requireDownloadToken, async (req, res) => {
+    const downloadFileName = Request.getDownloadFileName(req)
+    const { surveyId, cycle, fileType, fileFormat } = Request.getParams(req)
 
-      const survey = surveyId ? await SurveyService.fetchSurveyById({ surveyId, draft: true }) : null
+    const survey = surveyId ? await SurveyService.fetchSurveyById({ surveyId, draft: true }) : null
 
-      const outputFileName = ExportFileNameGenerator.generate({
-        survey,
-        cycle,
-        fileType,
-        fileFormat,
-        includeTimestamp: true,
-      })
-      sendTempFileToResponse({ res, tempFileName: downloadFileName, fileFormat, outputFileName })
-    } catch (error) {
-      next(error)
-    }
+    const outputFileName = ExportFileNameGenerator.generate({
+      survey,
+      cycle,
+      fileType,
+      fileFormat,
+      includeTimestamp: true,
+    })
+    sendTempFileToResponse({ res, tempFileName: downloadFileName, fileFormat, outputFileName })
   })
 }

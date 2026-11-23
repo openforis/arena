@@ -1,5 +1,5 @@
 import type { Readable } from 'node:stream'
-import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
+import type { Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
 import { FileFormats } from '@core/fileFormats'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
@@ -21,20 +21,16 @@ export const init = (app: Router) => {
   app.post(
     '/survey/odk-import',
     AuthMiddleware.requireSurveyCreatePermission,
-    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      try {
-        const tempFile = await processChunkedFileForBackgroundMerge({ req })
-        if (tempFile) {
-          const user = Request.getUser(req)
-          const newSurvey = Request.getJsonParam(req, 'survey', {})
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
+        const user = Request.getUser(req)
+        const newSurvey = Request.getJsonParam(req, 'survey', {})
 
-          const job = OdkImportService.startOdkImportJob({ user, ...tempFile, newSurvey })
-          res.json({ job: JobUtils.jobToJSON(job) })
-        } else {
-          res.json({ chunkProcessing: true })
-        }
-      } catch (error) {
-        next(error)
+        const job = OdkImportService.startOdkImportJob({ user, ...tempFile, newSurvey })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ chunkProcessing: true })
       }
     }
   )
@@ -44,70 +40,58 @@ export const init = (app: Router) => {
   app.get(
     '/survey/:surveyId/odk-import/report',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      try {
-        const { surveyId, excludeResolved = false, offset, limit } = Request.getParams(req)
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      const { surveyId, excludeResolved = false, offset, limit } = Request.getParams(req)
 
-        const list = await OdkImportService.fetchReportItems({ surveyId, excludeResolved, offset, limit })
+      const list = await OdkImportService.fetchReportItems({ surveyId, excludeResolved, offset, limit })
 
-        res.json({ list })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ list })
     }
   )
 
   app.get(
     '/survey/:surveyId/odk-import/report/export',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      try {
-        const { surveyId, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      const { surveyId, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
+      const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
 
-        const reportItemsQueryStream = await OdkImportService.fetchReportItemsStream({ surveyId })
+      const reportItemsQueryStream = await OdkImportService.fetchReportItemsStream({ surveyId })
 
-        const fields = ['id', 'node_def_uuid', 'node_def_name', 'type', 'expression', 'message', 'resolved']
+      const fields = ['id', 'node_def_uuid', 'node_def_name', 'type', 'expression', 'message', 'resolved']
 
-        const fileName = ExportFileNameGenerator.generate({
-          survey,
-          fileType: 'odk-import-report',
-          includeTimestamp: true,
-          fileFormat,
-        })
-        Response.setContentTypeFile({ res, fileName, fileFormat })
+      const fileName = ExportFileNameGenerator.generate({
+        survey,
+        fileType: 'odk-import-report',
+        includeTimestamp: true,
+        fileFormat,
+      })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await DbUtils.stream({
-          queryStream: reportItemsQueryStream,
-          processor: async (dbStream: Readable) =>
-            FlatDataWriter.writeItemsStreamToStream({
-              stream: dbStream,
-              outputStream: res,
-              fields,
-              options: undefined,
-              fileFormat,
-            }),
-        })
-      } catch (error) {
-        next(error)
-      }
+      await DbUtils.stream({
+        queryStream: reportItemsQueryStream,
+        processor: async (dbStream: Readable) =>
+          FlatDataWriter.writeItemsStreamToStream({
+            stream: dbStream,
+            outputStream: res,
+            fields,
+            options: undefined,
+            fileFormat,
+          }),
+      })
     }
   )
 
   app.get(
     '/survey/:surveyId/odk-import/report/count',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      try {
-        const { surveyId, excludeResolved } = Request.getParams(req)
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      const { surveyId, excludeResolved } = Request.getParams(req)
 
-        const count = await OdkImportService.countReportItems({ surveyId, excludeResolved })
+      const count = await OdkImportService.countReportItems({ surveyId, excludeResolved })
 
-        res.json({ count })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ count })
     }
   )
 
@@ -116,16 +100,12 @@ export const init = (app: Router) => {
   app.post(
     '/survey/:surveyId/odk-import/report/:itemId/resolve',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      try {
-        const { surveyId, itemId, resolved } = Request.getParams(req)
+    async (req: ExpressRequest, res: ExpressResponse) => {
+      const { surveyId, itemId, resolved } = Request.getParams(req)
 
-        const item = await OdkImportService.updateReportItem(surveyId, itemId, resolved)
+      const item = await OdkImportService.updateReportItem(surveyId, itemId, resolved)
 
-        res.json({ item })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ item })
     }
   )
 }

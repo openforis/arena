@@ -56,25 +56,17 @@ const sendPolicy = async ({
  * @returns {{get: Middleware[], put: Middleware[]}} The chains.
  */
 export const createSurveyAiPolicyRoutes = (deps: SurveyAiPolicyRouteDeps = createDefaultDeps()) => {
-  const getHandler: Middleware = async (req, res, next) => {
-    try {
-      const surveyId = Number(Request.getParams(req).surveyId)
-      const user = Request.getUser(req)
-      const state = await deps.getPolicy(surveyId)
-      await sendPolicy({ res, user, surveyId, state, deps })
-    } catch (error) {
-      next(error)
-    }
+  const getHandler: Middleware = async (req, res) => {
+    const surveyId = Number(Request.getParams(req).surveyId)
+    const user = Request.getUser(req)
+    const state = await deps.getPolicy(surveyId)
+    await sendPolicy({ res, user, surveyId, state, deps })
   }
-  const putHandler: Middleware = async (req, res, next) => {
-    try {
-      const surveyId = Number(Request.getParams(req).surveyId)
-      const user = Request.getUser(req)
-      const state = await deps.updatePolicy({ user, surveyId, policy: Request.getBody(req) })
-      await sendPolicy({ res, user, surveyId, state, deps })
-    } catch (error) {
-      next(error)
-    }
+  const putHandler: Middleware = async (req, res) => {
+    const surveyId = Number(Request.getParams(req).surveyId)
+    const user = Request.getUser(req)
+    const state = await deps.updatePolicy({ user, surveyId, policy: Request.getBody(req) })
+    await sendPolicy({ res, user, surveyId, state, deps })
   }
   return { get: [deps.requireView, getHandler], put: [deps.requireEdit, putHandler] }
 }

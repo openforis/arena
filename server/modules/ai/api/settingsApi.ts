@@ -69,24 +69,18 @@ const toBodyObject = (body: unknown): Record<string, unknown> =>
   body !== null && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {}
 
 /**
- * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON and forwards
- * errors to Express. The in-flight slot of a provider call is freed when the handler settles.
+ * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON (Express forwards
+ * its errors). The in-flight slot of a provider call is freed when the handler settles.
  * @param {RouteHandler} handler - Receives `{ user, body, params }`.
- * @returns {(req: object, res: object, next: (error?: unknown) => void) => Promise<void>} The Express handler.
+ * @returns {(req: object, res: object) => Promise<void>} The Express handler.
  */
 const jsonRoute =
   (handler: RouteHandler) =>
-  async (
-    req: ExpressRequest,
-    res: { json: (body: unknown) => void },
-    next: (error?: unknown) => void
-  ): Promise<void> => {
+  async (req: ExpressRequest, res: { json: (body: unknown) => void }): Promise<void> => {
     try {
       res.json(
         await handler({ user: Request.getUser(req), body: toBodyObject(Request.getBody(req)), params: req.params })
       )
-    } catch (error) {
-      next(error)
     } finally {
       releaseProviderCall(res)
     }

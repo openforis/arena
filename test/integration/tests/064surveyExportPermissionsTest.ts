@@ -17,6 +17,7 @@ import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFi
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import FileZip from '@server/utils/file/fileZip'
 
+import { callHandler } from '@test/unit/utils/fakeExpress'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import { getContextUser } from '../config/context'
@@ -53,7 +54,7 @@ const runMiddleware = async (middleware: Middleware, user: any, body: object = {
     send: () => res,
   }
   const next = jest.fn()
-  await middleware(req, res, next)
+  await callHandler(middleware, req, res, next)
   return { res, next }
 }
 

@@ -18,23 +18,19 @@ export const init = (app: Router): void => {
    *
    * If neither idGreaterThan nor idLessThan are specified, the last 30 activities will be fetched.
    */
-  app.get('/survey/:surveyId/activity-log', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const params = Request.getParams(req)
-      const { idGreaterThan, idLessThan, limit } = parseActivityLogFetchParams(params)
-      const user = Request.getUser(req)
+  app.get('/survey/:surveyId/activity-log', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const params = Request.getParams(req)
+    const { idGreaterThan, idLessThan, limit } = parseActivityLogFetchParams(params)
+    const user = Request.getUser(req)
 
-      const activityLogs = await ActivityLogService.fetch({
-        user,
-        surveyId: params.surveyId,
-        idGreaterThan,
-        idLessThan,
-        limit,
-      })
+    const activityLogs = await ActivityLogService.fetch({
+      user,
+      surveyId: params.surveyId,
+      idGreaterThan,
+      idLessThan,
+      limit,
+    })
 
-      res.json({ activityLogs })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ activityLogs })
   })
 }

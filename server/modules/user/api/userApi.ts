@@ -30,83 +30,67 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 export const init = (app: Router) => {
   // ==== CREATE
 
-  app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res) => {
+    const { surveyId, surveyCycleKey, repeatInvitation = false } = Request.getParams(req)
+    const invitation = Request.getBody(req)
+
+    if (!repeatInvitation) {
+      const validation = await UserValidator.validateInvitation(invitation)
+
+      if (!Validation.isValid(validation)) {
+        res.json({ errorKey: 'appErrors:userInvalid' })
+        return
+      }
+    }
+
+    const user = Request.getUser(req)
+    const serverUrl = Request.getServerUrl(req)
     try {
-      const { surveyId, surveyCycleKey, repeatInvitation = false } = Request.getParams(req)
-      const invitation = Request.getBody(req)
-
-      if (!repeatInvitation) {
-        const validation = await UserValidator.validateInvitation(invitation)
-
-        if (!Validation.isValid(validation)) {
-          res.json({ errorKey: 'appErrors:userInvalid' })
-          return
-        }
-      }
-
-      const user = Request.getUser(req)
-      const serverUrl = Request.getServerUrl(req)
-      try {
-        const { skippedEmails, invalidEmails } = await UserService.inviteUsers({
-          user,
-          surveyId,
-          surveyCycleKey,
-          invitation,
-          serverUrl,
-          repeatInvitation,
-        })
-        res.json({ skippedEmails, invalidEmails })
-      } catch (e) {
-        const errorKey = e.key || 'appErrors:generic'
-        const errorParams = e.params || { text: e.message }
-        res.json({ errorKey, errorParams })
-      }
-    } catch (error) {
-      next(error)
+      const { skippedEmails, invalidEmails } = await UserService.inviteUsers({
+        user,
+        surveyId,
+        surveyCycleKey,
+        invitation,
+        serverUrl,
+        repeatInvitation,
+      })
+      res.json({ skippedEmails, invalidEmails })
+    } catch (e) {
+      const errorKey = e.key || 'appErrors:generic'
+      const errorParams = e.params || { text: e.message }
+      res.json({ errorKey, errorParams })
     }
   })
 
-  app.post('/user/request-access', async (req, res, next) => {
-    try {
-      const userAccessRequest = Request.getBody(req)
-      const serverUrl = Request.getServerUrl(req)
+  app.post('/user/request-access', async (req, res) => {
+    const userAccessRequest = Request.getBody(req)
+    const serverUrl = Request.getServerUrl(req)
 
-      const { error, errorParams, requestInserted } = await UserService.insertUserAccessRequest({
-        userAccessRequest,
+    const { error, errorParams, requestInserted } = await UserService.insertUserAccessRequest({
+      userAccessRequest,
+      serverUrl,
+    })
+    res.json({ error, errorParams, requestInserted })
+  })
+
+  app.post('/user/accept-request-access', AuthMiddleware.requireCanEditAccessRequestsPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const accessRequestAccept = Request.getBody(req)
+    const serverUrl = Request.getServerUrl(req)
+
+    try {
+      const { survey, userInvited, validation } = await UserService.acceptUserAccessRequest({
+        user,
+        accessRequestAccept,
         serverUrl,
       })
-      res.json({ error, errorParams, requestInserted })
-    } catch (error) {
-      next(error)
+      res.json({ survey, userInvited, validation })
+    } catch (e) {
+      const errorKey = e.key || 'appErrors:generic'
+      const errorParams = e.params || { text: e.message }
+      res.json({ errorKey, errorParams })
     }
   })
-
-  app.post(
-    '/user/accept-request-access',
-    AuthMiddleware.requireCanEditAccessRequestsPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const accessRequestAccept = Request.getBody(req)
-        const serverUrl = Request.getServerUrl(req)
-
-        try {
-          const { survey, userInvited, validation } = await UserService.acceptUserAccessRequest({
-            user,
-            accessRequestAccept,
-            serverUrl,
-          })
-          res.json({ survey, userInvited, validation })
-        } catch (e) {
-          const errorKey = e.key || 'appErrors:generic'
-          const errorParams = e.params || { text: e.message }
-          res.json({ errorKey, errorParams })
-        }
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   // ==== READ
 
@@ -156,301 +140,201 @@ export const init = (app: Router) => {
     res.json(user)
   }
 
-  app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
-    try {
-      await _getUser(req, res)
-    } catch (error) {
-      next(error)
-    }
+  app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res) => {
+    await _getUser(req, res)
   })
 
-  app.get(
-    '/survey/:surveyId/current-user-group',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const user = Request.getUser(req)
-        const survey = await SurveyManager.fetchSurveyById({ surveyId })
-        const surveyUuid = Survey.getUuid(survey)
-        // UserGroupService is not exported by arena-server
-        const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup) as unknown as {
-          getManyByUser(params: { userUuid: string; surveyUuid?: string }): Promise<ArenaUserGroup[]>
-        }
-        const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
-        const userGroup = userGroups[0]
-        // the user of the request has the server-only prefs (AI keys, usage): never sent
-        res.json({ user: omitServerOnlyPrefsFromUser(user), userGroup })
-      } catch (error) {
-        next(error)
-      }
+  app.get('/survey/:surveyId/current-user-group', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
+    const surveyUuid = Survey.getUuid(survey)
+    // UserGroupService is not exported by arena-server
+    const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup) as unknown as {
+      getManyByUser(params: { userUuid: string; surveyUuid?: string }): Promise<ArenaUserGroup[]>
     }
-  )
-
-  app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
-    try {
-      await _getUser(req, res)
-    } catch (error) {
-      next(error)
-    }
+    const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
+    const userGroup = userGroups[0]
+    // the user of the request has the server-only prefs (AI keys, usage): never sent
+    res.json({ user: omitServerOnlyPrefsFromUser(user), userGroup })
   })
 
-  app.get('/user/:userUuid/surveys', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
-    try {
-      const { userUuid } = Request.getParams(req)
-      const userSearch = await UserService.fetchUserByUuid(userUuid)
-      const surveys = await SurveyManager.fetchUserSurveysInfo({ user: userSearch })
-      res.json({ surveys })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res) => {
+    await _getUser(req, res)
   })
 
-  app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
-    try {
-      const { search } = Request.getParams(req)
-      const count = await UserService.countUsers({ search })
-      res.json({ count })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/user/:userUuid/surveys', AuthMiddleware.requireUsersAllViewPermission, async (req, res) => {
+    const { userUuid } = Request.getParams(req)
+    const userSearch = await UserService.fetchUserByUuid(userUuid)
+    const surveys = await SurveyManager.fetchUserSurveysInfo({ user: userSearch })
+    res.json({ surveys })
   })
 
-  app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
-    try {
-      const { offset, onlyAccepted, limit, search, sortBy, sortOrder } = Request.getParams(req)
-
-      const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder })
-
-      res.json({ list })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res) => {
+    const { search } = Request.getParams(req)
+    const count = await UserService.countUsers({ search })
+    res.json({ count })
   })
 
-  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
-    try {
-      const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
-      const fileName = ExportFileNameGenerator.generate({ fileType: 'users', includeTimestamp: true, fileFormat })
-      Response.setContentTypeFile({ res, fileName, fileFormat })
-      await UserExportService.exportUsersIntoStream({ outputStream: res, fileFormat })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res) => {
+    const { offset, onlyAccepted, limit, search, sortBy, sortOrder } = Request.getParams(req)
+
+    const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder })
+
+    res.json({ list })
+  })
+
+  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (req, res) => {
+    const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+    const fileName = ExportFileNameGenerator.generate({ fileType: 'users', includeTimestamp: true, fileFormat })
+    Response.setContentTypeFile({ res, fileName, fileFormat })
+    await UserExportService.exportUsersIntoStream({ outputStream: res, fileFormat })
   })
 
   // users backup (to be imported into another server)
-  app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { includePasswords = true, emails = null } = Request.getParams(req)
-      const serverUrl = Request.getPublicServerUrl(req)
-      const job = UsersBackupService.startExportJob({ user, includePasswords, emails, serverUrl })
-      res.json({ job })
-    } catch (error) {
-      next(error)
-    }
+  app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, (req, res) => {
+    const user = Request.getUser(req)
+    const { includePasswords = true, emails = null } = Request.getParams(req)
+    const serverUrl = Request.getPublicServerUrl(req)
+    const job = UsersBackupService.startExportJob({ user, includePasswords, emails, serverUrl })
+    res.json({ job })
   })
 
-  app.get('/users/backup/export/download', AuthMiddleware.requireAdminPermission, (req, res, next) => {
-    try {
-      const { tempFileName } = Request.getParams(req)
-      FileUtils.checkIsValidTempFileName(tempFileName)
-      const path = FileUtils.tempFilePath(tempFileName)
-      const name = `arena_users_backup_${DateUtils.nowFormatDefault()}.zip`
-      // the file contains password hashes: delete it once downloaded
-      Response.sendFile({ res, path, name, onEnd: () => FileUtils.deleteFileAsync(path) })
-    } catch (error) {
-      next(error)
-    }
+  app.get('/users/backup/export/download', AuthMiddleware.requireAdminPermission, (req, res) => {
+    const { tempFileName } = Request.getParams(req)
+    FileUtils.checkIsValidTempFileName(tempFileName)
+    const path = FileUtils.tempFilePath(tempFileName)
+    const name = `arena_users_backup_${DateUtils.nowFormatDefault()}.zip`
+    // the file contains password hashes: delete it once downloaded
+    Response.sendFile({ res, path, name, onEnd: () => FileUtils.deleteFileAsync(path) })
   })
 
   // reads the uploaded backup: the import starts only after choosing what to do with every user
-  app.post('/users/backup/import/preview', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
-    try {
-      const uploadedFilePath = Request.getFilePath(req)
-      const preview = await UsersBackupService.readImportPreview({ uploadedFilePath })
-      res.json(preview)
-    } catch (error) {
-      next(error)
-    }
+  app.post('/users/backup/import/preview', AuthMiddleware.requireAdminPermission, async (req, res) => {
+    const uploadedFilePath = Request.getFilePath(req)
+    const preview = await UsersBackupService.readImportPreview({ uploadedFilePath })
+    res.json(preview)
   })
 
-  app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { tempFileName, actionsByEmail, restorePasswordEmails } = Request.getParams(req)
-      const job = UsersBackupService.startImportJob({ user, tempFileName, actionsByEmail, restorePasswordEmails })
-      res.json({ job })
-    } catch (error) {
-      next(error)
-    }
+  app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, (req, res) => {
+    const user = Request.getUser(req)
+    const { tempFileName, actionsByEmail, restorePasswordEmails } = Request.getParams(req)
+    const job = UsersBackupService.startImportJob({ user, tempFileName, actionsByEmail, restorePasswordEmails })
+    res.json({ job })
   })
 
-  app.post('/users/backup/import/cancel', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
-    try {
-      const { tempFileName } = Request.getParams(req)
-      await UsersBackupService.cancelImport({ tempFileName })
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+  app.post('/users/backup/import/cancel', AuthMiddleware.requireAdminPermission, async (req, res) => {
+    const { tempFileName } = Request.getParams(req)
+    await UsersBackupService.cancelImport({ tempFileName })
+    Response.sendOk(res)
   })
 
-  app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
+  app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const { surveyId } = Request.getParams(req)
 
-      const count = await UserService.countUsersBySurveyId(surveyId)
-      res.json({ count })
-    } catch (error) {
-      next(error)
-    }
+    const count = await UserService.countUsersBySurveyId(surveyId)
+    res.json({ count })
   })
 
-  app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
+  app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId({
-        surveyId,
-        offset,
-        limit,
-        onlyAccepted,
-        includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
-      })
-      const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
-      const canViewEmails = Authorizer.canViewOtherUsersEmail({ user, surveyInfo })
-      const listWithSurveyGroups = _dissocOtherSurveysAuthGroups({
-        user,
-        surveyUuid: Survey.getUuid(surveyInfo),
-        users: list,
-      })
-      const listFiltered = canViewEmails
-        ? listWithSurveyGroups
-        : listWithSurveyGroups.map((userItem) =>
-            User.isEqual(user)(userItem) ? userItem : A.dissoc(User.keys.email, userItem)
-          )
+    const list = await UserService.fetchUsersBySurveyId({
+      surveyId,
+      offset,
+      limit,
+      onlyAccepted,
+      includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
+    })
+    const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+    const canViewEmails = Authorizer.canViewOtherUsersEmail({ user, surveyInfo })
+    const listWithSurveyGroups = _dissocOtherSurveysAuthGroups({
+      user,
+      surveyUuid: Survey.getUuid(surveyInfo),
+      users: list,
+    })
+    const listFiltered = canViewEmails
+      ? listWithSurveyGroups
+      : listWithSurveyGroups.map((userItem) =>
+          User.isEqual(user)(userItem) ? userItem : A.dissoc(User.keys.email, userItem)
+        )
 
-      res.json({ list: listFiltered })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ list: listFiltered })
   })
 
   app.get(
     '/survey/:surveyId/user/:userUuid/resetpasswordurl',
     AuthMiddleware.requireUserInvitePermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, userUuid } = Request.getParams(req)
-        const user = Request.getUser(req)
-        const serverUrl = Request.getServerUrl(req)
-        const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
-        res.json(url)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get(
-    '/survey/:surveyId/user/:userUuid/name',
-    AuthMiddleware.requireUserNameViewPermission,
-    async (req, res, next) => {
-      try {
-        const user = await _fetchUser(req)
-        const name = user ? User.getName(user) : null
-        res.json(name)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get('/user/:userUuid/resetpasswordurl', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
-    try {
+    async (req, res) => {
       const { surveyId, userUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
       const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
       res.json(url)
-    } catch (error) {
-      next(error)
     }
+  )
+
+  app.get('/survey/:surveyId/user/:userUuid/name', AuthMiddleware.requireUserNameViewPermission, async (req, res) => {
+    const user = await _fetchUser(req)
+    const name = user ? User.getName(user) : null
+    res.json(name)
   })
 
-  app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
-    try {
-      const { userUuid } = Request.getParams(req)
+  app.get('/user/:userUuid/resetpasswordurl', AuthMiddleware.requireUsersAllViewPermission, async (req, res) => {
+    const { surveyId, userUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const serverUrl = Request.getServerUrl(req)
+    const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
+    res.json(url)
+  })
 
-      const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
+  app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res) => {
+    const { userUuid } = Request.getParams(req)
 
-      // Ensure we don't need to make duplicate requests by caching the profile picture for a small instant.
-      // The value of 3 seconds is chosen as the smallest amount of time it takes for a user to switch to
-      // a new profile picture, ensuring they always see their own newest picture.
-      res.set('Cache-Control', 'private, max-age=3')
+    const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
 
-      if (profilePicture) {
-        res.end(profilePicture, 'binary')
-      } else {
-        res.end()
-      }
-    } catch (error) {
-      next(error)
+    // Ensure we don't need to make duplicate requests by caching the profile picture for a small instant.
+    // The value of 3 seconds is chosen as the smallest amount of time it takes for a user to switch to
+    // a new profile picture, ensuring they always see their own newest picture.
+    res.set('Cache-Control', 'private, max-age=3')
+
+    if (profilePicture) {
+      res.end(profilePicture, 'binary')
+    } else {
+      res.end()
     }
   })
 
   // ==== USER ACCESS REQUEST
 
-  app.get(
-    '/users/users-access-request',
-    AuthMiddleware.requireCanViewAccessRequestsPermission,
-    async (req, res, next) => {
-      try {
-        const { offset, limit } = Request.getParams(req)
+  app.get('/users/users-access-request', AuthMiddleware.requireCanViewAccessRequestsPermission, async (req, res) => {
+    const { offset, limit } = Request.getParams(req)
 
-        const list = await UserService.fetchUserAccessRequests({ offset, limit })
+    const list = await UserService.fetchUserAccessRequests({ offset, limit })
 
-        res.json({ list })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    res.json({ list })
+  })
 
-  app.get(
-    '/users/users-access-request/export',
-    AuthMiddleware.requireUsersAllViewPermission,
-    async (req, res, next) => {
-      try {
-        const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
-        const fileName = ExportFileNameGenerator.generate({
-          itemName: 'user_access_requests',
-          includeTimestamp: true,
-          fileFormat,
-        })
-        Response.setContentTypeFile({ res, fileName, fileFormat })
+  app.get('/users/users-access-request/export', AuthMiddleware.requireUsersAllViewPermission, async (req, res) => {
+    const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+    const fileName = ExportFileNameGenerator.generate({
+      itemName: 'user_access_requests',
+      includeTimestamp: true,
+      fileFormat,
+    })
+    Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res, fileFormat })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
+    await UserService.exportUserAccessRequestsIntoStream({ outputStream: res, fileFormat })
+  })
 
   app.get(
     '/users/users-access-request/count',
     AuthMiddleware.requireCanViewAccessRequestsPermission,
-    async (_req, res, next) => {
-      try {
-        const count = await UserService.countUserAccessRequests()
+    async (_req, res) => {
+      const count = await UserService.countUserAccessRequests()
 
-        res.json({ count })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ count })
     }
   )
 
@@ -504,100 +388,68 @@ export const init = (app: Router) => {
   app.put(
     '/survey/:surveyId/user/:userUuid/extraProps',
     AuthMiddleware.requireSurveyUserExtraPropsEditPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, userUuid } = Request.getParams(req)
-        const { extraProps } = Request.getBody(req)
-        await UserService.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
-        Response.sendOk(res)
-      } catch (error) {
-        next(error)
-      }
+    async (req, res) => {
+      const { surveyId, userUuid } = Request.getParams(req)
+      const { extraProps } = Request.getBody(req)
+      await UserService.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
+      Response.sendOk(res)
     }
   )
 
-  app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
-    try {
-      await _updateUser(req, res)
-    } catch (error) {
-      next(error)
-    }
+  app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res) => {
+    await _updateUser(req, res)
   })
 
-  app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
-    try {
-      await _updateUser(req, res)
-    } catch (error) {
-      next(error)
-    }
+  app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res) => {
+    await _updateUser(req, res)
   })
 
-  app.post('/user', AuthMiddleware.requireUserCreatePermission, async (req, res, next) => {
-    try {
-      await _insertUser(req, res)
-    } catch (error) {
-      next(error)
-    }
+  app.post('/user', AuthMiddleware.requireUserCreatePermission, async (req, res) => {
+    await _insertUser(req, res)
   })
 
-  app.post('/user/:userUuid/prefs', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const userToUpdate = Request.getBody(req)
+  app.post('/user/:userUuid/prefs', async (req, res) => {
+    const user = Request.getUser(req)
+    const userToUpdate = Request.getBody(req)
 
-      if (!User.isEqual(userToUpdate)(user)) {
-        throw new SystemError('userNotAllowedToChangePref')
-      }
-      // an array or a scalar would replace the stored prefs object for good
-      if (!isValidPrefsUpdate(User.getPrefs(userToUpdate))) {
-        throw new SystemError('userPrefsInvalid', {}, StatusCodes.BAD_REQUEST)
-      }
-
-      await UserService.updateUserPrefs(userToUpdate)
-
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
+    if (!User.isEqual(userToUpdate)(user)) {
+      throw new SystemError('userNotAllowedToChangePref')
     }
+    // an array or a scalar would replace the stored prefs object for good
+    if (!isValidPrefsUpdate(User.getPrefs(userToUpdate))) {
+      throw new SystemError('userPrefsInvalid', {}, StatusCodes.BAD_REQUEST)
+    }
+
+    await UserService.updateUserPrefs(userToUpdate)
+
+    Response.sendOk(res)
   })
 
-  app.post('/user/change-password', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const passwordChangeForm = Request.getBody(req)
+  app.post('/user/change-password', async (req, res) => {
+    const user = Request.getUser(req)
+    const passwordChangeForm = Request.getBody(req)
 
-      const validation = await UserService.updateUserPassword({ user, passwordChangeForm })
+    const validation = await UserService.updateUserPassword({ user, passwordChangeForm })
 
-      res.json({ validation })
-    } catch (error) {
-      next(error)
-    }
+    res.json({ validation })
   })
 
   // ==== DELETE
-  app.delete('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserRemovePermission, async (req, res, next) => {
-    try {
-      const { surveyId, userUuid } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.delete('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserRemovePermission, async (req, res) => {
+    const { surveyId, userUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-      await UserService.deleteUserFromSurvey({ user, userUuidToRemove: userUuid, surveyId })
+    await UserService.deleteUserFromSurvey({ user, userUuidToRemove: userUuid, surveyId })
 
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+    Response.sendOk(res)
   })
 
-  app.delete('/user/:userUuid', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
-    try {
-      const { userUuid } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.delete('/user/:userUuid', AuthMiddleware.requireAdminPermission, async (req, res) => {
+    const { userUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
 
-      await UserService.deleteUser({ user, userUuidToDelete: userUuid })
+    await UserService.deleteUser({ user, userUuidToDelete: userUuid })
 
-      Response.sendOk(res)
-    } catch (error) {
-      next(error)
-    }
+    Response.sendOk(res)
   })
 }
