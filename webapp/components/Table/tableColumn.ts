@@ -5,4 +5,7 @@ export type TableColumn = {
   headerIsTranslationKey?: boolean
   sortable?: boolean
   sortField?: string
+  renderItem?: (...args: any[]) => any
+  width?: string
+  className?: string
 }

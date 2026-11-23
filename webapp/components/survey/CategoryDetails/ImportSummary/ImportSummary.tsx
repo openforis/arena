@@ -1,0 +1,69 @@
+import './ImportSummary.scss'
+
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+
+import { Button } from '@webapp/components/buttons'
+import { FormItem } from '@webapp/components/form/Input'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+
+import { State, useActions } from '../store'
+
+import TableHeader from './TableHeader'
+import TableRow from './TableRow'
+
+type ImportSummaryProps = {
+  state: Record<string, any>
+  setState: (...args: any[]) => any
+}
+
+const ImportSummary = (props: ImportSummaryProps) => {
+  const { state, setState } = props
+
+  const Actions = useActions({ setState })
+
+  const importSummary = State.getImportSummary(state)
+  const items = CategoryImportSummary.getItems(importSummary)
+
+  return (
+    <Modal
+      className="category__import-summary"
+      onClose={Actions.hideImportSummary}
+      showCloseButton
+      title="categoryEdit.importSummary.title"
+    >
+      <ModalBody>
+        <div className="table">
+          <div className="table__content">
+            <TableHeader />
+            <div className="table__rows">
+              {items.map((item, idx) => {
+                const key = CategoryImportSummary.getItemKey(item)
+                return (
+                  <TableRow
+                    key={key}
+                    idx={idx}
+                    item={item}
+                    onDataTypeChange={(dataType) => Actions.setImportSummaryColumnDataType({ key, dataType })}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          className="modal-footer__item btn-import"
+          onClick={() => Actions.importCategory({ state })}
+          iconClassName="icon-upload2 icon-12px"
+          label="common.import"
+        />
+        <FormItem className="total-items" label="common.totalItems">
+          {CategoryImportSummary.getItemsCount(importSummary)}
+        </FormItem>
+      </ModalFooter>
+    </Modal>
+  )
+}
+
+export default ImportSummary
