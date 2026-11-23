@@ -4,20 +4,9 @@ import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 
 import { Button } from '@webapp/components/buttons'
+import type { ExpressionNodeComponentProps } from './expressionNode'
 
-type LogicalProps = {
-  node: any
-  onChange: (...args: any[]) => any
-  renderNode: React.ElementType
-  // ExpressionNode props
-  canDelete?: boolean
-  nodeDefCurrent?: any
-  isBoolean?: boolean
-  level?: number
-  variables?: any[]
-}
-
-const Logical = (props: LogicalProps) => {
+const Logical = (props: ExpressionNodeComponentProps) => {
   const {
     canDelete = false,
     isBoolean = false,

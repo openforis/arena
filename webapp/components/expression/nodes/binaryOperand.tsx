@@ -5,6 +5,7 @@ import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { ButtonGroup } from '@webapp/components/form'
+import type { ExpressionNodeComponentProps } from './expressionNode'
 
 const { types } = Expression
 
@@ -37,18 +38,8 @@ const toUiOperandExpressionType = (type) => {
   return type
 }
 
-type BinaryOperandProps = {
-  isBoolean?: boolean
-  node: any
-  nodeDefCurrent?: any
-  onChange: (...args: any[]) => any
+type BinaryOperandProps = ExpressionNodeComponentProps & {
   type: string
-  renderNode: (...args: any[]) => any
-  // ExpressionNode props
-  canDelete?: boolean
-  level?: number
-  onDelete?: (...args: any[]) => any
-  variables?: any[]
 }
 
 const BinaryOperand = (props: BinaryOperandProps) => {

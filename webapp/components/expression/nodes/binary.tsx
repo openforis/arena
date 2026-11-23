@@ -6,21 +6,9 @@ import Dropdown from '../../form/Dropdown'
 import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
 import { useI18n } from '@webapp/store/system'
+import type { ExpressionNodeComponentProps } from './expressionNode'
 
-type BinaryProps = {
-  canDelete?: boolean
-  isBoolean?: boolean
-  node: any
-  nodeDefCurrent?: any
-  onChange: (...args: any[]) => any
-  onDelete?: (...args: any[]) => any
-  // ExpressionNode props
-  level?: number
-  renderNode: (...args: any[]) => any
-  variables?: any[]
-}
-
-const Binary = (props: BinaryProps) => {
+const Binary = (props: ExpressionNodeComponentProps) => {
   const {
     canDelete = false,
     isBoolean = false,
