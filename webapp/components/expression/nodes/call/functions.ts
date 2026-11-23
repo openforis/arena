@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react'
+
 import * as Expression from '@core/expressionParser/expression'
 
 import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
@@ -24,7 +26,15 @@ const complexFunctions = {
   },
 }
 
-export const functions = {
+type CallFunction = {
+  callee?: string
+  component?: ComponentType<any>
+  exprString?: string
+  label?: string
+  labelKey?: string
+}
+
+export const functions: Record<string, CallFunction> = {
   [functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
     component: CallCategoryItemPropEditor,

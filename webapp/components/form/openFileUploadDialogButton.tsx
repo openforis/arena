@@ -1,10 +1,10 @@
 import './uploadButton.scss'
 
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
+import { useAppDispatch } from '@webapp/store'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 
 import { Button } from '../buttons'
@@ -22,7 +22,7 @@ const OpenFileUploadDialogButton = (props) => {
     variant,
   } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
 
   const label = i18n.t(labelProp)

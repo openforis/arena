@@ -22,7 +22,7 @@ export const ADVANCED_EXPRESSION_SUFFIX = '\n'
 const getExpressionOrParseQuery = ({ expr, query, canBeConstant }) => {
   try {
     return expr ?? ExpressionParser.parseQuery({ query, canBeConstant })
-  } catch (error) {
+  } catch {
     return ExpressionParser.parseQuery({ query: '', canBeConstant })
   }
 }

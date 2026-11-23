@@ -24,7 +24,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
-import { BinaryOperandType } from './binaryOperand'
+import { BinaryOperandType, isLeftOperand, isRightOperand } from './binaryOperand'
 import { findVariableByName } from '../expressionVariables'
 
 const isValueText = (nodeDef, value) =>
@@ -67,10 +67,10 @@ const _findNodeDefByName = ({ survey, name, variables }) => {
 }
 
 const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type, variables = [] }) => {
-  if (!type || BinaryOperandType.isLeft(type)) {
+  if (!type || isLeftOperand(type)) {
     return { nodeDef: nodeDefCurrent, isIdentifierField: true }
   }
-  if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
+  if (isRightOperand(type) && Expression.isBinary(expressionNodeParent)) {
     const nodeLeftOperand = A.prop(BinaryOperandType.left, expressionNodeParent)
     if (Expression.isThis(nodeLeftOperand)) {
       return { nodeDef: nodeDefCurrent, isIdentifierField: true }
