@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 import { configureStore } from '@reduxjs/toolkit'
 
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
@@ -22,7 +22,12 @@ const appReducers = {
   [UiState.stateKey]: UiReducer,
 }
 
-const createReducer = (asyncReducers) =>
+type ReducersByKey = { [stateKey: string]: Reducer }
+
+// reducers injected after the store creation (see injectReducers)
+const asyncReducers: ReducersByKey = {}
+
+const createReducer = () =>
   combineReducers({
     ...appReducers,
     ...asyncReducers,
@@ -35,9 +40,9 @@ export const store = configureStore({
     getDefaultMiddleware({ serializableCheck: false }).concat([appErrorsMiddleware, aiSuggestionsMiddleware]),
 })
 
-store.asyncReducers = {}
+export type AppDispatch = typeof store.dispatch
 
-export const injectReducers = (name, asyncReducer) => {
-  store.asyncReducers[name] = asyncReducer
-  store.replaceReducer(createReducer(store.asyncReducers))
+export const injectReducers = (name: string, asyncReducer: Reducer): void => {
+  asyncReducers[name] = asyncReducer
+  store.replaceReducer(createReducer())
 }

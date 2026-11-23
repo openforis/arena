@@ -26,14 +26,9 @@ if (browserI18n.language !== detectedLanguage) {
 
 export const useI18n = () => browserI18n
 
-export const useI18nT = ({ unescapeHtml = false } = {}) =>
+export const useI18nT = ({ unescapeHtml = false }: { unescapeHtml?: boolean } = {}) =>
   useCallback(
-    /**
-     * @param {string} textKey - The text key.
-     * @param {object} [textParams] - The text parameters.
-     * @returns {string} - The translated text.
-     */
-    (textKey, textParams) => {
+    (textKey: string, textParams?: Record<string, unknown>): string => {
       const text = browserI18n.t(textKey, textParams)
       return unescapeHtml ? DomUtils.unescapeHtml(text) : text
     },
