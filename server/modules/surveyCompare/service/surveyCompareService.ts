@@ -1,4 +1,5 @@
 import type { ArenaUser } from '@openforis/arena-core'
+import type { SurveyCompareResult } from '@core/survey/surveyCompare'
 import * as JobManager from '@server/job/jobManager'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 
@@ -31,10 +32,10 @@ export const startSurveyCompareApplyJob = (params: {
  * Reads the result of a comparison; it is read only once, so it is deleted afterwards.
  * @param {object} params - The parameters.
  * @param {string} params.resultFileId - Id of the result file kept in the temp storage.
- * @returns {Promise<any>} - The comparison result.
+ * @returns {Promise<SurveyCompareResult>} - The comparison result.
  */
 export const readSurveyCompareResult = async ({ resultFileId }: { resultFileId: string }) => {
-  const result = await readKeptJson({ fileId: resultFileId })
+  const result = await readKeptJson<SurveyCompareResult>({ fileId: resultFileId })
   await TempFileManager.deletePendingImportFileIfAny({ fileId: resultFileId })
   return result
 }

@@ -9,8 +9,8 @@ import * as CategoryManager from '../manager/categoryManager'
 
 export default class CategoriesExportJob extends Job {
   static readonly type = 'CategoriesExportJob'
-  archiver: any
-  categoriesTempFolderName: any
+  archiver: ZipArchiver
+  categoriesTempFolderName: string
 
   constructor(params, type = CategoriesExportJob.type) {
     super(type, params)

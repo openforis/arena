@@ -112,7 +112,7 @@ export const updateItem = (
   surveyId: number,
   source: ImportReportSource,
   itemId: number,
-  props: any,
+  props: { [key: string]: unknown },
   resolved: boolean,
   client: DbClient = db
 ) =>

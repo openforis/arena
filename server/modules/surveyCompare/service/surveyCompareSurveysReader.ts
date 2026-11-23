@@ -1,4 +1,12 @@
-import type { ArenaTaxon, ArenaSurvey, ArenaCategory, ArenaTaxonomy } from '@openforis/arena-core'
+import type {
+  ArenaAnyNodeDef,
+  ArenaCategory,
+  ArenaCategoryItem,
+  ArenaSurvey,
+  ArenaTaxon,
+  ArenaTaxonomy,
+  ArenaVernacularName,
+} from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
@@ -15,10 +23,18 @@ import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonom
 import { db, type DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-const hasDraftProps = (obj: any): boolean => Boolean(obj?.propsDraft || obj?.propsAdvancedDraft)
+// object with props (published and draft) as exported in a backup
+type ObjectWithProps = {
+  props?: object
+  propsDraft?: object
+  propsAdvanced?: object
+  propsAdvancedDraft?: object
+}
+
+const hasDraftProps = (obj: ObjectWithProps): boolean => Boolean(obj?.propsDraft || obj?.propsAdvancedDraft)
 
 // a backup export keeps published and draft props separated: combine them, draft props win
-const combineProps = (obj: any): any => {
+const combineProps = <T extends ObjectWithProps>(obj: T): T => {
   if (!hasDraftProps(obj)) return obj
   const result = {
     ...obj,
@@ -30,7 +46,7 @@ const combineProps = (obj: any): any => {
   return result
 }
 
-const combinePropsInObjects = (objsByUuid: Record<string, any> = {}): Record<string, any> =>
+const combinePropsInObjects = <T extends ObjectWithProps>(objsByUuid: Record<string, T> = {}): Record<string, T> =>
   Object.fromEntries(Object.entries(objsByUuid).map(([uuid, obj]) => [uuid, combineProps(obj)]))
 
 const combineCategoryProps = (category: ArenaCategory) => {
@@ -39,7 +55,13 @@ const combineCategoryProps = (category: ArenaCategory) => {
   return Category.assocLevelsArray(levels)(categoryCombined)
 }
 
-const readCategoryItems = async ({ zipFile, categoryUuid }): Promise<any[]> => {
+const readCategoryItems = async ({
+  zipFile,
+  categoryUuid,
+}: {
+  zipFile: FileZip
+  categoryUuid: string
+}): Promise<ArenaCategoryItem[]> => {
   const items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
   if (items.length > 0) return items
   const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
@@ -51,7 +73,13 @@ const readCategoryItems = async ({ zipFile, categoryUuid }): Promise<any[]> => {
   return result
 }
 
-const readTaxa = async ({ zipFile, taxonomyUuid }): Promise<any[]> => {
+const readTaxa = async ({
+  zipFile,
+  taxonomyUuid,
+}: {
+  zipFile: FileZip
+  taxonomyUuid: string
+}): Promise<ArenaTaxon[]> => {
   const taxa = await ArenaSurveyFileZip.getTaxa(zipFile, taxonomyUuid)
   if (taxa.length > 0) return taxa
   const partsCount = ArenaSurveyFileZip.getTaxaPartsCount({ zipFile, taxonomyUuid })
@@ -65,7 +93,7 @@ const readTaxa = async ({ zipFile, taxonomyUuid }): Promise<any[]> => {
 
 const combineTaxonProps = (taxon: ArenaTaxon) => {
   const vernacularNames = Object.fromEntries(
-    Object.entries(Taxon.getVernacularNames(taxon) as Record<string, any[]>).map(([lang, names]) => [
+    Object.entries(Taxon.getVernacularNames(taxon) as Record<string, ArenaVernacularName[]>).map(([lang, names]) => [
       lang,
       names.map(combineProps),
     ])
@@ -110,8 +138,8 @@ export const readSurveyFromFile = async ({ filePath }: { filePath: string }): Pr
         combineCategoryProps(category),
       ])
     )
-    const taxonomies = combinePropsInObjects(arenaSurvey.taxonomies)
-    const nodeDefs = Object.values(combinePropsInObjects(arenaSurvey.nodeDefs)).filter(
+    const taxonomies = combinePropsInObjects<ArenaTaxonomy>(arenaSurvey.taxonomies)
+    const nodeDefs = Object.values(combinePropsInObjects<ArenaAnyNodeDef>(arenaSurvey.nodeDefs)).filter(
       (nodeDef) => !NodeDef.isDeleted(nodeDef)
     )
     // node defs, categories and taxonomies are replaced below
@@ -143,13 +171,15 @@ const fetchTaxa = async ({ surveyId, taxonomyUuid, draft }, client: DbClient) =>
   return taxa.map((taxon: ArenaTaxon) =>
     Taxon.assocVernacularNamesByLang(
       Object.fromEntries(
-        Object.entries(Taxon.getVernacularNames(taxon) as Record<string, any[]>).map(([lang, names]) => [
-          lang,
-          names.map((name) => ({
-            ...name,
-            published: publishedVernacularNameUuids.has(TaxonVernacularName.getUuid(name)),
-          })),
-        ])
+        Object.entries(Taxon.getVernacularNames(taxon) as Record<string, ArenaVernacularName[]>).map(
+          ([lang, names]) => [
+            lang,
+            names.map((name) => ({
+              ...name,
+              published: publishedVernacularNameUuids.has(TaxonVernacularName.getUuid(name)),
+            })),
+          ]
+        )
       )
     )(taxon)
   )

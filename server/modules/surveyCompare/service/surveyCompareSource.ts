@@ -61,10 +61,10 @@ export const withKeptFilePath = async <T>(
 
 /**
  * Keeps an object as JSON in the shared temp storage.
- * @param {any} data - The object to keep.
+ * @param {unknown} data - The object to keep.
  * @returns {Promise<string>} - The id of the kept file.
  */
-export const keepJson = async (data: any): Promise<string> => {
+export const keepJson = async (data: unknown): Promise<string> => {
   const filePath = FileUtils.tempFilePath(FileUtils.newTempFileName())
   await FileUtils.writeFile(filePath, JSON.stringify(data))
   return keepFile({ filePath })
@@ -74,9 +74,9 @@ export const keepJson = async (data: any): Promise<string> => {
  * Reads an object kept with keepJson.
  * @param {object} params - The parameters.
  * @param {string} params.fileId - The id of the kept file.
- * @returns {Promise<any>} - The kept object.
+ * @returns {Promise<unknown>} - The kept object.
  */
-export const readKeptJson = async ({ fileId }: { fileId: string }): Promise<any> =>
+export const readKeptJson = async <T = unknown>({ fileId }: { fileId: string }): Promise<T> =>
   withKeptFilePath({ fileId }, async (filePath) => JSON.parse(await FileUtils.readFile(filePath)))
 
 const readSurveyFileFromZip = async ({ filePath, fileUuid }): Promise<Buffer | null> => {

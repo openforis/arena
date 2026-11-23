@@ -1,7 +1,7 @@
 import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
-import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaCategoryItem, ArenaSurvey } from '@openforis/arena-core'
 import { Objects, Points } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -47,12 +47,12 @@ const extraPropProcessorByDataType = {
 
 export class CategoryImportInternalJob extends Job {
   category: ArenaCategory
-  itemsByCodes: any
-  itemsUpdater: any
-  srsIndex: any
+  itemsByCodes: { [codes: string]: ArenaCategoryItem }
+  itemsUpdater: CategoryItemsUpdater | null
+  srsIndex: { [srsCode: string]: unknown } | null
   summary: CategoryImportSummary.CategoryImportSummary
   survey: ArenaSurvey | null
-  totalItemsInserted: any
+  totalItemsInserted: number
 
   constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)

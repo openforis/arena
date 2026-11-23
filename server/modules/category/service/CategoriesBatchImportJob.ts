@@ -20,8 +20,8 @@ const extractCategoryNameFromZipEntryName = (entryName: string) => {
 
 export default class CategoriesBatchImportJob extends Job {
   static readonly type = 'CategoriesBatchImportJob'
-  insertedCategories: any
-  updatedCategories: any
+  insertedCategories: number
+  updatedCategories: number
 
   constructor(params) {
     super(CategoriesBatchImportJob.type, params)
