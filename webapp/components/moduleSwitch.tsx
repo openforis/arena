@@ -2,7 +2,6 @@ import './moduleSwitch.scss'
 
 import React, { useEffect } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
-import PropTypes from 'prop-types'
 
 import { app, appModuleUri } from '@webapp/app/appModules'
 import { useIsInRoute } from '@webapp/components/hooks'
@@ -16,7 +15,15 @@ const NotFoundPage = () => {
 
 const FallbackComponent = () => <>...</>
 
-const ModuleSwitch = (props) => {
+type AppModule = { key: string; path: string; icon?: string }
+
+type ModuleSwitchProps = {
+  modules: { path: string; component: React.ElementType; props?: Record<string, unknown> }[]
+  moduleRoot?: AppModule
+  moduleDefault?: AppModule
+}
+
+const ModuleSwitch = (props: ModuleSwitchProps) => {
   const { modules = [], moduleRoot = null, moduleDefault = null } = props
 
   const navigate = useNavigate()
@@ -47,12 +54,6 @@ const ModuleSwitch = (props) => {
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
-}
-
-ModuleSwitch.propTypes = {
-  modules: PropTypes.array.isRequired,
-  moduleRoot: PropTypes.object,
-  moduleDefault: PropTypes.object,
 }
 
 export default ModuleSwitch

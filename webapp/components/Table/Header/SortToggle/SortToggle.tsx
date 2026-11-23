@@ -1,7 +1,5 @@
 import './SortToggle.scss'
 
-import PropTypes from 'prop-types'
-
 import { useI18n } from '@webapp/store/system'
 
 const tooltipKeyByOrder = {
@@ -9,7 +7,15 @@ const tooltipKeyByOrder = {
   desc: 'common.sortNone',
 }
 
-const SortToggle = ({ disabled = false, sort, field, handleSortBy, priority = null }) => {
+type SortToggleProps = {
+  disabled?: boolean
+  sort: Record<string, any>
+  field: string
+  handleSortBy: (...args: any[]) => any
+  priority?: number
+}
+
+const SortToggle = ({ disabled = false, sort, field, handleSortBy, priority = null }: SortToggleProps) => {
   const i18n = useI18n()
 
   const active = sort.by === field
@@ -34,14 +40,6 @@ const SortToggle = ({ disabled = false, sort, field, handleSortBy, priority = nu
       {priority && <span className="btn-sort-toggle-priority">{priority}</span>}
     </button>
   )
-}
-
-SortToggle.propTypes = {
-  disabled: PropTypes.bool,
-  sort: PropTypes.object.isRequired,
-  field: PropTypes.string.isRequired,
-  handleSortBy: PropTypes.func.isRequired,
-  priority: PropTypes.number,
 }
 
 export default SortToggle

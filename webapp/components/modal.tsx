@@ -1,7 +1,6 @@
 import './modal.scss'
 
-import { useCallback, useId } from 'react'
-import PropTypes from 'prop-types'
+import { useCallback, useId, type ReactNode } from 'react'
 import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
 
@@ -9,7 +8,11 @@ import { TestId } from '@webapp/utils/testId'
 import { useI18nT } from '@webapp/store/system'
 import { Button } from './buttons'
 
-export const ModalClose = ({ onClose }) => (
+type ModalCloseProps = {
+  onClose: (...args: any[]) => any
+}
+
+export const ModalClose = ({ onClose }: ModalCloseProps) => (
   <Button
     className="modal-close"
     iconClassName="icon-cross icon-20px"
@@ -19,29 +22,37 @@ export const ModalClose = ({ onClose }) => (
   />
 )
 
-ModalClose.propTypes = {
-  onClose: PropTypes.func.isRequired,
+type ModalHeaderProps = {
+  children: ReactNode
 }
 
-export const ModalHeader = ({ children }) => <div className="modal-header">{children}</div>
+export const ModalHeader = ({ children }: ModalHeaderProps) => <div className="modal-header">{children}</div>
 
-ModalHeader.propTypes = {
-  children: PropTypes.node.isRequired,
+type ModalBodyProps = {
+  children: ReactNode
 }
 
-export const ModalBody = ({ children }) => <div className="modal-body">{children}</div>
+export const ModalBody = ({ children }: ModalBodyProps) => <div className="modal-body">{children}</div>
 
-ModalBody.propTypes = {
-  children: PropTypes.node.isRequired,
+type ModalFooterProps = {
+  children: ReactNode
 }
 
-export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
+export const ModalFooter = ({ children }: ModalFooterProps) => <div className="modal-footer">{children}</div>
 
-ModalFooter.propTypes = {
-  children: PropTypes.node.isRequired,
+type ModalProps = {
+  children: ReactNode
+  className?: string
+  closeOnEsc?: boolean
+  onClose?: (...args: any[]) => any
+  // called with 'backdropClick' or 'escapeKeyDown' instead of onClose (to ask before closing)
+  onDismiss?: (...args: any[]) => any
+  title?: string
+  titleParams?: Record<string, any>
+  showCloseButton?: boolean
 }
 
-export const Modal = (props) => {
+export const Modal = (props: ModalProps) => {
   const {
     children,
     className = '',
@@ -90,16 +101,4 @@ export const Modal = (props) => {
       </Fade>
     </MuiModal>
   )
-}
-
-Modal.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  closeOnEsc: PropTypes.bool,
-  onClose: PropTypes.func,
-  // called with 'backdropClick' or 'escapeKeyDown' instead of onClose (to ask before closing)
-  onDismiss: PropTypes.func,
-  title: PropTypes.string,
-  titleParams: PropTypes.object,
-  showCloseButton: PropTypes.bool,
 }

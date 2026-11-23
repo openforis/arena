@@ -1,7 +1,6 @@
 import './VisibleColumnsMenu.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -10,7 +9,13 @@ import { ArrayUtils } from '@core/arrayUtils'
 import { ButtonMenu } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 
-export const VisibleColumnsMenu = (props) => {
+type VisibleColumnsMenuProps = {
+  columns: any[]
+  onSelectionChange: (...args: any[]) => any
+  selectedColumnKeys?: any[]
+}
+
+export const VisibleColumnsMenu = (props: VisibleColumnsMenuProps) => {
   const { columns, onSelectionChange, selectedColumnKeys } = props
 
   const availableColumns = columns.filter((column) => !Objects.isEmpty(column.header) && column.header !== '#')
@@ -47,10 +52,4 @@ export const VisibleColumnsMenu = (props) => {
       menuClassName="visible-columns-menu"
     />
   )
-}
-
-VisibleColumnsMenu.propTypes = {
-  columns: PropTypes.array.isRequired,
-  onSelectionChange: PropTypes.func.isRequired,
-  selectedColumnKeys: PropTypes.array,
 }

@@ -1,7 +1,6 @@
 import './GeoPolygonInfo.scss'
 
 import { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import { Numbers } from '@openforis/arena-core'
 
@@ -11,12 +10,17 @@ import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { FormItem } from '../form/Input'
 import { ButtonIconInfo } from '../buttons'
+import type { Feature } from 'geojson'
 
 const { areaUnits, lengthUnits, abbreviationByUnit, metersToUnit, squareMetersToUnit } = NumberConversionUtils
 
 const formatNumber = (value) => Numbers.formatDecimal(value, 2)
 
-export const GeoPolygonInfo = (props) => {
+type GeoPolygonInfoProps = {
+  geoJson: Feature
+}
+
+export const GeoPolygonInfo = (props: GeoPolygonInfoProps) => {
   const { geoJson } = props
 
   const areaInSquareMeters = useMemo(() => GeoJsonUtils.area(geoJson), [geoJson])
@@ -64,8 +68,4 @@ export const GeoPolygonInfo = (props) => {
       </FormItem>
     </div>
   )
-}
-
-GeoPolygonInfo.propTypes = {
-  geoJson: PropTypes.object.isRequired,
 }

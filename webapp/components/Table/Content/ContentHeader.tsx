@@ -1,16 +1,25 @@
-import PropTypes from 'prop-types'
-
 import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 
-import { TableColumnPropType } from '../tablePropTypes'
+import type { TableColumn } from '../tableColumn'
 
 const getHeaderText = ({ header, headerIsTranslationKey, i18n }) => {
   if (!header) return ''
   return headerIsTranslationKey && i18n.exists(header) ? i18n.t(header) : header
 }
 
-export const ContentHeader = (props) => {
+type ContentHeaderProps = {
+  column: TableColumn
+  deselectAllItems?: (...args: any[]) => any
+  handleSortBy?: (...args: any[]) => any
+  selectAllItems?: (...args: any[]) => any
+  selectedItemsCount?: number
+  sort?: Record<string, any>
+  totalCount?: number
+  allVisibleItemsSelected?: boolean
+}
+
+export const ContentHeader = (props: ContentHeaderProps) => {
   const {
     column,
     deselectAllItems,
@@ -32,15 +41,4 @@ export const ContentHeader = (props) => {
       {getHeaderText({ header, headerIsTranslationKey, i18n })}
     </div>
   )
-}
-
-ContentHeader.propTypes = {
-  column: TableColumnPropType.isRequired,
-  deselectAllItems: PropTypes.func,
-  handleSortBy: PropTypes.func,
-  selectAllItems: PropTypes.func,
-  selectedItemsCount: PropTypes.number,
-  sort: PropTypes.object,
-  totalCount: PropTypes.number,
-  allVisibleItemsSelected: PropTypes.bool,
 }

@@ -1,7 +1,6 @@
 import './ScriptEditor.scss'
 
 import { useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 
 import AceEditor from 'react-ace'
 import * as ace from 'ace-builds'
@@ -16,7 +15,20 @@ const aceLangTools = ace.require('ace/ext/language_tools')
 const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools
 const defaultCompleters = [snippetCompleter, textCompleter, keyWordCompleter]
 
-export const ScriptEditor = (props) => {
+type ScriptEditorProps = {
+  name: string
+  mode: 'r' | 'sql' | 'json' | 'javascript'
+  completer?: {
+    getCompletions: (...args: any[]) => any
+  }
+  height?: string
+  width?: string
+  script: string
+  onChange: (...args: any[]) => any
+  readOnly?: boolean
+}
+
+export const ScriptEditor = (props: ScriptEditorProps) => {
   const {
     completer = null,
     height = '200px',
@@ -67,17 +79,4 @@ export const ScriptEditor = (props) => {
       width={width}
     />
   )
-}
-
-ScriptEditor.propTypes = {
-  name: PropTypes.string.isRequired,
-  mode: PropTypes.oneOf(['r', 'sql', 'json', 'javascript']).isRequired,
-  completer: PropTypes.shape({
-    getCompletions: PropTypes.func.isRequired,
-  }),
-  height: PropTypes.string,
-  width: PropTypes.string,
-  script: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
 }

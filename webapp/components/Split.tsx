@@ -1,13 +1,23 @@
 import './Split.scss'
 
+import type React from 'react'
+
 import ReactSplit from 'react-split'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 // same as $paneResizeHandleWidth (layoutMixins.scss)
 const GUTTER_SIZE = 12
 
-export const Split = (props) => {
+type SplitProps = {
+  children: React.ReactNode
+  className?: string
+  direction?: 'horizontal' | 'vertical'
+  expandToMin?: boolean
+  minSize?: number | number[]
+  sizes?: number[]
+}
+
+export const Split = (props: SplitProps) => {
   const {
     className = undefined,
     children,
@@ -29,13 +39,4 @@ export const Split = (props) => {
       {children}
     </ReactSplit>
   )
-}
-
-Split.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  direction: PropTypes.oneOf(['horizontal', 'vertical']),
-  expandToMin: PropTypes.bool,
-  minSize: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]),
-  sizes: PropTypes.arrayOf(PropTypes.number),
 }

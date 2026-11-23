@@ -1,11 +1,21 @@
 import './ItemEditButtonBar.scss'
 
-import PropTypes from 'prop-types'
-
 import * as Validation from '@core/validation/validation'
 import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from './buttons'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-export const ItemEditButtonBar = (props) => {
+type ItemEditButtonBarProps = {
+  dirty?: boolean
+  editing?: boolean
+  onCancel: (...args: any[]) => any
+  onDelete?: (...args: any[]) => any
+  onEdit: (...args: any[]) => any
+  onSave: (...args: any[]) => any
+  readOnly?: boolean
+  validation?: ArenaValidation
+}
+
+export const ItemEditButtonBar = (props: ItemEditButtonBarProps) => {
   const {
     dirty = false,
     editing = false,
@@ -37,15 +47,4 @@ export const ItemEditButtonBar = (props) => {
       )}
     </div>
   )
-}
-
-ItemEditButtonBar.propTypes = {
-  dirty: PropTypes.bool,
-  editing: PropTypes.bool,
-  onCancel: PropTypes.func.isRequired,
-  onDelete: PropTypes.func,
-  onEdit: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
-  validation: PropTypes.object,
 }

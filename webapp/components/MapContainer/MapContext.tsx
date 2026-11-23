@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
@@ -22,10 +21,20 @@ type MapContextValue = {
 const MapContext = React.createContext<MapContextValue>({})
 
 // Consumer
-const MapContextConsumer = ({ children }) => <MapContext.Consumer>{(context) => children(context)}</MapContext.Consumer>
+type MapContextConsumerProps = {
+  children?: any
+}
+
+const MapContextConsumer = ({ children }: MapContextConsumerProps) => (
+  <MapContext.Consumer>{(context) => children(context)}</MapContext.Consumer>
+)
 
 // Provider
-const MapContextProvider = ({ children }) => {
+type MapContextProviderProps = {
+  children?: any
+}
+
+const MapContextProvider = ({ children }: MapContextProviderProps) => {
   const survey = useSurvey()
 
   const sampleBasedImageInterpretationEnabled = Survey.isSampleBasedImageInterpretationEnabled(survey)
@@ -76,11 +85,4 @@ export {
   useMapContext,
   useMapContextBaseLayer,
   useMapContextOptions,
-}
-
-MapContextConsumer.propTypes = {
-  children: PropTypes.any,
-}
-MapContextProvider.propTypes = {
-  children: PropTypes.any,
 }

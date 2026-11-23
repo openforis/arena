@@ -1,6 +1,21 @@
-import PropTypes from 'prop-types'
+type SliderProps = {
+  className?: string
+  id: string
+  max?: number
+  min?: number
+  name?: string
+  onChange?: (...args: any[]) => any
+  onMouseDown?: (...args: any[]) => any
+  onMouseUp?: (...args: any[]) => any
+  options?: {
+    value: string
+    label?: string
+  }[]
+  step?: number
+  value?: number
+}
 
-export const Slider = (props) => {
+export const Slider = (props: SliderProps) => {
   const { className, id, max, min, name, onChange, onMouseDown, onMouseUp, options, step, value } = props
 
   const listId = options ? `${id}-dl` : null
@@ -31,23 +46,4 @@ export const Slider = (props) => {
       )}
     </>
   )
-}
-
-Slider.propTypes = {
-  className: PropTypes.string,
-  id: PropTypes.string.isRequired,
-  max: PropTypes.number,
-  min: PropTypes.number,
-  name: PropTypes.string,
-  onChange: PropTypes.func,
-  onMouseDown: PropTypes.func,
-  onMouseUp: PropTypes.func,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      value: PropTypes.string.isRequired,
-      label: PropTypes.string,
-    })
-  ),
-  step: PropTypes.number,
-  value: PropTypes.number,
 }

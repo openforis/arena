@@ -1,6 +1,5 @@
 import { useAppDispatch } from '@webapp/store/hooks'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
@@ -14,7 +13,13 @@ import { useKeyboardShiftKeyPressed } from './hooks'
 
 import './buttonPublishSurvey.scss'
 
-const ButtonPublishSurvey = (props) => {
+type ButtonPublishSurveyProps = {
+  className?: string
+  disabled?: boolean
+  variant?: 'contained' | 'outlined' | 'text'
+}
+
+const ButtonPublishSurvey = (props: ButtonPublishSurveyProps) => {
   const { className, disabled = false, variant = 'outlined' } = props
 
   const dispatch = useAppDispatch()
@@ -47,12 +52,6 @@ const ButtonPublishSurvey = (props) => {
       variant={variant}
     />
   )
-}
-
-ButtonPublishSurvey.propTypes = {
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
-  variant: PropTypes.string,
 }
 
 export default ButtonPublishSurvey

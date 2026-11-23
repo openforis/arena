@@ -1,9 +1,16 @@
-import PropTypes from 'prop-types'
 import { Step, StepLabel, Stepper as MuiStepper } from '@mui/material'
 
 import { useI18n } from '@webapp/store/system'
 
-const Stepper = (props) => {
+type StepperProps = {
+  activeStep: number
+  steps?: {
+    key: string
+    label: string
+  }[]
+}
+
+const Stepper = (props: StepperProps) => {
   const { activeStep, steps } = props
 
   const i18n = useI18n()
@@ -19,11 +26,6 @@ const Stepper = (props) => {
       })}
     </MuiStepper>
   )
-}
-
-Stepper.propTypes = {
-  activeStep: PropTypes.number.isRequired,
-  steps: PropTypes.arrayOf(PropTypes.shape({ key: PropTypes.string.isRequired, label: PropTypes.string.isRequired })),
 }
 
 export default Stepper

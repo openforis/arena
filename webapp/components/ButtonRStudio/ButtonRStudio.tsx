@@ -1,10 +1,15 @@
 import './ButtonRStudio.scss'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import { Button } from '../buttons'
 
-const ButtonRStudio = ({ disabled = false, isLocal = false, onClick }) => {
+type ButtonRStudioProps = {
+  disabled?: boolean
+  onClick: (...args: any[]) => any
+  isLocal?: boolean
+}
+
+const ButtonRStudio = ({ disabled = false, isLocal = false, onClick }: ButtonRStudioProps) => {
   const i18n = useI18n()
   return (
     <Button className="btn btn-s btn-rstudio" onClick={onClick} disabled={disabled} variant="outlined">
@@ -98,12 +103,6 @@ const ButtonRStudio = ({ disabled = false, isLocal = false, onClick }) => {
       <span>{i18n.t(`common.${isLocal ? 'local' : 'remote'}`)}</span>
     </Button>
   )
-}
-
-ButtonRStudio.propTypes = {
-  disabled: PropTypes.bool,
-  onClick: PropTypes.func.isRequired,
-  isLocal: PropTypes.bool,
 }
 
 export default ButtonRStudio
