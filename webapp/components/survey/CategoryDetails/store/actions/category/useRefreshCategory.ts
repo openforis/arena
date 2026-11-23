@@ -12,7 +12,7 @@ export const useRefreshCategory = ({ setState }) => {
   const fetchLevelItems = useFetchLevelItems({ setState })
 
   return useCallback(
-    async ({ category }) => {
+    ({ category }) => {
       dispatch(SurveyActions.metaUpdated())
 
       setState((statePrev) => {

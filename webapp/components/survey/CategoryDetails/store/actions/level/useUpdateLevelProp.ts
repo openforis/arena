@@ -27,7 +27,7 @@ export const useUpdateLevelProp = ({ setState }) => {
   const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ category, level, key, value }) => {
+  return useCallback(({ category, level, key, value }) => {
     const categoryUuid = Category.getUuid(category)
     const levelUuid = CategoryLevel.getUuid(level)
     const levelIndex = CategoryLevel.getIndex(level)

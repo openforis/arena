@@ -38,7 +38,7 @@ export const useDelete = () => {
           DialogConfirmActions.showDialogConfirm({
             key: 'categoryEdit.confirmDelete',
             params: { categoryName: Category.getName(category) || i18n.t('common.undefinedName') },
-            onOk: async () => dispatch(_delete({ survey, category, callback: initData })),
+            onOk: () => dispatch(_delete({ survey, category, callback: initData })),
           })
         )
       } else {

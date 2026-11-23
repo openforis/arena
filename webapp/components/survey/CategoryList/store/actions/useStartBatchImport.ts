@@ -14,7 +14,7 @@ export const useStartBatchImport = ({ setState }) => {
   const dispatch = useAppDispatch()
 
   const onJobComplete = useCallback(
-    async (job) => {
+    (job) => {
       const { importedCategories, insertedCategories, updatedCategories } = JobSerialized.getResult(job)
       setState({ categoriesRequestedAt: Date.now() })
       dispatch(

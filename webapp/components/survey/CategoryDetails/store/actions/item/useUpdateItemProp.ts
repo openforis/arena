@@ -26,7 +26,7 @@ export const useUpdateItemProp = ({ setState }) => {
   const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ categoryUuid, levelIndex, itemUuid, key, value }) => {
+  return useCallback(({ categoryUuid, levelIndex, itemUuid, key, value }) => {
     setState(State.assocItemProp({ levelIndex, itemUuid, key, value }))
 
     dispatch(

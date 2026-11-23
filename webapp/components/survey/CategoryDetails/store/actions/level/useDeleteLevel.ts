@@ -47,14 +47,14 @@ export const useDeleteLevel = ({ setState }) => {
   const survey = useSurvey()
 
   return useCallback(
-    async ({ category, level }) => {
+    ({ category, level }) => {
       const categoryUuid = Category.getUuid(category)
       if (_checkCanBeDeleted({ survey, categoryUuid, level, dispatch })) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'categoryEdit.confirmDeleteLevel',
             params: { levelName: CategoryLevel.getName(level) },
-            onOk: async () =>
+            onOk: () =>
               _deleteLevel({
                 surveyId: Survey.getId(survey),
                 categoryUuid,

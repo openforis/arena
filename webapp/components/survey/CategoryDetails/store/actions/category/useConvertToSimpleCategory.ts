@@ -11,11 +11,11 @@ export const useConvertToSimpleCategory = ({ setState }) => {
   const dispatch = useAppDispatch()
   const updateCategoryProp = useUpdateCategoryProp({ setState })
 
-  return useCallback(async () => {
+  return useCallback(() => {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
         key: 'categoryEdit.convertToSimpleCategory.confirmMessage',
-        onOk: async () => {
+        onOk: () => {
           updateCategoryProp({ key: Category.keysProps.reportingData, value: false })
         },
       })

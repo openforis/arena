@@ -28,7 +28,7 @@ export const useLocalState = (props) => {
     return () => notifySuggestionEvent({ type: 'categoryEditorLeft' })
   }, [])
 
-  const cleanupCategory = useCallback(async () => Actions.cleanupCategory({ categoryUuid }), [])
+  const cleanupCategory = useCallback(() => Actions.cleanupCategory({ categoryUuid }), [])
 
   useOnBrowserBack({
     active: inCategoriesPath && canEdit && !categoryCleaned,

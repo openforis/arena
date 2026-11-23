@@ -36,7 +36,7 @@ export const useUpdateCategoryProp = ({ setState }) => {
   const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ key, value }) => {
+  return useCallback(({ key, value }) => {
     setState((statePrev) => {
       const category = State.getCategory(statePrev)
       const categoryUuid = Category.getUuid(category)
