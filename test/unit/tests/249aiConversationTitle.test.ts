@@ -1,4 +1,4 @@
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+import { MockLanguageModelV4 } from 'ai/test'
 
 import { buildConversationTitleInstruction } from '@common/ai/prompts/assistantConversationTitle'
 
@@ -10,35 +10,15 @@ import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { conversationSetTitleTool } from '@webapp/ai/tools/common/conversationSetTitle'
 import { getTools, runTool } from '@webapp/ai/tools/registry'
 import { isHiddenToolPart } from '@webapp/components/ai/Assistant/assistantPanelModel'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
+import {
+  cloudAccess,
+  createToolContext,
+  scriptedModel,
+  textStream,
+  toolCallStream,
+} from '@test/unit/utils/assistantTestUtils'
 
-const usage = { inputTokens: { total: 1 }, outputTokens: { total: 1 } }
-const finish = (unified: string) => ({ type: 'finish', finishReason: { unified, raw: undefined }, usage })
-
-const textStream = (text: string): any =>
-  convertArrayToReadableStream([
-    { type: 'stream-start', warnings: [] },
-    { type: 'text-start', id: 't' },
-    { type: 'text-delta', id: 't', delta: text },
-    { type: 'text-end', id: 't' },
-    finish('stop'),
-  ] as any[])
-
-const titleCallStream = (title: string): any =>
-  convertArrayToReadableStream([
-    { type: 'stream-start', warnings: [] },
-    { type: 'tool-call', toolCallId: 'c1', toolName: 'conversation_setTitle', input: JSON.stringify({ title }) },
-    finish('tool-calls'),
-  ] as any[])
-
-const scriptedModel = (...streams: (() => any)[]) => {
-  let call = 0
-  return new MockLanguageModelV4({
-    doStream: async () => ({ stream: streams[Math.min(call++, streams.length - 1)]() }) as any,
-  })
-}
-
-const cloudAccess = { effective: { schema: 'cloud', data: 'onDevice' } as any, hostingClass: 'cloud' as const }
+const titleCallStream = (title: string): any => toolCallStream('c1', 'conversation_setTitle', { title })
 
 const run = ({
   model,

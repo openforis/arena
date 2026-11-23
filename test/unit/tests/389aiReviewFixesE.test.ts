@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { applyChangeSet, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { findStructuralConflicts, findValidationConflicts } from '@webapp/ai/changeSets/designerRuleConflicts'
 import { isI18nKeyReason } from '@webapp/ai/changeSets/types'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
@@ -11,6 +11,7 @@ import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsPr
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
 import { runTool } from '@webapp/ai/tools/registry'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { createRecordingApplierDeps } from '@test/unit/utils/categoryLabelsTestUtils'
 import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
 import { namespaceByLanguage } from '../utils/i18nParity'
 
@@ -136,30 +137,6 @@ describe('Apply does not count on a create it will not apply (389)', () => {
     survey = await buildRefSurvey()
   })
 
-  const fakeDeps = (start: any) => {
-    let current = start
-    const posts: any[] = []
-    const puts: any[] = []
-    const deps: ApplierDeps = {
-      getSurvey: () => current,
-      isSurveyDirty: () => false,
-      postNodeDef: async (nodeDef) => {
-        posts.push(nodeDef)
-      },
-      putNodeDefProps: async (params) => {
-        puts.push(params)
-      },
-      onNodeDefCreated: (nodeDef) => {
-        current = Survey.assocNodeDef({ nodeDef })(current)
-      },
-      onNodeDefUpdated: (nodeDef) => {
-        current = Survey.assocNodeDef({ nodeDef })(current)
-      },
-      onNodeDefSaved: () => undefined,
-    }
-    return { deps, posts, puts }
-  }
-
   // creates plot_size and sets country's relevant-if expression to use it
   const buildMixedChangeSet = async (): Promise<ChangeSet> => {
     const createCtx = createToolContext({ survey })
@@ -169,7 +146,7 @@ describe('Apply does not count on a create it will not apply (389)', () => {
       createCtx
     )
     const create = createCtx.changeSets[0]
-    const applied = fakeDeps(survey)
+    const applied = createRecordingApplierDeps(survey)
     await applyChangeSet({
       changeSet: create,
       operationIds: create.operations.map((op) => op.id),
@@ -192,7 +169,7 @@ describe('Apply does not count on a create it will not apply (389)', () => {
   test('an expression that uses a create left out of the selection is held back', async () => {
     const changeSet = await buildMixedChangeSet()
     const expressionOp = changeSet.operations.at(-1)!
-    const { deps, posts, puts } = fakeDeps(survey)
+    const { deps, posts, puts } = createRecordingApplierDeps(survey)
     const results = await applyChangeSet({ changeSet, operationIds: [expressionOp.id], deps })
     expect(results).toHaveLength(1)
     expect(results[0].status).toBe('conflict')
@@ -202,7 +179,7 @@ describe('Apply does not count on a create it will not apply (389)', () => {
 
   test('with the create selected too, both are applied', async () => {
     const changeSet = await buildMixedChangeSet()
-    const { deps, posts } = fakeDeps(survey)
+    const { deps, posts } = createRecordingApplierDeps(survey)
     const results = await applyChangeSet({ changeSet, operationIds: changeSet.operations.map((op) => op.id), deps })
     expect(results.map((result) => result.status)).toEqual(['applied', 'applied'])
     expect(posts).toHaveLength(1)

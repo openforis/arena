@@ -5,27 +5,7 @@ import {
   revokeLocalServerConsent,
   saveLocalServerConsent,
 } from '@webapp/ai/engines/localServerConsent'
-import type { StorageLike } from '@webapp/ai/engines/types'
-
-const memoryStorage = (): StorageLike & { data: Map<string, string> } => {
-  const data = new Map<string, string>()
-  return {
-    data,
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => {
-      data.set(key, String(value))
-    },
-  }
-}
-
-const throwingStorage: StorageLike = {
-  getItem: () => {
-    throw new Error('SecurityError')
-  },
-  setItem: () => {
-    throw new Error('QuotaExceededError')
-  },
-}
+import { memoryStorage, throwingStorage } from '@test/unit/utils/aiTestUtils'
 
 const URL_A = 'http://localhost:1234/v1'
 const URL_B = 'http://localhost:5678/v1'
@@ -63,17 +43,14 @@ describe('local consent per data class (371)', () => {
     expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'data' })).toBeNull()
   })
 
-  test('saving the survey design never lowers a consent for record data of the same server', () => {
+  test.each([
+    ['saving the survey design never lowers a consent for record data of the same server', ['data', 'schema']],
+    ['saving the survey design then record data raises the consent', ['schema', 'data']],
+  ] as const)('%s', (_title, dataClasses) => {
     const storage = memoryStorage()
-    saveLocalServerConsent({ storage, ...base, surveyId: 1, decision: 'accepted', dataClass: 'data' })
-    saveLocalServerConsent({ storage, ...base, surveyId: 1, decision: 'accepted', dataClass: 'schema' })
-    expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'data' })).toBe('accepted')
-  })
-
-  test('saving the survey design then record data raises the consent', () => {
-    const storage = memoryStorage()
-    saveLocalServerConsent({ storage, ...base, surveyId: 1, decision: 'accepted', dataClass: 'schema' })
-    saveLocalServerConsent({ storage, ...base, surveyId: 1, decision: 'accepted', dataClass: 'data' })
+    for (const dataClass of dataClasses) {
+      saveLocalServerConsent({ storage, ...base, surveyId: 1, decision: 'accepted', dataClass })
+    }
     expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'data' })).toBe('accepted')
   })
 

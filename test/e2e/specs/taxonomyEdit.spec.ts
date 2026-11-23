@@ -40,12 +40,7 @@ test.describe('Taxonomy edit', () => {
     survey: _,
   }, testInfo) => {
     const designer = new FormDesigner(page)
-    await designer.goto()
-
-    await designer.edit('root_entity')
-    await designer.fillDetails({ name: 'cluster', label: 'Cluster' })
-    await designer.saveAndBack('Cluster')
-    await designer.addChildWithDetails('cluster', 'integer', { name: 'cluster_id', label: 'Cluster id', key: true })
+    await designer.gotoWithClusterRootEntity()
 
     await designer.addChild('cluster', 'taxon')
     await designer.fillDetails({ name: 'species', label: 'Species' })

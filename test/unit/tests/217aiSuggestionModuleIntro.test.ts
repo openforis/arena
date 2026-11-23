@@ -18,6 +18,7 @@ import {
 } from '@webapp/ai/suggestions/suggestionActions'
 import { createSuggestionStore, type SuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion, SuggestionRequest } from '@webapp/ai/suggestions/types'
+import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
 
 const NOW = new Date('2026-10-11T12:00:00.000Z')
 const LATER = new Date('2026-10-12T12:00:00.000Z')
@@ -94,17 +95,6 @@ const recordingSend = (id: string | null) => {
   }
   return { calls, send }
 }
-
-const system = (text: string): any => ({ role: 'system', content: text })
-const user = (text: string): any => ({ role: 'user', content: [{ type: 'text', text }] })
-const toolCall = (id: string): any => ({
-  role: 'assistant',
-  content: [{ type: 'tool-call', toolCallId: id, toolName: 'docs_search', input: {} }],
-})
-const toolResult = (id: string): any => ({
-  role: 'tool',
-  content: [{ type: 'tool-result', toolCallId: id, toolName: 'docs_search', output: { type: 'json', value: {} } }],
-})
 
 describe('module introduction and suggestion actions (217)', () => {
   test('the first visit to the designer, Data or Analysis adds its introduction to Help; other modules add nothing', async () => {
@@ -316,13 +306,15 @@ describe('module introduction and suggestion actions (217)', () => {
 
   test('the mock provider answers the introduction prompt from the manual (e2e script)', async () => {
     const start = [
-      system(`${assistantMarkers.help}\nYou are the help assistant.`),
-      user(buildModuleIntroPrompt('designer')),
+      systemMessage(`${assistantMarkers.help}\nYou are the help assistant.`),
+      userMessage(buildModuleIntroPrompt('designer')),
     ]
     expect(getScriptedStep(start)).toEqual({
       toolCall: { toolName: 'docs_search', input: { query: 'getting started' } },
     })
-    expect(getScriptedStep([...start, toolCall('a'), toolResult('a')])).toEqual({
+    expect(
+      getScriptedStep([...start, toolCallMessage('a', 'docs_search'), toolResultMessage('a', 'docs_search')])
+    ).toEqual({
       text: 'MOCK help: start with the steps of the cited manual section.',
     })
   })

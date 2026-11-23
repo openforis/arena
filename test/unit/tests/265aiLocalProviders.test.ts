@@ -7,23 +7,11 @@ import {
   saveLocalProviders,
 } from '@webapp/ai/engines/localProviders'
 import type { StorageLike } from '@webapp/ai/engines/types'
+import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 
 const NEW_KEY = 'arena.ai.localProviders.u1'
 
 /** Creates an in-memory storage that exposes its data. */
-const memoryStorage = (initial: Record<string, string> = {}): StorageLike & { data: Map<string, string> } => {
-  const data = new Map<string, string>(Object.entries(initial))
-  return {
-    data,
-    /** Reads a key. */
-    getItem: (key) => data.get(key) ?? null,
-    /** Writes a key. */
-    setItem: (key, value) => {
-      data.set(key, String(value))
-    },
-  }
-}
-
 /** Creates a storage whose reads work and whose writes fail (quota or blocked storage). */
 const readOnlyStorage = (initial: Record<string, string>): StorageLike & { data: Map<string, string> } => {
   const storage = memoryStorage(initial)

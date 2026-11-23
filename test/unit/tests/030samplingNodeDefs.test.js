@@ -32,6 +32,33 @@ const addAreaBasedEstimateNodeDef = ({ survey, estimatedOfNodeDefName, chainUuid
   return { survey: Survey.assocNodeDef({ nodeDef })(survey), nodeDef }
 }
 
+/**
+ * Builds a survey plot > subplot (multiple), tree (multiple) > volume, with the area based estimate of volume.
+ * @param {object} [areaBasedEstimateOptions] - Options of the area based estimate (chainUuid, active).
+ * @returns {Promise<object>} The survey (surveyWithHa) and the subplot and tree defs.
+ */
+const buildSubplotTreeSurvey = async (areaBasedEstimateOptions = {}) => {
+  const survey = await SB.survey(
+    user,
+    SB.entity(
+      'plot',
+      SB.entity('subplot', SB.attribute('subplot_dummy')).multiple(),
+      SB.entity('tree', quantitativeAnalysisAttribute('volume')).multiple()
+    )
+  ).build()
+
+  const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({
+    survey,
+    estimatedOfNodeDefName: 'volume',
+    ...areaBasedEstimateOptions,
+  })
+  return {
+    surveyWithHa,
+    subplotDef: Survey.getNodeDefByName('subplot')(surveyWithHa),
+    treeDef: Survey.getNodeDefByName('tree')(surveyWithHa),
+  }
+}
+
 // mimics the sampling node defs created by SamplingNodeDefs.determinePlotAreaNodeDefs, for pre-existing fixtures
 const newSamplingNodeDefFixture = ({ nodeDefParent, name, chainUuid = CHAIN_UUID, active = true }) =>
   NodeDef.newNodeDef(
@@ -54,19 +81,7 @@ const findCreated = (nodeDefsToCreate, name) => nodeDefsToCreate.find((nodeDef) 
 
 describe('SamplingNodeDefs.determinePlotAreaNodeDefs', () => {
   it('creates weight and plot area node defs for a base unit and a sibling entity (not a descendant)', async () => {
-    const survey = await SB.survey(
-      user,
-      SB.entity(
-        'plot',
-        SB.entity('subplot', SB.attribute('subplot_dummy')).multiple(),
-        SB.entity('tree', quantitativeAnalysisAttribute('volume')).multiple()
-      )
-    ).build()
-
-    const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({ survey, estimatedOfNodeDefName: 'volume' })
-
-    const subplotDef = Survey.getNodeDefByName('subplot')(surveyWithHa)
-    const treeDef = Survey.getNodeDefByName('tree')(surveyWithHa)
+    const { surveyWithHa, subplotDef, treeDef } = await buildSubplotTreeSurvey()
     const chain = newChain({ baseUnitNodeDefUuid: NodeDef.getUuid(subplotDef) })
 
     const { nodeDefsToCreate, nodeDefsToDelete } = SamplingNodeDefs.determinePlotAreaNodeDefs({
@@ -120,23 +135,7 @@ describe('SamplingNodeDefs.determinePlotAreaNodeDefs', () => {
   })
 
   it('does not create a plot area node def for an inactive area based estimated attribute, and deletes a stale one', async () => {
-    const survey = await SB.survey(
-      user,
-      SB.entity(
-        'plot',
-        SB.entity('subplot', SB.attribute('subplot_dummy')).multiple(),
-        SB.entity('tree', quantitativeAnalysisAttribute('volume')).multiple()
-      )
-    ).build()
-
-    const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({
-      survey,
-      estimatedOfNodeDefName: 'volume',
-      active: false,
-    })
-
-    const subplotDef = Survey.getNodeDefByName('subplot')(surveyWithHa)
-    const treeDef = Survey.getNodeDefByName('tree')(surveyWithHa)
+    const { surveyWithHa, subplotDef, treeDef } = await buildSubplotTreeSurvey({ active: false })
     const chain = newChain({ baseUnitNodeDefUuid: NodeDef.getUuid(subplotDef) })
 
     // no stale plot area def yet: none should be created
@@ -152,22 +151,7 @@ describe('SamplingNodeDefs.determinePlotAreaNodeDefs', () => {
   })
 
   it('does not create a plot area node def for an area based estimated attribute belonging to a different chain', async () => {
-    const survey = await SB.survey(
-      user,
-      SB.entity(
-        'plot',
-        SB.entity('subplot', SB.attribute('subplot_dummy')).multiple(),
-        SB.entity('tree', quantitativeAnalysisAttribute('volume')).multiple()
-      )
-    ).build()
-
-    const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({
-      survey,
-      estimatedOfNodeDefName: 'volume',
-      chainUuid: OTHER_CHAIN_UUID,
-    })
-
-    const subplotDef = Survey.getNodeDefByName('subplot')(surveyWithHa)
+    const { surveyWithHa, subplotDef } = await buildSubplotTreeSurvey({ chainUuid: OTHER_CHAIN_UUID })
     const chain = newChain({ chainUuid: CHAIN_UUID, baseUnitNodeDefUuid: NodeDef.getUuid(subplotDef) })
 
     const { nodeDefsToCreate } = SamplingNodeDefs.determinePlotAreaNodeDefs({ survey: surveyWithHa, chain })
@@ -211,19 +195,7 @@ describe('SamplingNodeDefs.determinePlotAreaNodeDefs', () => {
   })
 
   it('deletes a plot area node def with a stale name after the entity has been renamed', async () => {
-    const survey = await SB.survey(
-      user,
-      SB.entity(
-        'plot',
-        SB.entity('subplot', SB.attribute('subplot_dummy')).multiple(),
-        SB.entity('tree', quantitativeAnalysisAttribute('volume')).multiple()
-      )
-    ).build()
-
-    const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({ survey, estimatedOfNodeDefName: 'volume' })
-
-    const subplotDef = Survey.getNodeDefByName('subplot')(surveyWithHa)
-    const treeDef = Survey.getNodeDefByName('tree')(surveyWithHa)
+    const { surveyWithHa, subplotDef, treeDef } = await buildSubplotTreeSurvey()
 
     // simulate a stale plot area node def left over from before "tree" was renamed
     const staleNodeDef = newSamplingNodeDefFixture({ nodeDefParent: treeDef, name: 'old_tree_name_plot_area_' })

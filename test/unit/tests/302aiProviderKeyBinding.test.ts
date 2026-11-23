@@ -2,7 +2,7 @@ import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
-import { createAiPrefsStore } from '@test/unit/utils/aiPrefsStoreTestUtils'
+import { createRecordingAiProviderServiceDeps } from '@test/unit/utils/aiPrefsStoreTestUtils'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { legacyEnvelope } from '@test/unit/utils/secretBoxTestUtils'
 
@@ -49,39 +49,6 @@ const userWith = (uuid: string, providers: any[]): any => ({
   prefs: { ai: { accessLevel: 1, defaultProviderId: 'arena-default', providers } },
 })
 
-/**
- * Builds recording dependencies with the real secret box, over an in-memory store of the AI prefs of the user.
- * @param {any} [user] - The user whose AI prefs are stored at the start.
- * @returns {object} The dependencies, what they recorded (`saved` is every stored AI prefs value) and the store.
- */
-const createDeps = (user: any = null) => {
-  const store = createAiPrefsStore(user?.prefs?.ai ?? null)
-  const tests: any[] = []
-  const listed: any[] = []
-  const deps: AiProviderService.AiProviderServiceDeps = {
-    updateAiPrefs: store.updateAiPrefs,
-    runTest: async ({ cfg }) => {
-      tests.push(cfg)
-      return { ok: true, latencyMs: 1 }
-    },
-    listModels: async (cfg) => {
-      listed.push(cfg)
-      return [{ id: 'm1' }]
-    },
-    encrypt: SecretBox.encrypt,
-    decrypt: SecretBox.decrypt,
-    isLegacyEnvelope: SecretBox.isLegacyEnvelope,
-    isEncryptionConfigured: () => true,
-    hasAdminDefault: () => true,
-    isMockEnabled: () => false,
-    newId: () => 'new-id',
-    now: () => '2026-10-15T00:00:00.000Z',
-    allowlist: [],
-    findCopiedEnvelopes: store.findCopiedEnvelopes,
-  }
-  return { deps, tests, listed, saved: store.writes, store }
-}
-
 describe('Provider keys are bound to their owner (302)', () => {
   let originalSecret: string | undefined
 
@@ -103,7 +70,7 @@ describe('Provider keys are bound to their owner (302)', () => {
     const attacker = userWith('attacker', [
       storedProvider({ id: 'acct:x', baseUrl: ATTACKER_ENDPOINT, apiKeyEncrypted: stolen }),
     ])
-    const { deps, tests, listed } = createDeps(attacker)
+    const { deps, tests, listed } = createRecordingAiProviderServiceDeps(attacker)
     const calls = [
       () => AiProviderService.testProvider({ user: attacker, input: { id: 'acct:x' }, deps }),
       () => AiProviderService.listProviderModels({ user: attacker, input: { id: 'acct:x' }, deps }),
@@ -126,7 +93,7 @@ describe('Provider keys are bound to their owner (302)', () => {
   test('the same ciphertext does not work for another provider id, type or endpoint of the same user', async () => {
     const original = { id: 'acct:p1', type: 'openai-compatible', baseUrl: ENDPOINT }
     const ciphertext = sealedFor('u1', original, 'sk-own')
-    const { deps, tests } = createDeps()
+    const { deps, tests } = createRecordingAiProviderServiceDeps()
     const moved = [
       storedProvider({ id: 'acct:p2', apiKeyEncrypted: ciphertext }),
       storedProvider({ id: 'acct:p1', baseUrl: ATTACKER_ENDPOINT, apiKeyEncrypted: ciphertext }),
@@ -151,7 +118,7 @@ describe('Provider keys are bound to their owner (302)', () => {
   })
 
   test('a saved key is encrypted for its user, provider id, type and endpoint', async () => {
-    const { deps, saved } = createDeps()
+    const { deps, saved } = createRecordingAiProviderServiceDeps()
     const { provider } = await AiProviderService.addProvider({
       user: userWith('u1', []),
       input: { type: 'openai-compatible', model: 'm', baseUrl: ENDPOINT, apiKey: 'sk-new' },
@@ -182,7 +149,7 @@ describe('Provider keys are bound to their owner (302)', () => {
     const own = storedProvider({
       apiKeyEncrypted: sealedFor('u1', { id: 'acct:p1', type: 'openai-compatible', baseUrl: ENDPOINT }, 'sk-own'),
     })
-    const { deps, tests, saved, store } = createDeps()
+    const { deps, tests, saved, store } = createRecordingAiProviderServiceDeps()
     const forged = sealedFor('victim', { id: 'acct:p1', type: 'openai', baseUrl: null }, 'sk-victim')
     // a draft with a forged ciphertext has no key
     await expectSystemErrorKey(
@@ -215,7 +182,7 @@ describe('Provider keys are bound to their owner (302)', () => {
   test('a key saved before the AAD existed still works for its owner', async () => {
     // an endpoint fixed by the server: the key can only go where the server sends it
     const legacy = storedProvider({ type: 'openai', baseUrl: null, apiKeyEncrypted: legacyEnvelope('sk-old') })
-    const { deps, tests } = createDeps()
+    const { deps, tests } = createRecordingAiProviderServiceDeps()
     await AiProviderService.testProvider({ user: userWith('u1', [legacy]), input: { id: 'acct:p1' }, deps })
     expect(tests[0].apiKey).toBe('sk-old')
     expect(
