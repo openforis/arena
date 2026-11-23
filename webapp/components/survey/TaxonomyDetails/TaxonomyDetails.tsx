@@ -21,6 +21,8 @@ import { State, useLocalState } from './store'
 
 type TaxonomyDetailsProps = {
   showClose?: boolean
+  // read by useLocalState: the taxonomy to edit (otherwise taken from the URL)
+  taxonomyUuid?: string
 }
 
 const TaxonomyDetails = (props: TaxonomyDetailsProps) => {

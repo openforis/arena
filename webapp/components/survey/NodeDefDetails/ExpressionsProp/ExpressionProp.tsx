@@ -1,0 +1,148 @@
+import React from 'react'
+
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as Expression from '@core/expressionParser/expression'
+
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
+import ExpressionEditor from '@webapp/components/expression/expressionEditor'
+import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
+import { ButtonIconDelete } from '@webapp/components/buttons'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import ValidationTooltip from '@webapp/components/validationTooltip'
+import type { ArenaNodeDefExpression } from '@openforis/arena-core'
+
+import type { ExpressionEditorSettingsProps } from './expressionPropTypes'
+
+type ExpressionPropProps = ExpressionEditorSettingsProps & {
+  index: number // used to generate test ids
+  expression: ArenaNodeDefExpression
+  canBeCall?: boolean
+  onUpdate?: (...args: any[]) => any
+  onDelete?: (...args: any[]) => any
+}
+
+const ExpressionProp = (props: ExpressionPropProps) => {
+  const {
+    applyIf = true, // Show apply if expression editor
+    canBeConstant = false,
+    canBeCall = true,
+    excludeCurrentNodeDef = true,
+    expression,
+    hideAdvanced = false,
+    index,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onUpdate = () => {},
+    onDelete = () => {},
+    qualifier,
+    readOnly = false,
+    severity = false, // Show severity (error/warning) button group
+    showLabels = false, // Show error message labels editor
+    validation = null,
+  } = props
+
+  const i18n = useI18n()
+
+  const severityItems = Object.keys(ValidationResult.severity).map((severity) => ({
+    key: severity,
+    label: i18n.t(`common.${severity}`),
+  }))
+
+  const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
+  const expressionEmpty = NodeDefExpression.isEmpty(expression)
+  const [isExpressionEditorOpen, setIsExpressionEditorOpen] = React.useState(isPlaceholder)
+  const [isApplyIfEditorOpen, setIsApplyIfEditorOpen] = React.useState(false)
+  const validationToShow = isExpressionEditorOpen || isApplyIfEditorOpen ? null : validation
+
+  const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
+
+  return (
+    <ValidationTooltip validation={validationToShow} showKeys={false}>
+      <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
+        {!isPlaceholder && !readOnly && (
+          <ButtonIconDelete
+            id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
+            onClick={() => onDelete(expression)}
+            testId={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
+          />
+        )}
+
+        <div className="expression-item">
+          <div className="label">{i18n.t('nodeDefEdit:expressionsProp.expression')}</div>
+
+          <ExpressionEditor
+            index={index}
+            placeholder={isPlaceholder}
+            qualifier={qualifier}
+            nodeDefUuidContext={nodeDefUuidContext}
+            nodeDefUuidCurrent={nodeDefUuidCurrent}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
+            query={NodeDefExpression.getExpression(expression)}
+            onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocExpression(query)(expression), callback)}
+            onCancel={() => onDelete(expression, null, { confirm: false })}
+            onEditChange={setIsExpressionEditorOpen}
+            isContextParent={isContextParent}
+            canBeCall={canBeCall}
+            canBeConstant={canBeConstant}
+            isBoolean={isBoolean}
+            types={expressionEditorTypes}
+            mode={mode}
+            readOnly={readOnly}
+          />
+        </div>
+
+        {applyIf && !isPlaceholder && !expressionEmpty && (
+          <div className="expression-item">
+            <div className="label">{i18n.t('nodeDefEdit:expressionsProp.applyIf')}</div>
+
+            <ExpressionEditor
+              index={index}
+              placeholder={isPlaceholder}
+              qualifier={TestId.nodeDefDetails.applyIf(qualifier)}
+              nodeDefUuidContext={nodeDefUuidContext}
+              nodeDefUuidCurrent={nodeDefUuidCurrent}
+              excludeCurrentNodeDef={excludeCurrentNodeDef}
+              query={NodeDefExpression.getApplyIf(expression)}
+              onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
+              onEditChange={setIsApplyIfEditorOpen}
+              isContextParent={isContextParent}
+              canBeCall
+              canBeConstant={false}
+              readOnly={readOnly}
+              types={expressionEditorTypes}
+            />
+          </div>
+        )}
+        {severity && (
+          <div className="expression-item severity">
+            <div className="label">{i18n.t('nodeDefEdit:expressionsProp.severity')}</div>
+
+            <ButtonGroup
+              selectedItemKey={NodeDefExpression.getSeverity(expression)}
+              onChange={(severityVal) => onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))}
+              items={severityItems}
+              disabled={expressionEmpty}
+            />
+          </div>
+        )}
+        {showLabels && (
+          <LabelsEditor
+            formLabelKey="common.errorMessage"
+            labels={NodeDefExpression.getMessages(expression)}
+            onChange={(messages) => onUpdate(NodeDefExpression.assocMessages(messages)(expression))}
+            readOnly={expressionEmpty}
+          />
+        )}
+      </div>
+    </ValidationTooltip>
+  )
+}
+
+export default ExpressionProp
