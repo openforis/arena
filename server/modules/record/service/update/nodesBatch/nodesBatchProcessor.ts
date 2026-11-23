@@ -126,7 +126,9 @@ const toMessageParams = (params: unknown): Record<string, unknown> | undefined =
  * @param {unknown} error - The error.
  * @returns {{messageKey: string, params?: object}} The message.
  */
-const toFailureMessage = (error: any): { messageKey: string; params?: Record<string, unknown> } => {
+const toFailureMessage = (
+  error: { key?: unknown; params?: unknown } | null | undefined
+): { messageKey: string; params?: Record<string, unknown> } => {
   const key = error?.key
   // the message of a non-application error may hold database details: it is logged, not sent
   if (typeof key !== 'string') return { messageKey: NodesBatchMessageKeys.unexpected }

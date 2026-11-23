@@ -131,7 +131,7 @@ export const deleteProvider = async ({
         msgKey: 'emails:authProviderDeleted',
         msgParams: { name: userToNotify.name ?? '', providerLabel: provider?.label ?? id, serverUrl },
       })
-    } catch (error: any) {
+    } catch (error) {
       logger.error(`error notifying ${userToNotify.email} of the deletion of provider "${id}": ${error.message}`)
     }
   }
@@ -139,7 +139,7 @@ export const deleteProvider = async ({
   return { deletedIdentities, notifiedUsers: usersToNotify.length }
 }
 
-const fetchJson = async (url: string): Promise<any> => {
+const fetchJson = async (url: string): Promise<{ [key: string]: unknown }> => {
   const response = await fetch(url, { signal: AbortSignal.timeout(connectionTestTimeoutMs) })
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`)
   return response.json()
@@ -156,14 +156,14 @@ export const testProviderConnection = async ({ id }: { id: string }) => {
   const start = Date.now()
   try {
     const metadata = await fetchJson(`${issuer}/.well-known/openid-configuration`)
-    const jwks = metadata.jwks_uri ? await fetchJson(metadata.jwks_uri) : {}
+    const jwks = metadata.jwks_uri ? await fetchJson(String(metadata.jwks_uri)) : {}
     return {
       ok: true,
       issuer: metadata.issuer,
       keysCount: Array.isArray(jwks.keys) ? jwks.keys.length : 0,
       durationMs: Date.now() - start,
     }
-  } catch (error: any) {
+  } catch (error) {
     return { ok: false, error: error.message, durationMs: Date.now() - start }
   }
 }

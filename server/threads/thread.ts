@@ -1,5 +1,7 @@
 import { parentPort, workerData, isMainThread } from 'node:worker_threads'
 
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as Log from '@server/log/log'
 
 import * as ThreadParams from './threadParams'
@@ -27,7 +29,7 @@ export default class Thread {
     }
   }
 
-  get user(): any {
+  get user(): ArenaUser {
     return this.params[ThreadParams.keys.user]
   }
 
