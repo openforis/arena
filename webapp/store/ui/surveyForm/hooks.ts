@@ -1,3 +1,4 @@
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { useSelector } from 'react-redux'
 
 import { Objects, Surveys } from '@openforis/arena-core'
@@ -32,12 +33,13 @@ export const usePagesUuidMap = () => useSelector(SurveyFormState.getPagesUuidMap
 
 const visitSurveyEntityDefsInOwnPage = ({ survey, cycle, visitor }) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
-  const stack = [nodeDefRoot]
+  const stack: ArenaNodeDefEntity[] = [nodeDefRoot]
   while (stack.length > 0) {
     const currentEntityDef = stack.pop()
     visitor(currentEntityDef)
     const childrenInOwnPage = Survey.getNodeDefChildrenInOwnPage({ nodeDef: currentEntityDef, cycle })(survey)
-    stack.push(...childrenInOwnPage)
+    // the children in their own page are entities
+    stack.push(...(childrenInOwnPage as ArenaNodeDefEntity[]))
   }
 }
 

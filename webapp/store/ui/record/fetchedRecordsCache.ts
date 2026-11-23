@@ -1,3 +1,4 @@
+import type { ArenaRecordNodesMap } from '@openforis/arena-core'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
@@ -54,16 +55,16 @@ export const fetchRecordAndNodesOnce = ({ surveyId, recordUuid }) => {
  * @param {object} nodes - The updated/created nodes, indexed by uuid.
  * @returns {void}
  */
-export const mergeNodesIntoFetchedRecordsCache = (nodes) => {
-  const nodesByRecordUuid = {}
-  Object.values(nodes).forEach((node) => {
+export const mergeNodesIntoFetchedRecordsCache = (nodes: ArenaRecordNodesMap) => {
+  const nodesByRecordUuid: { [recordUuid: string]: ArenaRecordNodesMap } = {}
+  for (const node of Object.values(nodes)) {
     const recordUuid = Node.getRecordUuid(node)
-    if (!resolvedRecordsByUuid[recordUuid]) return
+    if (!resolvedRecordsByUuid[recordUuid]) continue
     nodesByRecordUuid[recordUuid] = { ...nodesByRecordUuid[recordUuid], [Node.getUuid(node)]: node }
-  })
-  Object.entries(nodesByRecordUuid).forEach(([recordUuid, recordNodes]) => {
+  }
+  for (const [recordUuid, recordNodes] of Object.entries(nodesByRecordUuid)) {
     resolvedRecordsByUuid[recordUuid] = Record.mergeNodes(recordNodes, { removeFlags: true })(
       resolvedRecordsByUuid[recordUuid]
     )
-  })
+  }
 }
