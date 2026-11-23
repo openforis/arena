@@ -30,30 +30,26 @@ const fetchSurvey = ({ surveyId, cycle, draft = false }: { surveyId: number; cyc
 
 export const init = (app: Router) => {
   // ====== READ - all survey data
-  app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      Logger.info('fetching survey data')
+  app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    Logger.info('fetching survey data')
 
-      // draft: used by the mobile app web preview in the survey designer
-      const { surveyId, cycle, draft = false } = Request.getParams(req)
+    // draft: used by the mobile app web preview in the survey designer
+    const { surveyId, cycle, draft = false } = Request.getParams(req)
 
-      const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
-      Logger.info('total category items', totalCategoryItems)
+    const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
+    Logger.info('total category items', totalCategoryItems)
 
-      const totalTaxa = await TaxonomyService.countTaxaBySurveyId({ surveyId })
-      Logger.info('total taxa', totalTaxa)
+    const totalTaxa = await TaxonomyService.countTaxaBySurveyId({ surveyId })
+    Logger.info('total taxa', totalTaxa)
 
-      Logger.info('constrained memory', process.constrainedMemory())
-      Logger.info('memory usage before', process.memoryUsage())
+    Logger.info('constrained memory', process.constrainedMemory())
+    Logger.info('memory usage before', process.memoryUsage())
 
-      const survey = await fetchSurvey({ surveyId, cycle, draft })
+    const survey = await fetchSurvey({ surveyId, cycle, draft })
 
-      Logger.info('memory usage after', process.memoryUsage())
+    Logger.info('memory usage after', process.memoryUsage())
 
-      res.json({ survey })
-    } catch (e) {
-      next(e)
-    }
+    res.json({ survey })
   })
 
   // ====== READ - survey package (zip with the Arena export layout: info.json, survey.json, surveyfiles/)
@@ -78,37 +74,33 @@ export const init = (app: Router) => {
   })
 
   // ====== UPDATE - records and files of the survey
-  app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const {
-        surveyId,
-        conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting,
-        skipMissingFiles = false,
-        fileId,
-        reuseUploadedFile = false,
-        selectedRecordsUuids,
-      } = Request.getParams(req)
+  app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res) => {
+    const user = Request.getUser(req)
+    const {
+      surveyId,
+      conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting,
+      skipMissingFiles = false,
+      fileId,
+      reuseUploadedFile = false,
+      selectedRecordsUuids,
+    } = Request.getParams(req)
 
-      // when reusing a file previously uploaded to generate an import preview/summary, no new file is sent
-      const tempFile = reuseUploadedFile ? { fileId } : await processChunkedFileForBackgroundMerge({ req })
-      if (tempFile) {
-        const job = ArenaMobileImportService.startArenaMobileImportJob({
-          user,
-          ...tempFile,
-          surveyId,
-          conflictResolutionStrategy,
-          skipMissingFiles,
-          reuseUploadedFile,
-          selectedRecordsUuids,
-          serverUrl: Request.getPublicServerUrl(req),
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } else {
-        res.json({ chunkProcessing: true })
-      }
-    } catch (e) {
-      next(e)
+    // when reusing a file previously uploaded to generate an import preview/summary, no new file is sent
+    const tempFile = reuseUploadedFile ? { fileId } : await processChunkedFileForBackgroundMerge({ req })
+    if (tempFile) {
+      const job = ArenaMobileImportService.startArenaMobileImportJob({
+        user,
+        ...tempFile,
+        surveyId,
+        conflictResolutionStrategy,
+        skipMissingFiles,
+        reuseUploadedFile,
+        selectedRecordsUuids,
+        serverUrl: Request.getPublicServerUrl(req),
+      })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } else {
+      res.json({ chunkProcessing: true })
     }
   })
 
@@ -117,26 +109,21 @@ export const init = (app: Router) => {
   app.post(
     '/mobile/survey/:surveyId/import-summary',
     AuthMiddleware.requireRecordCreatePermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } =
-          Request.getParams(req)
+    async (req, res) => {
+      const user = Request.getUser(req)
+      const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
 
-        const tempFile = await processChunkedFileForBackgroundMerge({ req })
-        if (tempFile) {
-          const job = ArenaMobileImportService.startArenaMobileImportSummaryJob({
-            user,
-            ...tempFile,
-            surveyId,
-            conflictResolutionStrategy,
-          })
-          res.json({ job: JobUtils.jobToJSON(job) })
-        } else {
-          res.json({ chunkProcessing: true })
-        }
-      } catch (e) {
-        next(e)
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
+        const job = ArenaMobileImportService.startArenaMobileImportSummaryJob({
+          user,
+          ...tempFile,
+          surveyId,
+          conflictResolutionStrategy,
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ chunkProcessing: true })
       }
     }
   )
@@ -146,14 +133,10 @@ export const init = (app: Router) => {
   app.delete(
     '/mobile/survey/:surveyId/import-summary/:fileId',
     AuthMiddleware.requireRecordCreatePermission,
-    async (req, res, next) => {
-      try {
-        const { fileId } = Request.getParams(req)
-        await TempFileManager.deletePendingImportFileIfAny({ fileId })
-        res.json({})
-      } catch (e) {
-        next(e)
-      }
+    async (req, res) => {
+      const { fileId } = Request.getParams(req)
+      await TempFileManager.deletePendingImportFileIfAny({ fileId })
+      res.json({})
     }
   )
 
@@ -162,14 +145,10 @@ export const init = (app: Router) => {
   app.post(
     '/mobile/survey/:surveyId/records/file-uuids',
     AuthMiddleware.requireRecordListViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, recordUuids = [] } = Request.getParams(req)
-        const fileUuidsByRecordUuid = await RecordService.fetchFileUuidsByRecordUuid({ surveyId, recordUuids })
-        res.json({ fileUuidsByRecordUuid })
-      } catch (e) {
-        next(e)
-      }
+    async (req, res) => {
+      const { surveyId, recordUuids = [] } = Request.getParams(req)
+      const fileUuidsByRecordUuid = await RecordService.fetchFileUuidsByRecordUuid({ surveyId, recordUuids })
+      res.json({ fileUuidsByRecordUuid })
     }
   )
 }

@@ -24,83 +24,63 @@ export const init = (app: Router) => {
     '/survey/:surveyId/data-export',
     AuthMiddleware.requireRecordsExportPermission,
     requireRecordsReadableByUserGroup,
-    (req, res, next) => {
-      try {
-        const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
-
-        const user = Request.getUser(req)
-
-        const job = DataExportService.startCsvDataExportJob({
-          user,
-          surveyId,
-          cycle,
-          recordUuids,
-          search,
-          options,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.post('/survey/:surveyId/data-matrix-export', AuthMiddleware.requireRecordsExportPermission, (req, res, next) => {
-    try {
-      const { surveyId, cycle, options } = Request.getParams(req)
+    (req, res) => {
+      const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
 
       const user = Request.getUser(req)
 
-      const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, options })
-
+      const job = DataExportService.startCsvDataExportJob({
+        user,
+        surveyId,
+        cycle,
+        recordUuids,
+        search,
+        options,
+      })
       res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.post(
-    '/survey/:surveyId/data-summary-export',
-    AuthMiddleware.requireRecordAnalysisPermission,
-    (req, res, next) => {
-      try {
-        const { surveyId, cycle, lang, options } = Request.getParams(req)
-
-        const user = Request.getUser(req)
-
-        const job = DataExportService.startDataSummaryExportJob({ user, surveyId, cycle, lang, options })
-
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
     }
   )
+
+  app.post('/survey/:surveyId/data-matrix-export', AuthMiddleware.requireRecordsExportPermission, (req, res) => {
+    const { surveyId, cycle, options } = Request.getParams(req)
+
+    const user = Request.getUser(req)
+
+    const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, options })
+
+    res.json({ job: JobUtils.jobToJSON(job) })
+  })
+
+  app.post('/survey/:surveyId/data-summary-export', AuthMiddleware.requireRecordAnalysisPermission, (req, res) => {
+    const { surveyId, cycle, lang, options } = Request.getParams(req)
+
+    const user = Request.getUser(req)
+
+    const job = DataExportService.startDataSummaryExportJob({ user, surveyId, cycle, lang, options })
+
+    res.json({ job: JobUtils.jobToJSON(job) })
+  })
 
   app.get(
     '/survey/:surveyId/data-summary-export/:exportUuid',
     AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, exportUuid } = Request.getParams(req)
+    async (req, res) => {
+      const { surveyId, cycle, exportUuid } = Request.getParams(req)
 
-        checkExportUuid(exportUuid)
+      checkExportUuid(exportUuid)
 
-        const survey = await SurveyService.fetchSurveyById({ surveyId })
+      const survey = await SurveyService.fetchSurveyById({ surveyId })
 
-        const fileFormat = FileFormats.xlsx
-        const outputFileName = ExportFileNameGenerator.generate({
-          survey,
-          cycle,
-          fileType: 'DataSummaryExport',
-          fileFormat,
-          includeTimestamp: true,
-        })
+      const fileFormat = FileFormats.xlsx
+      const outputFileName = ExportFileNameGenerator.generate({
+        survey,
+        cycle,
+        fileType: 'DataSummaryExport',
+        fileFormat,
+        includeTimestamp: true,
+      })
 
-        sendTempFileToResponse({ res, tempFileUuid: exportUuid, fileFormat, outputFileName })
-      } catch (error) {
-        next(error)
-      }
+      sendTempFileToResponse({ res, tempFileUuid: exportUuid, fileFormat, outputFileName })
     }
   )
 }

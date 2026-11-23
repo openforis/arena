@@ -5,7 +5,7 @@ import { ENV } from '@core/processUtils'
 import * as SettingsApi from '@server/modules/ai/api/settingsApi'
 import { createProviderRateLimit, limitProviderCalls } from '@server/modules/ai/api/providerRateLimit'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { collectRoutes } from '@test/utils/routeUtils'
 
 describe('The in-flight slot of a provider call lasts until its handler settles (540)', () => {
@@ -34,7 +34,7 @@ describe('The in-flight slot of a provider call lasts until its handler settles 
     const next = jest.fn()
     limit(req, res, next)
     const accepted = next.mock.calls.length === 1
-    const done = accepted ? handler(req, res, jest.fn()) : Promise.resolve()
+    const done = accepted ? callHandler(handler, req, res, jest.fn()) : Promise.resolve()
     return { res, done, accepted }
   }
 
