@@ -18,14 +18,22 @@ export const getSort = () => ({
 
 export const getSearch = () => String(_getUrlSearchParam({ param: 'search', defaultValue: '' }))
 
-const _setOrDeleteParams = ({ searchParams, params }) => {
-  Object.entries(params).forEach(([key, value]) => {
+type SearchParamValue = string | number | null | undefined
+
+const _setOrDeleteParams = ({
+  searchParams,
+  params,
+}: {
+  searchParams: URLSearchParams
+  params: Record<string, SearchParamValue>
+}) => {
+  for (const [key, value] of Object.entries(params)) {
     if (A.isEmpty(value)) {
       searchParams.delete(key)
     } else {
       searchParams.set(key, String(value))
     }
-  })
+  }
 }
 
 const getLink = ({ limit, offset, sort, search }) => {
