@@ -17,6 +17,15 @@
  */
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
+// callbacks of the SSE stream consumer
+export type SseHandlers<C = string> = {
+  onChunk?: (chunk: C) => void
+  onError?: (error: Error) => void
+  onDone?: () => void
+}
+
+type CancelState = { cancelled: boolean }
+
 const SSE_FRAME_DELIMITER = '\n\n'
 const DATA_PREFIX = 'data:'
 const DONE_TOKEN = '[DONE]'
@@ -25,12 +34,9 @@ const DONE_TOKEN = '[DONE]'
  * Dispatch a single parsed `data:` payload to the right handler.
  * @param {string} payload - Trimmed payload after the `data:` prefix.
  * @param {object} handlers - User-supplied callbacks.
- * @param handlers.onChunk
- * @param handlers.onDone
- * @param handlers.onError
  * @returns {boolean} True when the payload terminates the stream.
  */
-const dispatchPayload = (payload, { onChunk, onDone, onError }) => {
+const dispatchPayload = <C>(payload: string, { onChunk, onDone, onError }: SseHandlers<C>): boolean => {
   if (payload === DONE_TOKEN) {
     onDone?.()
     return true
@@ -59,7 +65,7 @@ const dispatchPayload = (payload, { onChunk, onDone, onError }) => {
  * @param {object} handlers - User-supplied callbacks.
  * @returns {{ remainder: string, terminated: boolean }} Drain result.
  */
-const drainFrames = (buffer, handlers) => {
+const drainFrames = <C>(buffer: string, handlers: SseHandlers<C>): { remainder: string; terminated: boolean } => {
   let remainder = buffer
   let terminated = false
   let idx
@@ -88,7 +94,12 @@ const drainFrames = (buffer, handlers) => {
  * @param {Function} cancel - Cancel callback (invoked on terminal frame).
  * @returns {Promise<void>} Resolves when the loop ends.
  */
-const pumpResponse = async (response, handlers, state, cancel) => {
+const pumpResponse = async <C>(
+  response: Response,
+  handlers: SseHandlers<C>,
+  state: CancelState,
+  cancel: () => void
+): Promise<void> => {
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
@@ -110,7 +121,7 @@ const pumpResponse = async (response, handlers, state, cancel) => {
 
 const makeCanceller = () => {
   const controller = new AbortController()
-  const state = { cancelled: false }
+  const state: CancelState = { cancelled: false }
   const cancel = () => {
     if (state.cancelled) return
     state.cancelled = true
@@ -119,7 +130,7 @@ const makeCanceller = () => {
   return { controller, state, cancel }
 }
 
-const authHeaders = (extra = {}) => {
+const authHeaders = (extra: Record<string, string> = {}): Record<string, string> => {
   const token = ApiConstants.getAuthToken()
   return {
     ...extra,
@@ -140,7 +151,7 @@ const authHeaders = (extra = {}) => {
  * @param {Function} [handlers.onDone] - Called when the server closes the stream cleanly.
  * @returns {Function} A cancel function that aborts the fetch and stops dispatching events.
  */
-export const streamSse = (url, handlers = {}) => {
+export const streamSse = <C = string>(url: string, handlers: SseHandlers<C> = {}): (() => void) => {
   const { controller, state, cancel } = makeCanceller()
 
   const run = async () => {

@@ -201,5 +201,5 @@ export const convertToGeoPackageCategory = async ({ surveyId, categoryUuid, lock
 }
 
 // DELETE
-export const deleteCategory = async ({ surveyId, categoryUuid }) =>
+export const deleteCategory = ({ surveyId, categoryUuid }) =>
   axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)

@@ -14,4 +14,4 @@ export const createInstance = async () => {
 }
 
 // DELETE
-export const terminateInstance = async ({ instanceId }) => axios.delete('/api/rstudio', { params: { instanceId } })
+export const terminateInstance = ({ instanceId }) => axios.delete('/api/rstudio', { params: { instanceId } })
