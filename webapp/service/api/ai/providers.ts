@@ -5,7 +5,7 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 
 // read by appErrorsMiddleware: the dialog shows the error, and the request body (with the API key) stays out of Redux
-const localErrors: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
+const localErrors: AxiosRequestConfig = { errorHandledLocally: true }
 
 export type AiProviderRequest = {
   id?: string

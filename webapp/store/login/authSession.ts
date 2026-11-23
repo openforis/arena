@@ -26,7 +26,7 @@ export type AuthSession = {
 export const LOGOUT_RETRY_DELAY_MS = 500
 
 // read by appErrorsMiddleware: no error toast for the logout request, the warning of the logout says what happened
-export const logoutRequestConfig: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
+export const logoutRequestConfig: AxiosRequestConfig = { errorHandledLocally: true }
 
 /**
  * Waits.

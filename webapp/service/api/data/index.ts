@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type AxiosProgressEvent } from 'axios'
 
 import { FileProcessor } from '@openforis/arena-core'
 
@@ -9,6 +9,8 @@ import * as Node from '@core/record/node'
 import { Chunks } from '@webapp/utils/chunks'
 
 import { objectToFormData } from '../utils/apiUtils'
+
+type AxiosProgressHandler = (progressEvent: AxiosProgressEvent) => void
 
 // ==== RECORD
 export const createRecordFromSamplingPointDataItem = async ({ surveyId, itemUuid }) => {
@@ -64,7 +66,14 @@ export const startCollectRecordsImportJob = async ({
   cycle,
   onUploadProgress,
   forceImport = false,
-} = {}) => {
+}: {
+  surveyId: number
+  file: File
+  deleteAllRecords: boolean
+  cycle: string
+  onUploadProgress?: AxiosProgressHandler
+  forceImport?: boolean
+}) => {
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
   const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, { onUploadProgress })
@@ -72,7 +81,17 @@ export const startCollectRecordsImportJob = async ({
   return job
 }
 
-export const startOdkDataImportJob = async ({ surveyId, file, cycle, onUploadProgress } = {}) => {
+export const startOdkDataImportJob = async ({
+  surveyId,
+  file,
+  cycle,
+  onUploadProgress,
+}: {
+  surveyId: number
+  file: File
+  cycle: string
+  onUploadProgress?: AxiosProgressHandler
+}) => {
   const formData = objectToFormData({ file, cycle })
 
   const { data } = await axios.post(`/api/odk-import/survey/${surveyId}`, formData, { onUploadProgress })
