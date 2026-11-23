@@ -28,14 +28,14 @@ const fetchFile = async ({ file, path }) => {
 }
 
 // Ensures that HEIC images are converted to JPEG before being displayed, as HEIC is not widely supported by browsers.
-const ensureJpegConversion = async ({ blob, contentType }: { blob: Blob; contentType: string }): Promise<Blob> => {
+const ensureJpegConversion = ({ blob, contentType }: { blob: Blob; contentType: string }): Promise<Blob> => {
   if (contentType === mimeTypes.heic) {
     return heicTo({
       blob,
       type: mimeTypes.jpeg as `image/${string}`,
     })
   }
-  return blob
+  return Promise.resolve(blob)
 }
 
 type ImagePreviewProps = {
