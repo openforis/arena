@@ -6,7 +6,7 @@ export const USER_UPDATE = 'store/user/update'
 
 export const setUser =
   ({ user }) =>
-  async (dispatch) => {
+  (dispatch) => {
     dispatch({ type: USER_UPDATE, user })
   }
 

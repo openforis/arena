@@ -58,7 +58,7 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 
 // ==== CREATE
 
-export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
+export const createNodeDef = (parent, type, props, navigate) => (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
   const treeSelectViewMode = SurveyFormState.getGlobalStateTreeSelectViewMode(state)
@@ -318,7 +318,7 @@ export const putNodeDefLayoutProp =
     dispatch(_putNodeDefPropsDebounced(nodeDef, NodeDef.propKeys.layout, propsToPersist))
   }
 
-export const compressFormItems = (nodeDef) => async (dispatch, getState) => {
+export const compressFormItems = (nodeDef) => (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
   const layoutChildrenCompact = NodeDefLayout.getLayoutChildrenCompressed({ cycle })(nodeDef)
@@ -407,7 +407,7 @@ export const removeNodeDef =
 
 export const convertNodeDef =
   ({ nodeDef, toType, navigate }) =>
-  async (dispatch, getState) => {
+  (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
 
