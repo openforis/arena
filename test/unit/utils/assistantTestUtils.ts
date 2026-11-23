@@ -1,8 +1,11 @@
+import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+import { z } from 'zod'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
-import type { AiToolContext } from '@webapp/ai/tools/types'
+import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
 import * as SB from '@test/utils/surveyBuilder'
 
@@ -89,3 +92,76 @@ export const createToolContext = (
     ...overrides,
   }
 }
+
+const usage = { inputTokens: { total: 1 }, outputTokens: { total: 1 } }
+
+/**
+ * Builds the finish part of a model stream.
+ * @param {string} unified - Unified finish reason (stop, tool-calls, ...).
+ * @returns {object} The stream part.
+ */
+export const finish = (unified: string) => ({ type: 'finish', finishReason: { unified, raw: undefined }, usage })
+
+/**
+ * Builds a model stream that answers with the given text.
+ * @param {string} text - Text.
+ * @returns {ReadableStream} The stream.
+ */
+export const textStream = (text: string): any =>
+  convertArrayToReadableStream([
+    { type: 'stream-start', warnings: [] },
+    { type: 'text-start', id: 't' },
+    { type: 'text-delta', id: 't', delta: text },
+    { type: 'text-end', id: 't' },
+    finish('stop'),
+  ] as any[])
+
+/**
+ * Builds a model stream that calls a tool.
+ * @param {string} toolCallId - Tool call id.
+ * @param {string} toolName - Tool name.
+ * @param {unknown} [input] - Tool input (default: the tool name as summary).
+ * @returns {ReadableStream} The stream.
+ */
+export const toolCallStream = (toolCallId: string, toolName: string, input: unknown = { summary: toolName }): any =>
+  convertArrayToReadableStream([
+    { type: 'stream-start', warnings: [] },
+    { type: 'tool-call', toolCallId, toolName, input: JSON.stringify(input) },
+    finish('tool-calls'),
+  ] as any[])
+
+/**
+ * Creates a mock model that returns one stream per call, in order (the last one repeats).
+ * @param {...Function} streams - Stream factories.
+ * @returns {MockLanguageModelV4} The model.
+ */
+export const scriptedModel = (...streams: (() => any)[]): MockLanguageModelV4 => {
+  let call = 0
+  return new MockLanguageModelV4({
+    doStream: async () => ({ stream: streams[Math.min(call++, streams.length - 1)]() }) as any,
+  })
+}
+
+/**
+ * Creates a design tool with a summary input.
+ * @param {string} name - Tool name.
+ * @param {Function} execute - Execute function.
+ * @param {Function} [requires] - Requires function (default: always available).
+ * @returns {AiTool} The tool.
+ */
+export const makeTool = (
+  name: string,
+  execute: AiTool['execute'],
+  requires: AiTool['requires'] = () => true
+): AiTool => ({
+  name,
+  description: `${name} tool`,
+  inputSchema: z.object({ summary: z.string() }),
+  area: ['design'],
+  dataClass: 'schema',
+  requires,
+  execute,
+})
+
+// cloud provider allowed for the schema only
+export const cloudAccess = { effective: { schema: 'cloud', data: 'onDevice' } as any, hostingClass: 'cloud' as const }

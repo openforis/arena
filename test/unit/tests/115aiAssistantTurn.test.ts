@@ -1,5 +1,4 @@
 import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
-import { z } from 'zod'
 
 import { Query } from '@common/model/query'
 
@@ -16,46 +15,15 @@ import {
   runAssistantTurn,
 } from '@webapp/ai/agent/runAssistantTurn'
 import type { AiTool } from '@webapp/ai/tools/types'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
-
-const usage = { inputTokens: { total: 1 }, outputTokens: { total: 1 } }
-const finish = (unified: string) => ({ type: 'finish', finishReason: { unified, raw: undefined }, usage })
-
-const textStream = (text: string): any =>
-  convertArrayToReadableStream([
-    { type: 'stream-start', warnings: [] },
-    { type: 'text-start', id: 't' },
-    { type: 'text-delta', id: 't', delta: text },
-    { type: 'text-end', id: 't' },
-    finish('stop'),
-  ] as any[])
-
-const toolCallStream = (toolCallId: string, toolName: string, input: unknown): any =>
-  convertArrayToReadableStream([
-    { type: 'stream-start', warnings: [] },
-    { type: 'tool-call', toolCallId, toolName, input: JSON.stringify(input) },
-    finish('tool-calls'),
-  ] as any[])
-
-// one stream per model call, in order (the last one repeats)
-const scriptedModel = (...streams: (() => any)[]) => {
-  let call = 0
-  return new MockLanguageModelV4({
-    doStream: async () => ({ stream: streams[Math.min(call++, streams.length - 1)]() }) as any,
-  })
-}
-
-const makeTool = (name: string, execute: AiTool['execute']): AiTool => ({
-  name,
-  description: `${name} tool`,
-  inputSchema: z.object({ summary: z.string() }),
-  area: ['design'],
-  dataClass: 'schema',
-  requires: () => true,
-  execute,
-})
-
-const cloudAccess = { effective: { schema: 'cloud', data: 'onDevice' } as any, hostingClass: 'cloud' as const }
+import {
+  cloudAccess,
+  createToolContext,
+  finish,
+  makeTool,
+  scriptedModel,
+  textStream,
+  toolCallStream,
+} from '@test/unit/utils/assistantTestUtils'
 
 const answerOf = (conversation: Conversation): AssistantMessage => conversation.messages.at(-1) as AssistantMessage
 

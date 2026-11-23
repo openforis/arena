@@ -1,7 +1,7 @@
 import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as SecretBox from '@server/utils/crypto/secretBox'
-import { createAiPrefsStore } from '@test/unit/utils/aiPrefsStoreTestUtils'
+import { createRecordingAiProviderServiceDeps } from '@test/unit/utils/aiPrefsStoreTestUtils'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
@@ -51,39 +51,19 @@ const userWithProviders = (extra: Record<string, unknown> = {}) =>
   })
 
 /**
- * Builds recording dependencies over an in-memory store of the AI prefs of the user.
+ * Builds recording dependencies over an in-memory store of the AI prefs of the user, with sequential ids.
  * @param {object} [overrides] - Dependencies to replace.
  * @param {any} [user] - The user whose AI prefs are stored at the start.
  * @returns {object} The dependencies, what they recorded (`saved` is every stored AI prefs value) and the store.
  */
 const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> = {}, user: any = null) => {
-  const store = createAiPrefsStore(user?.prefs?.ai ?? null)
-  const tests: any[] = []
-  const listed: any[] = []
   let ids = 0
-  const deps: AiProviderService.AiProviderServiceDeps = {
-    updateAiPrefs: store.updateAiPrefs,
-    runTest: async ({ cfg }) => {
-      tests.push(cfg)
-      return { ok: true, latencyMs: 1 }
-    },
-    listModels: async (cfg) => {
-      listed.push(cfg)
-      return [{ id: 'm1' }]
-    },
-    encrypt: SecretBox.encrypt,
-    decrypt: SecretBox.decrypt,
-    isLegacyEnvelope: SecretBox.isLegacyEnvelope,
-    isEncryptionConfigured: () => true,
-    hasAdminDefault: () => true,
-    isMockEnabled: () => false,
+  return createRecordingAiProviderServiceDeps(user, {
     newId: () => `id-${++ids}`,
     now: () => NOW,
     allowlist: ['https://llm.example.org/v1'],
-    findCopiedEnvelopes: store.findCopiedEnvelopes,
     ...overrides,
-  }
-  return { deps, saved: store.writes, tests, listed, store }
+  })
 }
 
 describe('AI provider service (261)', () => {

@@ -119,6 +119,33 @@ export const createApplierDepsStub = (survey: any, overrides: Partial<ApplierDep
   ...overrides,
 })
 
+/**
+ * Creates applier dependencies that fake the designer's save: the survey changes as the reducers would change it.
+ * @param {object} start - Initial survey.
+ * @returns {{deps: ApplierDeps, posts: any[], puts: any[]}} The dependencies, the posted node defs and the put props.
+ */
+export const createRecordingApplierDeps = (start: any) => {
+  let current = start
+  const posts: any[] = []
+  const puts: any[] = []
+  const deps = createApplierDepsStub(start, {
+    getSurvey: () => current,
+    postNodeDef: async (nodeDef) => {
+      posts.push(nodeDef)
+    },
+    putNodeDefProps: async (params) => {
+      puts.push(params)
+    },
+    onNodeDefCreated: (nodeDef) => {
+      current = Survey.assocNodeDef({ nodeDef })(current)
+    },
+    onNodeDefUpdated: (nodeDef) => {
+      current = Survey.assocNodeDef({ nodeDef })(current)
+    },
+  })
+  return { deps, posts, puts }
+}
+
 export type FakeCategoryItem = {
   uuid: string
   levelIndex: number

@@ -9,6 +9,7 @@ import { AppInfo } from '@core/app/appInfo'
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
 import * as RecordStep from './recordStep'
+import type { RecordKeyValue } from './recordSummary'
 
 import { keys, infoKeys } from './_record/recordKeys'
 import * as RecordReader from './_record/recordReader'
@@ -147,14 +148,14 @@ const getNumberProp =
   (record: ArenaRecord): number | undefined =>
     A.prop(key)(record) as number | undefined
 
-const getObjectProp =
+const getKeyValuesObjProp =
   (key: string) =>
-  (record: ArenaRecord): Record<string, unknown> =>
-    A.propOr({}, key)(record) as Record<string, unknown>
+  (record: ArenaRecord): Record<string, RecordKeyValue> =>
+    A.propOr({}, key)(record) as Record<string, RecordKeyValue>
 
 export const getFilesCount = getNumberProp(keys.filesCount)
 export const getFilesSize = getNumberProp(keys.filesSize)
 export const getFilesMissing = getNumberProp(keys.filesMissing)
 
-export const getKeysObj = getObjectProp(keys.keysObj)
-export const getSummaryAttributesObj = getObjectProp(keys.summaryAttributesObj)
+export const getKeysObj = getKeyValuesObjProp(keys.keysObj)
+export const getSummaryAttributesObj = getKeyValuesObjProp(keys.summaryAttributesObj)

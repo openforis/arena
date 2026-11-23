@@ -9,13 +9,8 @@ import {
   type LocalServerConsentRequest,
 } from '@webapp/ai/engines/resolveModel'
 import { getEffectiveProviderId, selectEngine } from '@webapp/ai/engines/selectEngine'
-import type {
-  AiCapabilities,
-  AiEngine,
-  AiLocalServerCapability,
-  AiProviderEntry,
-  StorageLike,
-} from '@webapp/ai/engines/types'
+import type { AiCapabilities, AiEngine, AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
+import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 
 const CLOUD: AiPolicy = { schema: 'cloud', data: 'cloud' }
 const LOCAL_URL = 'http://localhost:1234/v1'
@@ -86,16 +81,6 @@ const capabilities = ({
 })
 
 /** Builds an in-memory storage. */
-const memoryStorage = (): StorageLike => {
-  const data = new Map<string, string>()
-  return {
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => {
-      data.set(key, value)
-    },
-  }
-}
-
 /** Builds a model resolver over the capabilities, recording every gateway, local and consent call. */
 const setupResolver = (caps: AiCapabilities, answers: LocalServerConsentAnswer[] = []) => {
   const state = {
