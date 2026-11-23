@@ -38,7 +38,7 @@ const _sendNodeDeleteRequest = async ({ dispatch, getState, nodeUuid, clearNonAp
   )
 }
 
-export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
+export const removeNode = (nodeDef, node) => (dispatch, getState) => {
   const onOk = async () => {
     dispatch({ type: ActionTypes.nodeDelete, node })
     await _sendNodeDeleteRequest({ dispatch, getState, nodeUuid: Node.getUuid(node) })

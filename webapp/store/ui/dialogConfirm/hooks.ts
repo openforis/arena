@@ -1,11 +1,13 @@
 import { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
+
+import { useAppDispatch } from '@webapp/store/hooks'
 
 import * as DialogConfirmActions from './actions'
 import * as DialogConfirmState from './state'
 
 export const useDialogConfirm = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const key = useSelector(DialogConfirmState.getKey)
   const params = useSelector(DialogConfirmState.getParams)

@@ -10,7 +10,7 @@ import { ChainState } from '../state'
 
 export const updateChain =
   ({ chain }) =>
-  async (dispatch, getState) => {
+  (dispatch, getState) => {
     const state = getState()
     const chainPrev = ChainState.getChain(state)
     const surveyId = SurveyState.getSurveyId(state)
