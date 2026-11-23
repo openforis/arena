@@ -1,3 +1,5 @@
+import type { ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 
 import { exportReducer } from '@webapp/utils/reduxUtils'
@@ -18,8 +20,10 @@ const actionHandlers = {
   [SurveyActions.surveyDefsReset]: () => ({}),
 
   // NodeDefs load
-  [SurveyActions.surveyDefsLoad]: (_state, { nodeDefs }) => Survey.initNodeDefsIndex({ nodeDefs }),
-  [SurveyActions.surveyDefsIndexUpdate]: (_state, { nodeDefs }) => Survey.initNodeDefsIndex({ nodeDefs }),
+  // only the node defs are used to build the index
+  [SurveyActions.surveyDefsLoad]: (_state, { nodeDefs }) => Survey.initNodeDefsIndex({ nodeDefs } as ArenaSurvey),
+  [SurveyActions.surveyDefsIndexUpdate]: (_state, { nodeDefs }) =>
+    Survey.initNodeDefsIndex({ nodeDefs } as ArenaSurvey),
 
   [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => Survey.addNodeDefToIndex({ nodeDefsIndex: state, nodeDef }),
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef }),

@@ -142,7 +142,7 @@ export const useSurveyHasFileAttributes = () =>
 
 export const useIsSurveyDirty = () => useSelector(SurveyStatusState.isDirty)
 
-export const useChains = ({ surveyCycleKey } = {}) => {
+export const useChains = ({ surveyCycleKey }: { surveyCycleKey?: string } = {}) => {
   const canUseAnalysis = useAuthCanUseAnalysis()
   const surveyId = useSurveyId()
   const [chains, setChains] = useState(null)

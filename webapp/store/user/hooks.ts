@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
@@ -10,6 +10,7 @@ import * as RecordStep from '@core/record/recordStep'
 import * as User from '@core/user/user'
 import { Authorizer } from '@openforis/arena-core'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store/hooks'
 
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
@@ -22,7 +23,7 @@ export const useUserIsSystemAdmin = () => User.isSystemAdmin(useUser())
 
 // ====== Auth
 // ====== Auth / Surveys
-export const useAuthCanCreateSurvey = () => Authorizer.canCreateSurvey(useUser(), useSurveyInfo())
+export const useAuthCanCreateSurvey = () => Authorizer.canCreateSurvey(useUser())
 export const useAuthIsMaxSurveysCountReached = () => {
   const user = useUser()
   const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
@@ -31,8 +32,8 @@ export const useAuthIsMaxSurveysCountReached = () => {
   return surveysCount >= maxSurveysCount
 }
 
-export const useOnNewSurveyClick = ({ onAfterClick } = {}) => {
-  const dispatch = useDispatch()
+export const useOnNewSurveyClick = ({ onAfterClick }: { onAfterClick?: () => void } = {}) => {
+  const dispatch = useAppDispatch()
   const user = useUser()
   const isMaxSurveysCountReached = useAuthIsMaxSurveysCountReached()
 
