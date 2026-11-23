@@ -1,0 +1,126 @@
+import { useCallback, useMemo, useState } from 'react'
+import * as A from '@core/arena'
+
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Validation from '@core/validation/validation'
+
+import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
+
+import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+import { CategorySelector } from '@webapp/components/survey/CategorySelector'
+
+import { State, useNodeDefEditReadOnly } from './store'
+
+const displayAsItems = [
+  {
+    key: NodeDefLayout.renderType.dropdown,
+    label: 'nodeDefEdit:codeProps.displayAsTypes.dropdown',
+  },
+  {
+    key: NodeDefLayout.renderType.checkbox,
+    label: 'nodeDefEdit:codeProps.displayAsTypes.checkbox',
+  },
+]
+
+type CodePropsProps = {
+  state: Record<string, any>
+  Actions: Record<string, any>
+}
+
+const CodeProps = (props: CodePropsProps) => {
+  const { state, Actions } = props
+
+  const surveyCycleKey = useSurveyCycleKey()
+  const survey = useSurvey()
+  const readOnlyLocked = useNodeDefEditReadOnly()
+  const canEditSurvey = useAuthCanEditSurvey()
+  const readOnly = readOnlyLocked || !canEditSurvey
+
+  const [category, setCategory] = useState(null)
+
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
+  const validation = State.getValidation(state)
+  const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents({ nodeDef, category })(survey)
+  const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
+
+  const canUpdateCategory = useMemo(() => Survey.canUpdateCategory(nodeDef)(survey), [nodeDef, survey])
+
+  const nodeDefCategoryUuid = useMemo(() => NodeDef.getCategoryUuid(nodeDef), [nodeDef])
+
+  const onCategoryChange = useCallback(
+    (selectedCategory) => {
+      const selectedCategoryUuid = Category.getUuid(selectedCategory)
+      if (canUpdateCategory && selectedCategoryUuid !== nodeDefCategoryUuid) {
+        Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: selectedCategoryUuid })
+      }
+    },
+    [Actions, canUpdateCategory, nodeDefCategoryUuid, state]
+  )
+
+  return (
+    <>
+      <FormItem label="nodeDefEdit:codeProps.category">
+        <CategorySelector
+          disabled={readOnly || !canUpdateCategory}
+          categoryUuid={nodeDefCategoryUuid}
+          validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
+          onChange={onCategoryChange}
+          onCategoryLoad={setCategory}
+        />
+      </FormItem>
+
+      {!NodeDef.isAnalysis(nodeDef) && (
+        <>
+          {Category.isHierarchical(category) && (
+            <FormItem label="nodeDefEdit:codeProps.parentCode">
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 200px',
+                }}
+              >
+                <Dropdown
+                  disabled={readOnly || !canUpdateCategory || A.isEmpty(candidateParentCodeNodeDefs)}
+                  items={candidateParentCodeNodeDefs}
+                  selection={parentCodeDef}
+                  itemValue="uuid"
+                  itemLabel={NodeDef.getName}
+                  onChange={(def) =>
+                    Actions.setProp({ state, key: NodeDef.propKeys.parentCodeDefUuid, value: NodeDef.getUuid(def) })
+                  }
+                  testId={TestId.nodeDefDetails.nodeDefCodeParent}
+                />
+              </div>
+            </FormItem>
+          )}
+
+          <FormItem label="nodeDefEdit:basicProps.displayAs">
+            <ButtonGroup
+              disabled={readOnly}
+              selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
+              onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
+              items={displayAsItems}
+            />
+          </FormItem>
+
+          <FormItem label="nodeDefEdit:codeProps.codeShown">
+            <Checkbox
+              checked={NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)}
+              disabled={readOnly}
+              validation={Validation.getFieldValidation(NodeDefLayout.keys.codeShown)(validation)}
+              onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.codeShown, value })}
+            />
+          </FormItem>
+        </>
+      )}
+    </>
+  )
+}
+
+export default CodeProps
