@@ -1,3 +1,5 @@
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -6,7 +8,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 export const stateKey = 'user'
 
-export const getState = A.propOr({}, stateKey)
+export const getState: (state: unknown) => ArenaUser = A.propOr({}, stateKey)
 
 // ====== READ
 export const getUser = getState

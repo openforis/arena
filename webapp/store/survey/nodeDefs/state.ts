@@ -1,3 +1,5 @@
+import type { ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,16 +14,16 @@ export const mergeNodeDefs = A.mergeLeft
 
 // ====== DELETE
 
-export const dissocNodeDef = (nodeDef) => (nodeDefsState) => {
+export const dissocNodeDef = (nodeDef: ArenaAnyNodeDef) => (nodeDefsState: ArenaNodeDefMap) => {
   // Delete the given node def from state
-  let stateUpdated = A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsState)
+  let stateUpdated: ArenaNodeDefMap = A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsState)
 
   // Delete descendant node defs from state
-  Object.values(stateUpdated).forEach((nodeDefCurrent) => {
+  for (const nodeDefCurrent of Object.values(stateUpdated)) {
     if (NodeDef.isDescendantOf(nodeDef)(nodeDefCurrent)) {
       stateUpdated = A.dissoc(NodeDef.getUuid(nodeDefCurrent), stateUpdated)
     }
-  })
+  }
 
   return stateUpdated
 }
