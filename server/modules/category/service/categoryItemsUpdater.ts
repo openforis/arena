@@ -1,4 +1,4 @@
-import type { ArenaCategory, ArenaUser } from '@openforis/arena-core'
+import type { ArenaCategory, ArenaCategoryItem, ArenaUser } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
@@ -14,16 +14,21 @@ import BatchPersister from '@server/db/batchPersister'
 import type { DbClient } from '@server/db/db'
 import * as CategoryManager from '../manager/categoryManager'
 
+// placeholder: item created only as parent of other items (its own row has not been processed yet)
+type CategoryItemCached = ArenaCategoryItem & { placeholder?: boolean }
+
 export default class CategoryItemsUpdater {
   category: ArenaCategory
-  errorHandler: any
-  existingItems: any
+  errorHandler: (key: string, params?: { [key: string]: unknown }) => void
+  existingItems: ArenaCategoryItem[]
   existingItemsProcessedByUuid: Record<string, boolean>
-  itemExtraPropsExtrator: any
-  itemsBatchInserter: any
-  itemsBatchUpdater: any
-  itemsCacheByCodes: any
-  latestIndexByParent: any
+  itemExtraPropsExtrator: (extra: { [key: string]: unknown }) => { [key: string]: unknown }
+  itemsBatchInserter: BatchPersister<ArenaCategoryItem>
+  itemsBatchUpdater: BatchPersister<ArenaCategoryItem>
+  // processed items (without props) by ancestor codes + code (as a string)
+  itemsCacheByCodes: { [codes: string]: CategoryItemCached }
+  // latest index assigned to the children of every parent item
+  latestIndexByParent: { [parentItemUuid: string]: number }
   surveyId: number
   tx: DbClient
   user: ArenaUser

@@ -119,7 +119,7 @@ export default class RecordsImportJob extends Job<OdkImportJobContext> {
       // is skipped, regardless of whether the schema has any attribute marked as a key (most freshly
       // ODK-imported schemas won't - see the Phase 2 plan doc).
       const instanceUuid = extractInstanceUuid(submissionRoot)
-      if (instanceUuid && existingRecordsSummary.some((summary: any) => Record.getUuid(summary) === instanceUuid)) {
+      if (instanceUuid && existingRecordsSummary.some((summary) => Record.getUuid(summary) === instanceUuid)) {
         this.skippedCount += 1
         this.incrementProcessedItems()
         continue
@@ -193,7 +193,7 @@ export default class RecordsImportJob extends Job<OdkImportJobContext> {
     record: ArenaRecord
     submissionFileZip: FileZip
     submissionDir: string
-  }): Promise<any> {
+  }): Promise<ArenaRecord> {
     let recordUpdated = record
     const childrenByName = groupChildrenByName(XForm.getChildElements(submissionElement))
 
@@ -252,7 +252,7 @@ export default class RecordsImportJob extends Job<OdkImportJobContext> {
     record: ArenaRecord
     submissionFileZip: FileZip
     submissionDir: string
-  }): Promise<any> {
+  }): Promise<ArenaRecord> {
     if (NodeDef.isEntity(nodeDef)) {
       const node = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNode)
       const recordWithNode = Record.assocNode(node, { sideEffect: true })(record)
@@ -301,7 +301,7 @@ export default class RecordsImportJob extends Job<OdkImportJobContext> {
     record: ArenaRecord
     submissionFileZip: FileZip
     submissionDir: string
-  }): Promise<any> {
+  }): Promise<ArenaRecord> {
     if (NodeDef.getType(nodeDef) === NodeDef.nodeDefType.file) {
       return this._buildFileNode({
         nodeDefUuid,
@@ -339,7 +339,7 @@ export default class RecordsImportJob extends Job<OdkImportJobContext> {
     record: ArenaRecord
     submissionFileZip: FileZip
     submissionDir: string
-  }): Promise<any> {
+  }): Promise<ArenaRecord> {
     if (!fileName) return record
 
     const entryPath = `${submissionDir}/${fileName}`
@@ -375,7 +375,7 @@ export default class RecordsImportJob extends Job<OdkImportJobContext> {
     }
   }
 
-  async nodesBatchInsertHandler(nodesArray: any[], tx: DbClient) {
+  async nodesBatchInsertHandler(nodesArray: ArenaRecordNode[], tx: DbClient) {
     await RecordManager.insertNodesInBulk(
       { user: this.user, surveyId: this.surveyId, nodesArray, systemActivity: true },
       tx

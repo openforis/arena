@@ -1,4 +1,4 @@
-import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaCategory, ArenaNodeDefEntity } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -55,10 +55,10 @@ export default class NodeDefsImportJob extends Job<OdkImportJobContext> {
   static readonly type = 'NodeDefsImportJob'
 
   nodeDefs: Record<string, any>
-  nodeDefsByXFormPath: Map<string, any>
+  nodeDefsByXFormPath: Map<string, ArenaAnyNodeDef>
   nodeDefUniqueNameGenerator: NodeDefUniqueNameGenerator
   originalNamesByNodeDefUuid: Record<string, OdkNodeDefOriginalNameInfo>
-  reportItems: any[]
+  reportItems: OdkImportReportItem.OdkImportReportItem[]
   entityUuidsWithKeyAssigned: Set<string>
 
   constructor(params?: Partial<JobParams>) {
@@ -156,7 +156,7 @@ export default class NodeDefsImportJob extends Job<OdkImportJobContext> {
     parentNodeDef: ArenaNodeDefEntity
     parentPath: string | null
     instanceElement: XmlElement
-  }): Promise<any> {
+  }): Promise<ArenaAnyNodeDef | null> {
     const { context } = this
     const { defaultLanguage, bindsByPath, repeatPaths, bodyControlsByPath, itextTranslations, categoriesByKey } =
       context as {
@@ -253,8 +253,8 @@ export default class NodeDefsImportJob extends Job<OdkImportJobContext> {
     bind: XFormBind | null
     bodyControl: XFormBodyControl | null
     labels: Record<string, string>
-    categoriesByKey: Record<string, any>
-  }): Promise<any> {
+    categoriesByKey: Record<string, ArenaCategory>
+  }): Promise<ArenaAnyNodeDef | null> {
     const odkType = bind?.type ?? null
     const mapping = mapXFormTypeToNodeDefType({
       odkType,
@@ -406,7 +406,7 @@ export default class NodeDefsImportJob extends Job<OdkImportJobContext> {
     nodeDef: ArenaAnyNodeDef
     path: string
     bind: XFormBind | null
-  }): Promise<any> {
+  }): Promise<ArenaAnyNodeDef> {
     if (!bind) return nodeDef
 
     const nodeDefUuid = NodeDef.getUuid(nodeDef)

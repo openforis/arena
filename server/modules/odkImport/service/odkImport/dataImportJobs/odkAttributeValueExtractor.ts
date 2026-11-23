@@ -24,7 +24,7 @@ const extractTime = (text: string): string | null => {
 }
 
 // ODK geopoint: "lat lon altitude accuracy" (space-separated, altitude/accuracy optional)
-const extractCoordinate = (text: string): any => {
+const extractCoordinate = (text: string): ReturnType<typeof Node.newNodeValueCoordinate> | null => {
   const [latRaw, lonRaw, altitudeRaw, accuracyRaw] = text.split(/\s+/)
   const lat = Number.parseFloat(latRaw)
   const lon = Number.parseFloat(lonRaw)
@@ -53,7 +53,14 @@ const parseGeoPoint = (point: string): [number, number] => {
 // original ODK bind type through the whole submission-import pipeline just for this: a closed ring
 // (first point equals the last) is how ODK Collect always represents a geoshape, and not how a
 // geotrace is ever represented in practice.
-const extractGeo = (text: string): any => {
+// GeoJSON feature with a LineString or Polygon geometry
+export type GeoFeature = {
+  type: 'Feature'
+  geometry: { type: 'Polygon'; coordinates: number[][][] } | { type: 'LineString'; coordinates: number[][] }
+  properties: object
+}
+
+const extractGeo = (text: string): GeoFeature | null => {
   const points = text
     .split(';')
     .map((point) => point.trim())
@@ -86,7 +93,7 @@ const extractCode = async ({
   categoryItemProvider: Pick<typeof CategoryItemProviderDefault, 'getItemByCode'>
   text: string
   tx: DbClient
-}): Promise<any> => {
+}): Promise<unknown> => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const codes = NodeDef.isMultiple(nodeDef) ? text.split(/\s+/) : [text]
 
@@ -127,7 +134,7 @@ export const extractAttributeValue = async ({
   categoryItemProvider: Pick<typeof CategoryItemProviderDefault, 'getItemByCode'>
   rawText: string | null
   tx: DbClient
-}): Promise<any> => {
+}): Promise<unknown> => {
   const text = rawText?.trim() ?? ''
   if (!text) return null
 
