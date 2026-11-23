@@ -13,7 +13,7 @@ import { createUserServiceWithPrefsUpdate } from '@server/modules/user/service/u
 import { readAiPrefs, writeAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
 
 import { getContextUser } from '@test/integration/config/context'
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'
 import * as SB from '@test/utils/surveyBuilder'
 import { collectRoutes } from '@test/utils/routeUtils'
@@ -56,7 +56,8 @@ describe('The prefs of a user stay an object (062)', () => {
         ({ method, path }) => method === 'post' && path === '/user/:userUuid/prefs'
       )
       const next = jest.fn()
-      await route?.handlers.at(-1)(
+      await callHandler(
+        route?.handlers.at(-1),
         { params: { userUuid: User.getUuid(member) }, user: member, body: { ...member, prefs } },
         createFakeResponse(),
         next

@@ -12,7 +12,7 @@ import * as UserRepository from '@server/modules/user/repository/userRepository'
 import { readAiPrefs, writeAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
 
 import { getContextUser } from '@test/integration/config/context'
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'
 import * as SB from '@test/utils/surveyBuilder'
 import { getRouteHandler } from '@test/utils/routeUtils'
@@ -93,7 +93,7 @@ describe('Server-only user prefs (054)', () => {
     const handler = getRouteHandler(UserApi.init, ({ path }) => path === '/survey/:surveyId/users')
     const res = createFakeResponse()
     const next = jest.fn()
-    await handler({ params: { surveyId: String(surveyId) }, query: {}, user: attacker }, res, next)
+    await callHandler(handler, { params: { surveyId: String(surveyId) }, query: {}, user: attacker }, res, next)
     expect(next).not.toHaveBeenCalled()
     const uuids = res.body.list.map((listed: any) => User.getUuid(listed))
     expect(uuids).toContain(User.getUuid(victim))
@@ -134,7 +134,7 @@ describe('Server-only user prefs (054)', () => {
     }
     const res = createFakeResponse()
     const next = jest.fn()
-    await handler({ params: { userUuid: attackerUuid }, user: attacker, body }, res, next)
+    await callHandler(handler, { params: { userUuid: attackerUuid }, user: attacker, body }, res, next)
     expect(next).not.toHaveBeenCalled()
     expect(await readAiPrefs({ userUuid: attackerUuid })).toBeNull()
     const stored = await readPrefs(attackerUuid)
