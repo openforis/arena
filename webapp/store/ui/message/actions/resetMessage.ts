@@ -3,7 +3,7 @@ import { MessageActionTypes } from './actionTypes'
 
 export const resetMessage =
   ({ navigate }) =>
-  async (dispatch) => {
+  (dispatch) => {
     dispatch({ type: MessageActionTypes.messageReset })
 
     // navigate to messages list
