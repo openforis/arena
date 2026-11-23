@@ -9,37 +9,25 @@ import Header from './Header'
 import Content from './Content'
 import { Footer } from './Footer'
 import { useTable } from './useTable'
+import type { TableRowsProps } from './tableProps'
 
 // default props as constants: new objects or functions at every render would re-render all the (memoized) rows
 const defaultKeyExtractor = ({ item }) => ObjectUtils.getUuid(item)
 const defaultIsRowExpandable = () => true
 const emptyProps = {}
 
-type TableProps = {
-  cellProps?: Record<string, any>
-  cellTestIdExtractor?: (...args: any[]) => any
+type TableProps = Omit<TableRowsProps, 'module'> & {
   className?: string
-  columns?: any[]
-  expandableRows?: boolean
-  gridTemplateColumns?: string
   headerLeftComponent?: React.ElementType
   headerProps?: Record<string, any>
-  isRowActive?: (...args: any[]) => any // Checks whether a row must be highlighted
-  isRowExpandable?: (...args: any[]) => any // Checks if a row rendering an item can be expanded
-  isRowOpenable?: (...args: any[]) => any // Checks if the item of a row can be opened (onRowOpen); rows that cannot be opened do nothing on click
   keepSelectionOnSearch?: boolean // if true, selected items are kept when the search text changes
   keyExtractor?: (...args: any[]) => any
   module: string
   moduleApiUri?: string
   noItemsLabelKey?: string
   noItemsLabelForSearchKey?: string
-  onRowOpen?: (...args: any[]) => any // Opens (views or edits) the item of a row: on click, or on double click if the table is selectable
   restParams?: Record<string, any>
-  rowComponent?: React.ElementType
-  rowExpandedComponent?: React.ElementType
   rowHeaderComponent?: React.ElementType
-  rowProps?: Record<string, any>
-  selectable?: boolean // if true, a row click selects the row and selectedItems is passed to the HeaderLeft component
   showFooter?: boolean
   showHeader?: boolean
   visibleColumnsSelectionEnabled?: boolean // if true, visible columns selection menu button will be shown

@@ -2,6 +2,7 @@ import React, { memo, useCallback, useState } from 'react'
 import classNames from 'classnames'
 
 import { isEventFromInteractiveChild } from '@webapp/utils/domUtils'
+import type { TableRowsProps } from '../tableProps'
 
 const expandedPanelClassName = 'table__row-expanded-panel-wrapper'
 
@@ -12,26 +13,13 @@ const isEventFromRowCells = (event) => {
   return !expandedPanel || !event.currentTarget.contains(expandedPanel)
 }
 
-type ContentRowComponentProps = {
-  cellProps?: Record<string, any>
-  cellTestIdExtractor?: (...args: any[]) => any
-  columns?: any[]
-  expandableRows?: boolean
-  gridTemplateColumns?: string
+type ContentRowComponentProps = TableRowsProps & {
   index: number
   initData?: (...args: any[]) => any
-  isRowActive?: (...args: any[]) => any
-  isRowExpandable?: (...args: any[]) => any
-  isRowOpenable?: (...args: any[]) => any
   item: Record<string, any>
-  module?: string
   offset?: number
   onItemSelectToggle: (...args: any[]) => any
-  onRowOpen?: (...args: any[]) => any
   rowComponent: React.ElementType
-  rowExpandedComponent?: React.ElementType
-  rowProps?: Record<string, any>
-  selectable?: boolean
   selected?: boolean
 }
 
