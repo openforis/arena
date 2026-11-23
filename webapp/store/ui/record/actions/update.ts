@@ -65,7 +65,7 @@ export const persistNodeClearNonApplicableValuesConfirmed = (node) => async (dis
 
 export const updateNode =
   (nodeDef, node, value, file = null, meta = {}, refData = null) =>
-  async (dispatch, getState) => {
+  (dispatch, getState) => {
     if (!Node.getUuid(node)) {
       // the node doesn't exist yet (e.g. attribute of an entity just added, not yet created server side):
       // nothing to update (the attribute is read only until its node is available)
