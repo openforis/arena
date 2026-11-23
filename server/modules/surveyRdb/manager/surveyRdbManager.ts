@@ -366,12 +366,14 @@ const createEntityFetchParams = ({
     fileFormat,
   } = options
 
+  // multiple attributes (included to expand category items) only when their values are in the entity data view
+  const isAttributeInEntityView = (attributeDef) =>
+    NodeDef.isSingle(attributeDef) || (!!expandCategoryItems && NodeDef.canMultipleAttributeBeAggregated(attributeDef))
+
   const getChildAttributes = (nodeDef) => {
     if (exportSingleEntitiesIntoSeparateFiles) {
       const children = Survey.getNodeDefChildrenSorted({ cycle, nodeDef, includeAnalysis })(survey)
-      return children.filter(
-        (child) => NodeDef.isAttribute(child) && (NodeDef.isSingle(child) || !!expandCategoryItems)
-      )
+      return children.filter((child) => NodeDef.isAttribute(child) && isAttributeInEntityView(child))
     }
     return Survey.getNodeDefDescendantAttributesInSingleEntities({
       nodeDef,
@@ -379,7 +381,7 @@ const createEntityFetchParams = ({
       includeMultipleAttributes: !!expandCategoryItems,
       sorted: true,
       cycle,
-    })(survey)
+    })(survey).filter(isAttributeInEntityView)
   }
 
   const addCycle = Survey.getCycleKeys(survey).length > 1

@@ -72,9 +72,13 @@ const AttributesSelector = (props) => {
     childDefs = [nodeDefContext] // Multiple attribute
   }
 
+  // a multiple attribute not aggregated in the entity data view (e.g. file, taxon) can be queried only on its own
+  const isMultipleAttributeVisible = (nodeDef) =>
+    showMultipleAttributes && (!canSelectAttributes || NodeDef.canMultipleAttributeBeAggregated(nodeDef))
+
   const isNodeDefVisible = (nodeDef) =>
     !nodeDefUuidsToExclude.includes(NodeDef.getUuid(nodeDef)) &&
-    ((NodeDef.isAttribute(nodeDef) && (showMultipleAttributes || NodeDef.isSingle(nodeDef))) ||
+    ((NodeDef.isAttribute(nodeDef) && (NodeDef.isSingle(nodeDef) || isMultipleAttributeVisible(nodeDef))) ||
       NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
     NodeDef.getCycles(nodeDef).includes(cycle) &&
     (filterFunction === null || filterFunction(nodeDef)) &&
