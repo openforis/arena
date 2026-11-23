@@ -202,15 +202,20 @@ const NodeDefTaxonConnected = connect(mapStateToProps)(NodeDefTaxon)
 const MultipleTaxonInput = (props) => {
   const { canDeleteNode = false, canEditRecord = false, nodeDef, nodes, parentNode = null } = props
 
-  return nodes.map((node) =>
-    !Node.isPlaceholder(node) || canEditRecord ? (
-      <div key={Node.getUuid(node)} className="survey-form__node-def-taxon-multiple-item">
-        <NodeDefErrorBadge nodeDef={nodeDef} parentNode={parentNode} node={node} />
-        {/* fields with their labels also in the edit dialog of a table cell (renderType tableBody) */}
-        <NodeDefTaxonConnected {...props} node={node} renderType={null} />
-        {!Node.isPlaceholder(node) && canDeleteNode && <NodeDeleteButton nodeDef={nodeDef} node={node} />}
-      </div>
-    ) : null
+  // a single wrapper: the multiple attribute container makes its first child the scrollable area
+  return (
+    <div>
+      {nodes.map((node) =>
+        !Node.isPlaceholder(node) || canEditRecord ? (
+          <div key={Node.getUuid(node)} className="survey-form__node-def-taxon-multiple-item">
+            <NodeDefErrorBadge nodeDef={nodeDef} parentNode={parentNode} node={node} />
+            {/* fields with their labels also in the edit dialog of a table cell (renderType tableBody) */}
+            <NodeDefTaxonConnected {...props} node={node} renderType={null} />
+            {!Node.isPlaceholder(node) && canDeleteNode && <NodeDeleteButton nodeDef={nodeDef} node={node} />}
+          </div>
+        ) : null
+      )}
+    </div>
   )
 }
 
