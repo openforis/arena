@@ -7,7 +7,7 @@ import * as UserValidator from '@core/user/userValidator'
 import * as User from '@core/user/user'
 import { UserPasswordValidator } from '@core/user/userPasswordValidator'
 
-const getProp = (propName, defaultValue) => A.pathOr(defaultValue, propName.split('.'))
+const getProp = (propName: string, defaultValue: unknown = undefined) => A.pathOr(defaultValue, propName.split('.'))
 
 const _validatePasswordConfirm = (propName, item) => {
   const { password } = item
