@@ -83,7 +83,7 @@ Frontend uses a Redux store in `webapp/store/` (created with Redux Toolkit's `co
 
 Developer docs are in `docs/` (index: `docs/README.md`): architecture, record editing flow, analysis chains, webapp conventions. Read the relevant one before changing those areas, and update it in the same PR when the behavior it describes changes. `docs/superpowers/` holds dated design specs and plans: a record of past decisions, not maintained.
 
-**User manual:** `docs/user-manual/arena-user-manual-en.docx`, with French (`-fr`) and Spanish (`-es`) translations (Open Foris Arena Handbook, see `docs/user-manual/README.md`). Update it in the same PR as every user-facing change (new features, changed labels, menus or screens), in all three languages, with screenshots of the current UI, then run `yarn ai:docs:update` and commit `webapp/ai/help/handbook-*.json` (the copy the Help assistant searches; a unit test fails when it is out of date). The PDFs are not committed: the User manual workflow attaches them to every release.
+**User manual:** `docs/user-manual/arena-user-manual-en.docx`, with French (`-fr`) and Spanish (`-es`) translations (Open Foris Arena User Manual, see `docs/user-manual/README.md`). Update it in the same PR as every user-facing change (new features, changed labels, menus or screens), in all three languages, with screenshots of the current UI, then run `yarn ai:docs:update` and commit `webapp/ai/help/handbook-*.json` (the copy the Help assistant searches; a unit test fails when it is out of date). The PDFs are not committed: the User manual workflow attaches them to every release.
 
 ## Common Development Commands
 
