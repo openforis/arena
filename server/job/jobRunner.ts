@@ -20,7 +20,7 @@ export const startJobEnsuringEndNotification = async ({
   notifyJob: () => void
   logger?: { error: (...msgs: unknown[]) => void } | null
 }): Promise<void> => {
-  let startError: any = null
+  let startError: unknown = null
   try {
     await job.start()
   } catch (error) {

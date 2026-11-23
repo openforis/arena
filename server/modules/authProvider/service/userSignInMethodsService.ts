@@ -59,7 +59,7 @@ export const unlinkIdentity = async ({
       msgParams: { name: User.getName(user), providerLabel: provider?.label ?? identity.providerId },
       lang: User.getLang(user),
     })
-  } catch (error: any) {
+  } catch (error) {
     logger.error(`error sending the unlink notification to user ${userUuid}: ${error.message}`)
   }
   return identity
