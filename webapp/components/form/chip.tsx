@@ -1,8 +1,16 @@
+import type React from 'react'
 import MuiChip from '@mui/material/Chip'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-const Chip = (props) => {
+type ChipProps = {
+  className?: string
+  label: React.ReactNode
+  readOnly?: boolean
+  onDelete?: (...args: any[]) => any
+  variant?: 'filled' | 'outlined'
+}
+
+const Chip = (props: ChipProps) => {
   const { className, onDelete = null, label, readOnly = false, variant = 'outlined' } = props
 
   return (
@@ -13,14 +21,6 @@ const Chip = (props) => {
       variant={variant}
     />
   )
-}
-
-Chip.propTypes = {
-  className: PropTypes.string,
-  label: PropTypes.node.isRequired,
-  readOnly: PropTypes.bool,
-  onDelete: PropTypes.func,
-  variant: PropTypes.oneOf(['filled', 'outlined']),
 }
 
 export default Chip

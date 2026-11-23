@@ -2,10 +2,20 @@ import './buttonGroup.scss'
 
 import classNames from 'classnames'
 import * as A from '@core/arena'
-import PropTypes from 'prop-types'
 import MuiButtonGroup from '@mui/material/ButtonGroup'
 
 import { Button } from '../buttons'
+
+type ButtonGroupProps = {
+  items?: any[]
+  groupName?: string
+  selectedItemKey?: any // Array of values if multiple=true
+  onChange?: (...args: any[]) => any
+  disabled?: boolean
+  multiple?: boolean
+  deselectable?: boolean
+  className?: string
+}
 
 const ButtonGroup = ({
   className = null,
@@ -16,7 +26,7 @@ const ButtonGroup = ({
   multiple = false,
   onChange = (_value) => {},
   selectedItemKey = null,
-}) => {
+}: ButtonGroupProps) => {
   const onItemClick =
     ({ item, selected }) =>
     () => {
@@ -64,16 +74,5 @@ export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =
     label: i18n.t(`${labelPrefix}${key}`),
     icon: typeof icon === 'function' ? icon({ key }) : icon || null,
   }))
-
-ButtonGroup.propTypes = {
-  items: PropTypes.array,
-  groupName: PropTypes.string,
-  selectedItemKey: PropTypes.any, // Array of values if multiple=true
-  onChange: PropTypes.func,
-  disabled: PropTypes.bool,
-  multiple: PropTypes.bool,
-  deselectable: PropTypes.bool,
-  className: PropTypes.string,
-}
 
 export default ButtonGroup

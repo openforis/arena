@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import classNames from 'classnames'
 
 const TOLERANCE = 2 // pixels of tolerance when considering text as ellipsed
 
-export const LabelWithTooltip = (props) => {
+type LabelWithTooltipProps = {
+  children?: ReactNode
+  className?: string
+  label?: string
+  style?: Record<string, any>
+  testId?: string
+}
+
+export const LabelWithTooltip = (props: LabelWithTooltipProps) => {
   const { className, label = '', style, testId, children } = props
 
   const labelRef = useRef(null)
@@ -35,12 +42,4 @@ export const LabelWithTooltip = (props) => {
       {label}
     </div>
   )
-}
-
-LabelWithTooltip.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-  label: PropTypes.string,
-  style: PropTypes.object,
-  testId: PropTypes.string,
 }

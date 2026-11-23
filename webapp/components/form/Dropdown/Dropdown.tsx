@@ -1,6 +1,5 @@
 import './dropdown.scss'
 
-import PropTypes from 'prop-types'
 import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'
 
@@ -9,6 +8,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import { LabelWithTooltip } from '../LabelWithTooltip'
 import { dropdownTheme } from './dropdownTheme'
 import { useDropdown } from './useDropdown'
+import type { ArenaValidation } from '@openforis/arena-core'
 
 const OptionComponent =
   ({ renderOptionLabel }) =>
@@ -41,7 +41,37 @@ const SingleValueComponent = (reactSelectProps) => {
   )
 }
 
-const Dropdown = (props) => {
+type DropdownProps = {
+  className?: string
+  clearable?: boolean
+  defaultSelection?: any
+  disabled?: boolean
+  id?: string
+  idInput?: string
+  itemDescription?: string | ((...args: any[]) => any) // item description function or property name
+  itemIcon?: string | ((...args: any[]) => any)
+  itemLabel?: string | ((...args: any[]) => any) // item label function or property name
+  itemValue?: string | ((...args: any[]) => any)
+  items: any[] | ((...args: any[]) => any)
+  loading?: boolean
+  menuPlacement?: 'auto' | 'top' | 'bottom'
+  menuPosition?: 'absolute' | 'fixed'
+  minCharactersToAutocomplete?: number
+  multiple?: boolean
+  onBeforeChange?: (...args: any[]) => any // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
+  onChange: (...args: any[]) => any
+  placeholder?: string
+  readOnly?: boolean
+  renderOptionLabel?: (...args: any[]) => any
+  searchable?: boolean
+  selection?: Record<string, any> | number | string | any[]
+  testId?: string
+  title?: string
+  validation?: ArenaValidation
+  validationTooltipPosition?: 'bottom' | 'top'
+}
+
+const Dropdown = (props: DropdownProps) => {
   const {
     className = undefined,
     clearable = true,
@@ -68,7 +98,7 @@ const Dropdown = (props) => {
     selection = undefined,
     testId = null,
     title = null,
-    validation = {},
+    validation,
     validationTooltipPosition = 'top',
   } = props
 
@@ -134,36 +164,6 @@ const Dropdown = (props) => {
       />
     </ValidationTooltip>
   )
-}
-
-Dropdown.propTypes = {
-  className: PropTypes.string,
-  clearable: PropTypes.bool,
-  defaultSelection: PropTypes.any,
-  disabled: PropTypes.bool,
-  id: PropTypes.string,
-  idInput: PropTypes.string,
-  itemDescription: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item description function or property name
-  itemIcon: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
-  itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
-  loading: PropTypes.bool,
-  menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
-  menuPosition: PropTypes.oneOf(['absolute', 'fixed']),
-  minCharactersToAutocomplete: PropTypes.number,
-  multiple: PropTypes.bool,
-  onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
-  onChange: PropTypes.func.isRequired,
-  placeholder: PropTypes.string,
-  readOnly: PropTypes.bool,
-  renderOptionLabel: PropTypes.func,
-  searchable: PropTypes.bool,
-  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
-  testId: PropTypes.string,
-  title: PropTypes.string,
-  validation: PropTypes.object,
-  validationTooltipPosition: PropTypes.oneOf(['bottom', 'top']),
 }
 
 export default Dropdown

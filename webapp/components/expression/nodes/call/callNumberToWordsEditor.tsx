@@ -2,12 +2,12 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 
 import { CallSingleParameterEditor } from './callSingleParameterEditor'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
 const numericVarFilterFn = (variable) =>
   variable.root || [NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(variable.nodeDefType)
 
-export const CallNumberToWordsEditor = (props) => {
+export const CallNumberToWordsEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm, variables } = props
   return (
     <CallSingleParameterEditor
@@ -19,5 +19,3 @@ export const CallNumberToWordsEditor = (props) => {
     />
   )
 }
-
-CallNumberToWordsEditor.propTypes = CallEditorPropTypes

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -8,7 +7,20 @@ import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
 import { useI18n } from '@webapp/store/system'
 
-const Binary = (props) => {
+type BinaryProps = {
+  canDelete?: boolean
+  isBoolean?: boolean
+  node: any
+  nodeDefCurrent?: any
+  onChange: (...args: any[]) => any
+  onDelete?: (...args: any[]) => any
+  // ExpressionNode props
+  level?: number
+  renderNode: (...args: any[]) => any
+  variables?: any[]
+}
+
+const Binary = (props: BinaryProps) => {
   const {
     canDelete = false,
     isBoolean = false,
@@ -66,19 +78,6 @@ const Binary = (props) => {
       )}
     </div>
   )
-}
-
-Binary.propTypes = {
-  canDelete: PropTypes.bool,
-  isBoolean: PropTypes.bool,
-  node: PropTypes.any.isRequired,
-  nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func.isRequired,
-  onDelete: PropTypes.func,
-  // ExpressionNode props
-  level: PropTypes.number,
-  renderNode: PropTypes.func.isRequired,
-  variables: PropTypes.array,
 }
 
 export default Binary

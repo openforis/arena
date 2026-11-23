@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import {
   getLanguageISO639part2Label,
@@ -12,14 +11,23 @@ import {
 import { useI18n } from '@webapp/store/system'
 
 import Dropdown from './Dropdown'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const LanguageDropdown = (props) => {
+type LanguageDropdownProps = {
+  disabled?: boolean
+  onChange?: (...args: any[]) => any
+  selection?: string
+  standard?: any
+  validation?: ArenaValidation
+}
+
+const LanguageDropdown = (props: LanguageDropdownProps) => {
   const {
     disabled = false,
     onChange = () => ({}),
     selection = null,
     standard = standards.ISO_639_1,
-    validation = {},
+    validation,
   } = props
 
   const i18n = useI18n()
@@ -46,14 +54,6 @@ const LanguageDropdown = (props) => {
       validation={validation}
     />
   )
-}
-
-LanguageDropdown.propTypes = {
-  disabled: PropTypes.bool,
-  onChange: PropTypes.func,
-  selection: PropTypes.string,
-  standard: PropTypes.oneOf([standards.ISO_639_1, standards.ISO_639_2]),
-  validation: PropTypes.object,
 }
 
 export default LanguageDropdown

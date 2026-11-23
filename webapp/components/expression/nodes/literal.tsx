@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import PropTypes from 'prop-types'
 import axios from 'axios'
 
 import { Objects } from '@openforis/arena-core'
@@ -86,7 +85,16 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type, varia
   return null
 }
 
-const Literal = (props) => {
+type LiteralProps = {
+  expressionNodeParent?: any
+  node: any
+  nodeDefCurrent?: any
+  onChange: (...args: any[]) => any
+  type?: string
+  variables?: any[]
+}
+
+const Literal = (props: LiteralProps) => {
   const { expressionNodeParent, node, nodeDefCurrent, onChange, type, variables = [] } = props
 
   const i18n = useI18n()
@@ -179,15 +187,6 @@ const Literal = (props) => {
   }
 
   return <div className="literal">{getRenderer()}</div>
-}
-
-Literal.propTypes = {
-  expressionNodeParent: PropTypes.any,
-  node: PropTypes.any.isRequired,
-  nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func.isRequired,
-  type: PropTypes.string,
-  variables: PropTypes.array,
 }
 
 export default Literal

@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as A from '@core/arena'
 import * as User from '@core/user/user'
 
@@ -8,7 +6,14 @@ import Dropdown from '@webapp/components/form/Dropdown'
 
 const titleItems = User.titleKeysArray.map((value) => ({ value }))
 
-const DropdownUserTitle = (props) => {
+type DropdownUserTitleProps = {
+  disabled?: boolean
+  user: any
+  validation?: any
+  onChange: (...args: any[]) => any
+}
+
+const DropdownUserTitle = (props: DropdownUserTitleProps) => {
   const { disabled = false, onChange, user, validation = {} } = props
   const titleSelected = User.getTitle(user)
   const itemSelected = A.isEmpty(titleSelected) ? undefined : { value: titleSelected }
@@ -27,13 +32,6 @@ const DropdownUserTitle = (props) => {
       validation={validation}
     />
   )
-}
-
-DropdownUserTitle.propTypes = {
-  disabled: PropTypes.bool,
-  user: PropTypes.any.isRequired,
-  validation: PropTypes.any,
-  onChange: PropTypes.func.isRequired,
 }
 
 export default DropdownUserTitle

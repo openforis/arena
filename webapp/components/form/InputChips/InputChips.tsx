@@ -1,14 +1,32 @@
 import './InputChips.scss'
 
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import Dropdown from '../Dropdown'
 
 import { useLocalState, State } from './store'
 import Chip from '../chip'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const InputChips = (props) => {
+type InputChipsProps = {
+  className?: string
+  idInput?: string
+  items: any[] | ((...args: any[]) => any)
+  itemLabel?: string | ((...args: any[]) => any)
+  itemKey?: string | ((...args: any[]) => any)
+  selection?: any[]
+  requiredItems?: number
+  minCharactersToAutocomplete?: number
+  readOnly?: boolean
+  disabled?: boolean
+  validation?: ArenaValidation
+  placeholder?: string
+  onChange?: (...args: any[]) => any
+  onItemAdd?: (...args: any[]) => any
+  onItemRemove?: (...args: any[]) => any
+}
+
+const InputChips = (props: InputChipsProps) => {
   const {
     className = undefined,
     disabled = false,
@@ -63,27 +81,6 @@ const InputChips = (props) => {
       )}
     </div>
   )
-}
-
-InputChips.propTypes = {
-  className: PropTypes.string,
-  idInput: PropTypes.string,
-
-  items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
-  itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  itemKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
-
-  requiredItems: PropTypes.number,
-  minCharactersToAutocomplete: PropTypes.number,
-  readOnly: PropTypes.bool,
-  disabled: PropTypes.bool,
-  validation: PropTypes.object,
-  placeholder: PropTypes.string,
-
-  onChange: PropTypes.func,
-  onItemAdd: PropTypes.func,
-  onItemRemove: PropTypes.func,
 }
 
 export default InputChips

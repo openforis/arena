@@ -1,7 +1,6 @@
 import './uploadButton.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import { useAppDispatch } from '@webapp/store'
@@ -9,7 +8,19 @@ import { FileUploadDialogActions } from '@webapp/store/ui'
 
 import { Button } from '../buttons'
 
-const OpenFileUploadDialogButton = (props) => {
+type OpenFileUploadDialogButtonProps = {
+  accept?: string | Record<string, any>
+  className?: string
+  disabled?: boolean
+  label?: string
+  maxSize?: number
+  onOk: (...args: any[]) => any
+  showIcon?: boolean
+  showLabel?: boolean
+  variant?: 'contained' | 'outlined' | 'text'
+}
+
+const OpenFileUploadDialogButton = (props: OpenFileUploadDialogButtonProps) => {
   const {
     accept = null, // E.g. .txt, .xls (null = all type of files are accepted)
     className = 'btn', // Custom css class
@@ -41,18 +52,6 @@ const OpenFileUploadDialogButton = (props) => {
       variant={variant}
     />
   )
-}
-
-OpenFileUploadDialogButton.propTypes = {
-  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  className: PropTypes.string,
-  disabled: PropTypes.bool,
-  label: PropTypes.string,
-  maxSize: PropTypes.number,
-  onOk: PropTypes.func.isRequired,
-  showIcon: PropTypes.bool,
-  showLabel: PropTypes.bool,
-  variant: PropTypes.string,
 }
 
 export default OpenFileUploadDialogButton
