@@ -7,19 +7,10 @@ import {
   type LocalServerConsentRequest,
   type ModelResolverDeps,
 } from '@webapp/ai/engines/resolveModel'
-import type { AiCapabilities, AiEngine, AiProviderEntry, StorageLike } from '@webapp/ai/engines/types'
+import type { AiCapabilities, AiEngine, AiProviderEntry } from '@webapp/ai/engines/types'
+import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 
 /** Builds an in-memory storage. */
-const memoryStorage = (): StorageLike => {
-  const data = new Map<string, string>()
-  return {
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => {
-      data.set(key, value)
-    },
-  }
-}
-
 const ON_SETTINGS: AiFeatureSwitches = {
   featuresEnabled: true,
   featureToggles: { expressions: true, chat: true, dataQuery: true, userActivity: true, assistantDesign: true },

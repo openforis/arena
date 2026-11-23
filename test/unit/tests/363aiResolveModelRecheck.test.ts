@@ -6,17 +6,8 @@ import {
   type LocalServerConsentAnswer,
   type ModelResolverDeps,
 } from '@webapp/ai/engines/resolveModel'
-import type { AiCapabilities, AiEngine, AiProviderEntry, StorageLike } from '@webapp/ai/engines/types'
-
-const memoryStorage = (): StorageLike => {
-  const data = new Map<string, string>()
-  return {
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => {
-      data.set(key, value)
-    },
-  }
-}
+import type { AiCapabilities, AiEngine, AiProviderEntry } from '@webapp/ai/engines/types'
+import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 
 const SETTINGS: AiFeatureSwitches = {
   featuresEnabled: true,

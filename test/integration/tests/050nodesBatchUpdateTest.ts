@@ -16,13 +16,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
-import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
-import { createNodesBatchReplyRegistry } from '@server/modules/record/service/update/nodesBatch/nodesBatchReplies'
-import {
-  createDefaultNodesBatchServiceDeps,
-  updateNodesBatch,
-} from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
+import { updateNodesBatch } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
 
 import { getContextUser } from '../config/context'
 
@@ -35,25 +29,7 @@ import { collectRoutes } from '../../utils/routeUtils'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-
-const replies = createNodesBatchReplyRegistry()
-
-// the worker thread doesn't run in the integration tests: process the messages in-process and route the replies
-class TestRecordsUpdateThread extends RecordsUpdateThread {
-  messagesPosted: any[]
-
-  constructor() {
-    super({})
-    this.messagesPosted = []
-  }
-
-  postMessage(msg: any) {
-    this.messagesPosted.push(msg)
-    if (msg.type === RecordsUpdateThreadMessageTypes.nodesBatchPersistResult) {
-      replies.resolveReply(msg.content)
-    }
-  }
-}
+import { createInProcessNodesBatchServiceDeps, TestRecordsUpdateThread } from '../../utils/nodesBatchTestUtils'
 
 describe('Batch record edit (POST /records/nodes/update)', () => {
   let user: any
@@ -61,13 +37,7 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
   let surveyId: number
   let thread: TestRecordsUpdateThread
 
-  const deps = () => ({
-    ...createDefaultNodesBatchServiceDeps(),
-    replies,
-    postBatchMessage: (msg: any) => {
-      void thread.onMessage(msg)
-    },
-  })
+  const deps = () => createInProcessNodesBatchServiceDeps(thread)
 
   const fetchRecord = (record: any) =>
     RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid: Record.getUuid(record) })

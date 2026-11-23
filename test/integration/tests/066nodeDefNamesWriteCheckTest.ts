@@ -30,7 +30,7 @@ const fetchNodeDefNames = async (surveyId: number): Promise<string[]> => {
   const surveyDraft = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   return Survey.getNodeDefsArray(surveyDraft)
     .map((nodeDef: any) => NodeDef.getName(nodeDef))
-    .sort()
+    .sort((nameA, nameB) => nameA.localeCompare(nameB))
 }
 
 const surveyExists = async (surveyId: number): Promise<boolean> =>

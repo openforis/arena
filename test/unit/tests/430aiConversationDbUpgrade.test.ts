@@ -15,31 +15,24 @@ const openRaw = (factory: IDBFactory, version: number, onUpgrade: (request: IDBO
     request.onerror = () => reject(request.error)
   })
 
-describe('conversation database upgrades (430)', () => {
-  test('an upgrade of a database that already has the store does not create it again', async () => {
-    const factory = new IDBFactory()
-    const first = await openRaw(factory, 1, (request) =>
-      ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
-    )
-    first.close()
-    // a later version: the store exists, creating it again would throw a ConstraintError and abort the upgrade
-    const second = await openRaw(factory, 2, (request) =>
-      ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
-    )
-    const store = second.transaction('conversations').objectStore('conversations')
-    expect([...store.indexNames].sort((a, b) => a.localeCompare(b))).toEqual(['userSurvey', 'userUuid'])
-    second.close()
-  })
+const ensureSchema = (request: IDBOpenDBRequest) =>
+  ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
 
-  test('an upgrade adds the indexes a store from an older version lacks', async () => {
+describe('conversation database upgrades (430)', () => {
+  test.each([
+    // the store exists: creating it again would throw a ConstraintError and abort the upgrade
+    ['an upgrade of a database that already has the store does not create it again', ensureSchema],
+    [
+      'an upgrade adds the indexes a store from an older version lacks',
+      (request: IDBOpenDBRequest) => {
+        request.result.createObjectStore('conversations', { keyPath: 'id' })
+      },
+    ],
+  ])('%s', async (_title, upgradeFirstVersion) => {
     const factory = new IDBFactory()
-    const first = await openRaw(factory, 1, (request) => {
-      request.result.createObjectStore('conversations', { keyPath: 'id' })
-    })
+    const first = await openRaw(factory, 1, upgradeFirstVersion)
     first.close()
-    const second = await openRaw(factory, 2, (request) =>
-      ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
-    )
+    const second = await openRaw(factory, 2, ensureSchema)
     const store = second.transaction('conversations').objectStore('conversations')
     expect([...store.indexNames].sort((a, b) => a.localeCompare(b))).toEqual(['userSurvey', 'userUuid'])
     second.close()

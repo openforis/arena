@@ -13,8 +13,71 @@ describe('NodeDefExpressionValidator Test', () => {
   }, 10000)
 
   // ======
+  // expressions evaluated in the context of cluster_id, with self reference allowed
+  const validExpressions = [
+    // use of single attribute in context
+    'cluster_id + 1',
+    // use of different attributes
+    'cluster_distance + cluster_id',
+    // now function
+    'visit_date <= now()',
+    // isEmpty function
+    'isEmpty(cluster_id)',
+    // length property (multiple entities)
+    'plot.length',
+    // access multiple entities with index
+    'plot[0].plot_id',
+    // global objects
+    'Math.min(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)',
+    'Number.isFinite(plot[1].plot_id)',
+    'String.fromCharCode(65, 66, 67)',
+    // native properties (number)
+    'Math.PI.toFixed(2)',
+    'plot[0].tree[1].dbh.toFixed(1)',
+    'plot[0].tree[1].dbh.toPrecision(4)',
+    // native properties (string)
+    'gps_model.toLowerCase()',
+    'gps_model.substring(4,7)',
+    'gps_model.length',
+    // text search methods (supported in the Data Explorer filter)
+    `gps_model.includes('abc')`,
+    `gps_model.toLowerCase().startsWith('abc') && gps_model.endsWith('xyz')`,
+    // global objects (constructors)
+    'Boolean(cluster_id)',
+    'Boolean(remarks)',
+    'Date.parse(Date()) <= Date.now()',
+    'Number(remarks)',
+    'String(cluster_id)',
+    // composite attributes
+    'cluster_location.x',
+    'cluster_location.srs',
+    'plot[0].tree[0].tree_species.code',
+    'plot[0].tree[0].tree_species.scientificName',
+    'visit_date.year',
+    'visit_date.month',
+    'visit_date.day',
+    'visit_time.hour',
+    'visit_time.minute',
+    'visit_time.seconds',
+  ]
+
+  const invalidExpressions = [
+    // use of undefined attribute
+    'cluster_idd + 1',
+    // access of non-rechable nodes (descendant nodes)
+    'plot_id + 10',
+    // now function (with wrong parameters)
+    'visit_date <= now(123)',
+    // global objects
+    'Number.isSomething(plot[1].plot_id)',
+    'Strings(cluster_id)',
+    // composite attributes
+    'cluster_location.xyz',
+    'visit_date.hour',
+  ]
+
   /**
-   * Node def expr tests
+   * Other node def expr tests
    * query type:
    * - q: expression to test
    * - r: expected result (true = valid, false = not valid)
@@ -22,29 +85,14 @@ describe('NodeDefExpressionValidator Test', () => {
    * - s: self reference allowed (default to true).
    */
   const queries = [
-    // use of single attribute in context
-    { q: 'cluster_id + 1', r: true },
+    ...validExpressions.map((q) => ({ q, r: true })),
+    ...invalidExpressions.map((q) => ({ q, r: false })),
     // referencing same attribute when not allowed (error expected)
     { q: 'cluster_id + 1', r: false, s: false },
-    // use of undefined attribute
-    { q: 'cluster_idd + 1', r: false },
-    // use of different attributes
-    { q: 'cluster_distance + cluster_id', r: true },
     // access of non-rechable nodes (descendant nodes)
-    { q: 'plot_id + 10', r: false },
     { q: 'dbh + 10', n: 'plot_id', r: false },
-    // now function
-    { q: 'visit_date <= now()', r: true },
-    // now function (with wrong parameters)
-    { q: 'visit_date <= now(123)', r: false },
-    // isEmpty function
-    { q: 'isEmpty(cluster_id)', r: true },
-    // length property (multiple entities)
-    { q: 'plot.length', r: true },
     // length property (multiple attributes)
     { q: 'plot_multiple_number.length', n: 'plot_id', r: true },
-    // access multiple entities with index
-    { q: 'plot[0].plot_id', r: true },
     // index function
     { q: 'index(plot)', n: 'plot', r: true },
     { q: 'index(plot, plot_id)', n: 'plot', r: false },
@@ -52,42 +100,6 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'plot[index(plot) - 1].plot_id + 1', n: 'plot_id', r: true, s: false },
     // parent function
     { q: 'parent(plot_id)', n: 'plot_id', r: true },
-    // global objects
-    { q: 'Math.min(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: true },
-    { q: 'Number.isFinite(plot[1].plot_id)', r: true },
-    { q: 'Number.isSomething(plot[1].plot_id)', r: false },
-    { q: 'String.fromCharCode(65, 66, 67)', r: true },
-    // native properties (number)
-    { q: 'Math.PI.toFixed(2)', r: true },
-    { q: 'plot[0].tree[1].dbh.toFixed(1)', r: true },
-    { q: 'plot[0].tree[1].dbh.toPrecision(4)', r: true },
-    // native properties (string)
-    { q: 'gps_model.toLowerCase()', r: true },
-    { q: 'gps_model.substring(4,7)', r: true },
-    { q: 'gps_model.length', r: true },
-    // text search methods (supported in the Data Explorer filter)
-    { q: `gps_model.includes('abc')`, r: true },
-    { q: `gps_model.toLowerCase().startsWith('abc') && gps_model.endsWith('xyz')`, r: true },
-    // global objects (constructors)
-    { q: 'Boolean(cluster_id)', r: true },
-    { q: 'Boolean(remarks)', r: true },
-    { q: 'Date.parse(Date()) <= Date.now()', r: true },
-    { q: 'Number(remarks)', r: true },
-    { q: 'String(cluster_id)', r: true },
-    { q: 'Strings(cluster_id)', r: false },
-    // composite attributes
-    { q: 'cluster_location.x', r: true },
-    { q: 'cluster_location.srs', r: true },
-    { q: 'cluster_location.xyz', r: false },
-    { q: 'plot[0].tree[0].tree_species.code', r: true },
-    { q: 'plot[0].tree[0].tree_species.scientificName', r: true },
-    { q: 'visit_date.year', r: true },
-    { q: 'visit_date.month', r: true },
-    { q: 'visit_date.day', r: true },
-    { q: 'visit_date.hour', r: false },
-    { q: 'visit_time.hour', r: true },
-    { q: 'visit_time.minute', r: true },
-    { q: 'visit_time.seconds', r: true },
   ]
 
   const expressionEvaluator = NodeDefExpressionUtils.nodeDefExpressionEvaluator({ surveyFn: () => survey })

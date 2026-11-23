@@ -4,27 +4,7 @@ import {
   loadLocalServerConsent,
   saveLocalServerConsent,
 } from '@webapp/ai/engines/localServerConsent'
-import type { StorageLike } from '@webapp/ai/engines/types'
-
-const memoryStorage = (): StorageLike & { data: Map<string, string> } => {
-  const data = new Map<string, string>()
-  return {
-    data,
-    getItem: (key) => data.get(key) ?? null,
-    setItem: (key, value) => {
-      data.set(key, String(value))
-    },
-  }
-}
-
-const throwingStorage: StorageLike = {
-  getItem: () => {
-    throw new Error('SecurityError')
-  },
-  setItem: () => {
-    throw new Error('QuotaExceededError')
-  },
-}
+import { memoryStorage, throwingStorage } from '@test/unit/utils/aiTestUtils'
 
 describe('local server settings', () => {
   test('the default URL is the LM Studio one', () => {

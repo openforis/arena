@@ -9,6 +9,7 @@ import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 
 import * as SB from '../../utils/surveyBuilder'
+import { createCloneTargetSurvey, deleteSurveys } from '../../utils/surveyCloneTestUtils'
 
 import { getContextUser } from '../config/context'
 
@@ -50,10 +51,7 @@ describe('Clone chain from another survey - missing entities', () => {
     })
 
     // Target survey only has "cluster_src" - "plot_src" does not exist here.
-    targetSurvey = await SB.survey(
-      user,
-      SB.entity('cluster_src', SB.attribute('cluster_id_tgt', nodeDefType.integer).key())
-    ).buildAndStore()
+    targetSurvey = await createCloneTargetSurvey(user, 'cluster_src')
 
     // Target survey with neither "cluster_src" nor "plot_src" - every source analysis attribute's
     // parent entity is missing here.
@@ -64,9 +62,7 @@ describe('Clone chain from another survey - missing entities', () => {
   })
 
   afterAll(async () => {
-    if (sourceSurvey) await SurveyManager.deleteSurvey(Survey.getId(sourceSurvey))
-    if (targetSurvey) await SurveyManager.deleteSurvey(Survey.getId(targetSurvey))
-    if (targetSurveyEmpty) await SurveyManager.deleteSurvey(Survey.getId(targetSurveyEmpty))
+    await deleteSurveys([sourceSurvey, targetSurvey, targetSurveyEmpty])
   })
 
   test('Cloning without the skip flag throws when an entity is missing in the target survey', async () => {

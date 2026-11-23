@@ -213,6 +213,18 @@ export class FormDesigner {
   }
 
   /**
+   * Opens the form designer and defines the root entity cluster with its key cluster_id (required to publish).
+   * @returns {Promise<void>} - Resolves when back in the form designer.
+   */
+  async gotoWithClusterRootEntity(): Promise<void> {
+    await this.goto()
+    await this.edit('root_entity')
+    await this.fillDetails({ name: 'cluster', label: 'Cluster' })
+    await this.saveAndBack('Cluster')
+    await this.addChildWithDetails('cluster', 'integer', { name: 'cluster_id', label: 'Cluster id', key: true })
+  }
+
+  /**
    * Returns the names of the children of the specified entity, in the order they are displayed.
    * @param {string} entityName - Entity name.
    * @returns {Promise<string[]>} - Child names.

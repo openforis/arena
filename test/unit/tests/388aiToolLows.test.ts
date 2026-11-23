@@ -1,9 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
-import { z } from 'zod'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -17,9 +14,15 @@ import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsPr
 import { createCategoryItemsListMissingLabelsTool } from '@webapp/ai/tools/design/categoryItemsListMissingLabels'
 import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
 import { runTool, toAiSdkTools } from '@webapp/ai/tools/registry'
-import type { AiTool } from '@webapp/ai/tools/types'
 
-import { createToolContext, buildAssistantSurvey } from '@test/unit/utils/assistantTestUtils'
+import {
+  buildAssistantSurvey,
+  createToolContext,
+  makeTool,
+  scriptedModel,
+  textStream,
+  toolCallStream,
+} from '@test/unit/utils/assistantTestUtils'
 import { buildCategoryLabelsSurvey } from '@test/unit/utils/categoryLabelsTestUtils'
 
 const toolsDir = path.resolve(__dirname, '../../../webapp/ai/tools')
@@ -158,44 +161,14 @@ describe('the survey is read at each tool call (388)', () => {
 })
 
 describe('a tool the model asks for but was not offered (388)', () => {
-  const usage = { inputTokens: { total: 1 }, outputTokens: { total: 1 } }
-  const finish = (unified: string) => ({ type: 'finish', finishReason: { unified, raw: undefined }, usage })
-  const toolCallStream = (toolCallId: string, toolName: string, input: unknown): any =>
-    convertArrayToReadableStream([
-      { type: 'stream-start', warnings: [] },
-      { type: 'tool-call', toolCallId, toolName, input: JSON.stringify(input) },
-      finish('tool-calls'),
-    ] as any[])
-  const textStream = (text: string): any =>
-    convertArrayToReadableStream([
-      { type: 'stream-start', warnings: [] },
-      { type: 'text-start', id: 't' },
-      { type: 'text-delta', id: 't', delta: text },
-      { type: 'text-end', id: 't' },
-      finish('stop'),
-    ] as any[])
-
-  const makeTool = (name: string, requires: AiTool['requires'], execute: AiTool['execute']): AiTool => ({
-    name,
-    description: `${name} tool`,
-    inputSchema: z.object({ summary: z.string() }),
-    area: ['design'],
-    dataClass: 'schema',
-    requires,
-    execute,
-  })
-
   test('it is not executed, the model is told, and the turn goes on', async () => {
     const hiddenRun = jest.fn(async () => ({ leaked: true }))
-    const hidden = makeTool('test_hidden', () => false, hiddenRun)
-    const offered = makeTool(
-      'test_offered',
-      () => true,
-      async () => ({ ok: true })
+    const hidden = makeTool('test_hidden', hiddenRun, () => false)
+    const offered = makeTool('test_offered', async () => ({ ok: true }))
+    const model = scriptedModel(
+      () => toolCallStream('call-1', 'test_hidden', { summary: 'x' }),
+      () => textStream('Sorry.')
     )
-    const outputs = [() => toolCallStream('call-1', 'test_hidden', { summary: 'x' }), () => textStream('Sorry.')]
-    let call = 0
-    const model = new MockLanguageModelV4({ doStream: async () => ({ stream: outputs[Math.min(call++, 1)]() }) as any })
     const result = await runAssistantTurn({
       conversation: createConversation({ userUuid: 'user-1', surveyId: 7, area: 'design' }),
       userMessage: 'Do it',

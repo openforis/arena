@@ -14,15 +14,9 @@ import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
-import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
-import { createNodesBatchReplyRegistry } from '@server/modules/record/service/update/nodesBatch/nodesBatchReplies'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { NodesBatchProcessSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
-import {
-  createDefaultNodesBatchServiceDeps,
-  updateNodesBatch,
-} from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
+import { updateNodesBatch } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
 
 import { getContextUser } from '../config/context'
 
@@ -31,22 +25,8 @@ import { callHandler, createFakeResponse } from '../../unit/utils/fakeExpress'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import { createInProcessNodesBatchServiceDeps, TestRecordsUpdateThread } from '../../utils/nodesBatchTestUtils'
 import { collectRoutes } from '@test/utils/routeUtils'
-
-const replies = createNodesBatchReplyRegistry()
-
-// the worker thread doesn't run in the integration tests: process the messages in-process and route the replies
-class TestRecordsUpdateThread extends RecordsUpdateThread {
-  constructor() {
-    super({})
-  }
-
-  postMessage(msg: any) {
-    if (msg.type === RecordsUpdateThreadMessageTypes.nodesBatchPersistResult) {
-      replies.resolveReply(msg.content)
-    }
-  }
-}
 
 /**
  * Calls the route handler (the last one of its chain, after the permission middlewares).
@@ -87,13 +67,7 @@ describe('Batch record edit: value shape, applicability and activity log bounds 
   let surveyId: number
   let thread: TestRecordsUpdateThread
 
-  const deps = () => ({
-    ...createDefaultNodesBatchServiceDeps(),
-    replies,
-    postBatchMessage: (msg: any) => {
-      void thread.onMessage(msg)
-    },
-  })
+  const deps = () => createInProcessNodesBatchServiceDeps(thread)
 
   const fetchRecord = (record: any) =>
     RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid: Record.getUuid(record) })
