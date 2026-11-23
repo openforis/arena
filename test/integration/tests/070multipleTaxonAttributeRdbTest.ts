@@ -100,7 +100,9 @@ describe('Multiple taxon attribute', () => {
   test('the parent entity data has one row per entity', async () => {
     const rows = await fetchRows('plot', ['plot_id', 'remarks'])
 
-    const values = rows.map((row) => [Number(row.plot_id), row.remarks]).sort()
+    const values = rows
+      .map((row) => [Number(row.plot_id), row.remarks])
+      .sort(([plotIdA], [plotIdB]) => plotIdA - plotIdB)
     expect(values).toEqual([
       [1, 'grassland'],
       [2, null],
