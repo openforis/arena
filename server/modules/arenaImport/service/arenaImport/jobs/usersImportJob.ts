@@ -14,7 +14,10 @@ import * as UserInvitationsRepository from '@server/modules/user/repository/user
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import * as DbUtils from '@server/db/dbUtils'
 
-const _associateToGroup = async ({ userUuid, groupName }: { userUuid: string; groupName: any }, client: DbClient) => {
+const _associateToGroup = async (
+  { userUuid, groupName }: { userUuid: string; groupName: string },
+  client: DbClient
+) => {
   const group = await AuthGroupRepository.fetchGroupByName({ name: groupName }, client)
   await AuthGroupRepository.insertUserGroup({ groupUuid: AuthGroup.getUuid(group), userUuid }, client)
 }

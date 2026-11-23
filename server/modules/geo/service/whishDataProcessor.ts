@@ -31,7 +31,10 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // Wraps errors coming from the external Whisp API (e.g. its own 401s) so they are never
 // mistaken by clients for an Arena authentication error (see appErrorsMiddleware.js on the client).
-const wrapWhispApiError = (error: any) => {
+// error thrown by axios (or built from an unexpected Whisp API response)
+type WhispApiError = { response?: { status?: number; data?: { message?: string } }; message?: string }
+
+const wrapWhispApiError = (error: WhispApiError) => {
   const whispStatus = error.response?.status
   const message = error.response?.data?.message ?? error.message
   logger.error(`Whisp API error (status ${whispStatus}): ${message}`)
@@ -39,7 +42,7 @@ const wrapWhispApiError = (error: any) => {
 }
 
 // Whisp rate limit error message is like "Rate limit exceeded. Try again in 12 seconds."
-const extractRateLimitWaitMs = (error: any) => {
+const extractRateLimitWaitMs = (error: WhispApiError) => {
   const words = String(error.response?.data?.message ?? '').split(' ')
   const secondsWordIndex = words.findIndex((word) => word.startsWith('seconds'))
   const seconds = secondsWordIndex > 0 ? Number(words[secondsWordIndex - 1]) : 0
@@ -47,7 +50,7 @@ const extractRateLimitWaitMs = (error: any) => {
 }
 
 // Sends a request to the Whisp API, waiting and retrying when its rate limit is exceeded
-const sendRequest = async (requestFn: any) => {
+const sendRequest = async <T>(requestFn: () => Promise<T>): Promise<T> => {
   for (let attempt = 0; ; attempt++) {
     try {
       return await requestFn() // NOSONAR
@@ -92,8 +95,8 @@ const generateData = async ({
   analysisOptions = {},
   pollingPeriod = defaultPollingPeriod,
 }: {
-  geojson: any
-  analysisOptions?: any
+  geojson: object
+  analysisOptions?: Record<string, unknown>
   pollingPeriod?: number
 }) => {
   const requestPayload = { ...geojson, analysisOptions: { ...analysisOptions, async: true } }

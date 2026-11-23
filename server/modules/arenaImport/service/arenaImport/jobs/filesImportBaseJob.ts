@@ -8,7 +8,7 @@ import Job, { type JobParams } from '@server/job/job'
 export class FileImportBaseJob extends Job {
   deletedFileUuids: string[]
   insertedFileUuids: string[]
-  missingFileSummaries: any
+  missingFileSummaries: SurveyFile.SurveyFile[]
   updatedFileUuids: string[]
 
   constructor(type: string, params?: Partial<JobParams>) {

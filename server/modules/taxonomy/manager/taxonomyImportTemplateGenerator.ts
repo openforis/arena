@@ -3,6 +3,7 @@ import { getLanguageISO639part2Label } from '@core/app/languages'
 import { DataImportTemplateTypes } from '@core/dataImport'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxonomy from '@core/survey/taxonomy'
+import type { DataImportTemplateType } from '@core/dataImport/dataImportTemplateTypes'
 
 const VERNACULAR_LANGUAGE_CODE_SYNONYM = 'lat'
 
@@ -18,7 +19,13 @@ const genericExtraPropDefsArray = ExtraPropDef.extraDefsToArray({
   numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
 })
 
-const generateTemplate = ({ taxonomy, templateType }: { taxonomy: ArenaTaxonomy; templateType: any }) => {
+const generateTemplate = ({
+  taxonomy,
+  templateType,
+}: {
+  taxonomy: ArenaTaxonomy
+  templateType: DataImportTemplateType
+}) => {
   const vernacularLanguageCodes =
     templateType === DataImportTemplateTypes.generic
       ? genericVernacularLanguageCodes

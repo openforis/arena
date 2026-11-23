@@ -71,7 +71,7 @@ export const countItems = (
 export const insertItem = (
   surveyId: number,
   source: ImportReportSource,
-  item: { nodeDefUuid: string; props: any; resolved: boolean },
+  item: { nodeDefUuid: string; props: object; resolved: boolean },
   client: DbClient = db
 ) =>
   client.one(
@@ -89,7 +89,11 @@ export const insertItems = (
     surveyId,
     source,
     items = [],
-  }: { surveyId: number; source: ImportReportSource; items?: { nodeDefUuid: string; props: any; resolved: boolean }[] },
+  }: {
+    surveyId: number
+    source: ImportReportSource
+    items?: { nodeDefUuid: string; props: object; resolved: boolean }[]
+  },
   client: DbClient = db
 ): Promise<unknown> =>
   items.length === 0

@@ -1,4 +1,4 @@
-import type { ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
@@ -46,8 +46,8 @@ const extractKeys = ({
   dataItem,
 }: {
   survey: ArenaSurvey
-  ancestorKeyDefs: any
-  dataItem: any
+  ancestorKeyDefs: ArenaAnyNodeDef[]
+  dataItem: Record<string, unknown>
 }) =>
   ancestorKeyDefs
     .map((ancestorDef) =>
