@@ -1,3 +1,4 @@
+import type { ArenaCategoryItem, ArenaTaxon } from '@openforis/arena-core'
 import type { Router } from 'express'
 
 import * as A from '@core/arena'
@@ -16,12 +17,14 @@ type LiteralItem = { value: string; label: string }
 
 const toItem =
   (type: string, lang: string | null = null) =>
-  (item: any): LiteralItem | null => {
+  (item: ArenaCategoryItem | ArenaTaxon | null): LiteralItem | null => {
     if (!item) return null
     if (type === NodeDef.nodeDefType.code) {
-      return { value: CategoryItem.getCode(item), label: CategoryItem.getLabel(lang)(item) }
+      const categoryItem = item as ArenaCategoryItem
+      return { value: CategoryItem.getCode(categoryItem), label: CategoryItem.getLabel(lang)(categoryItem) }
     }
-    return { value: Taxon.getCode(item), label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}` }
+    const taxon = item as ArenaTaxon
+    return { value: Taxon.getCode(taxon), label: `(${Taxon.getCode(taxon)}) ${Taxon.getScientificName(taxon)}` }
   }
 
 export const init = (app: Router): void => {

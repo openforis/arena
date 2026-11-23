@@ -1,5 +1,5 @@
 import type { ArenaUser } from '@openforis/arena-core'
-import type { Router } from 'express'
+import type { NextFunction, Response as ExpressResponse, Router } from 'express'
 
 import * as User from '@core/user/user'
 
@@ -16,7 +16,10 @@ const basePath = '/admin/auth-providers'
 
 // errors of the arena-server services (ServerError: key, params, statusCode) are sent as JSON so the client can
 // translate them; the other errors go to the default handlers
-const handleError = (error: any, res, next) => {
+// error thrown by the arena-server services (ServerError) or any other error
+type ApiError = { name?: string; key?: string; params?: unknown; statusCode?: number }
+
+const handleError = (error: ApiError, res: ExpressResponse, next: NextFunction) => {
   if (error?.name === 'ServerError' && error.key && !res.headersSent) {
     res.status(error.statusCode ?? 500).json({ status: 'error', key: error.key, params: error.params })
   } else {

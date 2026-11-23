@@ -63,7 +63,7 @@ const _deleteFileContentSafely = async ({ surveyId, fileUuid, recordUuid }: File
       surveyId,
       fileSummaries: [{ uuid: fileUuid, props: { recordUuid } }],
     })
-  } catch (error: any) {
+  } catch (error) {
     logger.warn(`Cannot delete content of file ${fileUuid} (survey ${surveyId}): ${error?.message}; ignoring`)
   }
 }

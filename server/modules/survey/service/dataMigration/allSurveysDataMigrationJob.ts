@@ -69,7 +69,7 @@ export default class AllSurveysDataMigrationJob extends Job {
               surveyIdsWithErrors.push(surveyId)
               this.logWarn(`could not migrate data for survey ${surveyId}: inner job did not succeed`)
             }
-          } catch (error: any) {
+          } catch (error) {
             surveyIdsWithErrors.push(surveyId)
             this.logError(`error migrating survey ${surveyId}: ${error.stack || error}`)
           }
@@ -95,7 +95,7 @@ export default class AllSurveysDataMigrationJob extends Job {
       try {
         this.logDebug(`running after commit migration step ${step.version} for survey ${surveyId}`)
         await step.migrateAfterCommit({ surveyId })
-      } catch (error: any) {
+      } catch (error) {
         this.logWarn(`error running after commit migration step ${step.version} for survey ${surveyId}: ${error}`)
       }
     }

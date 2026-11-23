@@ -9,7 +9,7 @@ type SpatialRefSysRow = { srid: number; auth_name: string; auth_srid: number; sr
 
 const extractName = (row: SpatialRefSysRow) => {
   const { auth_name, auth_srid, srtext: wkt } = row
-  const datumNameMatch = wkt.match(DATUM_NAME_REGEX)
+  const datumNameMatch = DATUM_NAME_REGEX.exec(wkt)
 
   const authNameAndCode = `${auth_name}:${auth_srid}`
 
