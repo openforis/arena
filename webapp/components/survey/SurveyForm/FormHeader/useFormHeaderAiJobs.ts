@@ -4,7 +4,6 @@
  * unmounts its items when it closes.
  */
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { AiWorkflows, type NodeDefsTranslationResult } from '@webapp/ai/workflows'
 import { createAbortError } from '@webapp/ai/workflows/batchRun'
@@ -13,6 +12,7 @@ import { SchemaSummaryExportCloseButton } from '@webapp/components/survey/Survey
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useSurvey, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useAppDispatch } from '@webapp/store'
 
 /**
  * Returns the batch run state and the actions of the advanced menu.
@@ -20,7 +20,7 @@ import { useSurvey, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
  * startDataDictionaryExport.
  */
 export const useFormHeaderAiJobs = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const survey = useSurvey()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()

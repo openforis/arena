@@ -1,0 +1,260 @@
+import './SurveyCreate.scss'
+
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
+
+import * as A from '@core/arena'
+
+import * as StringUtils from '@core/stringUtils'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import { RecordCycle } from '@core/record/recordCycle'
+
+import { appModuleUri, appModules } from '@webapp/app/appModules'
+
+import { contentTypes } from '@webapp/service/api'
+import { useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { TestId } from '@webapp/utils/testId'
+
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import LanguageDropdown from '@webapp/components/form/languageDropdown'
+import { useOnUpdate } from '@webapp/components/hooks'
+import { Checkbox, Dropdown } from '@webapp/components/form'
+import { Button, Dropzone, Fieldset, RadioButtonGroup } from '@webapp/components'
+import { SurveyType } from '@webapp/model'
+import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
+import {
+  defaultChunkSize,
+  FileUploadChunkSizeDropdown,
+} from '@webapp/views/App/views/Data/DataImport/FileUploadChunkSizeDropdown'
+
+import { createTypes, importSources, useCreateSurvey } from './store'
+import { SurveyDropdown } from '../SurveyDropdown'
+
+const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
+  .reverse()
+  .map((key) => ({
+    key,
+    label: `surveyCreate:cloneFromType.${key}`,
+  }))
+
+const dropzoneAcceptBySource = {
+  [importSources.arena]: { [contentTypes.zip]: ['.zip'] },
+  [importSources.collect]: { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] },
+  [importSources.odk]: { [contentTypes.xml]: ['.xml'] },
+}
+
+type SurveyCreateProps = {
+  showImport?: boolean
+  submitButtonLabel?: string
+  template?: boolean
+}
+
+const SurveyCreate = (props: SurveyCreateProps) => {
+  const { showImport = true, submitButtonLabel = 'surveyCreate:createSurvey', template = false } = props
+
+  const surveyInfo = useSurveyInfo()
+  const navigate = useNavigate()
+  const [chunkSize, setChunkSize] = useState(defaultChunkSize)
+
+  const {
+    newSurvey,
+    onUpdate,
+    onCreate,
+    onImport,
+    onImportJobStart,
+    onImportUploadCancel,
+    onCreateTypeUpdate,
+    onFilesDrop,
+    onOptionChange,
+    onSourceChange,
+  } = useCreateSurvey({
+    template,
+  })
+  const {
+    createType,
+    name,
+    label,
+    lang,
+    source,
+    validation,
+    cloneFrom,
+    cloneFromType,
+    cloneFromCycle,
+    options,
+    file,
+    uploading,
+  } = newSurvey
+
+  // Redirect to dashboard after creating a survey or template.
+  useOnUpdate(() => {
+    navigate(appModuleUri(appModules.dashboard))
+  }, [Survey.getUuid(surveyInfo)])
+
+  const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
+
+  const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
+    key,
+    label: `surveyCreate:source.${key}`,
+  }))
+
+  return (
+    <div className="home-survey-create">
+      <div className="row">
+        <ButtonGroup
+          disabled={uploading}
+          groupName={template ? 'templateCreateType' : 'surveyCreateType'}
+          selectedItemKey={createType}
+          onChange={onCreateTypeUpdate}
+          items={[
+            {
+              key: createTypes.fromScratch,
+              label: template ? 'surveyCreate:newTemplateFromScratch' : 'surveyCreate:newSurveyFromScratch',
+            },
+            {
+              key: createTypes.clone,
+              label: 'common.clone',
+            },
+            ...(showImport
+              ? [
+                  {
+                    key: createTypes.import,
+                    label: 'common.import',
+                  },
+                ]
+              : []),
+          ]}
+        />
+      </div>
+      <FormItem label="common.name">
+        <Input
+          disabled={uploading}
+          id={TestId.surveyCreate.surveyName}
+          value={name}
+          validation={Validation.getFieldValidation('name')(validation)}
+          onChange={(value) => onUpdate({ name: 'name', value: StringUtils.normalizeName(value) })}
+        />
+      </FormItem>
+      {createType === createTypes.fromScratch && (
+        <>
+          <FormItem label="common.label">
+            <Input
+              id={TestId.surveyCreate.surveyLabel}
+              value={label}
+              validation={Validation.getFieldValidation('label')(validation)}
+              onChange={(value) => onUpdate({ name: 'label', value })}
+            />
+          </FormItem>
+          <FormItem label="common.language">
+            <LanguageDropdown
+              selection={lang}
+              validation={Validation.getFieldValidation('lang')(validation)}
+              onChange={(value) => onUpdate({ name: 'lang', value })}
+              disabled={!A.isEmpty(cloneFrom)}
+            />
+          </FormItem>
+        </>
+      )}
+
+      {createType === createTypes.clone && (
+        <>
+          <FormItem className="clone-from">
+            <Fieldset legend="common.cloneFrom">
+              <RadioButtonGroup
+                className="clone-from-type_btn-group"
+                items={cloneFromTypeButtonGroupItems}
+                onChange={(value) => onUpdate({ name: 'cloneFromType', value })}
+                row
+                value={cloneFromType}
+              />
+              <SurveyDropdown
+                onChange={(value) => {
+                  const cycles = value?.cycles || []
+                  const lastCycleKey = cycles.at(-1)
+                  onUpdate({ name: 'cloneFrom', value }, { name: 'cloneFromCycle', value: lastCycleKey })
+                }}
+                selection={cloneFrom?.value}
+                type={cloneFromType}
+              />
+            </Fieldset>
+          </FormItem>
+          {cloneFrom?.cycles?.length > 1 && (
+            <FormItem label="common.cycle">
+              <Dropdown
+                className="cycle-dropdown"
+                items={cloneFrom.cycles}
+                itemValue={(cycleKey) => cycleKey}
+                itemLabel={RecordCycle.getLabel}
+                onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
+                selection={cloneFromCycle}
+                validation={Validation.getFieldValidation('cloneFromCycle')(validation)}
+              />
+            </FormItem>
+          )}
+        </>
+      )}
+
+      {createType !== createTypes.import && (
+        <div className="row">
+          <Button
+            disabled={createType === createTypes.clone && !cloneFrom}
+            iconClassName="icon-plus icon-12px"
+            label={submitButtonLabel}
+            onClick={onCreate}
+            testId={TestId.surveyCreate.submitBtn}
+          />
+        </div>
+      )}
+
+      {createType === createTypes.import && showImport && (
+        <>
+          {!uploading && (
+            <>
+              <FormItem label="surveyCreate:source.label">
+                <RadioButtonGroup items={importSourceButtonGroupItems} onChange={onSourceChange} row value={source} />
+              </FormItem>
+              <div className="row">
+                <Dropzone
+                  accept={dropzoneAcceptBySource[source]}
+                  maxSize={fileUploadLimitMB}
+                  onDrop={onFilesDrop}
+                  droppedFiles={file ? [file] : []}
+                />
+              </div>
+              <div className="row">
+                <Fieldset className="options-fieldset" legend="common.options">
+                  {(source === importSources.arena || source === importSources.collect) && (
+                    <div>
+                      <Checkbox
+                        id={TestId.surveyCreate.optionIncludeDataCheckbox}
+                        checked={options['includeData']}
+                        label={`surveyCreate:options.includeData`}
+                        onChange={(value) => onOptionChange({ key: 'includeData', value })}
+                      />
+                    </div>
+                  )}
+                  <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
+                </Fieldset>
+              </div>
+            </>
+          )}
+          <div className="row">
+            <ImportStartButton
+              className="btn-secondary"
+              disabled={!file}
+              onCancel={onImportUploadCancel}
+              onUploadComplete={onImportJobStart}
+              startFunction={onImport}
+              startFunctionParams={{ chunkSize }}
+              testId={TestId.surveyCreate.startImportBtn}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+export { SurveyCreate }

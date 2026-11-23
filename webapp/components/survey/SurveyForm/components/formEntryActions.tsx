@@ -1,0 +1,158 @@
+import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate, Link } from 'react-router'
+
+import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
+import * as Validation from '@core/validation/validation'
+
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
+import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+
+import { PrintableExportFormats } from '@common/record/printableExport'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { Button, ButtonEditLockToggle } from '@webapp/components/buttons'
+import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
+import { TestId } from '@webapp/utils/testId'
+
+import { RecordPrintableExportModal } from './RecordPrintableExportModal'
+import { useAppDispatch } from '@webapp/store'
+
+type RecordEntryButtonsProps = {
+  disableLockUnlock?: boolean
+  disableValidationReport?: boolean
+}
+
+const RecordEntryButtons = (props: RecordEntryButtonsProps) => {
+  const { disableLockUnlock = false, disableValidationReport = false } = props
+  const i18n = useI18n()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const record = useRecord()
+  const noHeader = useIsRecordViewWithoutHeader()
+
+  const recordEditLocked = useSelector(RecordState.isRecordEditLocked)
+  const stepId = Record.getStep(record)
+  const step = RecordStep.getStep(stepId)
+  const stepNext = RecordStep.getNextStep(stepId)
+  const stepPrev = RecordStep.getPreviousStep(stepId)
+  const valid = Validation.isObjValid(record)
+
+  const canPromote = useAuthCanPromoteRecord(record) && !noHeader
+  const canDemote = useAuthCanDemoteRecord(record) && !noHeader
+  const canEdit = useAuthCanEditRecord(record)
+
+  const [printableExportOpen, setPrintableExportOpen] = useState(false)
+
+  const getStepLabel = (_step) => i18n.t(`surveyForm:step.${RecordStep.getName(_step)}`)
+
+  const recordUuid = Record.getUuid(record)
+
+  return (
+    <>
+      {!disableLockUnlock && canEdit && (
+        <ButtonEditLockToggle
+          locked={recordEditLocked}
+          onClick={() => dispatch(RecordActions.toggleEditLock)}
+          testId={TestId.record.editLockToggleBtn}
+        />
+      )}
+      {!disableValidationReport && !valid && (
+        <Link
+          data-testid={TestId.record.invalidBtn}
+          className="btn btn-transparent error"
+          to={`${appModuleUri(dataModules.recordValidationReport)}${recordUuid}`}
+          title={i18n.t('dataView:showValidationReport')}
+        >
+          <span className="icon icon-12px icon-warning icon-left" />
+          {i18n.t('dataView:invalidRecord')}
+        </Link>
+      )}
+      {!noHeader && (
+        <Button
+          iconClassName="icon-file-pdf"
+          onClick={() => setPrintableExportOpen(true)}
+          showLabel={false}
+          title="surveyForm:printableExport.exportDocument"
+          variant="text"
+        />
+      )}
+      {printableExportOpen && (
+        <RecordPrintableExportModal
+          open
+          initialFormat={PrintableExportFormats.pdf}
+          onClose={() => setPrintableExportOpen(false)}
+        />
+      )}
+      <div className="survey-form-header__record-actions-steps">
+        {canDemote && (
+          <Button
+            iconClassName="icon-reply icon-12px"
+            onClick={() =>
+              dispatch(
+                DialogConfirmActions.showDialogConfirm({
+                  key: 'surveyForm:formEntryActions.confirmDemote',
+                  params: { name: getStepLabel(stepPrev) },
+                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepPrev), navigate)),
+                })
+              )
+            }
+            size="small"
+            title="surveyForm:formEntryActions.demoteTo"
+            titleParams={{ stepPrev: getStepLabel(stepPrev) }}
+            variant="text"
+          />
+        )}
+
+        <span>
+          {i18n.t('surveyForm:formEntryActions.step', {
+            id: RecordStep.getId(step),
+            name: getStepLabel(step),
+          })}
+        </span>
+
+        {canPromote && (
+          <Button
+            iconClassName="icon-redo2 icon-12px"
+            onClick={() =>
+              dispatch(
+                DialogConfirmActions.showDialogConfirm({
+                  key: `surveyForm:formEntryActions.confirmPromote${valid ? '' : 'WithErrors'}`,
+                  params: { name: getStepLabel(stepNext) },
+                  onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepNext), navigate)),
+                })
+              )
+            }
+            size="small"
+            title="surveyForm:formEntryActions.promoteTo"
+            titleParams={{ stepNext: getStepLabel(stepNext) }}
+            variant="text"
+          />
+        )}
+      </div>
+    </>
+  )
+}
+
+type FormEntryActionsProps = {
+  disableLockUnlock?: boolean
+  disableValidationReport?: boolean
+  entry?: boolean
+  preview?: boolean
+}
+
+const FormEntryActions = (props: FormEntryActionsProps) => {
+  const { disableLockUnlock = false, disableValidationReport = false, entry = false, preview = false } = props
+
+  return (
+    <div className="survey-form-header__actions">
+      {entry && !preview && (
+        <RecordEntryButtons disableLockUnlock={disableLockUnlock} disableValidationReport={disableValidationReport} />
+      )}
+    </div>
+  )
+}
+
+export default FormEntryActions

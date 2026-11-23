@@ -1,7 +1,6 @@
 import './NodeDefsTranslationModal.scss'
 
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
@@ -13,6 +12,7 @@ import { RadioButton } from '@webapp/components/RadioButton'
 import Checkbox from '@webapp/components/form/checkbox'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 import { TestId } from '@webapp/utils/testId'
+import { useAppDispatch } from '@webapp/store'
 
 type TranslationMode = 'existing' | 'ai' | 'custom'
 
@@ -237,7 +237,7 @@ const NodeDefsTranslationModal = ({
   const displayPath = (path: string) =>
     rootPrefix && path !== rootPrefix && path.startsWith(`${rootPrefix} / `) ? path.slice(rootPrefix.length + 3) : path
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
