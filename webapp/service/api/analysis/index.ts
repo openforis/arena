@@ -4,7 +4,13 @@ import { objectToFormData } from '../utils/apiUtils'
 
 // ==== READ
 
-export const fetchChains = async ({ surveyId, surveyCycleKey = null } = {}) => {
+export const fetchChains = async ({
+  surveyId,
+  surveyCycleKey = null,
+}: {
+  surveyId: number
+  surveyCycleKey?: string | null
+}) => {
   const {
     data: { list: chains },
   } = await axios.get(

@@ -54,7 +54,7 @@ const generateBiannualPeriods = () => {
   return periods
 }
 
-export const fetchAvailableMapPeriods = async ({ provider, periodType }) => {
+export const fetchAvailableMapPeriods = async ({ provider, periodType }: { provider: string; periodType?: string }) => {
   if (provider === MapUtils.mapProviders.planet) {
     // const { data } = await axios.get(`/api/geo/map/${provider}/available_montly_periods`)
     // return data
@@ -76,9 +76,10 @@ export const fetchElevation = async ({ surveyId, lat, lng }) => {
   }
 }
 
-export const testMapApiKey = async ({ provider, apiKey }) => {
+export const testMapApiKey = async ({ provider }: { provider: string; apiKey: string }) => {
   try {
-    const mosaics = await fetchAvailableMapPeriods({ provider, apiKey })
+    // the API key is not used yet to fetch the periods
+    const mosaics = await fetchAvailableMapPeriods({ provider })
     return mosaics.length > 0
   } catch {
     // invalid API key or provider not reachable

@@ -19,4 +19,4 @@ export const streamSystemLog = ({ maxLines, onMessage, onError, onDone }: Stream
     onChunk: onMessage,
     onError,
     onDone,
-  }) as () => void
+  })
