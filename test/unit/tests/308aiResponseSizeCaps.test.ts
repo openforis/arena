@@ -1,27 +1,22 @@
-import http from 'node:http'
-import type { AddressInfo } from 'node:net'
-
 import { ENV } from '@core/processUtils'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import { createGuardedFetch } from '@server/modules/ai/service/guardedFetch'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
+import { createTestHttpServer } from '@test/unit/utils/testHttpServer'
 
 const MIB = 1024 * 1024
 // the time the test allows for a call that the byte cap must have stopped (a stream with no end)
 const PROMPT_MS = 3000
 
 describe('the size of what an endpoint of a user sends is capped (308)', () => {
-  let server: http.Server
-  let port: number
-  let handler: (request: http.IncomingMessage, response: http.ServerResponse) => void
-  let closedRequests: number
+  const server = createTestHttpServer()
   const originalAllowlist = ENV.aiOrgHostedBaseUrls
   const deps = AiProviderService.createDefaultAiProviderServiceDeps()
   const cfg = () => ({
     provider: 'openai-compatible',
     model: 'm',
-    baseUrl: `http://127.0.0.1:${port}/v1`,
+    baseUrl: `http://127.0.0.1:${server.port}/v1`,
     apiKey: 'k',
   })
 
@@ -32,7 +27,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
    * @returns {void}
    */
   const answerForever = (status: number, headers: Record<string, string> = {}) => {
-    handler = (_request, response) => {
+    server.handler = (_request, response) => {
       response.writeHead(status, { 'content-type': 'application/json', ...headers })
       const chunk = Buffer.alloc(64 * 1024, 'a')
       const timer = setInterval(() => response.write(chunk), 1)
@@ -47,7 +42,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
    * @returns {void}
    */
   const answer = (status: number, body: string) => {
-    handler = (_request, response) => {
+    server.handler = (_request, response) => {
       response.writeHead(status, { 'content-type': 'application/json' })
       response.end(body)
     }
@@ -64,38 +59,18 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
     return `{"data":[${Array.from({ length: count }, (_value, n) => entry(n)).join(',')}]}`
   }
 
-  /**
-   * Waits until the client has closed the connection of a request, or fails.
-   * @returns {Promise<void>} Resolves when a request was closed.
-   */
-  const untilClientClosed = async () => {
-    const start = Date.now()
-    while (closedRequests === 0 && Date.now() - start < PROMPT_MS) {
-      await new Promise((resolve) => setTimeout(resolve, 10))
-    }
-    expect(closedRequests).toBeGreaterThan(0)
-  }
-
   beforeAll(async () => {
-    server = http.createServer((request, response) => {
-      response.on('close', () => {
-        closedRequests += 1
-      })
-      handler(request, response)
-    })
-    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
-    port = (server.address() as AddressInfo).port
-    ENV.aiOrgHostedBaseUrls = [`http://127.0.0.1:${port}`]
+    await server.start()
+    ENV.aiOrgHostedBaseUrls = [`http://127.0.0.1:${server.port}`]
   })
 
   afterAll(async () => {
     ENV.aiOrgHostedBaseUrls = originalAllowlist
-    server.closeAllConnections()
-    await new Promise((resolve) => server.close(resolve))
+    await server.stop()
   })
 
   beforeEach(() => {
-    closedRequests = 0
+    server.closedRequests = 0
   })
 
   describe('the model list', () => {
@@ -116,18 +91,18 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       const start = Date.now()
       await expectSystemErrorKey(deps.listModels(cfg()), 'aiProviderResponseTooLarge')
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
 
     test('a declared size over the cap is refused before the body is read', async () => {
-      handler = (_request, response) => {
+      server.handler = (_request, response) => {
         response.writeHead(200, { 'content-type': 'application/json', 'content-length': String(500 * MIB) })
         response.write('{"data":[')
       }
       const start = Date.now()
       await expectSystemErrorKey(deps.listModels(cfg()), 'aiProviderResponseTooLarge')
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
 
     test('the body of an error is not read: a body that never ends does not hold the call', async () => {
@@ -135,7 +110,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       const start = Date.now()
       await expectSystemErrorKey(deps.listModels(cfg()), 'aiModelListFailed')
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
   })
 
@@ -146,7 +121,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       const result = await deps.runTest({ user: { uuid: 'u1' } as any, cfg: cfg() })
       expect(result).toMatchObject({ ok: false, errorKey: 'aiProviderUnavailable' })
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
 
     test('an error answer that never ends is cut too', async () => {
@@ -155,7 +130,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       const result = await deps.runTest({ user: { uuid: 'u1' } as any, cfg: cfg() })
       expect(result).toMatchObject({ ok: false })
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
   })
 
@@ -163,34 +138,34 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
     test('a body over its cap fails the read, and the connection is closed', async () => {
       answerForever(200)
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls, maxBodyBytes: 100_000 })
-      const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
+      const response = await guardedFetch(`http://127.0.0.1:${server.port}/x`)
       await expect(response.text()).rejects.toBeDefined()
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
 
     test('the body of an error is cut at 64 KiB, far below the cap of a success', async () => {
       answer(500, 'e'.repeat(100 * 1024))
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls })
-      const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
+      const response = await guardedFetch(`http://127.0.0.1:${server.port}/x`)
       await expect(response.text()).rejects.toBeDefined()
-      await untilClientClosed()
+      await server.untilClientClosed(PROMPT_MS)
     })
 
     test('an error body of 60 KiB is read whole', async () => {
       answer(500, 'e'.repeat(60 * 1024))
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls })
-      const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
+      const response = await guardedFetch(`http://127.0.0.1:${server.port}/x`)
       expect(await response.text()).toHaveLength(60 * 1024)
     })
 
     test('a call with no signal times out, and one with a signal keeps its own', async () => {
-      handler = () => undefined
+      server.handler = () => undefined
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls, timeoutMs: 50 })
       const start = Date.now()
-      await expect(guardedFetch(`http://127.0.0.1:${port}/x`)).rejects.toMatchObject({ name: 'TimeoutError' })
+      await expect(guardedFetch(`http://127.0.0.1:${server.port}/x`)).rejects.toMatchObject({ name: 'TimeoutError' })
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
       const controller = new AbortController()
-      const own = guardedFetch(`http://127.0.0.1:${port}/x`, { signal: controller.signal })
+      const own = guardedFetch(`http://127.0.0.1:${server.port}/x`, { signal: controller.signal })
       setTimeout(() => controller.abort(new Error('mine')), 150)
       await expect(own).rejects.toThrow('mine')
     })
@@ -198,7 +173,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
     test('a body within its cap is read whole', async () => {
       answer(200, 'a'.repeat(50_000))
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls, maxBodyBytes: 100_000 })
-      const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
+      const response = await guardedFetch(`http://127.0.0.1:${server.port}/x`)
       expect(await response.text()).toHaveLength(50_000)
     })
 
@@ -206,7 +181,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       const fetchImpl = async () => new Response(modelListOf(3 * MIB), { status: 200 })
       await expectSystemErrorKey(
         ModelDiscovery.listForProvider(
-          { provider: 'openai-compatible', baseUrl: `http://127.0.0.1:${port}/v1`, apiKey: 'k' },
+          { provider: 'openai-compatible', baseUrl: `http://127.0.0.1:${server.port}/v1`, apiKey: 'k' },
           { allowlist: ENV.aiOrgHostedBaseUrls, fetchImpl } as any
         ),
         'aiProviderResponseTooLarge'

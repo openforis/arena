@@ -4,52 +4,49 @@ import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { createMockModel } from '@server/modules/ai/service/mockProvider'
 import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
+import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
 
-const system = (text: string): any => ({ role: 'system', content: text })
-const user = (text: string): any => ({ role: 'user', content: [{ type: 'text', text }] })
-const toolCall = (id: string): any => ({
-  role: 'assistant',
-  content: [{ type: 'tool-call', toolCallId: id, toolName: 'nodeDef_get', input: {} }],
-})
-const toolResult = (id: string): any => ({
-  role: 'tool',
-  content: [{ type: 'tool-result', toolCallId: id, toolName: 'nodeDef_get', output: { type: 'json', value: {} } }],
-})
+// a nodeDef_get call and its result
+const nodeDefGet = (id: string): any[] => [toolCallMessage(id, 'nodeDef_get'), toolResultMessage(id, 'nodeDef_get')]
 
-const designSystem = system(`${assistantMarkers.design}\nYou are the design assistant.`)
+const designSystem = systemMessage(`${assistantMarkers.design}\nYou are the design assistant.`)
 
 describe('getScriptedStep', () => {
   test('no assistant marker: null, the canned answers apply', async () => {
-    expect(getScriptedStep([system('Generate an <expression>'), user('label')])).toBeNull()
-    const result: any = await createMockModel().doGenerate({ prompt: [system('Reply with <expression>')] } as any)
+    expect(getScriptedStep([systemMessage('Generate an <expression>'), userMessage('label')])).toBeNull()
+    const result: any = await createMockModel().doGenerate({
+      prompt: [systemMessage('Reply with <expression>')],
+    } as any)
     expect(result.content[0].text).toMatch(/^<expression>/)
   })
 
   test('the step index is the number of tool results after the last user message', () => {
-    const start = [designSystem, user('Change the label of cluster_id')]
+    const start = [designSystem, userMessage('Change the label of cluster_id')]
     expect(getScriptedStep(start)).toEqual({ toolCall: { toolName: 'nodeDef_get', input: { name: 'cluster_id' } } })
-    expect(getScriptedStep([...start, toolCall('a'), toolResult('a')])).toMatchObject({
+    expect(getScriptedStep([...start, ...nodeDefGet('a')])).toMatchObject({
       toolCall: { toolName: 'labels_proposeSet' },
     })
-    expect(getScriptedStep([...start, toolCall('a'), toolResult('a'), toolCall('b'), toolResult('b')])).toEqual({
+    expect(getScriptedStep([...start, ...nodeDefGet('a'), ...nodeDefGet('b')])).toEqual({
       text: 'MOCK: I proposed a new label for `cluster_id`. Review the card and click Apply.',
     })
   })
 
   test('tool results of earlier turns do not count', () => {
-    const prompt = [designSystem, user('Change the label'), toolCall('a'), toolResult('a'), user('Again the label')]
+    const prompt = [designSystem, userMessage('Change the label'), ...nodeDefGet('a'), userMessage('Again the label')]
     expect(getScriptedStep(prompt)).toMatchObject({ toolCall: { toolName: 'nodeDef_get' } })
   })
 
   test('a marked prompt without a script never gets the canned answers', () => {
-    const helpSystem = system(`${assistantMarkers.help}\nManual outline:\n7 Data Explorer`)
-    expect(getScriptedStep([helpSystem, user('What is a cycle?')])).toEqual({ text: 'MOCK answer.' })
+    const helpSystem = systemMessage(`${assistantMarkers.help}\nManual outline:\n7 Data Explorer`)
+    expect(getScriptedStep([helpSystem, userMessage('What is a cycle?')])).toEqual({ text: 'MOCK answer.' })
   })
 })
 
 describe('createMockModel with scripts', () => {
   test('doGenerate returns the scripted tool call', async () => {
-    const result: any = await createMockModel().doGenerate({ prompt: [designSystem, user('Add remarks')] } as any)
+    const result: any = await createMockModel().doGenerate({
+      prompt: [designSystem, userMessage('Add remarks')],
+    } as any)
     expect(result.finishReason.unified).toBe('tool-calls')
     expect(result.content[0]).toMatchObject({ type: 'tool-call', toolName: 'nodeDef_proposeCreate' })
     expect(JSON.parse(result.content[0].input).nodeDefs[0].name).toBe('cluster_remarks')
@@ -57,7 +54,7 @@ describe('createMockModel with scripts', () => {
 
   test('a fixed text still wins', async () => {
     const result: any = await createMockModel({ text: 'fixed' }).doGenerate({
-      prompt: [designSystem, user('label')],
+      prompt: [designSystem, userMessage('label')],
     } as any)
     expect(result.content[0].text).toBe('fixed')
   })

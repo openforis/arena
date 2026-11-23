@@ -8,6 +8,7 @@ import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 
 import * as SB from '../../utils/surveyBuilder'
+import { createCloneTargetSurvey, deleteSurveys } from '../../utils/surveyCloneTestUtils'
 
 import { getContextUser } from '../config/context'
 
@@ -42,15 +43,11 @@ describe('Clone chain from another survey - category resolution', () => {
     })
 
     // Analysis attributes are cloned into the entity with the same name in the target survey.
-    targetSurvey = await SB.survey(
-      user,
-      SB.entity('cluster_src', SB.attribute('cluster_id_tgt', nodeDefType.integer).key())
-    ).buildAndStore()
+    targetSurvey = await createCloneTargetSurvey(user, 'cluster_src')
   })
 
   afterAll(async () => {
-    if (sourceSurvey) await SurveyManager.deleteSurvey(Survey.getId(sourceSurvey))
-    if (targetSurvey) await SurveyManager.deleteSurvey(Survey.getId(targetSurvey))
+    await deleteSurveys([sourceSurvey, targetSurvey])
   })
 
   test('Cloning a chain with a code analysis attribute also clones the referenced category', async () => {

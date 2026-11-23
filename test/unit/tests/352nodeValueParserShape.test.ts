@@ -6,36 +6,11 @@ import { parseNodeValueInput } from '@core/record/nodeValueParser'
 import { isNodeValueShapeValid } from '@core/record/nodeValueShape'
 import { uuidv4 } from '@core/uuid'
 
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as SurveyUtils from '../../utils/surveyUtils'
+import { buildNodeValueParserSurvey } from '@test/unit/utils/nodeValueParserTestUtils'
 
 const user = { uuid: 'user-uuid' }
-
-const buildSurvey = () =>
-  SB.survey(
-    user,
-    SB.entity(
-      'cluster',
-      SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
-      SB.attribute('cluster_size', NodeDef.nodeDefType.decimal),
-      SB.attribute('cluster_accessible', NodeDef.nodeDefType.boolean),
-      SB.attribute('cluster_date', NodeDef.nodeDefType.date),
-      SB.attribute('cluster_time', NodeDef.nodeDefType.time),
-      SB.attribute('cluster_location', NodeDef.nodeDefType.coordinate),
-      SB.attribute('cluster_species', NodeDef.nodeDefType.taxon).taxonomy('trees'),
-      SB.attribute('cluster_remarks', NodeDef.nodeDefType.text),
-      SB.attribute('region', NodeDef.nodeDefType.code).category('admin'),
-      SB.attribute('district', NodeDef.nodeDefType.code).category('admin').parentCode('region')
-    )
-  )
-    .categories(
-      SB.category('admin')
-        .levels('region', 'district')
-        .items(SB.categoryItem('1').items(SB.categoryItem('11')), SB.categoryItem('2'))
-    )
-    .taxonomies(SB.taxonomy('trees').taxa(SB.taxon('AFZ/QUA', 'Fabaceae', 'Afzelia', 'Afzelia quanzensis')))
-    .build()
 
 // what the assistant may write, per attribute: every one must give a value the batch edit then accepts
 const inputsByAttribute: Record<string, unknown[]> = {
@@ -86,7 +61,7 @@ describe('nodeValueParser: the values it produces pass the shape of a batch edit
     })
 
   beforeAll(async () => {
-    survey = await buildSurvey()
+    survey = await buildNodeValueParserSurvey(user)
     const regionItemUuid = SurveyUtils.getCategoryItemUuid({ survey, categoryName: 'admin', codesPath: ['1'] })
     record = RB.record(
       user,

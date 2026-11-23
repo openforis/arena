@@ -69,6 +69,25 @@ const openNewDesignConversation = async (page: Page): Promise<void> => {
 }
 
 /**
+ * Chooses Arena default from the provider chip (nothing sent before), then checks a message goes to Arena default.
+ * @param {Page} page - The page.
+ * @param {any[]} gatewayBodies - The bodies of the gateway requests, as collected since the conversation opened.
+ * @returns {Promise<void>} Resolves when the answer has come.
+ */
+const switchToArenaDefaultAndSend = async (page: Page, gatewayBodies: any[]): Promise<void> => {
+  await providerChip(page).click()
+  await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
+  expect(gatewayBodies).toEqual([])
+  await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
+  await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
+
+  await sendAssistantMessage(page, LABEL_REQUEST)
+  await waitForAssistantTurn(page)
+  expect(gatewayBodies.length).toBeGreaterThan(0)
+  expect(gatewayBodies.every((body) => body.providerId === 'arena-default')).toBe(true)
+}
+
+/**
  * Leaves the worker's user with no account provider, Arena default as the default and AI off, for the other specs.
  * @param {ArenaApi} api - The ArenaApi fixture.
  * @returns {Promise<void>} Resolves when saved.
@@ -217,16 +236,7 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     await openNewDesignConversation(page)
     await expect(providerChip(page)).toHaveAttribute('title', /^Default provider not on this computer/)
 
-    await providerChip(page).click()
-    await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
-    expect(gatewayBodies).toEqual([])
-    await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
-    await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
-
-    await sendAssistantMessage(page, LABEL_REQUEST)
-    await waitForAssistantTurn(page)
-    expect(gatewayBodies.length).toBeGreaterThan(0)
-    expect(gatewayBodies.every((body) => body.providerId === 'arena-default')).toBe(true)
+    await switchToArenaDefaultAndSend(page, gatewayBodies)
   })
 
   // review I1: a default that is down does not hide the chat and its switcher
@@ -247,15 +257,6 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.input)).toBeVisible()
     await expect(providerChip(page)).toHaveAttribute('title', /^Local server/)
 
-    await providerChip(page).click()
-    await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
-    expect(gatewayBodies).toEqual([])
-    await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
-    await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
-
-    await sendAssistantMessage(page, LABEL_REQUEST)
-    await waitForAssistantTurn(page)
-    expect(gatewayBodies.length).toBeGreaterThan(0)
-    expect(gatewayBodies.every((body) => body.providerId === 'arena-default')).toBe(true)
+    await switchToArenaDefaultAndSend(page, gatewayBodies)
   })
 })
