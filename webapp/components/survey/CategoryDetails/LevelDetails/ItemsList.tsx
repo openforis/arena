@@ -27,7 +27,7 @@ export const ItemsList = (props: ItemsListProps) => {
 
   const levelIndex = CategoryLevel.getIndex(level)
   const itemActive = State.getItemActive({ levelIndex })(state)
-  const lastItem = items[items.length - 1]
+  const lastItem = items.at(-1)
   const lastItemActive = !!itemActive && !!lastItem && CategoryItem.isEqual(itemActive)(lastItem)
 
   // new item added (appended as last and active): scroll to it so its editor is visible
