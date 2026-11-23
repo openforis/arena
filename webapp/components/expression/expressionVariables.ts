@@ -200,7 +200,7 @@ export const getVariables = async ({
   nodeDefContext,
   mode,
   lang: langPreferred,
-  groupByParent,
+  groupByParent = false,
   editorType = undefined,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,

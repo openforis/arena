@@ -1,6 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import { Query } from '@common/model/query'
 
@@ -9,6 +7,7 @@ import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeature
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useNotifyInfo } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
 import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
@@ -26,7 +25,7 @@ type Props = {
 export const ButtonAiGenerateQuery = (props: Props) => {
   const { disabled = false, state, Actions } = props
 
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const availability = useAiFeatureAvailability('dataQueryGenerate')
   const query = DataExplorerSelectors.useQuery()
   const notifyInfo = useNotifyInfo()
