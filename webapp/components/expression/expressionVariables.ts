@@ -51,7 +51,7 @@ const getChildDefVariables = ({
   childDef,
   mode,
   lang,
-  editorType,
+  editorType = undefined,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,
 }) => {
@@ -201,7 +201,7 @@ export const getVariables = async ({
   mode,
   lang: langPreferred,
   groupByParent,
-  editorType,
+  editorType = undefined,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,
   includeAnalysis = false,
@@ -224,7 +224,7 @@ export const getVariables = async ({
   _sortVariables({ nodeDefCurrent, variables })
 
   return groupByParent
-    ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, excludeCurrentNodeDef })
+    ? getVariablesGroupedByParentUuid({ variables, survey, mode, nodeDefCurrent, excludeCurrentNodeDef })
     : variables
 }
 
@@ -236,7 +236,7 @@ export const getVariablesChildren = ({
   mode,
   lang,
   groupByParent,
-  excludeCurrentNodeDef,
+  excludeCurrentNodeDef = false,
   includeAnalysis = false,
 }) => {
   if (!NodeDef.isEntity(nodeDefContext)) {
@@ -252,7 +252,7 @@ export const getVariablesChildren = ({
   _sortVariables({ nodeDefCurrent, variables })
 
   return groupByParent
-    ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, includeThis: false })
+    ? getVariablesGroupedByParentUuid({ variables, survey, mode, nodeDefCurrent, includeThis: false })
     : variables
 }
 

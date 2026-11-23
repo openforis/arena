@@ -5,7 +5,7 @@ import * as A from '@core/arena'
 
 export const useDropdown = ({
   defaultSelection,
-  id,
+  id = null,
   idInputProp,
   itemDescription,
   itemIcon,
@@ -18,7 +18,7 @@ export const useDropdown = ({
   onChangeProp,
   readOnly,
   selection,
-  testId,
+  testId = null,
   title,
 }) => {
   const selectRef = useRef(null)

@@ -41,7 +41,7 @@ const InputChips = (props) => {
         <Chip
           key={State.getItemKey(state)(item)}
           label={State.getItemLabel(state)(item)}
-          onDelete={() => Actions.removeItem({ selection, state })(item)}
+          onDelete={() => Actions.removeItem({ selection })(item)}
           readOnly={readOnly || selection.length <= requiredItems}
         />
       ))}

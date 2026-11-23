@@ -26,7 +26,6 @@ const DateInput = (props) => {
       slotProps={{
         field: { clearable: !disabled },
         textField: {
-          autoComplete: 'off',
           className: 'date-picker__text-field',
           // eslint-disable-next-line react-hooks/refs -- same pre-existing pattern as TimeInput
           error: errorRef.current,

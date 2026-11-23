@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useI18nT } from '@webapp/store/system'
 
 import { ButtonIconInfo } from '../buttons/ButtonIconInfo'
 import ValidationTooltip from '../validationTooltip'
@@ -35,6 +35,7 @@ const Checkbox = (props) => {
   } = props
 
   const i18n = useI18n()
+  const t = useI18nT()
 
   const onChange = useCallback(
     (event) => {
@@ -79,10 +80,10 @@ const Checkbox = (props) => {
             className="btn-checkbox-label width100"
             control={control}
             // elements (e.g. node definition labels) are shown as they are
-            label={typeof label === 'string' ? i18n.t(label) : label}
+            label={typeof label === 'string' ? t(label) : label}
           />
         )}
-        {info && i18n.exists(info) && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info, infoParams)} />}
+        {info && i18n.exists(info) && <ButtonIconInfo className="info-icon-btn" title={t(info, infoParams)} />}
       </ValidationTooltip>
     </div>
   )

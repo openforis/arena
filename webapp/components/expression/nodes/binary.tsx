@@ -26,7 +26,7 @@ const Binary = (props) => {
   const leftOperand = A.prop(BinaryOperandType.left)(node)
   const leftOperandType = Expression.getType(leftOperand)
 
-  const showOperator = node.operator || ![Expression.types.Literal].includes(leftOperandType)
+  const showOperator = node.operator || leftOperandType !== Expression.types.Literal
 
   const binaryOperator = showOperator ? Expression.operators.findBinary(node.operator) : null
 
