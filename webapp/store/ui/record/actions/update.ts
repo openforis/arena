@@ -27,7 +27,7 @@ const _sendNodePersistRequest = async ({
   getState,
   node,
   file = null,
-  clearNonApplicableValuesConfirmed,
+  clearNonApplicableValuesConfirmed = false,
 }) => {
   dispatch(AppSavingActions.showAppSaving())
 

@@ -20,7 +20,7 @@ export const startCSVExport =
   }
 
 export const startDataSummaryExport =
-  ({ options } = {}) =>
+  ({ options }: { options?: object } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
