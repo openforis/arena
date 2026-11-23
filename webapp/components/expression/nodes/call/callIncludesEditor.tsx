@@ -10,9 +10,9 @@ import { useNodeDefByName } from '@webapp/store/survey/hooks'
 
 import Identifier from '../identifier'
 import Literal from '../literal'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
-export const CallIncludesEditor = (props) => {
+export const CallIncludesEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const [expressionNodeArg1, expressionNodeArg2] = expressionNode?.arguments ?? []
@@ -79,5 +79,3 @@ export const CallIncludesEditor = (props) => {
     </div>
   )
 }
-
-CallIncludesEditor.propTypes = CallEditorPropTypes

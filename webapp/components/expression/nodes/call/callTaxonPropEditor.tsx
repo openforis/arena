@@ -13,7 +13,7 @@ import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
 import Identifier from '../identifier'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
 const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdentifierName }) => {
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
@@ -24,7 +24,7 @@ const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdent
   }
 }
 
-export const CallTaxonPropEditor = (props) => {
+export const CallTaxonPropEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const expressionArgumentsValues =
@@ -102,5 +102,3 @@ export const CallTaxonPropEditor = (props) => {
     </div>
   )
 }
-
-CallTaxonPropEditor.propTypes = CallEditorPropTypes

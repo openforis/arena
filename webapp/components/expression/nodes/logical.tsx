@@ -1,12 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 
 import { Button } from '@webapp/components/buttons'
 
-const Logical = (props) => {
+type LogicalProps = {
+  node: any
+  onChange: (...args: any[]) => any
+  renderNode: React.ElementType
+  // ExpressionNode props
+  canDelete?: boolean
+  nodeDefCurrent?: any
+  isBoolean?: boolean
+  level?: number
+  variables?: any[]
+}
+
+const Logical = (props: LogicalProps) => {
   const {
     canDelete = false,
     isBoolean = false,
@@ -66,18 +77,6 @@ const Logical = (props) => {
       {createElementNode('right', right, left, true)}
     </div>
   )
-}
-
-Logical.propTypes = {
-  node: PropTypes.any.isRequired,
-  onChange: PropTypes.func.isRequired,
-  renderNode: PropTypes.elementType.isRequired,
-  // ExpressionNode props
-  canDelete: PropTypes.bool,
-  nodeDefCurrent: PropTypes.any,
-  isBoolean: PropTypes.bool,
-  level: PropTypes.number,
-  variables: PropTypes.array,
 }
 
 export default Logical

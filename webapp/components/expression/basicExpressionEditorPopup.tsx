@@ -2,12 +2,21 @@ import './expressionEditorPopup.scss'
 
 import * as A from '@core/arena'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
 
-const BasicExpressionEditorPopup = (props) => {
+type BasicExpressionEditorPopupProps = {
+  exprDraft?: Record<string, any>
+  exprDraftValid?: boolean
+  isBoolean?: boolean
+  nodeDefCurrent?: Record<string, any>
+  queryDraft?: string
+  updateDraftExpr: (...args: any[]) => any
+  variables: Record<string, any>[]
+}
+
+const BasicExpressionEditorPopup = (props: BasicExpressionEditorPopupProps) => {
   const {
     exprDraft = null,
     exprDraftValid = false,
@@ -41,16 +50,6 @@ const BasicExpressionEditorPopup = (props) => {
       </div>
     </>
   )
-}
-
-BasicExpressionEditorPopup.propTypes = {
-  exprDraft: PropTypes.object,
-  exprDraftValid: PropTypes.bool,
-  isBoolean: PropTypes.bool,
-  nodeDefCurrent: PropTypes.object,
-  queryDraft: PropTypes.string,
-  updateDraftExpr: PropTypes.func.isRequired,
-  variables: PropTypes.arrayOf(Object).isRequired,
 }
 
 export default BasicExpressionEditorPopup

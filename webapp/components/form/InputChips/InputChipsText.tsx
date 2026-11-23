@@ -1,6 +1,5 @@
 import './InputChips.scss'
 
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { ButtonAdd } from '@webapp/components/buttons'
@@ -10,8 +9,25 @@ import { SimpleTextInput } from '../SimpleTextInput'
 
 import { useLocalState, State } from './store'
 import Chip from '../chip'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const InputChipsText = (props) => {
+type InputChipsTextProps = {
+  className?: string
+  idInput?: string
+  selection?: any[]
+  requiredItems?: number
+  readOnly?: boolean
+  disabled?: boolean
+  validation?: ArenaValidation
+  placeholder?: string
+  textTransformFunction?: (...args: any[]) => any
+  isInputFieldValueValid?: (...args: any[]) => any
+  onChange?: (...args: any[]) => any
+  onItemAdd?: (...args: any[]) => any
+  onItemRemove?: (...args: any[]) => any
+}
+
+const InputChipsText = (props: InputChipsTextProps) => {
   const {
     className,
     disabled = false,
@@ -25,7 +41,7 @@ const InputChipsText = (props) => {
     requiredItems = 0,
     selection = [],
     textTransformFunction,
-    validation = {},
+    validation,
   } = props
 
   const { state, Actions } = useLocalState({
@@ -70,25 +86,6 @@ const InputChipsText = (props) => {
       )}
     </div>
   )
-}
-
-InputChipsText.propTypes = {
-  className: PropTypes.string,
-  idInput: PropTypes.string,
-
-  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
-
-  requiredItems: PropTypes.number,
-  readOnly: PropTypes.bool,
-  disabled: PropTypes.bool,
-  validation: PropTypes.object,
-  placeholder: PropTypes.string,
-  textTransformFunction: PropTypes.func,
-  isInputFieldValueValid: PropTypes.func,
-
-  onChange: PropTypes.func,
-  onItemAdd: PropTypes.func,
-  onItemRemove: PropTypes.func,
 }
 
 export default InputChipsText

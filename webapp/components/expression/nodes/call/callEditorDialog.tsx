@@ -1,8 +1,14 @@
-import PropTypes from 'prop-types'
+import type React from 'react'
 
 import { Modal, ModalBody } from '@webapp/components/modal'
 
-export const CallEditorDialog = (props) => {
+type CallEditorDialogProps = {
+  children?: React.ReactNode
+  functionName: string
+  onClose: (...args: any[]) => any
+}
+
+export const CallEditorDialog = (props: CallEditorDialogProps) => {
   const { children, functionName, onClose } = props
 
   return (
@@ -10,10 +16,4 @@ export const CallEditorDialog = (props) => {
       <ModalBody>{children}</ModalBody>
     </Modal>
   )
-}
-
-CallEditorDialog.propTypes = {
-  children: PropTypes.node,
-  functionName: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
 }

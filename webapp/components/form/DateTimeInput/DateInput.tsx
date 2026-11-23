@@ -1,12 +1,19 @@
 import './DateInput.scss'
 
-import PropTypes from 'prop-types'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 
 import * as DateUtils from '@core/dateUtils'
 import { useDateTimeInput } from './useDateTimeInput'
 
-const DateInput = (props) => {
+type DateInputProps = {
+  disabled?: boolean
+  displayFormat?: string
+  value?: string
+  valueFormat?: string
+  onChange?: (...args: any[]) => any
+}
+
+const DateInput = (props: DateInputProps) => {
   const {
     disabled = false,
     displayFormat = DateUtils.formats.dateDefault,
@@ -34,14 +41,6 @@ const DateInput = (props) => {
       value={dateValue}
     />
   )
-}
-
-DateInput.propTypes = {
-  disabled: PropTypes.bool,
-  displayFormat: PropTypes.string,
-  value: PropTypes.string,
-  valueFormat: PropTypes.string,
-  onChange: PropTypes.func,
 }
 
 export default DateInput

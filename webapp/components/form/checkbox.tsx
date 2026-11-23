@@ -1,11 +1,10 @@
 import './checkbox.scss'
 
-import { useCallback } from 'react'
+import { useCallback, type ReactElement } from 'react'
 import classNames from 'classnames'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
 import MuiCheckbox from '@mui/material/Checkbox'
 import MuiRadio from '@mui/material/Radio'
-import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -13,8 +12,29 @@ import { useI18n, useI18nT } from '@webapp/store/system'
 
 import { ButtonIconInfo } from '../buttons/ButtonIconInfo'
 import ValidationTooltip from '../validationTooltip'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const Checkbox = (props) => {
+type CheckboxProps = {
+  // when displayed without label, aligns the checkbox with labelled checkboxes or radio buttons in the same column
+  alignWithLabelledControls?: boolean
+  className?: string
+  id?: string
+  checked?: boolean
+  controlStyle?: Record<string, any>
+  disabled?: boolean
+  indeterminate?: boolean
+  info?: string
+  infoParams?: Record<string, any>
+  label?: string | ReactElement
+  onChange?: (...args: any[]) => any
+  radio?: boolean
+  size?: 'small' | 'medium'
+  testId?: string
+  validation?: ArenaValidation
+  value?: string
+}
+
+const Checkbox = (props: CheckboxProps) => {
   const {
     alignWithLabelledControls = false,
     className,
@@ -30,7 +50,7 @@ const Checkbox = (props) => {
     radio = false,
     size = 'medium',
     testId = null,
-    validation = {},
+    validation,
     value,
   } = props
 
@@ -87,26 +107,6 @@ const Checkbox = (props) => {
       </ValidationTooltip>
     </div>
   )
-}
-
-Checkbox.propTypes = {
-  // when displayed without label, aligns the checkbox with labelled checkboxes or radio buttons in the same column
-  alignWithLabelledControls: PropTypes.bool,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  checked: PropTypes.bool,
-  controlStyle: PropTypes.object,
-  disabled: PropTypes.bool,
-  indeterminate: PropTypes.bool,
-  info: PropTypes.string,
-  infoParams: PropTypes.object,
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  onChange: PropTypes.func,
-  radio: PropTypes.bool,
-  size: PropTypes.oneOf(['small', 'medium']),
-  testId: PropTypes.string,
-  validation: PropTypes.object,
-  value: PropTypes.string,
 }
 
 export default Checkbox

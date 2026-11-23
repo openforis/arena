@@ -9,11 +9,11 @@ import { Button } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
 
 import Identifier from '../identifier'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
 const variablesFilterFn = (variable) => variable.root || [NodeDef.nodeDefType.coordinate].includes(variable.nodeDefType)
 
-export const CallGeoDistanceEditor = (props) => {
+export const CallGeoDistanceEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const identifierArguments = expressionNode?.arguments ?? []
@@ -77,5 +77,3 @@ export const CallGeoDistanceEditor = (props) => {
     </div>
   )
 }
-
-CallGeoDistanceEditor.propTypes = CallEditorPropTypes

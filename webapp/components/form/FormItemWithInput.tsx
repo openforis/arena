@@ -1,10 +1,16 @@
-import { useMemo } from 'react'
-import PropTypes from 'prop-types'
+import { useMemo, type ComponentProps } from 'react'
 
 import { useIsMobile } from '../hooks/useIsMobile'
 import { FormItem, Input } from './Input'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-export const FormItemWithInput = (props) => {
+type FormItemWithInputProps = ComponentProps<typeof Input> & {
+  label?: string
+  labelParams?: Record<string, any>
+  validation?: ArenaValidation
+}
+
+export const FormItemWithInput = (props: FormItemWithInputProps) => {
   const { label, labelParams, ...rest } = props
 
   const isMobile = useIsMobile()
@@ -22,11 +28,4 @@ export const FormItemWithInput = (props) => {
       <Input {...inputFieldParams} />
     </FormItem>
   )
-}
-
-FormItemWithInput.propTypes = {
-  ...Input.propTypes,
-  label: PropTypes.string,
-  labelParams: PropTypes.object,
-  validation: PropTypes.object,
 }

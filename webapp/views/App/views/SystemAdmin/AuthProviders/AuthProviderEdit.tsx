@@ -307,7 +307,7 @@ const EmailDomainsField = ({ draft, readOnly, onChange }: SectionProps) => {
                 ? Validation.newInstance(false, {}, [
                     ValidationResult.newInstance('authProvidersView:form.emailDomainsRequired'),
                   ])
-                : {}
+                : undefined
             }
           />
         )}

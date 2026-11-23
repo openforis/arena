@@ -13,7 +13,7 @@ import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
 import Identifier from '../identifier'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 import { standards } from '@core/app/languages'
 
 const createInitialState = ({ initialTaxonomy, initialVernacularLangCode, initialIdentifierName }) => {
@@ -25,7 +25,7 @@ const createInitialState = ({ initialTaxonomy, initialVernacularLangCode, initia
   }
 }
 
-export const CallTaxonVernacularNameEditor = (props) => {
+export const CallTaxonVernacularNameEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const expressionArgumentsValues =
@@ -103,5 +103,3 @@ export const CallTaxonVernacularNameEditor = (props) => {
     </div>
   )
 }
-
-CallTaxonVernacularNameEditor.propTypes = CallEditorPropTypes

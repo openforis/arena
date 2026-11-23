@@ -1,7 +1,6 @@
 import './call.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -22,7 +21,15 @@ const extractFunctionLabel = ({ i18n, functionKey, func }) => {
 
 const deprecatedFunctionNames = new Set([Expression.functionNames.distance])
 
-const Call = (props) => {
+type CallProps = {
+  // Common props
+  node: any
+  onChange: (...args: any[]) => any
+  // Identifier / Member / Call
+  variables: any[]
+}
+
+const Call = (props: CallProps) => {
   const { node: expressionNode, variables, onChange } = props
 
   const i18n = useI18n()
@@ -106,14 +113,6 @@ const Call = (props) => {
       )}
     </div>
   )
-}
-
-Call.propTypes = {
-  // Common props
-  node: PropTypes.any.isRequired,
-  onChange: PropTypes.func.isRequired,
-  // Identifier / Member / Call
-  variables: PropTypes.array.isRequired,
 }
 
 export default Call

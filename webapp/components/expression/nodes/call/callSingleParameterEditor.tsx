@@ -1,14 +1,18 @@
 import { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
 import { FormItem } from '@webapp/components/form/Input'
 
 import Identifier from '../identifier'
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
 
-export const CallSingleParameterEditor = (props) => {
+type CallSingleParameterEditorProps = CallEditorProps & {
+  callee: string
+  label?: string
+}
+
+export const CallSingleParameterEditor = (props: CallSingleParameterEditorProps) => {
   const {
     callee,
     expressionNode,
@@ -53,10 +57,4 @@ export const CallSingleParameterEditor = (props) => {
       />
     </FormItem>
   )
-}
-
-CallSingleParameterEditor.propTypes = {
-  ...CallEditorPropTypes,
-  callee: PropTypes.string.isRequired,
-  label: PropTypes.string,
 }

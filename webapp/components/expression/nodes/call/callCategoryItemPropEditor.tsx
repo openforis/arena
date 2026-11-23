@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
@@ -18,9 +17,19 @@ import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { useSurvey } from '@webapp/store/survey'
 import { useCategoryByName, useNodeDefsByNames } from '@webapp/store/survey/hooks'
 
-import { CallEditorPropTypes } from './callEditorPropTypes'
+import type { CallEditorProps } from './callEditorProps'
+import type { ArenaCategoryLevel } from '@openforis/arena-core'
 
-const CategoryLevelVariable = (props) => {
+type CategoryLevelVariableProps = {
+  disabled?: boolean
+  hierarchicalCategory?: boolean
+  level: ArenaCategoryLevel
+  onChange: (...args: any[]) => any
+  selectedAttributeUuid?: string
+  variables: any[]
+}
+
+const CategoryLevelVariable = (props: CategoryLevelVariableProps) => {
   const { disabled, hierarchicalCategory, level, onChange, selectedAttributeUuid, variables } = props
 
   const survey = useSurvey()
@@ -58,15 +67,6 @@ const CategoryLevelVariable = (props) => {
   )
 }
 
-CategoryLevelVariable.propTypes = {
-  disabled: PropTypes.bool,
-  hierarchicalCategory: PropTypes.bool,
-  level: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  selectedAttributeUuid: PropTypes.string,
-  variables: PropTypes.array.isRequired,
-}
-
 const createInitialState = ({ initialCategory, initialCategoryPropKey, initialAttributeDefs }) => {
   const initialAttributeUuidsByLevelUuid: Record<string, string> = {}
   for (const [index, level] of Category.getLevelsArray(initialCategory).entries()) {
@@ -80,7 +80,7 @@ const createInitialState = ({ initialCategory, initialCategoryPropKey, initialAt
   }
 }
 
-export const CallCategoryItemPropEditor = (props) => {
+export const CallCategoryItemPropEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const survey = useSurvey()
@@ -186,5 +186,3 @@ export const CallCategoryItemPropEditor = (props) => {
     </div>
   )
 }
-
-CallCategoryItemPropEditor.propTypes = CallEditorPropTypes
