@@ -1,7 +1,14 @@
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+import type { TaxonBuilder } from './taxonBuilder'
 
 export class TaxonomyBuilder {
+  name: string
+  _extraProps: Record<string, any>
+  _descriptions: Record<string, any>
+  taxonBuilders: TaxonBuilder[]
+  _built: Record<string, any>
+
   constructor(name) {
     this.name = name
     this._extraProps = {}

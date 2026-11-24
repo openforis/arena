@@ -3,6 +3,11 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 
 export class ItemBuilder {
+  code: string
+  _label: string
+  extraProps: Record<string, any>
+  childItemBuilders: ItemBuilder[]
+
   constructor(code) {
     this.code = code
     this._label = ''
