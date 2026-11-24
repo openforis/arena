@@ -20,7 +20,6 @@ type Props = {
   canEditGroup: boolean
   canEditSurveyManager: boolean
   canEditSystemAdmin: boolean
-  editingLoggedInUser: boolean
   groupInCurrentSurvey: any
   onSurveyAuthGroupChange: (group: any) => void
   onSurveyManagerChange: (value: boolean) => void
@@ -40,7 +39,6 @@ export const AccessSection = (props: Props) => {
     canEditGroup,
     canEditSurveyManager,
     canEditSystemAdmin,
-    editingLoggedInUser,
     groupInCurrentSurvey,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
@@ -69,7 +67,6 @@ export const AccessSection = (props: Props) => {
           <FormItem label="usersView:roleInCurrentSurvey">
             <DropdownUserRole
               disabled={!canEditGroup}
-              editingLoggedUser={editingLoggedInUser}
               groupUuid={AuthGroup.getUuid(groupInCurrentSurvey)}
               onChange={onSurveyAuthGroupChange}
               showOnlySurveyGroups

@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import axios from 'axios'
 
@@ -15,6 +14,7 @@ import { useSurveyId } from '@webapp/store/survey'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import { validateUserEdit } from './validate'
+import { useAppDispatch } from '@webapp/store'
 
 const prepareFormData = ({ userToUpdate }) => {
   const formData = new FormData()
@@ -86,7 +86,7 @@ export const useOnSave = ({
   userToUpdateOriginal = null,
   setUserToUpdateOriginal = null,
 }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { showSurveyGroup } = useQuery()
   const user = useUser()

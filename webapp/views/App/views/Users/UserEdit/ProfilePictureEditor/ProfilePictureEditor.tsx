@@ -1,7 +1,6 @@
 import './ProfilePictureEditor.scss'
 
 import { useCallback, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
 import AvatarEditor from 'react-avatar-editor'
 
 import * as FileTypes from '@webapp/utils/fileTypes'
@@ -25,7 +24,7 @@ const ProfilePicturePlaceholder = () => (
     style={{ height: height + border * 2, width: width + border * 2 }}
   >
     <img
-      alt="Profile picture unset"
+      alt="No profile set"
       className="profile-picture-placeholder-img"
       height={height}
       width={width}
@@ -34,7 +33,12 @@ const ProfilePicturePlaceholder = () => (
   </div>
 )
 
-const ProfilePictureEditor = (props) => {
+type ProfilePictureEditorProps = {
+  userUuid?: string
+  onPictureUpdate: (...args: any[]) => any
+}
+
+const ProfilePictureEditor = (props: ProfilePictureEditorProps) => {
   const { onPictureUpdate, userUuid = null } = props
 
   const i18n = useI18n()
@@ -162,11 +166,6 @@ const ProfilePictureEditor = (props) => {
       </div>
     </div>
   )
-}
-
-ProfilePictureEditor.propTypes = {
-  userUuid: PropTypes.string,
-  onPictureUpdate: PropTypes.func.isRequired,
 }
 
 export default ProfilePictureEditor

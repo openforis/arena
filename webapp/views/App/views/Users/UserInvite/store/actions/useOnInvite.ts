@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import axios from 'axios'
 import * as A from '@core/arena'
@@ -18,6 +17,7 @@ import { DialogConfirmActions, LoaderActions, NotificationActions, NotificationS
 import { useUser } from '@webapp/store/user'
 
 import { validateUserInvite } from './validate'
+import { useAppDispatch } from '@webapp/store'
 
 // builds one notification message out of the same text blocks used elsewhere (invited/skipped/invalid),
 // so the user only ever sees a single notification for the outcome of an invite, however many addresses it covers
@@ -63,7 +63,7 @@ const _performInvite =
       dispatch(LoaderActions.showLoader())
 
       const userInviteParams = A.pipe(
-        A.omit([UserInvite.keys.validation]),
+        A.omit([Validation.keys.validation]),
         A.assoc('surveyCycleKey', surveyCycleKey),
         A.assoc('repeatInvitation', repeatInvitation)
       )(userInvite)
@@ -100,7 +100,7 @@ const _performInvite =
   }
 
 export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = false }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()

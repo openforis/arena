@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
@@ -17,6 +16,7 @@ import { useUser } from '@webapp/store/user'
 import { NotificationActions } from '@webapp/store/ui'
 
 import { useActions } from './actions'
+import { useAppDispatch } from '@webapp/store'
 
 const getEditCapabilities = ({ user, surveyInfo, ready, userToUpdate = null }) => {
   const userToUpdateUuid = User.getUuid(userToUpdate)
@@ -27,7 +27,7 @@ const getEditCapabilities = ({ user, surveyInfo, ready, userToUpdate = null }) =
     ((newUser && Authorizer.canCreateUsers(user)) ||
       (userToUpdate && !isUserAcceptPending && Authorizer.canEditUser(user, surveyInfo, userToUpdate)))
   const canEditName = canEditUser
-  const canEditEmail = canEditUser && (!userToUpdate || Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate))
+  const canEditEmail = canEditUser && (!userToUpdate || Authorizer.canEditUserEmail(user))
   const canEditGroup = canEditUser && (!userToUpdate || Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate))
   const canRemove = Authorizer.canRemoveUser(user, surveyInfo, userToUpdate)
   const canEdit = canEditName || canEditEmail || canEditGroup
@@ -63,7 +63,7 @@ export const useEditUser = ({ userUuid }) => {
 
   const [userToUpdateOriginal, setUserToUpdateOriginal] = useState({})
   const [userToUpdate, setUserToUpdate] = useState({})
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const { showSurveyGroup = false } = useQuery()
   const surveyInfo = useSurveyInfo()

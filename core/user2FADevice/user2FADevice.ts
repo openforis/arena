@@ -1,3 +1,5 @@
+import type { ArenaUser } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 
 const keys = {
@@ -14,15 +16,16 @@ const keys = {
 const getUuid = (device: Record<string, unknown>): string | undefined => device[keys.uuid] as string | undefined
 const getDeviceName = (device: Record<string, unknown>): string => (device[keys.deviceName] as string | undefined) ?? ''
 const isEnabled = (device: Record<string, unknown>): boolean => Boolean(device[keys.enabled] ?? false)
-const getDateCreated = (device: Record<string, unknown>): unknown => device[keys.dateCreated] ?? null
-const getDateModified = (device: Record<string, unknown>): unknown => device[keys.dateModified] ?? null
-const getSecret = (device: Record<string, unknown>): unknown => device[keys.secret] ?? null
-const getOtpAuthUrl = (device: Record<string, unknown>): unknown => device[keys.otpAuthUrl] ?? null
-const getBackupCodes = (device: Record<string, unknown>): Array<unknown> =>
-  (device[keys.backupCodes] as Array<unknown>) ?? []
+const getStringOrNull = (device: Record<string, unknown>, key: string): string | null =>
+  (device[key] as string | undefined) ?? null
+const getDateCreated = (device: Record<string, unknown>): string | null => getStringOrNull(device, keys.dateCreated)
+const getDateModified = (device: Record<string, unknown>): string | null => getStringOrNull(device, keys.dateModified)
+const getSecret = (device: Record<string, unknown>): string | null => getStringOrNull(device, keys.secret)
+const getOtpAuthUrl = (device: Record<string, unknown>): string | null => getStringOrNull(device, keys.otpAuthUrl)
+const getBackupCodes = (device: Record<string, unknown>): string[] => (device[keys.backupCodes] as string[]) ?? []
 
 const getDeviceNameFinal =
-  ({ user }: { user: Record<string, unknown> }) =>
+  ({ user }: { user: ArenaUser }) =>
   (device: Record<string, unknown>): string =>
     `Arena: ${getDeviceName(device)} - ${User.getEmail(user)}`
 
