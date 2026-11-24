@@ -19,7 +19,11 @@ import { useI18n } from '@webapp/store/system'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 
-const defaultState = { form: UserPasswordChangeForm.newForm(), userToUpdate: null, validation: {} }
+const defaultState = {
+  form: UserPasswordChangeForm.newForm(),
+  userToUpdate: null,
+  validation: Validation.newInstance(),
+}
 
 const UserPasswordChange = () => {
   const { userUuid } = useParams()

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
@@ -10,9 +9,10 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useConfirm } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
 
 export const useOnRemove = ({ userToUpdate }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const confirm = useConfirm()
   const lang = useSurveyPreferredLang()

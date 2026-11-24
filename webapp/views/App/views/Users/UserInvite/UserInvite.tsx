@@ -60,7 +60,7 @@ const UserInviteComponent = () => {
     <div className="user-invite form">
       <FormItem label="common.email_other">
         <InputChipsText
-          id={TestId.userInvite.email}
+          idInput={TestId.userInvite.email}
           isInputFieldValueValid={Validator.isEmailValueValid}
           onChange={(value) => onUpdate({ name: UserInvite.keys.emails, value })}
           placeholder="userInviteView.typeEmail"

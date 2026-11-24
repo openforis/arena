@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router'
-import PropTypes from 'prop-types'
 
 import { Button, ButtonDownload } from '@webapp/components'
 import { TextInput } from '@webapp/components/form'
@@ -8,7 +7,14 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import { UsersBackupButtons } from './UsersBackup'
 
-export const TableHeaderLeft = (props) => {
+type TableHeaderLeftProps = {
+  search?: string
+  handleSearch: (...args: any[]) => any
+  onUsersRestored?: (...args: any[]) => any
+  selectedItems?: any[]
+}
+
+export const TableHeaderLeft = (props: TableHeaderLeftProps) => {
   const { search, handleSearch, onUsersRestored, selectedItems = [] } = props
 
   const canCreateUsers = useAuthCanCreateUsers()
@@ -31,11 +37,4 @@ export const TableHeaderLeft = (props) => {
       <div /> {/* spacer */}
     </div>
   )
-}
-
-TableHeaderLeft.propTypes = {
-  search: PropTypes.string,
-  handleSearch: PropTypes.func.isRequired,
-  onUsersRestored: PropTypes.func,
-  selectedItems: PropTypes.array,
 }

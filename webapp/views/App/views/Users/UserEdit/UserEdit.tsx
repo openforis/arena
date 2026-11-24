@@ -1,7 +1,6 @@
 import './UserEdit.scss'
 
 import { useCallback, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -26,6 +25,7 @@ import { UserEditHeader } from './UserEditHeader'
 import { UserEditNav, UserEditNavItem } from './UserEditNav'
 import { UserEditSaveBar } from './UserEditSaveBar'
 import { useUserEditLayout } from './useUserEditLayout'
+import { useAppDispatch } from '@webapp/store'
 
 type Props = {
   // true when editing the logged-in user's own profile (route has no userUuid param)
@@ -42,7 +42,7 @@ const useUserUuid = (ownProfile: boolean) => {
 
 // notification preferences of the logged-in user, saved together with the other changes
 const useNotificationPrefs = (user) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [dirty, setDirty] = useState(false)
   const [notifyOnUserAccessRequest, setNotifyOnUserAccessRequest] = useState(() =>
     User.getPrefNotifyOnUserAccessRequest(user)
@@ -165,7 +165,6 @@ const UserEdit = (props: Props) => {
             canEditGroup={editUser.canEditGroup}
             canEditSurveyManager={editUser.canEditSurveyManager}
             canEditSystemAdmin={editUser.canEditSystemAdmin}
-            editingLoggedInUser={editingLoggedInUser}
             groupInCurrentSurvey={groupInCurrentSurvey}
             onSurveyAuthGroupChange={editUser.onSurveyAuthGroupChange}
             onSurveyManagerChange={editUser.onSurveyManagerChange}
