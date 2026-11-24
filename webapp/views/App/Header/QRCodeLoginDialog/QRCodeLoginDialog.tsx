@@ -1,7 +1,6 @@
 import './QRCodeLoginDialog.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import { waitFor } from '@core/promiseUtils'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
@@ -21,7 +20,11 @@ const initialState = {
   token: null,
 }
 
-export const QRCodeLoginDialog = (props) => {
+type QRCodeLoginDialogProps = {
+  onClose: (...args: any[]) => any
+}
+
+export const QRCodeLoginDialog = (props: QRCodeLoginDialogProps) => {
   const { onClose } = props
 
   const i18n = useI18n()
@@ -64,7 +67,7 @@ export const QRCodeLoginDialog = (props) => {
     setState((state) => ({ ...state, ...stateNext }))
   }, [])
 
-  const fetchTempAuthToken = useCallback(async () => {
+  const fetchTempAuthToken = useCallback(() => {
     cancelAuthTokenFetchInterval()
 
     fetchTempAuthTokenInternal().then(() => {
@@ -132,8 +135,4 @@ export const QRCodeLoginDialog = (props) => {
       )}
     </Modal>
   )
-}
-
-QRCodeLoginDialog.propTypes = {
-  onClose: PropTypes.func.isRequired,
 }

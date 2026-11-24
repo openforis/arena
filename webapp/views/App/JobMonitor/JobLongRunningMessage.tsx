@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import { useI18n } from '@webapp/store/system'
+import type { ArenaJobSerialized } from '@openforis/arena-core'
 
 const showMessageDelayMillis = 60 * 1000 // 1 minute
 
 type Props = {
-  job: Record<string, any>
+  job: ArenaJobSerialized
   messageKey?: string
 }
 

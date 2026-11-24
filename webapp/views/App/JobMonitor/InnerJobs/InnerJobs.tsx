@@ -1,12 +1,22 @@
-import PropTypes from 'prop-types'
-
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { ExpansionPanel } from '@webapp/components'
 
 import InnerJob from './InnerJob'
 
-const InnerJobs = ({ currentJobIndex = 0, innerJobs = [], openPanel = undefined, panelStartClosed = true }) => (
+type InnerJobsProps = {
+  currentJobIndex?: number
+  innerJobs?: any[]
+  openPanel?: boolean
+  panelStartClosed?: boolean
+}
+
+const InnerJobs = ({
+  currentJobIndex = 0,
+  innerJobs = [],
+  openPanel = undefined,
+  panelStartClosed = true,
+}: InnerJobsProps) => (
   <ExpansionPanel
     className="app-job-monitor__inner-jobs"
     buttonLabel="common.details"
@@ -23,12 +33,5 @@ const InnerJobs = ({ currentJobIndex = 0, innerJobs = [], openPanel = undefined,
     ))}
   </ExpansionPanel>
 )
-
-InnerJobs.propTypes = {
-  currentJobIndex: PropTypes.number,
-  innerJobs: PropTypes.array,
-  openPanel: PropTypes.bool,
-  panelStartClosed: PropTypes.bool,
-}
 
 export default InnerJobs

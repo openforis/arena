@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
@@ -15,9 +14,10 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
+import { useAppDispatch } from '@webapp/store'
 
 export const useOpenWebSocket = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const navigateRef = useRef(navigate)
   const user = useUser()
@@ -54,7 +54,7 @@ export const useOpenWebSocket = () => {
     }
   }, [dispatch])
   const onUserRoleUpdate = useCallback(
-    ({ surveyId } = {}) => {
+    ({ surveyId }: { surveyId?: number | string } = {}) => {
       if (String(surveyId) !== String(surveyIdCurrent)) {
         return
       }
@@ -72,7 +72,7 @@ export const useOpenWebSocket = () => {
     [dispatch, surveyIdCurrent]
   )
   const onUserRemovedFromSurvey = useCallback(
-    ({ surveyId } = {}) => {
+    ({ surveyId }: { surveyId?: number | string } = {}) => {
       if (String(surveyId) !== String(surveyIdCurrent)) {
         return
       }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as Languages from '@core/app/languages'
@@ -9,7 +8,12 @@ import { useI18n } from '@webapp/store/system'
 import { LoadingBar } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 
-export const SurveyTemplateSelect = (props) => {
+type SurveyTemplateSelectProps = {
+  selectedValue?: string
+  onChange: (...args: any[]) => any
+}
+
+export const SurveyTemplateSelect = (props: SurveyTemplateSelectProps) => {
   const { selectedValue, onChange } = props
 
   const [state, setState] = useState({ loading: true, items: null })
@@ -46,11 +50,6 @@ export const SurveyTemplateSelect = (props) => {
       selection={selectedItem}
     />
   )
-}
-
-SurveyTemplateSelect.propTypes = {
-  selectedValue: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
 }
 
 SurveyTemplateSelect.defaultValues = {

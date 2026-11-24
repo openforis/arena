@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import { useFormObject } from '@webapp/components/hooks'
@@ -10,11 +10,12 @@ import Error from '@webapp/views/Guest/Error'
 import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
+import { useAppDispatch } from '@webapp/store'
 
 const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)
   const error = useSelector(LoginState.getError)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {

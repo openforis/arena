@@ -1,7 +1,6 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaValidation } from '@openforis/arena-core'
 
 import { Countries } from '@core/Countries'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -13,13 +12,13 @@ import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
-const AccessRequestInputFieldPropTypes = {
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.any.isRequired,
+type AccessRequestInputFieldProps = {
+  field: Record<string, any>
+  onChange: (...args: any[]) => any
+  value: any
 }
 
-const CountryField = (props) => {
+const CountryField = (props: AccessRequestInputFieldProps) => {
   const { field, onChange, value } = props
 
   const { name, defaultValue } = field
@@ -37,9 +36,7 @@ const CountryField = (props) => {
   )
 }
 
-CountryField.propTypes = AccessRequestInputFieldPropTypes
-
-const TemplateField = (props) => {
+const TemplateField = (props: AccessRequestInputFieldProps) => {
   const { field, onChange, value } = props
 
   const { name, defaultValue } = field
@@ -49,9 +46,7 @@ const TemplateField = (props) => {
   return <SurveyTemplateSelect selectedValue={selectedValue} onChange={(value) => onChange({ name, value })} />
 }
 
-TemplateField.propTypes = AccessRequestInputFieldPropTypes
-
-const EmailField = (props) => {
+const EmailField = (props: AccessRequestInputFieldProps) => {
   const { field, onChange, value } = props
 
   const { name } = field
@@ -66,9 +61,7 @@ const EmailField = (props) => {
   )
 }
 
-EmailField.propTypes = AccessRequestInputFieldPropTypes
-
-const TextField = (props) => {
+const TextField = (props: AccessRequestInputFieldProps) => {
   const { field, onChange, value } = props
 
   const { name, normalizeFn } = field
@@ -84,15 +77,20 @@ const TextField = (props) => {
   )
 }
 
-TextField.propTypes = AccessRequestInputFieldPropTypes
-
 const componentsByFieldName = {
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: CountryField,
   [UserAccessRequest.keys.email]: EmailField,
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: TemplateField,
 }
 
-export const AccessRequestField = (props) => {
+type AccessRequestFieldProps = {
+  field: Record<string, any>
+  onChange: (...args: any[]) => any
+  request: Record<string, any>
+  validation?: ArenaValidation
+}
+
+export const AccessRequestField = (props: AccessRequestFieldProps) => {
   const { field, onChange, request, validation = null } = props
 
   const { name, required } = field
@@ -116,11 +114,4 @@ export const AccessRequestField = (props) => {
       <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
     </FormItem>
   )
-}
-
-AccessRequestField.propTypes = {
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  request: PropTypes.object.isRequired,
-  validation: PropTypes.object,
 }
