@@ -3,9 +3,10 @@ import { forwardRef, useEffect, type MutableRefObject } from 'react'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import TreeChart from '@webapp/charts/TreeChart'
+import type { TreeChartNode } from '@webapp/charts/TreeChart/TreeChart'
 import { useNodeDefTreeChart } from '@webapp/charts/TreeChart/useNodeDefTreeChart'
 
-const nodeClassFunction = (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`
+const nodeClassFunction = (d: TreeChartNode) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`
 
 type SurveyHierarchyTreeProps = {
   data: Record<string, any>

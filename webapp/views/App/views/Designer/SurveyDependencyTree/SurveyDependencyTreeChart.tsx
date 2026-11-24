@@ -3,7 +3,7 @@ import { forwardRef, useCallback, useEffect, type MutableRefObject } from 'react
 import * as NodeDef from '@core/survey/nodeDef'
 
 import TreeChart from '@webapp/charts/TreeChart'
-import { highlightClassName } from '@webapp/charts/TreeChart/TreeChart'
+import { highlightClassName, type TreeChartNode } from '@webapp/charts/TreeChart/TreeChart'
 import { useNodeDefTreeChart } from '@webapp/charts/TreeChart/useNodeDefTreeChart'
 
 type SurveyDependencyTreeChartProps = {
@@ -26,7 +26,7 @@ export const SurveyDependencyTreeChart = forwardRef<TreeChart, SurveyDependencyT
     })
 
     const nodeClassFunction = useCallback(
-      (d) => {
+      (d: TreeChartNode) => {
         const nodeDef = d.data
         const classes = ['node-grid']
         if (NodeDef.isVirtual(nodeDef)) {
