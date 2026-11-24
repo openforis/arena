@@ -3,12 +3,14 @@
 A motion-graphics video of the "What's new in 2026" deck, narrated with the [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M)
 neural voice (Apache 2.0), with background music and English subtitles.
 
-- `arena-whats-new-2026.mp4`: the video (4K, 3840×2160, about 5 minutes), grouped by area: look and feel, survey design,
+The videos are not in the repository (to keep it small): they are attached to the
+[whats-new-2026 release](https://github.com/openforis/arena/releases/tag/whats-new-2026) by the
+`What's new videos` workflow (`.github/workflows/whats-new-videos.yml`). New versions are attached to that release by hand
+(`gh release upload whats-new-2026 <file>.mp4 --clobber`); `*.mp4` files are git-ignored here.
+
+- [`arena-whats-new-2026.mp4`](https://github.com/openforis/arena/releases/download/whats-new-2026/arena-whats-new-2026.mp4): the video (4K, 3840×2160, about 5 minutes), grouped by area: look and feel, survey design,
   maps, data, analysis, users and security, and a short AI scene (AI features have a video of their own).
-- `arena-whats-new-2026-720p.mp4`: a 1280×720 copy of the video, light enough to share in a Zoom call. Made from the
-  4K video with:
-  `ffmpeg -i arena-whats-new-2026.mp4 -map 0 -vf "scale=1280:720:flags=lanczos:out_range=tv,format=yuv420p" -c:v libx264 -preset slow -crf 20 -c:a copy -c:s copy -movflags +faststart arena-whats-new-2026-720p.mp4`
-- `arena-ai-v5.mp4`: the AI features video (1920×1080, about 3 minutes).
+- [`arena-ai-v5.mp4`](https://github.com/openforis/arena/releases/download/whats-new-2026/arena-ai-v5.mp4): the AI features video (1920×1080, about 3 minutes).
 - `scenes.json`: the script: for each scene, the narration (`say`, one entry per sentence) and the animated items
   (screenshots, chips, cards, ...). An item with `"at": n` appears when sentence `n` starts (plus `delay` seconds).
   Acronyms are spelled with hyphens (e.g. "A-O-I") so that the voice pronounces them letter by letter.
