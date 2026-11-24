@@ -51,7 +51,7 @@ const _findCategoryItem = ({ survey, nodeDef, code, categoryItemsByCodeDefUuid, 
 export const formatTimeKeyValue = ({ value, nodeDef }) =>
   DateUtils.convertDate({
     dateStr: value,
-    formatFrom: 'HH:mm:ss',
+    formatFrom: DateUtils.formats.timeWithSeconds,
     formatTo: DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef)),
     keepTimeZone: false,
   })
@@ -143,7 +143,17 @@ const extractKeyOrSummaryValue = ({
  * @param {string} [params.lang] - The language of the labels.
  * @returns {Array} The key values.
  */
-const extractKeyValues = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
+const extractKeyValues = ({
+  survey,
+  record,
+  categoryItemsByCodeDefUuid = null,
+  lang = null,
+}: {
+  survey: any
+  record: any
+  categoryItemsByCodeDefUuid?: { [codeDefUuid: string]: any[] } | null
+  lang?: string | null
+}) => {
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   const srsIndex = Survey.getSRSIndex(survey)
   return nodeDefKeys.map((nodeDef) =>
@@ -151,7 +161,17 @@ const extractKeyValues = ({ survey, record, categoryItemsByCodeDefUuid, lang }) 
   )
 }
 
-const extractKeyValuesAndLabels = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
+const extractKeyValuesAndLabels = ({
+  survey,
+  record,
+  categoryItemsByCodeDefUuid = null,
+  lang = null,
+}: {
+  survey: any
+  record: any
+  categoryItemsByCodeDefUuid?: { [codeDefUuid: string]: any[] } | null
+  lang?: string | null
+}) => {
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   const srsIndex = Survey.getSRSIndex(survey)
   return nodeDefKeys.map((nodeDef) => {

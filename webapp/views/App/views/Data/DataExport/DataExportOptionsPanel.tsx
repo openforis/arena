@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import { DateFormats, Objects } from '@openforis/arena-core'
 
@@ -18,7 +17,13 @@ import { dataImportNonCompatibilityByOption, dataExportOptions as options } from
 
 const availableFileFormats = [FileFormats.xlsx, FileFormats.csv]
 
-export const DataExportOptionsPanel = (props) => {
+type DataExportOptionsPanelProps = {
+  availableOptions?: any[]
+  onOptionChange: (...args: any[]) => any
+  selectedOptionsByKey: Record<string, any>
+}
+
+export const DataExportOptionsPanel = (props: DataExportOptionsPanelProps) => {
   const { availableOptions: availableOptionsProp, onOptionChange, selectedOptionsByKey } = props
 
   const i18n = useI18n()
@@ -104,10 +109,4 @@ export const DataExportOptionsPanel = (props) => {
       )}
     </ExpansionPanel>
   )
-}
-
-DataExportOptionsPanel.propTypes = {
-  availableOptions: PropTypes.array,
-  onOptionChange: PropTypes.func.isRequired,
-  selectedOptionsByKey: PropTypes.object.isRequired,
 }

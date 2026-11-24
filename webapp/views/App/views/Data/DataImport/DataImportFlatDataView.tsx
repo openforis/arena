@@ -1,7 +1,6 @@
 import './DataImportFlatDataView.scss'
 
 import { useCallback, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Objects, UUIDs } from '@openforis/arena-core'
 
@@ -31,6 +30,7 @@ import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportFlatDataViewSteps } from './useDataImportFlatDataViewSteps'
 import { ImportStartButton } from './ImportStartButton'
+import { useAppDispatch } from '@webapp/store'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
@@ -56,7 +56,7 @@ export const DataImportFlatDataView = () => {
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canSelectCycle = surveyCycleKeys.length > 1
   const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
@@ -65,6 +65,7 @@ export const DataImportFlatDataView = () => {
     cycle: canSelectCycle ? null : surveyCycle,
     dataImportType: null,
     file: null,
+    fileFormat: null as string | null,
     fileId: null,
     jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,

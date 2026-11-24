@@ -167,6 +167,18 @@ export const startDataImportFromArenaJob = ({
   startFromChunk = 1,
   reuseUploadedFile = false,
   selectedRecordsUuids = undefined,
+}: {
+  surveyId: number
+  conflictResolutionStrategy: string
+  file?: File
+  fileId?: string
+  chunkSize?: number
+  onUploadProgress?: (progress: unknown) => void
+  dryRun?: boolean
+  skipMissingFiles?: boolean
+  startFromChunk?: number
+  reuseUploadedFile?: boolean
+  selectedRecordsUuids?: string[]
 }) => {
   const commonParameters = {
     fileId,
@@ -380,6 +392,14 @@ export const startValidationReportGeneration = async ({
   query,
   attributeDefUuids,
   messageTypeKeys,
+}: {
+  surveyId: number
+  cycle?: string
+  recordUuid?: string
+  lang?: string
+  query?: unknown
+  attributeDefUuids?: string[]
+  messageTypeKeys?: string[]
 }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/validationReport/start-export`, {
     cycle,

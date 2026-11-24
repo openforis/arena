@@ -1,5 +1,4 @@
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -22,7 +21,13 @@ const cleanupContent = ({ content }) => {
   return nonZeroParts.join('\n')
 }
 
-export const DataImportCompleteDialog = (props) => {
+type DataImportCompleteDialogProps = {
+  errorsExportFileName?: string
+  job: Record<string, any>
+  onClose: (...args: any[]) => any
+}
+
+export const DataImportCompleteDialog = (props: DataImportCompleteDialogProps) => {
   const { errorsExportFileName, job, onClose } = props
 
   const i18n = useI18n()
@@ -54,10 +59,4 @@ export const DataImportCompleteDialog = (props) => {
       </ModalFooter>
     </Modal>
   )
-}
-
-DataImportCompleteDialog.propTypes = {
-  errorsExportFileName: PropTypes.string,
-  job: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
 }

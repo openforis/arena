@@ -1,7 +1,6 @@
 import './RecordsCloneModal.scss'
 
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -15,16 +14,22 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { useAppDispatch } from '@webapp/store'
 
 const sources = {
   allRecords: 'allRecords',
   selectedRecords: 'selectedRecords',
 }
 
-export const RecordsCloneModal = (props) => {
+type RecordsCloneModalProps = {
+  onClose: () => void
+  selectedRecordsUuids: string[]
+}
+
+export const RecordsCloneModal = (props: RecordsCloneModalProps) => {
   const { onClose, selectedRecordsUuids } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
   const cycleFrom = useSurveyCycleKey()
 
@@ -61,7 +66,7 @@ export const RecordsCloneModal = (props) => {
   const showCloneCompleteNotification = useCallback(
     ({ recordsCloned }) => {
       dispatch(
-        NotificationActions.showNotification({
+        NotificationActions.notifyInfo({
           key: 'dataView:recordsClone.cloneComplete',
           params: { recordsCloned, cycleFrom: cycleFromLabel, cycleTo: cycleToLabel },
         })
@@ -85,7 +90,7 @@ export const RecordsCloneModal = (props) => {
     dispatch(JobActions.showJobMonitor({ job, onComplete: onCloneComplete }))
   }, [cycleFrom, cycleTo, dispatch, onCloneComplete, selectedRecordsUuids, source, surveyId])
 
-  const onStartCloneClick = async () => {
+  const onStartCloneClick = () => {
     if (!checkCanClone()) return
 
     dispatch(

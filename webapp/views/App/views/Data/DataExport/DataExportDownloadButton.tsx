@@ -1,6 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import { FileFormats } from '@core/fileFormats'
@@ -10,11 +8,16 @@ import * as API from '@webapp/service/api'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 import { TestId } from '@webapp/utils/testId'
+import { useAppDispatch } from '@webapp/store'
 
-export const DataExportDownloadButton = (props) => {
+type DataExportDownloadButtonProps = {
+  job: Record<string, any>
+}
+
+export const DataExportDownloadButton = (props: DataExportDownloadButtonProps) => {
   const { job } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
 
@@ -37,8 +40,4 @@ export const DataExportDownloadButton = (props) => {
       variant="contained"
     />
   )
-}
-
-DataExportDownloadButton.propTypes = {
-  job: PropTypes.object.isRequired,
 }

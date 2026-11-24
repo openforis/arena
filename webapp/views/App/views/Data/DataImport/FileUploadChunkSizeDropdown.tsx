@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
@@ -22,7 +20,13 @@ const chunkSizeItems = [
  * @param {number|string} props.value - Currently selected chunk size value.
  * @returns {React.JSX.Element|null} The chunk size dropdown or null if not a system admin.
  */
-export const FileUploadChunkSizeDropdown = ({ className, onChange, value }) => {
+type FileUploadChunkSizeDropdownProps = {
+  className?: string
+  onChange: (...args: any[]) => any
+  value: number | string
+}
+
+export const FileUploadChunkSizeDropdown = ({ className, onChange, value }: FileUploadChunkSizeDropdownProps) => {
   const userIsSystemAdmin = useUserIsSystemAdmin()
 
   if (!userIsSystemAdmin) return null
@@ -39,10 +43,4 @@ export const FileUploadChunkSizeDropdown = ({ className, onChange, value }) => {
       />
     </FormItem>
   )
-}
-
-FileUploadChunkSizeDropdown.propTypes = {
-  className: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
 }

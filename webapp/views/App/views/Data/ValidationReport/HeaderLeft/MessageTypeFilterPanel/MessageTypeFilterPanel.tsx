@@ -1,5 +1,4 @@
-import { useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { type RefObject, useEffect } from 'react'
 
 import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilterCategories'
 
@@ -8,13 +7,21 @@ import { Checkbox } from '@webapp/components/form'
 const customValidationCategoryId = 'customValidation'
 const otherCategoryIds = MessageTypeFilterCategoryIds.filter((categoryId) => categoryId !== customValidationCategoryId)
 
+type MessageTypeFilterPanelProps = {
+  allCategoriesSelected: boolean
+  containerRef: RefObject<HTMLDivElement | null>
+  onClose: (...args: any[]) => any
+  onSelectedCategoryIdsChange: (...args: any[]) => any
+  selectedCategoryIds: readonly string[]
+}
+
 export const MessageTypeFilterPanel = ({
   allCategoriesSelected,
   containerRef,
   onClose,
   onSelectedCategoryIdsChange,
   selectedCategoryIds,
-}) => {
+}: MessageTypeFilterPanelProps) => {
   const onCategoryToggle = (categoryId, selected) => {
     const next = new Set(selectedCategoryIds)
     if (selected) {
@@ -64,12 +71,4 @@ export const MessageTypeFilterPanel = ({
       </div>
     </div>
   )
-}
-
-MessageTypeFilterPanel.propTypes = {
-  allCategoriesSelected: PropTypes.bool.isRequired,
-  containerRef: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSelectedCategoryIdsChange: PropTypes.func.isRequired,
-  selectedCategoryIds: PropTypes.array.isRequired,
 }
