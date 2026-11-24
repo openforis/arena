@@ -1,8 +1,12 @@
-import PropTypes from 'prop-types'
-
 import { useI18n } from '@webapp/store/system'
 
-export const Legend = (props) => {
+type LegendProps = {
+  colors: any[]
+  data: any[]
+  totalItems: number
+}
+
+export const Legend = (props: LegendProps) => {
   const { colors, data, totalItems } = props
 
   const i18n = useI18n()
@@ -24,10 +28,4 @@ export const Legend = (props) => {
       })}
     </div>
   )
-}
-
-Legend.propTypes = {
-  colors: PropTypes.array.isRequired,
-  data: PropTypes.array.isRequired,
-  totalItems: PropTypes.number.isRequired,
 }

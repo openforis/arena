@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import { ArenaUserGroup } from '@openforis/arena-core'
 
@@ -12,6 +10,7 @@ import { useConfirm } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { useAppDispatch } from '@webapp/store'
 
 type SurveyUserType = Record<string, unknown>
 type UserGroupMemberType = Record<string, unknown>
@@ -89,11 +88,7 @@ const buildOtherGroupsMembersByUserMap = ({
 export const useUserGroupMembersEditor = ({
   groupUuid,
 }: UseUserGroupMembersEditorParams): UseUserGroupMembersEditorResult => {
-  // NotificationActions/LoaderActions dispatch thunks (functions), not plain actions, but the
-  // untyped store JS modules make useDispatch() infer the plain redux `Dispatch<UnknownAction>`
-  // type; type it explicitly as a thunk dispatch here, following the precedent in
-  // useEditUserGroup.ts / ChainCloneFromSurveyDialog.tsx.
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const confirm = useConfirm()
   // useSurveyId's untyped implementation makes TS infer its return type as `unknown`; cast to the
   // `string` shape the API service functions declare, following the useEditUserGroup.ts precedent.

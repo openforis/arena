@@ -1,8 +1,6 @@
 import './SurveyInfo.scss'
 
 import { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
@@ -20,11 +18,16 @@ import { TestId } from '@webapp/utils/testId'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-const SurveyInfo = (props) => {
+import { useAppDispatch } from '@webapp/store'
+type SurveyInfoProps = {
+  firstTime?: boolean
+}
+
+const SurveyInfo = (props: SurveyInfoProps) => {
   const { firstTime = false } = props
 
   const i18n = useI18n()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const surveyInfo = useSurveyInfo()
@@ -254,10 +257,6 @@ const SurveyInfo = (props) => {
       </div>
     </div>
   )
-}
-
-SurveyInfo.propTypes = {
-  firstTime: PropTypes.bool,
 }
 
 export default SurveyInfo

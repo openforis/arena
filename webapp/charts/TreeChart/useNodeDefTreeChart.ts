@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, type MutableRefObject } from 'react'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -7,14 +6,7 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-interface TreeChartNode {
-  data: ArenaAnyNodeDef
-}
-
-interface IconDescriptor {
-  className: string
-  text: string | null
-}
+import type { TreeChartNode, TreeChartNodeIcon } from './TreeChart'
 
 interface Params {
   ref: MutableRefObject<any>
@@ -26,7 +18,7 @@ interface Result {
   wrapperRef: MutableRefObject<HTMLDivElement | null>
   nodeLabelFunction: (d: TreeChartNode) => string
   nodeTooltipFunction: (d: TreeChartNode) => string
-  nodeIconFunction: (d: TreeChartNode) => IconDescriptor | null
+  nodeIconFunction: (d: TreeChartNode) => TreeChartNodeIcon | null
 }
 
 /**

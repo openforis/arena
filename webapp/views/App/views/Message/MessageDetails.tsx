@@ -1,7 +1,6 @@
 import './MessageDetails.scss'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 
 import {
@@ -25,6 +24,8 @@ import { useConfirm } from '@webapp/components/hooks'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
 import { DateInput } from '@webapp/components/form/DateTimeInput'
+import { useAppDispatch } from '@webapp/store'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const notificationTypeItems = [MessageNotificationType.Email, MessageNotificationType.PushNotification].map(
   (notificationType) => ({
@@ -50,7 +51,7 @@ const targetUserTypeItems = [
 const emailTransformFunction = (value) => value.trim().toLowerCase()
 
 const MessageDetails = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { messageUuid } = useParams()
   const message = useMessage()
@@ -60,7 +61,9 @@ const MessageDetails = () => {
   const readOnly = !message || Messages.getStatus(message) === MessageStatus.Sent
 
   useEffect(() => {
-    messageUuid && dispatch(MessageActions.fetchMessage({ messageUuid }))
+    if (messageUuid) {
+      dispatch(MessageActions.fetchMessage({ messageUuid }))
+    }
   }, [dispatch, messageUuid])
 
   const onMessageChange = useCallback(
@@ -200,15 +203,16 @@ const MessageDetails = () => {
         </div>
       </FormItem>
       <FormItem label="messageView:notificationType.label">
-        <ButtonGroup
-          disabled={readOnly}
-          groupName="messageNotificationType"
-          items={notificationTypeItems}
-          multiple
-          onChange={onNotificationTypesChange}
-          selectedItemKey={Messages.getNotificationTypes(message)}
-          validation={Validation.getFieldValidation(MessagePropsKey.notificationTypes)(validation)}
-        />
+        <ValidationTooltip validation={Validation.getFieldValidation(MessagePropsKey.notificationTypes)(validation)}>
+          <ButtonGroup
+            disabled={readOnly}
+            groupName="messageNotificationType"
+            items={notificationTypeItems}
+            multiple
+            onChange={onNotificationTypesChange}
+            selectedItemKey={Messages.getNotificationTypes(message)}
+          />
+        </ValidationTooltip>
       </FormItem>
       <FormItem label="messageView:target.userType.label">
         <ButtonGroup

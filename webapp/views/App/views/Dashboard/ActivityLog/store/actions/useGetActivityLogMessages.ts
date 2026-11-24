@@ -57,8 +57,8 @@ export const useFetchMessages = ({ messages, setMessages, onError = null, onLoad
     dependencies: [params],
   })
 
-  return ({ newest: _newest } = {}) => {
-    const _params = {}
+  return ({ newest: _newest }: { newest?: boolean } = {}) => {
+    const _params: { idGreaterThan?: number; idLessThan?: number } = {}
     const initialized = messages.length > 0
 
     if (initialized) {

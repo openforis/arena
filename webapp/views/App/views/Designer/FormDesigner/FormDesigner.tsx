@@ -10,7 +10,7 @@ const FormDesigner = () => {
   const canEditDef = useAuthCanEditSurvey()
   const recordPreviewUuid = useSelector(RecordState.getRecordUuidPreview)
 
-  return recordPreviewUuid ? <Record canEditDef={canEditDef} /> : <SurveyForm edit draft canEditDef={canEditDef} />
+  return recordPreviewUuid ? <Record /> : <SurveyForm edit draft canEditDef={canEditDef} />
 }
 
 export default FormDesigner

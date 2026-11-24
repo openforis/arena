@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import { ArenaUserGroup } from '@openforis/arena-core'
 
@@ -10,6 +8,7 @@ import * as UserGroup from '@core/user/userGroup/userGroup'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
+import { useAppDispatch } from '@webapp/store'
 
 export type SurveyUserType = Record<string, unknown>
 
@@ -42,11 +41,7 @@ interface UseUserGroupsOverviewResult {
  *   and the handler to change a user's group.
  */
 export const useUserGroupsOverview = (): UseUserGroupsOverviewResult => {
-  // NotificationActions dispatches a thunk (function), not a plain action, but the untyped store
-  // JS modules make useDispatch() infer the plain redux `Dispatch<UnknownAction>` type; type it
-  // explicitly as a thunk dispatch here, following the precedent in useEditUserGroup.ts /
-  // useUserGroupMembersEditor.ts.
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   // useSurveyId's untyped implementation makes TS infer its return type as `unknown`; cast to the
   // `string` shape the API service functions declare, following the useEditUserGroup.ts precedent.
   const surveyId = useSurveyId() as string
