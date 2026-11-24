@@ -1,5 +1,3 @@
-import pgPromise from 'pg-promise'
-
 import { db } from '../../../server/db/db'
 
 import * as A from '../../../core/arena'
@@ -21,6 +19,7 @@ import { TaxonomyBuilder } from './taxonomyBuilder'
 import { TaxonBuilder } from './taxonBuilder'
 import { ItemBuilder } from './categoryItemBuilder'
 import { CategoryBuilder } from './categoryBuilder'
+import type { ArenaUser } from '@openforis/arena-core'
 
 const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
@@ -28,7 +27,7 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const children = Survey.getNodeDefChildren({ nodeDef })(survey)
     // insert virtual node defs after source entity defs
-    children.sort((nodeDefA, nodeDefB) => NodeDef.isVirtual(nodeDefA) - NodeDef.isVirtual(nodeDefB))
+    children.sort((nodeDefA, nodeDefB) => Number(NodeDef.isVirtual(nodeDefA)) - Number(NodeDef.isVirtual(nodeDefB)))
 
     // insert node defs in order to avoid foreign keys violations
     for (const child of children) {
@@ -38,6 +37,17 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
 }
 
 class SurveyBuilder {
+  user: ArenaUser
+  name: string
+  label: string
+  lang: string
+  rootDefBuilder: NodeDefEntityBuilder
+  categoryBuilders: CategoryBuilder[]
+  taxonomyBuilders: TaxonomyBuilder[]
+  isTemplate: boolean
+  extraProps: Record<string, any>
+  langs: string[]
+
   constructor(user, rootDefBuilder) {
     this.user = user
     this.name = `do_not_use__test_${Date.now()}`
@@ -179,5 +189,5 @@ export const category = (name) => new CategoryBuilder(name)
 export const categoryItem = (code) => new ItemBuilder(code)
 // ==== taxonomy
 export const taxonomy = (name) => new TaxonomyBuilder(name)
-export const taxon = (code, family, genus, scientificName, ...vernacularNames) =>
-  new TaxonBuilder(code, family, genus, scientificName, ...vernacularNames)
+export const taxon = (code: string, family: string, genus: string, scientificName: string) =>
+  new TaxonBuilder(code, family, genus, scientificName)
