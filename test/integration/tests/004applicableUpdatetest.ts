@@ -95,7 +95,7 @@ describe('Applicable Test', () => {
     }
   })
 
-  test('Applicable evaluated on entity creation', async () => {
+  test('Applicable evaluated on entity creation', () => {
     const survey = global.applicableSurvey
     const record = global.applicableRecord
     const nodeTree = RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]')(survey, record)

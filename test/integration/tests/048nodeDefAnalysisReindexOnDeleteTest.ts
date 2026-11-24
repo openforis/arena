@@ -1,3 +1,4 @@
+import type { ArenaChain } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -53,7 +54,7 @@ describe('Analysis node defs chain index reindex on delete', () => {
 
     await ChainRepository.insertChain({
       surveyId: Survey.getId(survey),
-      chain: { uuid: chainUuid, props: { name: 'chain_reindex_test' } },
+      chain: { uuid: chainUuid, props: { labels: { en: 'chain_reindex_test' } } } as unknown as ArenaChain,
     })
   })
 
@@ -80,7 +81,7 @@ describe('Analysis node defs chain index reindex on delete', () => {
     })
 
     const remainingAnalysisNodeDefs = Survey.getAnalysisNodeDefs({
-      chain: { uuid: chainUuid },
+      chain: { uuid: chainUuid } as unknown as ArenaChain,
       showSamplingNodeDefs: false,
       showInactiveResultVariables: true,
     })(surveyRefetched)
