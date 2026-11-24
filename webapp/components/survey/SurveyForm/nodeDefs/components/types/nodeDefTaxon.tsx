@@ -20,6 +20,7 @@ import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon
 
@@ -29,18 +30,10 @@ const selectionDefault = {
   [vernacularName]: '',
 }
 
-type NodeDefTaxonProps = {
-  canEditRecord?: boolean
+type NodeDefTaxonProps = NodeDefComponentProps & {
   draft?: boolean
-  edit?: boolean
-  entryDataQuery?: boolean
   node?: ArenaRecordNode
-  nodeDef: ArenaAnyNodeDef
-  parentNode?: ArenaRecordNode
-  readOnly?: boolean
-  renderType?: string
   surveyId: number | string
-  updateNode: (...args: any[]) => any
 }
 
 const NodeDefTaxon = (props: NodeDefTaxonProps) => {

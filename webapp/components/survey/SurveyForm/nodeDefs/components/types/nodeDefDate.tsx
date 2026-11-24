@@ -4,23 +4,14 @@ import * as Node from '@core/record/node'
 
 import { DateInput } from '@webapp/components/form/DateTimeInput'
 import * as DateUtils from '@core/dateUtils'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const dateFormat = {
   display: DateUtils.formats.dateDefault,
   storage: DateUtils.formats.dateISO,
 }
 
-type NodeDefDateProps = {
-  canEditRecord?: boolean
-  edit?: boolean
-  entry?: boolean
-  nodeDef: any
-  nodes?: any[]
-  readOnly?: boolean
-  updateNode: (...args: any[]) => any
-}
-
-const NodeDefDate = (props: NodeDefDateProps) => {
+const NodeDefDate = (props: NodeDefComponentProps) => {
   const {
     canEditRecord = false,
     edit = false,

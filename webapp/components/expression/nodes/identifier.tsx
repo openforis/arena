@@ -4,6 +4,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { Dropdown } from '@webapp/components/form'
 
 import { findVariableByName } from '../expressionVariables'
+import type { ExpressionNodeProps } from './expressionNode'
 
 const getSelectedVariable = ({ variables, node }) => {
   if (!node) return null
@@ -39,13 +40,8 @@ const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
   }, [])
 }
 
-type IdentifierProps = {
+type IdentifierProps = Pick<ExpressionNodeProps, 'node' | 'onChange' | 'variables'> & {
   disabled?: boolean
-  // Common props
-  node: any
-  onChange: (...args: any[]) => any
-  // Identifier / Member / Call
-  variables?: any[]
   variablesFilterFn?: (...args: any[]) => any
 }
 

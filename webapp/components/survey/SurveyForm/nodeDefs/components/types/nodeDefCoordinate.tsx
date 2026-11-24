@@ -21,23 +21,12 @@ import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 import { MapTriggerButton } from '../mapTriggerButton'
-import type { ArenaAnyNodeDef, ArenaNodeDefCoordinate } from '@openforis/arena-core'
+import type { ArenaNodeDefCoordinate } from '@openforis/arena-core'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
 
-type NodeDefCoordinateProps = {
-  canEditRecord: boolean
-  edit: boolean
-  entry: boolean
-  nodeDef: ArenaAnyNodeDef
-  nodes: any[]
-  readOnly?: boolean
-  renderType?: string
-  surveyInfo: Record<string, any>
-  updateNode: (...args: any[]) => any
-}
-
-const NodeDefCoordinate = (props: NodeDefCoordinateProps) => {
+const NodeDefCoordinate = (props: NodeDefComponentProps) => {
   const { canEditRecord, edit, entry, nodeDef, nodes, readOnly = false, renderType, surveyInfo, updateNode } = props
 
   const lang = useSurveyPreferredLang()

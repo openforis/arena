@@ -25,6 +25,7 @@ import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType, isLeftOperand, isRightOperand } from './binaryOperand'
 import { findVariableByName } from '../expressionVariables'
+import type { ExpressionNodeProps } from './expressionNode'
 
 const isValueText = (nodeDef, value) =>
   nodeDef &&
@@ -85,14 +86,10 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type, varia
   return null
 }
 
-type LiteralProps = {
-  expressionNodeParent?: any
-  node: any
-  nodeDefCurrent?: any
-  onChange: (...args: any[]) => any
-  type?: string
-  variables?: any[]
-}
+type LiteralProps = Pick<
+  ExpressionNodeProps,
+  'expressionNodeParent' | 'node' | 'nodeDefCurrent' | 'onChange' | 'type' | 'variables'
+>
 
 const Literal = (props: LiteralProps) => {
   const { expressionNodeParent, node, nodeDefCurrent, onChange, type, variables = [] } = props

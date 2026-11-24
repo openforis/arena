@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import PropTypes from 'prop-types'
+import type L from 'leaflet'
 
 const GROUP_LABEL_CLASS = 'leaflet-control-layers-group-label'
 
@@ -13,7 +13,17 @@ const GROUP_LABEL_CLASS = 'leaflet-control-layers-group-label'
  * @param {Array<{label: string, count: number}>} [props.overlayGroups] - Overlay groups in display order.
  * @returns {null} Renders nothing.
  */
-export const MapLayersGroupsInjector = ({ control, baseLayersLabel, overlayGroups = [] }) => {
+type MapLayersGroupsInjectorProps = {
+  control?: L.Control.Layers | null
+  baseLayersLabel?: string
+  overlayGroups?: { label: string; count: number }[]
+}
+
+export const MapLayersGroupsInjector = ({
+  control,
+  baseLayersLabel,
+  overlayGroups = [],
+}: MapLayersGroupsInjectorProps) => {
   const groupsKey = JSON.stringify(overlayGroups)
 
   useEffect(() => {
@@ -21,7 +31,7 @@ export const MapLayersGroupsInjector = ({ control, baseLayersLabel, overlayGroup
     if (!container) return undefined
     const injected = []
 
-    const injectLabel = (label: string, referenceNode: Element | undefined, parentNode: Element | null = null) => {
+    const injectLabel = (label: string, referenceNode: ChildNode | undefined, parentNode: Element | null = null) => {
       const el = document.createElement('div')
       el.className = GROUP_LABEL_CLASS
       el.textContent = label
@@ -59,15 +69,4 @@ export const MapLayersGroupsInjector = ({ control, baseLayersLabel, overlayGroup
   }, [control, baseLayersLabel, groupsKey])
 
   return null
-}
-
-MapLayersGroupsInjector.propTypes = {
-  control: PropTypes.object,
-  baseLayersLabel: PropTypes.string,
-  overlayGroups: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      count: PropTypes.number.isRequired,
-    })
-  ),
 }

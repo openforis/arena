@@ -2,7 +2,7 @@ import './nodeDefFile.scss'
 
 import { useCallback, useState } from 'react'
 
-import { PointFactory, Points, type ArenaAnyNodeDef, type ArenaRecordNode } from '@openforis/arena-core'
+import { PointFactory, Points, type ArenaRecordNode } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -19,17 +19,12 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import { ImagePreview } from './ImagePreview'
 import { MapTriggerButton } from '../mapTriggerButton'
 import { useAppDispatch } from '@webapp/store'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
-type FileInputProps = {
+type FileInputProps = NodeDefComponentProps & {
   surveyInfo: Record<string, any>
-  nodeDef: ArenaAnyNodeDef
   node?: ArenaRecordNode
-  readOnly?: boolean
-  edit?: boolean
-  canEditRecord?: boolean
-  updateNode: (...args: any[]) => any
   removeNode: (...args: any[]) => any
-  insideTable?: boolean
   lang?: string
 }
 

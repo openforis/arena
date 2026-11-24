@@ -1,15 +1,9 @@
 import { ContentHeader } from './ContentHeader'
+import type { TableSelectionSortProps } from '../tableProps'
 
-type ContentHeadersProps = {
+type ContentHeadersProps = TableSelectionSortProps & {
   columns?: any[]
-  deselectAllItems?: (...args: any[]) => any
   expandableRows?: boolean
-  handleSortBy?: (...args: any[]) => any
-  selectAllItems?: (...args: any[]) => any
-  selectedItemsCount?: number
-  sort?: Record<string, any>
-  totalCount?: number
-  allVisibleItemsSelected?: boolean
 }
 
 export const ContentHeaders = (props: ContentHeadersProps) => {

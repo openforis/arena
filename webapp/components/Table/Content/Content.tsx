@@ -9,6 +9,7 @@ import { TestId } from '@webapp/utils/testId'
 import { ContentRowCells } from './ContentRowCells'
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
+import type { TableRowsProps, TableSelectionSortProps } from '../tableProps'
 
 // placeholder rows have no identity: give them positional ids
 const getLoadingRowIds = (rows) => Array.from({ length: rows }, (_item, index) => `loading-row-${index}`)
@@ -33,39 +34,25 @@ const emptyProps = {}
 const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
   [...(expandableRows ? ['40px'] : []), ...columns.map((column) => column.width || '1fr')].join(' ')
 
-type ContentProps = {
-  cellProps?: Record<string, any>
-  cellTestIdExtractor?: (...args: any[]) => any
-  columns?: any[]
-  deselectAllItems?: (...args: any[]) => any
-  expandableRows?: boolean
-  gridTemplateColumns: string
-  handleSortBy: (...args: any[]) => any
-  isRowActive?: (...args: any[]) => any
-  keyExtractor: (...args: any[]) => any
-  list: any[]
-  loading?: boolean
-  maxRows: number
-  module: string
-  noItemsLabelKey: string
-  noItemsLabelForSearchKey: string
-  offset: number
-  isRowExpandable?: (...args: any[]) => any
-  isRowOpenable?: (...args: any[]) => any
-  onItemSelectToggle: (...args: any[]) => any
-  onRowOpen?: (...args: any[]) => any
-  initData?: (...args: any[]) => any
-  rowHeaderComponent: React.ElementType
-  rowComponent: React.ElementType
-  rowExpandedComponent?: React.ElementType
-  rowProps?: Record<string, any>
-  selectable?: boolean
-  selectedItems?: any[]
-  selectAllItems?: (...args: any[]) => any
-  sort: Record<string, any>
-  totalCount?: number
-  allVisibleItemsSelected?: boolean
-}
+type ContentProps = TableRowsProps &
+  Omit<TableSelectionSortProps, 'selectedItemsCount'> & {
+    gridTemplateColumns: string
+    handleSortBy: (...args: any[]) => any
+    keyExtractor: (...args: any[]) => any
+    list: any[]
+    loading?: boolean
+    maxRows: number
+    module: string
+    noItemsLabelKey: string
+    noItemsLabelForSearchKey: string
+    offset: number
+    onItemSelectToggle: (...args: any[]) => any
+    initData?: (...args: any[]) => any
+    rowHeaderComponent: React.ElementType
+    rowComponent: React.ElementType
+    selectedItems?: any[]
+    sort: Record<string, any>
+  }
 
 const Content = (props: ContentProps) => {
   const {
