@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import { MessageActions } from '@webapp/store/ui/message'
 import { ButtonNew } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
 
 const MessagesHeaderLeft = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const createMessage = useCallback(() => {

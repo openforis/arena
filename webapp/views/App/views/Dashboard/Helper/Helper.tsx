@@ -1,5 +1,6 @@
 import './Helper.scss'
 
+import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { Trans } from 'react-i18next'
 
@@ -77,7 +78,14 @@ const HelpersByType = {
   [helperTypes.surveyWithoutNodeDefs]: HelperWithoutAttributes,
 }
 
-const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => (
+type LinkWithIconProps = {
+  to: string
+  iconLeft?: string
+  iconRight?: string
+  children?: ReactNode
+}
+
+const LinkWithIcon = ({ to, iconLeft, iconRight, children }: LinkWithIconProps) => (
   <Link to={to} className="btn-s btn-transparent">
     {iconLeft && <span className={`icon ${iconLeft} icon-14px`} />}
     {children}
@@ -85,7 +93,11 @@ const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => (
   </Link>
 )
 
-const FirstTimeHelp = ({ firstTimeHelp }) => {
+type FirstTimeHelpProps = {
+  firstTimeHelp: string
+}
+
+const FirstTimeHelp = ({ firstTimeHelp }: FirstTimeHelpProps) => {
   const HelperComponent = HelpersByType[firstTimeHelp]
   return <HelperComponent />
 }

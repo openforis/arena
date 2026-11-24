@@ -21,7 +21,7 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
   const surveyInfo = Survey.getSurveyInfo(survey)
   const numberOfNodeDefs = Survey.getNodeDefsArray(survey).length
   const [messages, setMessages] = useState([])
-  const [help, setHelp] = useState(false)
+  const [help, setHelp] = useState<string | false>(false)
 
   const fetchMessages = useFetchMessages({ messages, setMessages })
 

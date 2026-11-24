@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import { ArenaUserGroup } from '@openforis/arena-core'
 
@@ -15,6 +13,7 @@ import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
+import { useAppDispatch } from '@webapp/store'
 
 // appModules.js is a plain JS module without explicit types: TS infers appModuleUri's parameter shape
 // from its default value (appModules.home), which happens to include an `icon` field that userModules
@@ -52,11 +51,7 @@ interface UseEditUserGroupResult {
  *   capabilities, and the handlers to change and persist it.
  */
 export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEditUserGroupResult => {
-  // NotificationActions/LoaderActions dispatch thunks (functions), not plain actions, but the
-  // untyped store JS modules make useDispatch() infer the plain redux `Dispatch<UnknownAction>`
-  // type; type it explicitly as a thunk dispatch here, following the precedent in
-  // ChainCloneFromSurveyDialog.tsx.
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const confirm = useConfirm()
   // useSurveyId's untyped implementation makes TS infer its return type as `unknown`; cast to the

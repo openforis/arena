@@ -5,7 +5,7 @@ import * as d3 from 'd3'
 import 'd3-transition'
 
 import { elementOffset } from '@webapp/utils/domUtils'
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 
@@ -63,17 +63,48 @@ const DEFAULT_OPTIONS = {
 
 export const highlightClassName = 'highlight'
 
+// a d3 hierarchy node wrapping a node definition
+export type TreeChartNode = {
+  data: ArenaAnyNodeDef
+}
+
+export type TreeChartNodeIcon = {
+  className: string
+  text: string | null
+}
+
+type TreeChartNodeFunctions = {
+  nodeClassFunction?: (node: TreeChartNode) => string
+  nodeFilterFunction?: (node: TreeChartNode) => boolean
+  nodeIconFunction?: (node: TreeChartNode) => TreeChartNodeIcon | null
+  nodeLabelFunction?: (node: TreeChartNode) => string
+  nodeTooltipFunction?: (node: TreeChartNode) => string
+}
+
+type TreeChartParams = TreeChartNodeFunctions & {
+  domElement: HTMLElement
+  data: any
+  extraLinksGroups?: any
+  i18n: any
+  onNodeClick?: (nodeUuid: string) => void
+  selectedNodeUuid?: string | null
+  svgClass?: string
+  rootNodeElementId?: string
+  wrapperClass?: string
+  options?: Partial<typeof DEFAULT_OPTIONS>
+}
+
 export default class TreeChart {
   domElement: HTMLElement
   data: any
   extraLinksGroups: any
   i18n: any
   nodeWrapperClassName: string
-  nodeClassFunction: (...args: any[]) => any
-  nodeFilterFunction: (...args: any[]) => any
-  nodeIconFunction: (...args: any[]) => any
-  _nodeLabelFunction: (...args: any[]) => any
-  _nodeTooltipFunction: (...args: any[]) => any
+  nodeClassFunction: TreeChartNodeFunctions['nodeClassFunction']
+  nodeFilterFunction: TreeChartNodeFunctions['nodeFilterFunction']
+  nodeIconFunction: TreeChartNodeFunctions['nodeIconFunction']
+  _nodeLabelFunction: TreeChartNodeFunctions['nodeLabelFunction']
+  _nodeTooltipFunction: TreeChartNodeFunctions['nodeTooltipFunction']
   svgClass: string
   rootNodeElementId: string
   wrapperClass: string
@@ -103,7 +134,7 @@ export default class TreeChart {
     rootNodeElementId = 'hierarchy__root-g',
     wrapperClass = 'hierarchy__tree',
     options = DEFAULT_OPTIONS,
-  }) {
+  }: TreeChartParams) {
     this.domElement = domElement
     this.data = data
     this.extraLinksGroups = extraLinksGroups
