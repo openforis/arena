@@ -1,7 +1,6 @@
 import './SurveySecurityEditor.scss'
 
 import { Fragment, useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'
 
@@ -44,7 +43,18 @@ const deleteSecurityPropsEqualToDefault = (security) => {
   })
 }
 
-export const SurveySecurityEditor = (props) => {
+type SurveySecurityEditorProps = {
+  security?: Record<string, any>
+  onSecurityUpdate: (...args: any[]) => any
+  keepNonApplicableValues?: boolean
+  onKeepNonApplicableValuesUpdate?: (...args: any[]) => any
+  notifyAdminsOnRecordsUploadFromMobile?: boolean
+  onNotifyAdminsOnRecordsUploadFromMobileUpdate?: (...args: any[]) => any
+  formPreviewForDataEntryUsers?: boolean
+  onFormPreviewForDataEntryUsersUpdate?: (...args: any[]) => any
+}
+
+export const SurveySecurityEditor = (props: SurveySecurityEditorProps) => {
   const {
     security: securityProp,
     onSecurityUpdate,
@@ -120,15 +130,4 @@ export const SurveySecurityEditor = (props) => {
       )}
     </div>
   )
-}
-
-SurveySecurityEditor.propTypes = {
-  security: PropTypes.object,
-  onSecurityUpdate: PropTypes.func.isRequired,
-  keepNonApplicableValues: PropTypes.bool,
-  onKeepNonApplicableValuesUpdate: PropTypes.func,
-  notifyAdminsOnRecordsUploadFromMobile: PropTypes.bool,
-  onNotifyAdminsOnRecordsUploadFromMobileUpdate: PropTypes.func,
-  formPreviewForDataEntryUsers: PropTypes.bool,
-  onFormPreviewForDataEntryUsersUpdate: PropTypes.func,
 }

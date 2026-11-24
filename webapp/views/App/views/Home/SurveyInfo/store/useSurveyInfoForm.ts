@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
@@ -12,9 +11,10 @@ import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
 
 import { useFormObject } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
 
 export const useSurveyInfoForm = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyInfo = useSurveyInfo()
 
   const { object, setObjectField, setObjectFields, enableValidation, getFieldValidation, setValidation } =

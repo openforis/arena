@@ -1,7 +1,6 @@
 import './SrsEditor.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import axios from 'axios'
 
 import * as Srs from '@core/geo/srs'
@@ -10,8 +9,16 @@ import InputChips from '@webapp/components/form/InputChips'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const SrsEditor = (props) => {
+type SrsEditorProps = {
+  srs: any[]
+  validation?: ArenaValidation
+  readOnly: boolean
+  setSrs: (...args: any[]) => any
+}
+
+const SrsEditor = (props: SrsEditorProps) => {
   const { srs, validation, readOnly, setSrs } = props
 
   const i18n = useI18n()
@@ -42,13 +49,6 @@ const SrsEditor = (props) => {
       placeholder={i18n.t('homeView:surveyInfo.srsPlaceholder')}
     />
   )
-}
-
-SrsEditor.propTypes = {
-  srs: PropTypes.array.isRequired,
-  validation: PropTypes.object,
-  readOnly: PropTypes.bool.isRequired,
-  setSrs: PropTypes.func.isRequired,
 }
 
 export default SrsEditor

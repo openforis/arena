@@ -1,11 +1,14 @@
-import PropTypes from 'prop-types'
-
 import { ButtonDownload } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 
 import { useSurveyId } from '@webapp/store/survey'
 
-const HeaderLeft = (props) => {
+type HeaderLeftProps = {
+  excludeResolved: boolean
+  setExcludeResolved: (...args: any[]) => any
+}
+
+const HeaderLeft = (props: HeaderLeftProps) => {
   const { excludeResolved, setExcludeResolved } = props
 
   const surveyId = useSurveyId()
@@ -20,11 +23,6 @@ const HeaderLeft = (props) => {
       <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.exportToExcel" />
     </header>
   )
-}
-
-HeaderLeft.propTypes = {
-  excludeResolved: PropTypes.bool.isRequired,
-  setExcludeResolved: PropTypes.func.isRequired,
 }
 
 export default HeaderLeft
