@@ -1,8 +1,16 @@
-import PropTypes from 'prop-types'
-
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
-export const FormPropertyItem = (props) => {
+type FormPropertyItemProps = {
+  allowNegative?: boolean
+  getFieldValidation?: (...args: any[]) => any
+  objectKey?: string
+  onPropertyChange?: (...args: any[]) => any
+  readOnly: boolean
+  samplingPolygonObject?: Record<string, any>
+  value?: any
+}
+
+export const FormPropertyItem = (props: FormPropertyItemProps) => {
   const {
     allowNegative = true,
     getFieldValidation,
@@ -24,14 +32,4 @@ export const FormPropertyItem = (props) => {
       />
     </FormItem>
   )
-}
-
-FormPropertyItem.propTypes = {
-  allowNegative: PropTypes.bool,
-  getFieldValidation: PropTypes.func,
-  objectKey: PropTypes.string,
-  onPropertyChange: PropTypes.func,
-  readOnly: PropTypes.bool.isRequired,
-  samplingPolygonObject: PropTypes.object,
-  value: PropTypes.any,
 }

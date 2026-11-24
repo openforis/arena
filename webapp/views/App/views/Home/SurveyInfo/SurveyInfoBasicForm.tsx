@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as Survey from '@core/survey/survey'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -13,7 +11,20 @@ import CyclesEditor from './CyclesEditor'
 import SrsEditor from './SrsEditor'
 import LanguagesEditor from './LanguagesEditor'
 
-export const SurveyInfoBasicForm = (props) => {
+type SurveyInfoBasicFormProps = {
+  surveyInfoObject: Record<string, any>
+  getFieldValidation: (...args: any[]) => any
+  setFieldManualLinks: (...args: any[]) => any
+  setName: (...args: any[]) => any
+  setLanguages: (...args: any[]) => any
+  setSrs: (...args: any[]) => any
+  setLabels: (...args: any[]) => any
+  setDefaultCycleKey: (...args: any[]) => any
+  setDescriptions: (...args: any[]) => any
+  setCycles: (...args: any[]) => any
+}
+
+export const SurveyInfoBasicForm = (props: SurveyInfoBasicFormProps) => {
   const {
     surveyInfoObject,
     getFieldValidation,
@@ -104,17 +115,4 @@ export const SurveyInfoBasicForm = (props) => {
       )}
     </div>
   )
-}
-
-SurveyInfoBasicForm.propTypes = {
-  surveyInfoObject: PropTypes.object.isRequired,
-  getFieldValidation: PropTypes.func.isRequired,
-  setFieldManualLinks: PropTypes.func.isRequired,
-  setName: PropTypes.func.isRequired,
-  setLanguages: PropTypes.func.isRequired,
-  setSrs: PropTypes.func.isRequired,
-  setLabels: PropTypes.func.isRequired,
-  setDefaultCycleKey: PropTypes.func.isRequired,
-  setDescriptions: PropTypes.func.isRequired,
-  setCycles: PropTypes.func.isRequired,
 }

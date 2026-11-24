@@ -1,8 +1,13 @@
-import PropTypes from 'prop-types'
-
 import { FormPropertyItem } from './FormPropertyItem'
 
-export const RectangleOnlyItems = (props) => {
+type RectangleOnlyItemsProps = {
+  readOnly: boolean
+  onPropertyChange?: (...args: any[]) => any
+  samplingPolygonObject?: Record<string, any>
+  getFieldValidation?: (...args: any[]) => any
+}
+
+export const RectangleOnlyItems = (props: RectangleOnlyItemsProps) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
   const inputPropertiesForRectangle = [
     { key: 'lengthLatitude', allowNegative: false },
@@ -26,11 +31,4 @@ export const RectangleOnlyItems = (props) => {
       ))}
     </>
   )
-}
-
-RectangleOnlyItems.propTypes = {
-  readOnly: PropTypes.bool.isRequired,
-  onPropertyChange: PropTypes.func,
-  samplingPolygonObject: PropTypes.object,
-  getFieldValidation: PropTypes.func,
 }

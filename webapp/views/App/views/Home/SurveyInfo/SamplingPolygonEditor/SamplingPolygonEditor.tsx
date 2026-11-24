@@ -1,6 +1,5 @@
 import './SamplingPolygonEditor.scss'
 
-import PropTypes from 'prop-types'
 import { useCallback } from 'react'
 
 import { Numbers, Objects } from '@openforis/arena-core'
@@ -14,7 +13,14 @@ import { CircleOnlyItems } from './CircleOnlyItems'
 import { FormPropertyItem } from './FormPropertyItem'
 import { RectangleOnlyItems } from './RectangleOnlyItems'
 
-const SamplingPolygonEditor = (props) => {
+type SamplingPolygonEditorProps = {
+  readOnly: boolean
+  samplingPolygon?: Record<string, any>
+  getFieldValidation?: (...args: any[]) => any
+  setSamplingPolygon?: (...args: any[]) => any
+}
+
+const SamplingPolygonEditor = (props: SamplingPolygonEditorProps) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
 
   const samplingPolygonObject = Objects.isEmpty(samplingPolygon) ? getSamplingPolygonDefaults() : samplingPolygon
@@ -83,13 +89,6 @@ const SamplingPolygonEditor = (props) => {
       </div>
     </Fieldset>
   )
-}
-
-SamplingPolygonEditor.propTypes = {
-  readOnly: PropTypes.bool.isRequired,
-  samplingPolygon: PropTypes.object,
-  getFieldValidation: PropTypes.func,
-  setSamplingPolygon: PropTypes.func,
 }
 
 export default SamplingPolygonEditor

@@ -1,6 +1,6 @@
 import './SurveyInfo.scss'
 
-import { useEffect, useState } from 'react'
+import { type ElementType, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -23,6 +23,15 @@ import { SurveyInfoMap } from './SurveyInfoMap'
 
 import { useSurveyInfoForm } from './store'
 import { SurveySecurityEditor } from './surveySecurityEditor'
+
+// a survey info tab: each one renders its own editor component with its own props
+type SurveyInfoTab = {
+  key: string
+  id?: string
+  label: string
+  component: ElementType
+  props?: Record<string, unknown>
+}
 
 const SurveyInfoForm = () => {
   const readOnly = !useAuthCanEditSurvey()
@@ -83,7 +92,7 @@ const SurveyInfoForm = () => {
     ...surveyInfoObject
   } = useSurveyInfoForm()
 
-  const tabs = [
+  const tabs: SurveyInfoTab[] = [
     {
       key: 'basicInfo',
       component: SurveyInfoBasicForm,

@@ -1,7 +1,6 @@
 import './CyclesEditor.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -12,9 +11,17 @@ import CycleEditor from './CycleEditor'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { ButtonAdd } from '@webapp/components'
 import { useConfirmDelete } from '@webapp/components/hooks'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const CyclesEditor = (props) => {
-  const { cycles, readOnly, setCycles, validation = {} } = props
+type CyclesEditorProps = {
+  cycles: Record<string, any>
+  readOnly: boolean
+  setCycles: (...args: any[]) => any
+  validation?: ArenaValidation
+}
+
+const CyclesEditor = (props: CyclesEditorProps) => {
+  const { cycles, readOnly, setCycles, validation = {} as ArenaValidation } = props
   const cycleEntries = Object.entries(cycles)
 
   const confirmDelete = useConfirmDelete()
@@ -71,13 +78,6 @@ const CyclesEditor = (props) => {
       </div>
     </div>
   )
-}
-
-CyclesEditor.propTypes = {
-  cycles: PropTypes.object.isRequired,
-  readOnly: PropTypes.bool.isRequired,
-  setCycles: PropTypes.func.isRequired,
-  validation: PropTypes.object,
 }
 
 export default CyclesEditor

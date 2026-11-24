@@ -6,7 +6,13 @@ import { ButtonIconEdit } from '@webapp/components'
 
 import { useCollectImportReportItem } from './store'
 
-const Row = (props) => {
+type RowProps = {
+  item: Record<string, any>
+  itemPosition: number
+  onRowOpen: (item: Record<string, any>) => void
+}
+
+const Row = (props: RowProps) => {
   const { onRowOpen } = props
   const { rowNo, row, type, nodeDefPath, onUpdate } = useCollectImportReportItem(props)
   const { icon: typeIcon, label: typeLabel } = type
@@ -23,10 +29,9 @@ const Row = (props) => {
       <div className="width100">{CollectImportReportItem.getApplyIf(row)}</div>
       <div className="width100">
         <LabelsEditor
-          labels={CollectImportReportItem.getMessages(row)}
+          labels={CollectImportReportItem.getMessages(row) || {}}
           readOnly
           showFormLabel={false}
-          maxPreview={1}
           compactLanguage
         />
       </div>

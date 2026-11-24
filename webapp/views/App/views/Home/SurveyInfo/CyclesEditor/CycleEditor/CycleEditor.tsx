@@ -1,13 +1,22 @@
-import PropTypes from 'prop-types'
-
 import * as SurveyCycle from '@core/survey/surveyCycle'
 
 import { ButtonIconDelete } from '@webapp/components'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import DateContainer from './DateContainer'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-const CycleEditor = (props) => {
+type CycleEditorProps = {
+  cycleKey: string
+  cycle: Record<string, any>
+  readOnly: boolean
+  validation: ArenaValidation
+  canDelete: boolean
+  onChange: (...args: any[]) => any
+  onDelete: (...args: any[]) => any
+}
+
+const CycleEditor = (props: CycleEditorProps) => {
   const { cycleKey, cycle, readOnly, validation, canDelete, onChange, onDelete } = props
 
   const stepNum = Number(cycleKey) + 1
@@ -35,16 +44,6 @@ const CycleEditor = (props) => {
       </div>
     </ValidationTooltip>
   )
-}
-
-CycleEditor.propTypes = {
-  cycleKey: PropTypes.string.isRequired,
-  cycle: PropTypes.object.isRequired,
-  readOnly: PropTypes.bool.isRequired,
-  validation: PropTypes.object.isRequired,
-  canDelete: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 }
 
 export default CycleEditor

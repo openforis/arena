@@ -2,8 +2,6 @@ import type { ArenaValidation } from '@openforis/arena-core'
 import './SurveyInfoBrandingForm.scss'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject } from 'react'
-import { useDispatch } from 'react-redux'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -29,6 +27,7 @@ import { useI18n } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
 import { defaultTokens } from '@webapp/theme/tokens'
 import { FileUtils } from '@webapp/utils/fileUtils'
+import { useAppDispatch } from '@webapp/store'
 
 const { keys: brandingKeys, fontSizePreset } = SurveyBranding
 
@@ -218,7 +217,7 @@ type SurveyInfoBrandingFormProps = {
 export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
   const { branding = {}, setBranding, readOnly, labels, descriptions, name } = props
 
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()

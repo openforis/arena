@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 import * as Survey from '@core/survey/survey'
@@ -8,6 +7,7 @@ import * as API from '@webapp/service/api'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { surveyInfoUpdate } from '@webapp/store/survey/surveyInfo/actions'
 import { ConfigurationNumericItemEditor } from './ConfigurationNumericItemEditor'
+import { useAppDispatch } from '@webapp/store'
 
 const { dataStorageUnits, dataStorageValueToBytes, dataStorageValueToUnit, dataStorageBytesToUnit } =
   NumberConversionUtils
@@ -17,7 +17,7 @@ const maxTotalSpaceGB = 100
 const defaultTotalSpace = dataStorageValueToBytes(dataStorageUnits.GB)(defaultTotalSpaceGB)
 
 export const SurveyConfigurationEditor = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyInfo = useSurveyInfo()
   const surveyId = Survey.getId(surveyInfo)
   const filesStatistics = Survey.getFilesStatistics(surveyInfo)
@@ -33,7 +33,7 @@ export const SurveyConfigurationEditor = () => {
       const { survey: surveyInfoUpdated } = await API.updateSurveyConfigurationProp({
         surveyId,
         key: Survey.configKeys.filesTotalSpace,
-        value: valueToStore,
+        value: String(valueToStore),
       })
       dispatch({ type: surveyInfoUpdate, surveyInfo: surveyInfoUpdated })
     },

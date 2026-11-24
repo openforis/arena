@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as Survey from '@core/survey/survey'
 
 import { Checkbox } from '@webapp/components/form'
@@ -10,7 +8,22 @@ import SamplingPolygonEditor from './SamplingPolygonEditor'
 import { AreasOfInterestEditor } from './AreasOfInterestEditor'
 import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
 
-export const SurveyInfoMap = (props) => {
+type SurveyInfoMapProps = {
+  areasOfInterest?: any[]
+  canUseAnalysis?: boolean
+  setAreasOfInterest: (...args: any[]) => any
+  getFieldValidation: (...args: any[]) => any
+  sampleBasedImageInterpretationEnabled?: boolean
+  samplingPolygon?: Record<string, any>
+  setSampleBasedImageInterpretationEnabled: (...args: any[]) => any
+  setSamplingPolygon: (...args: any[]) => any
+  preloadedMapLayersEnabled?: boolean
+  preloadedMapLayers?: any[]
+  setPreloadedMapLayersEnabled: (...args: any[]) => any
+  setPreloadedMapLayers: (...args: any[]) => any
+}
+
+export const SurveyInfoMap = (props: SurveyInfoMapProps) => {
   const {
     areasOfInterest,
     canUseAnalysis = false,
@@ -68,19 +81,4 @@ export const SurveyInfoMap = (props) => {
       )}
     </div>
   )
-}
-
-SurveyInfoMap.propTypes = {
-  areasOfInterest: PropTypes.array,
-  canUseAnalysis: PropTypes.bool,
-  setAreasOfInterest: PropTypes.func.isRequired,
-  getFieldValidation: PropTypes.func.isRequired,
-  sampleBasedImageInterpretationEnabled: PropTypes.bool,
-  samplingPolygon: PropTypes.object,
-  setSampleBasedImageInterpretationEnabled: PropTypes.func.isRequired,
-  setSamplingPolygon: PropTypes.func.isRequired,
-  preloadedMapLayersEnabled: PropTypes.bool,
-  preloadedMapLayers: PropTypes.array,
-  setPreloadedMapLayersEnabled: PropTypes.func.isRequired,
-  setPreloadedMapLayers: PropTypes.func.isRequired,
 }
