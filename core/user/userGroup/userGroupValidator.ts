@@ -41,7 +41,10 @@ const _qualifiersAreValid = async (qualifiers: ArenaUserGroupQualifier[]): Promi
   return validations.every((validation) => Validation.isValid(validation))
 }
 
-export const validateUserGroup = async (userGroup: ArenaUserGroup, otherGroupsInSurvey: ArenaUserGroup[] = []) => {
+export const validateUserGroup = async (
+  userGroup: Partial<ArenaUserGroup>,
+  otherGroupsInSurvey: ArenaUserGroup[] = []
+) => {
   const qualifiers = UserGroup.getQualifiers(userGroup)
   const qualifiersValid = await _qualifiersAreValid(qualifiers)
 

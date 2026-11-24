@@ -55,7 +55,13 @@ const expressionTypeHints = {
  * @param {string} [args.previousError] - Error from an earlier parse attempt, fed back to the LLM.
  * @returns {{ system: string, prompt: string }} The pair for `generateStructured`.
  */
-export const buildExpressionGeneratePrompt = ({ survey, nodeDef, expressionType, description, previousError }) => {
+export const buildExpressionGeneratePrompt = ({
+  survey,
+  nodeDef,
+  expressionType,
+  description,
+  previousError = null,
+}) => {
   const nodeName = String(NodeDef.getName(nodeDef) || '')
   const nodeType = String(NodeDef.getType(nodeDef) || '')
   const siblings = getSiblingNodeDefs({ survey, nodeDef })

@@ -20,7 +20,7 @@ type JobSummary = {
   [key: string]: any
 }
 
-type JobInfo = {
+export type JobInfo = {
   uuid: string
   type: string
   status: JobStatus
@@ -347,7 +347,8 @@ export class JobQueue {
    * Execute a job thread.
    * @param jobInfo - The job info.
    */
-  private _executeJob(jobInfo: JobInfo): void {
+  // protected: subclasses (the tests) replace the execution of the jobs
+  protected _executeJob(jobInfo: JobInfo): void {
     JobThreadExecutor.executeJobThread(jobInfo, this.onJobUpdate.bind(this))
   }
 
