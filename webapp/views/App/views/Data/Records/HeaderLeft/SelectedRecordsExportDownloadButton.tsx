@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import { FileFormats } from '@core/fileFormats'
@@ -8,6 +7,7 @@ import { ButtonDownload } from '@webapp/components/buttons'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId } from '@webapp/store/survey'
+import { useAppDispatch } from '@webapp/store'
 
 type Props = {
   job: any
@@ -16,7 +16,7 @@ type Props = {
 export const SelectedRecordsExportDownloadButton = (props: Props) => {
   const { job } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
 
   const { downloadToken } = JobSerialized.getResult(job)

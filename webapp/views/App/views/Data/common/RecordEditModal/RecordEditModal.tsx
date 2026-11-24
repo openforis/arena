@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
@@ -52,7 +51,16 @@ const RecordEditModalTitle = () => {
   return <span>{title}</span>
 }
 
-export const RecordEditModal = (props) => {
+type RecordEditModalProps = {
+  detachable?: boolean
+  initialState?: Record<string, any>
+  onClose?: (...args: any[]) => any
+  onRequestClose?: (...args: any[]) => any
+  parentNodeUuid?: string
+  recordUuid: string
+}
+
+export const RecordEditModal = (props: RecordEditModalProps) => {
   const {
     detachable = true,
     initialState: initialStateProp,
@@ -92,13 +100,4 @@ export const RecordEditModal = (props) => {
       <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader locked />
     </ResizableModal>
   )
-}
-
-RecordEditModal.propTypes = {
-  detachable: PropTypes.bool,
-  initialState: PropTypes.object,
-  onClose: PropTypes.func,
-  onRequestClose: PropTypes.func,
-  parentNodeUuid: PropTypes.string,
-  recordUuid: PropTypes.string.isRequired,
 }

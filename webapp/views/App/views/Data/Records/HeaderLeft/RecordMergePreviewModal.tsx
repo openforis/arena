@@ -1,7 +1,5 @@
 import './RecordMergePreviewModal.scss'
 
-import PropTypes from 'prop-types'
-
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
 import { Button, ResizableModal } from '@webapp/components'
@@ -28,7 +26,12 @@ const ModalTitle = () => {
   return <span>{title}</span>
 }
 
-export const RecordMergePreviewModal = (props) => {
+type RecordMergePreviewModalProps = {
+  onConfirmClick: (...args: any[]) => any
+  onRequestClose: (...args: any[]) => any
+}
+
+export const RecordMergePreviewModal = (props: RecordMergePreviewModalProps) => {
   const { onConfirmClick, onRequestClose } = props
 
   const record = useRecord()
@@ -53,9 +56,4 @@ export const RecordMergePreviewModal = (props) => {
       </div>
     </ResizableModal>
   )
-}
-
-RecordMergePreviewModal.propTypes = {
-  onConfirmClick: PropTypes.func.isRequired,
-  onRequestClose: PropTypes.func.isRequired,
 }

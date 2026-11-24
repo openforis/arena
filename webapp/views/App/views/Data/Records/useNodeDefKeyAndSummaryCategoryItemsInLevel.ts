@@ -20,8 +20,8 @@ export const useNodeDefKeyAndSummaryCategoryItemsInLevel = () => {
   }, [cycle, survey])
 
   useEffect(() => {
-    const categoryItemsByCodeDefUuid = {}
-    const requestCancelByNodeDefUuid = {}
+    const categoryItemsByCodeDefUuid: { [codeDefUuid: string]: any[] } = {}
+    const requestCancelByNodeDefUuid: { [nodeDefUuid: string]: () => void } = {}
 
     const surveyId = Survey.getId(survey)
 

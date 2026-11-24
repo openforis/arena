@@ -1,11 +1,15 @@
 import './RecordsDataExportModal.scss'
 
-import PropTypes from 'prop-types'
-
 import { Modal, ModalBody } from '@webapp/components/modal'
 import DataExport from '../../DataExport'
 
-export const RecordsDataExportModal = (props) => {
+type RecordsDataExportModalProps = {
+  onClose: (...args: any[]) => any
+  recordUuids?: any[]
+  search?: string
+}
+
+export const RecordsDataExportModal = (props: RecordsDataExportModalProps) => {
   const { onClose, recordUuids, search } = props
 
   return (
@@ -15,10 +19,4 @@ export const RecordsDataExportModal = (props) => {
       </ModalBody>
     </Modal>
   )
-}
-
-RecordsDataExportModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  recordUuids: PropTypes.array,
-  search: PropTypes.string,
 }

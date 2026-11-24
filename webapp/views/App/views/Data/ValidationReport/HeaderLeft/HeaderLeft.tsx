@@ -1,10 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
-import PropTypes from 'prop-types'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { Query } from '@common/model/query'
+import type { QueryItem } from '@common/model/query/query/defaults'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
@@ -22,6 +21,7 @@ import { useSurvey, useSurveyCycleKey, useSurveyId, useSurveyName } from '@webap
 
 import { AttributesFilterPanel } from './AttributesFilterPanel'
 import { MessageTypeFilterPanel } from './MessageTypeFilterPanel'
+import { useAppDispatch } from '@webapp/store'
 
 const onExportComplete =
   ({ surveyId, surveyName, cycle }) =>
@@ -43,6 +43,17 @@ const onExportComplete =
     DomUtils.downloadBlobToFile(response.data, outputFileName)
   }
 
+type HeaderLeftProps = {
+  allAttributeDefUuids?: string[]
+  onQueryChange: (...args: any[]) => any
+  onSelectedAttributeDefUuidsChange: (...args: any[]) => any
+  onSelectedMessageTypeCategoryIdsChange: (...args: any[]) => any
+  query?: QueryItem | null
+  restParams?: Record<string, unknown>
+  selectedAttributeDefUuids?: string[]
+  selectedMessageTypeCategoryIds?: readonly string[]
+}
+
 export const HeaderLeft = ({
   allAttributeDefUuids = [],
   onQueryChange,
@@ -52,8 +63,8 @@ export const HeaderLeft = ({
   restParams = {},
   selectedAttributeDefUuids = [],
   selectedMessageTypeCategoryIds = MessageTypeFilterCategoryIds,
-}) => {
-  const dispatch = useDispatch()
+}: HeaderLeftProps) => {
+  const dispatch = useAppDispatch()
   const survey = useSurvey()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
@@ -88,7 +99,7 @@ export const HeaderLeft = ({
     )
   }, [cycle, dispatch, restParams, surveyId, surveyName])
 
-  const onFilterChange = ({ expr } = {}) => {
+  const onFilterChange = ({ expr }: { expr?: string } = {}) => {
     if (!expr) {
       onQueryChange(null)
       setFilterEditorShown(false)
@@ -168,15 +179,4 @@ export const HeaderLeft = ({
       )}
     </div>
   )
-}
-
-HeaderLeft.propTypes = {
-  allAttributeDefUuids: PropTypes.array,
-  onQueryChange: PropTypes.func.isRequired,
-  onSelectedAttributeDefUuidsChange: PropTypes.func.isRequired,
-  onSelectedMessageTypeCategoryIdsChange: PropTypes.func.isRequired,
-  query: PropTypes.object,
-  restParams: PropTypes.object,
-  selectedAttributeDefUuids: PropTypes.array,
-  selectedMessageTypeCategoryIds: PropTypes.array,
 }

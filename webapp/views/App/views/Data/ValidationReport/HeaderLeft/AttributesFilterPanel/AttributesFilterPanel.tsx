@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,6 +7,15 @@ import { Checkbox } from '@webapp/components/form'
 import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
+type AttributesFilterPanelProps = {
+  allAttributeDefUuids: any[]
+  allAttributesSelected: boolean
+  containerRef: Record<string, any>
+  onClose: (...args: any[]) => any
+  onSelectedAttributeDefUuidsChange: (...args: any[]) => any
+  selectedAttributeDefUuids: any[]
+}
+
 export const AttributesFilterPanel = ({
   allAttributeDefUuids,
   allAttributesSelected,
@@ -15,7 +23,7 @@ export const AttributesFilterPanel = ({
   onClose,
   onSelectedAttributeDefUuidsChange,
   selectedAttributeDefUuids,
-}) => {
+}: AttributesFilterPanelProps) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const rootNodeDef = Survey.getNodeDefRoot(survey)
@@ -119,13 +127,4 @@ export const AttributesFilterPanel = ({
       />
     </div>
   )
-}
-
-AttributesFilterPanel.propTypes = {
-  allAttributeDefUuids: PropTypes.array.isRequired,
-  allAttributesSelected: PropTypes.bool.isRequired,
-  containerRef: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSelectedAttributeDefUuidsChange: PropTypes.func.isRequired,
-  selectedAttributeDefUuids: PropTypes.array.isRequired,
 }
