@@ -12,11 +12,12 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 export const newRecord = (user, preview = false) => Record.newRecord(user, Survey.cycleOneKey, preview)
 
-export const insertAndInitRecord = async (user, survey, preview = false, client = db) =>
+export const insertAndInitRecord = (user, survey, preview = false, client = db) =>
   client.tx(async (t) => {
     const record = newRecord(user, preview)
     const recordDb = await RecordManager.insertRecord(user, Survey.getId(survey), record, true, t)
-    return RecordManager.initNewRecord({ user, survey, record: recordDb }, t)
+    const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+    return RecordManager.initNewRecord({ user, survey, record: recordDb, lang }, t)
   })
 
 export const getNodePath = (node) => (survey, record) => {
