@@ -90,8 +90,8 @@ route regenerates the project and sends it as a zip; the server URL written into
 (`arena.host`) is the one of this download request (`Request.getServerUrl`, switched to https except
 for localhost), so R calls back the URL it downloaded from.
 
-- **RStudio (cloud)**: `POST /api/rstudio` (`server/modules/rstudio/api/rstudioApi.ts`) asks the RStudio
-  pool service (`RSTUDIO_POOL_SERVER_URL`, `RSTUDIO_POOL_SERVICE_KEY`) for an instance for the current
+- **RStudio (cloud)**: `POST /api/survey/:surveyId/rstudio` (`server/modules/rstudio/api/rstudioApi.ts`,
+  like `GET` and `DELETE`, requires the record analysis permission on the survey) asks the RStudio pool service (`RSTUDIO_POOL_SERVER_URL`, `RSTUDIO_POOL_SERVICE_KEY`) for an instance for the current
   user, and the UI opens `<rStudioProxyUrl><instanceId>_<userUuid>`. Without a pool service the API
   returns nothing and the UI opens `/rstudio/` on Arena's own host: one RStudio shared by all users
   (see [infra/k8s/README.md](../infra/k8s/README.md)). The snippet first clears the RStudio workspace
