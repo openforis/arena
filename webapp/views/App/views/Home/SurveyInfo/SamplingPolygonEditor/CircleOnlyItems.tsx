@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as A from '@core/arena'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -9,7 +7,14 @@ import { FormPropertyItem } from './FormPropertyItem'
 
 const controlPointsOptions = [0, 4, 5, 10, 12, 21]
 
-export const CircleOnlyItems = (props) => {
+type CircleOnlyItemsProps = {
+  readOnly: boolean
+  onPropertyChange?: (...args: any[]) => any
+  samplingPolygonObject?: Record<string, any>
+  getFieldValidation?: (...args: any[]) => any
+}
+
+export const CircleOnlyItems = (props: CircleOnlyItemsProps) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
   const inputPropertiesForCircle = [{ key: 'radius', allowNegative: false }]
   return (
@@ -37,11 +42,4 @@ export const CircleOnlyItems = (props) => {
       ))}
     </>
   )
-}
-
-CircleOnlyItems.propTypes = {
-  readOnly: PropTypes.bool.isRequired,
-  onPropertyChange: PropTypes.func,
-  samplingPolygonObject: PropTypes.object,
-  getFieldValidation: PropTypes.func,
 }

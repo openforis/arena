@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
@@ -18,7 +17,14 @@ const accept = {
 }
 const maxSize = 10 // 10MB
 
-const PreloadedMapLayerEditor = (props) => {
+type PreloadedMapLayerEditorProps = {
+  editedPreloadedMapLayer?: SurveyFile.SurveyFile | null
+  onClose: (...args: any[]) => any
+  onOk: (...args: any[]) => any
+  preloadedMapLayers: any[]
+}
+
+const PreloadedMapLayerEditor = (props: PreloadedMapLayerEditorProps) => {
   const { editedPreloadedMapLayer, onClose, onOk: onOkProp, preloadedMapLayers } = props
 
   const [state, setState] = useState({
@@ -109,13 +115,6 @@ const PreloadedMapLayerEditor = (props) => {
       </ModalFooter>
     </Modal>
   )
-}
-
-PreloadedMapLayerEditor.propTypes = {
-  editedPreloadedMapLayer: PropTypes.object,
-  onClose: PropTypes.func.isRequired,
-  onOk: PropTypes.func.isRequired,
-  preloadedMapLayers: PropTypes.array.isRequired,
 }
 
 export default PreloadedMapLayerEditor

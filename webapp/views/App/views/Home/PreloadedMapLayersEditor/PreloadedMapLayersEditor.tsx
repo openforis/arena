@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
@@ -20,7 +19,13 @@ import PreloadedMapLayerEditor from './PreloadedMapLayerEditor'
 const getLayerLabel = (lang) => (preloadedMapLayer) =>
   SurveyFile.getLabel(lang)(preloadedMapLayer) || SurveyFile.getName(preloadedMapLayer)
 
-const PreloadedMapLayersEditor = (props) => {
+type PreloadedMapLayersEditorProps = {
+  preloadedMapLayers?: any[]
+  setPreloadedMapLayers: (...args: any[]) => any
+  readOnly?: boolean
+}
+
+const PreloadedMapLayersEditor = (props: PreloadedMapLayersEditorProps) => {
   const { preloadedMapLayers, setPreloadedMapLayers, readOnly } = props
 
   const i18n = useI18n()
@@ -156,12 +161,6 @@ const PreloadedMapLayersEditor = (props) => {
       )}
     </>
   )
-}
-
-PreloadedMapLayersEditor.propTypes = {
-  preloadedMapLayers: PropTypes.array,
-  setPreloadedMapLayers: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
 }
 
 export default PreloadedMapLayersEditor

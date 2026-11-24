@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import { FormItem } from '@webapp/components/form/Input'
 import { ButtonGroup } from '@webapp/components/form'
 
@@ -8,7 +6,13 @@ const buttonGroupItems = ['true', 'false'].map((value) => ({
   label: `samplingPolygonOptions.${value === 'true' ? 'circle' : 'rectangle'}`,
 }))
 
-const SamplingPolygonShapeEditor = (props) => {
+type SamplingPolygonShapeEditorProps = {
+  readOnly: boolean
+  isCircle?: boolean
+  onChange?: (...args: any[]) => any
+}
+
+const SamplingPolygonShapeEditor = (props: SamplingPolygonShapeEditorProps) => {
   const { readOnly, isCircle, onChange } = props
 
   return (
@@ -21,12 +25,6 @@ const SamplingPolygonShapeEditor = (props) => {
       />
     </FormItem>
   )
-}
-
-SamplingPolygonShapeEditor.propTypes = {
-  readOnly: PropTypes.bool.isRequired,
-  isCircle: PropTypes.bool,
-  onChange: PropTypes.func,
 }
 
 export default SamplingPolygonShapeEditor

@@ -1,12 +1,19 @@
 import { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import { Numbers } from '@openforis/arena-core'
 
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
-export const ConfigurationNumericItemEditor = (props) => {
+type ConfigurationNumericItemEditorProps = {
+  labelKey: string
+  maxValue?: number
+  minValue?: number
+  onSave: (...args: any[]) => any
+  value: number
+}
+
+export const ConfigurationNumericItemEditor = (props: ConfigurationNumericItemEditorProps) => {
   const { labelKey, maxValue = undefined, minValue = undefined, onSave: onSaveProp, value: valueProp } = props
 
   const [state, setState] = useState({
@@ -44,12 +51,4 @@ export const ConfigurationNumericItemEditor = (props) => {
       </div>
     </FormItem>
   )
-}
-
-ConfigurationNumericItemEditor.propTypes = {
-  labelKey: PropTypes.string.isRequired,
-  maxValue: PropTypes.number,
-  minValue: PropTypes.number,
-  onSave: PropTypes.func.isRequired,
-  value: PropTypes.number.isRequired,
 }

@@ -1,11 +1,17 @@
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import { DateInput } from '@webapp/components/form/DateTimeInput'
 import { DateFormats, Dates } from '@openforis/arena-core'
 
-const DateContainer = ({ date, keyLabel, readOnly, onChange: onChangeProp }) => {
+type DateContainerProps = {
+  date?: string
+  keyLabel: string
+  readOnly: boolean
+  onChange: (...args: any[]) => any
+}
+
+const DateContainer = ({ date, keyLabel, readOnly, onChange: onChangeProp }: DateContainerProps) => {
   const i18n = useI18n()
   const dateFormatted = Dates.convertDate({ dateStr: date, formatTo: DateFormats.dateDisplay })
 
@@ -29,13 +35,6 @@ const DateContainer = ({ date, keyLabel, readOnly, onChange: onChangeProp }) => 
       {readOnly ? <span className="date">{date}</span> : <DateInput onChange={onChange} value={dateFormatted} />}
     </div>
   )
-}
-
-DateContainer.propTypes = {
-  date: PropTypes.string,
-  keyLabel: PropTypes.string.isRequired,
-  readOnly: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
 }
 
 export default DateContainer

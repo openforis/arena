@@ -1,7 +1,6 @@
 import './SurveyCompare.scss'
 
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import * as Survey from '@core/survey/survey'
@@ -29,6 +28,7 @@ import { SurveyCompareCategories } from './SurveyCompareCategories'
 import { SurveyCompareTaxonomies } from './SurveyCompareTaxonomies'
 import { SurveyCompareFingerprints, SurveyFingerprint } from './SurveyCompareFingerprints'
 import { SurveyCompareChangesList } from './SurveyCompareChangesList'
+import { useAppDispatch } from '@webapp/store'
 
 const hasDifferences = ({ added, changed, removed }: { added: number; changed: number; removed: number }) =>
   added + changed + removed > 0
@@ -97,7 +97,7 @@ const Summary = ({ result }: { result: CompareResultWithSource }) => {
 }
 
 export const SurveyCompare = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const confirm = useConfirm()
   const surveyId = useSurveyId()

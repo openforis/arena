@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
@@ -7,7 +5,14 @@ import InputChips from '@webapp/components/form/InputChips'
 
 import { getLanguageLabel, languageItemsSortedByEnLabel as appLanguages } from '@core/app/languages'
 
-const LanguagesEditor = (props) => {
+type LanguagesEditorProps = {
+  idInput?: string
+  languages: any[]
+  setLanguages: (...args: any[]) => any
+  readOnly: boolean
+}
+
+const LanguagesEditor = (props: LanguagesEditorProps) => {
   const { idInput, languages, setLanguages, readOnly } = props
 
   const selection = languages.map((lang) => ({
@@ -36,13 +41,6 @@ const LanguagesEditor = (props) => {
       />
     </div>
   )
-}
-
-LanguagesEditor.propTypes = {
-  idInput: PropTypes.string,
-  languages: PropTypes.array.isRequired,
-  setLanguages: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool.isRequired,
 }
 
 export default LanguagesEditor
