@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { Legend, Line, LineChart as ReChartsLineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { CartesianGrid, ChartWrapper, RotatedCustomAxisTick } from '../common'
@@ -12,7 +11,16 @@ const margin = {
 
 const defaultLineFill = '#8884d8'
 
-export const LineChart = (props) => {
+type LineChartProps = {
+  allowDecimals?: boolean
+  data: any[]
+  dataColors?: any[]
+  dataKeys: any[]
+  labelDataKey: string
+  showLegend?: boolean
+}
+
+export const LineChart = (props: LineChartProps) => {
   const { allowDecimals = true, data, dataColors, dataKeys, labelDataKey, showLegend = false } = props
 
   return (
@@ -30,13 +38,4 @@ export const LineChart = (props) => {
       </ReChartsLineChart>
     </ChartWrapper>
   )
-}
-
-LineChart.propTypes = {
-  allowDecimals: PropTypes.bool,
-  data: PropTypes.array.isRequired,
-  dataColors: PropTypes.array,
-  dataKeys: PropTypes.array.isRequired,
-  labelDataKey: PropTypes.string.isRequired,
-  showLegend: PropTypes.bool,
 }

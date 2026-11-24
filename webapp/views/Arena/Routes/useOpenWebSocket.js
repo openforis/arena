@@ -90,8 +90,8 @@ export const useOpenWebSocket = () => {
     [dispatch, surveyIdCurrent]
   )
 
-  const openSocket = useCallback(async () => {
-    await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
+  const openSocket = useCallback(() => {
+    AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
     AppWebSocket.on(WebSocketEvents.jobUpdate, onJobUpdate)
     AppWebSocket.on(WebSocketEvents.connect, onSocketConnect)
     AppWebSocket.on(WebSocketEvents.userRoleUpdate, onUserRoleUpdate)

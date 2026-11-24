@@ -107,7 +107,7 @@ const DailyRecordsByUser = () => {
       {dataKeys.length === 0 && <NoRecordsAddedInSelectedPeriod />}
 
       {dataKeys.length > 0 && data.length > 0 && (
-        <AreaChart allowDecimals={false} colors={colors} data={data} dataKeys={dataKeys} labelDataKey="date" />
+        <AreaChart allowDecimals={false} dataColors={colors} data={data} dataKeys={dataKeys} labelDataKey="date" />
       )}
     </>
   )

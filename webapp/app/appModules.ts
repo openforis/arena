@@ -1,5 +1,10 @@
 import * as ProcessUtils from '@core/processUtils'
 
+export type AppModule = { key: string; path: string; icon?: string }
+
+// link to an external page (e.g. in the help menu)
+export type ExternalAppModule = { key: string; uri: string; external: true }
+
 // ==== Guest modules
 
 export const guest = 'guest'
@@ -21,7 +26,7 @@ export const guestModules = {
     key: 'accessRequest',
     path: 'accessRequest',
   },
-}
+} satisfies Record<string, AppModule>
 
 // ==== Logged in modules
 
@@ -33,7 +38,7 @@ export const noHeaderModules = {
     key: 'record',
     path: 'record',
   },
-}
+} satisfies Record<string, AppModule>
 
 // ==== App Root modules
 export const appModules = {
@@ -77,7 +82,7 @@ export const appModules = {
     path: 'help',
     icon: 'question',
   },
-}
+} satisfies Record<string, AppModule>
 
 // ==== Inner modules
 
@@ -118,7 +123,7 @@ export const homeModules = {
     key: 'surveyCompare',
     path: 'surveyCompare',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const designerModules = {
   formDesigner: {
@@ -153,7 +158,7 @@ export const designerModules = {
     key: 'taxonomy',
     path: 'taxonomy',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const dataModules = {
   record: {
@@ -197,7 +202,7 @@ export const dataModules = {
     key: 'formPreview',
     path: 'formPreview',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const userModules = {
   users: {
@@ -244,7 +249,7 @@ export const userModules = {
     key: 'userGroup',
     path: 'userGroup',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const analysisModules = {
   chains: {
@@ -271,7 +276,7 @@ export const analysisModules = {
     key: 'instances',
     path: 'instances',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const user2FADeviceModules = {
   user2FADeviceList: {
@@ -282,7 +287,7 @@ export const user2FADeviceModules = {
     key: 'user2FADeviceDetails',
     path: 'details',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const systemAdminModules = {
   jobMonitor: {
@@ -309,7 +314,7 @@ export const systemAdminModules = {
     key: 'authProvider',
     path: 'authProvider',
   },
-}
+} satisfies Record<string, AppModule>
 
 export const helpModules = {
   about: {
@@ -339,7 +344,7 @@ export const helpModules = {
     uri: 'https://github.com/openforis/arena/releases/latest/download/arena-user-manual-en.pdf',
     external: true,
   },
-}
+} satisfies Record<string, AppModule | ExternalAppModule>
 
 const userManualLanguages = new Set(['en', 'fr', 'es'])
 
@@ -384,30 +389,32 @@ const allAppModuleGroups = [
 
 export const app = 'app'
 
-const _getModuleParentPathParts = (module) => {
-  if (Object.values(appModules).includes(module)) return [app]
-  if (Object.values(guestModules).includes(module)) return [guest]
-  if (Object.values(noHeaderModules).includes(module)) return [noHeader]
+const _getModuleParentPathParts = (module: AppModule): string[] => {
+  if ((Object.values(appModules) as AppModule[]).includes(module)) return [app]
+  if ((Object.values(guestModules) as AppModule[]).includes(module)) return [guest]
+  if ((Object.values(noHeaderModules) as AppModule[]).includes(module)) return [noHeader]
 
-  if (Object.values(homeModules).includes(module)) return _getModulePathParts(appModules.home)
-  if (Object.values(designerModules).includes(module)) return _getModulePathParts(appModules.designer)
-  if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
-  if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
-  if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
-  if (Object.values(user2FADeviceModules).includes(module)) return _getModulePathParts(userModules.user2FADevices)
-  if (Object.values(systemAdminModules).includes(module)) return _getModulePathParts(appModules.systemAdmin)
-  if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
+  if ((Object.values(homeModules) as AppModule[]).includes(module)) return _getModulePathParts(appModules.home)
+  if ((Object.values(designerModules) as AppModule[]).includes(module)) return _getModulePathParts(appModules.designer)
+  if ((Object.values(dataModules) as AppModule[]).includes(module)) return _getModulePathParts(appModules.data)
+  if ((Object.values(userModules) as AppModule[]).includes(module)) return _getModulePathParts(appModules.users)
+  if ((Object.values(analysisModules) as AppModule[]).includes(module)) return _getModulePathParts(appModules.analysis)
+  if ((Object.values(user2FADeviceModules) as AppModule[]).includes(module))
+    return _getModulePathParts(userModules.user2FADevices)
+  if ((Object.values(systemAdminModules) as AppModule[]).includes(module))
+    return _getModulePathParts(appModules.systemAdmin)
+  if ((Object.values(helpModules) as AppModule[]).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)
 }
 
-const _getModulePathParts = (module) => [..._getModuleParentPathParts(module), module.path]
+const _getModulePathParts = (module: AppModule): string[] => [..._getModuleParentPathParts(module), module.path]
 
-const _getModuleInModuleGroupByPathPart = ({ moduleGroup, pathPart }) =>
-  Object.values(moduleGroup).find((module) => module.path === pathPart)
+const _getModuleInModuleGroupByPathPart = ({ moduleGroup, pathPart }): AppModule | undefined =>
+  (Object.values(moduleGroup) as AppModule[]).find((module) => module.path === pathPart)
 
-export const getModuleByPathPart = ({ levelIndex, pathPart }) => {
-  let foundModule = null
+export const getModuleByPathPart = ({ levelIndex, pathPart }): AppModule | null => {
+  let foundModule: AppModule | null = null
 
   const moduleGroups = levelIndex === 0 ? [appModules] : allAppModuleGroups
 
@@ -424,4 +431,5 @@ export const getModuleByPathPart = ({ levelIndex, pathPart }) => {
  * @param {{ key: string, path: string, icon?: string }} [module] - The app module.
  * @returns {string} The module route.
  */
-export const appModuleUri = (module = appModules.home) => `/${_getModulePathParts(module).join('/')}/`
+export const appModuleUri = (module: AppModule = appModules.home): string =>
+  `/${_getModulePathParts(module).join('/')}/`

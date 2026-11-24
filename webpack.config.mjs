@@ -96,7 +96,7 @@ if (process.env.BUILD_REPORT === 'true') {
 
 // ====== webpack config
 const webPackConfig = {
-  entry: ['./webapp/Main.js'],
+  entry: ['./webapp/Main.tsx'],
   mode: environment,
   devtool: 'source-map',
   // maplibre-gl's own runtime worker-loading code (new Worker(dynamicUrl, ...)) is flagged by
