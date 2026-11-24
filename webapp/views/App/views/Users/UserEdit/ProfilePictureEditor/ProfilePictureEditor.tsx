@@ -24,7 +24,7 @@ const ProfilePicturePlaceholder = () => (
     style={{ height: height + border * 2, width: width + border * 2 }}
   >
     <img
-      alt="Profile picture unset"
+      alt="No profile set"
       className="profile-picture-placeholder-img"
       height={height}
       width={width}
