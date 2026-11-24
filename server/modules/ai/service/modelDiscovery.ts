@@ -16,7 +16,7 @@ import { stripTrailingSlashes } from '@common/ai/allowlist'
 
 import * as Log from '@server/log/log'
 
-import { assertBaseUrlAllowed } from './baseUrlGuard'
+import { assertBaseUrlAllowed, type GuardOptions } from './baseUrlGuard'
 import { createGuardedFetch } from './guardedFetch'
 import * as ProviderRegistry from './providerRegistry'
 import { limitResponseBytes } from './responseLimits'
@@ -31,7 +31,9 @@ const MAX_LIST_BYTES = 2 * 1024 * 1024
 
 // the upstream answered, but not with a list
 class UpstreamStatusError extends Error {
-  constructor(status) {
+  status: number
+
+  constructor(status: number) {
     super(`HTTP ${status}`)
     this.status = status
   }
@@ -53,7 +55,14 @@ const getListTimeoutMs = () => Math.min(ENV.aiRequestTimeoutMs, LIST_TIMEOUT_MS)
  * @throws {UpstreamStatusError} When the upstream does not answer with a 2xx status.
  * @throws {SystemError} aiProviderResponseTooLarge when the body is over the cap.
  */
-const fetchJson = async (url, { headers, fetchImpl = fetch } = {}) => {
+type FetchImpl = typeof fetch
+
+type ModelDescriptor = { id: string; description?: string }
+
+const fetchJson = async (
+  url: string,
+  { headers, fetchImpl = fetch }: { headers?: Record<string, string>; fetchImpl?: FetchImpl } = {}
+): Promise<any> => {
   const signal = AbortSignal.timeout(getListTimeoutMs())
   const response = await fetchImpl(url, { method: 'GET', headers, signal, redirect: 'error' })
   if (!response.ok) {
@@ -86,9 +95,17 @@ const isLikelyChatModel = (id) => {
   return !blacklist.some((needle) => lower.includes(needle))
 }
 
-const listOpenAiCompatible = async ({ baseUrl, apiKey, fetchImpl }) => {
+const listOpenAiCompatible = async ({
+  baseUrl,
+  apiKey,
+  fetchImpl,
+}: {
+  baseUrl: string
+  apiKey?: string
+  fetchImpl?: FetchImpl
+}): Promise<ModelDescriptor[]> => {
   const base = normaliseOpenAiBase(baseUrl)
-  const headers = { Accept: 'application/json' }
+  const headers: Record<string, string> = { Accept: 'application/json' }
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`
   const json = await fetchJson(`${base}/models`, { headers, fetchImpl })
   const data = Array.isArray(json?.data) ? json.data : []
@@ -173,7 +190,10 @@ const toListError = (error) => {
  * @throws {SystemError} An error key with a status code (`aiModelListFailed` for an upstream failure without a more
  *   specific key).
  */
-export const listForProvider = async ({ provider, baseUrl, apiKey }, guardOptions = {}) => {
+export const listForProvider = async (
+  { provider, baseUrl, apiKey }: { provider: string; baseUrl?: string; apiKey?: string },
+  guardOptions: GuardOptions & { fetchImpl?: FetchImpl } = {}
+): Promise<ModelDescriptor[]> => {
   try {
     switch (provider) {
       case ProviderRegistry.providers.openai:
