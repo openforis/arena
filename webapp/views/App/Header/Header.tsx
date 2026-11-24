@@ -2,7 +2,6 @@ import './Header.scss'
 
 import classNames from 'classnames'
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { Link } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
@@ -31,9 +30,10 @@ import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import { PreferredUILanguageButtonMenu } from './PreferredUILanguageButtonMenu'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
 import UserPopupMenu from './UserPopupMenu'
+import { useAppDispatch } from '@webapp/store'
 
 const Header = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const user = useUser()
   const lang = useSurveyPreferredLang()
   const appSaving = useIsAppSaving()
@@ -137,7 +137,7 @@ const Header = () => {
             toggleShowUserPopup()
           }}
           onKeyDown={toggleShowUserPopup}
-          tabIndex="0"
+          tabIndex={0}
           type="button"
         >
           <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKey} thumbnail />

@@ -43,7 +43,7 @@ const ServiceErrors = () => {
     <TransitionGroup className={`service-errors${A.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
       {itemsWithRefs.map(({ error, nodeRef }) => (
         <CSSTransition key={error.id} timeout={500} classNames="fade" nodeRef={nodeRef}>
-          <ServiceError error={error} nodeRef={nodeRef} />
+          <ServiceError error={error} ref={nodeRef} />
         </CSSTransition>
       ))}
     </TransitionGroup>

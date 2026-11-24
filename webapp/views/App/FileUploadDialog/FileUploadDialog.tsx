@@ -1,17 +1,17 @@
 import './FileUploadDialog.scss'
 
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter, ProgressBar } from '@webapp/components'
 
 import { FileUploadDialogActions, useFileUploadDialog } from '@webapp/store/ui'
 import { useOnValueChange } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
 
-const initialState = { files: [] }
+const initialState: { files: File[]; uploadProgressPercent?: number; uploading?: boolean } = { files: [] }
 
 export const FileUploadDialog = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const { accept, maxSize, open, onOk, title } = useFileUploadDialog()
 

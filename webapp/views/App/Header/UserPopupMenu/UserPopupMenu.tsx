@@ -1,8 +1,6 @@
 import './UserPopupMenu.scss'
 
 import { useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
@@ -23,10 +21,18 @@ import {
   useAuthCanEditTemplates,
   useOnNewSurveyClick,
 } from '@webapp/store/user/hooks'
+import { useAppDispatch } from '@webapp/store'
 
 const Separator = () => <div className="user-popup-menu__sep" />
 
-const PopupMenuButton = (props) => {
+type PopupMenuButtonProps = {
+  onClick: (...args: any[]) => any
+  iconClassName: string
+  label: string
+  testId?: string
+}
+
+const PopupMenuButton = (props: PopupMenuButtonProps) => {
   const i18n = useI18n()
   const { onClick, iconClassName, label, testId } = props
   return (
@@ -37,17 +43,15 @@ const PopupMenuButton = (props) => {
   )
 }
 
-PopupMenuButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  iconClassName: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  testId: PropTypes.string,
+type UserPopupMenuProps = {
+  onClose: (...args: any[]) => any
+  onQrCodeLoginDialogOpen: (...args: any[]) => any
 }
 
-const UserPopupMenu = (props) => {
+const UserPopupMenu = (props: UserPopupMenuProps) => {
   const { onClose, onQrCodeLoginDialogOpen } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
   const elementRef = useRef(null)
@@ -165,11 +169,6 @@ const UserPopupMenu = (props) => {
       />
     </div>
   )
-}
-
-UserPopupMenu.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  onQrCodeLoginDialogOpen: PropTypes.func.isRequired,
 }
 
 export default UserPopupMenu

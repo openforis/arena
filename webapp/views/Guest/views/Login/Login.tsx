@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link, Navigate, useSearchParams } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -19,6 +19,7 @@ import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 import { useUser } from '@webapp/store/user'
+import { useAppDispatch } from '@webapp/store'
 
 const { ViewState } = LoginState
 
@@ -30,7 +31,7 @@ const FormFields = {
 
 // handles the redirect back from an external login provider: error or 2FA step
 const useExternalLoginRedirect = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [searchParams, setSearchParams] = useSearchParams()
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const RequestAccessBanner = () => {
 }
 
 const Login = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const error = useSelector(LoginState.getError)
   const email = useSelector(LoginState.getEmail)

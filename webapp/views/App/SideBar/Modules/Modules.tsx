@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import { useLang } from '@webapp/store/system'
 
@@ -7,8 +6,17 @@ import * as SideBarModule from './utils'
 
 import Module from './Module'
 import PopupMenu from './PopupMenu'
+import type { ArenaUser } from '@openforis/arena-core'
 
-const Modules = (props) => {
+type ModulesProps = {
+  user?: ArenaUser
+  surveyInfo?: Record<string, any>
+  surveyIsDirty?: boolean
+  pathname?: string
+  sideBarOpened?: boolean
+}
+
+const Modules = (props: ModulesProps) => {
   const { pathname = '', sideBarOpened = false, surveyInfo = null, surveyIsDirty = false, user = null } = props
 
   const [overSidebar, setOverSidebar] = useState(false)
@@ -73,14 +81,6 @@ const Modules = (props) => {
       )}
     </div>
   )
-}
-
-Modules.propTypes = {
-  user: PropTypes.object,
-  surveyInfo: PropTypes.object,
-  surveyIsDirty: PropTypes.bool,
-  pathname: PropTypes.string,
-  sideBarOpened: PropTypes.bool,
 }
 
 export default Modules

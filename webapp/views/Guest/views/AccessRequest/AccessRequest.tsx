@@ -1,7 +1,6 @@
 import './AccessRequest.scss'
 
 import { Link, useNavigate } from 'react-router'
-import PropTypes from 'prop-types'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -17,7 +16,11 @@ import { useI18n } from '@webapp/store/system'
 import { useAccessRequest } from './useAccessRequest'
 import { AccessRequestField } from './AccessRequestField'
 
-const AccessRequestSent = ({ email }) => {
+type AccessRequestSentProps = {
+  email: string
+}
+
+const AccessRequestSent = ({ email }: AccessRequestSentProps) => {
   const i18n = useI18n()
   const navigate = useNavigate()
   return (
@@ -38,10 +41,6 @@ const AccessRequestSent = ({ email }) => {
       />
     </div>
   )
-}
-
-AccessRequestSent.propTypes = {
-  email: PropTypes.string.isRequired,
 }
 
 const AccessRequest = () => {
