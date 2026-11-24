@@ -112,7 +112,7 @@ describe('Records merge Test', () => {
       recordSource: record2,
     })(record1)
 
-    expect(Object.values(nodesUpdated).length).toBe(30)
+    expect(Object.values(nodesUpdated)).toHaveLength(30)
 
     expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 4 })
 
@@ -213,7 +213,7 @@ describe('Records merge Test', () => {
     const { record: recordMergedOnce } = await Record.mergeRecords({ survey, recordSource })(record1)
     const { record: recordMergedTwice } = await Record.mergeRecords({ survey, recordSource })(recordMergedOnce)
 
-    expect(Record.getNodesArray(recordMergedTwice).length).toBe(Record.getNodesArray(recordMergedOnce).length)
+    expect(Record.getNodesArray(recordMergedTwice)).toHaveLength(Record.getNodesArray(recordMergedOnce).length)
     expectChildrenLengthToBe({
       survey,
       record: recordMergedTwice,

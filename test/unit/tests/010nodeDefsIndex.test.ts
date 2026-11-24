@@ -41,7 +41,7 @@ describe('NodeDefsIndex Test', () => {
       'remarks',
       'plot',
     ]
-    expect(childrenUuids.length).toBe(childrenNames.length)
+    expect(childrenUuids).toHaveLength(childrenNames.length)
 
     childrenNames.forEach((childName) => {
       const def = Survey.getNodeDefByName(childName)(survey)
@@ -59,7 +59,7 @@ describe('NodeDefsIndex Test', () => {
     expect(childrenUuids).toBeDefined()
 
     const childrenNames = ['plot_id', 'plot_location', 'plot_multiple_number', 'plot_details', 'tree']
-    expect(childrenUuids.length).toBe(childrenNames.length)
+    expect(childrenUuids).toHaveLength(childrenNames.length)
 
     childrenNames.forEach((childName) => {
       const def = Survey.getNodeDefByName(childName)(survey)
@@ -77,7 +77,7 @@ describe('NodeDefsIndex Test', () => {
     const { childDefUuidPresenceByParentUuid } = index
 
     const childrenUuids = Object.keys(childDefUuidPresenceByParentUuid[cluster.uuid] || {})
-    expect(childrenUuids.length).toBe(10)
+    expect(childrenUuids).toHaveLength(10)
     expect(childrenUuids.includes(nodeDef.uuid)).toBeTruthy()
   })
 })

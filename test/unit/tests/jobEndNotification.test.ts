@@ -74,7 +74,7 @@ describe('Job end notification', () => {
   test('job succeeding notifies its end only once', async () => {
     const notifications = await runJob(new SucceedingJob())
     const endNotifications = notifications.filter((notification) => notification.ended)
-    expect(endNotifications.length).toBe(1)
+    expect(endNotifications).toHaveLength(1)
     expect(endNotifications[0].status).toBe(jobStatus.succeeded)
   })
 
@@ -90,7 +90,7 @@ describe('Job end notification', () => {
     const notifications = await runJob(job)
     // the job end is handled as usual (onEnd cleanup)
     expect(job.onEndCalled).toBe(true)
-    expect(notifications.length).toBe(1)
+    expect(notifications).toHaveLength(1)
     const [notification] = notifications
     expect(notification.ended).toBe(true)
     expect(notification.status).toBe(jobStatus.failed)
@@ -111,7 +111,7 @@ describe('Job end notification (errors while ending)', () => {
       notifyJob,
     })
     expect(job.onEndCalled).toBe(true)
-    expect(notifications.length).toBe(1)
+    expect(notifications).toHaveLength(1)
     expect(notifications[0].ended).toBe(true)
     expect(notifications[0].status).toBe(jobStatus.failed)
   })
@@ -151,7 +151,7 @@ describe('Job thread listeners', () => {
     onJobUpdate({ uuid: 'job-exit-1', userUuid: 'user-1', status: jobStatus.running, ended: false })
     onThreadExit()
 
-    expect(updates.length).toBe(2)
+    expect(updates).toHaveLength(2)
     const lastUpdate = updates.at(-1)
     expect(lastUpdate.uuid).toBe('job-exit-1')
     expect(lastUpdate.ended).toBe(true)
@@ -176,7 +176,7 @@ describe('Job thread listeners', () => {
     onJobUpdate({ uuid: 'job-exit-2', userUuid: 'user-1', status: jobStatus.succeeded, ended: true })
     onThreadExit()
 
-    expect(updates.length).toBe(1)
+    expect(updates).toHaveLength(1)
     expect(updates[0].status).toBe(jobStatus.succeeded)
   })
 })

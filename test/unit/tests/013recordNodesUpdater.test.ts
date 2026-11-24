@@ -36,7 +36,7 @@ describe('RecordNodesUpdater Test', () => {
     })(record)
 
     // expect only one node modified
-    expect(Object.values(nodesUpdated).length).toBe(1)
+    expect(Object.values(nodesUpdated)).toHaveLength(1)
 
     // expect node value has been updated
     const dbhUpdatedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[1]/dbh')(survey, recordUpdated)
@@ -90,7 +90,7 @@ describe('RecordNodesUpdater Test', () => {
 
     // expect plot descendant nodes created
     const expectedNodesCreatedCount = 1 + Survey.getNodeDefChildren({ nodeDef: treeDef })(survey).length // tree node + descendants
-    expect(Object.values(nodesUpdated).length).toBe(expectedNodesCreatedCount)
+    expect(Object.values(nodesUpdated)).toHaveLength(expectedNodesCreatedCount)
 
     // expect node value has been updated
     const dbhInsertedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[2]/dbh')(survey, recordUpdated)

@@ -23,7 +23,7 @@ const _updateLayoutAndExpectParentChildrenIndexToBe = ({ nodeDefName, layout, ex
   const nodeDefsUpdatedNames = Object.values(nodeDefsUpdated).map(NodeDef.getName)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
-  expect(nodeDefsUpdatedNames.length).toBe(2)
+  expect(nodeDefsUpdatedNames).toHaveLength(2)
   expect(nodeDefsUpdatedNames).toContain(NodeDef.getName(nodeDef))
   expect(nodeDefsUpdatedNames).toContain(NodeDef.getName(nodeDefParent))
 
