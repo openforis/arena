@@ -1,5 +1,4 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
-import { db } from '@server/db/db'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -66,14 +65,11 @@ const fetchSurvey = (surveyId) =>
 const evaluate = async ({ survey, record, location }) => {
   const locationNode = RecordUtils.findNodeByPath('report/location')(survey, record)
   const nodesUpdated = { [Node.getUuid(locationNode)]: Node.assocValue(location)(locationNode) }
-  const { record: recordUpdated } = await RecordManager.updateNodesDependents(
-    {
-      survey,
-      record: Record.mergeNodes(nodesUpdated)(record),
-      nodes: nodesUpdated,
-    },
-    db
-  )
+  const { record: recordUpdated } = await RecordManager.updateNodesDependents({
+    survey,
+    record: Record.mergeNodes(nodesUpdated)(record),
+    nodes: nodesUpdated,
+  })
   const valueOf = (nodePath) => Node.getValue(RecordUtils.findNodeByPath(nodePath)(survey, recordUpdated))
   return { distance: valueOf('report/aoi_distance'), areaName: valueOf('report/aoi_name') }
 }

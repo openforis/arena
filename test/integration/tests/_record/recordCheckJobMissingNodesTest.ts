@@ -1,5 +1,4 @@
 import * as Survey from '@core/survey/survey'
-import { db } from '@server/db/db'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
@@ -33,7 +32,7 @@ const _insertRecordMissingComputedNode = async ({ user, survey, keyValue }) => {
   const rootNode = Node.newNode(NodeDef.getUuid(rootDef), recordUuid)
   const plainAttrNode = Node.newNode(NodeDef.getUuid(plainAttrDef), recordUuid, rootNode, keyValue)
 
-  await RecordManager.insertNodesInBulk({ user, surveyId, nodesArray: [rootNode, plainAttrNode] }, db)
+  await RecordManager.insertNodesInBulk({ user, surveyId, nodesArray: [rootNode, plainAttrNode] })
 
   return recordUuid
 }

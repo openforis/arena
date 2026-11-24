@@ -1,5 +1,4 @@
 import * as Survey from '@core/survey/survey'
-import { db } from '@server/db/db'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
@@ -80,14 +79,11 @@ describe('Applicable Test', () => {
       global.applicableRecord = record
 
       // Update dependent nodes
-      const { record: recordUpdate } = /* NOSONAR */ await RecordManager.updateNodesDependents(
-        {
-          survey,
-          record,
-          nodes: nodesUpdated,
-        },
-        db
-      )
+      const { record: recordUpdate } = /* NOSONAR */ await RecordManager.updateNodesDependents({
+        survey,
+        record,
+        nodes: nodesUpdated,
+      })
       record = recordUpdate
       global.applicableRecord = record
 
