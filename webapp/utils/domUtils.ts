@@ -135,7 +135,7 @@ const interactiveElementsSelector =
  */
 export const isEventFromInteractiveChild = (event) => {
   const { currentTarget } = event
-  const target = /** @type {Element} */ (event.target)
+  const target = /** @type {Element} */ event.target
   if (!currentTarget.contains(target)) return true
   const interactiveElement = target.closest(interactiveElementsSelector)
   return Boolean(interactiveElement) && interactiveElement !== currentTarget

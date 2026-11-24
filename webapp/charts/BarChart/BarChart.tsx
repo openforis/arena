@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, Tooltip, Legend } from 'recharts'
 
@@ -25,7 +24,16 @@ const margin = {
   left: 0,
 }
 
-export const BarChart = (props) => {
+type BarChartProps = {
+  data: any[]
+  dataColors?: any[]
+  dataKeys: any[]
+  labelDataKey?: string
+  layout?: 'horizontal' | 'vertical'
+  showLegend?: boolean
+}
+
+export const BarChart = (props: BarChartProps) => {
   const { data, dataColors = [], dataKeys, labelDataKey = 'name', layout = 'horizontal', showLegend = true } = props
 
   const tickFormatter = useCallback((value) => {
@@ -75,13 +83,4 @@ export const BarChart = (props) => {
       </ReChartsBarChart>
     </ChartWrapper>
   )
-}
-
-BarChart.propTypes = {
-  data: PropTypes.array.isRequired,
-  dataColors: PropTypes.array,
-  dataKeys: PropTypes.array.isRequired,
-  labelDataKey: PropTypes.string,
-  layout: PropTypes.oneOf(['horizontal', 'vertical', 'centric', 'radial']),
-  showLegend: PropTypes.bool,
 }

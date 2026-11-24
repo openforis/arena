@@ -1,10 +1,16 @@
-import PropTypes from 'prop-types'
-
 import * as StringUtils from '@core/stringUtils'
 
 const labelTextFill = '#666'
 
-export const CustomAxisTick = (props) => {
+type CustomAxisTickProps = {
+  labelRotation?: number
+  payload: Record<string, any>
+  labelMaxChars?: number
+  x: number
+  y: number
+}
+
+export const CustomAxisTick = (props: CustomAxisTickProps) => {
   const { labelRotation = 0, labelMaxChars = 14, payload, x, y } = props
   const { value } = payload
   const ellipsed = value.length > labelMaxChars
@@ -21,11 +27,3 @@ export const CustomAxisTick = (props) => {
 }
 
 export const RotatedCustomAxisTick = (props) => <CustomAxisTick {...props} labelRotation={-30} />
-
-CustomAxisTick.propTypes = {
-  labelRotation: PropTypes.number,
-  payload: PropTypes.object.isRequired,
-  labelMaxChars: PropTypes.number,
-  x: PropTypes.number.isRequired,
-  y: PropTypes.number.isRequired,
-}

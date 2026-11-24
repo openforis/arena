@@ -64,6 +64,29 @@ const DEFAULT_OPTIONS = {
 export const highlightClassName = 'highlight'
 
 export default class TreeChart {
+  domElement: HTMLElement
+  data: any
+  extraLinksGroups: any
+  i18n: any
+  nodeWrapperClassName: string
+  nodeClassFunction: (...args: any[]) => any
+  nodeFilterFunction: (...args: any[]) => any
+  nodeIconFunction: (...args: any[]) => any
+  _nodeLabelFunction: (...args: any[]) => any
+  _nodeTooltipFunction: (...args: any[]) => any
+  svgClass: string
+  rootNodeElementId: string
+  wrapperClass: string
+  options: typeof DEFAULT_OPTIONS
+  nodesByUuidMap: Record<string, any>
+  selectedNodeUuid: string | null
+  onNodeClick: (nodeUuid: string) => void
+  svg: any
+  tree: any
+  root: any
+  rootG: any
+  resizeObserver: ResizeObserver | null
+
   constructor({
     domElement,
     data,
