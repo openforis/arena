@@ -63,6 +63,24 @@ const DEFAULT_OPTIONS = {
 
 export const highlightClassName = 'highlight'
 
+type TreeChartParams = {
+  domElement: HTMLElement
+  data: any
+  extraLinksGroups?: any
+  i18n: any
+  nodeClassFunction?: (...args: any[]) => any
+  nodeFilterFunction?: (...args: any[]) => any
+  nodeIconFunction?: (...args: any[]) => any
+  nodeLabelFunction?: (...args: any[]) => any
+  nodeTooltipFunction?: (...args: any[]) => any
+  onNodeClick?: (nodeUuid: string) => void
+  selectedNodeUuid?: string | null
+  svgClass?: string
+  rootNodeElementId?: string
+  wrapperClass?: string
+  options?: Partial<typeof DEFAULT_OPTIONS>
+}
+
 export default class TreeChart {
   domElement: HTMLElement
   data: any
@@ -103,7 +121,7 @@ export default class TreeChart {
     rootNodeElementId = 'hierarchy__root-g',
     wrapperClass = 'hierarchy__tree',
     options = DEFAULT_OPTIONS,
-  }) {
+  }: TreeChartParams) {
     this.domElement = domElement
     this.data = data
     this.extraLinksGroups = extraLinksGroups

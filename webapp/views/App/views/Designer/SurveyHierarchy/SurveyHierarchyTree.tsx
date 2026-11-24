@@ -1,5 +1,4 @@
-import { forwardRef, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { forwardRef, useEffect, type MutableRefObject } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -8,7 +7,15 @@ import { useNodeDefTreeChart } from '@webapp/charts/TreeChart/useNodeDefTreeChar
 
 const nodeClassFunction = (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`
 
-export const SurveyHierarchyTree = forwardRef((props, ref) => {
+type SurveyHierarchyTreeProps = {
+  data: Record<string, any>
+  nodeDefLabelType?: NodeDef.NodeDefLabelType
+  onEntityClick: (...args: any[]) => any
+}
+
+export const SurveyHierarchyTree = forwardRef<TreeChart, SurveyHierarchyTreeProps>((props, forwardedRef) => {
+  // the tree chart instance is exposed to the parent through the forwarded ref
+  const ref = forwardedRef as MutableRefObject<TreeChart | null>
   const { data, nodeDefLabelType, onEntityClick } = props
 
   const { i18n, wrapperRef, nodeLabelFunction, nodeTooltipFunction, nodeIconFunction } = useNodeDefTreeChart({
@@ -35,9 +42,3 @@ export const SurveyHierarchyTree = forwardRef((props, ref) => {
 
   return <div className="hierarchy__tree survey-hierarchy__tree" ref={wrapperRef} />
 })
-
-SurveyHierarchyTree.propTypes = {
-  data: PropTypes.object.isRequired,
-  nodeDefLabelType: PropTypes.string,
-  onEntityClick: PropTypes.func.isRequired,
-}

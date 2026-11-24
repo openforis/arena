@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'
@@ -14,7 +12,12 @@ ${ActivityLogMessage.isItemDeleted(message) ? 'item-deleted' : ''}
 ${ActivityLogMessage.isHighlighted(message) ? 'highlighted' : ''}
 `
 
-const Message = ({ message, setRef }) => {
+type MessageProps = {
+  message: Record<string, any>
+  setRef: (...args: any[]) => any
+}
+
+const Message = ({ message, setRef }: MessageProps) => {
   const i18n = useI18n()
   const className = getMessageClassName({ message })
 
@@ -27,11 +30,6 @@ const Message = ({ message, setRef }) => {
       <div className="date">{DateUtils.getRelativeDate(i18n, ActivityLogMessage.getDateCreated(message))}</div>
     </div>
   )
-}
-
-Message.propTypes = {
-  message: PropTypes.object.isRequired,
-  setRef: PropTypes.func.isRequired,
 }
 
 export default Message

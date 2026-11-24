@@ -17,7 +17,13 @@ import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 
 const { dependencyTypes: surveyDependencyTypes } = Survey
 
-const generateExtraLinks = ({ dependencyGraph, selectedNodeDefUuid }) =>
+const generateExtraLinks = ({
+  dependencyGraph,
+  selectedNodeDefUuid,
+}: {
+  dependencyGraph: Record<string, string[]>
+  selectedNodeDefUuid: string | null
+}) =>
   Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
     if (selectedNodeDefUuid && source !== selectedNodeDefUuid && !dependentNodeDefUuids.includes(selectedNodeDefUuid)) {
       return acc
@@ -29,7 +35,15 @@ const generateExtraLinks = ({ dependencyGraph, selectedNodeDefUuid }) =>
     return acc
   }, [])
 
-const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNodeDefUuid }) =>
+const calculateDependentNodeDefsByUuid = ({
+  survey,
+  dependencyGraph,
+  selectedNodeDefUuid,
+}: {
+  survey: any
+  dependencyGraph: Record<string, string[]>
+  selectedNodeDefUuid: string | null
+}) =>
   Object.entries(dependencyGraph).reduce((acc, [nodeDefUuid, dependentNodeDefUuids]) => {
     if (!dependentNodeDefUuids.length) {
       return acc
@@ -100,7 +114,7 @@ const useSurveyWithDependencyGraph = () => {
     survey,
   })
 
-  const fetchSurveyWithDependencyGraph = useCallback(async () => Survey.buildAndAssocDependencyGraph(survey), [survey])
+  const fetchSurveyWithDependencyGraph = useCallback(() => Survey.buildAndAssocDependencyGraph(survey), [survey])
 
   useEffect(() => {
     fetchSurveyWithDependencyGraph().then((surveyUpdated) => setState({ ready: true, survey: surveyUpdated }))
@@ -117,7 +131,8 @@ export const SurveyDependencyTree = () => {
   const [dependencyTypes, setDependencyTypes] = useState([])
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
-  const hierarchy = useMemo(() => {
+  // the hierarchy is empty ({}) until the dependency graph is built
+  const hierarchy = useMemo((): { root?: any; length?: number } => {
     if (!ready) return {}
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
 
