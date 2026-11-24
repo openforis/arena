@@ -6,9 +6,17 @@ import * as NodeDef from '../../../core/survey/nodeDef'
 import * as NodeDefLayout from '../../../core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '../../../core/survey/nodeDefLayoutUpdater'
 
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
+
 import NodeDefBuilder from './nodeDefBuilder'
+import type NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
 
 export default class NodeDefEntityBuilder extends NodeDefBuilder {
+  childBuilders: Array<NodeDefEntityBuilder | NodeDefAttributeBuilder>
+  _renderType: string
+  _displayIn: string
+  _virtual: boolean
+
   constructor(name, ...childBuilders) {
     super(name, NodeDef.nodeDefType.entity)
     this.childBuilders = childBuilders
@@ -32,7 +40,7 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
     return this
   }
 
-  build(survey, parentDef = null) {
+  build(survey, parentDef = null): Record<string, ArenaAnyNodeDef> {
     const def = this._createNodeDef(parentDef)
     if (this._virtual) {
       def[NodeDef.keys.virtual] = true
@@ -56,7 +64,7 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
       A.map((childBuilder) => childBuilder.build(survey, defUpdated)),
       A.mergeAll,
       A.assoc(defUuid, defUpdated)
-    )(this.childBuilders)
+    )(this.childBuilders) as Record<string, ArenaAnyNodeDef>
 
     const findChildDef = (name) =>
       Object.values(defs).find((d) => NodeDef.getParentUuid(d) === defUuid && NodeDef.getName(d) === name)
@@ -64,7 +72,7 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
 
     // resolve parent code attributes (siblings, available only now that all the children have been built)
     this.childBuilders.forEach((childBuilder) => {
-      const { parentCodeDefName } = childBuilder
+      const parentCodeDefName = 'parentCodeDefName' in childBuilder ? childBuilder.parentCodeDefName : null
       if (!parentCodeDefName) return
       const childName = getChildBuilderName(childBuilder)
       const childDef = findChildDef(childName)
@@ -84,7 +92,7 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
     defUpdated = NodeDefLayoutUpdater.initializeParentLayout({
       survey: surveyUpdated,
       cycle: Survey.cycleOneKey,
-      nodeDefParent: defUpdated,
+      nodeDefParent: defUpdated as ArenaNodeDefEntity,
     })
     surveyUpdated = Survey.mergeNodeDefs({ [defUuid]: defUpdated })(surveyUpdated)
 

@@ -4,7 +4,7 @@ import { parse } from '@fast-csv/parse'
 
 export const parseCsv = (filePath) => csvLoadSync(filePath)
 
-export const parseCsvAsync = async (filePath) =>
+export const parseCsvAsync = (filePath) =>
   new Promise((resolve, reject) => {
     const csvContent = fs.readFileSync(filePath)
     const data = []

@@ -10,14 +10,19 @@ import * as Node from '@core/record/node'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import * as RecordUtils from './recordUtils'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 
 class NodeBuilder {
+  nodeDefName: string
+
   constructor(nodeDefName) {
     this.nodeDefName = nodeDefName
   }
 }
 
 class EntityBuilder extends NodeBuilder {
+  childBuilders: Array<EntityBuilder | AttributeBuilder>
+
   constructor(nodeDefName, ...childBuilders) {
     super(nodeDefName)
     this.childBuilders = childBuilders
@@ -59,6 +64,8 @@ class EntityBuilder extends NodeBuilder {
 }
 
 class AttributeBuilder extends NodeBuilder {
+  value: any
+
   constructor(nodeDefName, value = null) {
     super(nodeDefName)
     this.value = value
@@ -93,6 +100,10 @@ class AttributeBuilder extends NodeBuilder {
 }
 
 class RecordBuilder {
+  survey: ArenaSurvey
+  user: ArenaUser
+  rootEntityBuilder: EntityBuilder
+
   constructor(user, survey, rootEntityBuilder) {
     this.survey = survey
     this.user = user

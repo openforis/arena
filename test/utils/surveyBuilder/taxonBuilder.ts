@@ -1,11 +1,17 @@
-import * as A from '@core/arena'
-
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
+import type { ArenaVernacularName } from '@openforis/arena-core'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 export class TaxonBuilder {
-  constructor(code, family, genus, scientificName) {
+  code: string
+  family: string
+  genus: string
+  scientificName: string
+  vernacularNames: Record<string, ArenaVernacularName[]>
+  _extra: Record<string, unknown>
+
+  constructor(code: string, family: string, genus: string, scientificName: string) {
     this.code = code
     this.family = family
     this.genus = genus
@@ -14,11 +20,12 @@ export class TaxonBuilder {
     this._extra = {}
   }
 
-  vernacularName(lang, name) {
-    this.vernacularNames = A.pipe(
-      A.propOr([], lang),
-      A.append(TaxonVernacularName.newTaxonVernacularName(lang, name))
-    )(this.vernacularNames)
+  vernacularName(lang: string, name: string) {
+    const names = this.vernacularNames[lang] ?? []
+    this.vernacularNames = {
+      ...this.vernacularNames,
+      [lang]: [...names, TaxonVernacularName.newTaxonVernacularName(lang, name)],
+    }
     return this
   }
 
