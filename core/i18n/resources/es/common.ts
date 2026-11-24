@@ -373,7 +373,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     virtualEntity: 'Entidad virtual',
     entities: 'Entidades virtuales',
     virtualEntity_other: '$t(appModules.entities)',
-    instances: 'Instancias',
+    instances: 'Sesiones RStudio',
     message: 'Mensaje',
     message_other: '$t(common.message_other)',
 
@@ -1016,8 +1016,10 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     showSamplingAttributes: 'Mostrar atributos de muestreo',
   },
   instancesView: {
-    title: 'Instancias',
+    title: '$t(appModules.instances)',
     terminate: 'Terminar',
+    noSessionRunning: 'No hay ninguna sesión de RStudio en ejecución.',
+    noSessionRunningHint: 'Inicie una desde una cadena de procesamiento, con el botón RStudio.',
   },
   chain: {
     quantitative: 'Cuantitativo',
