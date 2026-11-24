@@ -4,10 +4,7 @@ import * as Survey from '@core/survey/survey'
 import { toKeyText } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
 import { isPointInBounds, type LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
 
-import type {
-  ActiveLayer,
-  MapLayerPoint,
-} from '@webapp/views/App/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
+import type { ActiveLayer, MapLayerPoint } from '@webapp/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type {
   LatLngLiteral,
   ScreenshotPlotCandidate,

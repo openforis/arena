@@ -4,7 +4,7 @@ import {
   getLevelsAbove,
   getPolicyLevelOptions,
   getPolicySaveErrorMessage,
-} from '@webapp/views/App/views/Home/SurveyInfo/SurveyAiPolicyEditor/policyLevelOptions'
+} from '@webapp/views/Home/SurveyInfo/SurveyAiPolicyEditor/policyLevelOptions'
 import { fakeT as t } from '../utils/fakeT'
 
 const getPath = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc?.[part], obj)

@@ -1,0 +1,134 @@
+@use '~@webapp/style/text' as t;
+@use '~@webapp/style/vars' as v;
+
+.analysis-node-def,
+.analysis-node-defs__list-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 0.2fr 0.4fr 0.4fr 120px 120px repeat(2, 80px);
+  grid-column-gap: 22px;
+  align-items: center;
+
+  > div {
+    padding-left: 8px;
+    @include t.line-clamp(1);
+  }
+}
+
+.analysis-node-defs__list-header {
+  margin-top: 16px;
+  height: 32px;
+  padding: unset;
+  // same look as the table headers
+  background:
+    v.$tableHeaderAccent bottom / 100% 2px no-repeat,
+    v.$colorPrimaryContainerLow;
+  color: v.$colorOnPrimaryContainer;
+  border-radius: v.$tableBorderRadius v.$tableBorderRadius 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.analysis-node-def {
+  font-size: 0.9rem;
+  padding: 8px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid v.$colorOutline;
+  }
+
+  .labels-editor {
+    grid-template-columns: auto 1fr;
+
+    input {
+      border: unset;
+    }
+  }
+
+  .analysis-node-def__entity-name {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    &.with-warning {
+      grid-template-columns: 1fr 25px;
+
+      .entity-label,
+      .badge {
+        position: relative;
+      }
+
+      .entity-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.analysis-node-def.draggable-mirror {
+  background-color: v.tint(v.$colorWarningContainer, 45%);
+  border: 1px dashed v.$colorPrimary;
+
+  .analysis-node-def__btn-move {
+    span {
+      color: v.$colorOnSurface;
+    }
+  }
+}
+
+.analysis-node-def.deleted {
+  background-color: v.with-alpha(v.$colorOutline, 0.4);
+  opacity: 0.7;
+
+  &:after {
+    background-color: v.with-alpha(v.$colorOnSurface, 0.4);
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: absolute;
+    top: calc(50% + 1px);
+    left: 2%;
+    transform: translateY(-50%);
+    width: 96%;
+  }
+
+  a {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+.analysis-node-def__area-based {
+  .icon {
+    padding-left: 2rem;
+  }
+}
+
+.analysis-node-def__type {
+  font-size: 0.8rem;
+
+  .icon {
+    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
+  }
+}
+
+.analysis-node-def__btn-move {
+  border: unset;
+  background-color: unset;
+  padding: unset;
+  width: 32px;
+  height: 16px;
+
+  span {
+    color: v.$colorOnSurfaceVariant;
+  }
+
+  &:hover {
+    background-color: transparent;
+    cursor: move;
+
+    span {
+      color: v.$colorOnSurface;
+    }
+  }
+}

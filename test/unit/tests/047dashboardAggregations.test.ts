@@ -1,6 +1,6 @@
-import { aggregateRecordsTotal } from '@webapp/views/App/views/Dashboard/utils/aggregateRecordsTotal'
-import { filterActiveContributors } from '@webapp/views/App/views/Dashboard/utils/filterActiveContributors'
-import { filterVisibleContributors } from '@webapp/views/App/views/Dashboard/utils/filterVisibleContributors'
+import { aggregateRecordsTotal } from '@webapp/views/Dashboard/utils/aggregateRecordsTotal'
+import { filterActiveContributors } from '@webapp/views/Dashboard/utils/filterActiveContributors'
+import { filterVisibleContributors } from '@webapp/views/Dashboard/utils/filterVisibleContributors'
 
 describe('aggregateRecordsTotal', () => {
   it('sums count fields', () => {

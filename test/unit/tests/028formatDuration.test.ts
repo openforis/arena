@@ -1,4 +1,4 @@
-import formatDuration from '@webapp/views/App/JobMonitor/JobTiming/formatDuration'
+import formatDuration from '@webapp/layouts/AppLayout/JobMonitor/JobTiming/formatDuration'
 
 describe('formatDuration', () => {
   test('returns null for 0', () => expect(formatDuration(0)).toBeNull())

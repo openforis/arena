@@ -11,7 +11,7 @@ import {
   LogMarkers,
   mergeLines,
   removeInstanceLines,
-} from '@webapp/views/App/views/SystemLogs/systemLogLines'
+} from '@webapp/views/SystemLogs/systemLogLines'
 
 const errorLine = '[2026-09-29T10:00:00.000] [ERROR] arena - Something failed'
 const stackLine = '    at fn (/app/server.js:1:1)'
