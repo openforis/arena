@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 import axios from 'axios'
@@ -17,11 +16,12 @@ import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
 
 import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
+import { useAppDispatch } from '@webapp/store'
 
 const itemsPageSize = 10000
 
 const _convertItemsToPoints = (items) => {
-  const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
+  const bounds = latLngBounds([]) // keep track of the layer bounds to calculate its center and pan the map into it
 
   const points = items.reduce((acc, item) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
@@ -97,7 +97,7 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
 export const useSamplingPointDataLayer = (props) => {
   const { levelIndex = 0, markersColor } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const isMountedRef = useIsMountedRef()
   const map = useMap()

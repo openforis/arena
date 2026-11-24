@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
@@ -26,7 +25,15 @@ ${levelCodesList}
 ${locationSummary}`
 }
 
-export const SamplingPointDataItemPopup = (props) => {
+type SamplingPointDataItemPopupProps = {
+  createRecordFromSamplingPointDataItem: (...args: any[]) => any
+  flyToNextPoint: (...args: any[]) => any
+  flyToPreviousPoint: (...args: any[]) => any
+  pointFeature: any
+  onRecordEditClick: (...args: any[]) => any
+}
+
+export const SamplingPointDataItemPopup = (props: SamplingPointDataItemPopupProps) => {
   const { createRecordFromSamplingPointDataItem, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } =
     props
 
@@ -98,12 +105,4 @@ export const SamplingPointDataItemPopup = (props) => {
       </div>
     </Popup>
   )
-}
-
-SamplingPointDataItemPopup.propTypes = {
-  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
-  flyToNextPoint: PropTypes.func.isRequired,
-  flyToPreviousPoint: PropTypes.func.isRequired,
-  pointFeature: PropTypes.any.isRequired,
-  onRecordEditClick: PropTypes.func.isRequired,
 }

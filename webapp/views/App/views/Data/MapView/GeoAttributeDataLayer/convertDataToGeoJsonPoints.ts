@@ -10,13 +10,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
-const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }) => {
+const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n, survey }) => {
   const recordUuid = dataItem[TableDataNodeDef.columnSet.recordUuid]
   const recordOwnerUuid = dataItem[TableDataNodeDef.columnSet.recordOwnerUuid]
   const parentUuid = dataItem[parentEntityColumn.name]
   const key = `${recordUuid}-${parentUuid}`
   const ancestorsKeys = ancestorsKeysColumns.map((column) =>
-    DataQueryValueFormatter.formatDataItemKey({ i18n, nodeDef: column.nodeDef, dataItem })
+    DataQueryValueFormatter.formatDataItemKey({ i18n, survey, nodeDef: column.nodeDef, dataItem })
   )
 
   return {
@@ -29,7 +29,10 @@ const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysCo
   }
 }
 
-const pointExtractorByNodeDefType = {
+type PointExtractorParams = { attributeDef: any; attributeValue: string; srsIndex: any }
+type PointExtractorResult = { point: { x: number; y: number } | null; properties?: Record<string, unknown> }
+
+const pointExtractorByNodeDefType: Record<string, (params: PointExtractorParams) => PointExtractorResult> = {
   [NodeDef.nodeDefType.coordinate]: ({ attributeValue, srsIndex }) => {
     const locationStr = StringUtils.prependIfMissing('SRID=')(attributeValue)
     const point = Points.parse(locationStr)
@@ -43,7 +46,11 @@ const pointExtractorByNodeDefType = {
   },
 }
 
-const extractPointAndExtraPropertiesFromAttributeValue = ({ attributeDef, attributeValue, srsIndex }) =>
+const extractPointAndExtraPropertiesFromAttributeValue = ({
+  attributeDef,
+  attributeValue,
+  srsIndex,
+}: PointExtractorParams) =>
   pointExtractorByNodeDefType[NodeDef.getType(attributeDef)]({ attributeDef, attributeValue, srsIndex })
 
 export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, survey, i18n }) => {
@@ -75,7 +82,7 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
       const { x, y } = point
 
       const properties = {
-        ...extractCommonProperties({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }),
+        ...extractCommonProperties({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n, survey }),
         point: PointFactory.createInstance({ x, y }),
         ...extraProperties,
       }
@@ -89,7 +96,7 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
       return acc
     },
     {
-      bounds: latLngBounds(), // keep track of the layer bounds to calculate its center and pan the map into it
+      bounds: latLngBounds([]), // keep track of the layer bounds to calculate its center and pan the map into it
       points: [],
       pointIndexByDataIndex: [], // data item converted into geojson item can be "null", keep track of it
     }

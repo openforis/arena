@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Marker, Popup, useMap } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 
-const ClusteredPointsPopup = (props) => {
+type ClusteredPointsPopupProps = {
+  clusteredPoints: any[]
+  openPopupOfPoint: (...args: any[]) => any
+  pointLabelFunction: (...args: any[]) => any
+}
+
+const ClusteredPointsPopup = (props: ClusteredPointsPopupProps) => {
   const { clusteredPoints, openPopupOfPoint, pointLabelFunction } = props
 
   return (
@@ -31,13 +36,18 @@ const ClusteredPointsPopup = (props) => {
   )
 }
 
-ClusteredPointsPopup.propTypes = {
-  clusteredPoints: PropTypes.array.isRequired,
-  openPopupOfPoint: PropTypes.func.isRequired,
-  pointLabelFunction: PropTypes.func.isRequired,
+type ClusterMarkerProps = {
+  cluster: Record<string, any>
+  clusterExpansionZoomExtractor: (...args: any[]) => any
+  clusterIconCreator: (...args: any[]) => any
+  color: string
+  getClusterLeaves: (...args: any[]) => any
+  openPopupOfPoint: (...args: any[]) => any
+  pointLabelFunction: (...args: any[]) => any
+  totalPoints: number
 }
 
-export const ClusterMarker = (props) => {
+export const ClusterMarker = (props: ClusterMarkerProps) => {
   const {
     cluster,
     clusterExpansionZoomExtractor,
@@ -55,7 +65,7 @@ export const ClusterMarker = (props) => {
   const { point_count: pointCount } = properties
   const [longitude, latitude] = geometry.coordinates
 
-  const position = useMemo(() => [latitude, longitude], [latitude, longitude])
+  const position = useMemo((): [number, number] => [latitude, longitude], [latitude, longitude])
 
   const markerRef = useRef(null)
   const [clusteredPoints, setClusteredPoints] = useState([])
@@ -103,15 +113,4 @@ export const ClusterMarker = (props) => {
       />
     </Marker>
   )
-}
-
-ClusterMarker.propTypes = {
-  cluster: PropTypes.object.isRequired,
-  clusterExpansionZoomExtractor: PropTypes.func.isRequired,
-  clusterIconCreator: PropTypes.func.isRequired,
-  color: PropTypes.string.isRequired,
-  getClusterLeaves: PropTypes.func.isRequired,
-  openPopupOfPoint: PropTypes.func.isRequired,
-  pointLabelFunction: PropTypes.func.isRequired,
-  totalPoints: PropTypes.number.isRequired,
 }

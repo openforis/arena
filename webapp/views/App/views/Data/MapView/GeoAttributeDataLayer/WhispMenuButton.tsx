@@ -2,7 +2,6 @@ import './WhispMenuButton.scss'
 
 import { useCallback, useMemo, useState } from 'react'
 import axios from 'axios'
-import PropTypes from 'prop-types'
 
 import { Button, ButtonMenu } from '@webapp/components'
 import { useSurveyId } from '@webapp/store/survey'
@@ -17,7 +16,11 @@ const labels = {
   csv: 'Whisp CSV',
 }
 
-export const WhispMenuButton = (props) => {
+type WhispMenuButtonProps = {
+  geoJsonGenerator: (...args: any[]) => any
+}
+
+export const WhispMenuButton = (props: WhispMenuButtonProps) => {
   const { geoJsonGenerator } = props
 
   const surveyId = useSurveyId()
@@ -92,8 +95,4 @@ export const WhispMenuButton = (props) => {
       variant="outlined"
     />
   )
-}
-
-WhispMenuButton.propTypes = {
-  geoJsonGenerator: PropTypes.func.isRequired,
 }

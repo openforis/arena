@@ -1,13 +1,19 @@
 import { useCallback, useMemo } from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 
-export const SamplingPointDataLayer = (props) => {
+type SamplingPointDataLayerProps = {
+  levelIndex?: number
+  markersColor: any
+  createRecordFromSamplingPointDataItem: (...args: any[]) => any
+  onRecordEditClick: (...args: any[]) => any
+}
+
+export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
   const { levelIndex = 0, markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
 
   const {
@@ -105,11 +111,4 @@ export const SamplingPointDataLayer = (props) => {
       </LayerGroup>
     </LayersControl.Overlay>
   )
-}
-
-SamplingPointDataLayer.propTypes = {
-  levelIndex: PropTypes.number,
-  markersColor: PropTypes.any.isRequired,
-  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
-  onRecordEditClick: PropTypes.func.isRequired,
 }

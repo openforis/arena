@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
@@ -8,7 +7,19 @@ import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 
-export const GeoAttributeDataLayer = (props) => {
+type GeoAttributeDataLayerProps = {
+  activationKey?: string // changes on each request to show the layer: it is then shown and zoomed to
+  attributeDef?: any
+  checked?: boolean // when true, the layer is selected (and its data fetched) on mount
+  fitOnActivation?: boolean // when false, an activation shows the layer without zooming to it
+  markersColor?: any
+  onPointsLoaded?: (...args: any[]) => any // called with ({ layerKey, points }) on every data fetch, before filtering
+  onRecordEditClick?: (...args: any[]) => any
+  pointsFilter?: (...args: any[]) => any // when specified, only the matching points are shown
+  renderPopup?: (...args: any[]) => any // when specified, replaces the default marker popup
+}
+
+export const GeoAttributeDataLayer = (props: GeoAttributeDataLayerProps) => {
   const {
     activationKey = null,
     attributeDef,
@@ -89,7 +100,6 @@ export const GeoAttributeDataLayer = (props) => {
                 clusterIconCreator={clusterIconCreator}
                 getClusterLeaves={getClusterLeaves}
                 openPopupOfPoint={openPopupOfPoint}
-                onRecordEditClick={onRecordEditClick}
                 pointLabelFunction={(point) => point.properties.ancestorsKeys.join(' - ')}
                 totalPoints={totalPoints}
               />
@@ -135,16 +145,4 @@ export const GeoAttributeDataLayer = (props) => {
       </LayerGroup>
     </LayersControl.Overlay>
   )
-}
-
-GeoAttributeDataLayer.propTypes = {
-  activationKey: PropTypes.string, // changes on each request to show the layer: it is then shown and zoomed to
-  attributeDef: PropTypes.any,
-  checked: PropTypes.bool, // when true, the layer is selected (and its data fetched) on mount
-  fitOnActivation: PropTypes.bool, // when false, an activation shows the layer without zooming to it
-  markersColor: PropTypes.any,
-  onPointsLoaded: PropTypes.func, // called with ({ layerKey, points }) on every data fetch, before filtering
-  onRecordEditClick: PropTypes.func,
-  pointsFilter: PropTypes.func, // when specified, only the matching points are shown
-  renderPopup: PropTypes.func, // when specified, replaces the default marker popup
 }

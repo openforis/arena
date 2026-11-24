@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react'
 import { CircleMarker, GeoJSON } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as ObjectUtils from '@core/objectUtils'
@@ -14,7 +13,22 @@ import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
 const markerRadius = 10
 const fillOpacity = 0.5
 
-export const CoordinateAttributeMarker = (props) => {
+type CoordinateAttributeMarkerProps = {
+  attributeDef?: any
+  data?: any
+  flyToPoint?: (...args: any[]) => any
+  flyToNextPoint?: (...args: any[]) => any
+  flyToPreviousPoint?: (...args: any[]) => any
+  markersColor?: any
+  onPopupClose?: (...args: any[]) => any
+  onPopupOpen?: (...args: any[]) => any
+  onRecordEditClick?: any
+  popupOpen?: boolean
+  renderPopup?: (...args: any[]) => any
+  setMarkerByKey?: (...args: any[]) => any
+}
+
+export const CoordinateAttributeMarker = (props: CoordinateAttributeMarkerProps) => {
   const {
     attributeDef,
     data,
@@ -120,19 +134,4 @@ export const CoordinateAttributeMarker = (props) => {
       )}
     </div>
   )
-}
-
-CoordinateAttributeMarker.propTypes = {
-  attributeDef: PropTypes.any,
-  data: PropTypes.any,
-  flyToPoint: PropTypes.func,
-  flyToNextPoint: PropTypes.func,
-  flyToPreviousPoint: PropTypes.func,
-  markersColor: PropTypes.any,
-  onPopupClose: PropTypes.func,
-  onPopupOpen: PropTypes.func,
-  onRecordEditClick: PropTypes.any,
-  popupOpen: PropTypes.bool,
-  renderPopup: PropTypes.func,
-  setMarkerByKey: PropTypes.func,
 }

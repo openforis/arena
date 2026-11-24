@@ -2,7 +2,6 @@ import './CoordinateAttributePopUp.scss'
 
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import { PointFactory } from '@openforis/arena-core'
 
@@ -58,7 +57,15 @@ ${locationSummary}
   return content
 }
 
-export const CoordinateAttributePopUp = (props) => {
+type CoordinateAttributePopUpProps = {
+  attributeDef: any
+  pointFeature: any
+  onRecordEditClick: (...args: any[]) => any
+  flyToNextPoint: (...args: any[]) => any
+  flyToPreviousPoint: (...args: any[]) => any
+}
+
+export const CoordinateAttributePopUp = (props: CoordinateAttributePopUpProps) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
 
   const { recordUuid, recordOwnerUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
@@ -170,12 +177,4 @@ export const CoordinateAttributePopUp = (props) => {
       </div>
     </Popup>
   )
-}
-
-CoordinateAttributePopUp.propTypes = {
-  attributeDef: PropTypes.any.isRequired,
-  pointFeature: PropTypes.any.isRequired,
-  onRecordEditClick: PropTypes.func.isRequired,
-  flyToNextPoint: PropTypes.func.isRequired,
-  flyToPreviousPoint: PropTypes.func.isRequired,
 }

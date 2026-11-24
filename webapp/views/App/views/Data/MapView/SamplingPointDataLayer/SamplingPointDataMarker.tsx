@@ -1,13 +1,26 @@
 import { useCallback, useMemo } from 'react'
 import { CircleMarker } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 
 const markerRadius = 10
 
-export const SamplingPointDataMarker = (props) => {
+type SamplingPointDataMarkerProps = {
+  createRecordFromSamplingPointDataItem: (...args: any[]) => any
+  flyToPoint: (...args: any[]) => any
+  flyToNextPoint: (...args: any[]) => any
+  flyToPreviousPoint: (...args: any[]) => any
+  markersColor?: string
+  onPopupClose?: (...args: any[]) => any
+  onPopupOpen?: (...args: any[]) => any
+  onRecordEditClick: (...args: any[]) => any
+  pointFeature: Record<string, any>
+  popupOpen?: boolean
+  setMarkerByKey: (...args: any[]) => any
+}
+
+export const SamplingPointDataMarker = (props: SamplingPointDataMarkerProps) => {
   const {
     createRecordFromSamplingPointDataItem,
     flyToPoint,
@@ -62,18 +75,4 @@ export const SamplingPointDataMarker = (props) => {
       />
     </CircleMarker>
   )
-}
-
-SamplingPointDataMarker.propTypes = {
-  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
-  flyToPoint: PropTypes.func.isRequired,
-  flyToNextPoint: PropTypes.func.isRequired,
-  flyToPreviousPoint: PropTypes.func.isRequired,
-  markersColor: PropTypes.string,
-  onPopupClose: PropTypes.func,
-  onPopupOpen: PropTypes.func,
-  onRecordEditClick: PropTypes.func.isRequired,
-  pointFeature: PropTypes.object.isRequired,
-  popupOpen: PropTypes.bool,
-  setMarkerByKey: PropTypes.func.isRequired,
 }

@@ -35,7 +35,17 @@ const buildLayerNameHtml = ({ innerName, extraButtons = '', colorPickerId, marke
  * @param {string} [params.initialColor] - Initial markers color.
  * @returns {{layerName: string, currentMarkersColor: string|undefined}} The overlay name HTML and the current color.
  */
-export const useLayerColorPicker = ({ colorPickerId, innerName, extraButtons, initialColor }) => {
+export const useLayerColorPicker = ({
+  colorPickerId,
+  innerName,
+  extraButtons,
+  initialColor,
+}: {
+  colorPickerId: string
+  innerName: string
+  extraButtons?: string
+  initialColor?: string
+}) => {
   const i18n = useI18n()
   const changeMarkerColorTitle = i18n.t('mapView.changeMarkerColor')
 

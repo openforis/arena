@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 import { Rectangle, Circle } from 'react-leaflet'
 import L from 'leaflet'
 
@@ -9,7 +8,12 @@ import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext
 import { useSurveyInfo } from '@webapp/store/survey'
 import { GeoUtils } from '@webapp/utils/geoUtils'
 
-export const CoordinateAttributePolygon = (props) => {
+type CoordinateAttributePolygonProps = {
+  latitude?: any
+  longitude?: any
+}
+
+export const CoordinateAttributePolygon = (props: CoordinateAttributePolygonProps) => {
   const surveyInfo = useSurveyInfo()
 
   const options = useMapContextOptions()
@@ -228,9 +232,4 @@ const PointColor = {
 const LineColor = {
   0: 'Yellow',
   1: 'Red',
-}
-
-CoordinateAttributePolygon.propTypes = {
-  latitude: PropTypes.any,
-  longitude: PropTypes.any,
 }

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 
 import { Objects } from '@openforis/arena-core'
@@ -19,6 +18,7 @@ import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../commo
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 import { fitLayerBounds } from './fitLayerBounds'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
+import { useAppDispatch } from '@webapp/store'
 
 const onGeoJsonDataExportComplete =
   ({ surveyId }) =>
@@ -46,7 +46,7 @@ export const useGeoAttributeDataLayer = (props) => {
 
   const attributeDefUuid = NodeDef.getUuid(attributeDef)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()

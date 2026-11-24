@@ -16,7 +16,7 @@ const flyToLoaderTimeoutAfterMoveEnd = 2000
 export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel = true }) => {
   const map = useMap()
 
-  const [state, setState] = useState({})
+  const [state, setState] = useState<{ currentPointShown?: any; currentPointPopupOpen?: boolean }>({})
   const { currentPointShown, currentPointPopupOpen } = state
 
   // Have a Reference to points for opening popups automatically
