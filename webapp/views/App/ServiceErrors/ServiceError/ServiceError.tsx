@@ -1,22 +1,25 @@
 import React, { useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'
 
 import { ServiceErrorActions, useI18n } from '@webapp/store/system'
 
 import Markdown from '@webapp/components/markdown'
+import { useAppDispatch } from '@webapp/store'
 
 const appErrorsNamespace = 'appErrors:'
 const _toMessageKey = (key) => [key, StringUtils.prependIfMissing(appErrorsNamespace)(key)]
 
-const defaultError = { key: 'appErrors:networkError' }
+const defaultError: { key: string; params?: Record<string, unknown> } = { key: 'appErrors:networkError' }
 
-const ServiceError = React.forwardRef((props, ref) => {
+type ServiceErrorProps = {
+  error: Record<string, any>
+}
+
+const ServiceError = React.forwardRef<HTMLDivElement, ServiceErrorProps>((props, ref) => {
   const { error } = props
   const i18n = useI18n()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const { response, message: errorMessage } = error
   const { data, status = '' } = response || {}
@@ -48,9 +51,5 @@ const ServiceError = React.forwardRef((props, ref) => {
 })
 
 ServiceError.displayName = 'ServiceError'
-
-ServiceError.propTypes = {
-  error: PropTypes.object.isRequired,
-}
 
 export default ServiceError

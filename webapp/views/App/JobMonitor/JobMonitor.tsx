@@ -1,7 +1,6 @@
 import './JobMonitor.scss'
 
 import React from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -16,6 +15,7 @@ import JobErrors from './JobErrors'
 import JobLongRunningMessage from './JobLongRunningMessage'
 import JobProgress from './JobProgress'
 import JobTiming from './JobTiming'
+import { useAppDispatch } from '@webapp/store'
 
 const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
@@ -25,7 +25,7 @@ const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) =
 }
 
 const JobMonitor = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const { job, closeButton, closeButtonProps, errorKeyHeaderName, errorsExportFileName, longRunningMessageKey } =
     useJob()

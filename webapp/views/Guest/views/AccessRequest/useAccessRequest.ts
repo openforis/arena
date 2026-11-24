@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as ProcessUtils from '@core/processUtils'
@@ -9,12 +8,13 @@ import * as Validation from '@core/validation/validation'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 
 export const useAccessRequest = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
 
-  const [request, setRequest] = useState({})
+  const [request, setRequest] = useState<Record<string, any>>({})
   const [requestSentSuccessfully, setRequestSentSuccessfully] = useState(false)
   const [validation, setValidation] = useState(null)
   const reCaptchaRef = useRef(null)

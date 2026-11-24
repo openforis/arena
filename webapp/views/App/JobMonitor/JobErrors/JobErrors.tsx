@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as JobSerialized from '@common/job/jobSerialized'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
@@ -18,12 +16,19 @@ const toValidation = (fields) => ({
   fields,
 })
 
+type JobErrorsProps = {
+  errorKeyHeaderName?: string
+  exportFileName?: string
+  job?: Record<string, any>
+  openPanel?: boolean
+}
+
 const JobErrors = ({
   errorKeyHeaderName = 'common.item',
   exportFileName: exportFileNameProp,
   job = {},
   openPanel = true,
-}) => {
+}: JobErrorsProps) => {
   const errors = JobSerialized.getErrors(job)
   const errorsCount = JobSerialized.getErrorsCount(job)
 
@@ -65,13 +70,6 @@ const JobErrors = ({
       />
     </ExpansionPanel>
   )
-}
-
-JobErrors.propTypes = {
-  errorKeyHeaderName: PropTypes.string,
-  exportFileName: PropTypes.string,
-  job: PropTypes.object,
-  openPanel: PropTypes.bool,
 }
 
 export default JobErrors

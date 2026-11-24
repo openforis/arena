@@ -7,13 +7,13 @@ import { Checkbox } from '@webapp/components/form'
 import Markdown from '@webapp/components/markdown'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 import { useDialogConfirm } from '@webapp/store/ui'
 
 import { TestId } from '@webapp/utils/testId'
 
 const DialogConfirm = () => {
-  const i18n = useI18n()
+  const t = useI18nT()
   const {
     key,
     params,
@@ -56,7 +56,7 @@ const DialogConfirm = () => {
       title={headerText}
     >
       <ModalBody>
-        <Markdown className={headerText ? 'highlight' : undefined} source={i18n.t(key, params)} />
+        <Markdown className={headerText ? 'highlight' : undefined} source={t(key, params)} />
 
         {checkboxLabel && (
           <Checkbox
@@ -68,12 +68,12 @@ const DialogConfirm = () => {
         )}
 
         {checkboxChecked && checkboxCheckedContentKey && (
-          <Markdown source={i18n.t(checkboxCheckedContentKey, checkboxCheckedContentParams)} />
+          <Markdown source={t(checkboxCheckedContentKey, checkboxCheckedContentParams)} />
         )}
 
         {strongConfirmActive && (
           <>
-            <Markdown className="text-center" source={i18n.t(strongConfirmInputLabel, { strongConfirmRequiredText })} />
+            <Markdown className="text-center" source={t(strongConfirmInputLabel, { strongConfirmRequiredText })} />
 
             <input
               type="text"

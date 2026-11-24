@@ -1,13 +1,15 @@
 import './MessageNotificationPanel.scss'
 
-import PropTypes from 'prop-types'
-
 import { Messages } from '@openforis/arena-core'
 
 import { Accordion, Markdown, PanelRight } from '@webapp/components'
 import { useMessageNotifications } from '@webapp/store/ui'
 
-export const MessageNotificationPanel = (props) => {
+type MessageNotificationPanelProps = {
+  onClose: (...args: any[]) => any
+}
+
+export const MessageNotificationPanel = (props: MessageNotificationPanelProps) => {
   const { onClose } = props
   const messages = useMessageNotifications()
 
@@ -29,8 +31,4 @@ export const MessageNotificationPanel = (props) => {
       />
     </PanelRight>
   )
-}
-
-MessageNotificationPanel.propTypes = {
-  onClose: PropTypes.func.isRequired,
 }
