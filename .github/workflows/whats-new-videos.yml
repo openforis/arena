@@ -1,7 +1,7 @@
 name: What's new videos
 
 # Attaches the "What's new in 2026" videos to the whats-new-2026 release (not in the repository, to keep it small):
-# https://github.com/openforis/arena/releases/download/whats-new-2026/arena-whats-new-2026.mp4 (and -720p, arena-ai-v5)
+# https://github.com/openforis/arena/releases/download/whats-new-2026/arena-whats-new-2026.mp4 (and arena-ai-v5.mp4)
 # The videos are taken from a commit that still has them; to publish new versions, attach them to the release by hand.
 
 on:
@@ -36,6 +36,6 @@ jobs:
           if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$VIDEOS_COMMIT" --latest=false \
               --title "What's new in 2026: videos" \
-              --notes "Videos of the \"What's new in 2026\" presentation (see docs/whats-new-2026/video/README.md): the 4K video, its 720p copy (for Zoom calls) and the AI features video."
+              --notes "Videos of the \"What's new in 2026\" presentation (see docs/whats-new-2026/video/README.md): the 4K video and the AI features video."
           fi
-          gh release upload "$TAG" docs/whats-new-2026/video/*.mp4 --clobber --repo "$GITHUB_REPOSITORY"
+          gh release upload "$TAG" docs/whats-new-2026/video/arena-whats-new-2026.mp4 docs/whats-new-2026/video/arena-ai-v5.mp4 --clobber --repo "$GITHUB_REPOSITORY"
