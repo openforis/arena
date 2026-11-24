@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import type { ReactElement } from 'react'
 import { Label, Legend, ScatterChart as ReChartsScatterChart, Scatter, Tooltip, XAxis, YAxis } from 'recharts'
 import { Objects } from '@openforis/arena-core'
 
@@ -12,10 +12,24 @@ const margin = {
 }
 const defaultFill = '#8884d8'
 
-const defaultXAxisProps = { dataKey: 'x', name: 'x', type: 'number' }
-const defaultYAxisProps = { dataKey: 'y', name: 'y', type: 'number' }
+type ScatterChartAxisProps = {
+  dataKey?: string
+  name?: string
+  type?: 'number' | 'category'
+}
 
-export const ScatterChart = (props) => {
+const defaultXAxisProps: ScatterChartAxisProps = { dataKey: 'x', name: 'x', type: 'number' }
+const defaultYAxisProps: ScatterChartAxisProps = { dataKey: 'y', name: 'y', type: 'number' }
+
+type ScatterChartProps = {
+  dataSet: { name?: string; data: any[]; fill?: string }[]
+  onClick?: (...args: any[]) => any
+  renderTooltip?: ReactElement | ((...args: any[]) => any)
+  xAxisProps?: ScatterChartAxisProps
+  yAxisProps?: ScatterChartAxisProps
+}
+
+export const ScatterChart = (props: ScatterChartProps) => {
   const { dataSet, onClick, renderTooltip, xAxisProps, yAxisProps } = props
   const { name: xAxisName, dataKey: xAxisDataKey, type: xAxisType } = { ...defaultXAxisProps, ...xAxisProps }
   const { name: yAxisName, dataKey: yAxisDataKey, type: yAxisType } = { ...defaultYAxisProps, ...yAxisProps }
@@ -40,23 +54,4 @@ export const ScatterChart = (props) => {
       </ReChartsScatterChart>
     </ChartWrapper>
   )
-}
-
-const AxisProps = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  dataKey: PropTypes.string,
-  type: PropTypes.string,
-})
-
-ScatterChart.propTypes = {
-  dataSet: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-      data: PropTypes.array.isRequired,
-    })
-  ).isRequired,
-  onClick: PropTypes.func,
-  renderTooltip: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
-  xAxisProps: AxisProps,
-  yAxisProps: AxisProps,
 }

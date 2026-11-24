@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import { Area, AreaChart as ReChartsAreaChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
@@ -15,11 +13,20 @@ const margin = {
   left: 0,
 }
 
-export const AreaChart = (props) => {
-  const { allowDecimals = true, colors: colorsProp, data, dataKeys, labelDataKey = 'name', showLegend = false } = props
+type AreaChartProps = {
+  allowDecimals?: boolean
+  dataColors?: any[]
+  data: any[]
+  dataKeys: any[]
+  labelDataKey?: string
+  showLegend?: boolean
+}
+
+export const AreaChart = (props: AreaChartProps) => {
+  const { allowDecimals = true, dataColors, data, dataKeys, labelDataKey = 'name', showLegend = false } = props
 
   const randomColors = useRandomColors(dataKeys.length, { onlyDarkColors: true })
-  const colors = colorsProp ?? randomColors
+  const colors = dataColors ?? randomColors
 
   return (
     <ChartWrapper>
@@ -40,13 +47,4 @@ export const AreaChart = (props) => {
       </ReChartsAreaChart>
     </ChartWrapper>
   )
-}
-
-AreaChart.propTypes = {
-  allowDecimals: PropTypes.bool,
-  colors: PropTypes.array,
-  data: PropTypes.array.isRequired,
-  dataKeys: PropTypes.array.isRequired,
-  labelDataKey: PropTypes.string,
-  showLegend: PropTypes.bool,
 }

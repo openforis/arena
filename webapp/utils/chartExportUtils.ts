@@ -48,9 +48,9 @@ const applyComputedStylesToSvg = (svgElement) => {
       setAttributeIfNotEmpty(clonedEl, 'font-weight', computedStyle.fontWeight)
 
       // Ensure text is not transparent
-      const opacity = Number.parseFloat(computedStyle.opacity || 1)
+      const opacity = Number.parseFloat(computedStyle.opacity || '1')
       if (opacity < 1 && opacity > 0) {
-        clonedEl.setAttribute('opacity', opacity)
+        clonedEl.setAttribute('opacity', String(opacity))
       } else if (opacity >= 1) {
         clonedEl.removeAttribute('opacity')
       }

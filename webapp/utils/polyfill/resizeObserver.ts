@@ -2,6 +2,10 @@ import { elementOffset } from '../domUtils'
 
 // ResizeObserver polyfill
 export default class ResizeObserver {
+  observables: { el: any; size: { height: number; width: number; x?: number; y?: number } }[]
+  callback: (...args: any[]) => any
+  af: number
+
   constructor(callback) {
     this.observables = []
     // Array of observed elements that looks like this:

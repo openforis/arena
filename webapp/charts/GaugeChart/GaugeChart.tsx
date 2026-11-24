@@ -1,7 +1,5 @@
 import './GaugeChart.scss'
 
-import PropTypes from 'prop-types'
-
 import { PieChart } from '../PieChart'
 
 const data = [
@@ -55,7 +53,13 @@ const needle = ({ value, height, width, innerRadius, outerRadius }) => {
   ]
 }
 
-export const GaugeChart = (props) => {
+type GaugeChartProps = {
+  height?: number
+  value: number
+  width?: number
+}
+
+export const GaugeChart = (props: GaugeChartProps) => {
   const { height = 300, width = 300, value } = props
 
   const outerRadius = Math.min(height, width) / 2
@@ -77,10 +81,4 @@ export const GaugeChart = (props) => {
       {needle({ value, height, width, innerRadius, outerRadius })}
     </PieChart>
   )
-}
-
-GaugeChart.propTypes = {
-  height: PropTypes.number,
-  value: PropTypes.number.isRequired,
-  width: PropTypes.number,
 }

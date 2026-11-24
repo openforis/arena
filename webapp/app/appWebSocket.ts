@@ -36,7 +36,7 @@ export const on = (eventName, eventHandler) => socket?.on(eventName, eventHandle
 
 export const off = (eventName, eventHandler) => socket?.off(eventName, eventHandler)
 
-export const openSocket = async (throwErrorFn) => {
+export const openSocket = (throwErrorFn) => {
   const throwError = (error) => {
     throwErrorFn(error)
     closeSocket()
