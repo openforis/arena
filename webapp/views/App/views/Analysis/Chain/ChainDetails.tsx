@@ -2,7 +2,6 @@ import './ChainDetails.scss'
 
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
 
@@ -23,9 +22,10 @@ import AdvancedFunctionsMenu from './AdvancedFunctionsMenu'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
+import { useAppDispatch } from '@webapp/store'
 
 const ChainDetails = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { chainUuid } = useParams()
   const { new: justCreated } = useQuery()
@@ -50,17 +50,14 @@ const ChainDetails = () => {
   const toggleEditLock = useCallback(() => dispatch(ChainActions.toggleEditLock), [dispatch])
 
   useEffect(() => {
-    const init = async () => {
-      dispatch(ChainActions.fetchChain({ chainUuid, validate: true }))
-      if (canHaveRecords) {
-        dispatch(ChainActions.fetchRecordsCountByStep)
-      }
-      if (justCreated === 'true') {
-        dispatch(ChainActions.setEditLocked(false))
-        navigate(`${appModuleUri(analysisModules.chain)}${chainUuid}/`, { replace: true })
-      }
+    dispatch(ChainActions.fetchChain({ chainUuid, validate: true }))
+    if (canHaveRecords) {
+      dispatch(ChainActions.fetchRecordsCountByStep)
     }
-    void init()
+    if (justCreated === 'true') {
+      dispatch(ChainActions.setEditLocked(false))
+      navigate(`${appModuleUri(analysisModules.chain)}${chainUuid}/`, { replace: true })
+    }
   }, [dispatch, chainUuid, canHaveRecords, justCreated, navigate])
 
   const locationPathMatcher = useLocationPathMatcher()

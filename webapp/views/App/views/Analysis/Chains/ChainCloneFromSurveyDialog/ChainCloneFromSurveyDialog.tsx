@@ -1,9 +1,7 @@
 import './chainCloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as Chain from '@common/analysis/chain'
 import * as Survey from '@core/survey/survey'
@@ -18,6 +16,7 @@ import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { useAppDispatch } from '@webapp/store'
 
 type ChainItem = {
   value: string
@@ -46,7 +45,7 @@ type ChainCloneFromSurveyDialogProps = {
 }
 
 export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDialogProps): React.ReactElement => {
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()

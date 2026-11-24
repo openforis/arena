@@ -9,12 +9,17 @@ import * as A from '@core/arena'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
+type RStudioInstance = {
+  instanceId?: string
+  Purpose?: string
+}
+
 const Instances = () => {
   const user = useUser()
   const i18n = useI18n()
 
   const [loading, setLoading] = useState(true)
-  const [instance, setInstance] = useState({})
+  const [instance, setInstance] = useState<RStudioInstance | null>({})
   const [url, setUrl] = useState('')
 
   const closeRStudioInstance = async () => {
@@ -23,7 +28,7 @@ const Instances = () => {
       const { instanceId } = instance
       await axios.delete('/api/rstudio', { params: { instanceId } })
       setInstance(null)
-      setUrl(false)
+      setUrl('')
     } finally {
       setLoading(false)
     }

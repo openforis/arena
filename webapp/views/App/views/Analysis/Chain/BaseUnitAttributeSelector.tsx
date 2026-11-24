@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -16,7 +15,17 @@ const nodeDefToItem = (nodeDef) => ({
   label: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
 })
 
-export const BaseUnitAttributeSelector = (props) => {
+type BaseUnitAttributeSelectorProps = {
+  allowEmptySelection?: boolean
+  info?: string
+  label: string
+  nodeDefFilter?: (...args: any[]) => any
+  nodeDefTypes?: string[]
+  onChange: (...args: any[]) => any
+  selectedNodeDefUuid?: string
+}
+
+export const BaseUnitAttributeSelector = (props: BaseUnitAttributeSelectorProps) => {
   const {
     allowEmptySelection,
     info,
@@ -73,14 +82,4 @@ export const BaseUnitAttributeSelector = (props) => {
       <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} disabled={!editable} />
     </FormItem>
   )
-}
-
-BaseUnitAttributeSelector.propTypes = {
-  allowEmptySelection: PropTypes.bool,
-  info: PropTypes.string,
-  label: PropTypes.string.isRequired,
-  nodeDefFilter: PropTypes.func,
-  nodeDefTypes: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func.isRequired,
-  selectedNodeDefUuid: PropTypes.string,
 }

@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import { RecordSummary } from '@core/record/recordSummary'
 import * as Survey from '@core/survey/survey'
@@ -10,7 +9,15 @@ import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { Dropdown } from '@webapp/components/form'
 
-const RecordsDropdown = (props) => {
+type RecordsDropdownProps = {
+  disabled?: boolean
+  onChange: (...args: any[]) => any
+  readOnly?: boolean
+  selectedUuids?: string[]
+  testId?: string
+}
+
+const RecordsDropdown = (props: RecordsDropdownProps) => {
   const { disabled = false, onChange, readOnly = false, selectedUuids = null, testId } = props
 
   const surveyInfo = useSurveyInfo()
@@ -18,7 +25,7 @@ const RecordsDropdown = (props) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
 
-  const [state, setState] = useState({ loading: true, records: [], recordsByUuid: {} })
+  const [state, setState] = useState({ loading: true, recordsByUuid: {} })
   const { loading, recordsByUuid } = state
 
   const selectedRecords = useMemo(
@@ -59,14 +66,6 @@ const RecordsDropdown = (props) => {
       testId={testId}
     />
   )
-}
-
-RecordsDropdown.propTypes = {
-  disabled: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
-  selectedUuids: PropTypes.string,
-  testId: PropTypes.string,
 }
 
 export default RecordsDropdown

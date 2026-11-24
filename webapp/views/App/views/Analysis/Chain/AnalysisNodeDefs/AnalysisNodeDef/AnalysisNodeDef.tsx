@@ -1,8 +1,6 @@
 import './AnalysisNodeDef.scss'
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import { Link } from 'react-router'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,9 +13,15 @@ import { useI18n } from '@webapp/store/system'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/warningBadge'
+import { useAppDispatch } from '@webapp/store'
 
-const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
-  const dispatch = useDispatch()
+type AnalysisNodeDefProps = {
+  nodeDefUuid: string
+  dataCount?: number
+}
+
+const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }: AnalysisNodeDefProps) => {
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
@@ -94,11 +98,6 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
       </div>
     </div>
   )
-}
-
-AnalysisNodeDef.propTypes = {
-  nodeDefUuid: PropTypes.string.isRequired,
-  dataCount: PropTypes.number,
 }
 
 export { AnalysisNodeDef }

@@ -1,7 +1,6 @@
 import './ChainStatisticalAnalysis.scss'
 
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
@@ -21,7 +20,11 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { DimensionsSelector } from './DimensionsSelector'
 import { PValueSelector } from '../PValueSelector'
 
-export const ChainStatisticalAnalysisProps = (props) => {
+type ChainStatisticalAnalysisPropsProps = {
+  updateChain: (...args: any[]) => any
+}
+
+export const ChainStatisticalAnalysisProps = (props: ChainStatisticalAnalysisPropsProps) => {
   const { updateChain } = props
   const survey = useSurvey()
   const i18n = useI18n()
@@ -145,8 +148,4 @@ export const ChainStatisticalAnalysisProps = (props) => {
       )}
     </div>
   )
-}
-
-ChainStatisticalAnalysisProps.propTypes = {
-  updateChain: PropTypes.func.isRequired,
 }

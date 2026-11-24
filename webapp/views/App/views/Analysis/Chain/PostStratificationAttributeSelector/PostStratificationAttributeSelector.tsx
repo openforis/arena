@@ -1,5 +1,3 @@
-import { useDispatch } from 'react-redux'
-
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
@@ -12,9 +10,10 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { useAppDispatch } from '@webapp/store'
 
 export const PostStratificationAttributeSelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
   const chain = useChain()

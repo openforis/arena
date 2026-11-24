@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -15,13 +15,14 @@ import { FormItem } from '@webapp/components/form/Input'
 import { SurveyState } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
+import { useAppDispatch } from '@webapp/store'
 
 const { categoryCodeAttributeName } = ChainSamplingDesign
 
 const attributeNameToItem = (name) => ({ value: name, label: name })
 
 export const Phase1JoinAttributeSelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const chain = useChain()
   const editable = useChainEditable()

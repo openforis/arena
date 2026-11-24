@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
@@ -7,9 +6,10 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
+import { useAppDispatch } from '@webapp/store'
 
 export const Phase2AsSamplingPointDataSelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const chain = useChain()
   const editable = useChainEditable()
   const samplingDesign = Chain.getSamplingDesign(chain)

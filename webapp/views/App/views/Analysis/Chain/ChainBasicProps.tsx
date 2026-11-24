@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
@@ -15,7 +14,11 @@ import { Checkbox } from '@webapp/components/form'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioPanel } from './ChainRStudioPanel'
 
-export const ChainBasicProps = (props) => {
+type ChainBasicPropsProps = {
+  updateChain: (...args: any[]) => any
+}
+
+export const ChainBasicProps = (props: ChainBasicPropsProps) => {
   const { updateChain } = props
 
   const i18n = useI18n()
@@ -82,8 +85,4 @@ export const ChainBasicProps = (props) => {
       <ChainRStudioPanel updateChain={updateChain} />
     </div>
   )
-}
-
-ChainBasicProps.propTypes = {
-  updateChain: PropTypes.func.isRequired,
 }
