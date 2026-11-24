@@ -4,18 +4,9 @@ import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { Radiobox } from '@webapp/components/form'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
-type NodeDefBooleanProps = {
-  canEditRecord?: boolean
-  edit?: boolean
-  entry?: boolean
-  nodeDef: any
-  nodes?: any[]
-  readOnly?: boolean
-  updateNode: (...args: any[]) => any
-}
-
-const NodeDefBoolean = (props: NodeDefBooleanProps) => {
+const NodeDefBoolean = (props: NodeDefComponentProps) => {
   const {
     canEditRecord = false,
     edit = false,

@@ -26,23 +26,11 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const maxFileSize = 1
 
-type NodeDefGeoProps = {
-  canEditRecord: boolean
-  edit: boolean
-  entry: boolean
-  insideTable?: boolean
-  nodeDef: ArenaAnyNodeDef
-  nodes: any[]
-  readOnly?: boolean
-  renderType?: string
-  updateNode: (...args: any[]) => any
-}
-
-const NodeDefGeo = (props: NodeDefGeoProps) => {
+const NodeDefGeo = (props: NodeDefComponentProps) => {
   const {
     canEditRecord,
     edit,

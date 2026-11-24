@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { Objects, Strings } from '@openforis/arena-core'
+import { Objects, Strings, type ArenaCategoryLevel } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
@@ -18,7 +18,6 @@ import { useSurvey } from '@webapp/store/survey'
 import { useCategoryByName, useNodeDefsByNames } from '@webapp/store/survey/hooks'
 
 import type { CallEditorProps } from './callEditorProps'
-import type { ArenaCategoryLevel } from '@openforis/arena-core'
 
 type CategoryLevelVariableProps = {
   disabled?: boolean

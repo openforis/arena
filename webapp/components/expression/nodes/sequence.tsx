@@ -2,22 +2,9 @@ import React from 'react'
 import * as A from '@core/arena'
 
 import EditButtons from './editButtons'
+import type { ExpressionNodeComponentProps } from './expressionNode'
 
-type SequenceProps = {
-  node: any
-  onChange: (...args: any[]) => any
-  renderNode: React.ElementType
-  level?: number
-  // ExpressionNode props
-  canDelete?: boolean
-  onDelete?: (...args: any[]) => any
-  nodeDefCurrent?: any
-  isBoolean?: boolean
-  type?: string
-  variables?: any[]
-}
-
-const Sequence = (props: SequenceProps) => {
+const Sequence = (props: ExpressionNodeComponentProps) => {
   const {
     canDelete = false,
     isBoolean = false,
