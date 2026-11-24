@@ -1,3 +1,5 @@
+import type { NodeDefType } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Survey from '../../../core/survey/survey'
@@ -6,6 +8,12 @@ import * as NodeDefExpression from '../../../core/survey/nodeDefExpression'
 import * as NodeDefValidations from '../../../core/survey/nodeDefValidations'
 
 export default class NodeDefBuilder {
+  type: NodeDefType
+  props: Record<string, any>
+  propsAdvanced: Record<string, any>
+  // size in the parent entity form layout (grid layout)
+  layoutInParent: { w?: number; h?: number }
+
   constructor(name, type) {
     this.type = type
     this.props = {
