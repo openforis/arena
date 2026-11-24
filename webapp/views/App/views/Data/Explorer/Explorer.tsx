@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
@@ -7,9 +6,10 @@ import { DataExplorerActions } from '@webapp/store/dataExplorer'
 
 import DataQuery from '@webapp/components/DataQuery'
 import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
+import { useAppDispatch } from '@webapp/store'
 
 const Explorer = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const pathMatcher = useLocationPathMatcher()
 

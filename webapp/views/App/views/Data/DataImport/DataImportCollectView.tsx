@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -20,6 +19,7 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { ImportStartButton } from './ImportStartButton'
+import { useAppDispatch } from '@webapp/store'
 
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
@@ -29,7 +29,7 @@ export const CollectDataImportView = () => {
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const canDeleteAllRecords = useAuthCanDeleteAllRecords()
   const fileMaxSizeMB = useSystemConfigFileUploadLimitMB()
 
@@ -39,7 +39,7 @@ export const CollectDataImportView = () => {
   const [file, setFile] = useState(null)
 
   const onJobComplete = useCallback(
-    async (jobCompleted) => {
+    (jobCompleted) => {
       const { insertedRecords } = JobSerialized.getResult(jobCompleted)
       dispatch(
         DialogConfirmActions.showDialogConfirm({
@@ -65,7 +65,7 @@ export const CollectDataImportView = () => {
     [dispatch, onJobComplete]
   )
 
-  const onFilesDrop = async (files) => {
+  const onFilesDrop = (files) => {
     const _file = files.find((file) => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)

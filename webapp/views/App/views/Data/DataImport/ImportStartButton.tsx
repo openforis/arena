@@ -1,14 +1,13 @@
 import './ImportStartButton.scss'
 
 import { useCallback, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
 
 import { Button, ProgressBar } from '@webapp/components'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { ButtonIconCancel } from '@webapp/components/buttons'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { FileUtils } from '@webapp/utils/fileUtils'
+import { useAppDispatch } from '@webapp/store'
 
 const stata = {
   running: 'running',
@@ -27,7 +26,23 @@ const completedProgressVisibleMs = 200
 
 const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout))
 
-export const ImportStartButton = (props) => {
+type ImportStartButtonProps = {
+  className?: string
+  confirmMessageKey?: string
+  confirmMessageParams?: Record<string, any>
+  disabled?: boolean
+  label?: string
+  onCancel?: (...args: any[]) => any
+  onUploadComplete: (...args: any[]) => any
+  showConfirm?: boolean
+  startFunction: (...args: any[]) => any
+  startFunctionParams?: Record<string, any>
+  strongConfirm?: boolean
+  strongConfirmRequiredText?: string
+  testId?: string
+}
+
+export const ImportStartButton = (props: ImportStartButtonProps) => {
   const {
     className = 'btn-primary start-btn',
     confirmMessageKey,
@@ -44,7 +59,7 @@ export const ImportStartButton = (props) => {
     testId = null,
   } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const uploadingRef = useRef(false)
   const processorRef = useRef(null)
   const confirm = useConfirmAsync()
@@ -182,20 +197,4 @@ export const ImportStartButton = (props) => {
       testId={testId}
     />
   )
-}
-
-ImportStartButton.propTypes = {
-  className: PropTypes.string,
-  confirmMessageKey: PropTypes.string,
-  confirmMessageParams: PropTypes.object,
-  disabled: PropTypes.bool,
-  label: PropTypes.string,
-  onCancel: PropTypes.func,
-  onUploadComplete: PropTypes.func.isRequired,
-  showConfirm: PropTypes.bool,
-  startFunction: PropTypes.func.isRequired,
-  startFunctionParams: PropTypes.object,
-  strongConfirm: PropTypes.bool,
-  strongConfirmRequiredText: PropTypes.string,
-  testId: PropTypes.string,
 }
