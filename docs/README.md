@@ -30,7 +30,7 @@ Elsewhere in the repo: [e2e tests](../test/e2e/README.md), [load tests](../test/
   They record the decisions made at that time and are not updated afterwards: check the code (or the
   guides above) for the current behavior.
 - [user-manual/](user-manual/): the user manual (`.docx`, in English, French and Spanish); its PDFs are attached to every release.
-- [whats-new-2026/](whats-new-2026/): "What's new in 2026" presentation, its screenshots, its animated, narrated video (with a 720p copy for Zoom) and the AI features video.
+- [whats-new-2026/](whats-new-2026/): "What's new in 2026" presentation, its screenshots, its animated, narrated video and the AI features video (the videos are attached to the [whats-new-2026 release](https://github.com/openforis/arena/releases/tag/whats-new-2026)).
 
 ## Writing docs
 

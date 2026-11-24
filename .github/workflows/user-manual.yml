@@ -22,6 +22,8 @@ on:
 
 jobs:
   user-manual:
+    # only app releases (not e.g. the whats-new-2026 videos release)
+    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
