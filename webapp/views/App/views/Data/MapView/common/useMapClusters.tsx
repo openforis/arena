@@ -7,23 +7,34 @@ import { Objects } from '@openforis/arena-core'
 
 import { Colors } from '@webapp/utils/colors'
 
+import type {
+  ClusterIconCreator,
+  MapClusterFeature,
+  MapClusterOrPointFeature,
+  MapPointFeature,
+  MapPointProperties,
+} from './mapPointTypes'
+
 const clusterRadius = 100
 const clusterMaxZoom = 17
 const initialZoom = 12
 const leavesLimit = 100
 
-export const useMapClusters = (props) => {
+export const useMapClusters = <P extends MapPointProperties>(props: { points: MapPointFeature<P>[] }) => {
   const { points } = props
 
   const map = useMap()
 
-  const [state, setState] = useState({ bounds: null, zoom: initialZoom })
+  const [state, setState] = useState<{ bounds: [number, number, number, number] | null; zoom: number }>({
+    bounds: null,
+    zoom: initialZoom,
+  })
 
   const { bounds, zoom } = state
 
-  const clusterIconsCacheRef = useRef({})
+  const clusterIconsCacheRef = useRef<Record<string, L.DivIcon>>({})
 
-  const clusterIconCreator = useCallback(
+  const clusterIconCreator: ClusterIconCreator = useCallback(
     ({ count, size, color }) => {
       const clusterIconsCache = clusterIconsCacheRef.current
       const cacheKey = `${count}-${Math.round(size)}-${color}`
@@ -43,7 +54,12 @@ export const useMapClusters = (props) => {
 
   const updateState = useCallback(() => {
     const b = map.getBounds()
-    const boundsNext = [b.getSouthWest().lng, b.getSouthWest().lat, b.getNorthEast().lng, b.getNorthEast().lat]
+    const boundsNext: [number, number, number, number] = [
+      b.getSouthWest().lng,
+      b.getSouthWest().lat,
+      b.getNorthEast().lng,
+      b.getNorthEast().lat,
+    ]
     const zoomNext = map.getZoom()
     if (zoom !== zoomNext || !Objects.isEqual(bounds, boundsNext)) {
       setState({ bounds: boundsNext, zoom: zoomNext })
@@ -68,27 +84,24 @@ export const useMapClusters = (props) => {
 
   // index built only when the points change (use-supercluster rebuilt it on every map move)
   const supercluster = useMemo(() => {
-    const index = new Supercluster({ radius: clusterRadius, maxZoom: clusterMaxZoom })
+    const index = new Supercluster<P>({ radius: clusterRadius, maxZoom: clusterMaxZoom })
     index.load(points)
     return index
   }, [points])
 
   const clusters = useMemo(
-    () => (bounds ? supercluster.getClusters(bounds, Math.round(zoom)) : []),
+    (): MapClusterOrPointFeature<P>[] => (bounds ? supercluster.getClusters(bounds, Math.round(zoom)) : []),
     [bounds, supercluster, zoom]
   )
 
   const getClusterLeaves = useCallback(
-    (cluster) => {
-      const { id, properties } = cluster
-      const { cluster: isCluster } = properties
-      return isCluster ? supercluster.getLeaves(id, leavesLimit) : []
-    },
+    (cluster: MapClusterFeature): MapPointFeature<P>[] =>
+      supercluster.getLeaves(cluster.properties.cluster_id, leavesLimit),
     [supercluster]
   )
 
   const clusterExpansionZoomExtractor = useCallback(
-    (cluster) => supercluster.getClusterExpansionZoom(cluster.id),
+    (cluster: MapClusterFeature): number => supercluster.getClusterExpansionZoom(cluster.properties.cluster_id),
     [supercluster]
   )
 
