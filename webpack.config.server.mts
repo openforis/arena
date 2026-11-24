@@ -1,7 +1,7 @@
 import * as path from 'node:path'
-import webpack from 'webpack'
+import webpack, { type Configuration } from 'webpack'
 import nodeExternals from 'webpack-node-externals'
-import mainConfig, { appVersion } from './webpack.config.mjs'
+import mainConfig, { appVersion } from './webpack.config.mts'
 
 const nodeEnv = process.env.NODE_ENV
 const arenaRoot = process.env.ARENA_ROOT || import.meta.dirname
@@ -19,12 +19,12 @@ const plugins = [
   ...(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
 ]
 
-const entry = (entryPath) => [
+const entry = (entryPath: string): string[] => [
   ...(isProduction ? [] : ['webpack/hot/poll?1000']),
   path.resolve(path.join(import.meta.dirname, entryPath)),
 ]
 
-export default {
+const serverConfig: Configuration = {
   mode: 'development',
   devtool: isProduction ? false : 'source-map',
   externals: [
@@ -50,7 +50,7 @@ export default {
   resolve: {
     extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.ts', '.tsx', '.js', '.jsx'],
     modules: [path.resolve(import.meta.dirname, 'node_modules')],
-    alias: mainConfig.resolve.alias,
+    alias: mainConfig.resolve?.alias,
   },
   module: {
     rules: [
@@ -68,3 +68,5 @@ export default {
   },
   stats: 'errors-only',
 }
+
+export default serverConfig

@@ -151,8 +151,8 @@ yarn test:e2e:codegen
 
 ```bash
 # Lint and fix (runs via lint-staged on pre-commit)
-# Targets: {common,core,server,test,webapp}/**/*.js
-npx eslint --cache --fix path/to/file.js
+# Targets: {common,core,server,test,webapp}/**/*.{ts,tsx,mts}
+npx eslint --cache --fix path/to/file.ts
 ```
 
 ### Database
@@ -194,7 +194,7 @@ jest dist/__tests__/bundle.unit.js
 
 When adding a new node definition type or modifying the survey schema:
 
-1. Update domain model in `core/survey/nodeDef*` (`nodeDef.ts`, `nodeDefLayout.js`, ...)
+1. Update domain model in `core/survey/nodeDef*` (`nodeDef.ts`, `nodeDefLayout.ts`, ...)
 2. Update database repository in `server/modules/nodeDef/repository/`
 3. Update API endpoints in `server/modules/nodeDef/api/`
 4. Update React components in `webapp/views/App/views/Designer/`
@@ -206,11 +206,11 @@ Database migrations (`public` schema and per-survey schemas) live in `@openforis
 
 ## Coding Conventions
 
-**TypeScript for new code:**
-New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When substantially rewriting an existing `.js` file, prefer converting it to TypeScript. Run `yarn typecheck` to verify types.
+**TypeScript only:**
+The codebase is TypeScript only (`.ts` / `.tsx`; `.mts` for the ESM tool configs, e.g. `webpack.config.mts`): `tsconfig.json` and the ESLint config cover only TypeScript files. Run `yarn typecheck` to verify types.
 
 **TypeScript version:**
-TypeScript 7 (native) is used for `tsc`, installed as the `@typescript/native` alias; the `typescript` package is an alias of `@typescript/typescript6` because typescript-eslint still needs the TypeScript 6 JavaScript API. In `.js` files, JSDoc `object` is a real type and parameters are required unless marked optional.
+TypeScript 7 (native) is used for `tsc`, installed as the `@typescript/native` alias; the `typescript` package is an alias of `@typescript/typescript6` because typescript-eslint still needs the TypeScript 6 JavaScript API.
 
 **Types from `@openforis/arena-core`:**
 Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `ArenaSurvey`, `ArenaNodeDef`, `ArenaRecord`, `ArenaRecordNode`, `ArenaCategory`, `ArenaTaxonomy`, `ArenaUser`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate. All arena-core types are `Arena`-prefixed (`ArenaSurvey`, `ArenaNodeDef`, `ArenaNodeDefEntity`, `ArenaRecord`, `ArenaRecordNode`, `ArenaValidation`, ...), so they don't clash with the `core/` module namespaces: import them without `as` renames. Use `ArenaAnyNodeDef` for a node def of any type.
@@ -255,7 +255,7 @@ After creating a PR, subscribe to its activity and wait for the automated checks
 ## Important Notes
 
 **Path Aliases:**
-All imports use path aliases defined in `jsconfig.json` and webpack config:
+All imports use path aliases defined in `tsconfig.json` and webpack config:
 
 - `@common/*` → `./common/*`
 - `@core/*` → `./core/*`

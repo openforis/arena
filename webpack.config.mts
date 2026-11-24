@@ -9,6 +9,8 @@ import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import TerserPlugin from 'terser-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
+import type { Compiler, Configuration, Stats, WebpackPluginInstance } from 'webpack'
+import type { Configuration as DevServerConfiguration } from 'webpack-dev-server'
 
 import { v4 as uuidv4 } from 'uuid'
 
@@ -24,12 +26,12 @@ export const appVersion =
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
 class CleanUpStatsPlugin {
-  shouldPickStatChild(child) {
-    return child.name.indexOf('mini-css-extract-plugin') !== 0
+  shouldPickStatChild(child: { name?: string }): boolean {
+    return !child.name?.startsWith('mini-css-extract-plugin')
   }
 
-  apply(compiler) {
-    compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
+  apply(compiler: Compiler): void {
+    compiler.hooks.done.tap('CleanUpStatsPlugin', (stats: Stats) => {
       const { children } = stats.compilation
       if (Array.isArray(children)) {
         stats.compilation.children = children.filter((child) => this.shouldPickStatChild(child))
@@ -44,9 +46,9 @@ const mobilePreviewUrlDefault = fs.existsSync(path.resolve(import.meta.dirname, 
   : undefined
 
 // ==== init plugins
-const environment = process.env.NODE_ENV ?? 'development'
+const environment = (process.env.NODE_ENV ?? 'development') as Configuration['mode']
 
-const plugins = [
+const plugins: WebpackPluginInstance[] = [
   new MiniCssExtractPlugin({
     filename: 'styles-[fullhash].css',
     ignoreOrder: true,
@@ -80,7 +82,7 @@ const plugins = [
       {
         from: path.resolve(import.meta.dirname, 'node_modules/maplibre-gl/dist'),
         to: 'maplibre-gl/[name][ext]',
-        filter: (resourcePath) => /maplibre-gl-(worker|shared)\.mjs$/.test(resourcePath),
+        filter: (resourcePath: string) => /maplibre-gl-(worker|shared)\.mjs$/.test(resourcePath),
       },
     ],
   }),
@@ -94,8 +96,36 @@ if (process.env.BUILD_REPORT === 'true') {
   plugins.push(new BundleAnalyzerPlugin())
 }
 
+const devServer: DevServerConfiguration = {
+  hot: true,
+  devMiddleware: {
+    index: false, // specify to enable root proxying
+  },
+  proxy: [
+    {
+      // Proxy all server-served routes:
+      context: ['/img', '/geo', '/mobile-preview', '/analytics.js', '/api', '/auth', '/socket.io'],
+      target: 'http://localhost:9090',
+    },
+    {
+      context: ['/socket.io'],
+      target: 'ws://localhost:9090',
+      ws: true,
+    },
+    // Proxy root to server to mirror the server routes (goes to /app/home currently);
+    // any other path is served index.html by historyApiFallback
+    {
+      context: (pathname: string) => pathname === '/',
+      target: 'http://localhost:9090',
+    },
+  ],
+  compress: false,
+  port: 9000,
+  historyApiFallback: true,
+}
+
 // ====== webpack config
-const webPackConfig = {
+const webPackConfig: Configuration = {
   entry: ['./webapp/Main.tsx'],
   mode: environment,
   devtool: 'source-map',
@@ -131,33 +161,7 @@ const webPackConfig = {
     path: path.resolve(import.meta.dirname, 'dist'),
     publicPath: '/',
   },
-  devServer: {
-    hot: true,
-    devMiddleware: {
-      index: false, // specify to enable root proxying
-    },
-    proxy: [
-      {
-        // Proxy all server-served routes:
-        context: ['/img', '/geo', '/mobile-preview', '/analytics.js', '/api', '/auth', '/socket.io'],
-        target: 'http://localhost:9090',
-      },
-      {
-        context: ['/socket.io'],
-        target: 'ws://localhost:9090',
-        ws: true,
-      },
-      // Proxy root to server to mirror the server routes (goes to /app/home currently);
-      // any other path is served index.html by historyApiFallback
-      {
-        context: (path) => path === '/',
-        target: 'http://localhost:9090',
-      },
-    ],
-    compress: false,
-    port: 9000,
-    historyApiFallback: true,
-  },
+  devServer,
   module: {
     rules: [
       // georaster-layer-for-leaflet's ESM build imports 'georaster-stack/web' without a file extension
@@ -188,15 +192,11 @@ const webPackConfig = {
             loader: 'css-loader',
             options: {
               url: {
-                filter: (url) => {
-                  // Don't handle /img/ urls
-                  return !url.includes('/img/')
-                },
+                // Don't handle /img/ urls
+                filter: (url: string) => !url.includes('/img/'),
               },
               import: {
-                filter: (url) => {
-                  return true
-                },
+                filter: () => true,
               },
             },
           },

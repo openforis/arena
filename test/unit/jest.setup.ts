@@ -1,14 +1,17 @@
-const crypto = require('node:crypto')
-const streamWeb = require('node:stream/web')
+import crypto from 'node:crypto'
+import * as streamWeb from 'node:stream/web'
 
-if (global.crypto === undefined) {
-  global.crypto = crypto.webcrypto
+const globals = globalThis as Record<string, unknown>
+
+if (globals.crypto === undefined) {
+  globals.crypto = crypto.webcrypto
 }
 
 // Jest 27's sandbox does not expose Node's global Web Streams API. The AI SDK
 // v5 pulls in eventsource-parser, which references TransformStream at module
 // load time. Mirror Node's `stream/web` exports onto the global so test files
 // that transitively load the AI SDK can resolve them.
+const streamWebExports = streamWeb as unknown as Record<string, unknown>
 for (const name of [
   'ReadableStream',
   'WritableStream',
@@ -18,7 +21,7 @@ for (const name of [
   'TextEncoderStream',
   'TextDecoderStream',
 ]) {
-  if (global[name] === undefined && streamWeb[name]) {
-    global[name] = streamWeb[name]
+  if (globals[name] === undefined && streamWebExports[name]) {
+    globals[name] = streamWebExports[name]
   }
 }

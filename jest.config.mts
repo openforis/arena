@@ -1,7 +1,14 @@
-module.exports = {
+import { createRequire } from 'node:module'
+
+import type { Config } from 'jest'
+
+const require = createRequire(import.meta.url)
+const rootDir = import.meta.dirname
+
+const config: Config = {
   roots: ['<rootDir>/'],
   testEnvironment: 'node',
-  setupFiles: [require.resolve('./test/unit/jest.setup.js')],
+  setupFiles: [require.resolve('./test/unit/jest.setup.ts')],
   // Jest's default transform is the babel-jest nested in jest-config, which is tied to Babel 7
   transform: { [String.raw`\.[jt]sx?$`]: require.resolve('babel-jest') },
   // Claude Code checks out isolated git worktrees under .claude/worktrees/ (see
@@ -21,14 +28,16 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|openid-client/|oauth4webapi/|jose/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/)',
   ],
-  // Path aliases (mirrors jsconfig.json / the webpack configs): unit and integration tests are bundled
+  // Path aliases (mirrors tsconfig.json / the webpack configs): unit and integration tests are bundled
   // by webpack, which resolves them; they are needed here only for tests run directly through Jest.
   moduleNameMapper: {
-    '^@common/(.*)$': `${__dirname}/common/$1`,
-    '^@core/(.*)$': `${__dirname}/core/$1`,
-    '^@server/(.*)$': `${__dirname}/server/$1`,
-    '^@webapp/(.*)$': `${__dirname}/webapp/$1`,
-    '^@test/(.*)$': `${__dirname}/test/$1`,
+    '^@common/(.*)$': `${rootDir}/common/$1`,
+    '^@core/(.*)$': `${rootDir}/core/$1`,
+    '^@server/(.*)$': `${rootDir}/server/$1`,
+    '^@webapp/(.*)$': `${rootDir}/webapp/$1`,
+    '^@test/(.*)$': `${rootDir}/test/$1`,
   },
   verbose: true,
 }
+
+export default config
