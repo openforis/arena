@@ -34,6 +34,16 @@ export const category = {
   ],
 }
 
+// sampling point data (category with a location for every item), added only by the specs asking for it
+// (sampleSurveyOptions.withSamplingPointData): its items are shown in the map view, in a layer of their own
+export const samplingPointData = {
+  levelName: 'sampling_point',
+  items: [
+    { code: 'SP1', location: { x: 10.5, y: 45.5 } },
+    { code: 'SP2', location: { x: 11.5, y: 46.5 } },
+  ],
+}
+
 export type SampleCategoryItem = { code: string; label: string; children: SampleCategoryItem[] }
 
 const createCategoryItems = (levelIdx = 0, codePrefix = ''): SampleCategoryItem[] => {

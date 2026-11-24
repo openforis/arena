@@ -4,6 +4,8 @@ import log4js from 'log4js'
 
 import type { NodeDefType as ArenaNodeDefType } from '@openforis/arena-core'
 
+import * as Category from '@core/survey/category'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
@@ -23,6 +25,7 @@ import {
   SampleCategoryItem,
   SampleNodeDef,
   SampleRecord,
+  samplingPointData,
   taxonomy,
   tree,
 } from './sampleSurveyModel'
@@ -63,6 +66,8 @@ export type SampleSurveyOptions = {
   records?: SampleRecord[]
   /** Whether to add the image attribute "cluster_photo" to the cluster; default false. */
   withClusterImage?: boolean
+  /** Whether to add the sampling point data category (items with a location); default false. */
+  withSamplingPointData?: boolean
 }
 
 type ExpressionsByName = Record<string, string>
@@ -103,6 +108,21 @@ const createTaxonBuilders = () =>
     return taxonBuilder
   })
 
+// the sampling point data category: one level, items with a location (WGS84)
+const createSamplingPointDataBuilder = () =>
+  SB.category(Category.samplingPointDataCategoryName)
+    .levels(samplingPointData.levelName)
+    .extraProps({
+      location: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint, index: 0, locked: true }),
+    })
+    .items(
+      ...samplingPointData.items.map(({ code, location }) =>
+        SB.categoryItem(code)
+          .label(code)
+          .extra({ location: `SRID=EPSG:4326;POINT(${location.x} ${location.y})` })
+      )
+    )
+
 /**
  * Inserts the sample survey (cluster -> plot -> tree, with a category and a taxonomy) directly in the DB,
  * owned by the specified user and set as its current survey, optionally with some records.
@@ -120,6 +140,7 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
     records = [],
     languages,
     withClusterImage = false,
+    withSamplingPointData = false,
   } = options
 
   const user = await UserManager.fetchUserByEmail(userEmail)
@@ -162,7 +183,13 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
     .description(taxonomy.description)
     .taxa(...createTaxonBuilders())
 
-  const surveyBuilder = SB.survey(user, clusterBuilder).categories(categoryBuilder).taxonomies(taxonomyBuilder)
+  const categoryBuilders = withSamplingPointData
+    ? [categoryBuilder, createSamplingPointDataBuilder()]
+    : [categoryBuilder]
+
+  const surveyBuilder = SB.survey(user, clusterBuilder)
+    .categories(...categoryBuilders)
+    .taxonomies(taxonomyBuilder)
   surveyBuilder.name = name
   surveyBuilder.label = label
   if (template) surveyBuilder.template()
