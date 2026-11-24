@@ -1,5 +1,3 @@
-import { useDispatch } from 'react-redux'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
@@ -10,9 +8,10 @@ import { useSurvey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { useAppDispatch } from '@webapp/store'
 
 export const ClusteringEntitySelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const chain = useChain()
   const editable = useChainEditable()

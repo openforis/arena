@@ -1,6 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
 
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
@@ -13,11 +11,16 @@ import { Checkbox } from '@webapp/components/form'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import RecordsDropdown from './RecordsDropdown'
+import { useAppDispatch } from '@webapp/store'
 
-export const ChainRStudioPanel = (props) => {
+type ChainRStudioPanelProps = {
+  updateChain: (...args: any[]) => any
+}
+
+export const ChainRStudioPanel = (props: ChainRStudioPanelProps) => {
   const { updateChain } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const chain = useChain()
   // RStudio section is never locked, regardless of the chain edit lock state
   const editable = useAuthCanUseAnalysis()
@@ -83,8 +86,4 @@ export const ChainRStudioPanel = (props) => {
       ]}
     />
   )
-}
-
-ChainRStudioPanel.propTypes = {
-  updateChain: PropTypes.func.isRequired,
 }

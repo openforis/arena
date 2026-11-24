@@ -1,5 +1,4 @@
 import './AnalysisNodeDefsHeader.scss'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
@@ -10,9 +9,15 @@ import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { Button } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
+import { useAppDispatch } from '@webapp/store'
 
-const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDefs }) => {
-  const dispatch = useDispatch()
+type AnalysisNodeDefsHeaderProps = {
+  toggleShowSamplingNodeDefs: () => void
+  showSamplingNodeDefs: boolean
+}
+
+const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDefs }: AnalysisNodeDefsHeaderProps) => {
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const chain = useChain()
   const editable = useChainEditable()

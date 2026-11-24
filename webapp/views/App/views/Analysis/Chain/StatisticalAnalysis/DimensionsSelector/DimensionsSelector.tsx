@@ -1,7 +1,6 @@
 import './DimensionsSelector.scss'
 
 import { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,7 +9,17 @@ import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/st
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { Dropdown } from '@webapp/components/form'
 
-export const DimensionsSelector = (props) => {
+type DimensionsSelectorProps = {
+  chainUuid: string
+  entityDefUuid?: string
+  disabled?: boolean
+  labelType?: NodeDef.NodeDefLabelType
+  onDimensionsChange: (...args: any[]) => any
+  selectedDimensionsUuids?: any[]
+  showAnalysisAttributes?: boolean
+}
+
+export const DimensionsSelector = (props: DimensionsSelectorProps) => {
   const {
     chainUuid,
     disabled = false,
@@ -90,14 +99,4 @@ export const DimensionsSelector = (props) => {
       selection={selectedOptions}
     />
   )
-}
-
-DimensionsSelector.propTypes = {
-  chainUuid: PropTypes.string.isRequired,
-  entityDefUuid: PropTypes.string,
-  disabled: PropTypes.bool,
-  labelType: PropTypes.string,
-  onDimensionsChange: PropTypes.func.isRequired,
-  selectedDimensionsUuids: PropTypes.array,
-  showAnalysisAttributes: PropTypes.bool,
 }

@@ -1,10 +1,13 @@
-import PropTypes from 'prop-types'
-
 import { useNodeDefByUuid, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { ButtonIconEdit } from '@webapp/components'
 
-const Row = (props) => {
+type RowProps = {
+  item: Record<string, any>
+  onRowOpen: (...args: any[]) => any
+}
+
+const Row = (props: RowProps) => {
   const { item: entity, onRowOpen } = props
   const parentDef = useNodeDefByUuid(entity?.parentUuid)
   const lang = useSurveyPreferredLang()
@@ -20,11 +23,6 @@ const Row = (props) => {
       </div>
     </>
   )
-}
-
-Row.propTypes = {
-  item: PropTypes.object.isRequired,
-  onRowOpen: PropTypes.func.isRequired,
 }
 
 export default Row

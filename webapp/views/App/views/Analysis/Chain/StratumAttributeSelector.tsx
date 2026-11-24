@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -12,9 +11,10 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
 
 import { BaseUnitAttributeSelector } from './BaseUnitAttributeSelector'
+import { useAppDispatch } from '@webapp/store'
 
 export const StratumAttributeSelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const survey = useSurvey()
   const chain = useChain()
   const samplingDesign = Chain.getSamplingDesign(chain)
@@ -49,7 +49,7 @@ export const StratumAttributeSelector = () => {
 
   return (
     <BaseUnitAttributeSelector
-      allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
+      allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed()}
       info={info}
       label={label}
       nodeDefFilter={nodeDefFilter}

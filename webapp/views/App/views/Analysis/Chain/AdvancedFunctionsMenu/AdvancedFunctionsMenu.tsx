@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
@@ -12,11 +11,12 @@ import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import { NotificationActions } from '@webapp/store/ui'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { Button, ButtonDelete, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
 
 const isZipFile = (file) => file.name?.toLowerCase().endsWith('.zip')
 
 const AdvancedFunctionsMenu = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const chain = useChain()

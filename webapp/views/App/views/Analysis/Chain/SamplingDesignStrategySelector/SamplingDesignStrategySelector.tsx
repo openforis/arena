@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import type { ArenaChain } from '@openforis/arena-core'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
@@ -8,7 +8,12 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useChainEditable } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
-export const SamplingDesignStrategySelector = (props) => {
+type SamplingDesignStrategySelectorProps = {
+  chain: ArenaChain
+  updateChain: (...args: any[]) => any
+}
+
+export const SamplingDesignStrategySelector = (props: SamplingDesignStrategySelectorProps) => {
   const { chain, updateChain } = props
 
   const i18n = useI18n()
@@ -39,9 +44,4 @@ export const SamplingDesignStrategySelector = (props) => {
       />
     </FormItem>
   )
-}
-
-SamplingDesignStrategySelector.propTypes = {
-  chain: PropTypes.object.isRequired,
-  updateChain: PropTypes.func.isRequired,
 }

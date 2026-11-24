@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
@@ -12,9 +11,10 @@ import { useSurvey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { useAppDispatch } from '@webapp/store'
 
 export const Phase2JoinEntitySelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const survey = useSurvey()
 
   const chain = useChain()
