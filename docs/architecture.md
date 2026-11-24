@@ -44,9 +44,9 @@ Entry point: `server/server.ts` → `server/system/appCluster.ts`, which:
 1. creates the Express app with `ArenaServer.init` (arena-server); this also migrates the `public` DB
    schema;
 2. registers the arena API routes (`server/system/apiRouter.ts`), the static webapp bundle and Swagger
-   (`/api-docs`, built from the `@swagger` comments in [api/](api/)). Route handlers and middlewares
-   don't wrap their body in `try { ... } catch (error) { next(error) }`: Express 5 passes the error thrown
-   by a handler (or its rejected promise) to `next` itself;
+   (`/api-docs`, built from the `@swagger` comments in [server/apiDocs/](../server/apiDocs/)). Route
+   handlers and middlewares don't wrap their body in `try { ... } catch (error) { next(error) }`: Express 5
+   passes the error thrown by a handler (or its rejected promise) to `next` itself;
 3. starts listening, then the schedulers (`server/system/schedulers/`) and the background job that
    migrates every survey's schema and data (`AllSurveysDataMigrationJob`).
 

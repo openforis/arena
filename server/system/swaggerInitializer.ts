@@ -24,7 +24,7 @@ const options = {
     },
   },
   // not './**': that walks node_modules at every server startup
-  apis: ['./server/**/*Api.js', './docs/api/*.js'],
+  apis: ['./server/**/*Api.ts', './server/apiDocs/*.ts'],
 }
 
 const specs = swaggerJSDoc(options)

@@ -1,14 +1,20 @@
-const fs = require('node:fs')
-const path = require('node:path')
-const glob = require('glob')
-const nodeExternals = require('webpack-node-externals')
+import fs from 'node:fs'
+import path from 'node:path'
 
-const isEsmOnlyModule = (moduleName) => {
+import { globSync } from 'glob'
+import type { Configuration, ModuleOptions, ResolveOptions } from 'webpack'
+import nodeExternals from 'webpack-node-externals'
+
+type TestType = 'unit' | 'integration'
+
+const dirname = import.meta.dirname
+
+const isEsmOnlyModule = (moduleName: string): boolean => {
   const [first, second] = moduleName.split('/')
   const packageName = first.startsWith('@') ? `${first}/${second}` : first
   try {
     const packageJson = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, '..', 'node_modules', packageName, 'package.json'), 'utf8')
+      fs.readFileSync(path.resolve(dirname, '..', 'node_modules', packageName, 'package.json'), 'utf8')
     )
     return packageJson.type === 'module'
   } catch {
@@ -16,25 +22,23 @@ const isEsmOnlyModule = (moduleName) => {
   }
 }
 
-const getEntry = (type) =>
+const getEntry = (type: TestType): string[] =>
   // glob v13 requires forward slashes; path.resolve uses backslashes on Windows.
-  glob
-    .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replaceAll('\\', '/'))
-    .sort((fileA, fileB) => {
-      const idxA = path.basename(fileA).substr(0, 3)
-      const idxB = path.basename(fileB).substr(0, 3)
-      if (idxA < idxB) return -1
-      if (idxA > idxB) return 1
-      return 0
-    })
+  globSync(path.resolve(dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replaceAll('\\', '/')).sort((fileA, fileB) => {
+    const idxA = path.basename(fileA).slice(0, 3)
+    const idxB = path.basename(fileB).slice(0, 3)
+    if (idxA < idxB) return -1
+    if (idxA > idxB) return 1
+    return 0
+  })
 
-const getOutput = (type) => ({
-  path: path.resolve(__dirname, '..', 'dist', '__tests__'),
+const getOutput = (type: TestType): Configuration['output'] => ({
+  path: path.resolve(dirname, '..', 'dist', '__tests__'),
   filename: `bundle.${type}.js`,
   publicPath: '/',
 })
 
-const getModule = () => ({
+const getModule = (): ModuleOptions => ({
   rules: [
     {
       test: /\.(js|jsx|ts|tsx)$/,
@@ -47,7 +51,7 @@ const getModule = () => ({
   ],
 })
 
-const getResolve = () => ({
+const getResolve = (): ResolveOptions => ({
   extensions: [
     '.webpack-loader.js',
     '.web-loader.js',
@@ -61,15 +65,15 @@ const getResolve = () => ({
     '.css',
   ],
   alias: {
-    '@common': path.resolve(__dirname, '..', 'common/'),
-    '@core': path.resolve(__dirname, '..', 'core/'),
-    '@server': path.resolve(__dirname, '..', 'server/'),
-    '@webapp': path.resolve(__dirname, '..', 'webapp/'),
-    '@test': path.resolve(__dirname, '..', 'test/'),
+    '@common': path.resolve(dirname, '..', 'common/'),
+    '@core': path.resolve(dirname, '..', 'core/'),
+    '@server': path.resolve(dirname, '..', 'server/'),
+    '@webapp': path.resolve(dirname, '..', 'webapp/'),
+    '@test': path.resolve(dirname, '..', 'test/'),
   },
 })
 
-const createWebpackConfig = (type) => ({
+export const createWebpackConfig = (type: TestType): Configuration => ({
   entry: getEntry(type),
   target: 'node', // Ignore built-in modules like path, fs, etc.
   // Ignore all modules in node_modules folder, except the ESM-only ones: Jest can only require() ESM
@@ -80,7 +84,7 @@ const createWebpackConfig = (type) => ({
   devtool: 'source-map',
   cache: {
     type: 'filesystem',
-    cacheDirectory: path.resolve(__dirname, '..', 'node_modules', '.cache', 'webpack-test', type),
+    cacheDirectory: path.resolve(dirname, '..', 'node_modules', '.cache', 'webpack-test', type),
   },
   node: {
     __filename: true,
@@ -90,5 +94,3 @@ const createWebpackConfig = (type) => ({
   resolve: getResolve(),
   module: getModule(),
 })
-
-module.exports = createWebpackConfig
