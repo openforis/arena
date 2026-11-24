@@ -1,5 +1,4 @@
 import { forwardRef } from 'react'
-import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import { TestId } from '@webapp/utils/testId'
@@ -8,7 +7,17 @@ import * as SideBarModule from '../utils'
 import ModuleLink from '../ModuleLink'
 import SubModules from '../SubModules'
 
-const Module = forwardRef((props, ref) => {
+type ModuleProps = {
+  disabled?: boolean
+  surveyInfo?: Record<string, any>
+  module?: Record<string, any>
+  pathname?: string
+  sideBarOpened?: boolean
+  isOver?: boolean
+  onMouseEnter?: (...args: any[]) => any
+}
+
+const Module = forwardRef<HTMLDivElement, ModuleProps>((props, ref) => {
   const { disabled = false, isOver = false, module, pathname, onMouseEnter, sideBarOpened = false, surveyInfo } = props
 
   const isModuleHome = SideBarModule.isHome(module)
@@ -50,15 +59,5 @@ const Module = forwardRef((props, ref) => {
     </div>
   )
 })
-
-Module.propTypes = {
-  disabled: PropTypes.bool,
-  surveyInfo: PropTypes.object,
-  module: PropTypes.object,
-  pathname: PropTypes.string,
-  sideBarOpened: PropTypes.bool,
-  isOver: PropTypes.bool,
-  onMouseEnter: PropTypes.func,
-}
 
 export default Module

@@ -120,7 +120,7 @@ const getHelpModule = (user, lang) =>
     ],
   })
 
-export const getModulesHierarchy = (user, surveyInfo, lang) => [
+export const getModulesHierarchy = (user, surveyInfo, lang?: string) => [
   getModule({ module: appModules.home }),
   // the dashboard is not available to data editors and survey guests
   getModule({ module: appModules.dashboard, hidden: !Authorizer.canCleanseRecords(user, surveyInfo) }),

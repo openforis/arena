@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -8,6 +7,7 @@ import { useI18n } from '@webapp/store/system'
 import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
 import JobTiming from '../../JobTiming'
+import type { ArenaJobSerialized } from '@openforis/arena-core'
 
 const getStatusIconClass = (innerJob, isCurrentJob) => {
   if (JobSerialized.isSucceeded(innerJob)) return 'icon-checkbox-checked'
@@ -16,7 +16,13 @@ const getStatusIconClass = (innerJob, isCurrentJob) => {
   return 'icon-checkbox-unchecked'
 }
 
-const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
+type InnerJobProps = {
+  isCurrentJob?: boolean
+  innerJob: ArenaJobSerialized
+  index: number
+}
+
+const InnerJob = ({ isCurrentJob = false, innerJob, index }: InnerJobProps) => {
   const i18n = useI18n()
   const elementRef = useRef(null)
 
@@ -44,12 +50,6 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
       <JobErrors job={innerJob} />
     </>
   )
-}
-
-InnerJob.propTypes = {
-  isCurrentJob: PropTypes.bool,
-  innerJob: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
 }
 
 export default InnerJob

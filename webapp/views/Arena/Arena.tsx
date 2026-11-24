@@ -1,26 +1,25 @@
 import { useCallback, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
-import PropTypes from 'prop-types'
 
 import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
 import { ExpansionPanel } from '@webapp/components'
 
 import Routes from './Routes'
+import { useAppDispatch } from '@webapp/store'
 
-const ErrorFallback = ({ error }) => (
+type ErrorFallbackProps = {
+  error: Record<string, any>
+}
+
+const ErrorFallback = ({ error }: ErrorFallbackProps) => (
   <div role="alert">
     <p>Something went wrong:</p>
     <pre>{error.stack ?? error.message}</pre>
   </div>
 )
 
-ErrorFallback.propTypes = {
-  error: PropTypes.object.isRequired,
-}
-
 const Arena = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const ready = useSystemStatusReady()
   const systemError = useSystemError()

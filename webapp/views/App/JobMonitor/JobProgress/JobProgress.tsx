@@ -1,17 +1,20 @@
-import PropTypes from 'prop-types'
-
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import ProgressBar from '@webapp/components/progressBar'
 
-const colorByJobStatus = {
+const colorByJobStatus: Record<string, 'primary' | 'error' | 'success'> = {
   [JobSerialized.keys.pending]: 'primary',
   [JobSerialized.keys.running]: 'primary',
   [JobSerialized.keys.failed]: 'error',
   [JobSerialized.keys.succeeded]: 'success',
 }
 
-const JobProgress = ({ isCurrentJob = true, job = {} }) => {
+type JobProgressProps = {
+  isCurrentJob?: boolean
+  job?: Record<string, any>
+}
+
+const JobProgress = ({ isCurrentJob = true, job = {} }: JobProgressProps) => {
   const color = colorByJobStatus[JobSerialized.getStatus(job)]
   const progressPercent = JobSerialized.getProgressPercent(job)
 
@@ -23,11 +26,6 @@ const JobProgress = ({ isCurrentJob = true, job = {} }) => {
       className={JobSerialized.getStatus(job)}
     />
   )
-}
-
-JobProgress.propTypes = {
-  isCurrentJob: PropTypes.bool,
-  job: PropTypes.object,
 }
 
 export default JobProgress

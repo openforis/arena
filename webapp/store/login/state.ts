@@ -18,17 +18,20 @@ export const ViewState = {
 
 const viewStates2FA = new Set([ViewState.ask2FAToken, ViewState.ask2FABackupCode])
 
-const getStateProp = (key, defaultValue = null) => A.pathOr(defaultValue, [stateKey, key])
+const getStateProp =
+  <T>(key: string, defaultValue: T = null) =>
+  (state: unknown): T =>
+    A.pathOr(defaultValue, [stateKey, key])(state)
 
-export const getError = getStateProp(keys.error)
+export const getError = getStateProp<string | null>(keys.error)
 export const assocError = A.assoc(keys.error)
 
-export const getViewState = getStateProp(keys.viewState, ViewState.askUsernameAndPassword)
+export const getViewState = getStateProp<string>(keys.viewState, ViewState.askUsernameAndPassword)
 export const is2FAViewState = (state) => viewStates2FA.has(getViewState(state))
 export const assocViewState = A.assoc(keys.viewState)
 
-export const isExternalLogin = getStateProp(keys.externalLogin, false)
+export const isExternalLogin = getStateProp<boolean>(keys.externalLogin, false)
 export const assocExternalLogin = A.assoc(keys.externalLogin)
 
-export const getEmail = getStateProp(keys.email, '')
+export const getEmail = getStateProp<string>(keys.email, '')
 export const assocEmail = (email) => A.pipe(A.assoc(keys.email, email), assocError(null))
