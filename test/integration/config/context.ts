@@ -20,7 +20,7 @@ export const getContextUser = () => {
 export const getContextSurvey = () => global.survey || survey
 export const getContextSurveyId = () => Survey.getId(getContextSurvey())
 
-const createAdminUser = async () =>
+const createAdminUser = () =>
   db.multi(`
     -- Insert the admin user to be used in the test suite:
     INSERT INTO "user" (name, email, password, status)
@@ -63,10 +63,11 @@ export const destroyTestContext = async () => {
     setContextSurvey(null)
     setContextUser(null)
   }
-  await db.$pool.end()
+  // db is the pg-promise database: close its pool
+  await (db as unknown as { $pool: { end: () => Promise<void> } }).$pool.end()
 }
 
-export const fetchFullContextSurvey = async (draft = true, advanced = true) =>
+export const fetchFullContextSurvey = (draft = true, advanced = true) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId: getContextSurveyId(),
     cycle: Survey.cycleOneKey,

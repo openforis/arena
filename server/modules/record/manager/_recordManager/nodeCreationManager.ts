@@ -1,4 +1,4 @@
-import type { DbClient } from '@server/db/db'
+import { db, type DbClient } from '@server/db/db'
 import {
   Objects,
   RecordNodesUpdater,
@@ -58,7 +58,7 @@ export const insertNodesInBulk = async (
     nodesArray,
     systemActivity = false,
   }: { user: ArenaUser; surveyId: number; nodesArray: ArenaRecordNode[]; systemActivity?: boolean },
-  tx: DbClient
+  tx: DbClient = db
 ) => {
   const nodeValues = nodesArray.map((node) => [
     Node.getUuid(node),

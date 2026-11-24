@@ -364,7 +364,7 @@ export const deleteNode = (
     record: ArenaRecord
     nodeUuid: string
     timezoneOffset?: number
-    lang: string
+    lang?: string
     nodesUpdateListener?: (nodes: NodesByUuid) => void
     nodesValidationListener?: (validation: ArenaValidation) => void
     clearNonApplicableValues?: boolean

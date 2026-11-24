@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaSurveyFile } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
@@ -154,7 +154,9 @@ describe('Survey areas of interest', () => {
       name: 'point.geojson',
       temporary: true,
     })
-    await expect(SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })).rejects.toThrow()
+    await expect(
+      SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile: surveyFile as unknown as ArenaSurveyFile })
+    ).rejects.toThrow()
     expect(await SurveyFileManager.fetchFileSummaryByUuid(surveyId, SurveyFile.getUuid(surveyFile))).toBeNull()
   })
 })

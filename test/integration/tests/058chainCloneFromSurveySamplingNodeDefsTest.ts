@@ -1,3 +1,4 @@
+import type { ArenaChain, ArenaNodeDefEntity } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -50,7 +51,7 @@ const findChainNodeDef = ({ survey, chainUuid, name }) =>
 const insertAreaBasedAttribute = async ({ survey, chainUuid, name }) => {
   const surveyId = Survey.getId(survey)
   const nodeDef = NodeDef.newNodeDef(
-    Survey.getNodeDefByName('tree')(survey),
+    Survey.getNodeDefByName('tree')(survey) as ArenaNodeDefEntity,
     nodeDefType.decimal,
     [Survey.cycleOneKey],
     { [NodeDef.propKeys.name]: name },
@@ -101,8 +102,8 @@ describe('Clone chain from another survey - sampling node defs', () => {
       surveyId,
       chain: {
         uuid: sourceChainUuid,
-        props: { name: 'chain_src', [Chain.keysProps.samplingDesign]: samplingDesign },
-      },
+        props: { labels: { en: 'chain_src' }, [Chain.keysProps.samplingDesign]: samplingDesign },
+      } as unknown as ArenaChain,
     })
     await insertAreaBasedAttribute({ survey: sourceSurvey, chainUuid: sourceChainUuid, name: 'agb' })
 
@@ -122,7 +123,10 @@ describe('Clone chain from another survey - sampling node defs', () => {
     // This chain uses the plot area node def of the first chain: there can be only one per entity.
     await ChainRepository.insertChain({
       surveyId,
-      chain: { uuid: sourceChainSharingPlotAreaUuid, props: { name: 'chain_sharing_plot_area_src' } },
+      chain: {
+        uuid: sourceChainSharingPlotAreaUuid,
+        props: { labels: { en: 'chain_sharing_plot_area_src' } },
+      } as unknown as ArenaChain,
     })
     await insertAreaBasedAttribute({
       survey: sourceSurvey,

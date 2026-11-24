@@ -20,6 +20,9 @@ import DataImportValidationJob from '@server/modules/dataImport/service/DataImpo
 import * as SB from '../../../utils/surveyBuilder'
 import { toFileContent } from '../../../utils/flatDataImportTestUtils'
 
+type FlatDataImportParams = Parameters<typeof DataImportService.startFlatDataImportJob>[0]
+type CollectDataImportParams = Parameters<typeof DataImportService.startCollectDataImportJob>[0]
+
 const clusterName = 'cluster'
 const clusterIdName = 'cluster_id'
 const plotsCountName = 'plots_count'
@@ -318,7 +321,7 @@ const _toDataEditor = ({ user, survey, otherUser = false }) => {
   return { ...user, ...(otherUser ? { uuid: uuidv4() } : {}), authGroups: [dataEditorGroup] }
 }
 
-const _insertClusters = async ({ user, survey, fileFormat }) =>
+const _insertClusters = ({ user, survey, fileFormat }) =>
   _runImport({
     user,
     survey,
@@ -375,10 +378,19 @@ export const dataImportRestrictedOptionsTest = async ({ user }) => {
     DataImportService.checkFlatDataImportOptions({ user: dataEditor, deleteExistingEntities: true })
   ).toThrow(UnauthorizedError)
   expect(() =>
-    DataImportService.startFlatDataImportJob({ user: dataEditor, surveyId, deleteExistingEntities: true })
+    // rejected before the import parameters are read
+    DataImportService.startFlatDataImportJob({
+      user: dataEditor,
+      surveyId,
+      deleteExistingEntities: true,
+    } as FlatDataImportParams)
   ).toThrow(UnauthorizedError)
   await expect(
-    DataImportService.startCollectDataImportJob({ user: dataEditor, surveyId, deleteAllRecords: true })
+    DataImportService.startCollectDataImportJob({
+      user: dataEditor,
+      surveyId,
+      deleteAllRecords: true,
+    } as CollectDataImportParams)
   ).rejects.toThrow(UnauthorizedError)
 
   expect(() => DataImportService.checkFlatDataImportOptions({ user: dataEditor })).not.toThrow()

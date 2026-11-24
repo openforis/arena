@@ -58,7 +58,7 @@ export const createCategoryLevelTest = async () => {
   })
 
   // Levels must be 2
-  expect(Category.getLevelsArray(reloadedCategory).length).toBe(2)
+  expect(Category.getLevelsArray(reloadedCategory)).toHaveLength(2)
 }
 
 export const createCategoryItemTest = async () => {
@@ -190,7 +190,7 @@ export const convertCategoryToGeoPackageTest = async () => {
     categoryUuid: Category.getUuid(category),
     locked: false,
   })
-  expect(Category.getItemExtraDefsArray(categoryUpdatedAgain).length).toBe(1)
+  expect(Category.getItemExtraDefsArray(categoryUpdatedAgain)).toHaveLength(1)
   expect(ExtraPropDef.isLocked(Category.getItemExtraDefsArray(categoryUpdatedAgain)[0])).toBe(true)
 }
 
@@ -215,7 +215,7 @@ export const convertCategoryToGeoPackageFixesWrongTypeLocationExtraDefTest = asy
 
   const extraDefsArray = Category.getItemExtraDefsArray(categoryUpdated)
   // the wrong-type def is fixed in place, not duplicated alongside a second 'location' def
-  expect(extraDefsArray.length).toBe(2)
+  expect(extraDefsArray).toHaveLength(2)
 
   const locationDef = Category.getItemExtraDef(categoryUpdated)[Category.locationItemExtraDefName]
   expect(ExtraPropDef.getDataType(locationDef)).toBe(ExtraPropDef.dataTypes.geometryPoint)
@@ -271,7 +271,7 @@ export const convertCategoryToSamplingPointDataAlreadyConvertedTest = async () =
   const locationDefs = Category.getItemExtraDefsArray(categoryUpdatedAgain).filter(
     (extraDef) => ExtraPropDef.getName(extraDef) === Category.locationItemExtraDefName
   )
-  expect(locationDefs.length).toBe(1)
+  expect(locationDefs).toHaveLength(1)
   expect(ExtraPropDef.isLocked(locationDefs[0])).toBe(true)
 }
 

@@ -310,7 +310,7 @@ export const updateNodesDependents = async (
     sideEffect?: boolean
     clearNonApplicableValues?: boolean
   },
-  tx: DbClient
+  tx: DbClient = db
 ) => {
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
     // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
