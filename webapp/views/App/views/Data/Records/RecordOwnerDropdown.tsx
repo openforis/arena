@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 
@@ -9,7 +8,12 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
-export const RecordOwnerDropdown = (props) => {
+type RecordOwnerDropdownProps = {
+  selectedUuid?: string
+  onChange: (...args: any[]) => any
+}
+
+export const RecordOwnerDropdown = (props: RecordOwnerDropdownProps) => {
   const { selectedUuid, onChange } = props
 
   const i18n = useI18n()
@@ -46,9 +50,4 @@ export const RecordOwnerDropdown = (props) => {
       selection={selectedUser}
     />
   )
-}
-
-RecordOwnerDropdown.propTypes = {
-  selectedUuid: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
 }

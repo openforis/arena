@@ -1,7 +1,5 @@
 import './HeaderLeft.scss'
 import { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
@@ -35,16 +33,13 @@ import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 import { RecordKeyValuesExtractor } from '../recordKeyValuesExtractor'
 import { RecordListActions } from '@webapp/store/ui'
+import { useAppDispatch } from '@webapp/store'
 
 const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }) => {
   // sort selected records by date modified; source record will be the newest one
-  const sortedRecords = [...selectedItems].sort((summaryA, summaryB) => {
-    const dateModifiedAString = Record.getDateModified(summaryA)
-    const dateModifiedA = DateUtils.parseDateISO(dateModifiedAString)
-    const dateModifiedBString = Record.getDateModified(summaryB)
-    const dateModifiedB = DateUtils.parseDateISO(dateModifiedBString)
-    return dateModifiedB.getTime() - dateModifiedA.getTime()
-  })
+  const sortedRecords = [...selectedItems].sort(
+    (summaryA, summaryB) => Record.getDateModified(summaryB).getTime() - Record.getDateModified(summaryA).getTime()
+  )
   const [sourceRecord, targetRecord] = sortedRecords
   return { sourceRecord, targetRecord }
 }
@@ -122,8 +117,24 @@ const buildExportMenuItems = ({
   return exportMenuItems
 }
 
-const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
-  const dispatch = useDispatch()
+type HeaderLeftProps = {
+  handleSearch: (...args: any[]) => any
+  navigateToRecord: (...args: any[]) => any
+  onRecordsUpdate: (...args: any[]) => any
+  search?: string
+  selectedItems: any[]
+  totalCount: number
+}
+
+const HeaderLeft = ({
+  handleSearch,
+  navigateToRecord,
+  onRecordsUpdate,
+  search,
+  selectedItems,
+  totalCount,
+}: HeaderLeftProps) => {
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
   const survey = useSurvey()
@@ -338,15 +349,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
       )}
     </div>
   )
-}
-
-HeaderLeft.propTypes = {
-  handleSearch: PropTypes.func.isRequired,
-  navigateToRecord: PropTypes.func.isRequired,
-  onRecordsUpdate: PropTypes.func.isRequired,
-  search: PropTypes.string,
-  selectedItems: PropTypes.array.isRequired,
-  totalCount: PropTypes.number.isRequired,
 }
 
 export default HeaderLeft

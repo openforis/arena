@@ -1,8 +1,6 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
 
-import { Strings } from '@openforis/arena-core'
+import { Strings, type ArenaRecord } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
@@ -14,11 +12,17 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { EditableColumn } from '@webapp/components/DataGrid/EditableColumn'
 
 import { RecordOwnerDropdown } from './RecordOwnerDropdown'
+import { useAppDispatch } from '@webapp/store'
 
-export const RecordOwnerColumn = (props) => {
+type RecordOwnerColumnProps = {
+  item: ArenaRecord
+  onRecordsUpdate?: (...args: any[]) => any
+}
+
+export const RecordOwnerColumn = (props: RecordOwnerColumnProps) => {
   const { item: record, onRecordsUpdate } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const surveyId = useSurveyId()
   const ownerUuid = Record.getOwnerUuid(record)
@@ -36,14 +40,14 @@ export const RecordOwnerColumn = (props) => {
   )
 
   const onChange = useCallback(
-    async (selectedOwner) => {
+    (selectedOwner) => {
       const selectedOwnerUuid = User.getUuid(selectedOwner)
       if (selectedOwnerUuid !== ownerUuid) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'dataView:records.confirmUpdateRecordOwner',
             params: { ownerName: User.getName(selectedOwner) },
-            onOk: async () => onChangeConfirmed({ selectedOwnerUuid }),
+            onOk: () => onChangeConfirmed({ selectedOwnerUuid }),
           })
         )
       }
@@ -64,9 +68,4 @@ export const RecordOwnerColumn = (props) => {
       renderItemEditing={() => <RecordOwnerDropdown selectedUuid={ownerUuid} onChange={onChange} />}
     />
   )
-}
-
-RecordOwnerColumn.propTypes = {
-  item: PropTypes.object.isRequired,
-  onRecordsUpdate: PropTypes.func,
 }

@@ -57,7 +57,7 @@ export const useConfirmAsync = () => {
       strongConfirmRequiredText = undefined,
       dismissable = true,
     }) =>
-      new Promise((resolve, reject) => {
+      new Promise<boolean>((resolve, reject) => {
         try {
           dispatch(
             DialogConfirmActions.showDialogConfirm({

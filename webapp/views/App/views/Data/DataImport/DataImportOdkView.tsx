@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -15,6 +14,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 
 import { ImportStartButton } from './ImportStartButton'
+import { useAppDispatch } from '@webapp/store'
 
 const fileAccept = { 'application/zip': ['.zip'] }
 
@@ -22,14 +22,14 @@ export const DataImportOdkView = () => {
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const fileMaxSizeMB = useSystemConfigFileUploadLimitMB()
 
   const [cycle, setCycle] = useState(surveyCycle)
   const [file, setFile] = useState(null)
 
   const onJobComplete = useCallback(
-    async (jobCompleted) => {
+    (jobCompleted) => {
       const { submittedCount, skippedCount } = JobSerialized.getResult(jobCompleted)
       dispatch(
         DialogConfirmActions.showDialogConfirm({
@@ -55,7 +55,7 @@ export const DataImportOdkView = () => {
     [dispatch, onJobComplete]
   )
 
-  const onFilesDrop = async (files) => {
+  const onFilesDrop = (files) => {
     setFile(files[0])
   }
 

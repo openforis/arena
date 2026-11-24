@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
@@ -17,7 +15,14 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import { AskAssistantButton } from './AskAssistantButton'
 
-const Row = (props) => {
+type RowProps = {
+  item: Record<string, any>
+  itemPosition: number
+  onRowOpen: (...args: any[]) => any
+  askAssistantAvailable?: boolean
+}
+
+const Row = (props: RowProps) => {
   const { item: row, itemPosition: rowNo, onRowOpen, askAssistantAvailable = false } = props
 
   const lang = useSurveyPreferredLang()
@@ -35,6 +40,7 @@ const Row = (props) => {
       [Record.keys.uuid]: RecordValidationReportItem.getRecordUuid(row),
       [Record.keys.step]: RecordValidationReportItem.getRecordStep(row),
       [Record.keys.ownerUuid]: RecordValidationReportItem.getRecordOwnerUuid(row),
+      [Record.keys.ownerName]: ownerName,
     })
 
   const validation = RecordValidationReportItem.getValidation(row)
@@ -66,13 +72,6 @@ const Row = (props) => {
       )}
     </>
   )
-}
-
-Row.propTypes = {
-  item: PropTypes.object.isRequired,
-  itemPosition: PropTypes.number.isRequired,
-  onRowOpen: PropTypes.func.isRequired,
-  askAssistantAvailable: PropTypes.bool,
 }
 
 export default Row

@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { UUIDs } from '@openforis/arena-core'
 
@@ -20,6 +19,7 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 import { defaultChunkSize, FileUploadChunkSizeDropdown } from './FileUploadChunkSizeDropdown'
 import { ImportStartButton } from './ImportStartButton'
 import { ArenaImportPreviewDialog } from './ArenaImportPreviewDialog'
+import { useAppDispatch } from '@webapp/store'
 
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
@@ -34,7 +34,7 @@ const importSummaryItemKeys = new Set([
 ])
 const importSummaryItemKeysExcludedIfEmpty = new Set([missingFilesSummaryItemKey])
 
-const generateImportSummary = ({ result, i18n }) =>
+const generateImportSummary = ({ result, i18n }: { result: Record<string, number>; i18n: any }) =>
   Object.entries(result)
     .filter(
       ([key, value]) => importSummaryItemKeys.has(key) && (!importSummaryItemKeysExcludedIfEmpty.has(key) || value > 0)
@@ -49,7 +49,7 @@ const generateImportSummary = ({ result, i18n }) =>
 export const DataImportArenaView = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const fileMaxSizeMB = useSystemConfigFileUploadLimitMB()
 
   const [state, setState] = useState({
@@ -64,7 +64,7 @@ export const DataImportArenaView = () => {
   const { conflictResolutionStrategy, file, fileId, chunkSize, skipMissingFiles, previewItems } = state
 
   const onImportJobComplete = useCallback(
-    async (jobCompleted) => {
+    (jobCompleted) => {
       setState((state) => ({ ...state, file: null, fileId: null, previewItems: null }))
       const result = JobSerialized.getResult(jobCompleted)
       const summary = generateImportSummary({ result, i18n })
@@ -136,7 +136,7 @@ export const DataImportArenaView = () => {
     [dispatch, onPreviewJobComplete]
   )
 
-  const onFilesDrop = useCallback(async (files) => {
+  const onFilesDrop = useCallback((files) => {
     const _file = files.find((file) => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)

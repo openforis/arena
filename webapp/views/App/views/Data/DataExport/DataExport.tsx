@@ -1,9 +1,7 @@
 import './DataExport.scss'
 
 import { useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -14,6 +12,7 @@ import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import { DataExportOptionsPanel } from './DataExportOptionsPanel'
 import { dataExportOptions, defaultDataExportOptionsSelection } from './dataExportOptions'
+import { useAppDispatch } from '@webapp/store'
 
 const sources = {
   allRecords: 'allRecords',
@@ -21,12 +20,18 @@ const sources = {
   selectedRecords: 'selectedRecords',
 }
 
-const DataExport = (props) => {
+type DataExportProps = {
+  recordUuids?: any[]
+  search?: string
+  sourceSelectionAvailable?: boolean
+}
+
+const DataExport = (props: DataExportProps) => {
   const { recordUuids = null, search = null, sourceSelectionAvailable = false } = props
 
   const selectedRecordsCount = recordUuids?.length ?? 0
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [state, setState] = useState({
     selectedOptionsByKey: defaultDataExportOptionsSelection,
@@ -55,7 +60,7 @@ const DataExport = (props) => {
     )
 
   const availableSources = useMemo(() => {
-    const _availableSources = [
+    const _availableSources: { key: string; label: string; labelParams?: Record<string, unknown> }[] = [
       {
         key: sources.allRecords,
         label: `dataView:dataExport.source.allRecords`,
@@ -97,12 +102,6 @@ const DataExport = (props) => {
       />
     </div>
   )
-}
-
-DataExport.propTypes = {
-  recordUuids: PropTypes.array,
-  search: PropTypes.string,
-  sourceSelectionAvailable: PropTypes.bool,
 }
 
 export default DataExport

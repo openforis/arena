@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
+import type { ArenaRecord } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 
@@ -11,11 +11,19 @@ import { RecordActions } from '@webapp/store/ui/record'
 import { ButtonIconDelete } from '@webapp/components'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
+import { useAppDispatch } from '@webapp/store'
 
-export const RecordDeleteButton = (props) => {
+type RecordDeleteButtonProps = {
+  categoryItemsByCodeDefUuid?: { [codeDefUuid: string]: any[] } | null
+  onRecordsUpdate?: () => void
+  record: ArenaRecord
+  testId?: string
+}
+
+export const RecordDeleteButton = (props: RecordDeleteButtonProps) => {
   const { categoryItemsByCodeDefUuid, onRecordsUpdate, record, testId } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()

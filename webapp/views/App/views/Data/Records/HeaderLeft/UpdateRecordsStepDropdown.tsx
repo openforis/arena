@@ -1,6 +1,3 @@
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
-
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 
@@ -11,6 +8,7 @@ import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webap
 import * as API from '@webapp/service/api'
 
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useAppDispatch } from '@webapp/store'
 
 export const updateTypes = {
   promoteAllRecordsToCleansing: 'promoteAllRecordsToCleansing',
@@ -33,9 +31,14 @@ const toStepByKey = {
   [updateTypes.demoteAllRecordsFromCleansing]: RecordStep.stepNames.entry,
 }
 
-export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
+type UpdateRecordsStepDropdownProps = {
+  onRecordsUpdate: (...args: any[]) => any
+  records: any[]
+}
+
+export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }: UpdateRecordsStepDropdownProps) => {
   const i18n = useI18n()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
 
@@ -51,7 +54,7 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
 
     if (count === 0) {
       dispatch(
-        NotificationActions.showNotification({
+        NotificationActions.notifyInfo({
           key: 'dataView:records.noSelectedRecordsInStep',
           params: { step: stepFromLabel },
         })
@@ -98,9 +101,4 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
       selection={null}
     />
   )
-}
-
-UpdateRecordsStepDropdown.propTypes = {
-  onRecordsUpdate: PropTypes.func.isRequired,
-  records: PropTypes.array.isRequired,
 }
