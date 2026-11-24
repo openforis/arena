@@ -2,16 +2,16 @@ import { createContext, ReactNode, useCallback, useContext, useMemo, useState } 
 
 import { SortOrder } from '@core/sortOrder'
 
+import type { MapPointProperties } from '../common/mapPointTypes'
+
+// point of a layer listed in the panel (geo attribute or sampling point): record and parent only for geo attributes
 export type MapLayerPoint = {
-  geometry: {
-    coordinates: [number, number]
-  }
-  properties: {
-    key: string
+  geometry: { coordinates: number[] }
+  properties: MapPointProperties & {
     ancestorsKeys: string[]
-    parentUuid: string
-    recordUuid: string
-    recordOwnerUuid: string
+    parentUuid?: string
+    recordUuid?: string
+    recordOwnerUuid?: string
   }
 }
 
@@ -46,7 +46,7 @@ const compareAncestorsKeys = (keysA: string[], keysB: string[]): number => {
   return keysA.length - keysB.length
 }
 
-export const applySortOrder = (points: MapLayerPoint[], sortOrder: MapSortOrder): MapLayerPoint[] => {
+export const applySortOrder = <P extends MapLayerPoint>(points: P[], sortOrder: MapSortOrder): P[] => {
   if (sortOrder === 'none') return points
   return [...points].sort((a, b) => {
     const cmp = compareAncestorsKeys(a.properties.ancestorsKeys, b.properties.ancestorsKeys)

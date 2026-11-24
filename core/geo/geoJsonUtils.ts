@@ -21,10 +21,10 @@ const countVertices = (geoJsonOrGeometry: { type?: string; geometry?: unknown })
   return (coords?.coordinates?.[0] as unknown[] | undefined)?.length ?? 0
 }
 
-const createPointFeature = ({ x, y, properties }: { x: number; y: number; properties: Record<string, unknown> }) => ({
-  type: Type.Feature,
+const createPointFeature = <P extends object>({ x, y, properties }: { x: number; y: number; properties: P }) => ({
+  type: 'Feature' as const,
   geometry: {
-    type: 'Point',
+    type: 'Point' as const,
     coordinates: [x, y],
   },
   properties,

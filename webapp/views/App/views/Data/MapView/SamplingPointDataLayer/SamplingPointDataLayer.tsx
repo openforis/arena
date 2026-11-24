@@ -1,13 +1,24 @@
 import { useCallback, useMemo } from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
+import {
+  isMapClusterFeature,
+  type CreateRecordFromSamplingPointDataItem,
+  type RecordEditClickHandler,
+} from '../common/mapPointTypes'
 
-export const SamplingPointDataLayer = (props) => {
+type SamplingPointDataLayerProps = {
+  levelIndex?: number
+  markersColor: string
+  createRecordFromSamplingPointDataItem: CreateRecordFromSamplingPointDataItem
+  onRecordEditClick: RecordEditClickHandler
+}
+
+export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
   const { levelIndex = 0, markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
 
   const {
@@ -39,7 +50,7 @@ export const SamplingPointDataLayer = (props) => {
     setMarkerByKey,
   } = useFlyToPoint({ points: sortedPoints, onRecordEditClick })
 
-  const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
+  const onMarkerPopupOpen = useCallback((key: string) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
   useLayerRegistration({ active: isLayerActive, layerKey, layerName: overlayInnerName, points, flyToPoint })
@@ -49,10 +60,7 @@ export const SamplingPointDataLayer = (props) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item
-          const { cluster: isCluster, itemUuid } = cluster.properties
-
-          // we have a cluster to render
-          if (isCluster) {
+          if (isMapClusterFeature(cluster)) {
             return (
               <ClusterMarker
                 key={cluster.id}
@@ -70,7 +78,7 @@ export const SamplingPointDataLayer = (props) => {
           // we have a single point (sampling point item) to render
           return (
             <SamplingPointDataMarker
-              key={itemUuid}
+              key={cluster.properties.itemUuid}
               createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
               flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
@@ -105,11 +113,4 @@ export const SamplingPointDataLayer = (props) => {
       </LayerGroup>
     </LayersControl.Overlay>
   )
-}
-
-SamplingPointDataLayer.propTypes = {
-  levelIndex: PropTypes.number,
-  markersColor: PropTypes.any.isRequired,
-  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
-  onRecordEditClick: PropTypes.func.isRequired,
 }

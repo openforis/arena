@@ -1,11 +1,16 @@
-import PropTypes from 'prop-types'
+import type React from 'react'
 
 import { Colors } from '@webapp/utils/colors'
 import { Tooltip } from 'react-leaflet'
 
 const tooltipOpacity = 0.8
 
-export const MarkerTooltip = (props) => {
+type MarkerTooltipProps = {
+  color: string
+  children: React.ReactNode
+}
+
+export const MarkerTooltip = (props: MarkerTooltipProps) => {
   const { children, color } = props
 
   const tooltipEventHandlers = {
@@ -32,9 +37,4 @@ export const MarkerTooltip = (props) => {
       {children}
     </Tooltip>
   )
-}
-
-MarkerTooltip.propTypes = {
-  color: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
 }

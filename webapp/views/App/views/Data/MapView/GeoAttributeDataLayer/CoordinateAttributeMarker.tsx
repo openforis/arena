@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react'
 import { CircleMarker, GeoJSON } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as ObjectUtils from '@core/objectUtils'
@@ -10,11 +9,36 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
+import type {
+  GeoAttributePointFeature,
+  GeoAttributePopupRenderer,
+  MapPointMarker,
+  RecordEditClickHandler,
+  SetMarkerByKey,
+} from '../common/mapPointTypes'
 
 const markerRadius = 10
 const fillOpacity = 0.5
 
-export const CoordinateAttributeMarker = (props) => {
+type CoordinateAttributeMarkerProps = {
+  attributeDef: ArenaAnyNodeDef
+  data: GeoAttributePointFeature
+  flyToPoint?: FlyToPointFunction<GeoAttributePointFeature>
+  flyToNextPoint?: FlyToPointFunction<GeoAttributePointFeature>
+  flyToPreviousPoint?: FlyToPointFunction<GeoAttributePointFeature>
+  markersColor?: string
+  onPopupClose?: () => void
+  onPopupOpen?: (key: string) => void
+  onRecordEditClick?: RecordEditClickHandler
+  popupOpen?: boolean
+  renderPopup?: GeoAttributePopupRenderer | null
+  setMarkerByKey?: SetMarkerByKey
+}
+
+export const CoordinateAttributeMarker = (props: CoordinateAttributeMarkerProps) => {
   const {
     attributeDef,
     data,
@@ -76,7 +100,7 @@ export const CoordinateAttributeMarker = (props) => {
   )
 
   const setRef = useCallback(
-    (ref) => {
+    (ref: MapPointMarker | null) => {
       markerRef.current = ref
       setMarkerByKey({ key, marker: ref })
     },
@@ -120,19 +144,4 @@ export const CoordinateAttributeMarker = (props) => {
       )}
     </div>
   )
-}
-
-CoordinateAttributeMarker.propTypes = {
-  attributeDef: PropTypes.any,
-  data: PropTypes.any,
-  flyToPoint: PropTypes.func,
-  flyToNextPoint: PropTypes.func,
-  flyToPreviousPoint: PropTypes.func,
-  markersColor: PropTypes.any,
-  onPopupClose: PropTypes.func,
-  onPopupOpen: PropTypes.func,
-  onRecordEditClick: PropTypes.any,
-  popupOpen: PropTypes.bool,
-  renderPopup: PropTypes.func,
-  setMarkerByKey: PropTypes.func,
 }

@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
@@ -14,6 +13,12 @@ import { useAuthCanCreateRecord } from '@webapp/store/user'
 
 import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
+import type {
+  CreateRecordFromSamplingPointDataItem,
+  RecordEditClickHandler,
+  SamplingPointFeature,
+} from '../common/mapPointTypes'
 
 const generateContent = ({ i18n, itemCodes, locationPoint, elevation }) => {
   const levelCodesList = itemCodes
@@ -26,7 +31,15 @@ ${levelCodesList}
 ${locationSummary}`
 }
 
-export const SamplingPointDataItemPopup = (props) => {
+type SamplingPointDataItemPopupProps = {
+  createRecordFromSamplingPointDataItem: CreateRecordFromSamplingPointDataItem
+  flyToNextPoint: FlyToPointFunction<SamplingPointFeature>
+  flyToPreviousPoint: FlyToPointFunction<SamplingPointFeature>
+  pointFeature: SamplingPointFeature
+  onRecordEditClick: RecordEditClickHandler
+}
+
+export const SamplingPointDataItemPopup = (props: SamplingPointDataItemPopupProps) => {
   const { createRecordFromSamplingPointDataItem, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } =
     props
 
@@ -98,12 +111,4 @@ export const SamplingPointDataItemPopup = (props) => {
       </div>
     </Popup>
   )
-}
-
-SamplingPointDataItemPopup.propTypes = {
-  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
-  flyToNextPoint: PropTypes.func.isRequired,
-  flyToPreviousPoint: PropTypes.func.isRequired,
-  pointFeature: PropTypes.any.isRequired,
-  onRecordEditClick: PropTypes.func.isRequired,
 }

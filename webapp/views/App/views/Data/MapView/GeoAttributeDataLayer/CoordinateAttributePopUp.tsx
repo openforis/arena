@@ -2,9 +2,8 @@ import './CoordinateAttributePopUp.scss'
 
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
-import PropTypes from 'prop-types'
 
-import { PointFactory } from '@openforis/arena-core'
+import { PointFactory, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -24,6 +23,8 @@ import * as API from '@webapp/service/api'
 import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
 import { WhispMenuButton } from './WhispMenuButton'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
+import type { GeoAttributePointFeature, RecordEditClickHandler } from '../common/mapPointTypes'
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -58,7 +59,15 @@ ${locationSummary}
   return content
 }
 
-export const CoordinateAttributePopUp = (props) => {
+type CoordinateAttributePopUpProps = {
+  attributeDef: ArenaAnyNodeDef
+  pointFeature: GeoAttributePointFeature
+  onRecordEditClick: RecordEditClickHandler
+  flyToNextPoint: FlyToPointFunction<GeoAttributePointFeature>
+  flyToPreviousPoint: FlyToPointFunction<GeoAttributePointFeature>
+}
+
+export const CoordinateAttributePopUp = (props: CoordinateAttributePopUpProps) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
 
   const { recordUuid, recordOwnerUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
@@ -170,12 +179,4 @@ export const CoordinateAttributePopUp = (props) => {
       </div>
     </Popup>
   )
-}
-
-CoordinateAttributePopUp.propTypes = {
-  attributeDef: PropTypes.any.isRequired,
-  pointFeature: PropTypes.any.isRequired,
-  onRecordEditClick: PropTypes.func.isRequired,
-  flyToNextPoint: PropTypes.func.isRequired,
-  flyToPreviousPoint: PropTypes.func.isRequired,
 }

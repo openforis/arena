@@ -1,8 +1,18 @@
 import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 import { useEffect, useRef } from 'react'
 
-export const useLayerMarker = ({ key, popupOpen, setMarkerByKey }) => {
-  const markerRef = useRef(null)
+import type { MapPointMarker, SetMarkerByKey } from './mapPointTypes'
+
+export const useLayerMarker = ({
+  key,
+  popupOpen,
+  setMarkerByKey,
+}: {
+  key: string
+  popupOpen?: boolean
+  setMarkerByKey?: SetMarkerByKey
+}) => {
+  const markerRef = useRef<MapPointMarker | null>(null)
 
   const options = useMapContextOptions()
   const { showMarkersLabels, showLocationMarkers } = options
