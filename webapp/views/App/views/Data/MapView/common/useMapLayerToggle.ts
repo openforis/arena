@@ -9,7 +9,17 @@ import { useMapEvents } from 'react-leaflet'
  * @param {() => void} [params.onRemove] - Called when the overlay is unchecked.
  * @returns {void}
  */
-export const useMapLayerToggle = ({ layerName, layerKey, onAdd, onRemove }) => {
+export const useMapLayerToggle = ({
+  layerName,
+  layerKey,
+  onAdd,
+  onRemove,
+}: {
+  layerName: string
+  layerKey?: string
+  onAdd?: () => void
+  onRemove?: () => void
+}) => {
   const matchesLayer = (eventName) => (layerKey ? eventName.includes(layerKey) : eventName === layerName)
 
   useMapEvents({

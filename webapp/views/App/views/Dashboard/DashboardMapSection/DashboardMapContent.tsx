@@ -46,7 +46,7 @@ export const DashboardMapContent = () => {
 
   const layers = useMemo(
     () =>
-      geoAttributeDefs.map((attributeDef: unknown, index: number) => (
+      geoAttributeDefs.map((attributeDef: ArenaAnyNodeDef, index: number) => (
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}

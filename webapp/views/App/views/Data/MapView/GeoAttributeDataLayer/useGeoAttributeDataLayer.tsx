@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 
@@ -19,6 +18,12 @@ import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../commo
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 import { fitLayerBounds } from './fitLayerBounds'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
+import type {
+  GeoAttributePointFeature,
+  GeoAttributePointsFilter,
+  GeoAttributePointsLoadedHandler,
+} from '../common/mapPointTypes'
+import { useAppDispatch } from '@webapp/store'
 
 const onGeoJsonDataExportComplete =
   ({ surveyId }) =>
@@ -32,7 +37,18 @@ const onGeoJsonDataExportComplete =
     window.open(earthMapUrl, '_blank')
   }
 
-export const useGeoAttributeDataLayer = (props) => {
+type UseGeoAttributeDataLayerProps = {
+  activationKey?: string | null
+  attributeDef: ArenaAnyNodeDef
+  markersColor?: string
+  editingRecordUuid?: string | null
+  checked?: boolean
+  fitOnActivation?: boolean
+  onPointsLoaded?: GeoAttributePointsLoadedHandler | null
+  pointsFilter?: GeoAttributePointsFilter | null
+}
+
+export const useGeoAttributeDataLayer = (props: UseGeoAttributeDataLayerProps) => {
   const {
     activationKey = null,
     attributeDef,
@@ -46,7 +62,7 @@ export const useGeoAttributeDataLayer = (props) => {
 
   const attributeDefUuid = NodeDef.getUuid(attributeDef)
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const survey = useSurvey()
@@ -58,8 +74,8 @@ export const useGeoAttributeDataLayer = (props) => {
     query: Query.create(),
     data: null,
     editedRecordQuery: Query.create(),
-    points: [],
-    pointIndexByDataIndex: [],
+    points: [] as GeoAttributePointFeature[],
+    pointIndexByDataIndex: [] as number[],
   })
 
   const nodeDefParent = useMemo(
