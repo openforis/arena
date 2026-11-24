@@ -1,17 +1,20 @@
 import axios from 'axios'
 
-export const getCurrentInstance = async () => {
-  const { data = {} } = await axios.get('/api/rstudio')
+const getUrl = ({ surveyId }: { surveyId: number }): string => `/api/survey/${surveyId}/rstudio`
+
+export const getCurrentInstance = async ({ surveyId }: { surveyId: number }) => {
+  const { data = {} } = await axios.get(getUrl({ surveyId }))
   const { instance = {} } = data
   return instance
 }
 
 // CREATE
-export const createInstance = async () => {
-  const { data = {} } = await axios.post('/api/rstudio')
+export const createInstance = async ({ surveyId }: { surveyId: number }) => {
+  const { data = {} } = await axios.post(getUrl({ surveyId }))
   const { instanceId = false, rStudioProxyUrl = false } = data
   return { instanceId, rStudioProxyUrl }
 }
 
 // DELETE
-export const terminateInstance = ({ instanceId }) => axios.delete('/api/rstudio', { params: { instanceId } })
+export const terminateInstance = ({ surveyId, instanceId }: { surveyId: number; instanceId: string }) =>
+  axios.delete(getUrl({ surveyId }), { params: { instanceId } })
