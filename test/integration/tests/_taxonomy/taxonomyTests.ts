@@ -50,7 +50,7 @@ afterAll(async () => {
 export const taxonomyTests = async () => {
   const { survey } = getContext()
   const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId({ surveyId: Survey.getId(survey), draft: true })
-  expect(taxonomies.length).toBe(1)
+  expect(taxonomies).toHaveLength(1)
   const taxonomy = A.head(taxonomies)
   expect(Taxonomy.getName(taxonomy)).toBe(taxonomyNameDefault)
 
@@ -181,7 +181,7 @@ export const taxonomyImportNewTest = async () => {
     taxonomyUuid,
     draft: true,
   })
-  expect(taxa.length).toBe(14 /* 12 items + Unlisted + Unknown */)
+  expect(taxa).toHaveLength(14 /* 12 items + Unlisted + Unknown */)
 
   // Check that all taxon props have been imported
   {

@@ -23,6 +23,6 @@ describe('scheduler cluster lock', () => {
     ])
 
     expect(runCount).toBe(1)
-    expect(results.filter(Boolean).length).toBe(1)
+    expect(results.filter(Boolean)).toHaveLength(1)
   })
 })
