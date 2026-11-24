@@ -3,11 +3,9 @@ import shp from 'shpjs'
 
 import { ZipUtils } from '@webapp/utils/zipUtils'
 
-// side effect: defines L.KML
-import '../../L.KML'
+import { toKmlLayer } from '../../kmlLayer'
 import { getUploadedFileKind, type UploadedFileKind } from './uploadedFiles'
 
-type KmlLayerConstructor = new (kml: Document) => L.FeatureGroup
 type ZipEntry = { async: (type: 'string') => Promise<string> }
 type GeoJsonInput = Parameters<typeof L.geoJSON>[0]
 
@@ -20,7 +18,7 @@ const formatPropertyValue = (value: unknown): string =>
   value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value as string | number | boolean)
 
 /**
- * Binds a popup with the properties of a feature as plain text (the file comes from the user; KML popups are sanitized in L.KML).
+ * Binds a popup with the properties of a feature as plain text (the file comes from the user; KML popups are sanitized in kmlLayer).
  * @param {object} feature - The GeoJSON feature.
  * @param {L.Layer} layer - The layer of the feature.
  * @returns {void}
@@ -43,18 +41,6 @@ const bindPropertiesPopup = (feature: { properties?: Record<string, unknown> | n
  * @returns {L.GeoJSON} The layer.
  */
 const toGeoJsonLayer = (data: GeoJsonInput): L.GeoJSON => L.geoJSON(data, { onEachFeature: bindPropertiesPopup })
-
-/**
- * Builds a layer from KML text.
- * @param {string} text - The KML text.
- * @returns {L.Layer} The layer.
- */
-const toKmlLayer = (text: string): L.Layer => {
-  const xml = new DOMParser().parseFromString(text, 'text/xml')
-  if (xml.getElementsByTagName('parsererror').length > 0) throw new Error('invalid KML')
-  const KmlLayer = (L as unknown as { KML: KmlLayerConstructor }).KML
-  return new KmlLayer(xml)
-}
 
 /**
  * Reads the KML files inside a KMZ file.
