@@ -35,7 +35,10 @@ const describeContext = (ctx) =>
  * @param {Error} [outcome.error] - Error, when the call failed or was aborted.
  * @returns {void}
  */
-export const record = (ctx, { latencyMs, usage, error }) => {
+export const record = (
+  ctx,
+  { latencyMs, usage, error }: { latencyMs: number; usage?: unknown; error?: unknown }
+): void => {
   if (error) {
     logger.error(`fail ${describeContext(ctx)} latencyMs=${latencyMs}`)
     return
