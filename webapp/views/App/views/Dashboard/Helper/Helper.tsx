@@ -93,7 +93,11 @@ const LinkWithIcon = ({ to, iconLeft, iconRight, children }: LinkWithIconProps) 
   </Link>
 )
 
-const FirstTimeHelp = ({ firstTimeHelp }) => {
+type FirstTimeHelpProps = {
+  firstTimeHelp: string
+}
+
+const FirstTimeHelp = ({ firstTimeHelp }: FirstTimeHelpProps) => {
   const HelperComponent = HelpersByType[firstTimeHelp]
   return <HelperComponent />
 }
