@@ -42,7 +42,7 @@ afterAll(async () => {
   }
 })
 
-const _updateTaxonWithNewVernacularNames = async (taxonCode, lang, names) =>
+const _updateTaxonWithNewVernacularNames = (taxonCode, lang, names) =>
   TaxonomyUtils.updateTaxonWithNewVernacularNames(
     getContextUser(),
     Survey.getId(survey),
@@ -52,7 +52,7 @@ const _updateTaxonWithNewVernacularNames = async (taxonCode, lang, names) =>
     names
   )
 
-const _publishSurvey = async () => SurveyUtils.publishSurvey(getContextUser(), Survey.getId(survey))
+const _publishSurvey = () => SurveyUtils.publishSurvey(getContextUser(), Survey.getId(survey))
 
 export const taxonPublishedUpdateTest = async () => {
   const user = getContextUser()
@@ -66,7 +66,7 @@ export const taxonPublishedUpdateTest = async () => {
   // Update taxon
   const taxonNew = Taxon.newTaxon({
     taxonomyUuid,
-    taxonCode,
+    code: taxonCode,
     family: 'Fabaceae updated',
     genus: 'Albizia updated',
     scientificName: 'Albizia glaberrima updated',

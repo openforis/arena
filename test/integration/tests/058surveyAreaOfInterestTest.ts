@@ -1,8 +1,9 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { db } from '@server/db/db'
 import os from 'node:os'
 import path from 'node:path'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, type ArenaSurveyFile } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
@@ -65,11 +66,14 @@ const fetchSurvey = (surveyId) =>
 const evaluate = async ({ survey, record, location }) => {
   const locationNode = RecordUtils.findNodeByPath('report/location')(survey, record)
   const nodesUpdated = { [Node.getUuid(locationNode)]: Node.assocValue(location)(locationNode) }
-  const { record: recordUpdated } = await RecordManager.updateNodesDependents({
-    survey,
-    record: Record.mergeNodes(nodesUpdated)(record),
-    nodes: nodesUpdated,
-  })
+  const { record: recordUpdated } = await RecordManager.updateNodesDependents(
+    {
+      survey,
+      record: Record.mergeNodes(nodesUpdated)(record),
+      nodes: nodesUpdated,
+    },
+    db
+  )
   const valueOf = (nodePath) => Node.getValue(RecordUtils.findNodeByPath(nodePath)(survey, recordUpdated))
   return { distance: valueOf('report/aoi_distance'), areaName: valueOf('report/aoi_name') }
 }
@@ -154,7 +158,9 @@ describe('Survey areas of interest', () => {
       name: 'point.geojson',
       temporary: true,
     })
-    await expect(SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })).rejects.toThrow()
+    await expect(
+      SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile: surveyFile as unknown as ArenaSurveyFile })
+    ).rejects.toThrow()
     expect(await SurveyFileManager.fetchFileSummaryByUuid(surveyId, SurveyFile.getUuid(surveyFile))).toBeNull()
   })
 })

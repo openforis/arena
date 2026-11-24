@@ -70,7 +70,7 @@ const _updateValidationsAndPublish = async ({ nodeDefName, validationsUpdater })
   return _fetchPublishedSurveyAndRecord()
 }
 
-const _updateRemarksRequiredIfAndPublish = async (requiredIf) =>
+const _updateRemarksRequiredIfAndPublish = (requiredIf) =>
   _updateValidationsAndPublish({
     nodeDefName: remarksDefName,
     validationsUpdater: NodeDefValidations.assocRequiredIf(requiredIf),

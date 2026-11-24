@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import type { ArenaUser } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
@@ -10,8 +11,14 @@ import * as RecordUtils from '../../utils/recordUtils'
 
 // Users are built directly (not via getContextUser()) so each test can give them different
 // "extra" props, read by userProp() (@openforis/arena-core Users.getCombinedExtraProps).
-const userA = { uuid: 'test-user-dependent-a', props: { extra: { role: 'role1', level: 'admin' } } }
-const userB = { uuid: 'test-user-dependent-b', props: { extra: { role: 'role2', level: 'other' } } }
+const userA = {
+  uuid: 'test-user-dependent-a',
+  props: { extra: { role: 'role1', level: 'admin' } },
+} as unknown as ArenaUser
+const userB = {
+  uuid: 'test-user-dependent-b',
+  props: { extra: { role: 'role2', level: 'other' } },
+} as unknown as ArenaUser
 
 describe('User dependent node state update', () => {
   test('applicable is recomputed per user, without persisting', async () => {

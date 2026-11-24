@@ -9,7 +9,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
 import { fetchFullContextSurvey } from '../config/context'
 
-const validateExpression = async (survey, nodeDefName, expression) => {
+const validateExpression = (survey, nodeDefName, expression) => {
   const nodeDef = A.pipe(
     Survey.getNodeDefByName(nodeDefName),
     NodeDef.mergePropsAdvanced({

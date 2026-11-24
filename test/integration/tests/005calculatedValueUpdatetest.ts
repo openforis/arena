@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import { db } from '@server/db/db'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
@@ -31,11 +32,14 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
   global.applicableRecord = recordWithSourceUpdated
 
   // Update dependent nodes
-  const { record: recordUpdate } = await RecordManager.updateNodesDependents({
-    survey,
-    record: recordWithSourceUpdated,
-    nodes: nodesUpdated,
-  })
+  const { record: recordUpdate } = await RecordManager.updateNodesDependents(
+    {
+      survey,
+      record: recordWithSourceUpdated,
+      nodes: nodesUpdated,
+    },
+    db
+  )
   global.applicableRecord = recordUpdate
 
   const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, recordUpdate)

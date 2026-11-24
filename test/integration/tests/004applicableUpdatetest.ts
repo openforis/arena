@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import { db } from '@server/db/db'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
@@ -79,11 +80,14 @@ describe('Applicable Test', () => {
       global.applicableRecord = record
 
       // Update dependent nodes
-      const { record: recordUpdate } = /* NOSONAR */ await RecordManager.updateNodesDependents({
-        survey,
-        record,
-        nodes: nodesUpdated,
-      })
+      const { record: recordUpdate } = /* NOSONAR */ await RecordManager.updateNodesDependents(
+        {
+          survey,
+          record,
+          nodes: nodesUpdated,
+        },
+        db
+      )
       record = recordUpdate
       global.applicableRecord = record
 
@@ -95,7 +99,7 @@ describe('Applicable Test', () => {
     }
   })
 
-  test('Applicable evaluated on entity creation', async () => {
+  test('Applicable evaluated on entity creation', () => {
     const survey = global.applicableSurvey
     const record = global.applicableRecord
     const nodeTree = RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]')(survey, record)

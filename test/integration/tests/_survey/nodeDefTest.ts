@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import { getContextSurvey } from '../../config/context'
 
-const fetchRootNodeDef = async () => {
+const fetchRootNodeDef = () => {
   const survey = getContextSurvey()
   return NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
@@ -17,7 +17,7 @@ const createNodeDef = (nodeDefParent, type, name, extraProps = {}) =>
     ...extraProps,
   })
 
-const createAndStoreNodeDef = async (nodeDefParent, type, name, extraProps = {}) => {
+const createAndStoreNodeDef = (nodeDefParent, type, name, extraProps = {}) => {
   const survey = getContextSurvey()
   const nodeDef = createNodeDef(nodeDefParent, type, name, extraProps)
   return NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)

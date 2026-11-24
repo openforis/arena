@@ -148,7 +148,7 @@ export const taxonUpdateTest = async () => {
   expect(Taxon.getProps(taxonReloaded)).toEqual(Taxon.getProps(taxonNew))
 }
 
-const _importFile = async (taxonomyName, importFileName) => {
+const _importFile = (taxonomyName, importFileName) => {
   const { survey } = getContext()
   return TaxonomyUtils.importFile(getContextUser(), Survey.getId(survey), taxonomyName, importFileName)
 }

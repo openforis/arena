@@ -8,14 +8,16 @@ describe('scheduler cluster lock', () => {
     const results = await Promise.all([
       runWithClusterLock({
         lockName,
-        fn: async () => {
+        fn: () => {
           runCount += 1
+          return Promise.resolve()
         },
       }),
       runWithClusterLock({
         lockName,
-        fn: async () => {
+        fn: () => {
           runCount += 1
+          return Promise.resolve()
         },
       }),
     ])
