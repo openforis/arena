@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as AuthGroup from '@core/auth/authGroup'
 import { Authorizer } from '@openforis/arena-core'
 
@@ -10,21 +8,22 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const DropdownUserRole = (props) => {
-  const {
-    disabled = false,
-    editingLoggedUser = false, // True if user being edited is the logged one
-    groupUuid = null,
-    onChange,
-    showOnlySurveyGroups = false,
-    validation,
-  } = props
+type DropdownUserRoleProps = {
+  groupUuid?: any
+  disabled?: boolean
+  validation?: any
+  onChange?: (...args: any[]) => any
+  showOnlySurveyGroups?: boolean
+}
+
+const DropdownUserRole = (props: DropdownUserRoleProps) => {
+  const { disabled = false, groupUuid = null, onChange, showOnlySurveyGroups = false, validation } = props
 
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
 
-  const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo, editingLoggedUser, showOnlySurveyGroups })
+  const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo, showOnlySurveyGroups })
 
   return (
     <Dropdown
@@ -40,15 +39,6 @@ const DropdownUserRole = (props) => {
       validation={validation}
     />
   )
-}
-
-DropdownUserRole.propTypes = {
-  editingLoggedUser: PropTypes.any,
-  groupUuid: PropTypes.any,
-  disabled: PropTypes.bool,
-  validation: PropTypes.any,
-  onChange: PropTypes.func,
-  showOnlySurveyGroups: PropTypes.bool,
 }
 
 export default DropdownUserRole

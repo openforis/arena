@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -13,7 +12,13 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { ButtonSave } from '@webapp/components'
 
-export const UserAuthGroupExtraPropsEditor = (props) => {
+type UserAuthGroupExtraPropsEditorProps = {
+  onChange: (...args: any[]) => any
+  onSave?: (...args: any[]) => any
+  userToUpdate: Record<string, any>
+}
+
+export const UserAuthGroupExtraPropsEditor = (props: UserAuthGroupExtraPropsEditorProps) => {
   const { onChange, onSave, userToUpdate } = props
 
   const canEditSurvey = useAuthCanEditSurvey()
@@ -55,10 +60,4 @@ export const UserAuthGroupExtraPropsEditor = (props) => {
       {onSave && <ButtonSave onClick={onSave} />}
     </div>
   )
-}
-
-UserAuthGroupExtraPropsEditor.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  onSave: PropTypes.func,
-  userToUpdate: PropTypes.object.isRequired,
 }

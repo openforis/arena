@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
 import * as User from '@core/user/user'
 
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyId } from '@webapp/store/survey'
+import { useAppDispatch } from '@webapp/store'
 
 export const useOnSaveExtraProps = ({ userToUpdate }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const surveyId = useSurveyId()
 
   return useCallback(async () => {

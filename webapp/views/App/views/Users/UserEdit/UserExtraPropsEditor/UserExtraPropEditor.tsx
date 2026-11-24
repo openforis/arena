@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
+import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
@@ -9,13 +9,25 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 import { useConfirmAsync } from '@webapp/components/hooks'
 
-const validateExtraProp = async (extraProp, items) =>
+export type UserExtraPropItem = {
+  uuid: string
+  name: string
+  value: string
+  newItem?: boolean
+}
+
+type EditorState = Omit<UserExtraPropItem, 'newItem'> & {
+  editing: boolean
+  validation?: ArenaValidation
+}
+
+const validateExtraProp = (extraProp: UserExtraPropItem, items: UserExtraPropItem[]) =>
   Validator.validate(extraProp, {
     name: [
       Validator.validateRequired(Validation.messageKeys.extraPropEdit.nameRequired),
       Validator.validateName(Validation.messageKeys.extraPropEdit.nameInvalid),
       (_, item) => {
-        const { name, uuid } = item
+        const { name, uuid } = item as UserExtraPropItem
         if (StringUtils.isBlank(name)) return null
         const isDuplicate = items.some((extraProp) => extraProp.name === name && extraProp.uuid !== uuid)
 
@@ -25,7 +37,21 @@ const validateExtraProp = async (extraProp, items) =>
     value: [Validator.validateRequired(Validation.messageKeys.extraPropEdit.valueRequired)],
   })
 
-export const UserExtraPropEditor = (props) => {
+type UserExtraPropEditorProps = {
+  editingItems?: boolean
+  items: UserExtraPropItem[]
+  index: number
+  name?: string
+  newItem?: boolean
+  onDelete: (...args: any[]) => any
+  onEditChange: (...args: any[]) => any
+  onSave: (...args: any[]) => any
+  readOnly?: boolean
+  uuid?: string
+  value?: string
+}
+
+export const UserExtraPropEditor = (props: UserExtraPropEditorProps) => {
   const {
     editingItems,
     items,
@@ -44,7 +70,7 @@ export const UserExtraPropEditor = (props) => {
 
   const initialItem = useMemo(() => ({ name: nameProp, value: valueProp, uuid }), [nameProp, uuid, valueProp])
 
-  const [state, setState] = useState({ ...initialItem, editing: newItem })
+  const [state, setState] = useState<EditorState>({ ...initialItem, editing: newItem })
 
   const { editing, name, validation, value } = state
 
@@ -96,7 +122,7 @@ export const UserExtraPropEditor = (props) => {
     if (newItem) {
       await onDelete(false)
     } else {
-      setState(() => ({ ...initialItem }))
+      setState({ ...initialItem, editing: false })
       onEditChange(false)
     }
   }, [initialItem, newItem, onDelete, onEditChange])
@@ -132,18 +158,4 @@ export const UserExtraPropEditor = (props) => {
       />
     </div>
   )
-}
-
-UserExtraPropEditor.propTypes = {
-  editingItems: PropTypes.bool,
-  items: PropTypes.array.isRequired,
-  index: PropTypes.number.isRequired,
-  name: PropTypes.string,
-  newItem: PropTypes.bool,
-  onDelete: PropTypes.func.isRequired,
-  onEditChange: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
-  uuid: PropTypes.string,
-  value: PropTypes.string,
 }

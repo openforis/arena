@@ -1,8 +1,6 @@
 import './UsersBackup.scss'
 
 import { useCallback, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as DateUtils from '@core/dateUtils'
 import * as User from '@core/user/user'
@@ -33,6 +31,7 @@ import {
   existingUserActions,
   newUserActions,
 } from './UsersBackupImportUsersTable'
+import { useAppDispatch } from '@webapp/store'
 
 const acceptedFiles = { 'application/zip': ['.zip'] }
 
@@ -56,7 +55,7 @@ type ImportPreview = {
 const defaultUserAction = (user: ImportPreviewUser) => (user.existing ? UserAction.skip : UserAction.insert)
 
 const BackupDownloadButton = ({ job }: { job: any }) => {
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const { outputFileName: tempFileName } = job.result
   return (
     <ButtonDownload
@@ -100,7 +99,7 @@ const getEmailsToExport = ({
 }
 
 const UsersBackupExportModal = ({ onClose, selectedUsers }: { onClose: () => void; selectedUsers: any[] }) => {
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const [includePasswords, setIncludePasswords] = useState(true)
   const [scope, setScope] = useState<ExportScopeType>(selectedUsers.length > 0 ? ExportScope.selected : ExportScope.all)
@@ -248,7 +247,7 @@ const UsersBackupImportUsersModal = ({
   onRestored?: () => void
   preview: ImportPreview
 }) => {
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const { tempFileName, info, users } = preview
   const [actionsByEmail, setActionsByEmail] = useState<Record<string, string>>(() =>
