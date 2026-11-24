@@ -203,7 +203,7 @@ export const SurveyDependencyTree = () => {
         ) : (
           <SurveyDependencyTreeChart
             ref={treeRef}
-            data={hierarchy?.root}
+            data={hierarchy.root}
             extraLinksGroups={extraLinksGroups}
             nodeDefLabelType={nodeDefLabelType}
             onNodeClick={onNodeClick}
