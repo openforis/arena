@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -24,7 +23,11 @@ import { Phase2JoinEntitySelector } from './Phase2JoinEntitySelector'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 
-export const ChainSamplingDesignProps = (props) => {
+type ChainSamplingDesignPropsProps = {
+  updateChain: (...args: any[]) => any
+}
+
+export const ChainSamplingDesignProps = (props: ChainSamplingDesignPropsProps) => {
   const { updateChain } = props
 
   const survey = useSurvey()
@@ -131,8 +134,4 @@ export const ChainSamplingDesignProps = (props) => {
       </div>
     </div>
   )
-}
-
-ChainSamplingDesignProps.propTypes = {
-  updateChain: PropTypes.func.isRequired,
 }

@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react'
-import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,6 +11,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
+import { useAppDispatch } from '@webapp/store'
 
 const allowedNodeDefTypes = new Set([NodeDef.nodeDefType.code, NodeDef.nodeDefType.text])
 
@@ -21,7 +21,7 @@ const nodeDefToItem = (nodeDef) => ({
 })
 
 export const Phase2JoinAttributeSelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
   const chain = useChain()

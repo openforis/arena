@@ -1,16 +1,15 @@
-import { useDispatch } from 'react-redux'
-
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { useAppDispatch } from '@webapp/store'
 
 const pValueToItem = (value) => ({ value, label: String(value) })
 
 export const PValueSelector = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const chain = useChain()
   const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
 

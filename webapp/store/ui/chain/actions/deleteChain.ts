@@ -18,7 +18,15 @@ import { ChainActions } from '@webapp/store/ui/chain'
  * @returns {Function} - Redux thunk.
  */
 export const deleteChain =
-  ({ chain, navigate, silent = false }) =>
+  ({
+    chain,
+    navigate,
+    silent = false,
+  }: {
+    chain: { uuid: string }
+    navigate?: (to: string) => void
+    silent?: boolean
+  }) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
