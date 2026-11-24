@@ -1,9 +1,8 @@
-// eslint.config.js
+import type { ESLint } from 'eslint'
+import { defineConfig } from 'eslint/config'
 import globals from 'globals'
-import pluginJs from '@eslint/js'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
-import pluginJsdoc from 'eslint-plugin-jsdoc'
 import pluginTypeScript from '@typescript-eslint/eslint-plugin'
 import parserTypeScript from '@typescript-eslint/parser'
 
@@ -15,35 +14,14 @@ import pluginPlaywright from 'eslint-plugin-playwright' // Used for Playwright T
 import configPrettier from 'eslint-config-prettier'
 import pluginPrettier from 'eslint-plugin-prettier'
 
-export default [
-  // --- CORE CONFIGURATION (APPLIES TO ALL JS/JSX) ---
+// the rule types of these plugins don't match ESLint 10's yet
+const pluginTypeScriptCompat = pluginTypeScript as unknown as ESLint.Plugin
+const pluginReactHooksCompat = pluginReactHooks as unknown as ESLint.Plugin
 
-  // 1. Basic JavaScript Configuration
+export default defineConfig([
+  // 1. TypeScript Configuration
   {
-    ...pluginJs.configs.recommended,
-    files: ['**/*.js', '**/*.jsx'],
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-      globals: {
-        ...globals.browser, // Standard React (browser) globals
-        ...globals.node, // Standard Node.js globals (backend/config files)
-      },
-    },
-    rules: {
-      'no-console': 'warn',
-      'prefer-const': 'error',
-    },
-  },
-
-  // 2. TypeScript Configuration.
-  {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -61,7 +39,7 @@ export default [
       },
     },
     plugins: {
-      '@typescript-eslint': pluginTypeScript,
+      '@typescript-eslint': pluginTypeScriptCompat,
     },
     rules: {
       ...pluginTypeScript.configs.recommended.rules,
@@ -73,12 +51,12 @@ export default [
     },
   },
 
-  // 3. React and React Hooks Configuration (for all JSX files)
+  // 2. React and React Hooks Configuration
   {
-    files: ['**/*.jsx', '**/*.js', '**/*.tsx', '**/*.ts'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
     plugins: {
       react: pluginReact,
-      'react-hooks': pluginReactHooks,
+      'react-hooks': pluginReactHooksCompat,
     },
     settings: {
       // shortcut: 'detect' crashes on ESLint 10, restore it when eslint-plugin-react supports ESLint 10
@@ -99,24 +77,12 @@ export default [
     },
   },
 
-  // 4. JSDoc Configuration
-  {
-    files: ['**/*.js', '**/*.jsx'],
-    plugins: {
-      jsdoc: pluginJsdoc,
-    },
-    rules: {
-      ...pluginJsdoc.configs['recommended-typescript-flavor'].rules,
-      'jsdoc/require-description': 'warn',
-    },
-  },
-
   // --- TESTING CONFIGURATIONS (APPLIES ONLY TO TEST FILES) ---
 
-  // 5. Jest (Unit/Integration Tests) Configuration
+  // 3. Jest (Unit/Integration Tests) Configuration
   {
     // Apply this to files matching Jest naming convention
-    files: ['test/**/*.js', 'test/**/*.ts', '**/*.test.js', '**/*.spec.js', '**/*.test.ts', '**/*.spec.ts'],
+    files: ['test/**/*.ts', 'test/**/*.mts', '**/*.test.ts', '**/*.spec.ts'],
     // e2e tests run with Playwright Test (see below)
     ignores: ['test/e2e/**'],
     plugins: {
@@ -139,7 +105,7 @@ export default [
     },
   },
 
-  // 6. Playwright Test (E2E Tests) Configuration
+  // 4. Playwright Test (E2E Tests) Configuration
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['test/e2e/**/*.ts'],
@@ -157,9 +123,9 @@ export default [
 
   // --- FINAL FORMATTING & IGNORE ---
 
-  // 7. Prettier Integration (Must be the LAST configuration)
+  // 5. Prettier Integration (Must be the LAST configuration)
   {
-    files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
     plugins: {
       prettier: pluginPrettier,
     },
@@ -171,7 +137,7 @@ export default [
     },
   },
 
-  // 8. Ignore Configuration
+  // 6. Ignore Configuration
   {
     ignores: [
       'node_modules/',
@@ -179,7 +145,6 @@ export default [
       'build/',
       '.cache/',
       'coverage/', // Ignore test coverage directories
-      'webapp/components/Map/L.KML.js',
     ],
   },
-]
+])
