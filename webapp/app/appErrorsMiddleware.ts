@@ -80,7 +80,7 @@ const createAxiosMiddleware =
       }
       return config
     })
-    axiosInstance.interceptors.response.use(null, async (error) => {
+    axiosInstance.interceptors.response.use(null, (error) => {
       const originalRequest = error.config ?? {}
       const { url } = originalRequest
 
