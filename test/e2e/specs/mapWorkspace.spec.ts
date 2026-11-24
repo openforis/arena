@@ -76,6 +76,7 @@ const ONE_PIXEL_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   'base64'
 )
+const ONE_PIXEL_PNG_DATA_URL = `data:image/png;base64,${ONE_PIXEL_PNG.toString('base64')}`
 
 /**
  * Locates the rows of the custom overlays in the Layers panel.
@@ -305,6 +306,42 @@ test.describe('Map workspace', () => {
     await expect(popup.locator('b')).toHaveText('bold')
     await expect(popup.locator('[onerror]')).toHaveCount(0)
     expect(await page.evaluate(() => (window as unknown as { kmlXss?: number }).kmlXss)).toBeUndefined()
+  })
+
+  test('an uploaded KML keeps its styles, place icons and rotated ground overlays', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    // KML colors are aabbggrr: ff0000ff is opaque red, 7f00ff00 half transparent green
+    const kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
+<Style id="area"><LineStyle><color>ff0000ff</color><width>4</width></LineStyle><PolyStyle><color>7f00ff00</color></PolyStyle></Style>
+<Style id="pin"><IconStyle><Icon><href>${ONE_PIXEL_PNG_DATA_URL}</href></Icon></IconStyle></Style>
+<Placemark><name>Area</name><styleUrl>#area</styleUrl><Polygon><outerBoundaryIs><LinearRing>
+<coordinates>12,41 13,41 13,42 12,41</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
+<Placemark><name>Pin</name><styleUrl>#pin</styleUrl><Point><coordinates>12.5,41.9,0</coordinates></Point></Placemark>
+<GroundOverlay><name>Scan</name><Icon><href>${ONE_PIXEL_PNG_DATA_URL}</href></Icon>
+<LatLonBox><north>42</north><south>41</south><east>13</east><west>12</west><rotation>30</rotation></LatLonBox></GroundOverlay>
+</Document></kml>`
+    await openMap(page)
+    await page
+      .getByTestId(ids.uploadInput)
+      .setInputFiles({ name: 'styles.kml', mimeType: 'application/vnd.google-earth.kml+xml', buffer: Buffer.from(kml) })
+    await expect(uploadedRows(page)).toHaveCount(1)
+
+    const polygon = page.locator('.leaflet-overlay-pane path.leaflet-interactive')
+    await expect(polygon).toHaveAttribute('stroke', '#ff0000')
+    await expect(polygon).toHaveAttribute('stroke-width', '4')
+    await expect(polygon).toHaveAttribute('fill', '#00ff00')
+
+    // the place icon comes from its style
+    await expect(
+      page.locator(`.leaflet-marker-pane img.leaflet-marker-icon[src="${ONE_PIXEL_PNG_DATA_URL}"]`)
+    ).toHaveCount(1)
+
+    // KML rotations are counterclockwise
+    const overlay = page.locator('.leaflet-overlay-pane img.leaflet-image-layer')
+    await expect(overlay).toHaveAttribute('style', /rotate\(-30deg\)/)
   })
 
   test('unsupported and broken files show a message', async ({ page, sampleSurvey: _ }) => {
