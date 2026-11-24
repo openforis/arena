@@ -1,6 +1,6 @@
 import { latLngBounds } from 'leaflet'
 
-import { PointFactory, Points } from '@openforis/arena-core'
+import { PointFactory, Points, type ArenaAnyNodeDef, type ArenaSRSIndex } from '@openforis/arena-core'
 
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatter'
@@ -9,6 +9,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
+
+import type { GeoAttributePointFeature } from '../common/mapPointTypes'
 
 const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n, survey }) => {
   const recordUuid = dataItem[TableDataNodeDef.columnSet.recordUuid]
@@ -29,7 +31,7 @@ const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysCo
   }
 }
 
-type PointExtractorParams = { attributeDef: any; attributeValue: string; srsIndex: any }
+type PointExtractorParams = { attributeDef: ArenaAnyNodeDef; attributeValue: string; srsIndex: ArenaSRSIndex }
 type PointExtractorResult = { point: { x: number; y: number } | null; properties?: Record<string, unknown> }
 
 const pointExtractorByNodeDefType: Record<string, (params: PointExtractorParams) => PointExtractorResult> = {
@@ -97,8 +99,8 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
     },
     {
       bounds: latLngBounds([]), // keep track of the layer bounds to calculate its center and pan the map into it
-      points: [],
-      pointIndexByDataIndex: [], // data item converted into geojson item can be "null", keep track of it
+      points: [] as GeoAttributePointFeature[],
+      pointIndexByDataIndex: [] as number[], // data item converted into geojson item can be "null", keep track of it
     }
   )
 }

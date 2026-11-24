@@ -1,22 +1,31 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
+import {
+  isMapClusterFeature,
+  type GeoAttributePointsFilter,
+  type GeoAttributePointsLoadedHandler,
+  type GeoAttributePopupRenderer,
+  type RecordEditClickHandler,
+} from '../common/mapPointTypes'
 
 type GeoAttributeDataLayerProps = {
   activationKey?: string // changes on each request to show the layer: it is then shown and zoomed to
-  attributeDef?: any
+  attributeDef: ArenaAnyNodeDef
   checked?: boolean // when true, the layer is selected (and its data fetched) on mount
   fitOnActivation?: boolean // when false, an activation shows the layer without zooming to it
-  markersColor?: any
-  onPointsLoaded?: (...args: any[]) => any // called with ({ layerKey, points }) on every data fetch, before filtering
-  onRecordEditClick?: (...args: any[]) => any
-  pointsFilter?: (...args: any[]) => any // when specified, only the matching points are shown
-  renderPopup?: (...args: any[]) => any // when specified, replaces the default marker popup
+  markersColor?: string
+  onPointsLoaded?: GeoAttributePointsLoadedHandler
+  onRecordEditClick?: RecordEditClickHandler
+  pointsFilter?: GeoAttributePointsFilter // when specified, only the matching points are shown
+  renderPopup?: GeoAttributePopupRenderer // when specified, replaces the default marker popup
 }
 
 export const GeoAttributeDataLayer = (props: GeoAttributeDataLayerProps) => {
@@ -77,7 +86,7 @@ export const GeoAttributeDataLayer = (props: GeoAttributeDataLayerProps) => {
     setMarkerByKey,
   } = useFlyToPoint({ points: sortedPoints, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
 
-  const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
+  const onMarkerPopupOpen = useCallback((key: string) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
   useLayerRegistration({ layerKey, layerName: layerInnerName, points, flyToPoint })
@@ -87,10 +96,7 @@ export const GeoAttributeDataLayer = (props: GeoAttributeDataLayerProps) => {
       <LayerGroup ref={layerGroupRef}>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a node value point
-          const { cluster: isCluster, key } = cluster.properties
-
-          // we have a cluster to render
-          if (isCluster) {
+          if (isMapClusterFeature(cluster)) {
             return (
               <ClusterMarker
                 key={cluster.id}
@@ -109,7 +115,7 @@ export const GeoAttributeDataLayer = (props: GeoAttributeDataLayerProps) => {
           // we have a single point (node value) to render
           return (
             <CoordinateAttributeMarker
-              key={key}
+              key={cluster.properties.key}
               attributeDef={attributeDef}
               data={cluster}
               flyToPoint={flyToPoint}

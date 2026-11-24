@@ -3,7 +3,7 @@ import './CoordinateAttributePopUp.scss'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 
-import { PointFactory } from '@openforis/arena-core'
+import { PointFactory, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -24,6 +24,7 @@ import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
 import { WhispMenuButton } from './WhispMenuButton'
 import type { FlyToPointFunction } from '../common/useFlyToPoint'
+import type { GeoAttributePointFeature, RecordEditClickHandler } from '../common/mapPointTypes'
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -59,11 +60,11 @@ ${locationSummary}
 }
 
 type CoordinateAttributePopUpProps = {
-  attributeDef: any
-  pointFeature: any
-  onRecordEditClick: (...args: any[]) => any
-  flyToNextPoint: FlyToPointFunction
-  flyToPreviousPoint: FlyToPointFunction
+  attributeDef: ArenaAnyNodeDef
+  pointFeature: GeoAttributePointFeature
+  onRecordEditClick: RecordEditClickHandler
+  flyToNextPoint: FlyToPointFunction<GeoAttributePointFeature>
+  flyToPreviousPoint: FlyToPointFunction<GeoAttributePointFeature>
 }
 
 export const CoordinateAttributePopUp = (props: CoordinateAttributePopUpProps) => {

@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type L from 'leaflet'
 import { Marker, Popup, useMap } from 'react-leaflet'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 
-type ClusteredPointsPopupProps = {
-  clusteredPoints: any[]
-  openPopupOfPoint: (...args: any[]) => any
-  pointLabelFunction: (...args: any[]) => any
+import type { ClusterIconCreator, MapClusterFeature, MapPointFeature, MapPointProperties } from './mapPointTypes'
+
+type ClusteredPointsPopupProps<P extends MapPointProperties> = {
+  clusteredPoints: MapPointFeature<P>[]
+  openPopupOfPoint: (point: MapPointFeature<P>) => void
+  pointLabelFunction: (point: MapPointFeature<P>) => string
 }
 
-const ClusteredPointsPopup = (props: ClusteredPointsPopupProps) => {
+const ClusteredPointsPopup = <P extends MapPointProperties>(props: ClusteredPointsPopupProps<P>) => {
   const { clusteredPoints, openPopupOfPoint, pointLabelFunction } = props
 
   return (
@@ -36,18 +39,19 @@ const ClusteredPointsPopup = (props: ClusteredPointsPopupProps) => {
   )
 }
 
-type ClusterMarkerProps = {
-  cluster: Record<string, any>
-  clusterExpansionZoomExtractor: (...args: any[]) => any
-  clusterIconCreator: (...args: any[]) => any
+type ClusterMarkerProps<P extends MapPointProperties> = {
+  cluster: MapClusterFeature
+  clusterExpansionZoomExtractor: (cluster: MapClusterFeature) => number
+  clusterIconCreator: ClusterIconCreator
   color: string
-  getClusterLeaves: (...args: any[]) => any
-  openPopupOfPoint: (...args: any[]) => any
-  pointLabelFunction: (...args: any[]) => any
+  getClusterLeaves: (cluster: MapClusterFeature) => MapPointFeature<P>[]
+  openPopupOfPoint: (point: MapPointFeature<P>) => void
+  // label of a point in the list of the clustered points
+  pointLabelFunction: (point: MapPointFeature<P>) => string
   totalPoints: number
 }
 
-export const ClusterMarker = (props: ClusterMarkerProps) => {
+export const ClusterMarker = <P extends MapPointProperties>(props: ClusterMarkerProps<P>) => {
   const {
     cluster,
     clusterExpansionZoomExtractor,
@@ -67,8 +71,8 @@ export const ClusterMarker = (props: ClusterMarkerProps) => {
 
   const position = useMemo((): [number, number] => [latitude, longitude], [latitude, longitude])
 
-  const markerRef = useRef(null)
-  const [clusteredPoints, setClusteredPoints] = useState([])
+  const markerRef = useRef<L.Marker>(null)
+  const [clusteredPoints, setClusteredPoints] = useState<MapPointFeature<P>[]>([])
 
   const options = useMapContextOptions()
   const { showLocationMarkers } = options

@@ -17,7 +17,8 @@ const labels = {
 }
 
 type WhispMenuButtonProps = {
-  geoJsonGenerator: (...args: any[]) => any
+  // generates the GeoJSON sent to Whisp (the polygon of the point)
+  geoJsonGenerator: () => unknown
 }
 
 export const WhispMenuButton = (props: WhispMenuButtonProps) => {

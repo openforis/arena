@@ -9,24 +9,33 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import type { FlyToPointFunction } from '../common/useFlyToPoint'
+import type {
+  GeoAttributePointFeature,
+  GeoAttributePopupRenderer,
+  MapPointMarker,
+  RecordEditClickHandler,
+  SetMarkerByKey,
+} from '../common/mapPointTypes'
 
 const markerRadius = 10
 const fillOpacity = 0.5
 
 type CoordinateAttributeMarkerProps = {
-  attributeDef?: any
-  data?: any
-  flyToPoint?: FlyToPointFunction
-  flyToNextPoint?: FlyToPointFunction
-  flyToPreviousPoint?: FlyToPointFunction
-  markersColor?: any
-  onPopupClose?: (...args: any[]) => any
-  onPopupOpen?: (...args: any[]) => any
-  onRecordEditClick?: any
+  attributeDef: ArenaAnyNodeDef
+  data: GeoAttributePointFeature
+  flyToPoint?: FlyToPointFunction<GeoAttributePointFeature>
+  flyToNextPoint?: FlyToPointFunction<GeoAttributePointFeature>
+  flyToPreviousPoint?: FlyToPointFunction<GeoAttributePointFeature>
+  markersColor?: string
+  onPopupClose?: () => void
+  onPopupOpen?: (key: string) => void
+  onRecordEditClick?: RecordEditClickHandler
   popupOpen?: boolean
-  renderPopup?: (...args: any[]) => any
-  setMarkerByKey?: (...args: any[]) => any
+  renderPopup?: GeoAttributePopupRenderer | null
+  setMarkerByKey?: SetMarkerByKey
 }
 
 export const CoordinateAttributeMarker = (props: CoordinateAttributeMarkerProps) => {
@@ -91,7 +100,7 @@ export const CoordinateAttributeMarker = (props: CoordinateAttributeMarkerProps)
   )
 
   const setRef = useCallback(
-    (ref) => {
+    (ref: MapPointMarker | null) => {
       markerRef.current = ref
       setMarkerByKey({ key, marker: ref })
     },

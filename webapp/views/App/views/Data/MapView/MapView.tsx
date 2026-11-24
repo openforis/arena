@@ -2,6 +2,7 @@ import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
+import type { ArenaAnyNodeDef, ArenaCategoryLevel, ArenaSurvey } from '@openforis/arena-core'
 
 import { isHexColor } from '@core/colorUtils'
 import * as Survey from '@core/survey/survey'
@@ -27,8 +28,7 @@ import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
-import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
-import type { ActiveLayer } from './MapLayersPanel/MapLayersPanelContext'
+import { useMapLayersPanel, type ActiveLayer } from './MapLayersPanel/MapLayersPanelContext'
 import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
 
 type LayerGroup = {
@@ -95,7 +95,7 @@ const getGeoAttributeLayerMarkersColor = ({
   attributeDef,
   defaultColor,
 }: {
-  attributeDef: any
+  attributeDef: ArenaAnyNodeDef
   defaultColor: string
 }): string => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
@@ -104,7 +104,7 @@ const getGeoAttributeLayerMarkersColor = ({
   return isHexColor(mapMarkerColor) ? mapMarkerColor : defaultColor
 }
 
-const getSamplingPointDataLevels = (survey: any): any[] => {
+const getSamplingPointDataLevels = (survey: ArenaSurvey): ArenaCategoryLevel[] => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
   const samplingPointDataCoordinatesDefined =
     Category.getItemExtraDefKeys(samplingPointDataCategory).includes('location')
@@ -135,7 +135,7 @@ const MapWrapper = () => {
   const [requestedUuids, setRequestedUuids] = useState<ReadonlySet<string>>(new Set())
   if (requestedUuid && !requestedUuids.has(requestedUuid)) setRequestedUuids(new Set(requestedUuids).add(requestedUuid))
 
-  const surveyInfo = useSurveyInfo() as any
+  const surveyInfo = useSurveyInfo()
   const surveyId = Survey.getId(survey)
 
   const [state, setState] = useState<MapWrapperState>({
@@ -147,7 +147,9 @@ const MapWrapper = () => {
 
   const geoAttributeDefs = useMemo(
     () =>
-      Survey.getNodeDefsArray(survey).filter((nodeDef: any) => NodeDef.isGeo(nodeDef) || NodeDef.isCoordinate(nodeDef)),
+      Survey.getNodeDefsArray(survey).filter(
+        (nodeDef: ArenaAnyNodeDef) => NodeDef.isGeo(nodeDef) || NodeDef.isCoordinate(nodeDef)
+      ),
     [survey]
   )
   const samplingPointDataLevels = useMemo(() => getSamplingPointDataLevels(survey), [survey])
@@ -155,7 +157,7 @@ const MapWrapper = () => {
   const preloadedLayerRefs = useMemo((): SurveyFileRef[] => {
     if (!Survey.isPreloadedMapLayersEnabled(surveyInfo)) return []
 
-    return (Survey.getPreloadedMapLayers(surveyInfo) as any[]).map((preloadedMapLayer) => ({
+    return Survey.getPreloadedMapLayers(surveyInfo).map((preloadedMapLayer: SurveyFile.SurveyFile) => ({
       fileUuid: SurveyFile.getUuid(preloadedMapLayer),
       fileName: SurveyFile.getName(preloadedMapLayer),
       label: SurveyFile.getLabel(lang)(preloadedMapLayer),
@@ -211,7 +213,7 @@ const MapWrapper = () => {
         <SurveyFileLayer key={surveyFile.fileUuid} surveyFile={surveyFile} />
       )),
 
-      ...samplingPointDataLevels.map((level: any, index: number) => (
+      ...samplingPointDataLevels.map((level: ArenaCategoryLevel, index: number) => (
         <SamplingPointDataLayer
           key={CategoryLevel.getUuid(level)}
           levelIndex={CategoryLevel.getIndex(level)}
@@ -221,7 +223,7 @@ const MapWrapper = () => {
         />
       )),
 
-      ...geoAttributeDefs.map((attributeDef: any, index: number) => (
+      ...geoAttributeDefs.map((attributeDef: ArenaAnyNodeDef, index: number) => (
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}

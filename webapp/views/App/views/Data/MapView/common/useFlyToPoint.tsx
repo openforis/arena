@@ -4,6 +4,8 @@ import { useMap } from 'react-leaflet'
 
 import { Numbers } from '@openforis/arena-core'
 
+import type { MapPointMarker, RecordEditClickHandler, SetMarkerByKey } from './mapPointTypes'
+
 // shown at the destination until the popup of the point opens
 const flyToLoaderIcon = L.divIcon({
   className: 'map-view__fly-to-loader',
@@ -27,7 +29,7 @@ export const useFlyToPoint = <P extends FlyToPointFeature>({
   zoomToMaxLevel = true,
 }: {
   points: P[]
-  onRecordEditClick?: ((params: { recordUuid: string } | null) => void) | null
+  onRecordEditClick?: RecordEditClickHandler | null
   zoomToMaxLevel?: boolean
 }) => {
   const map = useMap()
@@ -36,10 +38,10 @@ export const useFlyToPoint = <P extends FlyToPointFeature>({
   const { currentPointShown, currentPointPopupOpen } = state
 
   // Have a Reference to points for opening popups automatically
-  const markersByKeyRef = useRef({})
+  const markersByKeyRef = useRef<Record<string, MapPointMarker>>({})
 
   // removes the loader and the listeners of the last flight, if still pending
-  const pendingFlightCleanupRef = useRef(null)
+  const pendingFlightCleanupRef = useRef<(() => void) | null>(null)
 
   const getPointKey = useCallback((point: FlyToPointFeature | null) => point?.properties?.key, [])
 
@@ -136,7 +138,7 @@ export const useFlyToPoint = <P extends FlyToPointFeature>({
     [flyToPoint, getPreviousPoint]
   )
 
-  const setMarkerByKey = useCallback(({ key, marker }) => {
+  const setMarkerByKey: SetMarkerByKey = useCallback(({ key, marker }) => {
     if (marker) {
       markersByKeyRef.current[key] = marker
     } else {

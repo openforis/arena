@@ -2,16 +2,16 @@ import { createContext, ReactNode, useCallback, useContext, useMemo, useState } 
 
 import { SortOrder } from '@core/sortOrder'
 
+import type { MapPointProperties } from '../common/mapPointTypes'
+
+// point of a layer listed in the panel (geo attribute or sampling point): record and parent only for geo attributes
 export type MapLayerPoint = {
-  geometry: {
-    coordinates: [number, number]
-  }
-  properties: {
-    key: string
+  geometry: { coordinates: number[] }
+  properties: MapPointProperties & {
     ancestorsKeys: string[]
-    parentUuid: string
-    recordUuid: string
-    recordOwnerUuid: string
+    parentUuid?: string
+    recordUuid?: string
+    recordOwnerUuid?: string
   }
 }
 

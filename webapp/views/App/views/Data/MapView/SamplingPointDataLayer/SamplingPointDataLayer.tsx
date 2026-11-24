@@ -1,22 +1,21 @@
 import { useCallback, useMemo } from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
-import type { AnyProps, ClusterFeature, PointFeature } from 'supercluster'
 
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
-import { SamplingPointDataMarker, type SamplingPointFeature } from './SamplingPointDataMarker'
-
-// supercluster returns the original feature of a sampling point item not clustered
-const isSamplingPointFeature = (
-  feature: ClusterFeature<AnyProps> | PointFeature<AnyProps>
-): feature is SamplingPointFeature => !feature.properties.cluster
+import { SamplingPointDataMarker } from './SamplingPointDataMarker'
+import {
+  isMapClusterFeature,
+  type CreateRecordFromSamplingPointDataItem,
+  type RecordEditClickHandler,
+} from '../common/mapPointTypes'
 
 type SamplingPointDataLayerProps = {
   levelIndex?: number
-  markersColor: any
-  createRecordFromSamplingPointDataItem: (...args: any[]) => any
-  onRecordEditClick: (...args: any[]) => any
+  markersColor: string
+  createRecordFromSamplingPointDataItem: CreateRecordFromSamplingPointDataItem
+  onRecordEditClick: RecordEditClickHandler
 }
 
 export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
@@ -51,7 +50,7 @@ export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
     setMarkerByKey,
   } = useFlyToPoint({ points: sortedPoints, onRecordEditClick })
 
-  const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
+  const onMarkerPopupOpen = useCallback((key: string) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
   useLayerRegistration({ active: isLayerActive, layerKey, layerName: overlayInnerName, points, flyToPoint })
@@ -61,7 +60,7 @@ export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item
-          if (!isSamplingPointFeature(cluster)) {
+          if (isMapClusterFeature(cluster)) {
             return (
               <ClusterMarker
                 key={cluster.id}

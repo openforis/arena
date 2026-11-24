@@ -9,8 +9,8 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { GeoUtils } from '@webapp/utils/geoUtils'
 
 type CoordinateAttributePolygonProps = {
-  latitude?: any
-  longitude?: any
+  latitude: number
+  longitude: number
 }
 
 export const CoordinateAttributePolygon = (props: CoordinateAttributePolygonProps) => {
