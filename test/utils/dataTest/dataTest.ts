@@ -8,7 +8,7 @@ import * as RB from '../recordBuilder'
 import * as SurveyUtils from '../surveyUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
-export const createTestSurvey = async ({ user }) =>
+export const createTestSurvey = ({ user }) =>
   SB.survey(
     user,
     SB.entity(

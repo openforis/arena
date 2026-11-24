@@ -50,7 +50,7 @@ export const evaluateQuery = async ({ query, expressionEvaluator }) => {
 
 export const recordExpressionEvaluator =
   ({ surveyFn, recordFn }) =>
-  async ({ nodePath, query }) => {
+  ({ nodePath, query }) => {
     const survey = surveyFn()
     const record = recordFn()
     const node = RecordUtils.findNodeByPath(nodePath || 'cluster/cluster_id')(survey, record)

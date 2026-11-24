@@ -1,8 +1,15 @@
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import type { ItemBuilder } from './categoryItemBuilder'
 
 export class CategoryBuilder {
+  name: string
+  childItemBuilders: ItemBuilder[]
+  levelNames: string[]
+  _extraProps: Record<string, any>
+  _built: Record<string, any>
+
   constructor(name) {
     this.name = name
     this.childItemBuilders = []
