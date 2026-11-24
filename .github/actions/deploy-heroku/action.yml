@@ -1,16 +1,15 @@
 name: Deploy to Heroku
 description: >
-  Deploys the checked out repository to a Heroku app, with the app version (see the app-version action) included in
-  the pushed code. Requires the repository to be checked out with its tags (actions/checkout with `fetch-depth: 0`).
+  Deploys the checked out repository to a Heroku app with the Heroku Builds API: the code (without git history,
+  docs and tests) is uploaded as a source tarball, built by the app buildpacks and released. Includes the app
+  version (see the app-version action): requires the repository to be checked out with its tags
+  (actions/checkout with `fetch-depth: 0`).
 inputs:
   heroku_api_key:
-    description: Heroku API key
+    description: Heroku API key (or authorization token) of an account that can deploy to the app
     required: true
   heroku_app_name:
     description: Name of the Heroku app to deploy to
-    required: true
-  heroku_email:
-    description: Email of the Heroku account
     required: true
 runs:
   using: composite
@@ -19,23 +18,53 @@ runs:
       id: app_version
       uses: ./.github/actions/app-version
 
-    - name: Commit the version file
-      # committed locally only, to be included in the push to Heroku
+    - name: Create the source tarball
+      # the version file is committed locally only, to be included in the tarball (git archive takes committed files)
       shell: bash
       env:
         APP_VERSION: ${{ steps.app_version.outputs.version }}
       run: |
         git add -f .app-version
-        git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -m "App version $APP_VERSION"
+        git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "App version $APP_VERSION"
+        # docs (videos, user manuals) and tests are not needed to build and run the app
+        git archive --format=tar.gz -o "$RUNNER_TEMP/source.tgz" HEAD -- . ':(exclude)docs' ':(exclude)test'
+        echo "Source tarball: $(du -h "$RUNNER_TEMP/source.tgz" | cut -f1)"
 
-    - name: Install Heroku CLI
-      # pinned version from the npm registry (integrity checked), instead of piping a downloaded install script to sh
+    - name: Build and release on Heroku
       shell: bash
-      run: npm install -g --ignore-scripts heroku@11.12.0
+      env:
+        HEROKU_API_KEY: ${{ inputs.heroku_api_key }}
+        HEROKU_APP_NAME: ${{ inputs.heroku_app_name }}
+        APP_VERSION: ${{ steps.app_version.outputs.version }}
+      run: |
+        set -euo pipefail
 
-    - name: Deploy to Heroku
-      uses: akhileshns/heroku-deploy@1b080913896a5d6d44a18e9e208f8eb1fee9b0f7 # v3.15.15
-      with:
-        heroku_api_key: ${{ inputs.heroku_api_key }}
-        heroku_app_name: ${{ inputs.heroku_app_name }}
-        heroku_email: ${{ inputs.heroku_email }}
+        api() {
+          curl -fsS -H "Authorization: Bearer $HEROKU_API_KEY" -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Content-Type: application/json" "$@"
+        }
+
+        # upload the tarball to a Heroku source (temporary storage)
+        source_json="$(api --retry 3 -X POST https://api.heroku.com/sources)"
+        put_url="$(jq -r .source_blob.put_url <<< "$source_json")"
+        get_url="$(jq -r .source_blob.get_url <<< "$source_json")"
+        curl -fsS --retry 3 -X PUT -H "Content-Type:" --data-binary "@$RUNNER_TEMP/source.tgz" "$put_url"
+
+        # start the build (not retried: it would start another one)
+        build_request="$(jq -n --arg url "$get_url" --arg version "$APP_VERSION" '{source_blob: {url: $url, version: $version}}')"
+        build_json="$(api -X POST "https://api.heroku.com/apps/$HEROKU_APP_NAME/builds" -d "$build_request")"
+        build_id="$(jq -r .id <<< "$build_json")"
+        echo "Build $build_id started"
+
+        # show the build output (the stream ends with the build; a dropped stream does not fail the deploy)
+        curl -sS -N --max-time 3600 "$(jq -r .output_stream_url <<< "$build_json")" || echo "(build output stream interrupted)"
+
+        # wait for the build result: a successful build is released by Heroku
+        status=pending
+        for _ in $(seq 1 360); do
+          status="$(api --retry 3 "https://api.heroku.com/apps/$HEROKU_APP_NAME/builds/$build_id" | jq -r .status)"
+          [ "$status" != "pending" ] && break
+          sleep 10
+        done
+        echo "Build status: $status"
+        [ "$status" = "succeeded" ]
