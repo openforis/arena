@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import ErrorBadge from '@webapp/components/errorBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 import { Button, ButtonIconDelete, LoadingBar } from '@webapp/components'
 
 import { useI18n } from '@webapp/store/system'

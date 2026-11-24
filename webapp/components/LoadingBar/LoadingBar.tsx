@@ -1,6 +1,6 @@
 import './loadingBar.scss'
 
-import ProgressBar from '@webapp/components/progressBar'
+import ProgressBar from '@webapp/components/ProgressBar'
 
 const LoadingBar = () => (
   <div className="loading-bar">

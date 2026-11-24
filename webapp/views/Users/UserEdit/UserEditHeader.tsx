@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import * as User from '@core/user/user'
 
 import { Button, Modal, ModalBody, ModalFooter } from '@webapp/components'
-import ProfilePicture from '@webapp/components/profilePicture'
+import ProfilePicture from '@webapp/components/ProfilePicture'
 import { useI18n } from '@webapp/store/system'
 
 import ProfilePictureEditor from './ProfilePictureEditor'

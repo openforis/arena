@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey'
 
-import Checkbox from '@webapp/components/form/checkbox'
+import Checkbox from '@webapp/components/form/Checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useNodeDefEditReadOnly } from '../../store'

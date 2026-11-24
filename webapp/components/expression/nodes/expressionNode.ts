@@ -1,13 +1,13 @@
 import React, { type ElementType } from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
-import Binary from './binary'
-import Call from './call'
-import Sequence from './sequence'
-import Identifier from './identifier'
-import Literal from './literal'
-import Logical from './logical'
-import Member from './member'
+import Binary from './Binary'
+import Call from './Call'
+import Sequence from './Sequence'
+import Identifier from './Identifier'
+import Literal from './Literal'
+import Logical from './Logical'
+import Member from './Member'
 
 const { types } = Expression
 

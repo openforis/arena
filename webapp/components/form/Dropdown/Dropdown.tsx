@@ -4,7 +4,7 @@ import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import { LabelWithTooltip } from '../LabelWithTooltip'
 import { dropdownTheme } from './dropdownTheme'
 import { useDropdown } from './useDropdown'

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
 

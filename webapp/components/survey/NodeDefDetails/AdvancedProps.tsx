@@ -11,8 +11,8 @@ import { useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import Checkbox from '@webapp/components/form/checkbox'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import Checkbox from '@webapp/components/form/Checkbox'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State, useNodeDefEditReadOnly } from './store'

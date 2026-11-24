@@ -13,7 +13,7 @@ import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
-import ProfilePicture from '@webapp/components/profilePicture'
+import ProfilePicture from '@webapp/components/ProfilePicture'
 
 import {
   useAuthCanCreateSurvey,

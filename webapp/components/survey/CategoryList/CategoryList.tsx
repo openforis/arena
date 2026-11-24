@@ -7,8 +7,8 @@ import * as Validation from '@core/validation/validation'
 
 import Table from '@webapp/components/Table'
 import type { TableColumn } from '@webapp/components/Table/tableColumn'
-import ErrorBadge from '@webapp/components/errorBadge'
-import WarningBadge from '@webapp/components/warningBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
+import WarningBadge from '@webapp/components/WarningBadge'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'

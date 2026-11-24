@@ -6,7 +6,7 @@ import {
   MenuActionItem,
   MenuRadioItem,
   MenuSectionHeader,
-} from '@webapp/components/MapContainer/workspace/toolbar/menuItems'
+} from '@webapp/components/MapContainer/workspace/toolbar/MenuItems'
 
 type CloseMenu = (afterClose?: () => void) => void
 

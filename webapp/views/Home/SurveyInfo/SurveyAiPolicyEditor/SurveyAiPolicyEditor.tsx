@@ -10,7 +10,7 @@ import {
   updateSurveyAiPolicy,
   type SurveyAiPolicyClientState,
 } from '@webapp/ai/policy/surveyAiPolicyClient'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
+import ButtonGroup from '@webapp/components/form/ButtonGroup'
 import { FormItem } from '@webapp/components/form/Input'
 import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import { useSurveyId } from '@webapp/store/survey'

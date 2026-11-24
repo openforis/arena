@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 
 import { appModuleUri, appModules, homeModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'

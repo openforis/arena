@@ -6,7 +6,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'

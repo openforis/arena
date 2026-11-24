@@ -10,7 +10,7 @@ import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { Button } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 

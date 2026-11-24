@@ -2,7 +2,7 @@ import './DataImport.scss'
 
 import { useI18n } from '@webapp/store/system'
 
-import TabBar from '@webapp/components/tabBar'
+import TabBar from '@webapp/components/TabBar'
 import { TestId } from '@webapp/utils/testId'
 import { DataImportFlatDataView } from './DataImportFlatDataView'
 import { CollectDataImportView } from './DataImportCollectView'

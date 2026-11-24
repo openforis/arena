@@ -27,7 +27,7 @@ import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
-import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/nodeDefCloneFromSurveyDialog'
+import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/NodeDefCloneFromSurveyDialog'
 import { NodeDefsTranslationModal } from './NodeDefsTranslationModal'
 import { useFormHeaderAiJobs } from './useFormHeaderAiJobs'
 import { useAppDispatch } from '@webapp/store'

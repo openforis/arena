@@ -11,7 +11,7 @@ import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/s
 
 import { ButtonIconEditOrView } from '@webapp/components'
 import { AppIcon } from '@webapp/components/AppIcon'
-import ErrorBadge from '@webapp/components/errorBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
 import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
 

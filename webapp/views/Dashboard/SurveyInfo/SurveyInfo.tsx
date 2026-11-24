@@ -15,7 +15,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey, useAuthCanExportSurveyData } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
-import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
+import ButtonPublishSurvey from '@webapp/components/ButtonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useAppDispatch } from '@webapp/store'

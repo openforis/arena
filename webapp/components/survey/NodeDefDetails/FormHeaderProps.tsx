@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/buttonGroup'
+import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/ButtonGroup'
 
 import { headerColorRgbCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
