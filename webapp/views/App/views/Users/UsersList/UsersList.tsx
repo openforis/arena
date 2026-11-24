@@ -2,7 +2,7 @@ import './UsersList.scss'
 
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
-import PropTypes from 'prop-types'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 
@@ -14,11 +14,11 @@ import { UserSurveysTable } from './UserSurveysTable'
 import { TableHeaderLeft } from './TableHeaderLeft'
 import { useUsersListColumns } from './useUsersListColumns'
 
-const UserRowExpanded = ({ item }) => <UserSurveysTable user={item} />
-
-UserRowExpanded.propTypes = {
-  item: PropTypes.object.isRequired,
+type UserRowExpandedProps = {
+  item: ArenaUser
 }
+
+const UserRowExpanded = ({ item }: UserRowExpandedProps) => <UserSurveysTable user={item} />
 
 // users who have not accepted the invitation yet cannot be edited
 const isRowOpenable = (user) => User.hasAccepted(user)

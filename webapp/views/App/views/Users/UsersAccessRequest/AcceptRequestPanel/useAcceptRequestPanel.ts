@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
@@ -14,6 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as ValidationUtils from '@webapp/utils/validationUtils'
+import { useAppDispatch } from '@webapp/store'
 
 export type AccessRequestAccept = {
   accessRequestUuid: string
@@ -34,7 +33,7 @@ export const useAcceptRequestPanel = ({ userAccessRequest, onRequestAccepted }: 
 
   const { templateUuid } = requestProps
 
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const dispatch = useAppDispatch()
   const i18n = useI18n()
 
   const [accessRequestAccept, setAccessRequestAccept] = useState<AccessRequestAccept>({

@@ -138,7 +138,7 @@ export const getTimeFormat = (includeSeconds: boolean): DateFormats =>
 
 export const parseDateISO = (dateStr: string): unknown => parse(dateStr, formats.dateISO)
 
-export const convertDateFromISOToDisplay = (dateStr: string): unknown =>
+export const convertDateFromISOToDisplay = (dateStr: string): string | undefined =>
   convertDate({
     dateStr,
     formatFrom: formats.dateISO,
@@ -148,7 +148,7 @@ export const convertDateFromISOToDisplay = (dateStr: string): unknown =>
 /**
  * Formats an ISO (UTC) timestamp for display in the local time zone of the browser.
  */
-export const convertDateTimeFromISOToDisplay = (dateStr: string): unknown =>
+export const convertDateTimeFromISOToDisplay = (dateStr: string): string | undefined =>
   convertDate({
     dateStr,
     formatFrom: formats.datetimeISO,

@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -15,7 +13,13 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
-const Row = (props) => {
+type RowProps = {
+  item: Record<string, any>
+  onEditSurveyUserExtraProps: (...args: any[]) => any
+  onRowOpen: (...args: any[]) => any
+}
+
+const Row = (props: RowProps) => {
   const { onEditSurveyUserExtraProps, onRowOpen, item: userListItem } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -96,12 +100,6 @@ const Row = (props) => {
       </div>
     </>
   )
-}
-
-Row.propTypes = {
-  item: PropTypes.object.isRequired,
-  onEditSurveyUserExtraProps: PropTypes.func.isRequired,
-  onRowOpen: PropTypes.func.isRequired,
 }
 
 export default Row

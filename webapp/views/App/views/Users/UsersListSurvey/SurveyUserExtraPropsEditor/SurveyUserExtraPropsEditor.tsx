@@ -1,5 +1,4 @@
 import { useCallback, useState, useMemo } from 'react'
-import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 
@@ -17,7 +16,13 @@ const buildUserUpdated = ({ surveyUuid, userToUpdate }) => {
   return User.assocAuthGroupExtraProps(groupExtraProps)(userToUpdate)
 }
 
-export const SurveyUserExtraPropsEditor = (props) => {
+type SurveyUserExtraPropsEditorProps = {
+  onClose: (...args: any[]) => any
+  onUserUpdate: (...args: any[]) => any
+  userToUpdate: Record<string, any>
+}
+
+export const SurveyUserExtraPropsEditor = (props: SurveyUserExtraPropsEditorProps) => {
   const { onClose, onUserUpdate, userToUpdate } = props
 
   const surveyUuid = useSurveyUuid()
@@ -47,10 +52,4 @@ export const SurveyUserExtraPropsEditor = (props) => {
       <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} onSave={onSave} userToUpdate={userUpdated} />
     </PanelRight>
   )
-}
-
-SurveyUserExtraPropsEditor.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  onUserUpdate: PropTypes.func.isRequired,
-  userToUpdate: PropTypes.object.isRequired,
 }

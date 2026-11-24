@@ -1,16 +1,23 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { copyToClipboard } from '@webapp/utils/domUtils'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { useAppDispatch } from '@webapp/store'
 
 const messageTypes = {
   passwordReset: 'passwordReset',
   invitation: 'invitation',
+} as const
+
+type MessageType = (typeof messageTypes)[keyof typeof messageTypes]
+
+type CopyPasswordResetLinkButtonProps = {
+  email: string
+  userUuid: string
+  messageType?: MessageType
 }
 
 const notificationKeyByMessageType = {
@@ -28,11 +35,11 @@ const titleKeyByMessageType = {
   [messageTypes.invitation]: 'usersView:copyInvitationLink',
 }
 
-export const CopyPasswordResetLinkButton = (props) => {
+export const CopyPasswordResetLinkButton = (props: CopyPasswordResetLinkButtonProps) => {
   const { email, userUuid, messageType = messageTypes.passwordReset } = props
 
   const surveyId = useSurveyId()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const doCopyLinkToClipboard = useCallback(async () => {
     const url =
@@ -70,10 +77,4 @@ export const CopyPasswordResetLinkButton = (props) => {
       variant="text"
     />
   )
-}
-
-CopyPasswordResetLinkButton.propTypes = {
-  email: PropTypes.string.isRequired,
-  userUuid: PropTypes.string.isRequired,
-  messageType: PropTypes.oneOf(Object.values(messageTypes)),
 }
