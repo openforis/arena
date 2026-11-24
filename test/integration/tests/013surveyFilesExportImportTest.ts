@@ -30,7 +30,7 @@ describe('Survey files export/import - branding and doc-layout images, area of i
   const expectSameFileContent = async ({ surveyId, fileUuid, content }) => {
     const contentInSurvey = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId,
-      fileSummary: { uuid: fileUuid },
+      fileSummary: { uuid: fileUuid } as SurveyFile.SurveyFile,
     })
     expect(Buffer.compare(contentInSurvey, content)).toBe(0)
   }
@@ -154,7 +154,8 @@ describe('Survey files export/import - branding and doc-layout images, area of i
       expect.objectContaining({ outputFileName: expect.any(String), downloadToken: expect.any(String) })
     )
 
-    const { filePath } = exportJob.context
+    // the job context is protected: read the path of the exported file
+    const { filePath } = (exportJob as unknown as { context: { filePath: string } }).context
 
     const importJob = new ArenaImportJob({ filePath, user })
     await importJob.start()
@@ -165,13 +166,13 @@ describe('Survey files export/import - branding and doc-layout images, area of i
 
     const importedLogoContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: importedSurveyId,
-      fileSummary: { uuid: logoFileUuid },
+      fileSummary: { uuid: logoFileUuid } as SurveyFile.SurveyFile,
     })
     expect(Buffer.compare(importedLogoContent, logoContent)).toBe(0)
 
     const importedHeaderContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: importedSurveyId,
-      fileSummary: { uuid: headerFileUuid },
+      fileSummary: { uuid: headerFileUuid } as SurveyFile.SurveyFile,
     })
     expect(Buffer.compare(importedHeaderContent, headerContent)).toBe(0)
 
@@ -192,13 +193,13 @@ describe('Survey files export/import - branding and doc-layout images, area of i
 
     const clonedLogoContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: clonedSurveyId,
-      fileSummary: { uuid: logoFileUuid },
+      fileSummary: { uuid: logoFileUuid } as SurveyFile.SurveyFile,
     })
     expect(Buffer.compare(clonedLogoContent, logoContent)).toBe(0)
 
     const clonedHeaderContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: clonedSurveyId,
-      fileSummary: { uuid: headerFileUuid },
+      fileSummary: { uuid: headerFileUuid } as SurveyFile.SurveyFile,
     })
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
 
@@ -209,7 +210,7 @@ describe('Survey files export/import - branding and doc-layout images, area of i
 
   test('import warns and skips missing survey file content when skipMissingFiles is true', async () => {
     const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
-    const fakeZipMissingAllEntries = { getEntryData: async () => null }
+    const fakeZipMissingAllEntries = { getEntryData: () => null }
 
     const importJob = new SurveyFilesImportJob({
       arenaSurveyFileZip: fakeZipMissingAllEntries,
@@ -224,7 +225,7 @@ describe('Survey files export/import - branding and doc-layout images, area of i
 
   test('import fails on missing survey file content when skipMissingFiles is false', async () => {
     const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
-    const fakeZipMissingAllEntries = { getEntryData: async () => null }
+    const fakeZipMissingAllEntries = { getEntryData: () => null }
 
     const importJob = new SurveyFilesImportJob({
       arenaSurveyFileZip: fakeZipMissingAllEntries,
@@ -244,7 +245,8 @@ describe('Survey files export/import - branding and doc-layout images, area of i
     await exportJob.start()
     expect(exportJob.isSucceeded()).toBe(true)
 
-    const { filePath } = exportJob.context
+    // the job context is protected: read the path of the exported file
+    const { filePath } = (exportJob as unknown as { context: { filePath: string } }).context
 
     // SurveyBranding.getBrandingFileSummaries reads size/name straight off the branding
     // descriptor stored in survey props (set at upload time by SurveyInfoBrandingForm). Spy on

@@ -1,3 +1,4 @@
+import type { ArenaChain } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -70,7 +71,7 @@ describe('Chain sampling design phase props migration', () => {
       chain: {
         uuid: chainWithOldPropsUuid,
         props: {
-          name: 'chain_with_old_props',
+          labels: { en: 'chain_with_old_props' },
           [Chain.keysProps.samplingDesign]: {
             samplingStrategy: ChainSamplingDesign.samplingStrategies.twoPhase,
             [ChainSamplingDesign.keysProps.baseUnitNodeDefUuid]: plotEntityUuid,
@@ -79,7 +80,7 @@ describe('Chain sampling design phase props migration', () => {
             firstPhaseCommonAttributeUuid: commonAttributeUuid,
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     chainWithCategoryOnlyUuid = uuidv4()
@@ -88,14 +89,14 @@ describe('Chain sampling design phase props migration', () => {
       chain: {
         uuid: chainWithCategoryOnlyUuid,
         props: {
-          name: 'chain_with_category_only',
+          labels: { en: 'chain_with_category_only' },
           [Chain.keysProps.samplingDesign]: {
             samplingStrategy: ChainSamplingDesign.samplingStrategies.twoPhase,
             firstPhaseCategoryUuid: 'category-uuid-2',
             firstPhaseCategoryExtraProp: 'design_psu_2',
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     chainWithoutOldPropsUuid = uuidv4()
@@ -104,12 +105,12 @@ describe('Chain sampling design phase props migration', () => {
       chain: {
         uuid: chainWithoutOldPropsUuid,
         props: {
-          name: 'chain_without_old_props',
+          labels: { en: 'chain_without_old_props' },
           [Chain.keysProps.samplingDesign]: {
             samplingStrategy: ChainSamplingDesign.samplingStrategies.simpleRandom,
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     chainWithAttributeInSiblingBranchUuid = uuidv4()
@@ -118,14 +119,14 @@ describe('Chain sampling design phase props migration', () => {
       chain: {
         uuid: chainWithAttributeInSiblingBranchUuid,
         props: {
-          name: 'chain_with_attribute_in_sibling_branch',
+          labels: { en: 'chain_with_attribute_in_sibling_branch' },
           [Chain.keysProps.samplingDesign]: {
             samplingStrategy: ChainSamplingDesign.samplingStrategies.twoPhase,
             [ChainSamplingDesign.keysProps.baseUnitNodeDefUuid]: plotEntityUuid,
             firstPhaseCommonAttributeUuid: siblingBranchAttributeUuid,
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     chainWithUnknownAttributeUuid = uuidv4()
@@ -134,14 +135,14 @@ describe('Chain sampling design phase props migration', () => {
       chain: {
         uuid: chainWithUnknownAttributeUuid,
         props: {
-          name: 'chain_with_unknown_attribute',
+          labels: { en: 'chain_with_unknown_attribute' },
           [Chain.keysProps.samplingDesign]: {
             samplingStrategy: ChainSamplingDesign.samplingStrategies.twoPhase,
             [ChainSamplingDesign.keysProps.baseUnitNodeDefUuid]: plotEntityUuid,
             firstPhaseCommonAttributeUuid: unknownAttributeUuid,
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     // Regression test for a real deadlock: at the point AllSurveysDataMigrationJob runs this step,
@@ -174,9 +175,9 @@ describe('Chain sampling design phase props migration', () => {
     expect(ChainSamplingDesign.getPhase2JoinEntityUuid(samplingDesign)).not.toBe(plotDetailsEntityUuid)
     expect(ChainSamplingDesign.getPhase2JoinEntityUuid(samplingDesign)).toBe(plotEntityUuid)
     expect(ChainSamplingDesign.isPhase2AsSamplingPointData(samplingDesign)).toBe(false)
-    expect(samplingDesign.firstPhaseCategoryUuid).toBeUndefined()
-    expect(samplingDesign.firstPhaseCategoryExtraProp).toBeUndefined()
-    expect(samplingDesign.firstPhaseCommonAttributeUuid).toBeUndefined()
+    expect((samplingDesign as Record<string, unknown>).firstPhaseCategoryUuid).toBeUndefined()
+    expect((samplingDesign as Record<string, unknown>).firstPhaseCategoryExtraProp).toBeUndefined()
+    expect((samplingDesign as Record<string, unknown>).firstPhaseCommonAttributeUuid).toBeUndefined()
   })
 
   test('migrates a chain with only the category props set, leaving the join entity unset', async () => {
@@ -209,6 +210,6 @@ describe('Chain sampling design phase props migration', () => {
     expect(ChainSamplingDesign.getPhase2JoinAttribute(samplingDesign)).toBe(unknownAttributeUuid)
     expect(ChainSamplingDesign.getPhase2JoinEntityUuid(samplingDesign)).toBeUndefined()
     expect(ChainSamplingDesign.isPhase2AsSamplingPointData(samplingDesign)).toBe(false)
-    expect(samplingDesign.firstPhaseCommonAttributeUuid).toBeUndefined()
+    expect((samplingDesign as Record<string, unknown>).firstPhaseCommonAttributeUuid).toBeUndefined()
   })
 })

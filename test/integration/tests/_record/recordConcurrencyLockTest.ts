@@ -17,6 +17,8 @@ import * as RecordUtils from '../../../utils/recordUtils'
 // The real thread posts messages to the parent port, which doesn't exist in the main thread:
 // collect them instead, so the record processing logic can be exercised in-process.
 class TestRecordsUpdateThread extends RecordsUpdateThread {
+  messagesPosted: unknown[]
+
   constructor() {
     super({})
     this.messagesPosted = []
@@ -118,14 +120,14 @@ export const getOrFetchRecordStalenessDecisionTest = async () => {
   expect(Record.getDateModified(cachedRecord).getTime()).toBe(dateModifiedDb.getTime())
 
   // (a) cache considered fresh: the very same cached object is returned, no refetch
-  const recordFromCache = await db.tx(async (t) => thread.getOrFetchRecord({ msg, recordUuid, t }))
+  const recordFromCache = await db.tx((t) => thread.getOrFetchRecord({ msg, recordUuid, t }))
   expect(recordFromCache).toBe(cachedRecord)
 
   // (b) DB date_modified moved ahead (as if another dyno committed a change): refetch and update cache
   await new Promise((resolve) => setTimeout(resolve, 10)) // ensure a distinguishable timestamp
   await RecordManager.updateRecordDateModified({ surveyId, recordUuid })
 
-  const recordRefetched = await db.tx(async (t) => thread.getOrFetchRecord({ msg, recordUuid, t }))
+  const recordRefetched = await db.tx((t) => thread.getOrFetchRecord({ msg, recordUuid, t }))
   expect(recordRefetched).not.toBe(cachedRecord)
   expect(Record.getUuid(recordRefetched)).toBe(recordUuid)
   expect(recordsCache.get(recordUuid)).toBe(recordRefetched)

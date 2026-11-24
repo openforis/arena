@@ -1,4 +1,5 @@
 import { uuidv4 } from '@core/uuid'
+import type { ArenaChain, ArenaUser } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
@@ -21,7 +22,7 @@ describe('Clone chain from another survey - templates', () => {
   let templateSurvey
   let regularSurvey
   let chainUuid
-  const outsiderUser = { authGroups: [] }
+  const outsiderUser = { authGroups: [] } as ArenaUser
 
   beforeAll(async () => {
     const user = getContextUser()
@@ -43,7 +44,7 @@ describe('Clone chain from another survey - templates', () => {
 
     await ChainRepository.insertChain({
       surveyId: Survey.getId(templateSurvey),
-      chain: { uuid: chainUuid, props: { name: 'chain_template_src' } },
+      chain: { uuid: chainUuid, props: { labels: { en: 'chain_template_src' } } } as unknown as ArenaChain,
     })
 
     // Regular (non-template) published survey the outsider user also has no access to.

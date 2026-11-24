@@ -26,7 +26,7 @@ const entityName = 'cluster'
 
 let survey = null
 
-const _fetchDraftSurvey = async (surveyId) =>
+const _fetchDraftSurvey = (surveyId) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
     cycle: Survey.cycleOneKey,

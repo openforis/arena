@@ -50,11 +50,12 @@ describe('User group readable groups', () => {
   })
 
   test('count includes the records of the readable groups', async () => {
+    // no search or owner filters
     const count = await RecordManager.countRecordsBySurveyId({
       surveyId: Survey.getId(survey),
       cycle: Survey.cycleOneKey,
       user: getContextUser(),
-    })
+    } as Parameters<typeof RecordManager.countRecordsBySurveyId>[0])
     expect(count).toBe(2)
   })
 
@@ -65,7 +66,7 @@ describe('User group readable groups', () => {
       surveyId: Survey.getId(survey),
       recordUuid: Record.getUuid(summariesByClusterNo[2]),
       draft: false,
-    })
+    } as Parameters<typeof RecordService.checkIn>[0])
     expect(Record.isReadOnly(record)).toBe(true)
   })
 

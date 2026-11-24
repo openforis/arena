@@ -107,7 +107,7 @@ describe('Validation Report - Message Type Filter', () => {
     return keysAcc
   }
 
-  const countForCategories = async (categoryIds) =>
+  const countForCategories = (categoryIds) =>
     RecordManager.countValidationReportItems({
       surveyId,
       cycle,
@@ -153,7 +153,7 @@ describe('Validation Report - Message Type Filter', () => {
       limit: 100,
       offset: 0,
       filterBySurveyAttrs: { messageTypeKeys },
-    })
+    } as unknown as Parameters<typeof RecordManager.fetchValidationReport>[0])
     expect(rows.length).toBeGreaterThan(0)
     rows.forEach((row) => {
       expect(collectValidationMessageKeys(row.validation)).toContain('record.entity.keyDuplicate')

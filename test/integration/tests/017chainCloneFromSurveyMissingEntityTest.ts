@@ -1,3 +1,4 @@
+import type { ArenaChain } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -47,7 +48,7 @@ describe('Clone chain from another survey - missing entities', () => {
 
     await ChainRepository.insertChain({
       surveyId: Survey.getId(sourceSurvey),
-      chain: { uuid: sourceChainUuid, props: { name: 'chain_missing_entity_src' } },
+      chain: { uuid: sourceChainUuid, props: { labels: { en: 'chain_missing_entity_src' } } } as unknown as ArenaChain,
     })
 
     // Target survey only has "cluster_src" - "plot_src" does not exist here.
@@ -126,12 +127,12 @@ describe('Clone chain from another survey - missing entities', () => {
       chain: {
         uuid: samplingDesignChainUuid,
         props: {
-          name: 'chain_sampling_design_src',
+          labels: { en: 'chain_sampling_design_src' },
           [Chain.keysProps.samplingDesign]: {
             [ChainSamplingDesign.keysProps.baseUnitNodeDefUuid]: NodeDef.getUuid(plotSrcEntity),
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     const clonedChain = await AnalysisManager.cloneChainFromSurvey({
@@ -161,7 +162,7 @@ describe('Clone chain from another survey - missing entities', () => {
       chain: {
         uuid: phase2ChainUuid,
         props: {
-          name: 'chain_phase2_join_props_src',
+          labels: { en: 'chain_phase2_join_props_src' },
           [Chain.keysProps.samplingDesign]: {
             [ChainSamplingDesign.keysProps.samplingStrategy]: ChainSamplingDesign.samplingStrategies.twoPhase,
             [ChainSamplingDesign.keysProps.phase1CategoryUuid]: 'category-uuid',
@@ -170,7 +171,7 @@ describe('Clone chain from another survey - missing entities', () => {
             [ChainSamplingDesign.keysProps.phase2JoinAttribute]: NodeDef.getUuid(volumeAnalysisAttr),
           },
         },
-      },
+      } as unknown as ArenaChain,
     })
 
     const clonedChain = await AnalysisManager.cloneChainFromSurvey({

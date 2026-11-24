@@ -1,3 +1,4 @@
+import type { ArenaChain } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -39,7 +40,7 @@ describe('Clone chain from another survey - category resolution', () => {
 
     await ChainRepository.insertChain({
       surveyId: Survey.getId(sourceSurvey),
-      chain: { uuid: sourceChainUuid, props: { name: 'chain_src' } },
+      chain: { uuid: sourceChainUuid, props: { labels: { en: 'chain_src' } } } as unknown as ArenaChain,
     })
 
     // Analysis attributes are cloned into the entity with the same name in the target survey.
