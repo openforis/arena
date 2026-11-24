@@ -87,9 +87,7 @@ export default class CategoryGeoPackageExportJob extends Job<CategoryGeoPackageE
     const surveyInfo = Survey.getSurveyInfo(survey)
     const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft }, this.tx)
     const srsIndex = Survey.getSRSIndex(surveyInfo)
-    // cast: Survey.getLanguages is a destructured re-export (survey.js: `export const { ..., getLanguages,
-    // ... } = SurveyInfo`), which allowJs's lightweight JS inference resolves to {} instead of string[]
-    const languages = Survey.getLanguages(surveyInfo) as string[]
+    const languages = Survey.getLanguages(surveyInfo)
     const levels = Category.getLevelsArray(category)
     const leafLevelIndex = levels.length - 1
 

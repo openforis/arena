@@ -25,7 +25,6 @@ Elsewhere in the repo: [e2e tests](../test/e2e/README.md), [load tests](../test/
 
 ## Other folders
 
-- [api/](api/): OpenAPI (`@swagger`) definitions served by the server at `/api-docs` (logged-in users).
 - [superpowers/](superpowers/): design specs and implementation plans written while building a feature.
   They record the decisions made at that time and are not updated afterwards: check the code (or the
   guides above) for the current behavior.

@@ -57,7 +57,7 @@ def main():
             break
         part = work / f'part{i:02d}.mp4'
         parts.append(part)
-        jobs.append(['node', HERE / 'render.mjs', work, 'video', a, b, part, args.height // 1080, args.crf])
+        jobs.append(['node', HERE / 'render.mts', work, 'video', a, b, part, args.height // 1080, args.crf])
     with ThreadPoolExecutor(len(jobs)) as pool:
         for f in [pool.submit(run, job) for job in jobs]:
             f.result()

@@ -1,10 +1,8 @@
-module.exports = function babelConfig(api) {
-  // Cache the returned value forever and don't call this function again.
-  //   api.cache(true);
+import type { ConfigAPI, InputOptions } from '@babel/core'
 
-  // If testing for a specific env, we recommend specifics to avoid instantiating a plugin for
-  // any possible NODE_ENV value that might come up during plugin execution.
-  global._isProd = api.cache(() => process.env.NODE_ENV === 'production')
+export default function babelConfig(api: ConfigAPI): InputOptions {
+  // the config depends only on NODE_ENV: cache it per value
+  api.cache(() => process.env.NODE_ENV === 'production')
 
   return {
     presets: [
