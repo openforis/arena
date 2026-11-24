@@ -1,5 +1,4 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { type ElementType } from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
 import Binary from './binary'
@@ -44,7 +43,26 @@ const toUiComponentNode = (node) => {
   return node
 }
 
-const ExpressionNode = (props) => {
+// props of the expression node and of the node components it renders
+export type ExpressionNodeProps = {
+  canDelete?: boolean // binary
+  expressionNodeParent?: any
+  isBoolean?: boolean // binary
+  level?: number // sequence
+  node: any
+  nodeDefCurrent?: any
+  onChange: (...args: any[]) => any
+  onDelete?: (...args: any[]) => any // binary
+  type?: string // literal
+  variables?: any[] // identifier / member / call
+}
+
+// props of the node components: renderNode renders the nested nodes
+export type ExpressionNodeComponentProps = ExpressionNodeProps & {
+  renderNode: ElementType
+}
+
+const ExpressionNode = (props: ExpressionNodeProps) => {
   const {
     canDelete = false,
     isBoolean = false,
@@ -77,24 +95,6 @@ const ExpressionNode = (props) => {
     type,
     variables,
   })
-}
-
-ExpressionNode.propTypes = {
-  // Common props
-  expressionNodeParent: PropTypes.any,
-  node: PropTypes.any.isRequired,
-  nodeDefCurrent: PropTypes.any,
-  onChange: PropTypes.func.isRequired,
-  // Identifier / Member / Call
-  variables: PropTypes.array,
-  // Binary
-  canDelete: PropTypes.bool,
-  isBoolean: PropTypes.bool,
-  onDelete: PropTypes.func,
-  // Sequence
-  level: PropTypes.number,
-  // Literal
-  type: PropTypes.string,
 }
 
 export default ExpressionNode

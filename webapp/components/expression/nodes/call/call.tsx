@@ -10,6 +10,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { functions, getComplexFunctionNameByExpression } from './functions'
 import { CallEditorDialog } from './callEditorDialog'
+import type { ExpressionNodeProps } from '../expressionNode'
 
 const extractFunctionLabel = ({ i18n, functionKey, func }) => {
   const { callee, label, labelKey } = func
@@ -21,11 +22,7 @@ const extractFunctionLabel = ({ i18n, functionKey, func }) => {
 
 const deprecatedFunctionNames = new Set([Expression.functionNames.distance])
 
-type CallProps = {
-  // Common props
-  node: any
-  onChange: (...args: any[]) => any
-  // Identifier / Member / Call
+type CallProps = Pick<ExpressionNodeProps, 'node' | 'onChange'> & {
   variables: any[]
 }
 

@@ -2,7 +2,7 @@ import './NodeDefCode.scss'
 
 import { useCallback, useMemo } from 'react'
 
-import { Surveys, type ArenaAnyNodeDef, type ArenaRecordNode } from '@openforis/arena-core'
+import { Surveys } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
@@ -19,18 +19,10 @@ import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/h
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
+import type { NodeDefComponentProps } from '../../nodeDefComponentProps'
 
-type NodeDefCodeProps = {
-  canEditRecord?: boolean
-  edit?: boolean
-  entryDataQuery?: boolean
-  insideTable?: boolean
-  nodeDef: ArenaAnyNodeDef
-  nodes?: ArenaRecordNode[]
-  parentNode?: ArenaRecordNode
-  readOnly?: boolean
+type NodeDefCodeProps = NodeDefComponentProps & {
   removeNode: (...args: any[]) => any
-  updateNode: (...args: any[]) => any
 }
 
 const NodeDefCode = (props: NodeDefCodeProps) => {

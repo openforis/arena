@@ -2,21 +2,15 @@ import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 
 import type { TableColumn } from '../tableColumn'
+import type { TableSelectionSortProps } from '../tableProps'
 
 const getHeaderText = ({ header, headerIsTranslationKey, i18n }) => {
   if (!header) return ''
   return headerIsTranslationKey && i18n.exists(header) ? i18n.t(header) : header
 }
 
-type ContentHeaderProps = {
+type ContentHeaderProps = TableSelectionSortProps & {
   column: TableColumn
-  deselectAllItems?: (...args: any[]) => any
-  handleSortBy?: (...args: any[]) => any
-  selectAllItems?: (...args: any[]) => any
-  selectedItemsCount?: number
-  sort?: Record<string, any>
-  totalCount?: number
-  allVisibleItemsSelected?: boolean
 }
 
 export const ContentHeader = (props: ContentHeaderProps) => {

@@ -1,14 +1,9 @@
 import * as Expression from '@core/expressionParser/expression'
 
 import Identifier from './identifier'
+import type { ExpressionNodeProps } from './expressionNode'
 
-type MemberProps = {
-  // Common props
-  node: any
-  onChange: (...args: any[]) => any
-  // Identifier / Member / Call
-  variables?: any[]
-}
+type MemberProps = Pick<ExpressionNodeProps, 'node' | 'onChange' | 'variables'>
 
 const Member = ({ node, variables, onChange }: MemberProps) => {
   const nodeIdentifier = {

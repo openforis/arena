@@ -4,18 +4,9 @@ import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { TimeInput } from '@webapp/components/form/DateTimeInput'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
-type NodeDefTimeProps = {
-  canEditRecord?: boolean
-  edit?: boolean
-  entry?: boolean
-  nodeDef: any
-  nodes?: any[]
-  readOnly?: boolean
-  updateNode: (...args: any[]) => any
-}
-
-const NodeDefTime = (props: NodeDefTimeProps) => {
+const NodeDefTime = (props: NodeDefComponentProps) => {
   const {
     canEditRecord = false,
     edit = false,
