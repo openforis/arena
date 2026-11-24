@@ -1,29 +1,34 @@
 import { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
-import { UUIDs } from '@openforis/arena-core'
+import { UUIDs, type ArenaUser } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 
 import { ButtonAdd, ExpansionPanel } from '@webapp/components'
 
-import { UserExtraPropEditor } from './UserExtraPropEditor'
+import { UserExtraPropEditor, type UserExtraPropItem } from './UserExtraPropEditor'
 
-const extraEntryToItem = ([name, value]) => ({ uuid: UUIDs.v4(), name, value })
+const extraEntryToItem = ([name, value]: [string, string]): UserExtraPropItem => ({ uuid: UUIDs.v4(), name, value })
 const extraToItems = (extra) => Object.entries(extra).map(extraEntryToItem)
 
-const itemsToExtraProps = (items) =>
+const itemsToExtraProps = (items: UserExtraPropItem[]): Record<string, string> =>
   items.reduce((acc, item) => {
     acc[item.name] = item.value
     return acc
   }, {})
 
-export const UserExtraPropsEditor = (props) => {
+type UserExtraPropsEditorProps = {
+  onChange: (...args: any[]) => any
+  readOnly?: boolean
+  user: ArenaUser
+}
+
+export const UserExtraPropsEditor = (props: UserExtraPropsEditorProps) => {
   const { onChange, readOnly = false, user } = props
 
   const extra = User.getExtra(user)
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<{ editing: boolean; items: UserExtraPropItem[] }>({
     editing: false,
     items: extraToItems(extra),
   })
@@ -31,7 +36,7 @@ export const UserExtraPropsEditor = (props) => {
   const { editing, items } = state
 
   const onAdd = useCallback(() => {
-    const newItem = { newItem: true, uuid: UUIDs.v4(), name: '', value: '' }
+    const newItem: UserExtraPropItem = { newItem: true, uuid: UUIDs.v4(), name: '', value: '' }
     setState((statePrev) => ({ ...statePrev, editing: true, items: [...statePrev.items, newItem] }))
   }, [])
 
@@ -55,7 +60,7 @@ export const UserExtraPropsEditor = (props) => {
   const onItemDelete = useCallback(
     ({ item }) => {
       const itemsUpdated = [...items]
-      const itemIndex = items.indexOf((itm) => itm.uuid === item.uuid)
+      const itemIndex = items.findIndex((itm) => itm.uuid === item.uuid)
       itemsUpdated.splice(itemIndex, 1)
       onItemsUpdate(itemsUpdated)
     },
@@ -98,10 +103,4 @@ export const UserExtraPropsEditor = (props) => {
       </div>
     </ExpansionPanel>
   )
-}
-
-UserExtraPropsEditor.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
-  user: PropTypes.object.isRequired,
 }

@@ -483,6 +483,7 @@ export const TestId = {
     inviteBtn: 'invite-user-btn',
     invitedBy: 'invited_by',
     invitedDate: 'invited_date',
+    lastLogin: 'last_login',
     profilePicture: 'user_profile_img',
     name: 'user_name',
     email: 'user_email',

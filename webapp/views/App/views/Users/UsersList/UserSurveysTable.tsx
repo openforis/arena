@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -8,7 +9,11 @@ import LoadingBar from '@webapp/components/LoadingBar'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 
-export const UserSurveysTable = (props) => {
+type UserSurveysTableProps = {
+  user: ArenaUser
+}
+
+export const UserSurveysTable = (props: UserSurveysTableProps) => {
   const { user } = props
 
   const [state, setState] = useState({ loading: true, surveys: [] })
