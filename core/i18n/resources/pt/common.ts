@@ -396,7 +396,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     virtualEntity: 'Entidade virtual',
     entities: 'Entidades virtuais',
     virtualEntity_other: '$t(appModules.entities)',
-    instances: 'Instâncias',
+    instances: 'Sessões RStudio',
 
     message: 'Mensagem',
     message_other: '$t(common.message_other)',
@@ -1109,8 +1109,10 @@ $t(common.cantUndoWarning)`,
     showSamplingAttributes: 'Mostrar atributos amostrais',
   },
   instancesView: {
-    title: 'Instâncias',
+    title: '$t(appModules.instances)',
     terminate: 'Encerrar',
+    noSessionRunning: 'Nenhuma sessão RStudio em execução.',
+    noSessionRunningHint: 'Inicie uma a partir de uma cadeia de processamento, com o botão RStudio.',
   },
   chain: {
     quantitative: 'Quantitativo',

@@ -396,7 +396,7 @@ export default {
     virtualEntity: 'Виртуал объект',
     entities: 'Виртуал объектууд',
     virtualEntity_other: '$t(appModules.entities)',
-    instances: 'Жишээнүүд',
+    instances: 'RStudio сешнүүд',
     message: 'Мессеж',
     message_other: '$t(common.message_other)',
 
@@ -1103,8 +1103,10 @@ $t(common.cantUndoWarning)`,
     showSamplingAttributes: 'Түүвэрлэх шинж чанаруудыг харуулах',
   },
   instancesView: {
-    title: 'Жишээнүүд',
+    title: '$t(appModules.instances)',
     terminate: 'Дуусгах',
+    noSessionRunning: 'Ажиллаж буй RStudio сешн алга.',
+    noSessionRunningHint: 'Боловсруулалтын гинжээс RStudio товчийг ашиглан эхлүүлнэ үү.',
   },
   chain: {
     quantitative: 'Тоон',

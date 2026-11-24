@@ -14,12 +14,12 @@ import * as API from '@webapp/service/api'
 
 import { ChainState } from '../state'
 
-const _getRStudioParams = async ({ userUuid }) => {
+const _getRStudioParams = async ({ surveyId, userUuid }) => {
   if (ProcessUtils.ENV.rStudioServerUrl) {
     return { rStudioUrl: ProcessUtils.ENV.rStudioServerUrl }
   }
 
-  const { instanceId, rStudioProxyUrl } = await API.createInstance()
+  const { instanceId, rStudioProxyUrl } = await API.createInstance({ surveyId })
   const rStudioUrl = instanceId && rStudioProxyUrl ? `${rStudioProxyUrl}${instanceId}_${userUuid}` : false
 
   if (rStudioUrl && instanceId) {
@@ -84,8 +84,8 @@ const _getRStudioCode = ({
 
 const _copyRStudioCode = async ({ rStudioCode }) => copyToClipboard(rStudioCode)
 
-const isInstanceRunning = async () => {
-  const currentInstance = await API.getCurrentInstance()
+const isInstanceRunning = async ({ surveyId }) => {
+  const currentInstance = await API.getCurrentInstance({ surveyId })
   return Boolean(currentInstance?.instanceId)
 }
 
@@ -125,13 +125,13 @@ export const openRStudio =
     const config = { params: { surveyCycleKey } }
     const chainUuid = Chain.getUuid(chain)
 
-    const hadInstance = !isLocal && (await isInstanceRunning())
+    const hadInstance = !isLocal && (await isInstanceRunning({ surveyId }))
 
     const { data } = await axios.post(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
 
     const { token, serverUrl } = data
 
-    const { instanceId, rStudioUrl } = isLocal ? {} : await _getRStudioParams({ userUuid })
+    const { instanceId, rStudioUrl } = isLocal ? {} : await _getRStudioParams({ surveyId, userUuid })
 
     const rStudioCode = _getRStudioCode({ surveyId, chainUuid, token, serverUrl, isLocal, surveyInfo, surveyCycleKey })
 
@@ -148,7 +148,7 @@ export const openRStudio =
         },
         onCancel: async () => {
           if (!hadInstance && !isLocal) {
-            await API.terminateInstance({ instanceId })
+            await API.terminateInstance({ surveyId, instanceId })
           }
         },
       })
