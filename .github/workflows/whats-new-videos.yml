@@ -1,0 +1,41 @@
+name: What's new videos
+
+# Attaches the "What's new in 2026" videos to the whats-new-2026 release (not in the repository, to keep it small):
+# https://github.com/openforis/arena/releases/download/whats-new-2026/arena-whats-new-2026.mp4 (and arena-ai-v5.mp4)
+# The videos are taken from a commit that still has them; to publish new versions, attach them to the release by hand.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/whats-new-videos.yml
+  workflow_dispatch:
+
+env:
+  TAG: whats-new-2026
+  # last commit with the videos in docs/whats-new-2026/video
+  VIDEOS_COMMIT: bd1ca7bde50a20eca86a7bfb8b0900eaa37d5f12
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout the videos
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.VIDEOS_COMMIT }}
+          sparse-checkout: docs/whats-new-2026/video
+          persist-credentials: false
+
+      - name: Create the release and upload the videos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$VIDEOS_COMMIT" --latest=false \
+              --title "What's new in 2026: videos" \
+              --notes "Videos of the \"What's new in 2026\" presentation (see docs/whats-new-2026/video/README.md): the 4K video and the AI features video."
+          fi
+          gh release upload "$TAG" docs/whats-new-2026/video/arena-whats-new-2026.mp4 docs/whats-new-2026/video/arena-ai-v5.mp4 --clobber --repo "$GITHUB_REPOSITORY"
