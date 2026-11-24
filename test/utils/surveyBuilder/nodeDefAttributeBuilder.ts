@@ -8,6 +8,12 @@ import * as NodeDefExpression from '../../../core/survey/nodeDefExpression'
 import NodeDefBuilder from './nodeDefBuilder'
 
 export default class NodeDefAttributeBuilder extends NodeDefBuilder {
+  _analysis: boolean
+  _categoryName: string
+  _taxonomyName: string
+  // name of the parent code attribute (a sibling), resolved when the parent entity is built
+  parentCodeDefName: string
+
   constructor(name, type = NodeDef.nodeDefType.text) {
     super(name, type)
     this._analysis = false
