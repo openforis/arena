@@ -12,7 +12,7 @@ import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
-import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
+import DataImportBaseJob from '@server/modules/dataImport/service/dataImportJob/dataImportBaseJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
@@ -25,7 +25,7 @@ import {
   getRecordFormattedKeyValuesByDefUuid,
   findExistingRecordSummary,
   determineRecordAction,
-} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
+} from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',

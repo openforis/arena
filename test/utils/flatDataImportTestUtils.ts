@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { FileFormats } from '@core/fileFormats'
 
-import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
+import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/dataImportJob/dataImportFlatDataFileReader'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import * as SB from './surveyBuilder'

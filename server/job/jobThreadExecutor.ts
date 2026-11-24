@@ -4,7 +4,7 @@ import { throttle } from '@core/functionsDefer'
 
 import ThreadManager from '@server/threads/threadManager'
 import ThreadsCache from '@server/threads/threadsCache'
-import DelayedDeleteCache from '@server/utils/DelayedDeleteCache'
+import DelayedDeleteCache from '@server/utils/delayedDeleteCache'
 import * as Log from '@server/log/log'
 
 import { jobRowToSummary, jobStatus, jobThreadMessageTypes } from './jobUtils'

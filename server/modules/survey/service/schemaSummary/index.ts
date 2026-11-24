@@ -1,2 +1,2 @@
 export * as SchemaSummary from './schemaSummary'
-export { default as SchemaSummaryExportJob } from './SchemaSummaryExportJob'
+export { default as SchemaSummaryExportJob } from './schemaSummaryExportJob'

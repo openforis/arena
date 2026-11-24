@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Objects, type ArenaValidation } from '@openforis/arena-core'
 
-import { Countries } from '@core/Countries'
+import { Countries } from '@core/countries'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 

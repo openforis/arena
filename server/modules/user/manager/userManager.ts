@@ -7,7 +7,7 @@ import { db, DbClient } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import { Countries } from '@core/Countries'
+import { Countries } from '@core/countries'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as AuthGroup from '@core/auth/authGroup'

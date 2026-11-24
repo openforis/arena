@@ -8,12 +8,12 @@ import * as ValidationResult from '@core/validation/validationResult'
 import Job, { type JobParams } from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import { RecordsDateModifiedBatchPersister } from '@server/modules/record/manager/RecordsDateModifiedBatchPersister'
-import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
-import { NodesDeleteBatchPersister } from '@server/modules/record/manager/NodesDeleteBatchPersister'
-import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
-import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
-import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
+import { RecordsDateModifiedBatchPersister } from '@server/modules/record/manager/recordsDateModifiedBatchPersister'
+import { RecordsValidationBatchPersister } from '@server/modules/record/manager/recordsValidationBatchPersister'
+import { NodesDeleteBatchPersister } from '@server/modules/record/manager/nodesDeleteBatchPersister'
+import { NodesInsertBatchPersister } from '@server/modules/record/manager/nodesInsertBatchPersister'
+import { NodesUpdateBatchPersister } from '@server/modules/record/manager/nodesUpdateBatchPersister'
+import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/rdbUpdatesBatchPersister'
 
 export default class DataImportBaseJob extends Job {
   currentRecord: ArenaRecord | null

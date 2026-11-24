@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 
 import { Numbers, Objects } from '@openforis/arena-core'
 
-import { getSamplingPolygonDefaults } from '@core/survey/SamplingPolygon'
+import { getSamplingPolygonDefaults } from '@core/survey/samplingPolygon'
 
 import { Fieldset } from '@webapp/components'
 

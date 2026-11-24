@@ -4,7 +4,7 @@ import * as ProcessUtils from '@core/processUtils'
 import { uuidv4 } from '@core/uuid'
 import * as Log from '@server/log/log'
 
-import { JobQueue } from './JobQueue'
+import { JobQueue } from './jobQueue'
 import { jobRowToSummary, jobRowToMonitorSummary } from './jobUtils'
 import * as jobRepository from './jobRepository'
 

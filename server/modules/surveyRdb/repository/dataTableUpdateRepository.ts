@@ -15,7 +15,7 @@ import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/co
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as DbUtils from '@server/db/dbUtils'
-import { type RdbUpdate, RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
+import { type RdbUpdate, RdbUpdateTypes, RdbUpdates } from './rdbUpdates'
 
 const types = RdbUpdateTypes
 
