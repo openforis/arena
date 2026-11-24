@@ -3,19 +3,25 @@ import { CircleMarker } from 'react-leaflet'
 
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
+import type { PointFeature } from 'supercluster'
+
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
 
 const markerRadius = 10
 
+// a sampling point data item as a map point feature
+export type SamplingPointFeature = PointFeature<{ key: string; [name: string]: any }>
+
 type SamplingPointDataMarkerProps = {
   createRecordFromSamplingPointDataItem: (...args: any[]) => any
-  flyToPoint: (...args: any[]) => any
-  flyToNextPoint: (...args: any[]) => any
-  flyToPreviousPoint: (...args: any[]) => any
+  flyToPoint: FlyToPointFunction
+  flyToNextPoint: FlyToPointFunction
+  flyToPreviousPoint: FlyToPointFunction
   markersColor?: string
   onPopupClose?: (...args: any[]) => any
   onPopupOpen?: (...args: any[]) => any
   onRecordEditClick: (...args: any[]) => any
-  pointFeature: Record<string, any>
+  pointFeature: SamplingPointFeature
   popupOpen?: boolean
   setMarkerByKey: (...args: any[]) => any
 }

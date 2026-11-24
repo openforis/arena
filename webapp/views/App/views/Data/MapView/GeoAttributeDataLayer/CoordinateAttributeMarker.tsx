@@ -9,6 +9,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -16,9 +17,9 @@ const fillOpacity = 0.5
 type CoordinateAttributeMarkerProps = {
   attributeDef?: any
   data?: any
-  flyToPoint?: (...args: any[]) => any
-  flyToNextPoint?: (...args: any[]) => any
-  flyToPreviousPoint?: (...args: any[]) => any
+  flyToPoint?: FlyToPointFunction
+  flyToNextPoint?: FlyToPointFunction
+  flyToPreviousPoint?: FlyToPointFunction
   markersColor?: any
   onPopupClose?: (...args: any[]) => any
   onPopupOpen?: (...args: any[]) => any

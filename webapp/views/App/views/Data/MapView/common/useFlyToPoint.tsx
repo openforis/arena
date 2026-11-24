@@ -13,10 +13,26 @@ const flyToLoaderIcon = L.divIcon({
 // the loader is removed anyway if no popup opens (e.g. layer hidden during the flight)
 const flyToLoaderTimeoutAfterMoveEnd = 2000
 
-export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel = true }) => {
+// GeoJSON point feature of a map layer: [longitude, latitude] coordinates and a key unique in the layer
+export type FlyToPointFeature = {
+  geometry: { coordinates: number[] }
+  properties: { key: string }
+}
+
+export type FlyToPointFunction<P extends FlyToPointFeature = FlyToPointFeature> = (point: P) => void
+
+export const useFlyToPoint = <P extends FlyToPointFeature>({
+  points,
+  onRecordEditClick = null,
+  zoomToMaxLevel = true,
+}: {
+  points: P[]
+  onRecordEditClick?: ((params: { recordUuid: string } | null) => void) | null
+  zoomToMaxLevel?: boolean
+}) => {
   const map = useMap()
 
-  const [state, setState] = useState<{ currentPointShown?: any; currentPointPopupOpen?: boolean }>({})
+  const [state, setState] = useState<{ currentPointShown?: P | null; currentPointPopupOpen?: boolean }>({})
   const { currentPointShown, currentPointPopupOpen } = state
 
   // Have a Reference to points for opening popups automatically
@@ -25,10 +41,10 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
   // removes the loader and the listeners of the last flight, if still pending
   const pendingFlightCleanupRef = useRef(null)
 
-  const getPointKey = useCallback((point) => point?.properties?.key, [])
+  const getPointKey = useCallback((point: FlyToPointFeature | null) => point?.properties?.key, [])
 
   const openPopupOfPoint = useCallback(
-    async (point) => {
+    async (point: P) => {
       const marker = markersByKeyRef.current[getPointKey(point)]
       if (marker) {
         // marker has been rendered already
@@ -45,20 +61,23 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
     [currentPointShown, getPointKey]
   )
 
-  const getPointIndex = useCallback((point) => points.findIndex((p) => getPointKey(p) === getPointKey(point)), [points])
+  const getPointIndex = useCallback(
+    (point: P) => points.findIndex((p) => getPointKey(p) === getPointKey(point)),
+    [getPointKey, points]
+  )
 
   const getPointByOffset = useCallback(
-    (point, offset) => {
+    (point: P, offset: number): P => {
       const index = getPointIndex(point)
       const indexNext = Numbers.absMod(points.length)(index + offset)
       return points[indexNext]
     },
     [getPointIndex, points]
   )
-  const getNextPoint = useCallback((point) => getPointByOffset(point, 1), [getPointByOffset])
-  const getPreviousPoint = useCallback((point) => getPointByOffset(point, -1), [getPointByOffset])
+  const getNextPoint = useCallback((point: P) => getPointByOffset(point, 1), [getPointByOffset])
+  const getPreviousPoint = useCallback((point: P) => getPointByOffset(point, -1), [getPointByOffset])
 
-  const flyToPoint = useCallback(
+  const flyToPoint: FlyToPointFunction<P> = useCallback(
     (point) => {
       // close record edit popup
       onRecordEditClick?.(null)
@@ -101,7 +120,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
 
   useEffect(() => () => pendingFlightCleanupRef.current?.(), [])
 
-  const flyToNextPoint = useCallback(
+  const flyToNextPoint: FlyToPointFunction<P> = useCallback(
     (point) => {
       const nextPoint = getNextPoint(point)
       flyToPoint(nextPoint)
@@ -109,7 +128,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
     [flyToPoint, getNextPoint]
   )
 
-  const flyToPreviousPoint = useCallback(
+  const flyToPreviousPoint: FlyToPointFunction<P> = useCallback(
     (point) => {
       const previousPoint = getPreviousPoint(point)
       flyToPoint(previousPoint)
@@ -135,7 +154,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
   useEffect(() => {
     flyToPointRef.current = flyToPoint
   }, [flyToPoint])
-  const stableFlyToPoint = useCallback((point) => flyToPointRef.current(point), [])
+  const stableFlyToPoint: FlyToPointFunction<P> = useCallback((point) => flyToPointRef.current(point), [])
 
   return {
     currentPointShown,

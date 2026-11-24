@@ -46,7 +46,7 @@ const compareAncestorsKeys = (keysA: string[], keysB: string[]): number => {
   return keysA.length - keysB.length
 }
 
-export const applySortOrder = (points: MapLayerPoint[], sortOrder: MapSortOrder): MapLayerPoint[] => {
+export const applySortOrder = <P extends MapLayerPoint>(points: P[], sortOrder: MapSortOrder): P[] => {
   if (sortOrder === 'none') return points
   return [...points].sort((a, b) => {
     const cmp = compareAncestorsKeys(a.properties.ancestorsKeys, b.properties.ancestorsKeys)

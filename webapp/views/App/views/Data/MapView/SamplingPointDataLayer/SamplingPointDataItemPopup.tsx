@@ -13,6 +13,7 @@ import { useAuthCanCreateRecord } from '@webapp/store/user'
 
 import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
 
 const generateContent = ({ i18n, itemCodes, locationPoint, elevation }) => {
   const levelCodesList = itemCodes
@@ -27,8 +28,8 @@ ${locationSummary}`
 
 type SamplingPointDataItemPopupProps = {
   createRecordFromSamplingPointDataItem: (...args: any[]) => any
-  flyToNextPoint: (...args: any[]) => any
-  flyToPreviousPoint: (...args: any[]) => any
+  flyToNextPoint: FlyToPointFunction
+  flyToPreviousPoint: FlyToPointFunction
   pointFeature: any
   onRecordEditClick: (...args: any[]) => any
 }

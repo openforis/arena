@@ -23,6 +23,7 @@ import * as API from '@webapp/service/api'
 import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
 import { WhispMenuButton } from './WhispMenuButton'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -61,8 +62,8 @@ type CoordinateAttributePopUpProps = {
   attributeDef: any
   pointFeature: any
   onRecordEditClick: (...args: any[]) => any
-  flyToNextPoint: (...args: any[]) => any
-  flyToPreviousPoint: (...args: any[]) => any
+  flyToNextPoint: FlyToPointFunction
+  flyToPreviousPoint: FlyToPointFunction
 }
 
 export const CoordinateAttributePopUp = (props: CoordinateAttributePopUpProps) => {

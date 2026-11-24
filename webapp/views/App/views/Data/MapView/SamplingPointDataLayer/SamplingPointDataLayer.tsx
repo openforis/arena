@@ -1,10 +1,16 @@
 import { useCallback, useMemo } from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
+import type { AnyProps, ClusterFeature, PointFeature } from 'supercluster'
 
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
-import { SamplingPointDataMarker } from './SamplingPointDataMarker'
+import { SamplingPointDataMarker, type SamplingPointFeature } from './SamplingPointDataMarker'
+
+// supercluster returns the original feature of a sampling point item not clustered
+const isSamplingPointFeature = (
+  feature: ClusterFeature<AnyProps> | PointFeature<AnyProps>
+): feature is SamplingPointFeature => !feature.properties.cluster
 
 type SamplingPointDataLayerProps = {
   levelIndex?: number
@@ -55,10 +61,7 @@ export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item
-          const { cluster: isCluster, itemUuid } = cluster.properties
-
-          // we have a cluster to render
-          if (isCluster) {
+          if (!isSamplingPointFeature(cluster)) {
             return (
               <ClusterMarker
                 key={cluster.id}
@@ -76,7 +79,7 @@ export const SamplingPointDataLayer = (props: SamplingPointDataLayerProps) => {
           // we have a single point (sampling point item) to render
           return (
             <SamplingPointDataMarker
-              key={itemUuid}
+              key={cluster.properties.itemUuid}
               createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
               flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
