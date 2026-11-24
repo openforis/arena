@@ -614,7 +614,6 @@ declare global {
       const [from, to] = inside ? ['#000', 'transparent'] : ['transparent', '#000']
       m = `radial-gradient(circle at 50% 55%, ${from} ${r}px, ${to} ${r + 2}px)`
     }
-    e.style.webkitMaskImage = m
     e.style.maskImage = m
   }
 
