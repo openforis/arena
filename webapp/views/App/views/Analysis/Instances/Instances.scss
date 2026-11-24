@@ -7,11 +7,23 @@
   align-items: center;
 
   .instance-row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 0.5rem 1rem;
     border: 1px solid $colorOutline;
 
-    a {
-      margin: 0 16px;
-      margin-right: 32px;
+    p {
+      margin: 0;
+    }
+  }
+
+  .instances-empty {
+    margin-top: 2rem;
+    text-align: center;
+
+    &__hint {
+      color: $colorOnSurfaceVariant;
     }
   }
 }

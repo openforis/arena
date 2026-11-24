@@ -391,7 +391,7 @@ export default {
     virtualEntity: '仮想項目',
     entities: '仮想項目',
     virtualEntity_other: '$t(appModules.entities)',
-    instances: 'インスタンス',
+    instances: 'RStudioセッション',
 
     message: 'メッセージ',
     message_other: '$t(common.message_other)',
@@ -1107,8 +1107,10 @@ $t(common.cantUndoWarning)`,
     showSamplingAttributes: 'サンプリング属性を表示',
   },
   instancesView: {
-    title: 'インスタンス',
+    title: '$t(appModules.instances)',
     terminate: '終了',
+    noSessionRunning: '実行中のRStudioセッションはありません。',
+    noSessionRunningHint: '処理チェーンのRStudioボタンから開始できます。',
   },
   chain: {
     quantitative: '量的',
