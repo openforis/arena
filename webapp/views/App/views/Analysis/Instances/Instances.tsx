@@ -19,7 +19,7 @@ const Instances = () => {
   const i18n = useI18n()
 
   const [loading, setLoading] = useState(true)
-  const [instance, setInstance] = useState<RStudioInstance | null>({})
+  const [instance, setInstance] = useState<RStudioInstance | null>(null)
   const [url, setUrl] = useState('')
 
   const closeRStudioInstance = async () => {
@@ -38,9 +38,11 @@ const Instances = () => {
     axios
       .get('/api/rstudio')
       .then(({ data }) => {
-        const { instance, rStudioProxyUrl } = data
-        setInstance(instance)
-        setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
+        const { instance, rStudioProxyUrl } = data ?? {}
+        setInstance(instance ?? null)
+        if (instance?.instanceId) {
+          setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
+        }
       })
       .catch(() => {
         // no RStudio instance available
@@ -48,11 +50,16 @@ const Instances = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p>loading...</p>
+  if (loading) return <p>{i18n.t('common.loading')}</p>
   return (
     <div className="instances-container">
       <p>{i18n.t('instancesView.title')}</p>
-      {!A.isEmpty(instance) && (
+      {A.isEmpty(instance?.instanceId) ? (
+        <div className="instances-empty">
+          <p>{i18n.t('instancesView.noSessionRunning')}</p>
+          <p className="instances-empty__hint">{i18n.t('instancesView.noSessionRunningHint')}</p>
+        </div>
+      ) : (
         <div className="instance-row">
           <a href={url} target="_blank" rel="noreferrer">
             <p>

@@ -14,4 +14,13 @@
       margin-right: 32px;
     }
   }
+
+  .instances-empty {
+    margin-top: 2rem;
+    text-align: center;
+
+    &__hint {
+      color: $colorOnSurfaceVariant;
+    }
+  }
 }
