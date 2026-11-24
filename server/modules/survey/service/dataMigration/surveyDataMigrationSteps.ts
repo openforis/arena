@@ -62,7 +62,7 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
   },
   {
     // node meta hierarchy no longer stored (rebuilt from the parent uuids): the RDB node hierarchy view reads it no more
-    version: '2.11.3',
+    version: '3.0.1',
     migrate: async ({ surveyId, client }) => {
       await replaceNodeHierarchyDisaggregatedViewIfExists({ surveyId }, client)
     },
