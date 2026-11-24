@@ -4736,6 +4736,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tmcw/togeojson@npm:^7.1.4":
+  version: 7.1.4
+  resolution: "@tmcw/togeojson@npm:7.1.4"
+  checksum: 10c0/bb5acafc21404d3c7bb2caeebbf370a3b9fcaa5231ec81b347a811a3eaa43361608521cc9eecd49e3229bef8d6254f8d9c260637d4b00aebafdd28b77874f00d
+  languageName: node
+  linkType: hard
+
 "@turf/area@npm:^7.4.0":
   version: 7.4.0
   resolution: "@turf/area@npm:7.4.0"
@@ -15491,6 +15498,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:^2.15.0"
     "@sendgrid/mail": "npm:^8.1.6"
     "@shopify/draggable": "npm:^1.2.1"
+    "@tmcw/togeojson": "npm:^7.1.4"
     "@turf/area": "npm:^7.4.0"
     "@turf/bbox-polygon": "npm:^7.4.0"
     "@turf/centroid": "npm:^7.4.0"
