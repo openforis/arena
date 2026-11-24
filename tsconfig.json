@@ -23,6 +23,6 @@
     "allowImportingTsExtensions": true,
     "types": ["node", "jest"]
   },
-  "include": ["common", "core", "server", "webapp", "test", "*.d.ts", "*.config.ts", "*.config.mts", "docs/whats-new-2026/video"],
+  "include": ["common", "core", "server", "webapp", "test", "*.d.ts", "*.config.cts", "*.config.mts", "docs/whats-new-2026/video"],
   "exclude": ["dist", "node_modules"]
 }
