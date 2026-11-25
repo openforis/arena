@@ -5,7 +5,6 @@ import type { DbClient } from '@server/db/db'
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
-import * as SurveyDependencyGraphsManager from '@server/modules/survey/manager/surveyDependencyGraphsManager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
 
@@ -58,13 +57,6 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
     version: '2.10.9',
     migrate: async ({ surveyId, client }) => {
       await migrateTaxaExcelCellValues({ surveyId }, client)
-    },
-  },
-  {
-    // arena-core dependency graph with the new appInfo and nodeDates dependency types (app info and node date functions)
-    version: '3.0.1',
-    migrate: async ({ surveyId, client }) => {
-      await SurveyDependencyGraphsManager.rebuildDependencyGraphs({ surveyId }, client)
     },
   },
   // future per-survey migration steps are appended here, each with its own version threshold
