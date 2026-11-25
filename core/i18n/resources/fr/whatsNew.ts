@@ -14,7 +14,7 @@ export default {
 - **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()** : l'application qui modifie l'enregistrement (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), sa plateforme (\`web\`, \`android\` ou \`ios\`) et sa version. Elles sont évaluées à la création de l'enregistrement, puis à nouveau lorsqu'il est modifié avec une autre application, plateforme ou version de l'application : par ex. un attribut en **Lecture seule** avec la valeur par défaut \`appIdLabel()\` et **Valeur par défaut évaluée une seule fois** garde l'application qui a créé l'enregistrement.
 - **nodeDateCreated(node)**, **nodeDateModified(node)** : date et heure de création et de dernière modification d'un attribut ou d'une entité ; pour une entité, la dernière fois qu'une de ses valeurs a changé, par ex. \`nodeDateModified(parent(this))\`.
 
-Dans l'éditeur d'expressions simple, sélectionnez-les dans la liste **Fonction** : l'assistant des fonctions de date des nœuds liste les attributs et les entités, y compris les entités ancêtres.`,
+Dans l'éditeur d'expressions simple, sélectionnez-les dans la liste **Fonction** : l'assistant des fonctions de date des nœuds liste les attributs accessibles depuis le nœud courant et les entités ancêtres.`,
     },
     googleSignIn: {
       title: 'Connexion avec votre compte Google',

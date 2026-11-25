@@ -14,7 +14,7 @@ export default {
 - **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()**: la aplicación que modifica el registro (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), su plataforma (\`web\`, \`android\` o \`ios\`) y su versión. Se evalúan al crear el registro y de nuevo cuando se modifica con otra aplicación, plataforma o versión de la aplicación: p. ej., un atributo de **Solo lectura** con el valor predeterminado \`appIdLabel()\` y **Valor predeterminado evaluado solo una vez** conserva la aplicación que creó el registro.
 - **nodeDateCreated(node)**, **nodeDateModified(node)**: fecha y hora de creación y de última modificación de un atributo o entidad; para una entidad, la última vez que cambió alguno de sus valores, p. ej. \`nodeDateModified(parent(this))\`.
 
-En el editor de expresiones básico, selecciónelas en la lista **Función**: el asistente de las funciones de fecha de los nodos muestra los atributos y las entidades, incluidas las entidades antecesoras.`,
+En el editor de expresiones básico, selecciónelas en la lista **Función**: el asistente de las funciones de fecha de los nodos muestra los atributos accesibles desde el nodo actual y las entidades antecesoras.`,
     },
     googleSignIn: {
       title: 'Inicio de sesión con su cuenta de Google',

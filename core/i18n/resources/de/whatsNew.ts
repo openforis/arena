@@ -14,7 +14,7 @@ export default {
 - **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()**: die App, die den Datensatz bearbeitet (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), ihre Plattform (\`web\`, \`android\` oder \`ios\`) und ihre Version. Sie werden beim Erstellen des Datensatzes ausgewertet und erneut, wenn er mit einer anderen App, Plattform oder App-Version bearbeitet wird: z. B. behält ein **Schreibgeschützt**-Attribut mit dem Standardwert \`appIdLabel()\` und **Standardwert nur einmal auswerten** die App, die den Datensatz erstellt hat.
 - **nodeDateCreated(node)**, **nodeDateModified(node)**: Datum und Uhrzeit der Erstellung und der letzten Änderung eines Attributs oder einer Entität; bei einer Entität der Zeitpunkt, zu dem sich zuletzt einer ihrer Werte geändert hat, z. B. \`nodeDateModified(parent(this))\`.
 
-Wählen Sie sie im einfachen Ausdruckseditor in der Liste **Funktion** aus: der Assistent der Knotendatum-Funktionen listet die Attribute und Entitäten auf, einschließlich der übergeordneten Entitäten.`,
+Wählen Sie sie im einfachen Ausdruckseditor in der Liste **Funktion** aus: der Assistent der Knotendatum-Funktionen listet die vom aktuellen Knoten aus erreichbaren Attribute und die übergeordneten Entitäten auf.`,
     },
     googleSignIn: {
       title: 'Mit Ihrem Google-Konto anmelden',
