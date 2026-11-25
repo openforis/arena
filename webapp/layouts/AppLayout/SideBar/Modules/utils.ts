@@ -1,6 +1,7 @@
 import { Authorizer } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
+import { canViewChangelog } from '@core/auth/changelogAuthorizer'
 import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -113,7 +114,7 @@ const getHelpModule = (user, lang) =>
       { ...helpModules.userManual, uri: getUserManualUri(lang) },
       helpModules.about,
       helpModules.whatsNew,
-      ...(User.canViewChangelog(user) ? [helpModules.changelog] : []),
+      ...(canViewChangelog(user) ? [helpModules.changelog] : []),
       helpModules.termsOfService,
       helpModules.privacyPolicy,
     ],

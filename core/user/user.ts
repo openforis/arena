@@ -59,13 +59,6 @@ export const isSurveyManager = (user: any) => !!user && A.any(AuthGroup.isSurvey
  */
 export const isSurveyAdminOfSomeSurvey = (user: any): boolean =>
   !!user && getAuthGroups(user).some((group: any) => AuthGroup.getName(group) === AuthGroup.groupNames.surveyAdmin)
-/**
- * Returns true if the user can view the changelog (system admins, survey managers and survey admins).
- * @param {object} user - The user.
- * @returns {boolean} True if the changelog is visible to the user.
- */
-export const canViewChangelog = (user: any): boolean =>
-  isSystemAdmin(user) || isSurveyManager(user) || isSurveyAdminOfSomeSurvey(user)
 export const hasAccepted = A.propEq(keys.status, userStatus.ACCEPTED)
 export const isInvited = A.propEq(keys.status, userStatus.INVITED)
 export const isInvitationExpired = A.propEq(keys.invitationExpired, true)

@@ -4,6 +4,7 @@ import { type ArenaSurvey, Authorizer, ServiceRegistry, ServiceType } from '@ope
 import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import { canEditSurveyAiPolicy } from '@common/ai/policy'
+import { canViewChangelog } from '@core/auth/changelogAuthorizer'
 import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -81,7 +82,7 @@ export const requireLoggedInUser = (req: ExpressRequest, res: ExpressResponse, n
 }
 
 export const requireChangelogViewPermission = (req: ExpressRequest, res: ExpressResponse, next: NextFunction): void => {
-  if (User.canViewChangelog(Request.getUser(req))) {
+  if (canViewChangelog(Request.getUser(req))) {
     next()
     return
   }

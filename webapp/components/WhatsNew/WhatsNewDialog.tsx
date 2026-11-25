@@ -3,7 +3,7 @@ import './WhatsNew.scss'
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import * as User from '@core/user/user'
+import { canViewChangelog } from '@core/auth/changelogAuthorizer'
 import { appModuleUri, helpModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 import { Button } from '../buttons'
@@ -47,7 +47,7 @@ export const WhatsNewDialog = () => {
         <WhatsNewCarousel items={unseenItems} />
       </ModalBody>
       <ModalFooter>
-        {User.canViewChangelog(user) && (
+        {canViewChangelog(user) && (
           <Button
             className="modal-footer__item whats-new-dialog__changelog-link"
             label="whatsNew:showChangelog"
