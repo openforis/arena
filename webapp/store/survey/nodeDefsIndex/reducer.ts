@@ -1,13 +1,10 @@
 import type { ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
-
-import { NodeDefsActions } from '../nodeDefs'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as SurveyActions from '../actions'
+import { NodeDefsActions } from '../nodeDefs'
 
 const actionHandlers = {
   // Reset state

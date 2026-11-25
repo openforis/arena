@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import * as ProcessUtils from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-
 import * as Log from '@server/log/log'
 
 const logger = Log.getLogger('WhispDataProcessor')

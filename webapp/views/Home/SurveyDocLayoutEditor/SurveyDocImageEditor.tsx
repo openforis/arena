@@ -3,18 +3,17 @@ import './SurveyDocImageEditor.scss'
 import { useCallback, useEffect, useState } from 'react'
 
 import {
-  SurveyDocImages,
-  SurveyDocImageFactory,
-  SurveyDocPlace,
-  surveyDocImagePropKeys,
   type ArenaSurveyDocImage,
   type ArenaValidation,
+  SurveyDocImageFactory,
+  surveyDocImagePropKeys,
+  SurveyDocImages,
+  SurveyDocPlace,
 } from '@openforis/arena-core'
 
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
-
 import { Button, ButtonDownload, Dropzone, Modal, ModalBody, ModalFooter, RadioButtonGroup } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'

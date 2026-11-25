@@ -6,7 +6,6 @@ import {
   isDeclaredDataClassAllowed,
 } from '@common/ai/features'
 import { parseGatewayRequest } from '@server/modules/ai/service/gateway/callValidation'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]

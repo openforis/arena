@@ -1,7 +1,5 @@
 import * as Survey from '@core/survey/survey'
-
 import { OdkExpressionConverter } from '@server/modules/odkImport/service/odkImport/metaImportJobs/nodeDefsImportJob/odkExpressionConverter'
-
 import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 

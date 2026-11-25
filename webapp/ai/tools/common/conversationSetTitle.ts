@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
-
 import { cleanConversationTitle } from '@webapp/ai/conversations/conversationModel'
-
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool } from '../types'
 

@@ -2,18 +2,17 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { useStore } from 'react-redux'
 
 import * as User from '@core/user/user'
-
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import type { AssistantArea } from './assistantAreas'
 import {
-  selectShownConversation,
   type AssistantConversationController,
   type AssistantConversationEnv,
   type AssistantConversationScope,
   type AssistantSendOptions,
+  selectShownConversation,
 } from './assistantConversationController'
 import { createBrowserAssistantController } from './createBrowserAssistantController'
 import { useAssistantToolContext } from './useAssistantToolContext'

@@ -1,26 +1,25 @@
-import type FileZip from '@server/utils/file/fileZip'
-import type { DbClient } from '@server/db/db'
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
+
 import { ConflictResolutionStrategy } from '@common/dataImport'
-
-import { isUuid } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
-
-import Job, { type JobParams } from '@server/job/job'
-import type { OdkImportJobContext } from '../odkImportJobContext'
+import { isUuid } from '@core/uuid'
 import BatchPersister from '@server/db/batchPersister'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
-import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
+import type { DbClient } from '@server/db/db'
+import Job, { type JobParams } from '@server/job/job'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { findExistingRecordSummary } from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
-
-import * as XForm from '../model/xform'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import type FileZip from '@server/utils/file/fileZip'
 import type { XmlElement } from '../model/xform'
+import * as XForm from '../model/xform'
+import type { OdkImportJobContext } from '../odkImportJobContext'
+
 import { extractAttributeValue } from './odkAttributeValueExtractor'
 
 const categoryItemProvider = CategoryItemProviderDefault

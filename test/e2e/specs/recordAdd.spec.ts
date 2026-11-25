@@ -1,5 +1,4 @@
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { getCategoryItemLabel, getTaxon } from '../fixtures/seed/sampleRecordDisplay'
 import { cluster, plot, tree } from '../fixtures/seed/sampleSurveyModel'

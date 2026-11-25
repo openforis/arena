@@ -1,26 +1,22 @@
-import type { DbClient } from '@server/db/db'
-import * as A from '@core/arena'
-
 import {
-  RecordValidator,
-  type ArenaRecordNode,
-  type ArenaUser,
-  type ArenaRecord,
-  type ArenaSurvey,
   ArenaAnyNodeDef,
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type ArenaSurvey,
+  type ArenaUser,
   type ArenaValidation,
+  RecordValidator,
 } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
+import type { DbClient } from '@server/db/db'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
-
 import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'

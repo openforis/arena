@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import type { ArenaApi } from '../fixtures/arenaApi'
 import { E2E_LOCAL_PROVIDER_ID } from '../helpers/aiAnalysis'

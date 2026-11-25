@@ -1,16 +1,16 @@
 import './NodeDefTableCellHeader.scss'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import { valuePropsTaxon } from '@core/survey/nodeValueProps'
-
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
-
 import * as NodeDefUiProps from '../nodeDefUIProps'
+
 import NodeDefIconKey from './NodeDefIconKey'
 import { NodeDefInfoIcon } from './NodeDefInfoIcon'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type NodeDefTableCellHeaderProps = {
   label: string

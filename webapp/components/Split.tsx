@@ -1,9 +1,8 @@
 import './Split.scss'
 
-import type React from 'react'
-
-import ReactSplit from 'react-split'
 import classNames from 'classnames'
+import type React from 'react'
+import ReactSplit from 'react-split'
 
 // same as $paneResizeHandleWidth (layoutMixins.scss)
 const GUTTER_SIZE = 12

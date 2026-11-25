@@ -1,9 +1,8 @@
 import { UserFactory } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
-
 import {
   filterNodesOfRecord,
   isEventOfOpenRecord,

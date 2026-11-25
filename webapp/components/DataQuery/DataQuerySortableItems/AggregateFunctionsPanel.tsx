@@ -1,17 +1,16 @@
 import './AggregateFunctionsPanel.scss'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import { Query } from '@common/model/query'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
+import { Query } from '@common/model/query'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
-
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { CustomAggregateFunctionsEditor } from './CustomAggregateFunctionsEditor'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type AggregateFunctionsPanelProps = {
   aggregateFunctions: any[]

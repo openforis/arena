@@ -1,26 +1,26 @@
 import type { ArenaAnyNodeDef, ArenaCategory, ArenaNodeDefEntity } from '@openforis/arena-core'
-import { uuidv4 } from '@core/uuid'
+
 import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Category from '@core/survey/category'
 import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
-
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import Job, { type JobParams } from '@server/job/job'
-import type { OdkImportJobContext } from '../odkImportJobContext'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 // Small, generic (no Collect-specific logic) name-deduplication utility - reused as-is rather than
 // forked, see docs/superpowers/specs/2026-09-09-odk-import-design.md.
 import NodeDefUniqueNameGenerator from '@server/modules/collectImport/service/collectImport/model/nodeDefUniqueNameGenerator'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as OdkImportReportManager from '../../../manager/odkImportReportManager'
-
+import type { ItextTranslations, XFormBind, XFormBodyControl, XmlElement } from '../model/xform'
 import * as XForm from '../model/xform'
-import type { XmlElement, XFormBind, XFormBodyControl, ItextTranslations } from '../model/xform'
-import { mapXFormTypeToNodeDefType, arenaFileTypeFromMediatype } from '../model/xformTypeMapping'
+import { arenaFileTypeFromMediatype, mapXFormTypeToNodeDefType } from '../model/xformTypeMapping'
+import type { OdkImportJobContext } from '../odkImportJobContext'
+
 import { OdkExpressionConverter } from './nodeDefsImportJob/odkExpressionConverter'
 
 const literalTrueValues = new Set(['true()', 'true'])

@@ -1,11 +1,11 @@
-import type { ArenaCategoryItem, ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
+import type { ArenaAnyNodeDef, ArenaCategoryItem, ArenaSurvey } from '@openforis/arena-core'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as A from '@core/arena'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 type RootEntityKeyDef = ArenaAnyNodeDef
 type RecordSummary = Record<string, any>

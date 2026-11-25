@@ -13,7 +13,6 @@ import {
 } from '@common/ai/features'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
-
 import { OFF_POLICY } from '@webapp/ai/policy/effectivePolicy'
 
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from './featureSwitches'

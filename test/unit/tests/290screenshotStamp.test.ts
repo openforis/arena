@@ -1,9 +1,9 @@
 import { formatCoordinates } from '@core/geo/coordinateFormat'
 import {
-  getBaseMapName,
   buildStampLines,
   collectAttributions,
   formatStampCoordinates,
+  getBaseMapName,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotStamp'
 
 // plain text: the HTML decoding is the browser's DOMParser, absent from the node test environment

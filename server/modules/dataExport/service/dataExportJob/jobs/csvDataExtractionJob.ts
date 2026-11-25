@@ -1,5 +1,4 @@
 import Job, { type JobParams } from '@server/job/job'
-
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 
 export default class CSVDataExtractionJob extends Job {

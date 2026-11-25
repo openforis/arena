@@ -1,12 +1,11 @@
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { QueryNodeDefs } from '@common/model/query'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
-import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import { getAnalysisContext } from './toolResults'

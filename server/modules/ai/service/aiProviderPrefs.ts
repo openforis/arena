@@ -2,7 +2,6 @@
  * The account providers stored in `user.prefs.ai` (pure: no database, no secret read), and the read-time conversion
  * of the single provider slot saved before the list existed.
  */
-import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
 import { isAllowlisted, providerTypeUsesBaseUrl, stripTrailingSlashes } from '@common/ai/allowlist'
 import {
@@ -14,6 +13,7 @@ import {
   normalizeProviderName,
 } from '@common/ai/providerIds'
 import { AI_MAX_ACCOUNT_PROVIDERS, AI_PROVIDER_FIELD_MAX_CHARS } from '@common/ai/providerLimits'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import { MOCK_PROVIDER } from './mockProvider'
 

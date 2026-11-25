@@ -3,11 +3,10 @@
  */
 import type { LanguageModelV4 } from '@ai-sdk/provider'
 
-import SystemError from '@core/systemError'
 import { type AiDataClass, getAiFeature } from '@common/ai/features'
-
-import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
+import SystemError from '@core/systemError'
 import { refreshAuthToken } from '@webapp/app/appErrorsMiddleware'
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
 import { createAuthorizedFetch } from './authorizedFetch'
 import { createGatewayModel } from './gatewayModel'

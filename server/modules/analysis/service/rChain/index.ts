@@ -1,29 +1,26 @@
 import type { Response as ExpressResponse } from 'express'
-import type { ArenaNodeDefEntity, ArenaUser, ArenaAnyNodeDef } from '@openforis/arena-core'
-import { db } from '@server/db/db'
 
-import FileZip from '@server/utils/file/fileZip'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity, ArenaUser } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as RecordStep from '@core/record/recordStep'
-import { FileFormats } from '@core/fileFormats'
-
+import * as Chain from '@common/analysis/chain'
 import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
-import * as Chain from '@common/analysis/chain'
-
+import { FileFormats } from '@core/fileFormats'
+import * as RecordStep from '@core/record/recordStep'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { db } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
-import * as UserService from '@server/modules/user/service/userService'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as UserService from '@server/modules/user/service/userService'
+import FileZip from '@server/utils/file/fileZip'
 import * as AnalysisManager from '../../manager'
-
-import RChain from './rChain'
-import PersistResultsJob from './persistResultsJob'
 import PersistOlapDataJob from '../olap/persistOlapDataJob'
+
+import PersistResultsJob from './persistResultsJob'
+import RChain from './rChain'
 
 export const generateScript = ({
   surveyId,

@@ -3,7 +3,7 @@
  * providers (this browser, with their probe) and Arena default (the admin default), each with a status.
  * Pure, no AI SDK import.
  */
-import { aiHostingClasses, type AiHostingClass } from '@common/ai/policy'
+import { type AiHostingClass, aiHostingClasses } from '@common/ai/policy'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   isAccountProviderId,

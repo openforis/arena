@@ -1,12 +1,11 @@
-import * as A from '@core/arena'
-
-import { CategoryItems, DateFormats, Dates, Objects, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, CategoryItems, DateFormats, Dates, Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 type NodeValue = any // NOSONAR: node value shape depends on the node def type
 

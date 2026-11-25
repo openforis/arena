@@ -1,10 +1,10 @@
 import {
-  PrintOrientations,
+  type PrintableExportFormat,
   PrintableExportFormats,
+  type PrintableExportScope,
   PrintableExportScopes,
   type PrintOrientation,
-  type PrintableExportFormat,
-  type PrintableExportScope,
+  PrintOrientations,
 } from '@common/record/printableExport'
 
 export type { PrintableExportFormat, PrintableExportScope, PrintOrientation }

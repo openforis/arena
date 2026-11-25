@@ -13,10 +13,10 @@ import {
 } from '@mui/material'
 
 import { SortOrder } from '@core/sortOrder'
-
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { useI18n } from '@webapp/store/system'
 import { themeColors, withAlpha } from '@webapp/theme/tokens'
+
 import {
   applySortOrder,
   type MapLayerPoint,

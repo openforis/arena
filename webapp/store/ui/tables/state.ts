@@ -1,7 +1,7 @@
-import * as A from '@core/arena'
-
-import * as UiState from '../state'
 import { Objects } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+import * as UiState from '../state'
 
 export const stateKey = 'tables'
 

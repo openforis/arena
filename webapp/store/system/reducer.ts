@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux'
 
 import { SystemInfoReducer, SystemInfoState } from './info'
-import { SystemErrorReducer, SystemErrorState } from './systemError'
-import { SystemStatusReducer, SystemStatusState } from './status'
 import { ServiceErrorReducer, ServiceErrorState } from './serviceError'
+import { SystemStatusReducer, SystemStatusState } from './status'
+import { SystemErrorReducer, SystemErrorState } from './systemError'
 
 export default combineReducers({
   [SystemInfoState.stateKey]: SystemInfoReducer,

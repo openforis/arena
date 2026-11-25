@@ -3,11 +3,9 @@ import { useCallback } from 'react'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
-
 import { Checkbox } from '@webapp/components/form'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { State, useNodeDefEditReadOnly } from './store'
 

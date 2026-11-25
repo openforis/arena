@@ -1,40 +1,35 @@
 import React from 'react'
 
-import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { uuidv4 } from '@core/uuid'
 import * as Validation from '@core/validation/validation'
-
+import { ButtonIconInfo } from '@webapp/components/buttons'
+import ButtonGroup from '@webapp/components/form/ButtonGroup'
+import Checkbox from '@webapp/components/form/Checkbox'
+import { FormItem } from '@webapp/components/form/Input'
+import CyclesSelector from '@webapp/components/survey/CyclesSelector'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
-import { FormItem } from '@webapp/components/form/Input'
-import Checkbox from '@webapp/components/form/Checkbox'
-import ButtonGroup from '@webapp/components/form/ButtonGroup'
-
-import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import { NodeDefExpressionsProp } from '../ExpressionsProp'
-import { NodeDefSingleExpressionProp } from '../ExpressionsProp/NodeDefSingleExpressionProp'
-import { useNodeDefEditReadOnly } from '../store'
-
-import { useBasicProps } from './store'
-
-import { ButtonIconInfo } from '@webapp/components/buttons'
-
+import AnalysisProps from '../AnalysisProps'
 import BooleanProps from '../BooleanProps'
 import CodeProps from '../CodeProps'
 import CoordinateProps from '../CoordinateProps'
 import DecimalProps from '../DecimalProps'
+import { NodeDefExpressionsProp } from '../ExpressionsProp'
+import { NodeDefSingleExpressionProp } from '../ExpressionsProp/NodeDefSingleExpressionProp'
 import FileProps from '../FileProps'
-import GeoProps from '../GeoProps'
 import FormHeaderProps from '../FormHeaderProps'
+import GeoProps from '../GeoProps'
 import IntegerProps from '../IntegerProps'
+import { useNodeDefEditReadOnly } from '../store'
 import TaxonProps from '../TaxonProps'
 import TextProps from '../TextProps'
 import TimeProps from '../TimeProps'
-import AnalysisProps from '../AnalysisProps'
+
+import { useBasicProps } from './store'
 
 const basicPropsComponentByType = {
   [NodeDef.nodeDefType.boolean]: BooleanProps,

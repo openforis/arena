@@ -1,12 +1,11 @@
 import { useCallback, useState } from 'react'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import { Button } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
-
 import Identifier from '../Identifier'
+
 import type { CallEditorProps } from './callEditorProps'
 
 const coordinateVarFilterFn = (variable) => variable.root || NodeDef.nodeDefType.coordinate === variable.nodeDefType

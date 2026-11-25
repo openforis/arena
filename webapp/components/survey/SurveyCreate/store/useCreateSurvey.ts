@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Objects, UUIDs, type ArenaValidation } from '@openforis/arena-core'
+import { type ArenaValidation, Objects, UUIDs } from '@openforis/arena-core'
 
 import { SurveyType } from '@webapp/model'
 

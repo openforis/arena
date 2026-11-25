@@ -1,7 +1,8 @@
-import type L from 'leaflet'
-import type { AnyProps, ClusterFeature, PointFeature } from 'supercluster'
-import type { ReactNode } from 'react'
 import type { GeoJsonObject } from 'geojson'
+import type L from 'leaflet'
+import type { ReactNode } from 'react'
+import type { AnyProps, ClusterFeature, PointFeature } from 'supercluster'
+
 import type { ArenaAnyNodeDef, ArenaPoint } from '@openforis/arena-core'
 
 // properties of every map layer point: the key identifies the point in its layer

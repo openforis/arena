@@ -3,7 +3,6 @@
  * and when "Add provider" / "Save" is enabled. Pure.
  */
 import { ARENA_DEFAULT_PROVIDER_ID } from '@common/ai/providerIds'
-
 import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { AiProviderRequest } from '@webapp/service/api/ai/providers'
 

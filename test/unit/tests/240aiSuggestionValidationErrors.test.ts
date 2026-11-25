@@ -1,12 +1,12 @@
 import { type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
-import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import { getSuggestionExpiresAt, SUGGESTION_EXPIRY_DAYS } from '@webapp/ai/suggestions/detectors/suggestionExpiry'
 import {
-  VALIDATION_MESSAGES_THRESHOLD,
   createValidationErrorsDetector,
   getValidationErrorsSuggestionId,
+  VALIDATION_MESSAGES_THRESHOLD,
 } from '@webapp/ai/suggestions/detectors/validationErrors'
 import type { SuggestionGeneration } from '@webapp/ai/suggestions/generation'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 

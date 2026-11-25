@@ -1,22 +1,21 @@
 import classNames from 'classnames'
 
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Validation from '@core/validation/validation'
+import type { ArenaCategoryLevel } from '@openforis/arena-core'
+
 import * as StringUtils from '@core/stringUtils'
-
-import { FormItem, Input } from '@webapp/components/form/Input'
-import ErrorBadge from '@webapp/components/ErrorBadge'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Validation from '@core/validation/validation'
 import { Button, ButtonIconDelete, LoadingBar } from '@webapp/components'
-
+import ErrorBadge from '@webapp/components/ErrorBadge'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
 import { State, useActions } from '../store'
+
 import { ItemsList } from './ItemsList'
-import type { ArenaCategoryLevel } from '@openforis/arena-core'
 
 type LevelDetailsProps = {
   level: ArenaCategoryLevel

@@ -1,13 +1,13 @@
-import { isUuid } from '../../../../../core/uuid'
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as Node from '../../../../../core/record/node'
-
+import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as Survey from '../../../../../core/survey/survey'
+import { isUuid } from '../../../../../core/uuid'
+import { jsonBuildObject } from '../../sql'
 import TableCategoryItem from '../categoryItem'
+import type Table from '../table'
 import TableTaxon from '../taxon'
 import TableTaxonVernacularName from '../taxonVernacularName'
-import { jsonBuildObject } from '../../sql'
-import type Table from '../table'
+
 import type TableNode from './table'
 
 export type GetSelectParams = {

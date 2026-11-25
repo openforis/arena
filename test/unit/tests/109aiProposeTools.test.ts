@@ -1,14 +1,13 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
 import { labelsProposeSetTool } from '@webapp/ai/tools/design/labelsProposeSet'
 import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefProposeCreate'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
-import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
-import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { AI_TOOL_NAME_PATTERN, getTools, runTool } from '@webapp/ai/tools/registry'
-import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 let survey: any
 

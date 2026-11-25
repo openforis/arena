@@ -1,5 +1,5 @@
-import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
+import GeometryUtil from 'leaflet-geometryutil'
 
 const { destination } = GeometryUtil
 

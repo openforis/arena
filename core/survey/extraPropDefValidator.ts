@@ -1,9 +1,9 @@
 import type { ArenaValidation } from '@openforis/arena-core'
-import { ExtraPropDef, ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as Validator from '@core/validation/validator'
+import { ExtraPropDef, ExtraPropDefItem } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 export const validateExtraPropDef = async ({
   extraPropDef,

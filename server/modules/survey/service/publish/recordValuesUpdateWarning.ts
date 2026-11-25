@@ -1,10 +1,10 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-
 import * as SurveyManager from '../../manager/surveyManager'
+
 import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './nodeDefExtraPropDependencyUtils'
 
 export type RecordValuesUpdateWarning = {

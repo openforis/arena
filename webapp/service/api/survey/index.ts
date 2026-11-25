@@ -1,5 +1,6 @@
-import type { ArenaSurvey } from '@openforis/arena-core'
 import axios from 'axios'
+
+import type { ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { FileUtils } from '@webapp/utils/fileUtils'

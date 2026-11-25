@@ -3,12 +3,12 @@ import './AiGenerateQueryPopup.scss'
 
 import { useEffect, useRef, useState } from 'react'
 
-import { AiWorkflows, getAiErrorMessage, type AiDataQueryGenerateResult } from '@webapp/ai/workflows'
+import { type AiDataQueryGenerateResult, AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
-import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 type Props = {

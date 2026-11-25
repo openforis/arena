@@ -1,16 +1,15 @@
 import React from 'react'
 
-import { Objects, type ArenaValidation } from '@openforis/arena-core'
+import { type ArenaValidation, Objects } from '@openforis/arena-core'
 
 import { Countries } from '@core/countries'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
-
+import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 import { SurveyTemplateSelect } from './SurveyTemplateSelect'
-import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
-import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 type AccessRequestInputFieldProps = {
   field: Record<string, any>

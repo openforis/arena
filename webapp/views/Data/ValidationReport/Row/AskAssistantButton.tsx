@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { Button } from '@webapp/components/buttons'
 import { useAskAssistantAboutRow } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
+import { Button } from '@webapp/components/buttons'
 import { TestId } from '@webapp/utils/testId'
 
 type Props = { row: any }

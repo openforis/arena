@@ -1,13 +1,12 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as StringUtils from '@core/stringUtils'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
+import * as StringUtils from '@core/stringUtils'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
-
 import * as Log from '@server/log/log'
-
 import * as CollectSurvey from '../../model/collectSurvey'
+
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
 const parseConstantValue = async ({

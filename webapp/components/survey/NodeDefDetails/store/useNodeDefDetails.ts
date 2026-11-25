@@ -1,20 +1,19 @@
 import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import {
   useIsDesignerNodeDefRoute,
-  useOnUpdate,
   useOnBrowserBack,
   useOnPageUnload,
+  useOnUpdate,
   useOnValueChange,
 } from '@webapp/components/hooks'
-
-import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 import { useNodeDefByUuid, useSurveyCycleKey } from '@webapp/store/survey'
+import { useNodeDefValidationByUuid } from '@webapp/store/survey/hooks'
 
 import { useActions } from './actions'
 import { State } from './state'
-import { useNodeDefValidationByUuid } from '@webapp/store/survey/hooks'
 
 export const useNodeDefDetails = (props) => {
   const { nodeDefUuid: nodeDefUuidProp } = props

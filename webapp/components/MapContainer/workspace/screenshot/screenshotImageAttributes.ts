@@ -1,7 +1,7 @@
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import type { ScreenshotImageAttributeOption } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 
 /**

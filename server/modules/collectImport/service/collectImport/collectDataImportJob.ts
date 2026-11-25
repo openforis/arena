@@ -1,10 +1,9 @@
 import Job, { type JobParams } from '@server/job/job'
-
-import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
+import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 
-import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
+import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 
 export default class CollectDataImportJob extends Job {
   static readonly type = 'CollectDataImportJob'

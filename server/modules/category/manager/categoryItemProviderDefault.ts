@@ -1,8 +1,8 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { db, DbClient } from '@server/db/db'
 import * as CategoryRepository from '../repository/categoryRepository'
 

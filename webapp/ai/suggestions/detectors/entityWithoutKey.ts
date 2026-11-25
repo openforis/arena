@@ -1,8 +1,8 @@
 /**
  * Entity without a key suggestion: multiple entities added during a designer visit without a key attribute (the designer saves them).
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import {
   findDesignNodeDef,

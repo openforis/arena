@@ -1,4 +1,5 @@
 import './InputSwitch.scss'
+
 import ReactSwitch from 'react-switch'
 
 type InputSwitchProps = {

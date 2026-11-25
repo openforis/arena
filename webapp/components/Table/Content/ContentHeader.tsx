@@ -1,6 +1,5 @@
 import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
-
 import type { TableColumn } from '../tableColumn'
 import type { TableSelectionSortProps } from '../tableProps'
 

@@ -1,5 +1,5 @@
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as AnalysisService from '@server/modules/analysis/service'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 const fileName = 'chain_summary.json'
 

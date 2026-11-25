@@ -1,10 +1,10 @@
+import { fileContentStorageTypes } from '../../../server/modules/file/manager/fileManagerCommon'
 import {
+  deletePendingImportFunctionByStorageType,
+  getKeptFilePathFunctionByStorageType,
   getStorageFunctionOrThrow,
   keepFileFunctionByStorageType,
-  getKeptFilePathFunctionByStorageType,
-  deletePendingImportFunctionByStorageType,
 } from '../../../server/modules/file/manager/tempFileManager'
-import { fileContentStorageTypes } from '../../../server/modules/file/manager/fileManagerCommon'
 import * as TempFileRepositoryFileSystem from '../../../server/modules/file/repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../../../server/modules/file/repository/tempFileRepositoryS3Bucket'
 

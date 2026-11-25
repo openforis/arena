@@ -5,11 +5,9 @@
  * stored provider prefs (see aiPrefsWriter), never a save of the copy read when the request began.
  */
 import { generateText } from 'ai'
+
 import type { ArenaUser } from '@openforis/arena-core'
 
-import { ENV } from '@core/processUtils'
-import SystemError, { StatusCodes } from '@core/systemError'
-import { uuidv4 } from '@core/uuid'
 import { AiProvider } from '@common/ai/aiProvider'
 import { providerTypeUsesBaseUrl } from '@common/ai/allowlist'
 import { isPlainHttpBaseUrl } from '@common/ai/localServerAddress'
@@ -20,19 +18,23 @@ import {
   isAiProviderId,
   normalizeProviderName,
 } from '@common/ai/providerIds'
+import { ENV } from '@core/processUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { uuidv4 } from '@core/uuid'
 import * as Log from '@server/log/log'
 import type { AiPrefsUpdate, StoredAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
-import { formatErrorForLog, toAiSystemError } from './gateway/errorMapping'
+import { type AiPrefsWriterDeps, changeAiPrefs, createDefaultAiPrefsWriterDeps } from './aiPrefsWriter'
 import {
+  type AiProviderPrefs,
   assertFieldLengths,
   assertProviderCountBelowLimit,
   decryptStoredKey,
   encryptProviderKey,
-  type AiProviderPrefs,
   findStoredProvider,
   getProviderPrefs,
+  hasLegacyKeys,
   isSameEndpoint,
   type KeyCipher,
   type PublicAiProvider,
@@ -40,11 +42,10 @@ import {
   toPublicProvider,
   trimmedOrNull,
   withProviderPrefs,
-  hasLegacyKeys,
 } from './aiProviderPrefs'
-import { type AiPrefsWriterDeps, changeAiPrefs, createDefaultAiPrefsWriterDeps } from './aiPrefsWriter'
 import * as AiTelemetry from './aiTelemetry'
 import { getAiPrefs } from './aiUserPrefs'
+import { formatErrorForLog, toAiSystemError } from './gateway/errorMapping'
 import { getProviderHostingClass } from './hostingClass'
 import { MOCK_PROVIDER } from './mockProvider'
 import * as ModelDiscovery from './modelDiscovery'

@@ -1,15 +1,14 @@
 import { useEffect, useReducer } from 'react'
 import { useSelector } from 'react-redux'
 
-import { NodeDefs, RecordNodes, Objects, Records, Surveys } from '@openforis/arena-core'
+import { NodeDefs, Objects, RecordNodes, Records, Surveys } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-
 import { SurveyState } from '@webapp/store/survey'
-import * as RecordState from '../state'
 import { fetchRecordAndNodesOnce, getResolvedRecord } from '../fetchedRecordsCache'
+import * as RecordState from '../state'
 
 export const useRecord = () => useSelector(RecordState.getRecord)
 

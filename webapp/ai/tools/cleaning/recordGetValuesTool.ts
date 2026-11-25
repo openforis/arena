@@ -1,21 +1,20 @@
 import { z } from 'zod'
 
 import * as Record from '@core/record/record'
-
-import type { AiTool } from '@webapp/ai/tools/types'
+import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
+import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import {
   attributeNamesSchema,
   NAME_MAX_CHARS,
   uuidSchema,
   VALUE_PART_MAX_CHARS,
 } from '@webapp/ai/tools/common/toolSchemas'
-import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
-import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
-import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { CleaningApi } from './cleaningApi'
-import { getCleaningContext, describeUnknownAttributes, resolveAttributeDefs } from './cleaningContext'
+import { describeUnknownAttributes, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
 import { findRecordUuidByKeys } from './recordLookup'
 import { getRecordValues } from './recordValues'
 import type { CleaningI18n } from './validationRows'

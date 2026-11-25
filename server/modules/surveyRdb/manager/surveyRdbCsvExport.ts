@@ -1,22 +1,21 @@
 import {
+  type ArenaAnyNodeDef,
+  type ArenaCategoryItem,
+  type ArenaSurvey,
   FlatDataExportModel,
   Objects,
-  type ArenaSurvey,
-  type ArenaCategoryItem,
-  type ArenaAnyNodeDef,
   type UniqueFileNamesGenerator,
 } from '@openforis/arena-core'
 
+import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
 import * as A from '@core/arena'
+import { ArrayUtils } from '@core/arrayUtils'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
-import { ArrayUtils } from '@core/arrayUtils'
-import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
-import { Query } from '@common/model/query'
-
 import { toSafeFileName } from '@server/utils/file/fileNames'
+
 import type { DataExportOptions } from './dataExportOptions'
 
 // a column name, or a column name and its type

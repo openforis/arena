@@ -5,7 +5,6 @@ import classNames from 'classnames'
 
 import { debounce } from '@core/functionsDefer'
 import { uuidv4 } from '@core/uuid'
-
 import { LoadingBar } from '@webapp/components'
 
 type VirtualizedListProps = {

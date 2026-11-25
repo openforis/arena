@@ -1,7 +1,7 @@
 import {
+  emptySuggestionState,
   MAX_SEEN_MODULES,
   MAX_SURVEY_BUCKETS,
-  emptySuggestionState,
   normalizeSuggestionState,
   parseSuggestionState,
   shrinkSuggestionState,

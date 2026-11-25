@@ -1,5 +1,4 @@
 import { ArrayUtils } from '@core/arrayUtils'
-
 import Job, { type JobParams } from '@server/job/job'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import { ExportFile } from '../exportFile'

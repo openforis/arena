@@ -1,14 +1,13 @@
 import { useState } from 'react'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
-import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
-
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+
+import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
 const defaultAggregateFunctions: string[] = Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS)
 

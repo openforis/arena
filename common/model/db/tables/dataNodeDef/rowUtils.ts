@@ -1,8 +1,8 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as NodeDef from '@core/survey/nodeDef'
+
 import { TableDataNodeDefColUtils } from './colUtils'
 
 type NodeRow = Record<string, any>

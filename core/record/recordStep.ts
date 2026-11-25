@@ -6,7 +6,6 @@ import {
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 
 export type RecordStep = { id: string; name: string }

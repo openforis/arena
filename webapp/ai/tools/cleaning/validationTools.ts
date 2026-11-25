@@ -1,23 +1,22 @@
 import { z } from 'zod'
 
-import {
-  MessageTypeFilterCategoryIds,
-  expandMessageTypeFilterCategoriesToKeys,
-} from '@core/validation/messageTypeFilterCategories'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import type { AiTool } from '@webapp/ai/tools/types'
-import { attributeNamesSchema, uuidSchema } from '@webapp/ai/tools/common/toolSchemas'
+import {
+  expandMessageTypeFilterCategoriesToKeys,
+  MessageTypeFilterCategoryIds,
+} from '@core/validation/messageTypeFilterCategories'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
 import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
+import { attributeNamesSchema, uuidSchema } from '@webapp/ai/tools/common/toolSchemas'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { CleaningApi } from './cleaningApi'
-import { getCleaningContext, describeUnknownAttributes, resolveAttributeDefs } from './cleaningContext'
+import { describeUnknownAttributes, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
+import { LIST_ROWS_MAX, pageValidationRows, toValidationListItems } from './validationList'
 import type { CleaningI18n } from './validationRows'
 import { summarizeValidationRows } from './validationSummary'
-import { LIST_ROWS_MAX, pageValidationRows, toValidationListItems } from './validationList'
 
 const SUMMARY_ROWS_MAX = 1000
 

@@ -7,7 +7,6 @@ import {
   SurveyCompareResult,
   SurveyCompareStatus,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
-
 import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 

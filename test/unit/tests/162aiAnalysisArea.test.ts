@@ -1,17 +1,15 @@
 import { Query } from '@common/model/query'
-
+import { createTurnState } from '@webapp/ai/agent/turnState'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
+import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import {
   getAnalysisAreaStatus,
   getProposedQueryId,
   isAnalysisRoute,
   shouldShowRecordDataNotice,
 } from '@webapp/components/ai/Assistant/analysis/analysisArea'
-
-import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import { pickArea } from '@webapp/components/ai/Assistant/assistantAreas'
-import { createTurnState } from '@webapp/ai/agent/turnState'
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 
 const available = { status: 'available' } as any
 const noEngine = { status: 'noEngine', reasonKeys: ['aiEngine.unavailable.notAvailable'] } as any

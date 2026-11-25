@@ -1,11 +1,11 @@
 import { type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
-import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   DATA_IMPORTED_SUGGESTION_ID,
   dataImportedDetector,
   getImportedRecordsCount,
 } from '@webapp/ai/suggestions/detectors/dataImported'
 import type { SuggestionGeneration } from '@webapp/ai/suggestions/generation'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 

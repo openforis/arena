@@ -4,26 +4,24 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import {
-  MessageTypeFilterCategoryIds,
   expandMessageTypeFilterCategoriesToKeys,
+  MessageTypeFilterCategoryIds,
 } from '@core/validation/messageTypeFilterCategories'
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
-import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-
 import { RECORD_EDITS_APPLIED_EVENT } from '@webapp/ai/changeSets/recordEdits/types'
 import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useCleaningAreaStatus } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
-import Table from '@webapp/components/Table'
 import { ButtonBack } from '@webapp/components/buttons'
-
-import RowHeader from './RowHeader'
-import Row from './Row'
-import { HeaderLeft } from './HeaderLeft'
 import { useOnValueChange } from '@webapp/components/hooks'
+import Table from '@webapp/components/Table'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+
+import { HeaderLeft } from './HeaderLeft'
+import Row from './Row'
+import RowHeader from './RowHeader'
 
 const ValidationReport = () => {
   const navigate = useNavigate()

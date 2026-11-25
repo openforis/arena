@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import * as Taxonomy from '@core/survey/taxonomy'
 
 export const stateKey = 'taxonomies'

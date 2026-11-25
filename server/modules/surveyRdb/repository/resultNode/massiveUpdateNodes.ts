@@ -1,10 +1,10 @@
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import pgPromise from 'pg-promise'
 
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import { TableNode } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import MassiveUpdate from '@server/db/massiveUpdate'
 import { NA } from '@server/modules/analysis/service/rChain/rFunctions'
 

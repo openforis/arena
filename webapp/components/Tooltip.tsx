@@ -1,6 +1,6 @@
 import './Tooltip.scss'
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactDom from 'react-dom'
 import classNames from 'classnames'
 

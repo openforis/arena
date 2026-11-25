@@ -2,15 +2,13 @@ import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import { useFormObject } from '@webapp/components/hooks'
-import { EmailInput } from '@webapp/components/form'
-
 import { Button } from '@webapp/components'
+import { EmailInput } from '@webapp/components/form'
 import GuestError from '@webapp/components/guest/GuestError'
 import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
-
-import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
+import { useFormObject } from '@webapp/components/hooks'
 import { useAppDispatch } from '@webapp/store'
+import { LoginActions, LoginState, LoginValidator } from '@webapp/store/login'
 
 const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)

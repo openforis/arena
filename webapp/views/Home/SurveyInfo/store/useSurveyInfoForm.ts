@@ -6,12 +6,10 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as Validation from '@core/validation/validation'
-
-import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
-import { NotificationActions } from '@webapp/store/ui'
-
 import { useFormObject } from '@webapp/components/hooks'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
 
 export const useSurveyInfoForm = () => {
   const dispatch = useAppDispatch()

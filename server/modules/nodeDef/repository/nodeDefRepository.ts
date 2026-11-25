@@ -1,10 +1,10 @@
-import type { DbClient } from '@server/db/db'
 import type { ArenaAnyNodeDef, ArenaNodeDefMeta, ArenaNodeDefPropsAdvanced } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
-import { DB, TableNodeDef, Schemata, NodeDefRepository as NodeDefRepositoryServer } from '@openforis/arena-server'
+import { DB, NodeDefRepository as NodeDefRepositoryServer, Schemata, TableNodeDef } from '@openforis/arena-server'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import * as NodeDef from '@core/survey/nodeDef'
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import { checkNodeDef, checkNodeDefProps, checkNodeDefType } from './nodeDefWriteCheck'

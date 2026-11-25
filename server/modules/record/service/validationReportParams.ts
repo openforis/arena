@@ -1,10 +1,9 @@
-import { Authorizer, ArenaSurvey, ArenaUser } from '@openforis/arena-core'
+import { ArenaSurvey, ArenaUser, Authorizer } from '@openforis/arena-core'
 
-import { Query } from '@common/model/query'
 import { TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
 import * as Survey from '@core/survey/survey'
 import * as UserUtils from '@core/user/user'
-
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const { columnSet } = TableDataNodeDef

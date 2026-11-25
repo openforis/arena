@@ -1,6 +1,6 @@
-import fs from 'node:fs'
-import { load as csvLoadSync } from 'csv-load-sync'
 import { parse } from '@fast-csv/parse'
+import { load as csvLoadSync } from 'csv-load-sync'
+import fs from 'node:fs'
 
 export const parseCsv = (filePath) => csvLoadSync(filePath)
 

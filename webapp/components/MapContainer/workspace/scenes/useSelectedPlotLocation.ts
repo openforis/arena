@@ -1,5 +1,5 @@
-import L from 'leaflet'
 import { useEffect, useState } from 'react'
+import L from 'leaflet'
 
 export type PlotLocation = { lat: number; lng: number }
 

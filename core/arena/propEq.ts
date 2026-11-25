@@ -1,5 +1,5 @@
-import { _curry3 } from './internal/_curry3'
 import { equals } from './equals'
+import { _curry3 } from './internal/_curry3'
 
 /**
  * Checks if the property of the object is deeply equal to the given value.

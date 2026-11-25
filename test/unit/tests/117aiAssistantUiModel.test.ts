@@ -1,12 +1,13 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import * as Survey from '@core/survey/survey'
+import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import {
+  type AssistantAreaStatus,
   getDesignAreaStatus,
   getHelpAreaStatus,
   getTabAreas,
@@ -14,17 +15,15 @@ import {
   isTabBarShown,
   parseAppPath,
   pickArea,
-  type AssistantAreaStatus,
 } from '@webapp/components/ai/Assistant/assistantAreas'
 import { createAssistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
 import {
   buildCardRows,
   getNodeDefNavigation,
-  getPendingOperationIds,
   getOperationConflicts,
+  getPendingOperationIds,
 } from '@webapp/components/ai/Assistant/changeSetCardModel'
 import { TreeSelectViewMode } from '@webapp/model'
-import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 
 const location = { hostingClass: 'cloud', provider: 'openai', model: null } as any
 const available = { status: 'available', location } as any

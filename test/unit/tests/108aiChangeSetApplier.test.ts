@@ -1,14 +1,13 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-
-import { applyChangeSet, getChangedProps, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
-import { applyOperationToNodeDef } from '@webapp/ai/changeSets/operations'
+import * as Survey from '@core/survey/survey'
+import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { type ApplierDeps, applyChangeSet, getChangedProps } from '@webapp/ai/changeSets/applyChangeSet'
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
+import { applyOperationToNodeDef } from '@webapp/ai/changeSets/operations'
 import type { ChangeOperation, ChangeSet } from '@webapp/ai/changeSets/types'
-import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 
 let initialSurvey: any
 

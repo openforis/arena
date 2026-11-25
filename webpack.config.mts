@@ -1,18 +1,18 @@
 import 'dotenv/config'
-import path from 'node:path'
-import fs from 'node:fs'
+
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
-import webpack from 'webpack'
+import CopyPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import fs from 'node:fs'
+import path from 'node:path'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import TerserPlugin from 'terser-webpack-plugin'
-import CopyPlugin from 'copy-webpack-plugin'
-import type { Compiler, Configuration, Stats, WebpackPluginInstance } from 'webpack'
-import type { Configuration as DevServerConfiguration } from 'webpack-dev-server'
-
 import { v4 as uuidv4 } from 'uuid'
+import type { Compiler, Configuration, Stats, WebpackPluginInstance } from 'webpack'
+import webpack from 'webpack'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import type { Configuration as DevServerConfiguration } from 'webpack-dev-server'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

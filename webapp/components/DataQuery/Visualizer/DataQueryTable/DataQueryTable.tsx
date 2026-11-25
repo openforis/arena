@@ -1,17 +1,16 @@
 import './DataQueryTable.scss'
+
 import { useEffect, useMemo, useRef } from 'react'
 
 import { Query } from '@common/model/query'
-
 import * as ObjectUtils from '@core/objectUtils'
-
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
 import { useQuerySortableVariables } from '@webapp/components/DataQuery/store'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
 
-import { RowHeader, RowData } from './Row'
+import { RowData, RowHeader } from './Row'
 import { useTable, useTotals } from './store'
-import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 type DataQueryTableProps = {
   data?: any[]

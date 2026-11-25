@@ -1,25 +1,23 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
-
+import MuiBreadcrumbs from '@mui/material/Breadcrumbs'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import MuiBreadcrumbs from '@mui/material/Breadcrumbs'
 import SvgIcon from '@mui/material/SvgIcon'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
+import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
-
 import { useNotifyInfo } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { computeBreadcrumbsMaxItems } from '@webapp/utils/breadcrumbsUtils'
 import { copyToClipboard } from '@webapp/utils/domUtils'
 
-import { usePathCrumbs, type FormPathCrumb } from './usePathCrumbs'
+import { type FormPathCrumb, usePathCrumbs } from './usePathCrumbs'
 
 /** Estimated minimum width per visible crumb slot (survey labels are often long). */
 const CRUMB_MIN_WIDTH_PX = 140

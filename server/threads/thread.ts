@@ -1,11 +1,11 @@
-import { parentPort, workerData, isMainThread } from 'node:worker_threads'
+import { isMainThread, parentPort, workerData } from 'node:worker_threads'
 
 import type { ArenaUser } from '@openforis/arena-core'
 
 import * as Log from '@server/log/log'
+import { initArenaServerServices } from '@server/system/arenaServerServices'
 
 import * as ThreadParams from './threadParams'
-import { initArenaServerServices } from '@server/system/arenaServerServices'
 
 // base class for the threads executed in the worker pool
 export default class Thread {

@@ -1,12 +1,11 @@
 import { ArenaRecordNode, FileNames } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 import { truncate } from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
-
 import * as Node from '../record/node'
+
 import { cycleOneKey } from './_survey/surveyInfo'
 
 export const keys = {

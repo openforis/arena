@@ -3,8 +3,8 @@
  * Body: { surveyId?, feature, dataClass, stream, call }. Response: JSON generate result or SSE stream parts.
  */
 import * as Request from '@server/utils/request'
-
 import { createDefaultModelGatewayDeps, handleModelRequest } from '../service/gateway/modelGateway'
+
 import { requireAiFeaturePermission, requireAiFeaturesEnabled } from './aiMiddleware'
 
 /**

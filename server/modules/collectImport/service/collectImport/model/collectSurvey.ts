@@ -1,9 +1,10 @@
-import type { NodeDefType } from '@openforis/arena-core'
 import type { Element } from 'xml-js'
 
-import * as A from '@core/arena'
+import type { NodeDefType } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import { nodeDefType } from '@core/survey/nodeDef'
+
 import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
 
 // node definition of a Collect survey (survey IDML parsed by xml-js in non compact mode)

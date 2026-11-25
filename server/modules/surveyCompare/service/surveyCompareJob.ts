@@ -1,13 +1,12 @@
 import * as Survey from '@core/survey/survey'
 import { compareSurveys } from '@core/survey/surveyCompare'
-
 import Job, { type JobParams } from '@server/job/job'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import { SurveyCompareSourceRef, keepFile, keepJson, withSource } from './surveyCompareSource'
-import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
 import type { SurveyCompareJobContext } from './surveyCompareJobContext'
+import { keepFile, keepJson, SurveyCompareSourceRef, withSource } from './surveyCompareSource'
+import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
 import { computeSurveyFingerprint } from './surveyFingerprintService'
 
 /**

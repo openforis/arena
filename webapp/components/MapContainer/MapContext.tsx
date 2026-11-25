@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
 import { useSurvey } from '@webapp/store/survey'
 
 import { type BaseLayerDef, defaultBaseLayer } from './baseLayers'

@@ -3,21 +3,20 @@ import './ProviderDialog.scss'
 import { useCallback } from 'react'
 
 import { AI_PROVIDER_NAME_MAX_CHARS } from '@common/ai/providerIds'
-
 import { getProviderNameText } from '@webapp/ai/providers/providerNames'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
-import { TestId } from '@webapp/utils/testId'
 import { useI18nT } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 import { AccountProviderFields } from './AccountProviderFields'
 import { LocalProviderFields } from './LocalProviderFields'
 import type { ProviderDialogContext } from './providerDialogState'
 import { isLocalDraftUrlInvalid } from './providerDraft'
-import { ProviderTypeStep } from './ProviderTypeStep'
 import { getProviderTypeSpec, type ProviderTypeSpec, type SavedProvider } from './providerTypes'
+import { ProviderTypeStep } from './ProviderTypeStep'
 import { type ProviderDialogApi, useProviderDialog } from './useProviderDialog'
 
 type Props = {

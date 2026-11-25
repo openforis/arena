@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useInit } from './useInit'
-import { useAppDispatch } from '@webapp/store'
 
 export const useConvertToReportingDataCategory = ({ setState }) => {
   const dispatch = useAppDispatch()

@@ -13,8 +13,8 @@ import {
   getExternalLoginStartUrl,
   unlinkUserIdentity,
 } from '@webapp/service/api/authProviders'
-import { useI18n } from '@webapp/store/system'
 import { LoginActions } from '@webapp/store/login'
+import { useI18n } from '@webapp/store/system'
 
 interface LinkedIdentity {
   id: string

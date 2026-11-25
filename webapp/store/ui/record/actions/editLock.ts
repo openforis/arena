@@ -1,4 +1,5 @@
 import * as RecordState from '../state'
+
 import * as ActionTypes from './actionTypes'
 
 export const toggleEditLock = (dispatch, getState) => {

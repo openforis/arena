@@ -3,7 +3,6 @@
  * within the budget without cutting it in the middle of a value.
  */
 import { AiLimits } from '@common/ai/limits'
-
 import type { AiToolErrorResult } from '../types'
 
 // the most the wrapper lets through; a longer result is cut by `limitToolResult`

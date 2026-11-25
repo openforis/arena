@@ -1,8 +1,7 @@
 // test/unit/tests/255aiSchemaSummaryAiDescriptions.test.ts
+import { AiLimits } from '@common/ai/limits'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { AiLimits } from '@common/ai/limits'
-
 import {
   assertNoLegacyIncludeAiDescriptions,
   parseAiDescriptions,
@@ -12,7 +11,6 @@ import {
   buildSchemaSummaryItems,
   getSchemaSummaryAiItems,
 } from '@server/modules/survey/service/schemaSummary/schemaSummary'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import * as SB from '../../utils/surveyBuilder'
 import { CYRILLIC, LANGUAGES, namespaceByLanguage, usesCyrillic } from '../utils/i18nParity'

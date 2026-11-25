@@ -1,22 +1,22 @@
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaRecord, ArenaRecordNode, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
-import * as Validation from '@core/validation/validation'
-import * as ValidationResult from '@core/validation/validationResult'
 import { findNodeEditRefusal } from '@core/record/nodeEditRefusal'
 import { areNodeValuesEqual } from '@core/record/nodeValueEquality'
 import { isNodeDefValueEditable } from '@core/record/nodeValueParser'
 import { isNodeValueShapeValid } from '@core/record/nodeValueShape'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import {
+  conflictResult,
+  failedResult,
   NodesBatchEditResult,
   NodesBatchMessageKeys,
   NodesBatchRecordEdit,
-  conflictResult,
-  failedResult,
 } from './nodesBatchTypes'
 
 const uniquenessErrorKeys = new Set<string>([

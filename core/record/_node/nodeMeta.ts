@@ -1,5 +1,5 @@
-import { RecordNodes } from '@openforis/arena-core'
 import type { ArenaRecordNode, ArenaRecordNodeMeta } from '@openforis/arena-core'
+import { RecordNodes } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

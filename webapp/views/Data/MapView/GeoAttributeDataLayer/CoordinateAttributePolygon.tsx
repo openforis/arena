@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Rectangle, Circle } from 'react-leaflet'
 import L from 'leaflet'
+import { Circle, Rectangle } from 'react-leaflet'
 
-import * as Survey from '@core/survey/survey'
 import * as SamplingPolygon from '@core/survey/samplingPolygon'
+import * as Survey from '@core/survey/survey'
 import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { GeoUtils } from '@webapp/utils/geoUtils'

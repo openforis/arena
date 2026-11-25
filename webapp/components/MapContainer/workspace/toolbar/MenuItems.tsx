@@ -1,5 +1,5 @@
-import type { ReactElement } from 'react'
 import { ListItemIcon, ListItemText, ListSubheader, MenuItem } from '@mui/material'
+import type { ReactElement } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'

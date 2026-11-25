@@ -2,14 +2,14 @@ import './AttributesList.scss'
 
 import { useMemo } from 'react'
 
-import * as ObjectUtils from '@core/objectUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
+import * as ObjectUtils from '@core/objectUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import AttributeSelector from './AttributeSelector'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type AttributesListProps = {
   attributeDefs: any[]

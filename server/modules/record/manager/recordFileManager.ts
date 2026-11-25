@@ -1,10 +1,10 @@
 import { db, DbClient } from '@server/db/db'
+import { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as FileRepository from '../repository/fileRepository'
-import * as NodeRepository from '../repository/nodeRepository'
-import { getFileContentStorageType, fileContentStorageTypes } from '@server/modules/file/manager/fileManagerCommon'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
 import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
-import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import * as NodeRepository from '../repository/nodeRepository'
 
 const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.deleteFiles,

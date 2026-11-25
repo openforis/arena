@@ -3,10 +3,8 @@ import './StorageCard.scss'
 import { useCallback, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
-
 import { DashboardKpiCard } from '../components/DashboardKpiCard'
 import { StorageSummary } from '../StorageSummary'
 

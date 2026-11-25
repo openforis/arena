@@ -1,7 +1,6 @@
 import { FileFormats } from '@core/fileFormats'
 import { parseCsvAsync } from '@test/utils/csvUtils'
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { getTaxon } from '../fixtures/seed/sampleRecordDisplay'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'

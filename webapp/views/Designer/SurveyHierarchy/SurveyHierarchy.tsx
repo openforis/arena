@@ -1,15 +1,13 @@
 import './SurveyHierarchy.scss'
 
-import { useState, useRef, useCallback } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-
-import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import * as Survey from '@core/survey/survey'
 import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { SurveyHierarchyTree } from './SurveyHierarchyTree'
 

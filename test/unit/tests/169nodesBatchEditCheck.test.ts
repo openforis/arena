@@ -1,20 +1,18 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import { areNodeValuesEqual } from '@core/record/nodeValueEquality'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import { areNodeValuesEqual } from '@core/record/nodeValueEquality'
 import {
   checkBatchEdit,
   findUniquenessErrorKey,
   isNodeDefBatchEditable,
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchEditCheck'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'user-uuid' }
 

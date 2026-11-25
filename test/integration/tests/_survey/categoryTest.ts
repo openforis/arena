@@ -1,11 +1,10 @@
 import * as A from '@core/arena'
-
-import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { StatusCodes } from '@core/systemError'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import { getContextSurveyId, getContextUser } from '../../config/context'
 
 export const createCategoryTest = async () => {

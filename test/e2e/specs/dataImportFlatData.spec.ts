@@ -3,7 +3,6 @@ import type { Page } from '@playwright/test'
 import { FileFormats } from '@core/fileFormats'
 import { fileFormats, FlatDataFileFormat, Rows, toFileContent } from '@test/utils/flatDataImportTestUtils'
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import { Urls } from '../helpers/urls'

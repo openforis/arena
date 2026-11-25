@@ -1,9 +1,7 @@
-import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as AuthGroup from '@core/auth/authGroup'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Survey from '@core/survey/survey'
 
 export default {
   [ActivityLog.type.userInvite]: (survey, i18n) => (activityLog) => {

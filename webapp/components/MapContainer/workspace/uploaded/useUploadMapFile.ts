@@ -4,9 +4,9 @@ import { useMap } from 'react-leaflet'
 
 import { uuidv4 } from '@core/uuid'
 import { useNotifyError, useNotifyWarning } from '@webapp/components/hooks'
-
 import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 import { exitFullScreen } from '../tools/useFullScreen'
+
 import { getReadErrorDetails, readUploadedFile, setUploadedLayerOpacity } from './readUploadedFile'
 import { getUploadedFileKind, isUploadTooLarge, MAX_UPLOAD_SIZE_MB } from './uploadedFiles'
 

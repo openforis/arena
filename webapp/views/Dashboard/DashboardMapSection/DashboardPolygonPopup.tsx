@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import { Popup } from 'react-leaflet'
 import { Link as RouterLink } from 'react-router'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
 import { useSurveyPreferredLang } from '@webapp/store/survey'

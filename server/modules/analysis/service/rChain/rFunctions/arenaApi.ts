@@ -1,5 +1,7 @@
 import { Objects } from '@openforis/arena-core'
+
 import { quote } from '@core/stringUtils'
+
 import { list, type RExpression } from './utility'
 
 const toQueryArg = (params: Record<string, RExpression>) => (Objects.isEmpty(params) ? null : `query = ${list(params)}`)

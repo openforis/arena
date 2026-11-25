@@ -3,19 +3,17 @@ import type { ArenaUser } from '@openforis/arena-core'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserApi from '@server/modules/user/api/userApi'
 import * as UserManager from '@server/modules/user/manager/userManager'
-import * as UserRepository from '@server/modules/user/repository/userRepository'
 import { readAiPrefs, writeAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
-
+import * as UserRepository from '@server/modules/user/repository/userRepository'
 import { getContextUser } from '@test/integration/config/context'
 import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'
-import * as SB from '@test/utils/surveyBuilder'
 import { getRouteHandler } from '@test/utils/routeUtils'
+import * as SB from '@test/utils/surveyBuilder'
 
 const VICTIM_CIPHERTEXT = 'v2:victim-ciphertext'
 const victimAi = {

@@ -1,10 +1,8 @@
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-
 import { Switch } from '@webapp/components'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
-
 import DropdownUserRole from '../../DropdownUserRole'
 import { UserEditSection, UserEditSectionRow } from '../UserEditSection'
 

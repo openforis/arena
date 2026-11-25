@@ -1,10 +1,9 @@
 import type { AiPolicy } from '@common/ai/policy'
-
-import { fromAvailability } from '@webapp/components/ai/Assistant/assistantAreas'
+import { isProviderChoiceError } from '@webapp/ai/engines/engineUi'
 import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import { selectEngine } from '@webapp/ai/engines/selectEngine'
-import { isProviderChoiceError } from '@webapp/ai/engines/engineUi'
 import type { AiCapabilities, AiProviderEntry } from '@webapp/ai/engines/types'
+import { fromAvailability } from '@webapp/components/ai/Assistant/assistantAreas'
 import {
   buildProviderChoices,
   canOpenProviderChooser,
@@ -14,8 +13,8 @@ import {
   hasPickableProvider,
   shouldShowProviderRemoved,
 } from '@webapp/components/ai/Assistant/providerChip/providerChipModel'
-import { CYRILLIC, CYRILLIC_LANGUAGES, RESOURCES } from '../utils/i18nParity'
 import { fakeT as t } from '../utils/fakeT'
+import { CYRILLIC, CYRILLIC_LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
 const ACCOUNT: AiProviderEntry = {
   id: 'acct:a1',

@@ -1,5 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
 
 import type { CleaningApi } from './cleaningApi'

@@ -1,14 +1,12 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
-import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
-import { useSurvey } from '@webapp/store/survey'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { FormItem } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useAppDispatch } from '@webapp/store'
+import { useSurvey } from '@webapp/store/survey'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 export const ClusteringEntitySelector = () => {
   const dispatch = useAppDispatch()

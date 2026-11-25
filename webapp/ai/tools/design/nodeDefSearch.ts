@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { canViewCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool } from '../types'
+
 import { describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
 
 export const SEARCH_MAX_RESULTS = 20

@@ -1,12 +1,11 @@
 import React from 'react'
 
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
-
 import type {
   ScreenshotImageAttributeOption,
   ScreenshotPlotCandidate,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const PREFIX = 'mapWorkspace.screenshot'
 

@@ -1,13 +1,11 @@
 import { CATEGORY_ITEM_LABEL_TEXT_MAX } from '@common/ai/categoryItemLabels'
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
-
-import { createCategoryItemRefs, type CategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
-import { categoryItemLabelsProposeSetTool } from '@webapp/ai/tools/design/categoryItemLabelsProposeSet'
-import { getTools, runTool } from '@webapp/ai/tools/registry'
-import type { AiToolContext } from '@webapp/ai/tools/types'
-
 import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
+import { categoryItemLabelsProposeSetTool } from '@webapp/ai/tools/design/categoryItemLabelsProposeSet'
+import { type CategoryItemRefs, createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
+import { getTools, runTool } from '@webapp/ai/tools/registry'
+import type { AiToolContext } from '@webapp/ai/tools/types'
 
 let survey: any
 let speciesUuid: string

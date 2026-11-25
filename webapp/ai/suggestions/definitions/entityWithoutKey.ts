@@ -2,6 +2,7 @@
  * Card and prompt of the entity without a key suggestion (entity without a key).
  */
 import { buildEntityWithoutKeyPrompt } from '../prompts/designPrompts'
+
 import { getTargetNodeDefNames } from './designTargetNames'
 import type { SuggestionDefinition } from './types'
 

@@ -1,12 +1,9 @@
-import SystemError from '@core/systemError'
 import * as Survey from '@core/survey/survey'
-
-import { createRecordCountTools } from '@webapp/ai/tools/analysis/recordCounts'
-
+import SystemError from '@core/systemError'
 import { newAnalysisToolContext, newFakeAnalysisApi, runTool } from '@test/unit/utils/aiAnalysisTestUtils'
-
-import * as DataTest from '../../utils/dataTest'
+import { createRecordCountTools } from '@webapp/ai/tools/analysis/recordCounts'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 let survey: any = null
 

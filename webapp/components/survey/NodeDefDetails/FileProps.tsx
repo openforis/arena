@@ -3,15 +3,13 @@ import { useCallback, useEffect } from 'react'
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
-
+import { Checkbox } from '@webapp/components/form'
+import ButtonGroup from '@webapp/components/form/ButtonGroup'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 
-import { Checkbox } from '@webapp/components/form'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import ButtonGroup from '@webapp/components/form/ButtonGroup'
-
-import { State, useNodeDefEditReadOnly } from './store'
 import { NodeDefSingleExpressionProp } from './ExpressionsProp/NodeDefSingleExpressionProp'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const fileTypes = Object.keys(NodeDef.fileTypeValues).map((key) => ({
   key,

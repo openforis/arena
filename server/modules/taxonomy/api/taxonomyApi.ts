@@ -1,20 +1,17 @@
-import type { Router, Response as ExpressResponse } from 'express'
-import * as Request from '../../../utils/request'
-import * as Response from '../../../utils/response'
+import type { Response as ExpressResponse, Router } from 'express'
 
-import { FileFormats } from '@core/fileFormats'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { DataImportTemplateTypes } from '@core/dataImport'
+import { FileFormats } from '@core/fileFormats'
 import * as ObjectUtils from '../../../../core/objectUtils'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
-
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-
 import { jobToJSON } from '../../../job/jobUtils'
+import * as Request from '../../../utils/request'
+import * as Response from '../../../utils/response'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
-
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 const sendTaxonomies = async (res: ExpressResponse, surveyId: number, draft: boolean, validate: boolean) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })

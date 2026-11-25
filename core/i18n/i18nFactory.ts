@@ -4,8 +4,8 @@ import { ArenaI18n } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import enTranslation from './resources/en'
 import deTranslation from './resources/de'
+import enTranslation from './resources/en'
 import esTranslation from './resources/es'
 import frTranslation from './resources/fr'
 import jaTranslation from './resources/ja'

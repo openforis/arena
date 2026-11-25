@@ -2,20 +2,18 @@ import './NodeDefEntityForm.scss'
 
 import { useEffect } from 'react'
 import { connect } from 'react-redux'
+
 import * as A from '@core/arena'
-
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import NodeDefErrorBadge from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefErrorBadge'
+import { useAppDispatch } from '@webapp/store'
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
-import NodeDefErrorBadge from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefErrorBadge'
-
 import NodeDefEntityFormGrid from './NodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './NodeDefEntityFormNodeSelect'
-import { useAppDispatch } from '@webapp/store'
 
 const NodeDefEntityForm = (props) => {
   const {

@@ -1,5 +1,4 @@
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { FormDesigner } from '../helpers/formDesigner'
 import { publishSurvey } from '../helpers/publish'

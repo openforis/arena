@@ -1,11 +1,9 @@
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
-
+import * as Survey from '@core/survey/survey'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordService from '@server/modules/record/service/recordService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import { getContextUser } from '../config/context'
 
 import {

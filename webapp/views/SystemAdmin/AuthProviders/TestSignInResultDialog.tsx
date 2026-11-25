@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { Button } from '@webapp/components/buttons'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
 

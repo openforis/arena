@@ -6,8 +6,8 @@ import { useParams } from 'react-router'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import { ButtonInvite } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n, useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
@@ -25,7 +25,6 @@ import { UserEditHeader } from './UserEditHeader'
 import { UserEditNav, UserEditNavItem } from './UserEditNav'
 import { UserEditSaveBar } from './UserEditSaveBar'
 import { useUserEditLayout } from './useUserEditLayout'
-import { useAppDispatch } from '@webapp/store'
 
 type Props = {
   // true when editing the logged-in user's own profile (route has no userUuid param)

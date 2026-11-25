@@ -2,8 +2,8 @@
  * System prompt of the assistant's Analysis area: builds Explorer queries with tools and,
  * only when data tools are offered, reads their aggregated results.
  */
-import * as Survey from '@core/survey/survey'
 import { Query } from '@common/model/query'
+import * as Survey from '@core/survey/survey'
 
 import { getAnswerLanguageLabel } from './assistantDesign'
 import { assistantMarkers } from './assistantMarkers'

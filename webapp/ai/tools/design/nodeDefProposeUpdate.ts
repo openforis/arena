@@ -1,15 +1,14 @@
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as ObjectUtils from '@core/objectUtils'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { getBasicPropValue, getUpdatePropValue } from '@webapp/ai/changeSets/operations'
-import { nodeDefBasicProps, type ChangeOperationDraft, type NodeDefRefProp } from '@webapp/ai/changeSets/types'
-
+import { type ChangeOperationDraft, nodeDefBasicProps, type NodeDefRefProp } from '@webapp/ai/changeSets/types'
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
+
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
 import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 

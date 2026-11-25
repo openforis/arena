@@ -1,10 +1,10 @@
-import type { ArenaJobContext } from '@openforis/arena-core'
 import { ZipArchive } from 'archiver'
 
-import * as ProcessUtils from '@core/processUtils'
+import type { ArenaJobContext } from '@openforis/arena-core'
 
-import * as FileUtils from '@server/utils/file/fileUtils'
+import * as ProcessUtils from '@core/processUtils'
 import Job from '@server/job/job'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 export interface ZipFileCreatorJobContext extends ArenaJobContext {
   archive?: ZipArchive

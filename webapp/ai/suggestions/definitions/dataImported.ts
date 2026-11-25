@@ -3,6 +3,7 @@
  */
 import { DATA_IMPORTED_PROMPT } from '../prompts/dataImported'
 import type { AssistantSuggestion } from '../types'
+
 import { formatSuggestionCount } from './formatSuggestionCount'
 import type { SuggestionDefinition, SuggestionDescribeContext } from './types'
 

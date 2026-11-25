@@ -1,17 +1,14 @@
 import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
 import Job, { type JobParams } from '@server/job/job'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 const recordValidationUpdateBatchSize = 1000

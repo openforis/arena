@@ -2,15 +2,14 @@ import axios from 'axios'
 
 import { Dates } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
+import * as Record from '@core/record/record'
 import { AppSavingActions } from '@webapp/store/app'
-import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
+import { I18nState } from '@webapp/store/system'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-
 import * as RecordState from '../state'
+
 import * as ActionTypes from './actionTypes'
 import { checkAndConfirmUpdateNode } from './common'
 import { enqueueNodeRequest } from './nodeRequestsQueue'

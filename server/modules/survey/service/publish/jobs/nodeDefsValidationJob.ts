@@ -1,14 +1,12 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import Job, { type JobParams } from '@server/job/job'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import * as SurveyManager from '../../../manager/surveyManager'
+import Job, { type JobParams } from '@server/job/job'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '../../../manager/surveyManager'
 
 const getNodeDefPath = ({ survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef }) => {
   if (NodeDef.isRoot(nodeDef)) {

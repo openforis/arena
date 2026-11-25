@@ -1,7 +1,5 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
-
 import { type SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import {
   DATA_IMPORTED_CARD_KEY,
   DATA_IMPORTED_CARD_ONE_KEY,
@@ -9,6 +7,7 @@ import {
 } from '@webapp/ai/suggestions/definitions/dataImported'
 import { buildDataImportedSuggestion } from '@webapp/ai/suggestions/detectors/dataImported'
 import { DATA_IMPORTED_PROMPT } from '@webapp/ai/suggestions/prompts/dataImported'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { CYRILLIC, LANGUAGES, RESOURCES, usesCyrillic } from '../utils/i18nParity'
 
 /**

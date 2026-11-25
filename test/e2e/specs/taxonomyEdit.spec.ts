@@ -1,9 +1,7 @@
+import { Page } from '@playwright/test'
 import path from 'node:path'
 
-import { Page } from '@playwright/test'
-
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { taxonomy } from '../fixtures/seed/sampleSurveyModel'
 import { FormDesigner } from '../helpers/formDesigner'

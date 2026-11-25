@@ -7,19 +7,17 @@ import * as ProcessUtils from '@core/processUtils'
 import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AuthManager from '@server/modules/auth/manager/authManager'
-import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import FileZip from '@server/utils/file/fileZip'
-
 import { callHandler } from '@test/unit/utils/fakeExpress'
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
+import * as SB from '../../utils/surveyBuilder'
 import { getContextUser } from '../config/context'
 
 let survey: any

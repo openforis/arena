@@ -4,18 +4,16 @@
  */
 import { useEffect, useMemo, useState } from 'react'
 
-import * as User from '@core/user/user'
-
 import { AiFeatureCategory } from '@common/ai/features'
-
+import * as User from '@core/user/user'
 import { suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-
 import type { AssistantArea } from '../assistantAreas'
 import { useAssistantAreas } from '../useAssistantAreas'
+
 import {
   getAvailableAreas,
   getNextExpiryDelay,

@@ -1,9 +1,10 @@
-import type { Readable, Writable } from 'node:stream'
 import { format } from '@fast-csv/format'
+import type { Readable, Writable } from 'node:stream'
 
-import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
-import { CsvField, CsvFieldItem } from './csvField'
 import { StreamUtils } from '../streamUtils'
+
+import { CsvField, CsvFieldItem } from './csvField'
+import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
 
 const transformJsonToCsv = ({
   fields,

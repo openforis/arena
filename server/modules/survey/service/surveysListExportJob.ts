@@ -1,9 +1,8 @@
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
-
 import Job, { type JobParams } from '@server/job/job'
-import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '../manager/surveyManager'
 
 export default class SurveysListExportJob extends Job {

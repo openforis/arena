@@ -1,6 +1,7 @@
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
 import type { ArenaVernacularName } from '@openforis/arena-core'
+
+import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 export class TaxonBuilder {

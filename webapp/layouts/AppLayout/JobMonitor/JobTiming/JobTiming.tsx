@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+
 import { ArenaJobSerialized } from '@openforis/arena-core'
+
 import * as JobSerializedUtils from '@common/job/jobSerialized'
 import { useI18n } from '@webapp/store/system'
 

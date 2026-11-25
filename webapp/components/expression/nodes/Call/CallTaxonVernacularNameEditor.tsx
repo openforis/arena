@@ -2,19 +2,18 @@ import { useCallback, useState } from 'react'
 
 import { Strings } from '@openforis/arena-core'
 
+import { standards } from '@core/app/languages'
 import * as Expression from '@core/expressionParser/expression'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as StringUtils from '@core/stringUtils'
-
+import * as Taxonomy from '@core/survey/taxonomy'
 import { Button } from '@webapp/components/buttons'
 import { LanguageDropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
-
 import Identifier from '../Identifier'
+
 import type { CallEditorProps } from './callEditorProps'
-import { standards } from '@core/app/languages'
 
 const createInitialState = ({ initialTaxonomy, initialVernacularLangCode, initialIdentifierName }) => {
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null

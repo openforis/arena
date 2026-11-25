@@ -4,12 +4,11 @@
 import type { LanguageModel } from 'ai'
 
 import {
-  generateDataQuery,
-  summarizeDataQuery,
   type AiDataQueryGenerateResult,
   type AiDataQuerySummarizeResult,
+  generateDataQuery,
+  summarizeDataQuery,
 } from '@common/ai/tasks/dataQuery'
-
 import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { createGatewayTextGenerator } from '../runtime/textGenerators'
 

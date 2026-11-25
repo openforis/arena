@@ -1,8 +1,8 @@
-import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
+import type { DbClient } from '@server/db/db'
 import { TableDataNodeDef } from '../../../../../common/model/db'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
 
 /**
  * Create a nodeDef data table.

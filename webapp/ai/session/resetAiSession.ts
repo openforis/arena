@@ -3,8 +3,8 @@
  * every in-memory cache of per-user AI state. The data stored in the browser (conversations, suggestions, local
  * providers) is not cleared: it is keyed by user, and another user of the same browser never reads it.
  */
-import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { cancelAllConsentRequests } from '@webapp/ai/engines/consentRequests'
+import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { resetSurveyAiPolicyCache } from '@webapp/ai/policy/surveyAiPolicyCache'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import { resetAssistantOnLogout } from '@webapp/components/ai/Assistant/assistantLogout'

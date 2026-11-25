@@ -1,6 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-can-node-def-be-qualifier-user' }

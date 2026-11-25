@@ -1,13 +1,14 @@
 import './ErrorBadge.scss'
 
-import type React from 'react'
 import classNames from 'classnames'
+import type React from 'react'
+
+import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import { useI18n } from '@webapp/store/system'
 
 import ValidationTooltip from './ValidationTooltip'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 type ErrorBadgeProps = {
   children?: React.ReactNode

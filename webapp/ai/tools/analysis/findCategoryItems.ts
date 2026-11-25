@@ -1,19 +1,19 @@
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import { Authorizer } from '@openforis/arena-core'
+
+import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { Authorizer } from '@openforis/arena-core'
-import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { findNodeDefByName, getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
-import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
-import { categoryItemsFetchLimit, type AnalysisApi } from './analysisApi'
+import { type AnalysisApi, categoryItemsFetchLimit } from './analysisApi'
 import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const categoryItemsMax = 20

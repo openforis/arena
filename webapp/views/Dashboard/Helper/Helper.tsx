@@ -1,15 +1,13 @@
 import './Helper.scss'
 
 import type { ReactNode } from 'react'
-import { Link } from 'react-router'
 import { Trans } from 'react-i18next'
+import { Link } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
-
-import { useSurveyInfo } from '@webapp/store/survey'
+import { appModuleUri, designerModules, homeModules } from '@webapp/app/appModules'
 import { TransTitle } from '@webapp/components/TransTitle'
-import { appModuleUri, homeModules, designerModules } from '@webapp/app/appModules'
-
+import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyInfo from '../SurveyInfo'
 
 const HelperFirstTimeSurvey = () => {

@@ -1,13 +1,13 @@
-import type { ArenaSurvey } from '@openforis/arena-core'
 import { createHash } from 'node:crypto'
 
+import type { ArenaSurvey } from '@openforis/arena-core'
+
 import {
+  buildSurveyFingerprintContent,
   CategoryItemsByCategoryUuid,
   SurveyFingerprintType,
   TaxaByTaxonomyUuid,
-  buildSurveyFingerprintContent,
 } from '@core/survey/surveyCompare'
-
 import { db, type DbClient } from '@server/db/db'
 
 import { fetchSurveyFromDb } from './surveyCompareSurveysReader'

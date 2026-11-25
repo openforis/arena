@@ -1,10 +1,8 @@
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-
 import { Button } from '@webapp/components'
 import { Input } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
-
 import { UserEditSection } from '../UserEditSection'
 
 const planetProvider = 'planet'

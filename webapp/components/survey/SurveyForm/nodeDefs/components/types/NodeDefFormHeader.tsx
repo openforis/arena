@@ -1,12 +1,11 @@
 import './NodeDefFormHeader.scss'
 
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import Markdown from '@webapp/components/Markdown'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
 import { useSurveyPreferredLang } from '@webapp/store/survey'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type NodeDefFormHeaderProps = {
   nodeDef: ArenaAnyNodeDef

@@ -1,14 +1,14 @@
 import type { ArenaSurvey } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
-import { writeImportedSurveyAiPolicy } from '@server/modules/ai/service/surveyAiPolicyService'
 import Job, { type JobParams } from '@server/job/job'
+import { writeImportedSurveyAiPolicy } from '@server/modules/ai/service/surveyAiPolicyService'
+import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
-import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 
 const isTemplate = ({
   backup = true,

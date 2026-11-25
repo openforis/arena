@@ -1,5 +1,3 @@
-import { db } from '@server/db/db'
-
 import { Schemata, TableNode } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
@@ -7,20 +5,18 @@ import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
+import { db } from '@server/db/db'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import { replaceNodeHierarchyDisaggregatedViewIfExists } from '@server/modules/surveyRdb/repository/nodeHierarchyDisaggregatedViewRepository'
 import * as NodeHierarchyDisaggregatedView from '@server/modules/surveyRdb/schemaRdb/nodeHierarchyDisaggregatedView'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // The node meta hierarchy (ancestor uuids) is not stored in the db: it's rebuilt from the parent uuids when reading the nodes.
 describe('Node meta hierarchy not stored', () => {

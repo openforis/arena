@@ -1,15 +1,14 @@
 import { Records } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-
-import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
+import * as NodeDef from '@core/survey/nodeDef'
 import { SurveyState } from '@webapp/store/survey'
-
-import * as RecordState from '../state'
-import * as ActionTypes from './actionTypes'
+import { DialogConfirmActions, LoaderActions } from '@webapp/store/ui'
 import { mergeNodesIntoFetchedRecordsCache } from '../fetchedRecordsCache'
+import * as RecordState from '../state'
+
+import * as ActionTypes from './actionTypes'
 
 export const recordNodesUpdate =
   (nodes, removeDirtyFlag = true) =>

@@ -1,17 +1,11 @@
-import * as A from '@core/arena'
-
-import { Objects, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaRecordNode } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Objects } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { uuidv4 } from '@core/uuid'
-
-import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { NodeMeta } from './_node/nodeMeta'
 import {
   valuePropsByType,
   valuePropsCode,
@@ -21,6 +15,10 @@ import {
   valuePropsTaxon,
   valuePropsTime,
 } from '@core/survey/nodeValueProps'
+import { uuidv4 } from '@core/uuid'
+import * as Validation from '@core/validation/validation'
+
+import { NodeMeta } from './_node/nodeMeta'
 
 type Node = ArenaRecordNode
 type NodeUpdater = (node: Node) => Node

@@ -1,14 +1,12 @@
 import { Numbers } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
-
 import { Query } from '@common/model/query'
-
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useNodeDefsByUuids, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
 export const emptyValueLabel = '--- NA ---'
 

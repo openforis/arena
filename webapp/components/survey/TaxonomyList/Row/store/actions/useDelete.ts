@@ -1,16 +1,14 @@
 import { useCallback } from 'react'
 import axios from 'axios'
+
 import * as A from '@core/arena'
-
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Survey from '@core/survey/survey'
-
-import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useSurvey, useSurveyId } from '@webapp/store/survey'
-
-import { State } from '../state'
+import * as Taxonomy from '@core/survey/taxonomy'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurvey, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { State } from '../state'
 
 export const useDelete = () => {
   const i18n = useI18n()

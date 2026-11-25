@@ -10,10 +10,9 @@
  * On any failure (network, auth, parse) we surface an error key with a status code: nothing the provider or the
  * network said is sent on (the details go to the server log) — the panel falls back to free-text input.
  */
+import { stripTrailingSlashes } from '@common/ai/allowlist'
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { stripTrailingSlashes } from '@common/ai/allowlist'
-
 import * as Log from '@server/log/log'
 
 import { assertBaseUrlAllowed, type GuardOptions } from './baseUrlGuard'

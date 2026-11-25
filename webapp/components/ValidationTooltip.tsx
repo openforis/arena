@@ -1,10 +1,11 @@
 import React from 'react'
 
-import * as Validation from '@core/validation/validation'
-
-import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
-import Tooltip from './Tooltip'
 import type { ArenaValidation } from '@openforis/arena-core'
+
+import * as Validation from '@core/validation/validation'
+import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
+
+import Tooltip from './Tooltip'
 
 type ValidationTooltipProps = {
   children: React.ReactNode

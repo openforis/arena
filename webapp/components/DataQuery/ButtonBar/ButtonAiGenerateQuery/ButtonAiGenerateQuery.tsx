@@ -1,19 +1,17 @@
 import { useCallback } from 'react'
 
 import { Query } from '@common/model/query'
-
-import { Button } from '@webapp/components/buttons'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import type { AiDataQueryGenerateResult } from '@webapp/ai/workflows'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { Button } from '@webapp/components/buttons'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { useAppDispatch } from '@webapp/store'
 import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { DialogConfirmActions } from '@webapp/store/ui'
-
-import type { AiDataQueryGenerateResult } from '@webapp/ai/workflows'
-
 import { State } from '../store'
+
 import { AiGenerateQueryPopup } from './AiGenerateQueryPopup'
 
 type Props = {

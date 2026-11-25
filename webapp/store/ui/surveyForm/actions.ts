@@ -1,8 +1,8 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import * as Survey from '@core/survey/survey'
 import { SurveyState } from '@webapp/store/survey'
+
 import * as SurveyFormState from './state'
 
 /**

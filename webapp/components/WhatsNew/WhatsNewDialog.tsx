@@ -5,8 +5,9 @@ import { useCallback, useState } from 'react'
 import { Button } from '../buttons'
 import { Checkbox } from '../form'
 import { Modal, ModalBody, ModalFooter } from '../Modal'
-import { WhatsNewCarousel } from './WhatsNewCarousel'
+
 import { useWhatsNewUnseenItems } from './useWhatsNew'
+import { WhatsNewCarousel } from './WhatsNewCarousel'
 
 /**
  * Dialog shown automatically when there are "What's new" items not dismissed yet by the current user.

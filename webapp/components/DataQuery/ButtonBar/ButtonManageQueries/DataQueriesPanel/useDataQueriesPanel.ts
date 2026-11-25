@@ -1,21 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import * as A from '@core/arena'
 import { type ArenaDataQuerySummary, DataQuerySummaries, Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
+import * as A from '@core/arena'
 import * as Validation from '@core/validation/validation'
-
 import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
-import * as API from '@webapp/service/api'
 import { useNotifyError } from '@webapp/components/hooks'
+import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
-import { useAppDispatch } from '@webapp/store'
 
 /**
  * Returns the given name, or the first "name_N" (N = 2, 3, ...) not used by any of the given query summaries.

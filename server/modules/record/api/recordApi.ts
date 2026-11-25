@@ -1,35 +1,30 @@
-import type { Router } from 'express'
 import exifr from 'exifr'
+import type { Router } from 'express'
 
 import { Authorizer, Objects } from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { minMobileAppVersionRecordsDownload } from '@common/mobile'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+import * as DateUtils from '@core/dateUtils'
+import { FileFormats } from '@core/fileFormats'
 import * as ProcessUtils from '@core/processUtils'
-
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
-import { sendRouteError } from '@server/utils/sendRouteError'
-import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
-import * as JobUtils from '@server/job/jobUtils'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import UnauthorizedError from '@server/utils/unauthorizedError'
-
-import * as User from '@core/user/user'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
-import * as Node from '@core/record/node'
-import * as DateUtils from '@core/dateUtils'
-import { FileFormats } from '@core/fileFormats'
-
-import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as User from '@core/user/user'
+import * as JobUtils from '@server/job/jobUtils'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
-import { minMobileAppVersionRecordsDownload } from '@common/mobile'
-import * as RecordService from '../service/recordService'
-
 import {
   requireRecordAnalysisPermission,
   requireRecordCleansePermission,
@@ -38,14 +33,20 @@ import {
   requireRecordListExportPermission,
   requireRecordListViewPermission,
   requireRecordOwnerChangePermission,
-  requireRecordStepEditPermission,
-  requireRecordViewPermission,
   requireRecordsEditPermission,
   requireRecordsExportPermission,
-  requireSurveyViewPermission,
   requireRecordsMergePermission,
+  requireRecordStepEditPermission,
+  requireRecordViewPermission,
+  requireSurveyViewPermission,
 } from '../../auth/authApiMiddleware'
 import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
+import * as RecordService from '../service/recordService'
+import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
+import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
+
+import { requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
+import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
 import {
   getPendingNodeFromBody,
   requireMergeRecordsMatchUserGroupQualifiers,
@@ -54,10 +55,6 @@ import {
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
-import { requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
-import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
-import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
-import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
 
 const fetchRecordNodeFileAsStream = async ({
   surveyId,

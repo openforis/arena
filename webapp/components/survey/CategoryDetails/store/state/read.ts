@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
-import * as Category from '@core/survey/category'
 import * as StringUtils from '@core/stringUtils'
+import * as Category from '@core/survey/category'
 
 import { keys } from './keys'
 

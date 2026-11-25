@@ -1,7 +1,6 @@
 import type { ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
 export const stateKey = 'nodeDefs'

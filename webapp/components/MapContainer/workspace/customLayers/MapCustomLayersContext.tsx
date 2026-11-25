@@ -8,13 +8,13 @@ import {
   mergeMapCustomLayers,
 } from '@core/map/customLayers/mapCustomLayer'
 import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
-import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 import {
   type CustomBaseLayerDef,
   isCustomBaseLayerKey,
   toCustomBaseLayerDef,
 } from '@webapp/components/MapContainer/workspace/customLayers/customLayerLeaflet'
 import { useMapBaseLayerApi } from '@webapp/components/MapContainer/workspace/customLayers/useMapBaseLayerApi'
+import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'

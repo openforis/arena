@@ -1,22 +1,20 @@
 import './AnalysisNodeDefs.scss'
-import { useRef, useMemo, useState } from 'react'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
+import { useMemo, useRef, useState } from 'react'
 
 import * as Chain from '@common/analysis/chain'
-
-import { useChain } from '@webapp/store/ui/chain'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import ErrorBadge from '@webapp/components/ErrorBadge'
+import { useOnUpdate } from '@webapp/components/hooks'
 import { useSurvey } from '@webapp/store/survey'
 import { useDataCountByEntityDefUuid } from '@webapp/store/surveyRdb/hooks'
 import { useI18n } from '@webapp/store/system'
+import { useChain } from '@webapp/store/ui/chain'
 
-import ErrorBadge from '@webapp/components/ErrorBadge'
-
-import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
 import { AnalysisNodeDef } from './AnalysisNodeDef'
+import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
 import { useSortAnalysisNodeDefs } from './hooks'
-import { useOnUpdate } from '@webapp/components/hooks'
 
 const AnalysisNodeDefs = () => {
   const [showSamplingNodeDefs, setShowSamplingNodeDefs] = useState(false)

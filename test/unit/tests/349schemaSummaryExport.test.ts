@@ -1,7 +1,6 @@
+import { FileFormats } from '@core/fileFormats'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { FileFormats } from '@core/fileFormats'
-
 import {
   neutraliseSpreadsheetFormula,
   parseAiDescriptions,
@@ -10,7 +9,6 @@ import {
   buildSchemaSummaryItems,
   generateSchemaSummaryItems,
 } from '@server/modules/survey/service/schemaSummary/schemaSummary'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import * as SB from '../../utils/surveyBuilder'
 

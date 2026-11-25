@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 import { ArenaUserGroup } from '@openforis/arena-core'
 
 type UserGroupMember = Record<string, unknown>

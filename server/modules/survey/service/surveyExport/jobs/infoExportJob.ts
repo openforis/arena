@@ -3,10 +3,8 @@ import { ArenaExportInfoFactory, ArenaExportType } from '@openforis/arena-core'
 import { AppInfo } from '@core/app/appInfo'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import { ExportFile } from '../exportFile'
 
 export default class InfoExportJob extends Job {

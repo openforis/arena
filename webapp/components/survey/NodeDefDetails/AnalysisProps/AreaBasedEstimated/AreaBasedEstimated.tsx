@@ -1,15 +1,13 @@
 import { useState } from 'react'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
-import { useSurvey } from '@webapp/store/survey'
-
 import Checkbox from '@webapp/components/form/Checkbox'
 import { FormItem } from '@webapp/components/form/Input'
-
+import { useSurvey } from '@webapp/store/survey'
 import { useNodeDefEditReadOnly } from '../../store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type AreaBasedEstimatedProps = {
   nodeDef: ArenaAnyNodeDef

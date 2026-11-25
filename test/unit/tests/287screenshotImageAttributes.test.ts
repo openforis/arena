@@ -1,7 +1,6 @@
-import type { NodeDefType, ArenaNodeDefEntity } from '@openforis/arena-core'
+import type { ArenaNodeDefEntity, NodeDefType } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import {
   filterImageAttributeDefs,
   toImageAttributeOptions,

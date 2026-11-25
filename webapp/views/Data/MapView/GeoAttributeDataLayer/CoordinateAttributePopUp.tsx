@@ -3,28 +3,26 @@ import './CoordinateAttributePopUp.scss'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 
-import { PointFactory, type ArenaAnyNodeDef } from '@openforis/arena-core'
+import { type ArenaAnyNodeDef, PointFactory } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/samplingPolygon'
-import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
+import * as Survey from '@core/survey/survey'
 import { Button, ButtonIconEdit } from '@webapp/components'
-import Markdown from '@webapp/components/Markdown'
-import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
-
-import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
-import { useUserName } from '@webapp/store/user/hooks'
-import { useI18n } from '@webapp/store/system'
+import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
+import Markdown from '@webapp/components/Markdown'
 import * as API from '@webapp/service/api'
-
-import { useElevation } from '../common/useElevation'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useUserName } from '@webapp/store/user/hooks'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
-import { WhispMenuButton } from './WhispMenuButton'
-import type { FlyToPointFunction } from '../common/useFlyToPoint'
 import type { GeoAttributePointFeature, RecordEditClickHandler } from '../common/mapPointTypes'
+import { useElevation } from '../common/useElevation'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
+
+import { WhispMenuButton } from './WhispMenuButton'
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].

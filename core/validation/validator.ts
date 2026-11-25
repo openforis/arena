@@ -1,14 +1,13 @@
+import { type ArenaValidation, type ArenaValidationResult, Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import { Objects, type ArenaValidation, type ArenaValidationResult } from '@openforis/arena-core'
-
 import { ArrayUtils } from '@core/arrayUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 
+import type { ValidatorFn, ValidatorResult } from './_validator/validatorFunctions'
+import * as ValidatorFunctions from './_validator/validatorFunctions'
 import * as Validation from './validation'
 import * as ValidationResult from './validationResult'
-import * as ValidatorFunctions from './_validator/validatorFunctions'
-import type { ValidatorFn, ValidatorResult } from './_validator/validatorFunctions'
 
 const extractNestedErrorsOrWarnings = (
   validationResultOrValidation: ValidatorResult | ArenaValidation

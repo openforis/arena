@@ -4,22 +4,18 @@ import { Link, Navigate, useSearchParams } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
-
-import { appModuleUri, appModules, guestModules } from '@webapp/app/appModules'
-
+import { appModules, appModuleUri, guestModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
-import { useFormObject } from '@webapp/components/hooks'
 import { EmailInput, PasswordInput, VerificationCodeInput } from '@webapp/components/form'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
-
-import GuestError from '@webapp/components/guest/GuestError'
 import { ExternalLoginButtons } from '@webapp/components/guest/ExternalLoginButtons'
+import GuestError from '@webapp/components/guest/GuestError'
 import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
-
-import { useI18n } from '@webapp/store/system'
-import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
-import { useUser } from '@webapp/store/user'
+import { useFormObject } from '@webapp/components/hooks'
 import { useAppDispatch } from '@webapp/store'
+import { LoginActions, LoginState, LoginValidator } from '@webapp/store/login'
+import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
 
 const { ViewState } = LoginState
 

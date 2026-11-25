@@ -1,12 +1,10 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import type { CleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
-
-import * as DataTest from '../../utils/dataTest'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 import { newAnalysisToolContext, newSurveyUser } from './aiAnalysisTestUtils'
 

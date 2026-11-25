@@ -1,10 +1,10 @@
 import React, { memo } from 'react'
 
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
 import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
 import { DataQueryChart } from './DataQueryChart'
 import DataQueryTable from './DataQueryTable'
-import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 const components: Record<string, React.ComponentType<any>> = {
   [DataExplorerState.displayTypes.chart]: DataQueryChart,

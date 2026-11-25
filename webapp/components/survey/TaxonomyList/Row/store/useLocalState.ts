@@ -1,8 +1,9 @@
 import { useState } from 'react'
 
+import { useOnValueChange } from '@webapp/components/hooks'
+
 import { useActions } from './actions'
 import { State } from './state'
-import { useOnValueChange } from '@webapp/components/hooks'
 
 export const useLocalState = (props) => {
   const { selectedItemUuid, item: taxonomy, canDelete, onTaxonomySelect, canSelect, initData } = props

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useMap } from 'react-leaflet'
 import L from 'leaflet'
+import { useMap } from 'react-leaflet'
 
 import { useMapContextOptions } from './MapContext'
 import { MapOptions } from './mapOptions'

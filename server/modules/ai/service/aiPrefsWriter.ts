@@ -6,9 +6,8 @@
  */
 import type { ArenaUser } from '@openforis/arena-core'
 
-import * as UserUtils from '@core/user/user'
-import * as SecretBox from '@server/utils/crypto/secretBox'
 import { ENV } from '@core/processUtils'
+import * as UserUtils from '@core/user/user'
 import {
   type AiPrefsUpdate,
   findEnvelopesOfOtherUsers,
@@ -17,6 +16,7 @@ import {
   type StoredAiPrefs,
   updateAiPrefs,
 } from '@server/modules/user/repository/userAiPrefsRepository'
+import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import {
   findCopiedLegacyKeyIds,

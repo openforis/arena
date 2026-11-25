@@ -1,13 +1,11 @@
 import * as A from '@core/arena'
-
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
 import { TreeSelectViewMode } from '@webapp/model'
+import * as SurveyActionTypes from '@webapp/store/survey/actions/actionTypes'
+import * as NodeDefsActionTypes from '@webapp/store/survey/nodeDefs/actionTypes'
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
-import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as RecordActions from '../record/actions'
 
 import * as SurveyFormActions from './actions'
@@ -17,9 +15,9 @@ const actionHandlers = {
   // Reset form
   [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
-  [SurveyActions.surveyCreate]: () => ({}),
-  [SurveyActions.surveyUpdate]: () => ({}),
-  [SurveyActions.surveyDelete]: () => ({}),
+  [SurveyActionTypes.surveyCreate]: () => ({}),
+  [SurveyActionTypes.surveyUpdate]: () => ({}),
+  [SurveyActionTypes.surveyDelete]: () => ({}),
 
   [SurveyFormActions.formReset]: () => ({}),
 
@@ -51,9 +49,10 @@ const actionHandlers = {
   [SurveyFormActions.formUpdateNodeDefLabelType]: (state, { nodeDefLabelType }) =>
     SurveyFormState.setNodeDefLabelType(nodeDefLabelType)(state),
   // Node def actions
-  [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
+  [NodeDefsActionTypes.nodeDefDelete]: (state, { nodeDef }) =>
+    SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
-  [NodeDefsActions.nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
+  [NodeDefsActionTypes.nodeDefSave]: (state, { nodeDef, nodeDefParent, surveyCycleKey }) => {
     if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
       const displayInParentPage = NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(nodeDef)
       // When changing displayIn change form active page
@@ -63,7 +62,7 @@ const actionHandlers = {
     return state
   },
 
-  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, isNodeDefNew }) => {
+  [NodeDefsActionTypes.nodeDefPropsUpdateCancel]: (state, { nodeDef, isNodeDefNew }) => {
     const viewMode = SurveyFormState.getTreeSelectViewMode(state)
     if (isNodeDefNew && viewMode === TreeSelectViewMode.allNodeDefs) {
       return SurveyFormState.assocFormActiveNodeDefUuid(NodeDef.getParentUuid(nodeDef))(state)

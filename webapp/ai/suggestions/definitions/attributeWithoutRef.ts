@@ -2,8 +2,8 @@
  * Card and prompt of the attribute without a reference suggestion (code or taxon attribute without a category or taxonomy).
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { buildAttributeWithoutRefPrompt } from '../prompts/designPrompts'
+
 import { getTargetNodeDefs } from './designTargetNames'
 import type { SuggestionDefinition } from './types'
 

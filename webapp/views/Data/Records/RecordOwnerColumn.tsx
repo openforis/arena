@@ -1,18 +1,17 @@
 import { useCallback } from 'react'
 
-import { Strings, type ArenaRecord } from '@openforis/arena-core'
+import { type ArenaRecord, Strings } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
-
-import * as API from '@webapp/service/api'
-import { useSurveyId } from '@webapp/store/survey'
-import { useAuthCanCleanseRecords } from '@webapp/store/user/hooks'
-import { DialogConfirmActions } from '@webapp/store/ui'
 import { EditableColumn } from '@webapp/components/DataGrid/EditableColumn'
+import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
+import { useSurveyId } from '@webapp/store/survey'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { useAuthCanCleanseRecords } from '@webapp/store/user/hooks'
 
 import { RecordOwnerDropdown } from './RecordOwnerDropdown'
-import { useAppDispatch } from '@webapp/store'
 
 type RecordOwnerColumnProps = {
   item: ArenaRecord

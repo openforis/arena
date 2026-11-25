@@ -1,14 +1,13 @@
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
-import type { DbClient } from '@server/db/db'
-import * as A from '@core/arena'
+import type { ArenaAnyNodeDef, ArenaRecord, ArenaRecordNode, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as A from '@core/arena'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
-import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
+import type { DbClient } from '@server/db/db'
 import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataView'
 
 const createNodesRecordUniqueValidation = ({

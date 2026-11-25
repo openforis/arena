@@ -1,6 +1,6 @@
-import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
 import { createValidationErrorsDetector } from '@webapp/ai/suggestions/detectors/validationErrors'
 import type { SuggestionGeneration } from '@webapp/ai/suggestions/generation'
+import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
 import {
   createSuggestionHostController,
   type SuggestionHostInput,

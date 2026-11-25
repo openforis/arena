@@ -2,10 +2,9 @@
  * Classifies a local AI server URL from the URL alone (the browser cannot resolve DNS):
  * loopback → onDevice, allowlisted → orgHosted, anything else → cloud.
  */
-import type { AiHostingClass } from '@common/ai/policy'
-
 import { isAllowlisted } from '@common/ai/allowlist'
 import { classifyIpAddress } from '@common/ai/ipAddress'
+import type { AiHostingClass } from '@common/ai/policy'
 
 const parseHttpUrl = (value: string): URL | null => {
   if (typeof value !== 'string') return null

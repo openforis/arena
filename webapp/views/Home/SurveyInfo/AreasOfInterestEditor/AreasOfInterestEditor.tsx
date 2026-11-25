@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react'
 import type { ArenaAreaOfInterestDescriptor } from '@openforis/arena-core'
 
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
-
 import { Button, ButtonAdd } from '@webapp/components'
 import { DataGrid, rowActionColumns } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'

@@ -1,12 +1,10 @@
 import { useCallback, useEffect } from 'react'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
-import { DataExplorerActions } from '@webapp/store/dataExplorer'
-
 import DataQuery from '@webapp/components/DataQuery'
 import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
 import { useAppDispatch } from '@webapp/store'
+import { DataExplorerActions } from '@webapp/store/dataExplorer'
 
 const Explorer = () => {
   const dispatch = useAppDispatch()

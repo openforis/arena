@@ -4,7 +4,6 @@
  */
 import type { AiDataClass } from '@common/ai/features'
 import { type AiPolicy, isHostingAllowed } from '@common/ai/policy'
-
 import { getEffectiveProviderId } from '@webapp/ai/engines/selectEngine'
 import type { AiCapabilities, AiProviderEntry } from '@webapp/ai/engines/types'
 import { type AiFeatureAvailabilityStatus, getPolicyBlockedReasonKeys } from '@webapp/ai/policy/aiFeatureAvailability'

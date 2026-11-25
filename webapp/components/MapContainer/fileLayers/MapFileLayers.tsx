@@ -3,9 +3,7 @@ import L from 'leaflet'
 import { useMap } from 'react-leaflet'
 
 import { escapeHtml } from '@core/stringUtils'
-
 import { useNotifyError } from '@webapp/components/hooks'
-
 import { getReadErrorDetails, readFileLayerGroup } from '../workspace/uploaded/readUploadedFile'
 
 export type MapFile = {

@@ -1,18 +1,10 @@
-import * as Survey from '@core/survey/survey'
+import { ValidationSeverity } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import { ValidationSeverity } from '@openforis/arena-core'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
-import { publishErrorsDefinition } from '@webapp/ai/suggestions/definitions/publishErrors'
-import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
-import {
-  hasPublishErrors,
-  publishErrorsDetector,
-  publishErrorsResolver,
-} from '@webapp/ai/suggestions/detectors/publishErrors'
 import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
   buildSuggestion,
@@ -23,6 +15,14 @@ import {
   withSavedNodeDefs,
 } from '@test/unit/utils/designSuggestionTestUtils'
 import { withValidation } from '@test/unit/utils/surveyValidationTestUtils'
+import { publishErrorsDefinition } from '@webapp/ai/suggestions/definitions/publishErrors'
+import {
+  hasPublishErrors,
+  publishErrorsDetector,
+  publishErrorsResolver,
+} from '@webapp/ai/suggestions/detectors/publishErrors'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 
 const keysEmpty = 'validationErrors:nodeDefEdit.keysEmpty'
 const childrenEmpty = 'validationErrors:nodeDefEdit.childrenEmpty'

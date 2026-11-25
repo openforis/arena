@@ -10,10 +10,10 @@
  * Plain-text JSON (instead of the SDK's structured output) because tiny local
  * models frequently fail on json mode; see `@common/ai/parsing`.
  */
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
+import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { pq } from './promptSafety'
 

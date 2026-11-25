@@ -4,7 +4,6 @@
  * use the conversation's provider (workflows/assistantBatches).
  */
 import { uuidv4 } from '@core/uuid'
-
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { logAiWarning } from '@webapp/ai/log/aiLog'
@@ -15,10 +14,10 @@ import { proposeChangeSet } from '@webapp/ai/tools/design/proposeChangeSet'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import type { AiToolContext } from '@webapp/ai/tools/types'
 import {
+  type AssistantBatchDeps,
   getAssistantBatchKind,
   loadAssistantBatch,
   runAssistantBatch,
-  type AssistantBatchDeps,
 } from '@webapp/ai/workflows/assistantBatches'
 import type { resolveBatchModel } from '@webapp/ai/workflows/batchModel'
 import type { AiBatchStop } from '@webapp/ai/workflows/batchRun'

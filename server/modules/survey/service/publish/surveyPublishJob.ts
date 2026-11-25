@@ -1,20 +1,17 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
-
 import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
 
 import CategoriesValidationJob from './jobs/categoriesValidationJob'
-import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
-import NodeDefsValidationJob from './jobs/nodeDefsValidationJob'
 import ChainsCyclesCheckJob from './jobs/chainsCyclesCheckJob'
 import ChainsSamplingNodeDefsCheckJob from './jobs/chainsSamplingNodeDefsCheckJob'
 import ChainsValidationJob from './jobs/chainsValidationJob'
+import CyclesDeletedCheckJob from './jobs/cyclesDeletedCheckJob'
+import NodeDefsValidationJob from './jobs/nodeDefsValidationJob'
 import SurveyInfoValidationJob from './jobs/surveyInfoValidationJob'
 import SurveyPropsPublishJob from './jobs/surveyPropsPublishJob'
 import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'

@@ -1,24 +1,23 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
-import { missingTranslationsDefinition } from '@webapp/ai/suggestions/definitions/missingTranslations'
-import { STATE_DETECTORS } from '@webapp/ai/suggestions/registry'
-import {
-  detectMissingTranslations,
-  missingTranslationsDetector,
-} from '@webapp/ai/suggestions/detectors/missingTranslations'
-import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
-  TEST_NOW,
   buildSuggestion,
   createDetectorContext,
   describeContext,
+  TEST_NOW,
   withLanguages,
   withNodeDef,
   withSavedNodeDefs,
   withTexts,
 } from '@test/unit/utils/designSuggestionTestUtils'
+import { missingTranslationsDefinition } from '@webapp/ai/suggestions/definitions/missingTranslations'
+import {
+  detectMissingTranslations,
+  missingTranslationsDetector,
+} from '@webapp/ai/suggestions/detectors/missingTranslations'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { STATE_DETECTORS } from '@webapp/ai/suggestions/registry'
+import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
 let survey: any
 

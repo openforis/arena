@@ -1,9 +1,9 @@
-import { fetchMessage } from './fetchMessage'
 import { createMessage } from './createMessage'
-import { updateMessage } from './updateMessage'
-import { sendMessage } from './sendMessage'
 import { deleteMessage } from './deleteMessage'
+import { fetchMessage } from './fetchMessage'
 import { resetMessage } from './resetMessage'
+import { sendMessage } from './sendMessage'
+import { updateMessage } from './updateMessage'
 
 export { MessageActionTypes } from './actionTypes'
 

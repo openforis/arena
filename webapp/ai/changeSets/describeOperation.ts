@@ -1,12 +1,12 @@
 /**
  * English descriptions of operations and results, for the note sent back to the model after Apply.
  */
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
-import { isRecordEditOperation } from './recordEdits/types'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
+import { isRecordEditOperation } from './recordEdits/types'
 import type { ChangeOperation, ChangeSet, OperationResult } from './types'
 
 const findName = (uuid: string, changeSet: ChangeSet, survey: any): string => {

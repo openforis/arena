@@ -1,16 +1,13 @@
-import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaChain, ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaChain, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
+
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { TableChain } from '@common/model/db'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as DB from '@server/db'
-
+import type { DbClient } from '@server/db/db'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainRepository from '../../repository/chain'
 
 const oldSamplingDesignPhasePropKeys = {

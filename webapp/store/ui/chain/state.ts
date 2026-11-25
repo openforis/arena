@@ -1,5 +1,4 @@
 import * as Chain from '@common/analysis/chain'
-
 import * as RecordStep from '@core/record/recordStep'
 
 const getChainState = (state) => state.ui.chain

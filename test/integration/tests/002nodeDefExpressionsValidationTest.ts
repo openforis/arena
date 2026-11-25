@@ -1,12 +1,10 @@
 import * as A from '@core/arena'
-
-import * as SurveyValidator from '@core/survey/surveyValidator'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Validation from '@core/validation/validation'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
+import * as SurveyValidator from '@core/survey/surveyValidator'
+import * as Validation from '@core/validation/validation'
 import { fetchFullContextSurvey } from '../config/context'
 
 const validateExpression = (survey, nodeDefName, expression) => {

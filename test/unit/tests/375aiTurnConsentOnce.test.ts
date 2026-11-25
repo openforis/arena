@@ -1,4 +1,5 @@
 import type { AiPolicy } from '@common/ai/policy'
+import { resolveAssistantTurnModel } from '@webapp/ai/agent/turnModel'
 import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
 import { loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import {
@@ -9,7 +10,6 @@ import {
   type ResolveModelParams,
 } from '@webapp/ai/engines/resolveModel'
 import type { AiCapabilities, AiEngine, AiProviderEntry, StorageLike } from '@webapp/ai/engines/types'
-import { resolveAssistantTurnModel } from '@webapp/ai/agent/turnModel'
 
 const URL_A = 'http://localhost:1234/v1'
 

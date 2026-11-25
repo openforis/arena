@@ -1,17 +1,16 @@
 import pgPromise from 'pg-promise'
 
+import { ViewDataNodeDef } from '@common/model/db'
+import SqlSelectAggBuilder from '@common/model/db/sql/sqlSelectAggBuilder'
 import * as Expression from '@core/expressionParser/expression'
+import { AggregateFunctionExpression } from '@core/survey/aggregateFunctionExpression'
+import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import { AggregateFunctionExpression } from '@core/survey/aggregateFunctionExpression'
-import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
-import { ViewDataNodeDef } from '@common/model/db'
-import SqlSelectAggBuilder from '@common/model/db/sql/sqlSelectAggBuilder'
-
-import * as SB from '../../utils/surveyBuilder'
 import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 const pgp = pgPromise()
 const errorKeys = Validation.messageKeys.aggregateFunction

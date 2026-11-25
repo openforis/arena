@@ -1,12 +1,12 @@
 import type { ArenaJobContext } from '@openforis/arena-core'
+
 import { type FileFormat, FileFormats } from '@core/fileFormats'
 import * as User from '@core/user/user'
-
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import type { DataMatrixExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
-import type { DataMatrixExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 
 /**
  * Exports the data of a multiple entity (filtered as in Data Explorer) as a matrix, with one column per record.

@@ -1,6 +1,6 @@
 // test/unit/tests/253aiBatchRun.test.ts
 import SystemError from '@core/systemError'
-
+import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import {
   type AiBatchCall,
@@ -9,8 +9,6 @@ import {
   isRunStoppingError,
   runAiBatchCalls,
 } from '@webapp/ai/workflows/batchRun'
-
-import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const call = <T>(size: number, run: () => Promise<T>): AiBatchCall<T> => ({ size, run: async () => run() })
 const noGuard = async () => {}

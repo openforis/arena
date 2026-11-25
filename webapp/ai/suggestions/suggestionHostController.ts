@@ -3,7 +3,7 @@
  * and 1 s after the last survey change, and hands events to the event detectors. A failing detector never stops the
  * others. No detector calls an AI engine.
  */
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
 import type { DetectorContext, EventDetector, StateDetector, SuggestionEvent, TargetResolver } from './detectors'

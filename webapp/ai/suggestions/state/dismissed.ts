@@ -2,9 +2,10 @@
  * Dismissal: the targets the user hid, recorded with their count so a counted gap can come back when it grows.
  */
 import type { AssistantSuggestion, SuggestionTarget } from '../types'
+
 import { findPending, replacePending } from './pending'
 import { getNested, setNested } from './records'
-import { toBucket, type DismissedEntry, type DismissedTargets, type SuggestionUserState } from './types'
+import { type DismissedEntry, type DismissedTargets, type SuggestionUserState, toBucket } from './types'
 import { getVisibleTargets } from './visibility'
 
 /**

@@ -1,11 +1,12 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Taxon from '@core/survey/taxon'
-
-import { useSurvey } from '@webapp/store/survey'
 import { useCallback, useEffect, useMemo } from 'react'
-import { useItemsFilter } from './useItemsFilter'
+
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxon from '@core/survey/taxon'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/store/survey'
+
+import { useItemsFilter } from './useItemsFilter'
 
 export const useTaxa = ({ nodeDef, draft, entryDataQuery, field, fieldValue, parentNode }) => {
   const survey = useSurvey()

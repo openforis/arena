@@ -1,18 +1,17 @@
-import type { JobParams } from '@server/job/job'
 import { AppInfo } from '@core/app/appInfo'
 import * as User from '@core/user/user'
-
+import type { JobParams } from '@server/job/job'
 import ZipFileCreatorBaseJob, { type ZipFileCreatorJobContext } from '@server/job/zipFileCreatorBaseJob'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UsersBackupRepository from '@server/modules/user/repository/usersBackupRepository'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import {
   UsersBackupFile,
-  UsersBackupInfo,
-  UsersBackupUser,
   usersBackupFormatVersion,
+  UsersBackupInfo,
   usersBackupType,
+  UsersBackupUser,
 } from './usersBackupModel'
 import { groupByUserUuid } from './usersBackupUtils'
 

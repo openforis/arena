@@ -1,19 +1,18 @@
-import { SystemError, type ArenaUser, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
+import { type ArenaRecord, type ArenaSurvey, type ArenaUser, SystemError } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
 import { db, DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as RecordRepository from '../../repository/recordRepository'
+
 import * as NodeCreationManager from './nodeCreationManager'
 import { NodeRdbManager } from './nodeRDBManager'
 

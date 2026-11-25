@@ -5,12 +5,10 @@ import { useCallback, useMemo } from 'react'
 import { FormHeaderColor } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useI18n } from '@webapp/store/system'
-import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/ButtonGroup'
-
+import { FormItem } from '@webapp/components/form/Input'
 import { headerColorRgbCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { useI18n } from '@webapp/store/system'
 
 import { State, useNodeDefEditReadOnly } from './store'
 

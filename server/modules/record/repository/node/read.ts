@@ -3,7 +3,6 @@ import type { ArenaSurvey } from '@openforis/arena-core'
 import type { GetSelectParams } from '@common/model/db/tables/node/select'
 import type { DbClient } from '@server/db/db'
 import { TableNode } from '../../../../../common/model/db'
-
 import { db } from '../../../../db/db'
 
 /**

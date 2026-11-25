@@ -2,18 +2,18 @@ import './NodeDefTableCellBody.scss'
 
 import React from 'react'
 
+import type { ArenaRecordNode } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
-
 import * as NodeDefUiProps from '../nodeDefUIProps'
-import NodeDefErrorBadge from './NodeDefErrorBadge'
+
 import NodeDefAttributeLockToggle from './NodeDefAttributeLockToggle'
-import NodeDefMultipleTableCell from './NodeDefMultipleTableCell'
-import type { ArenaRecordNode } from '@openforis/arena-core'
 import type { NodeDefComponentProps, NodeDefFieldLockProps } from './nodeDefComponentProps'
+import NodeDefErrorBadge from './NodeDefErrorBadge'
+import NodeDefMultipleTableCell from './NodeDefMultipleTableCell'
 
 type NodeDefTableCellBodyProps = NodeDefComponentProps &
   NodeDefFieldLockProps & {

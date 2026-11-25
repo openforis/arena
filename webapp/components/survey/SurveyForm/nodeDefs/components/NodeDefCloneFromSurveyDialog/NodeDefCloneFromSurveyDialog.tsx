@@ -1,20 +1,20 @@
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import '../../../../cloneFromSurveyDialog.scss'
 import './NodeDefCloneFromSurveyDialog.scss'
 
 import React, { useCallback, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { FormItem } from '@webapp/components/form/Input'
+import * as Survey from '@core/survey/survey'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
+import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-import { SurveyNodeDefsTreeView, SourceNodeDefSelection } from './SurveyNodeDefsTreeView'
+import { SourceNodeDefSelection, SurveyNodeDefsTreeView } from './SurveyNodeDefsTreeView'
 
 type ConfirmParams = {
   sourceSurveyId: number | string

@@ -4,7 +4,6 @@
  * Stored as `{ "<surveyId|help>": { "<area>": "<conversationId>" } }` under `arena.ai.openConversations.<userUuid>`.
  */
 import { isWireObject } from '@common/ai/wire'
-
 import {
   createResilientStorage,
   getBrowserLocalStorage,

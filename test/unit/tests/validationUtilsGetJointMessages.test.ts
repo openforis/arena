@@ -1,4 +1,5 @@
 import type { ArenaSurvey, ArenaValidation, ArenaValidationResult } from '@openforis/arena-core'
+
 import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
 

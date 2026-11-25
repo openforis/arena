@@ -1,5 +1,5 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
+import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
@@ -7,7 +7,6 @@ import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefPropose
 import { runTool } from '@webapp/ai/tools/registry'
 import { buildCardRows } from '@webapp/components/ai/Assistant/changeSetCardModel'
 import { buildReviewItems } from '@webapp/components/ai/Assistant/changeSetReviewModel'
-import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 
 let survey: any
 

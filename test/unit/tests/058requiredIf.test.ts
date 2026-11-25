@@ -1,11 +1,11 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
-
 import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-required-if-user' }

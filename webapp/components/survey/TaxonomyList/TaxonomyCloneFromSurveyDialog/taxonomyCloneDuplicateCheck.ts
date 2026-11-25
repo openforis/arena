@@ -1,10 +1,10 @@
 import { ArenaTaxonomy } from '@openforis/arena-core'
 
-import * as Taxonomy from '@core/survey/taxonomy'
 import {
   checkCloneFromSurveyDuplicate,
   CloneFromSurveyDuplicateCheckResult,
 } from '@core/survey/cloneFromSurveyDuplicateCheck'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 export type TaxonomyDuplicateCheckResult = CloneFromSurveyDuplicateCheckResult
 

@@ -1,24 +1,22 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate, Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
+import { PrintableExportFormats } from '@common/record/printableExport'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
-
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { Button, ButtonEditLockToggle } from '@webapp/components/buttons'
+import { useAppDispatch } from '@webapp/store'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
-import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
-
-import { PrintableExportFormats } from '@common/record/printableExport'
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
-import { Button, ButtonEditLockToggle } from '@webapp/components/buttons'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
+import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import { RecordPrintableExportModal } from './RecordPrintableExportModal'
-import { useAppDispatch } from '@webapp/store'
 
 type RecordEntryButtonsProps = {
   disableLockUnlock?: boolean

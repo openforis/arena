@@ -1,9 +1,9 @@
 import { MockLanguageModelV4 } from 'ai/test'
 
+import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import { parseGatewayRequest } from '@server/modules/ai/service/gateway/callValidation'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
-import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'

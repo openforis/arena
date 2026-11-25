@@ -1,7 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3'
-import type { DbClient } from '@server/db/db'
 
 import * as ProcessUtils from '@core/processUtils'
+import type { DbClient } from '@server/db/db'
 import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
 
 describe('RecordFileManager.deleteFiles with S3 bucket storage', () => {

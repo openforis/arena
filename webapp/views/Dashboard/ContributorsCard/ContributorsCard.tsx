@@ -1,14 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import * as User from '@core/user/user'
-
-import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
 import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
-
+import { TestId } from '@webapp/utils/testId'
 import { DashboardKpiCard } from '../components/DashboardKpiCard'
 import { useRecordsSummaryContext } from '../RecordsSummaryContext'
 import { filterVisibleContributors } from '../utils/filterVisibleContributors'
+
 import { ContributorsDetail } from './ContributorsDetail'
 
 /**

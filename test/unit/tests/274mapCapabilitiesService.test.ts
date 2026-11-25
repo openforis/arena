@@ -1,9 +1,9 @@
 import type { SafeHttpFetcher } from '@server/modules/geo/service/mapCapabilities/safeHttpFetcher'
-import {
-  newMapCustomLayersError,
-  type MapCustomLayersErrorName,
-} from '@server/modules/geo/service/mapCustomLayersErrors'
 import { createMapCapabilitiesService, parseCapabilitiesXml } from '@server/modules/geo/service/mapCapabilitiesService'
+import {
+  type MapCustomLayersErrorName,
+  newMapCustomLayersError,
+} from '@server/modules/geo/service/mapCustomLayersErrors'
 
 const wmsXml = `<WMS_Capabilities version="1.3.0"><Service><Title>W</Title></Service><Capability><Layer><CRS>EPSG:3857</CRS><Layer><Name>a</Name></Layer></Layer></Capability></WMS_Capabilities>`
 const wmtsXml = `<Capabilities version="1.0.0"><Contents><Layer><ows:Identifier>t</ows:Identifier></Layer></Contents></Capabilities>`

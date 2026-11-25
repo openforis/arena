@@ -1,6 +1,5 @@
-import { createRequire } from 'node:module'
-
 import type { Config } from 'jest'
+import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const rootDir = import.meta.dirname

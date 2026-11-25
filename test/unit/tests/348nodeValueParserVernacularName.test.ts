@@ -1,11 +1,9 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import { parseNodeValueProps } from '@core/record/nodeValueParser'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-
-import { parseNodeValueProps } from '@core/record/nodeValueParser'
-
 import * as SB from '../../utils/surveyBuilder'
 
 const { vernacularNameUuid } = Node.valuePropsTaxon

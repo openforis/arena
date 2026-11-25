@@ -1,8 +1,9 @@
-import { createTheme, type Theme } from '@mui/material/styles'
 // types of palette.DataGrid and components.MuiDataGrid (the module is empty at runtime)
 import '@mui/x-data-grid/themeAugmentation'
 
-import { defaultTokens, themeColors, themeModes, themePalettes, withAlpha, type ThemeMode } from './tokens'
+import { createTheme, type Theme } from '@mui/material/styles'
+
+import { defaultTokens, themeColors, type ThemeMode, themeModes, themePalettes, withAlpha } from './tokens'
 
 // same look as the Table component: keep in sync with the table variables in `webapp/style/_vars.scss`
 const tableRowHoverBackground = withAlpha(themeColors.primaryContainer, 0.35)

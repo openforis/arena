@@ -1,9 +1,7 @@
 import * as A from '@core/arena'
-
 import SystemError, { StatusCodes } from '@core/systemError'
-
-import { types } from '../helpers/types'
 import { operators } from '../helpers/operators'
+import { types } from '../helpers/types'
 
 type SqlParams = Record<string, unknown>
 

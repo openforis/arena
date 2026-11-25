@@ -3,13 +3,13 @@ import './AiExplainPanel.scss'
 import { useCallback, useEffect, useRef } from 'react'
 
 import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
-import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
-import { Modal, ModalBody } from '@webapp/components/Modal'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
 import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
-import { useI18n, useI18nT } from '@webapp/store/system'
+import { Modal, ModalBody } from '@webapp/components/Modal'
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
+import { useI18n, useI18nT } from '@webapp/store/system'
 
 type AiExplainPanelProps = {
   expression: string

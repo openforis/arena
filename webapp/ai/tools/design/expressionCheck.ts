@@ -1,13 +1,12 @@
 import { z } from 'zod'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
 import { checkNodeDefExpression } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
-
 import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { applyIfTextSchema, expressionTextSchema } from '../common/toolSchemas'
 import type { AiTool } from '../types'
+
 import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 const inputSchema = z.object({

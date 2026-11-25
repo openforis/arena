@@ -1,10 +1,11 @@
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
+
+import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import { buildApplyPlan, compareSurveys } from '@core/survey/surveyCompare'
 
 import * as SB from './surveyBuilder'

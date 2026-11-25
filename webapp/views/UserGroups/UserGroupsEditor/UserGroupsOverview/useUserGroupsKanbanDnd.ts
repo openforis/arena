@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from 'react'
-import { Sortable } from '@shopify/draggable'
 import type { SortableStopEvent } from '@shopify/draggable'
+import { Sortable } from '@shopify/draggable'
 
 type OnChangeUserGroup = (userUuid: string, groupUuidNew: string | null) => Promise<void>
 

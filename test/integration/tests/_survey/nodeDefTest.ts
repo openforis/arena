@@ -1,8 +1,6 @@
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import { getContextSurvey } from '../../config/context'
 

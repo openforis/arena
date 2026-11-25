@@ -3,6 +3,7 @@ import type { Router } from 'express'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ActivityLogService from '../service/activityLogService'
+
 import { parseActivityLogFetchParams } from './activityLogParams'
 
 export const init = (app: Router): void => {

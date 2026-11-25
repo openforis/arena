@@ -6,9 +6,8 @@ import {
   SystemLogMessageTypes,
   SystemLogResetReasons,
 } from '@common/systemLog/systemLogConstants'
-
-import * as API from '@webapp/service/api'
 import useInterval from '@webapp/components/hooks/useInterval'
+import * as API from '@webapp/service/api'
 
 import {
   appendLines,

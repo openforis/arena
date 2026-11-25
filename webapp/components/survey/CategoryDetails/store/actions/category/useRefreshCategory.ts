@@ -1,11 +1,10 @@
 import { useCallback } from 'react'
 
 import * as A from '@core/arena'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions } from '@webapp/store/survey'
-
 import { State } from '../../state'
 import { useFetchLevelItems } from '../item/useFetchLevelItems'
-import { useAppDispatch } from '@webapp/store'
 
 export const useRefreshCategory = ({ setState }) => {
   const dispatch = useAppDispatch()

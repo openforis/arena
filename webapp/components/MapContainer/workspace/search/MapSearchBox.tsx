@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import type { KeyboardEvent, ReactElement } from 'react'
 import L from 'leaflet'
+import type { KeyboardEvent, ReactElement } from 'react'
 import { useMap } from 'react-leaflet'
 
+import { formatCoordinates } from '@core/geo/coordinateFormat'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import type { MapRecordCandidate, MapWorkspaceRecords } from '../mapWorkspaceTypes'
-import { formatCoordinates } from '@core/geo/coordinateFormat'
-import { buildMapSearchResults, parseMapSearchQuery } from './mapSearchQuery'
+
 import type { MapSearchResult } from './mapSearchQuery'
+import { buildMapSearchResults, parseMapSearchQuery } from './mapSearchQuery'
 
 // zoom reached when going to coordinates (kept when the map is already closer)
 const SEARCH_MIN_ZOOM = 14

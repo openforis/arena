@@ -1,14 +1,13 @@
 import { useCallback } from 'react'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyActions, useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import * as Survey from '@core/survey/survey'
 import * as API from '@webapp/service/api'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 const _delete =
   ({ survey, category, callback }) =>

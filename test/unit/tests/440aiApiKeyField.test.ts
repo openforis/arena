@@ -1,11 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 
-import { getInputTitle } from '@webapp/components/form/Input/inputTitle'
-import { translatePlaceholder } from '@webapp/components/form/translatePlaceholder'
 import { getApiKeyFieldState } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/apiKeyField'
 import type { ProviderDraft } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
 import type { SavedProvider } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerTypes'
+import { getInputTitle } from '@webapp/components/form/Input/inputTitle'
+import { translatePlaceholder } from '@webapp/components/form/translatePlaceholder'
 import { LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
 const readSource = (file: string): string => fs.readFileSync(path.join(__dirname, '../../../webapp', file), 'utf8')

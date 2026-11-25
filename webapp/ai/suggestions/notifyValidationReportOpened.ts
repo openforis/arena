@@ -2,8 +2,8 @@
  * The validation report tells the suggestions it was opened (the validation errors suggestion counts the cycle's messages then). With AI
  * off the Cleaning area is not available, and the report does not even say it opened.
  */
-import { notifySuggestionEvent } from './suggestionEvents'
 import type { SuggestionEvent } from './detectors/types'
+import { notifySuggestionEvent } from './suggestionEvents'
 
 /**
  * Sends validationReportOpened when the Cleaning area is available.

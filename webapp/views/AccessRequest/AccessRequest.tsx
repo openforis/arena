@@ -4,17 +4,15 @@ import { Link, useNavigate } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
-
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
+import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
 import Markdown from '@webapp/components/Markdown'
 import { ReCaptcha } from '@webapp/components/ReCaptcha'
-import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
-
 import { useI18n } from '@webapp/store/system'
 
-import { useAccessRequest } from './useAccessRequest'
 import { AccessRequestField } from './AccessRequestField'
+import { useAccessRequest } from './useAccessRequest'
 
 type AccessRequestSentProps = {
   email: string

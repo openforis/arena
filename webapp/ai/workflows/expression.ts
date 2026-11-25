@@ -3,8 +3,7 @@
  */
 import type { LanguageModel } from 'ai'
 
-import { buildExplainExpressionRequest, generateExpression, type AiExpressionResult } from '@common/ai/tasks/expression'
-
+import { type AiExpressionResult, buildExplainExpressionRequest, generateExpression } from '@common/ai/tasks/expression'
 import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { createGatewayTextGenerator, streamTextChunks } from '../runtime/textGenerators'
 

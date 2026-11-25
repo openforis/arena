@@ -4,23 +4,22 @@
  * would propose a few texts at a time) and proposed on one change set card. Run by the Do it of a suggestion
  * (runSuggestionBatchTurn) and by the batch tools of the model (tools/design/batchTools).
  */
-import { getLanguageLabel } from '@core/app/languages'
-import * as Category from '@core/survey/category'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
-
 import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
 import type { AiDataDictionaryNodeDef, generateDataDictionaryDescriptions } from '@common/ai/tasks/dataDictionary'
 import type { translateItems } from '@common/ai/tasks/translation'
+import { getLanguageLabel } from '@core/app/languages'
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import type { FetchMissingLabelsPage } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import { getLabelValue } from '@webapp/ai/changeSets/operations'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 import { hasDescription } from '@webapp/ai/suggestions/detectors/newEntriesDescriptions'
 import {
-  withRemainingTime,
   type SuggestionBatchKind,
   type SuggestionBatchProgress,
+  withRemainingTime,
 } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 import { getSurveyLanguages, getTextNodeDefs } from '@webapp/ai/tools/design/missingTexts'
@@ -28,13 +27,13 @@ import { getSurveyLanguages, getTextNodeDefs } from '@webapp/ai/tools/design/mis
 import { type AiBatchModel, resolveBatchModel } from './batchModel'
 import type { AiBatchProgress, AiBatchStop } from './batchRun'
 import { runDataDictionaryDescriptions } from './dataDictionary'
-import { TRANSLATION_BATCH_SIZE, translateRowsToLang } from './translateAllLabels'
+import { translateRowsToLang, TRANSLATION_BATCH_SIZE } from './translateAllLabels'
 import {
   loadCategoryLabelRows,
   runTranslateCategoryItemLabels,
   toCategoryLabelDrafts,
 } from './translateCategoryItemLabels'
-import { buildMissingTextRows, runTranslateMissingTexts, type MissingTextRow } from './translateMissingTexts'
+import { buildMissingTextRows, type MissingTextRow, runTranslateMissingTexts } from './translateMissingTexts'
 
 // injected by tests
 export type AssistantBatchDeps = {

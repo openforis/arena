@@ -4,19 +4,17 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import * as API from '@webapp/service/api'
-import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-import { ChainActions } from '@webapp/store/ui/chain'
-
+import * as Survey from '@core/survey/survey'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
+import * as API from '@webapp/service/api'
 import { useAppDispatch } from '@webapp/store'
+import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { ChainActions } from '@webapp/store/ui/chain'
 
 type ChainItem = {
   value: string

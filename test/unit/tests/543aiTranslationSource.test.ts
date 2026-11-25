@@ -1,24 +1,4 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
-import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
-import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
-import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
-import { categoryItemLabelsProposeSetTool } from '@webapp/ai/tools/design/categoryItemLabelsProposeSet'
-import { runTool } from '@webapp/ai/tools/registry'
-import { buildCardRows } from '@webapp/components/ai/Assistant/changeSetCardModel'
-import {
-  getItemKind,
-  getReviewColumns,
-  hasCardValue,
-  isSameItemAsPrevious,
-} from '@webapp/components/ai/Assistant/changeItemModel'
-import {
-  buildReviewItems,
-  filterReviewItems,
-  type ReviewItem,
-} from '@webapp/components/ai/Assistant/changeSetReviewModel'
-
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
   buildCategoryLabelsSurvey,
@@ -26,6 +6,24 @@ import {
   categoryLabelOp,
   categoryUuidOf,
 } from '@test/unit/utils/categoryLabelsTestUtils'
+import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
+import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
+import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
+import { categoryItemLabelsProposeSetTool } from '@webapp/ai/tools/design/categoryItemLabelsProposeSet'
+import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
+import { runTool } from '@webapp/ai/tools/registry'
+import {
+  getItemKind,
+  getReviewColumns,
+  hasCardValue,
+  isSameItemAsPrevious,
+} from '@webapp/components/ai/Assistant/changeItemModel'
+import { buildCardRows } from '@webapp/components/ai/Assistant/changeSetCardModel'
+import {
+  buildReviewItems,
+  filterReviewItems,
+  type ReviewItem,
+} from '@webapp/components/ai/Assistant/changeSetReviewModel'
 
 describe('translation source of a proposed label (543)', () => {
   test('the first filled text in another language, survey languages first', () => {

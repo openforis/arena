@@ -1,7 +1,6 @@
-import { LoaderActions } from '@webapp/store/ui/loader'
-import { SurveyState } from '@webapp/store/survey'
-
 import * as API from '@webapp/service/api'
+import { SurveyState } from '@webapp/store/survey'
+import { LoaderActions } from '@webapp/store/ui/loader'
 
 import { ChainActionTypes } from './actionTypes'
 

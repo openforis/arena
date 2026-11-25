@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react'
+
 import { ArenaDictionary } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
+
 import { ButtonIconInfo } from './buttons'
 
 type FieldsetProps = {

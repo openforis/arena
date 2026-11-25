@@ -1,17 +1,15 @@
 import * as Survey from '@core/survey/survey'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
+import { describeContext, TEST_NOW } from '@test/unit/utils/designSuggestionTestUtils'
 import { categoryItemTranslationsDefinition } from '@webapp/ai/suggestions/definitions/categoryItemTranslations'
 import { getLanguageDisplayName } from '@webapp/ai/suggestions/definitions/missingTranslations'
-import { TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import {
   categoryItemTranslationsResolver,
   detectCategoryItemTranslations,
 } from '@webapp/ai/suggestions/detectors/categoryItemTranslations'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import { buildSuggestionRequest } from '@webapp/ai/suggestions/suggestionActions'
-
-import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
-import { describeContext, TEST_NOW } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
 let speciesUuid: string

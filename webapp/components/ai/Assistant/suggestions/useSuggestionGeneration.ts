@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import * as User from '@core/user/user'
-
 import {
   createGenerationTracker,
   type SuggestionGeneration,

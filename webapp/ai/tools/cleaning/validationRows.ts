@@ -1,9 +1,9 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { MessageTypeFilterCategories } from '@core/validation/messageTypeFilterCategories'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import { MessageTypeFilterCategories } from '@core/validation/messageTypeFilterCategories'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
 export type CleaningI18n = {

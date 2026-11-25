@@ -1,10 +1,9 @@
 import type { ArenaUser } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as AuthGroup from '@core/auth/authGroup'
 
 export const stateKey = 'user'
 

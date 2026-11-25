@@ -1,16 +1,14 @@
+import { getAiFeatureMinDataClass } from '@common/ai/features'
+import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
+import { getTurnDataClass, resolveAssistantTurnModel } from '@webapp/ai/agent/turnModel'
+import { createTurnState } from '@webapp/ai/agent/turnState'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import {
   escalateConversationDataClass,
   getConversationDataClass,
   isDataToolResult,
   isToolErrorOutput,
 } from '@webapp/ai/conversations/dataClass'
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import { getTurnDataClass, resolveAssistantTurnModel } from '@webapp/ai/agent/turnModel'
-import { createTurnState } from '@webapp/ai/agent/turnState'
-
-import { getAiFeatureMinDataClass } from '@common/ai/features'
-
-import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const schemaTool = { name: 'query_propose', dataClass: 'schema' } as any
 const dataTool = { name: 'query_run', dataClass: 'data' } as any

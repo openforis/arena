@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
-import Table from '@webapp/components/Table'
 import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
+import Table from '@webapp/components/Table'
 
 import MessagesHeaderLeft from './MessagesHeaderLeft'
 import { useMessageListColumns } from './useMessageListColumns'

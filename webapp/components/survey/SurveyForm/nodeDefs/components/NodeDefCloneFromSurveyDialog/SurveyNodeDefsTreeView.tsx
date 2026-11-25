@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import { surveyInfoToLabel, useOtherSurveysList } from '@webapp/components/hooks'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { TreeView } from '@webapp/components/TreeView'
 import * as API from '@webapp/service/api'
-import { surveyInfoToLabel, useOtherSurveysList } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { useI18n } from '@webapp/store/system'
 
 export interface SourceNodeDefSelection {
   surveyId: number

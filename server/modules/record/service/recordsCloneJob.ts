@@ -1,19 +1,16 @@
 import { Objects, RecordCloner, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
 import Job, { type JobParams } from '@server/job/job'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
-
 import { NodesInsertBatchPersister } from '../manager/nodesInsertBatchPersister'
 
 export default class RecordsCloneJob extends Job {

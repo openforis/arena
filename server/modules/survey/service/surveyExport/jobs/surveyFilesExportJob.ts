@@ -1,9 +1,8 @@
 import * as SurveyFile from '@core/survey/surveyFile'
-
+import * as DbUtils from '@server/db/dbUtils'
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFile } from '../exportFile'
-import * as DbUtils from '@server/db/dbUtils'
 
 const SURVEY_FILE_TYPES_TO_EXPORT = [
   SurveyFile.SurveyFileType.areaOfInterest,

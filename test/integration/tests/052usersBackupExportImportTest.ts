@@ -5,21 +5,19 @@ import { JobStatus } from '@openforis/arena-core'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import FileZip from '@server/utils/file/fileZip'
 import UsersBackupExportJob from '@server/modules/user/service/usersBackup/usersBackupExportJob'
 import UsersBackupImportJob from '@server/modules/user/service/usersBackup/usersBackupImportJob'
-import { UsersBackupService } from '@server/modules/user/service/usersBackup/usersBackupService'
 import {
   UsersBackupFile,
+  usersBackupType,
   UsersBackupUser,
   UsersBackupUserAction,
-  usersBackupType,
 } from '@server/modules/user/service/usersBackup/usersBackupModel'
-
+import { UsersBackupService } from '@server/modules/user/service/usersBackup/usersBackupService'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import FileZip from '@server/utils/file/fileZip'
 import { getContextUser } from '../config/context'
 
 const name = `users_backup_${Date.now()}`

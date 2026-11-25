@@ -1,7 +1,8 @@
 import { APIRequestContext, expect, request } from '@playwright/test'
 
-import type { TestUser } from './testUsers'
 import { AiFeatureCategory } from '@common/ai/features'
+
+import type { TestUser } from './testUsers'
 
 type JobSummary = {
   uuid: string

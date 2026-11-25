@@ -1,7 +1,6 @@
-import type { ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
 export interface EntityAggregatedView {

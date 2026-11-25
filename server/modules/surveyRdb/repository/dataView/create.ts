@@ -1,12 +1,11 @@
-import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as DbUtils from '@server/db/dbUtils'
-
-import * as SQL from '@common/model/db/sql'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
+import * as SQL from '@common/model/db/sql'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import type { DbClient } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 const canJoinWithMultipleAttributeTable = ({
   nodeDef,

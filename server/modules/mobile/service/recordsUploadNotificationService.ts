@@ -1,9 +1,9 @@
-import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
+
 import * as AuthGroup from '@core/auth/authGroup'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import * as Log from '@server/log/log'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as Mailer from '@server/utils/mailer'

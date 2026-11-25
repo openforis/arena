@@ -2,9 +2,8 @@ import { useCallback, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as StringUtils from '@core/stringUtils'
 import * as Expression from '@core/expressionParser/expression'
-
+import * as StringUtils from '@core/stringUtils'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 

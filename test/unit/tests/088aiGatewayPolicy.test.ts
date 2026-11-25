@@ -1,9 +1,8 @@
 import { MockLanguageModelV4 } from 'ai/test'
 
-import { createPolicyEnforcer, getEffectivePolicyFor } from '@server/modules/ai/service/gateway/policy'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
+import { createPolicyEnforcer, getEffectivePolicyFor } from '@server/modules/ai/service/gateway/policy'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 

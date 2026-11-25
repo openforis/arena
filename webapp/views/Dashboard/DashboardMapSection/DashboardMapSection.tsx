@@ -1,8 +1,8 @@
 import './DashboardMapSection.scss'
 
 import { useSurvey } from '@webapp/store/survey'
-
 import { surveyHasGeoAttributes } from '../utils/surveyHasGeoAttributes'
+
 import { DashboardMapContent } from './DashboardMapContent'
 
 /**

@@ -1,5 +1,6 @@
 import { matchPath, useLocation } from 'react-router'
-import { designerModules, appModuleUri } from '@webapp/app/appModules'
+
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 export const useIsInRoute = (path) => {
   const { pathname: currentPathName } = useLocation()

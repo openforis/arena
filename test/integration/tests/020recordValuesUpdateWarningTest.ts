@@ -1,15 +1,12 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as Survey from '@core/survey/survey'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { checkPublishRecordValuesUpdateWarning } from '@server/modules/survey/service/publish/recordValuesUpdateWarning'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // checkPublishRecordValuesUpdateWarning must report not only the node def whose default value/
 // applicable expression is directly edited in the draft, but every node def that would be recalculated

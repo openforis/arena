@@ -5,10 +5,9 @@ import { useCallback } from 'react'
 import { Numbers, Objects } from '@openforis/arena-core'
 
 import { getSamplingPolygonDefaults } from '@core/survey/samplingPolygon'
-
 import { Fieldset } from '@webapp/components'
-
 import SamplingPolygonShapeEditor from '../SamplingPolygonShapeEditor'
+
 import { CircleOnlyItems } from './CircleOnlyItems'
 import { FormPropertyItem } from './FormPropertyItem'
 import { RectangleOnlyItems } from './RectangleOnlyItems'

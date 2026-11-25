@@ -1,17 +1,18 @@
 import './CyclesEditor.scss'
 
 import { useCallback } from 'react'
-import * as A from '@core/arena'
 
+import type { ArenaValidation } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
-
-import CycleEditor from './CycleEditor'
-import { useSurveyCycleKey } from '@webapp/store/survey'
 import { ButtonAdd } from '@webapp/components'
 import { useConfirmDelete } from '@webapp/components/hooks'
-import type { ArenaValidation } from '@openforis/arena-core'
+import { useSurveyCycleKey } from '@webapp/store/survey'
+
+import CycleEditor from './CycleEditor'
 
 type CyclesEditorProps = {
   cycles: Record<string, any>

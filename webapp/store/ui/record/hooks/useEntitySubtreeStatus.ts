@@ -4,6 +4,7 @@ import { Objects, Records } from '@openforis/arena-core'
 
 import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../state'
+
 import { TreeItemStatus } from './useRecordTreeItemStatus'
 
 const EMPTY: TreeItemStatus = { hasErrors: false, hasWarnings: false, isComplete: false }

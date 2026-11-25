@@ -1,18 +1,16 @@
 import { useMemo, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Expression from '@core/expressionParser/expression'
-import { Query, QueryNodeDefs } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
-
+import { Query, QueryNodeDefs } from '@common/model/query'
+import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import ExpansionPanel from '@webapp/components/ExpansionPanel'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import ExpansionPanel from '@webapp/components/ExpansionPanel'
-
+import AttributeSelector from './AttributesSelector/AttributeSelector'
 import AttributesSelector from './AttributesSelector/AttributesSelector'
 import EntitySelector from './EntitySelector'
-import AttributeSelector from './AttributesSelector/AttributeSelector'
 import NodeDefsSelectorSearch from './NodeDefsSelectorSearch'
 import { combineNodeDefFilterFunctions, getNodeDefSearchFilterFunction } from './nodeDefsSelectorSearchUtils'
 

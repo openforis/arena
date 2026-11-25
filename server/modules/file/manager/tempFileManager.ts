@@ -1,9 +1,9 @@
-import { isUuid } from '@core/uuid'
 import SystemError from '@core/systemError'
-
-import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
+import { isUuid } from '@core/uuid'
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
+
+import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 
 export { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 

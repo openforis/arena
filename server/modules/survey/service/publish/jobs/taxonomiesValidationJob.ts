@@ -1,10 +1,7 @@
 import * as A from '@core/arena'
-
-import Job, { type JobParams } from '@server/job/job'
-
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
-
+import Job, { type JobParams } from '@server/job/job'
 import * as TaxonomyManager from '../../../../taxonomy/manager/taxonomyManager'
 
 export default class TaxonomiesValidationJob extends Job {

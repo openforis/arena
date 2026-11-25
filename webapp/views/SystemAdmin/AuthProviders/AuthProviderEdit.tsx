@@ -3,18 +3,17 @@ import './AuthProviders.scss'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 
-import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-
+import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
+import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { Button } from '@webapp/components/buttons'
-import { RadioButtonGroup } from '@webapp/components/RadioButtonGroup'
-import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import Checkbox from '@webapp/components/form/Checkbox'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
+import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import LoadingBar from '@webapp/components/LoadingBar'
-import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
+import { RadioButtonGroup } from '@webapp/components/RadioButtonGroup'
 import {
   createProvider,
   fetchAdminProvider,

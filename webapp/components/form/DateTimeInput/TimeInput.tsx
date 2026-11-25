@@ -1,9 +1,10 @@
 import './TimeInput.scss'
 
-import classNames from 'classnames'
 import { TimePicker } from '@mui/x-date-pickers/TimePicker'
+import classNames from 'classnames'
 
 import * as DateUtils from '@core/dateUtils'
+
 import { useDateTimeInput } from './useDateTimeInput'
 
 type TimeInputProps = {

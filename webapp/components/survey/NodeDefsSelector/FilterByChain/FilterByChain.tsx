@@ -1,11 +1,11 @@
 import './FilterByChain.scss'
+
 import classNames from 'classnames'
 
 import * as Chain from '@common/analysis/chain'
-
 import { Button } from '@webapp/components/buttons'
+import { useChains, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang, useSurveyCycleKey, useChains } from '@webapp/store/survey'
 
 type FilterByChainProps = {
   filterChainUuids?: any[]

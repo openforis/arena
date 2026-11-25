@@ -2,11 +2,10 @@ import axios from 'axios'
 
 import i18n from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
-
 import { JobActions } from '@webapp/store/app'
 import { DialogConfirmActions } from '@webapp/store/ui'
-
 import * as SurveyState from '../state'
+
 import { setActiveSurvey } from './active'
 
 export const publishSurvey =

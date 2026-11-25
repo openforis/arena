@@ -1,11 +1,12 @@
 import './TreeChart.scss'
-
-import * as d3 from 'd3'
 // d3 is flagged side-effect free: import d3-transition explicitly so selection.transition() is not tree-shaken
 import 'd3-transition'
 
+import * as d3 from 'd3'
+
+import { type ArenaAnyNodeDef, Objects } from '@openforis/arena-core'
+
 import { elementOffset } from '@webapp/utils/domUtils'
-import { Objects, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 

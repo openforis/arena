@@ -4,8 +4,8 @@ import { useMemo } from 'react'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
-
 import { MapContainer } from '../MapContainer'
+
 import { type MapFile, MapFileLayers } from './MapFileLayers'
 import { type SurveyFileRef, toSurveyMapFile } from './surveyMapFile'
 

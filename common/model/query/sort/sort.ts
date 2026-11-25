@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import { SortCriteria } from '../sortCriteria'
 import type { SortCriteriaItem } from '../sortCriteria/sortCriteria'
 

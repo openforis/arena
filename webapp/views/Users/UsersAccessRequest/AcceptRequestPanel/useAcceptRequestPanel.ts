@@ -2,17 +2,14 @@ import { useEffect, useState } from 'react'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
 import type { UserAccessRequest } from '@core/user/userAccessRequest'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
-
+import * as Validation from '@core/validation/validation'
 import * as API from '@webapp/service/api'
-
+import { useAppDispatch } from '@webapp/store'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-
 import * as ValidationUtils from '@webapp/utils/validationUtils'
-import { useAppDispatch } from '@webapp/store'
 
 export type AccessRequestAccept = {
   accessRequestUuid: string

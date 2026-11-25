@@ -1,15 +1,13 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import { RecordNodesUpdater } from '@core/record/_record/recordNodesUpdater'
+import * as Node from '@core/record/node'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Node from '@core/record/node'
-import { RecordNodesUpdater } from '@core/record/_record/recordNodesUpdater'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { getContextUser } from '../../integration/config/context'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-
-import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 const { nodeDefType } = NodeDef
 const { afterNodesUpdate } = RecordNodesUpdater

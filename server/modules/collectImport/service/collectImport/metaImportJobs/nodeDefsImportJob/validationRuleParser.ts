@@ -1,14 +1,14 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
-
-import * as Survey from '@core/survey/survey'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as Survey from '@core/survey/survey'
 import * as ValidationResult from '@core/validation/validationResult'
-
 import * as CollectSurvey from '../../model/collectSurvey'
+
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
 const jsOperatorByCollectOperator = {

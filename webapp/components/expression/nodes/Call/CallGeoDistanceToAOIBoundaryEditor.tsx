@@ -3,15 +3,13 @@ import { useCallback, useState } from 'react'
 import { Strings } from '@openforis/arena-core'
 
 import * as Expression from '@core/expressionParser/expression'
+import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
-import * as StringUtils from '@core/stringUtils'
-
 import { Alert } from '@webapp/components/Alert'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { useSurveyInfo } from '@webapp/store/survey'
-
 import Identifier from '../Identifier'
 
 type Variable = { root?: boolean; nodeDefType?: string }

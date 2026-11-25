@@ -1,21 +1,19 @@
 import { useCallback, useMemo } from 'react'
+
+import { type ArenaAnyNodeDef, Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import { Objects, type ArenaAnyNodeDef } from '@openforis/arena-core'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
+import Checkbox from '@webapp/components/form/Checkbox'
+import { FormItem, NumberFormats } from '@webapp/components/form/Input'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
-import { FormItem, NumberFormats } from '@webapp/components/form/Input'
-import Checkbox from '@webapp/components/form/Checkbox'
-import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 import { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
 import { State, useNodeDefEditReadOnly } from './store'

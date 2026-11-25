@@ -1,10 +1,9 @@
 import { useCallback } from 'react'
 
-import * as API from '@webapp/service/api'
-
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { ButtonAdd } from '@webapp/components'
+import * as API from '@webapp/service/api'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 export const metaItemTypes = {
   taxonomy: 'taxonomy',

@@ -1,13 +1,11 @@
 import * as A from '@core/arena'
-
-import { db } from '@server/db/db'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { db } from '@server/db/db'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 export const newRecord = (user, preview = false) => Record.newRecord(user, Survey.cycleOneKey, preview)

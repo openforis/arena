@@ -2,9 +2,8 @@ import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
-
-import { FormItem, Input } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'

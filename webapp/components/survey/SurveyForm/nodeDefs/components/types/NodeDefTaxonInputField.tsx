@@ -1,9 +1,9 @@
 import { useCallback, useRef, useState } from 'react'
 
-import { Input } from '@webapp/components/form/Input'
-
 import * as Node from '@core/record/node'
 import * as StringUtils from '@core/stringUtils'
+import { Input } from '@webapp/components/form/Input'
+
 import NodeDefTaxonAutocompleteDialog from './NodeDefTaxonAutocompleteDialog'
 
 const NodeDefTaxonInputField = (props) => {

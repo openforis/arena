@@ -1,6 +1,6 @@
 import { useFocusItem } from './useFocusItem'
-import { useOnListItemKeyDown } from './useOnListItemKeyDown'
 import { useOnInputFieldKeyDown } from './useOnInputFieldKeyDown'
+import { useOnListItemKeyDown } from './useOnListItemKeyDown'
 import { useOnOutsideClick } from './useOnOutsideClick'
 
 export const useActions = ({ setState, onItemSelect, onClose }) => {

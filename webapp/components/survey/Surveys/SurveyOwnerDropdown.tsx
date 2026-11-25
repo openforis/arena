@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Objects } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
-
 import { Dropdown } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'

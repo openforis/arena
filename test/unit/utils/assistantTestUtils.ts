@@ -1,13 +1,11 @@
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+import { convertArrayToReadableStream, MockLanguageModelV4 } from 'ai/test'
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import * as SB from '@test/utils/surveyBuilder'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
-
-import * as SB from '@test/utils/surveyBuilder'
 
 export const testUser: any = { uuid: 'user-1', name: 'Tester', authGroups: [] }
 

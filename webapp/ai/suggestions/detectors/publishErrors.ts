@@ -3,7 +3,6 @@
  * publishing and are left out.
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { getNodeDefIssues } from '@webapp/ai/tools/design/surveyGetValidation'
 import { getDesignNodeDefsDepthFirst } from '@webapp/ai/tools/design/surveyLookup'
 

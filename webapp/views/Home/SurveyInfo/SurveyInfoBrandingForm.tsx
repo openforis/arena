@@ -1,33 +1,33 @@
-import type { ArenaValidation } from '@openforis/arena-core'
 import './SurveyInfoBrandingForm.scss'
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject } from 'react'
+import { type ChangeEvent, type RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
+import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
-import * as SurveyBranding from '@core/survey/surveyBranding'
 import type {
   BrandingImageDescriptor,
   FontSizePreset,
   SurveyBranding as SurveyBrandingData,
   SurveyLogoKey,
 } from '@core/survey/surveyBranding'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-
 import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { useBrandingLogo, useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
 import { defaultTokens } from '@webapp/theme/tokens'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import { useAppDispatch } from '@webapp/store'
 
 const { keys: brandingKeys, fontSizePreset } = SurveyBranding
 

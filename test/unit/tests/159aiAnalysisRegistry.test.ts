@@ -1,12 +1,9 @@
 import { defaultAiPolicy } from '@common/ai/policy'
-
-import { getTools, toWebMcpDescriptor } from '@webapp/ai/tools/registry'
-import { analysisTools } from '@webapp/ai/tools/analysis'
-
 import { newAnalysisToolContext, userWithoutAccess } from '@test/unit/utils/aiAnalysisTestUtils'
-
-import * as DataTest from '../../utils/dataTest'
+import { analysisTools } from '@webapp/ai/tools/analysis'
+import { getTools, toWebMcpDescriptor } from '@webapp/ai/tools/registry'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 let survey: any = null
 

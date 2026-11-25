@@ -2,8 +2,8 @@ import './Accordion.scss'
 
 import React from 'react'
 import MuiAccordion from '@mui/material/Accordion'
-import MuiAccordionSummary from '@mui/material/AccordionSummary'
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
+import MuiAccordionSummary from '@mui/material/AccordionSummary'
 import MuiTypography from '@mui/material/Typography'
 
 type AccordionItem = {

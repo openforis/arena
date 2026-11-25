@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+
 import { DataExplorerActions } from './reducer'
 
 const useSetQuery = () => {

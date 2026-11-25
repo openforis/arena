@@ -1,16 +1,14 @@
+import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
+import { toQuery } from '@common/ai/tasks/dataQuery'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { toQuery } from '@common/ai/tasks/dataQuery'
-
+import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import {
   assistantAnalysisMockScripts,
   formatMockQueryAnswer,
 } from '@server/modules/ai/service/mock/mockScriptsAnalysis'
-import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { proposeMapLayerInputSchema } from '@webapp/ai/tools/analysis/proposeMapLayer'
 import { proposeQueryInputSchema, toDataQueryAiResult } from '@webapp/ai/tools/analysis/proposeQuery'
-import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
-
 import * as SB from '../../utils/surveyBuilder'
 
 // the patterns of CANNED_ANSWERS in server/modules/ai/service/mockProvider.ts

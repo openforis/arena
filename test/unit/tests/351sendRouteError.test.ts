@@ -1,10 +1,8 @@
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
-
 import { sendRouteError } from '@server/utils/sendRouteError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
-
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const unexpectedKey = 'appErrors:test.unexpected'

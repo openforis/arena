@@ -1,14 +1,12 @@
 import { useCallback } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
-
-import { useSurvey } from '@webapp/store/survey'
-
-import { NodeDefsSelectorAggregate, NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { NodeDefsSelector, NodeDefsSelectorAggregate } from '@webapp/components/survey/NodeDefsSelector'
 import { DataExplorerHooks } from '@webapp/store/dataExplorer'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer/selectors'
+import { useSurvey } from '@webapp/store/survey'
 
 type QueryNodeDefsSelectorProps = {
   nodeDefLabelType?: NodeDef.NodeDefLabelType

@@ -1,41 +1,37 @@
-import type { DbClient } from '@server/db/db'
 import {
-  Authorizer,
-  ChainFactory,
+  type ArenaAnyNodeDef,
   type ArenaChain,
+  type ArenaSurvey,
   type ArenaUser,
   type ArenaValidation,
-  type ArenaAnyNodeDef,
-  type ArenaSurvey,
+  Authorizer,
+  ChainFactory,
 } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
+import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
-import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
-import { uuidv4 } from '@core/uuid'
-import SystemError from '@core/systemError'
-import * as User from '@core/user/user'
-
-import { TableChain } from '@common/model/db'
-import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ChainValidator from '@common/analysis/chainValidator'
-
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
+import { TableChain } from '@common/model/db'
+import * as A from '@core/arena'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
+import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
+import * as User from '@core/user/user'
+import { uuidv4 } from '@core/uuid'
+import * as DB from '@server/db'
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
-import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as ChainMauFileService from '@server/modules/analysis/service/chainMauFile'
-
-import * as DB from '@server/db'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
 import UnauthorizedError from '@server/utils/unauthorizedError'
-
 import * as ChainRepository from '../../repository/chain'
 
 // ====== CREATE

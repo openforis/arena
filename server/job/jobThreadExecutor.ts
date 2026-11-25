@@ -1,14 +1,13 @@
 import { JobRepository, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { throttle } from '@core/functionsDefer'
-
+import * as Log from '@server/log/log'
 import ThreadManager from '@server/threads/threadManager'
 import ThreadsCache from '@server/threads/threadsCache'
 import DelayedDeleteCache from '@server/utils/delayedDeleteCache'
-import * as Log from '@server/log/log'
 
-import { jobRowToSummary, jobStatus, jobThreadMessageTypes } from './jobUtils'
 import * as LocalJobRepository from './jobRepository'
+import { jobRowToSummary, jobStatus, jobThreadMessageTypes } from './jobUtils'
 
 type JobSerialized = Record<string, any>
 type JobUpdateListener = (jobSerialized: JobSerialized) => void

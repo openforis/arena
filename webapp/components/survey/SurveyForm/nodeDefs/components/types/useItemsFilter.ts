@@ -5,7 +5,6 @@ import { Objects, RecordExpressionEvaluator } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 import { useUser } from '@webapp/store/user'

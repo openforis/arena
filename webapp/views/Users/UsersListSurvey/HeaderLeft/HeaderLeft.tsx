@@ -1,9 +1,8 @@
 import { Link } from 'react-router'
 
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanInviteUser } from '@webapp/store/user'
-
-import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { TestId } from '@webapp/utils/testId'
 
 const HeaderLeft = () => {

@@ -1,8 +1,8 @@
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
-import type { DbClient } from '@server/db/db'
+import type { ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
 import * as Record from '@core/record/record'
-
+import type { DbClient } from '@server/db/db'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 
 const { updateTablesFromUpdates } = DataTableUpdateRepository

@@ -2,8 +2,8 @@
  * Caps on what the server reads from a provider answer. The endpoint of a user is not trusted to stop: without a cap
  * it could fill the memory of the server with one endless body.
  */
-import SystemError, { StatusCodes } from '@core/systemError'
 import { AiLimits } from '@common/ai/limits'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 

@@ -1,6 +1,7 @@
-import { BarChart } from '@webapp/charts/BarChart'
-import { useDataQueryChartData } from './useDataQueryChartData'
 import type { NodeDefLabelType } from '@core/survey/nodeDef'
+import { BarChart } from '@webapp/charts/BarChart'
+
+import { useDataQueryChartData } from './useDataQueryChartData'
 
 type DataQueryBarChartProps = {
   data: any[]

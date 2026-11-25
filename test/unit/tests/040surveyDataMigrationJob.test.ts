@@ -1,5 +1,5 @@
-import { getPendingSurveyDataMigrationSteps } from '@server/modules/survey/service/dataMigration/surveyDataMigrationJob'
 import { getSurveysToMigrate } from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
+import { getPendingSurveyDataMigrationSteps } from '@server/modules/survey/service/dataMigration/surveyDataMigrationJob'
 import { latestSurveyDataMigrationVersion } from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
 
 describe('getPendingSurveyDataMigrationSteps', () => {

@@ -1,31 +1,28 @@
 import type { Router } from 'express'
-import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
+
 import type { ArenaUserGroup } from '@openforis/arena-core'
+import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import * as A from '@core/arena'
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
-
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-
 import * as Survey from '@core/survey/survey'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
-
-import SystemError, { StatusCodes } from '@core/systemError'
-import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import { isValidPrefsUpdate, omitServerOnlyPrefsFromUser } from '../serverOnlyPrefs'
-import * as UserService from '../service/userService'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { isValidPrefsUpdate, omitServerOnlyPrefsFromUser } from '../serverOnlyPrefs'
 import { UserExportService } from '../service/userExportService'
 import { UsersBackupService } from '../service/usersBackup/usersBackupService'
-import * as FileUtils from '@server/utils/file/fileUtils'
+import * as UserService from '../service/userService'
 
 export const init = (app: Router) => {
   // ==== CREATE
