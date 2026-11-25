@@ -1,49 +1,54 @@
 import { useCallback, useMemo } from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
-import type { ExpressionNode } from '@core/expressionParser/helpers/utils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { filterVariablesOrGroups } from '../Identifier'
 
 import type { CallEditorProps } from './callEditorProps'
 
-// entities too: their date modified changes when any of their descendants is modified
-const nodeVariablesFilterFn = () => true
-
-/**
- * Returns the items of the ancestor entities of the current node def, from the closest one to the root,
- * referenced with "parent" calls (e.g. parent(this), parent(parent(this))).
- * @param {!object} params - The parameters.
- * @param {!object} params.survey - The survey.
- * @param {object} [params.nodeDefCurrent] - The node def the expression belongs to.
- * @returns {Array} - The dropdown items.
- */
-const getAncestorItems = ({ survey, nodeDefCurrent }) => {
-  const items = []
-  let expression = Expression.thisVariable
-  let nodeDef = nodeDefCurrent
-  let ancestor = nodeDef ? Survey.getNodeDefParent(nodeDef)(survey) : null
-  while (ancestor) {
-    expression = `${Expression.functionNames.parent}(${expression})`
-    items.push({ value: expression, label: `${NodeDef.getName(ancestor)} (${expression})` })
-    nodeDef = ancestor
-    ancestor = Survey.getNodeDefParent(nodeDef)(survey)
-  }
-  return items
+const toItem = ({ nodeDef, lang }) => {
+  const name = NodeDef.getName(nodeDef)
+  const label = NodeDef.getLabel(nodeDef, lang)
+  return { value: name, label: label === name ? name : `${label} (${name})` }
 }
 
-const findItemByValue = ({ items, value }) => {
-  for (const item of items) {
-    if (item.value === value) return item
-    const found = item.options ? findItemByValue({ items: item.options, value }) : null
-    if (found) return found
+/**
+ * Returns the attributes sharing the parent entity with the specified node def (the node def itself excluded).
+ * @param {!object} params - The parameters.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.nodeDefCurrent - The node def the expression belongs to.
+ * @returns {Array} - The sibling attribute defs.
+ */
+const getSiblingAttributeDefs = ({ survey, nodeDefCurrent }) => {
+  const parentDef = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+  if (!parentDef) return []
+  return Survey.getNodeDefChildren({ nodeDef: parentDef, includeAnalysis: false })(survey).filter(
+    (childDef) =>
+      !NodeDef.isEntity(childDef) &&
+      Expression.isValidExpressionType(childDef) &&
+      !NodeDef.isEqual(childDef)(nodeDefCurrent)
+  )
+}
+
+/**
+ * Returns the ancestor entity defs of the specified node def, from the parent one to the root.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.nodeDefCurrent - The node def the expression belongs to.
+ * @returns {Array} - The ancestor entity defs.
+ */
+const getAncestorEntityDefs = ({ survey, nodeDefCurrent }) => {
+  const ancestorDefs = []
+  let ancestorDef = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+  while (ancestorDef) {
+    ancestorDefs.push(ancestorDef)
+    ancestorDef = Survey.getNodeDefParent(ancestorDef)(survey)
   }
-  return null
+  return ancestorDefs
 }
 
 type CallNodeDateEditorProps = CallEditorProps & {
@@ -51,31 +56,36 @@ type CallNodeDateEditorProps = CallEditorProps & {
 }
 
 const CallNodeDateEditor = (props: CallNodeDateEditorProps) => {
-  const { callee, expressionNode, onConfirm, variables } = props
+  const { callee, expressionNode, nodeDefCurrent, onConfirm } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
 
   const items = useMemo(() => {
-    const thisVariable = variables.find((variable) => variable.value === Expression.thisVariable)
-    const nodeDefCurrent = thisVariable ? Survey.getNodeDefByUuid(thisVariable.uuid)(survey) : null
-    const ancestorItems = getAncestorItems({ survey, nodeDefCurrent })
-    const [first, ...others] = filterVariablesOrGroups({ variables, variablesFilterFn: nodeVariablesFilterFn })
-    const ancestorsGroup = { label: i18n.t('expressionEditor.ancestorEntities'), options: ancestorItems }
-    // "this" first, then the ancestors, then the other nodes
-    if (first?.value === Expression.thisVariable) {
-      return [first, ...(ancestorItems.length > 0 ? [ancestorsGroup] : []), ...others]
-    }
-    return [...(ancestorItems.length > 0 ? [ancestorsGroup] : []), ...(first ? [first] : []), ...others]
-  }, [i18n, survey, variables])
+    if (!nodeDefCurrent) return []
+    const groups = [
+      {
+        label: i18n.t('expressionEditor.siblingAttributes'),
+        options: getSiblingAttributeDefs({ survey, nodeDefCurrent }).map((nodeDef) => toItem({ nodeDef, lang })),
+      },
+      {
+        label: i18n.t('expressionEditor.ancestorEntities'),
+        options: getAncestorEntityDefs({ survey, nodeDefCurrent }).map((nodeDef) => toItem({ nodeDef, lang })),
+      },
+    ]
+    return groups.filter((group) => group.options.length > 0)
+  }, [i18n, lang, nodeDefCurrent, survey])
 
-  const argument = expressionNode?.arguments?.[0]
-  const selection = argument ? findItemByValue({ items, value: Expression.toString(argument) }) : null
+  const argumentName = expressionNode?.arguments?.[0]?.name
+  const selection = argumentName
+    ? (items.flatMap((group) => group.options).find((item) => item.value === argumentName) ?? null)
+    : null
 
   const onChange = useCallback(
     (item) => {
-      const param = item?.value ? (Expression.fromString(item.value) as ExpressionNode) : null
-      onConfirm(Expression.newCall({ callee, params: param ? [param] : [] }))
+      const params = item?.value ? [Expression.newIdentifier(item.value)] : []
+      onConfirm(Expression.newCall({ callee, params }))
     },
     [callee, onConfirm]
   )
