@@ -1,6 +1,7 @@
 import type { ConfigAPI, InputOptions } from '@babel/core'
 
-export default function babelConfig(api: ConfigAPI): InputOptions {
+// CommonJS (.cts): Babel loads its config synchronously (babel-jest), and Node doesn't have to guess the module type
+module.exports = function babelConfig(api: ConfigAPI): InputOptions {
   // the config depends only on NODE_ENV: cache it per value
   api.cache(() => process.env.NODE_ENV === 'production')
 
