@@ -2,24 +2,22 @@ import './NodeDefFile.scss'
 
 import { useCallback, useState } from 'react'
 
-import { PointFactory, Points, type ArenaRecordNode } from '@openforis/arena-core'
+import { type ArenaRecordNode, PointFactory, Points } from '@openforis/arena-core'
 
-import { uuidv4 } from '@core/uuid'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-
-import UploadButton from '@webapp/components/form/UploadButton'
+import * as NodeDef from '@core/survey/nodeDef'
+import { uuidv4 } from '@core/uuid'
 import { ButtonDownload } from '@webapp/components/buttons'
+import UploadButton from '@webapp/components/form/UploadButton'
 import { TooltipNew } from '@webapp/components/TooltipNew'
-
-import { NotificationActions } from '@webapp/store/ui'
 import * as API from '@webapp/service/api'
-
-import NodeDeleteButton from '../NodeDeleteButton'
-import { ImagePreview } from './ImagePreview'
-import { MapTriggerButton } from '../MapTriggerButton'
 import { useAppDispatch } from '@webapp/store'
+import { NotificationActions } from '@webapp/store/ui'
+import { MapTriggerButton } from '../MapTriggerButton'
 import type { NodeDefComponentProps } from '../nodeDefComponentProps'
+import NodeDeleteButton from '../NodeDeleteButton'
+
+import { ImagePreview } from './ImagePreview'
 
 type FileInputProps = NodeDefComponentProps & {
   surveyInfo: Record<string, any>

@@ -1,10 +1,7 @@
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Node from '@core/record/node'
-
-import { computeRecordEditPreview } from '@webapp/ai/tools/cleaning/recordEditPreview'
-
+import * as Survey from '@core/survey/survey'
 import {
   asCleaningRecord,
   asCleaningSurvey,
@@ -13,11 +10,11 @@ import {
   surveyIndexProviders,
   validateWholeRecord,
 } from '@test/unit/utils/aiCleaningTestUtils'
-
-import * as SB from '../../utils/surveyBuilder'
+import { computeRecordEditPreview } from '@webapp/ai/tools/cleaning/recordEditPreview'
+import { getContextUser } from '../../integration/config/context'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 let survey: any
 

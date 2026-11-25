@@ -1,9 +1,8 @@
-import { uuidv4 } from '@core/uuid'
 import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
-
+import { uuidv4 } from '@core/uuid'
 import { getContextUser } from '../../integration/config/context'
-
 import * as DataTest from '../../utils/dataTest'
 
 let survey: ArenaSurvey = null

@@ -1,12 +1,12 @@
-import type React from 'react'
 import ReactDOM from 'react-dom'
+import type React from 'react'
+
+import type { ArenaAnyNodeDef, ArenaRecordNode, ArenaTaxon } from '@openforis/arena-core'
 
 import * as Taxon from '@core/survey/taxon'
-
 import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
 
 import { useTaxa } from './useTaxa'
-import type { ArenaAnyNodeDef, ArenaRecordNode, ArenaTaxon } from '@openforis/arena-core'
 
 type NodeDefTaxonAutocompleteItemRendererProps = {
   item: ArenaTaxon

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import * as User from '@core/user/user'
-
 import { Dropdown } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'

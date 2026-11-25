@@ -1,25 +1,24 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
-import { attributeWithoutRefDefinition } from '@webapp/ai/suggestions/definitions/attributeWithoutRef'
-import { STATE_DETECTORS } from '@webapp/ai/suggestions/registry'
-import {
-  attributeWithoutRefDetector,
-  detectAttributeWithoutRef,
-} from '@webapp/ai/suggestions/detectors/attributeWithoutRef'
 import { getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
-  TEST_NOW,
   buildRefSurvey,
   buildSuggestion,
   createDetectorContext,
   describeContext,
+  TEST_NOW,
   withNodeDef,
   withSavedNodeDefs,
 } from '@test/unit/utils/designSuggestionTestUtils'
+import { attributeWithoutRefDefinition } from '@webapp/ai/suggestions/definitions/attributeWithoutRef'
+import {
+  attributeWithoutRefDetector,
+  detectAttributeWithoutRef,
+} from '@webapp/ai/suggestions/detectors/attributeWithoutRef'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { STATE_DETECTORS } from '@webapp/ai/suggestions/registry'
 
 let survey: any
 

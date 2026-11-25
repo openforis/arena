@@ -7,19 +7,16 @@ import * as Expression from '@core/expressionParser/expression'
 import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
 import { StatusCodes } from '@core/systemError'
-
+import * as User from '@core/user/user'
 import { db } from '@server/db/db'
 import { requireNotOwnedRecordViewAllowed } from '@server/modules/record/api/recordOwnerMiddleware'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as RecordService from '@server/modules/record/service/recordService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import { getContextUser } from '../config/context'
-
 import * as RB from '../../utils/recordBuilder'
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // "view not owned records" survey setting and user group qualifiers applied to record reads and the validation report
 

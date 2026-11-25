@@ -1,17 +1,16 @@
 import { useMemo } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as RecordStep from '@core/record/recordStep'
-import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
-
-import { useI18n } from '@webapp/store/system'
+import * as RecordStep from '@core/record/recordStep'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import { Checkbox } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { useChains, useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useChain, useChainEditable, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
 
-import { FormItem } from '@webapp/components/form/Input'
-import { Checkbox } from '@webapp/components/form'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioPanel } from './ChainRStudioPanel'
 
 type ChainBasicPropsProps = {

@@ -9,11 +9,11 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ChangeItemRow } from './ChangeItem'
+import { splitReviewItems } from './changeItemModel'
 import { ChangeSetCompactCard } from './ChangeSetCompactCard'
 import { ChangeSetReviewDialog } from './ChangeSetReviewDialog'
-import { splitReviewItems } from './changeItemModel'
 import { buildReviewItems, getStatusLineText, isCompactCard, type ReviewItem } from './changeSetReviewModel'
-import { useChangeSetSelection, type ChangeSetSelection } from './useChangeSetSelection'
+import { type ChangeSetSelection, useChangeSetSelection } from './useChangeSetSelection'
 import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'
 
 /**

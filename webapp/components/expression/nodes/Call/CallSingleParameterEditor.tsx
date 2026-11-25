@@ -1,10 +1,9 @@
 import { useCallback, useState } from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
-
 import { FormItem } from '@webapp/components/form/Input'
-
 import Identifier from '../Identifier'
+
 import type { CallEditorProps } from './callEditorProps'
 
 type CallSingleParameterEditorProps = CallEditorProps & {

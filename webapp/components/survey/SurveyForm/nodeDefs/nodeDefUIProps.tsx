@@ -1,11 +1,9 @@
-import * as A from '@core/arena'
-
 import { FormHeaderColor } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
-
 import { NumberFormats } from '@webapp/components/form/Input'
 
 import NodeDefBoolean from './components/types/NodeDefBoolean'
@@ -15,10 +13,10 @@ import NodeDefDate from './components/types/NodeDefDate'
 import NodeDefEntitySwitch from './components/types/NodeDefEntitySwitch'
 import NodeDefFile from './components/types/NodeDefFile'
 import NodeDefFormHeader from './components/types/NodeDefFormHeader'
+import NodeDefGeo from './components/types/NodeDefGeo'
 import NodeDefTaxon from './components/types/NodeDefTaxon'
 import NodeDefText from './components/types/NodeDefText'
 import NodeDefTime from './components/types/NodeDefTime'
-import NodeDefGeo from './components/types/NodeDefGeo'
 
 const { boolean, code, coordinate, date, decimal, entity, file, formHeader, geo, integer, taxon, text, time } =
   NodeDef.nodeDefType

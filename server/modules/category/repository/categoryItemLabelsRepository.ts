@@ -2,10 +2,10 @@
  * SQL of the category item labels endpoints (assistant suggestion 6). Labels are read from the combined draft props
  * (props || props_draft, merged at the top level).
  */
-import SystemError, { StatusCodes } from '@core/systemError'
 import type { MissingLabelsCounts, MissingLabelsItem } from '@common/ai/categoryItemLabels'
-import { db, type DbClient } from '@server/db/db'
 import { Schemata } from '@common/model/db'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { db, type DbClient } from '@server/db/db'
 
 // the missing labels queries read every item of the categories: a huge category must not hold a connection for long
 const queryTimeoutMs = 15_000

@@ -1,10 +1,9 @@
 import { useCallback } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { useSortable } from '@webapp/components/hooks'
-import { NodeDefsActions } from '@webapp/store/survey'
 import { useAppDispatch } from '@webapp/store'
+import { NodeDefsActions } from '@webapp/store/survey'
 
 export const useSortAnalysisNodeDefs = ({ analysisNodeDefsContainerRef, analysisNodeDefs = [] }) => {
   const dispatch = useAppDispatch()

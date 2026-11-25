@@ -1,13 +1,11 @@
-import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
 import { findNodeEditRefusal } from '@core/record/nodeEditRefusal'
-
+import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 import { checkBatchEdit } from '@server/modules/record/service/update/nodesBatch/nodesBatchEditCheck'
-import { checkNodeEditable } from '@webapp/ai/tools/cleaning/recordEditPermissions'
-
-import * as RecordUtils from '../../utils/recordUtils'
 import { cleaningTestRecord, cleaningTestSurvey } from '@test/unit/utils/aiCleaningTestUtils'
+import { checkNodeEditable } from '@webapp/ai/tools/cleaning/recordEditPermissions'
+import * as RecordUtils from '../../utils/recordUtils'
 
 const dbhPath = 'cluster/plot[0]/tree[0]/dbh'
 

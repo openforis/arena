@@ -1,12 +1,12 @@
 import type { Readable, Writable } from 'node:stream'
 
 import { FileFormats } from '@core/fileFormats'
+import { StreamUtils } from '../streamUtils'
 
+import type { CsvFieldItem } from './csvField'
 import * as CSVWriter from './csvWriter'
 import * as ExcelWriter from './excelWriter'
 import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
-import type { CsvFieldItem } from './csvField'
-import { StreamUtils } from '../streamUtils'
 
 export const writeItemsToStream = ({
   items,

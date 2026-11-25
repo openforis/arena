@@ -1,22 +1,21 @@
 import './ActivityLog.scss'
 
 import { useState } from 'react'
+
 import * as A from '@core/arena'
-
 import * as Survey from '@core/survey/survey'
-
-import { Button, LoadingBar } from '@webapp/components'
-import { useOnIntersect } from '@webapp/components/hooks'
-
-import { useSurveyInfo } from '@webapp/store/survey'
-import { useActivityLog, ActivityLogMessage } from './store'
-import Message from './Message'
-import { FileUtils } from '@webapp/utils/fileUtils'
-import { useI18n } from '@webapp/store/system'
-import AiActivityLogSummaryModal from '@webapp/components/ai/AiActivityLogSummaryModal'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { Button, LoadingBar } from '@webapp/components'
+import AiActivityLogSummaryModal from '@webapp/components/ai/AiActivityLogSummaryModal'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { useOnIntersect } from '@webapp/components/hooks'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { FileUtils } from '@webapp/utils/fileUtils'
+
+import Message from './Message'
+import { ActivityLogMessage, useActivityLog } from './store'
 
 const minSizeToDisplayMessages = 1024 * 10 // 10KB
 

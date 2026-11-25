@@ -1,13 +1,12 @@
 import './TreeView.scss'
 
 import { useCallback } from 'react'
-
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem as MuiTreeItem } from '@mui/x-tree-view/TreeItem'
+
 import { Objects } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
-
 import { LabelWithTooltip } from '../form/LabelWithTooltip'
 
 type TreeItem = {

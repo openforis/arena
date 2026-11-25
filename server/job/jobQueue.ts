@@ -1,4 +1,4 @@
-import { JobStatus, Objects, ArenaUser } from '@openforis/arena-core'
+import { ArenaUser, JobStatus, Objects } from '@openforis/arena-core'
 import { JobRepository, JobRow, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'

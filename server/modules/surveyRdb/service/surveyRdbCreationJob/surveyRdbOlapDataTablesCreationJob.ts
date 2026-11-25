@@ -1,15 +1,13 @@
-import { Objects, type ArenaChain, type ArenaNodeDefEntity, type ArenaSurvey } from '@openforis/arena-core'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import { type ArenaChain, type ArenaNodeDefEntity, type ArenaSurvey, Objects } from '@openforis/arena-core'
 
 import * as Chain from '@common/analysis/chain'
 import TableOlapData from '@common/model/db/tables/olapData/table'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import Job, { type JobParams } from '@server/job/job'
 import * as ChainManager from '@server/modules/analysis/manager'
-import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 export default class SurveyRdbOlapDataTablesCreationJob extends Job {
   static readonly type = 'SurveyRdbOlapDataTablesCreationJob'

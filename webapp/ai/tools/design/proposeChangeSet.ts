@@ -5,17 +5,16 @@
 import { z } from 'zod'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft, ChangeSetIssue } from '@webapp/ai/changeSets/types'
-
 import { getResultBudget, takeWithinBudget } from '../common/toolResult'
 import { summaryTextSchema } from '../common/toolSchemas'
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'
+
 import { requireSurvey } from './surveyLookup'
 
 export const textItemSchema = z.object({

@@ -1,22 +1,21 @@
-import * as A from '@core/arena'
-
-import {
-  RecordNodes,
-  RecordExpressionEvaluator,
-  RecordNodesUpdater as CoreRecordNodesUpdater,
-  ArenaAnyNodeDef,
-} from '@openforis/arena-core'
 import type {
+  ArenaNodeDefExpression,
   ArenaRecord,
   ArenaRecordNode,
-  ArenaNodeDefExpression,
   ArenaSurvey,
   ArenaUser,
 } from '@openforis/arena-core'
+import {
+  ArenaAnyNodeDef,
+  RecordExpressionEvaluator,
+  RecordNodes,
+  RecordNodesUpdater as CoreRecordNodesUpdater,
+} from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as A from '@core/arena'
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import * as RecordReader from './recordReader'
 import * as RecordUpdater from './recordUpdater'

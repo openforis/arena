@@ -1,17 +1,15 @@
+import { type ArenaAnyNodeDef, type ArenaChain, type ArenaSurvey, Objects } from '@openforis/arena-core'
+
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import SystemError from '@core/systemError'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import * as ChainManager from '../manager'
-import { Objects, type ArenaChain, type ArenaSurvey, type ArenaAnyNodeDef } from '@openforis/arena-core'
-import { ArrayUtils } from '@core/arrayUtils'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+import { ArrayUtils } from '@core/arrayUtils'
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as ChainManager from '../manager'
 
 const getCycleLabel = (cycleKey: string) => `${Number(cycleKey) + 1}`
 

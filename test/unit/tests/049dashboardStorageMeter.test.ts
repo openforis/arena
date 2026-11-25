@@ -1,5 +1,5 @@
-import { getStorageUsageFillColor } from '@webapp/views/Dashboard/StorageSummary/StorageUsageMeter'
 import { themeColors } from '@webapp/theme/tokens'
+import { getStorageUsageFillColor } from '@webapp/views/Dashboard/StorageSummary/StorageUsageMeter'
 
 describe('getStorageUsageFillColor', () => {
   it('returns success below the warn threshold', () => {

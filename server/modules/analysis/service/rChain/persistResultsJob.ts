@@ -1,16 +1,15 @@
 import type { Readable } from 'node:stream'
 
-import type FileZip from '@server/utils/file/fileZip'
-import type { JobParams } from '@server/job/job'
+import { FileFormats } from '@core/fileFormats'
 import * as Record from '@core/record/record'
-
-import FlatDataImportJob from '@server/modules/dataImport/service/dataImportJob/flatDataImportJob'
+import type { JobParams } from '@server/job/job'
 import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/dataImportJob/dataImportFlatDataFileReader'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import FlatDataImportJob from '@server/modules/dataImport/service/dataImportJob/flatDataImportJob'
 import { RecordProvidersDefault } from '@server/modules/record/manager/recordEvaluationContextDefault'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import type FileZip from '@server/utils/file/fileZip'
 
 import { RecordsProvider } from './recordsProvider'
-import { FileFormats } from '@core/fileFormats'
 
 export default class PersistResultsJob extends FlatDataImportJob {
   static readonly type: string = 'PersistResultsJob'

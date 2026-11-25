@@ -1,11 +1,9 @@
 import type { ArenaValidation } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import Job, { type JobParams } from '@server/job/job'
-
 import * as Category from '@core/survey/category'
 import * as Validation from '@core/validation/validation'
-
+import Job, { type JobParams } from '@server/job/job'
 import * as CategoryManager from '../../../../category/manager/categoryManager'
 
 const _removeWarnings = (validation: ArenaValidation): ArenaValidation => {

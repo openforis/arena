@@ -3,14 +3,12 @@ import './ProfilePictureEditor.scss'
 import { useCallback, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
-import * as FileTypes from '@webapp/utils/fileTypes'
-
-import { useConfirm, useFileDrop, useOnValueChange } from '@webapp/components/hooks'
-import { useProfilePicture } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
-
-import UploadButton from '@webapp/components/form/UploadButton'
 import { ButtonIconDelete } from '@webapp/components'
+import UploadButton from '@webapp/components/form/UploadButton'
+import { useConfirm, useFileDrop, useOnValueChange } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+import { useProfilePicture } from '@webapp/store/user'
+import * as FileTypes from '@webapp/utils/fileTypes'
 
 const profilePicturePlaceholderImgSrc = '/img/user-profile-picture-default.png'
 

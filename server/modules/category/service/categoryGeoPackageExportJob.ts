@@ -1,24 +1,23 @@
-import type { Readable } from 'node:stream'
-import type { ArenaCategory, ArenaJobContext } from '@openforis/arena-core'
-import { GeoPackageAPI, GeometryColumns, FeatureColumn, GeometryType, GeoPackageDataType } from '@ngageoint/geopackage'
 import type { GeoPackage } from '@ngageoint/geopackage'
+import { FeatureColumn, GeometryColumns, GeometryType, GeoPackageAPI, GeoPackageDataType } from '@ngageoint/geopackage'
+import type { Readable } from 'node:stream'
 
-import * as ProcessUtils from '@core/processUtils'
-import { uuidv4 } from '@core/uuid'
+import type { ArenaCategory, ArenaJobContext } from '@openforis/arena-core'
+
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
-import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 import * as Category from '@core/survey/category'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
-
-import Job, { type JobParams } from '@server/job/job'
-import * as FileUtils from '@server/utils/file/fileUtils'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import * as DbUtils from '@server/db/dbUtils'
-
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as CategoryRepository from '../repository/categoryRepository'
-import * as CategoryExportRepository from '../repository/categoryExportRepository'
+import * as FileUtils from '@server/utils/file/fileUtils'
 import { buildCategoryItemFeature } from '../manager/categoryGeoPackageFeatureBuilder'
+import * as CategoryExportRepository from '../repository/categoryExportRepository'
+import * as CategoryRepository from '../repository/categoryRepository'
 
 const locationExtraPropName = Category.locationItemExtraDefName
 const geometryColumnName = 'geom'

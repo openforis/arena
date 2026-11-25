@@ -1,19 +1,17 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
-import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
-import { nextDesignerVisit, type DesignerVisit } from '@webapp/ai/suggestions/designerVisit'
+import * as Survey from '@core/survey/survey'
+import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { type DesignerVisit, nextDesignerVisit } from '@webapp/ai/suggestions/designerVisit'
 import {
   createGenerationTracker,
-  toGenerationInput,
   type SuggestionGeneration,
   type SuggestionGenerationInput,
+  toGenerationInput,
 } from '@webapp/ai/suggestions/generation'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import { notifySuggestionEvent, subscribeSuggestionEvents } from '@webapp/ai/suggestions/suggestionEvents'
 import * as SurveyStatusState from '@webapp/store/survey/status/state'
-
-import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 
 const input = (overrides: Partial<SuggestionGenerationInput> = {}): SuggestionGenerationInput => ({
   userUuid: 'u1',

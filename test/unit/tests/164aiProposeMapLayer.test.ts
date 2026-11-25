@@ -1,12 +1,9 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { getProposedMapLayer, proposeMapLayerTool } from '@webapp/ai/tools/analysis/proposeMapLayer'
-
 import { newAnalysisToolContext, runTool, userWithoutAccess } from '@test/unit/utils/aiAnalysisTestUtils'
-
+import { getProposedMapLayer, proposeMapLayerTool } from '@webapp/ai/tools/analysis/proposeMapLayer'
+import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import { getContextUser } from '../../integration/config/context'
 
 let survey: any = null
 const getUuid = (path: string) => NodeDef.getUuid(SurveyUtils.getNodeDefByPath({ survey, path }))

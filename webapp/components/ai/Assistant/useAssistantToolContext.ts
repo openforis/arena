@@ -9,7 +9,7 @@ import { useI18nT, useLang } from '@webapp/store/system'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 import * as UserState from '@webapp/store/user/state'
 
-import { parseAppPath, type AssistantArea } from './assistantAreas'
+import { type AssistantArea, parseAppPath } from './assistantAreas'
 
 /**
  * Reads the current view (module and selected item) for the view_getCurrent tool.

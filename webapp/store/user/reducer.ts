@@ -1,10 +1,9 @@
+import * as SurveyActions from '@webapp/store/survey/actions'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActionTypes } from '@webapp/store/system/actionTypes'
-import * as SurveyActions from '@webapp/store/survey/actions'
-
-import * as UserState from './state'
 import * as UserActions from './actions'
+import * as UserState from './state'
 
 const actionHandlers = {
   [SystemActionTypes.SYSTEM_INIT]: (state, { user }) => user || state,

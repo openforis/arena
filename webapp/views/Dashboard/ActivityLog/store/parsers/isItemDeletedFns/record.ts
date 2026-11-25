@@ -1,6 +1,5 @@
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
 
 const _isRecordDeleted = A.pipe(ActivityLog.getRecordUuid, A.isNil)
 

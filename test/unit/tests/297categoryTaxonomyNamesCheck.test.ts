@@ -4,7 +4,6 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 

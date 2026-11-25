@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { TimeInput } from '@webapp/components/form/DateTimeInput'
 import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 

@@ -1,17 +1,16 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
+
 import type { ArenaRecord } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
-
+import { ButtonIconDelete } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions } from '@webapp/store/ui/record'
 
-import { ButtonIconDelete } from '@webapp/components'
-
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
-import { useAppDispatch } from '@webapp/store'
 
 type RecordDeleteButtonProps = {
   categoryItemsByCodeDefUuid?: { [codeDefUuid: string]: any[] } | null

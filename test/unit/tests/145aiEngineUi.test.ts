@@ -1,5 +1,4 @@
 import SystemError from '@core/systemError'
-
 import { getAiEngineErrorView, getAiUnavailableActions } from '@webapp/ai/engines/engineUi'
 import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 

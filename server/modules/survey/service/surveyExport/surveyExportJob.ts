@@ -1,19 +1,18 @@
-import type { JobParams } from '@server/job/job'
 import * as User from '@core/user/user'
-
+import type { JobParams } from '@server/job/job'
 import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
 import ActivityLogExportJob from './jobs/activityLogExportJob'
 import CategoriesExportJob from './jobs/categoriesExportJob'
 import ChainExportJob from './jobs/chainExportJob'
+import InfoExportJob from './jobs/infoExportJob'
 import RecordFilesExportJob from './jobs/recordFilesExportJob'
 import RecordsExportJob from './jobs/recordsExportJob'
 import SurveyFilesExportJob from './jobs/surveyFilesExportJob'
 import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
 import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
-import InfoExportJob from './jobs/infoExportJob'
 
 const createInnerJobs = ({
   backup,

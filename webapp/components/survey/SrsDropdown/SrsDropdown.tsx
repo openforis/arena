@@ -1,8 +1,7 @@
-import * as Survey from '@core/survey/survey'
 import * as Srs from '@core/geo/srs'
-
-import { useSurveyInfo } from '@webapp/store/survey'
+import * as Survey from '@core/survey/survey'
 import { Dropdown } from '@webapp/components/form'
+import { useSurveyInfo } from '@webapp/store/survey'
 
 type SrsDropdownProps = {
   disabled?: boolean

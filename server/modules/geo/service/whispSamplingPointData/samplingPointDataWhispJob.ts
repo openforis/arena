@@ -1,10 +1,10 @@
-import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
 import Job, { type JobParams } from '@server/job/job'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import { CategoryValidationJob } from '@server/modules/category/service/categoryValidationJob'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import SamplingPointDataWhispAnalysisJob from './samplingPointDataWhispAnalysisJob'
 import SamplingPointDataWhispCategoryImportJob from './samplingPointDataWhispCategoryImportJob'
+import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
 
 /**
  * Generates the Whisp analysis for all the sampling point data items and stores it,

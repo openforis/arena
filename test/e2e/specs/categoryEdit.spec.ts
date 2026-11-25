@@ -1,9 +1,7 @@
+import { Page } from '@playwright/test'
 import fs from 'node:fs'
 
-import { Page } from '@playwright/test'
-
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { category, categoryItems, SampleCategoryItem } from '../fixtures/seed/sampleSurveyModel'
 import { expectDropdownValue, getDropdown, selectDropdownItem } from '../helpers/dropdown'

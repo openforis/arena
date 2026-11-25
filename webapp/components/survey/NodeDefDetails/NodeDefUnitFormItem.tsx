@@ -1,6 +1,5 @@
-import { FormItem, Input } from '@webapp/components/form/Input'
-
 import * as NodeDef from '@core/survey/nodeDef'
+import { FormItem, Input } from '@webapp/components/form/Input'
 
 import { State, useNodeDefEditReadOnly } from './store'
 

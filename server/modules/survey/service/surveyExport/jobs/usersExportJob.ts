@@ -1,6 +1,5 @@
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import Job, { type JobParams } from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import { ExportFile } from '../exportFile'

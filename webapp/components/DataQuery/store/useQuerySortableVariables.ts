@@ -4,9 +4,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import * as Expression from '@core/expressionParser/expression'
-
 import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
-
 import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const fetchVariables = async ({ survey, cycle, entityDef, attributeDefUuids, lang }) => {

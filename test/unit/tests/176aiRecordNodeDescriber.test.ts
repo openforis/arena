@@ -1,16 +1,13 @@
 import * as Node from '@core/record/node'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import { cleaningTestRecord, cleaningTestSurvey, fakeI18n } from '@test/unit/utils/aiCleaningTestUtils'
 import {
   describeNodePath,
   describeRecordKeys,
   getNodePage,
   getNodeValidationMessages,
 } from '@webapp/ai/tools/cleaning/recordNodeDescriber'
-
-import { cleaningTestRecord, cleaningTestSurvey, fakeI18n } from '@test/unit/utils/aiCleaningTestUtils'
-
 import * as RecordUtils from '../../utils/recordUtils'
 
 let survey: any

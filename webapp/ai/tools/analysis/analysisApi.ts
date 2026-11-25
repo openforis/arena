@@ -4,10 +4,9 @@
  */
 import axios from 'axios'
 
-import SystemError from '@core/systemError'
 import { Query } from '@common/model/query'
 import type { QueryItem } from '@common/model/query/query/query'
-
+import SystemError from '@core/systemError'
 import { getEntityViewDataCountRequest } from '@webapp/service/api/surveyRdb'
 
 export const analysisRequestTimeoutMs = 60_000

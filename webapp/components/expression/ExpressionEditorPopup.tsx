@@ -1,18 +1,15 @@
 import './ExpressionEditorPopup.scss'
 
 import * as A from '@core/arena'
-
 import * as Expression from '@core/expressionParser/expression'
-
-import { TestId } from '@webapp/utils/testId'
-
-import PanelRight from '@webapp/components/PanelRight'
-
-import { Button } from '../buttons'
 import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
-import { useExpressionEditorPopupState } from './expressionEditorPopupState'
+import PanelRight from '@webapp/components/PanelRight'
+import { TestId } from '@webapp/utils/testId'
+import { Button } from '../buttons'
+
 import AdvancedExpressionEditorPopup from './AdvancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './BasicExpressionEditorPopup'
+import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 import { ExpressionEditorType } from './expressionEditorType'
 
 type ExpressionEditorPopupProps = {

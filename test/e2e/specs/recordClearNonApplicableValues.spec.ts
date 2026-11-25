@@ -1,5 +1,4 @@
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { cluster, plot } from '../fixtures/seed/sampleSurveyModel'
 import { RecordForm } from '../helpers/recordForm'

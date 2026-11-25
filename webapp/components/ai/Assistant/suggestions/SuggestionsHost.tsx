@@ -5,10 +5,8 @@
  */
 import { useEffect, useState } from 'react'
 
-import * as User from '@core/user/user'
-
 import { AiFeatureCategory } from '@common/ai/features'
-
+import * as User from '@core/user/user'
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { reconcileInProgress } from '@webapp/ai/suggestions/reconcileInProgress'
@@ -18,8 +16,8 @@ import { suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-
 import type { AssistantArea, AssistantAreaStatus } from '../assistantAreas'
+
 import { getAvailableAreas } from './suggestionsModel'
 import { useDesignerVisit } from './useDesignerVisit'
 import { useGenerationStartedEvent } from './useGenerationStartedEvent'

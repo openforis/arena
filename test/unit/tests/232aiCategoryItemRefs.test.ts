@@ -1,15 +1,5 @@
 import { z } from 'zod'
 
-import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import type { Conversation } from '@webapp/ai/conversations/types'
-import {
-  categoryItemRefsRegistry,
-  createCategoryItemRefs,
-  createCategoryItemRefsRegistry,
-  CATEGORY_ITEM_REFS_MAX_ENTRIES,
-} from '@webapp/ai/tools/design/categoryItemRefs'
-import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 import {
   cloudAccess,
   createToolContext,
@@ -17,6 +7,16 @@ import {
   textStream,
   toolCallStream,
 } from '@test/unit/utils/assistantTestUtils'
+import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import type { Conversation } from '@webapp/ai/conversations/types'
+import {
+  CATEGORY_ITEM_REFS_MAX_ENTRIES,
+  categoryItemRefsRegistry,
+  createCategoryItemRefs,
+  createCategoryItemRefsRegistry,
+} from '@webapp/ai/tools/design/categoryItemRefs'
+import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
 const KEY = { surveyId: 7, categoryUuid: 'cat-1', ref: '2.14' }
 const ENTRY = { itemUuid: 'item-2.14', levelName: 'species', labels: { en: 'Pinus nigra' } }

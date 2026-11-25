@@ -4,18 +4,16 @@
  */
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-
 import { CATEGORY_ITEM_LABEL_TEXT_MAX } from '@common/ai/categoryItemLabels'
-
+import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import { CATEGORY_ITEM_LABEL_SET } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
-
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
+
 import { checkScope, requireCategory } from './categoryItemsListMissingLabels'
 import { getSurveyLanguages } from './missingTexts'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'

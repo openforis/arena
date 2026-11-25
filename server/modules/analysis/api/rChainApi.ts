@@ -1,14 +1,14 @@
 import type { Router } from 'express'
-import * as ApiRoutes from '@common/apiRoutes'
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
 
+import * as ApiRoutes from '@common/apiRoutes'
+import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as JobUtils from '@server/job/jobUtils'
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 import * as AnalysisService from '../service'
 
 export const init = (app: Router) => {

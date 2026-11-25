@@ -1,9 +1,9 @@
-import { Surveys } from '@openforis/arena-core'
 import type { ArenaSurvey, ArenaTaxonomy } from '@openforis/arena-core'
+import { Surveys } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as Taxonomy from '../taxonomy'
+
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
 type TaxonomiesByUuid = Record<string, ArenaTaxonomy>

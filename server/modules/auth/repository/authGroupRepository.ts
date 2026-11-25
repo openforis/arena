@@ -1,10 +1,8 @@
 import type { ArenaAuthGroup } from '@openforis/arena-core'
 
-import { db, DbClient } from '@server/db/db'
-
 import * as A from '@core/arena'
-
 import * as AuthGroup from '@core/auth/authGroup'
+import { db, DbClient } from '@server/db/db'
 import * as UserRepository from '../../user/repository/userRepository'
 
 const dbTransformCallback = A.camelizePartial({ limitToLevel: 1 })

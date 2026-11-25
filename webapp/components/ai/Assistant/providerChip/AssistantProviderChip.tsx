@@ -1,8 +1,8 @@
 import './AssistantProviderChip.scss'
 
 import { useCallback, useMemo, useState } from 'react'
-import classNames from 'classnames'
 import Popover from '@mui/material/Popover'
+import classNames from 'classnames'
 
 import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
 import { getConversationDataClass } from '@webapp/ai/conversations/dataClass'
@@ -10,8 +10,8 @@ import type { Conversation } from '@webapp/ai/conversations/types'
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import { useAiEngineActions } from '@webapp/components/ai/AiNotAvailable/useAiEngineActions'
-import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
 import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
 import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { getApiErrorMessage, type TFunction } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
@@ -20,8 +20,8 @@ import { useNotifyError } from '@webapp/components/hooks'
 import { setDefaultProvider } from '@webapp/service/api/ai/providers'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import type { AssistantArea } from '../assistantAreas'
+
 import {
   buildProviderChoices,
   getConversationProvider,

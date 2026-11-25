@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { useAppDispatch } from '@webapp/store/hooks'
 
+import { useAppDispatch } from '@webapp/store/hooks'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 export const useConfirm = () => {

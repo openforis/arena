@@ -1,22 +1,22 @@
 import './MapWorkspace.scss'
 
 import { useCallback, useMemo, useRef } from 'react'
-import type { ReactElement, ReactNode } from 'react'
 import classNames from 'classnames'
+import type { ReactElement, ReactNode } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { MapWorkspaceDialogs } from './MapWorkspaceDialogs'
 import { useMapWorkspace, WorkspaceLeafletProvider } from './MapWorkspaceContext'
+import { MapWorkspaceDialogs } from './MapWorkspaceDialogs'
 import type { MapRailTab, MapWorkspaceRecords } from './mapWorkspaceTypes'
 import { MapRail } from './rail/MapRail'
 import { MapStatusBar } from './statusbar/MapStatusBar'
 import { MapToolbar } from './toolbar/MapToolbar'
 import { MapWorkspaceTools } from './tools/MapWorkspaceTools'
 import { useFullScreen } from './tools/useFullScreen'
-import { useMapShortcuts } from './useMapShortcuts'
 import type { MapShortcutHandlers } from './useMapShortcuts'
+import { useMapShortcuts } from './useMapShortcuts'
 
 type MapWorkspaceProps = {
   hint?: string | null

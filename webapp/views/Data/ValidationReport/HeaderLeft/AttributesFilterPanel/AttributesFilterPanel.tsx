@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import { Checkbox } from '@webapp/components/form'
 import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'

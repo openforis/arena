@@ -1,17 +1,16 @@
-import * as Survey from '@core/survey/survey'
+import { Authorizer } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-import { Authorizer } from '@openforis/arena-core'
+import * as Survey from '@core/survey/survey'
 import { ValidationUtils } from '@core/validation/validationUtils'
-
+import { ButtonIconEditOrView } from '@webapp/components'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
-import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
-
-import { ButtonIconEditOrView } from '@webapp/components'
-import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
-import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import { AskAssistantButton } from './AskAssistantButton'
 

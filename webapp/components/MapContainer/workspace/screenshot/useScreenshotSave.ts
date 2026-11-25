@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { Authorizer, type ArenaUser } from '@openforis/arena-core'
+import { type ArenaUser, Authorizer } from '@openforis/arena-core'
 
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
-import { useSurveyCycleKey, useSurveyId, useSurveyInfo } from '@webapp/store/survey'
-import { useLang } from '@webapp/store/system'
-import { useUser } from '@webapp/store/user'
-
 import { getAvailableSpaceBytes } from '@webapp/components/MapContainer/workspace/screenshot/screenshotChecks'
 import {
   buildRowAttributeNode,
@@ -33,6 +28,9 @@ import type {
   ScreenshotPlotCandidate,
   ScreenshotSaveOutcome,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { useSurveyCycleKey, useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useLang } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
 
 export type ScreenshotSaveRequest = {
   plot: ScreenshotPlotCandidate

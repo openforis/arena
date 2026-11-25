@@ -1,26 +1,23 @@
-import type FileZip from '@server/utils/file/fileZip'
-import type { ArenaSurvey, ArenaRecordNode, ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as A from '@core/arena'
-
+import type { ArenaAnyNodeDef, ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as DateUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-import * as SurveyFile from '@core/survey/surveyFile'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as Taxon from '@core/survey/taxon'
-
 import { db, DbClient } from '@server/db/db'
-
+import type { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
+import type { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import type FileZip from '@server/utils/file/fileZip'
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
-import type { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import type { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 const { nodeDefType } = NodeDef
 

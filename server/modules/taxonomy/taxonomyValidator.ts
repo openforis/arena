@@ -1,11 +1,12 @@
 import type { ArenaTaxon, ArenaTaxonomy, ArenaValidation } from '@openforis/arena-core'
-import * as Taxonomy from '@core/survey/taxonomy'
+
+import * as ObjectUtils from '@core/objectUtils'
 import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as ObjectUtils from '@core/objectUtils'
+import * as Validator from '@core/validation/validator'
 
 // ====== TAXONOMY
 

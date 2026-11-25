@@ -2,9 +2,9 @@
  * Pure versions of the form designer's edit guards on a node definition's `multiple` and `key` props, shared by the
  * designer hooks and the assistant's change set validation.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 
 /**
  * Tells whether a node definition is locked by publication: it was published and the survey is not a template.

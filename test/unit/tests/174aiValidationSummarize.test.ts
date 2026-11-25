@@ -1,10 +1,5 @@
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
-import { collectValidationResults, getMessageCategoryId } from '@webapp/ai/tools/cleaning/validationRows'
-import { summarizeValidationRows } from '@webapp/ai/tools/cleaning/validationSummary'
-import { createValidationTools } from '@webapp/ai/tools/cleaning/validationTools'
-
 import {
   cleaningTestRecord,
   cleaningTestSurvey,
@@ -16,7 +11,9 @@ import {
   newValidationRow,
   runTool,
 } from '@test/unit/utils/aiCleaningTestUtils'
-
+import { collectValidationResults, getMessageCategoryId } from '@webapp/ai/tools/cleaning/validationRows'
+import { summarizeValidationRows } from '@webapp/ai/tools/cleaning/validationSummary'
+import { createValidationTools } from '@webapp/ai/tools/cleaning/validationTools'
 import * as RecordUtils from '../../utils/recordUtils'
 
 const RECORD_UUID = uuidv4()

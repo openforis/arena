@@ -4,19 +4,19 @@
  */
 import { Objects } from '@openforis/arena-core'
 
-import SystemError from '@core/systemError'
+import * as DateUtils from '@core/dateUtils'
 import * as Srs from '@core/geo/srs'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import * as RecordReader from '@core/record/_record/recordReader'
-import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 
 export type CategoryItemProvider = {

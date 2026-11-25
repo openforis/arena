@@ -1,5 +1,5 @@
-import { isNull } from './isNull'
 import { isEmpty } from './isEmpty'
+import { isNull } from './isNull'
 
 /**
  * Converts a JavaScript Object Notation (JSON) string to a Javascript value.

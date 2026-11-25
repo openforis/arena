@@ -1,17 +1,16 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
 import classNames from 'classnames'
-import * as A from '@core/arena'
+import { useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
+import { debounce } from '@core/functionsDefer'
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Node from '@core/record/node'
-import { debounce } from '@core/functionsDefer'
-
-import { elementOffset } from '@webapp/utils/domUtils'
+import * as Survey from '@core/survey/survey'
 import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
+import { elementOffset } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './NodeDefEntityTableRow'

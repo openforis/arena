@@ -1,5 +1,5 @@
-import * as A from '@core/arena'
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
 
 export const keys = {
   id: ActivityLog.keys.id,

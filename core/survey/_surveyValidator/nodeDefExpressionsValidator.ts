@@ -1,16 +1,15 @@
-import type { ArenaNodeDefExpression, ArenaSurvey, ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefExpression, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as Validator from '@core/validation/validator'
+import * as ObjectUtils from '@core/objectUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as ObjectUtils from '@core/objectUtils'
-import * as NodeDefExpressionValidator from '../nodeDefExpressionValidator'
+import * as Validator from '@core/validation/validator'
 import * as SurveyDependencyTypes from '../_survey/surveyDependencyTypes'
+import * as NodeDefExpressionValidator from '../nodeDefExpressionValidator'
 
 const { dependencyTypes } = SurveyDependencyTypes
 

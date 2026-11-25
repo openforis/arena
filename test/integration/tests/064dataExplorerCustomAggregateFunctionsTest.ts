@@ -1,16 +1,13 @@
+import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { Query } from '@common/model/query'
-
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
-
-import { getContextUser } from '../config/context'
-
 import * as RB from '../../utils/recordBuilder'
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 const { nodeDefType } = NodeDef
 const cycle = Survey.cycleOneKey

@@ -1,6 +1,7 @@
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+
 import type { ItemBuilder } from './categoryItemBuilder'
 
 export class CategoryBuilder {

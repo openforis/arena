@@ -1,4 +1,5 @@
 import * as Schemata from '../schemata'
+
 import Table, { ColumnSet } from './table'
 
 class TableSurvey extends Table {

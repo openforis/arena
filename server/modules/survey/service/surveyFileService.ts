@@ -1,8 +1,8 @@
 import { runWithClusterLock } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
-import * as SurveyRepository from '../repository/surveyRepository'
 import * as SurveyFileManager from '../manager/surveyFileManager'
+import * as SurveyRepository from '../repository/surveyRepository'
 
 const logger = Log.getLogger('SurveyFileService')
 

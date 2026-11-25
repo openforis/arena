@@ -1,16 +1,7 @@
-import * as Survey from '@core/survey/survey'
+import type { CategoryItemLabelsUpdateAnswer } from '@common/ai/categoryItemLabels'
 import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import type { CategoryItemLabelsUpdateAnswer } from '@common/ai/categoryItemLabels'
-import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
-import type { CategoryLabelsApplierDeps } from '@webapp/ai/changeSets/categoryItemLabels/applyCategoryItemLabels'
-import { createCategoryLabelsApplierDeps } from '@webapp/ai/changeSets/categoryItemLabels/categoryLabelsApplierDeps'
-import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
-import type { ChangeSet } from '@webapp/ai/changeSets/types'
-import { surveyCategoryUpdated } from '@webapp/store/survey/actions/category'
-import { resetSurveyDefs } from '@webapp/store/survey/actions/defs'
-import { metaUpdated } from '@webapp/store/survey/actions/metadata'
+import * as Survey from '@core/survey/survey'
 import { getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
   buildCategoryLabelsSurvey,
@@ -19,6 +10,14 @@ import {
   categoryUuidOf,
   createApplierDepsStub,
 } from '@test/unit/utils/categoryLabelsTestUtils'
+import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
+import type { CategoryLabelsApplierDeps } from '@webapp/ai/changeSets/categoryItemLabels/applyCategoryItemLabels'
+import { createCategoryLabelsApplierDeps } from '@webapp/ai/changeSets/categoryItemLabels/categoryLabelsApplierDeps'
+import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
+import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import { surveyCategoryUpdated } from '@webapp/store/survey/actions/category'
+import { resetSurveyDefs } from '@webapp/store/survey/actions/defs'
+import { metaUpdated } from '@webapp/store/survey/actions/metadata'
 
 let survey: any
 let speciesUuid: string

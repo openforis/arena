@@ -1,8 +1,8 @@
 import { generateText, streamText } from 'ai'
 
 import { createLocalServerEngine } from '@webapp/ai/engines/localServerEngine'
-import { createGatewayTextGenerator } from '@webapp/ai/runtime/textGenerators'
 import type { AiLocalServerCapability } from '@webapp/ai/engines/types'
+import { createGatewayTextGenerator } from '@webapp/ai/runtime/textGenerators'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
   reachable: true,

@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-
 import { ExtraPropDefsEditor } from '@webapp/components/survey/ExtraPropDefsEditor'
 
 type SurveyUserExtraPropDefsEditorProps = {

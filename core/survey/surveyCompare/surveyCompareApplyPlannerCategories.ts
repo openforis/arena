@@ -1,11 +1,11 @@
-import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 
-import { SurveyCompareCategoryDiff, SurveyCompareParams, SurveyCompareStatus } from './surveyCompareTypes'
 import { getExtraTargetLevels, indexItemsByCodePath, updatableCategoryProps } from './surveyCompareCategories'
+import { SurveyCompareCategoryDiff, SurveyCompareParams, SurveyCompareStatus } from './surveyCompareTypes'
 
 export interface CategoriesApplyPlan {
   categoriesToInsert: { category: any; items: any[] }[]

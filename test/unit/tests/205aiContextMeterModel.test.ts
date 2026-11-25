@@ -1,3 +1,4 @@
+import { fakeT } from '@test/unit/utils/assistantTestUtils'
 import type { AssistantMessageUsage, ConversationMessage } from '@webapp/ai/conversations/types'
 import {
   buildContextMeter,
@@ -11,7 +12,6 @@ import {
   getContextRingDashArray,
   getLatestUsage,
 } from '@webapp/components/ai/Assistant/contextMeterModel'
-import { fakeT } from '@test/unit/utils/assistantTestUtils'
 
 const usage = (overrides: Partial<AssistantMessageUsage> = {}): AssistantMessageUsage => ({
   contextTokens: 12400,

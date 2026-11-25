@@ -4,20 +4,20 @@ import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { Button } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
+import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { elementOffset } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
-import { Button } from '@webapp/components'
 
 import { NodeDefEditButtonsMenu } from './NodeDefEditButtonsMenu'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 const maxColumnsNo = 12
 

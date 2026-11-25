@@ -1,12 +1,13 @@
 import './CustomAggregateFunctionsEditor.scss'
 
-import { useI18n } from '@webapp/store/system'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import { ButtonNew } from '@webapp/components'
+import { useI18n } from '@webapp/store/system'
+
 import { CustomAggregateFunctionEditor } from './CustomAggregateFunctionEditor'
 import { CustomAggregateFunctionViewer } from './CustomAggregateFunctionViewer'
 import { useCustomAggregateFunctionsEditor } from './useCustomAggregateFunctionsEditor'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type CustomAggregateFunctionsEditorProps = {
   entityDef: ArenaAnyNodeDef

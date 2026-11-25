@@ -1,12 +1,10 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { recordMatchesQualifierFilters } from '@server/modules/record/manager/_recordManager/recordQualifierMatcher'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
+import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-record-qualifier-matcher-user' }
 

@@ -1,9 +1,8 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
 import { createNodesBatchReplyRegistry } from '@server/modules/record/service/update/nodesBatch/nodesBatchReplies'
 import {
   NodesBatchServiceDeps,
@@ -11,10 +10,9 @@ import {
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
 import { createNodesBatchSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
 import { NodesBatchMessageKeys } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 const admin = { uuid: uuidv4(), authGroups: [{ name: 'systemAdmin' }] }
 

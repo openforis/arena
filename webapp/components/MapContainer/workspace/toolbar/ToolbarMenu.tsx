@@ -1,11 +1,10 @@
 import { useCallback, useId, useState } from 'react'
-import type { ReactElement, ReactNode } from 'react'
 import { Button, Menu } from '@mui/material'
 import classNames from 'classnames'
+import type { ReactElement, ReactNode } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { useMapWorkspace } from '../MapWorkspaceContext'
 
 type ToolbarMenuProps = {

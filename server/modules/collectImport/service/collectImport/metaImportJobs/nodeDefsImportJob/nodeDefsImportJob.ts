@@ -1,28 +1,26 @@
-import type { ArenaNodeDefEntity, ArenaAnyNodeDef, ArenaNodeDefMap, NodeDefType } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity, ArenaNodeDefMap, NodeDefType } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
-
-import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Category from '@core/survey/category'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
-
+import { uuidv4 } from '@core/uuid'
 import Job, { type JobParams } from '@server/job/job'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
 import * as CollectSurvey from '../../model/collectSurvey'
 import NodeDefUniqueNameGenerator from '../../model/nodeDefUniqueNameGenerator'
+
 import { CollectExpressionConverter } from './collectExpressionConverter'
-import { parseValidationRules } from './validationRuleParser'
 import { parseDefaultValues } from './defaultValueParser'
+import { parseValidationRules } from './validationRuleParser'
 
 const specifyAttributeNameSuffix = '_specify'
 const specifyAttributeLabelSuffix = ' (Specify)'

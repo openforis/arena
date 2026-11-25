@@ -3,6 +3,7 @@
  */
 import { VALIDATION_ERRORS_PROMPT } from '../prompts/validationErrors'
 import type { AssistantSuggestion } from '../types'
+
 import { formatSuggestionCount } from './formatSuggestionCount'
 import type { SuggestionDefinition, SuggestionDescribeContext } from './types'
 

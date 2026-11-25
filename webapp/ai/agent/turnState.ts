@@ -4,8 +4,6 @@
 import type { AiDataClass } from '@common/ai/features'
 import { toRowContextDisplayText } from '@common/ai/prompts/cleaningRowContext'
 import { uuidv4 } from '@core/uuid'
-
-import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { toConversationTitle } from '@webapp/ai/conversations/conversationModel'
 import { escalateConversationDataClass, isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
@@ -16,6 +14,7 @@ import type {
   Conversation,
   UserMessage,
 } from '@webapp/ai/conversations/types'
+import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 
 export type TurnState = {
   get: () => Conversation

@@ -3,10 +3,9 @@ import './RecentActivitySection.scss'
 import { useCallback, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button, LoadingBar } from '@webapp/components'
 import AiActivityLogSummaryModal from '@webapp/components/ai/AiActivityLogSummaryModal'
-import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useOnIntersect } from '@webapp/components/hooks'
@@ -14,9 +13,9 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { TestId } from '@webapp/utils/testId'
-
 import { ActivityLogMessage, useActivityLog } from '../ActivityLog/store'
 import { DashboardSection } from '../components/DashboardSection'
+
 import { RecentActivityRow } from './RecentActivityRow'
 
 // Position from the end of the list whose row triggers loading older messages

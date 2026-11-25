@@ -2,11 +2,9 @@ import { useCallback } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { useSurveyCycleKey } from '@webapp/store/survey'
-
-import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/ButtonGroup'
+import { FormItem } from '@webapp/components/form/Input'
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import { State, useNodeDefEditReadOnly } from './store'
 

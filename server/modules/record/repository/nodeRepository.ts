@@ -1,15 +1,13 @@
-import { Dates, type ArenaNodeDefEntity, type ArenaRecordNode } from '@openforis/arena-core'
+import { type ArenaNodeDefEntity, type ArenaRecordNode, Dates } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
-
 import * as A from '@core/arena'
+import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
-
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 

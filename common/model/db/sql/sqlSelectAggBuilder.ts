@@ -1,11 +1,12 @@
-import * as Survey from '../../../../core/survey/survey'
-import * as NodeDef from '../../../../core/survey/nodeDef'
 import * as StringUtils from '../../../../core/stringUtils'
-import SystemError, { StatusCodes } from '../../../../core/systemError'
 import { AggregateFunctionExpression } from '../../../../core/survey/aggregateFunctionExpression'
-import { ColumnNodeDef } from '../tables/dataNodeDef'
+import * as NodeDef from '../../../../core/survey/nodeDef'
+import * as Survey from '../../../../core/survey/survey'
+import SystemError, { StatusCodes } from '../../../../core/systemError'
 import { Query } from '../../query'
+import { ColumnNodeDef } from '../tables/dataNodeDef'
 import type ViewDataNodeDef from '../views/dataNodeDef/view'
+
 import SqlSelectBuilder from './sqlSelectBuilder'
 
 const sqlFunctionByAggregateFunction: Record<string, string> = {

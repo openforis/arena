@@ -1,17 +1,16 @@
 import { useCallback } from 'react'
 
+import * as Chain from '@common/analysis/chain'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
-import * as Chain from '@common/analysis/chain'
-
+import { Accordion } from '@webapp/components'
+import ButtonRStudio from '@webapp/components/ButtonRStudio'
+import { Checkbox } from '@webapp/components/form'
+import { useAppDispatch } from '@webapp/store'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { Accordion } from '@webapp/components'
-import { Checkbox } from '@webapp/components/form'
-import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
 import RecordsDropdown from './RecordsDropdown'
-import { useAppDispatch } from '@webapp/store'
 
 type ChainRStudioPanelProps = {
   updateChain: (...args: any[]) => any

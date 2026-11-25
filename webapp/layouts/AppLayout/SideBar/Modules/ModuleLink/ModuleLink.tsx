@@ -1,9 +1,8 @@
-import { Link } from 'react-router'
 import classNames from 'classnames'
+import { Link } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import * as SideBarModule from '../utils'
 
 type ModuleLinkProps = {

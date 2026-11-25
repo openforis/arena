@@ -1,12 +1,10 @@
-import type { ArenaSurvey, ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
-import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
 
 import { Schemata, TableDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
+import * as A from '@core/arena'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { db, DbClient } from '@server/db/db'
 
 /**

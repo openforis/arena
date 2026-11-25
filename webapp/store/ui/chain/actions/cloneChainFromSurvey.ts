@@ -1,5 +1,5 @@
-import * as API from '@webapp/service/api'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import * as API from '@webapp/service/api'
 import { SurveyActions, SurveyState } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'

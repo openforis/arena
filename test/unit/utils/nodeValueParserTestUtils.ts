@@ -1,5 +1,4 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
 import * as SB from '@test/utils/surveyBuilder'
 
 /**

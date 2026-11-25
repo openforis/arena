@@ -2,7 +2,6 @@ import { useState } from 'react'
 import classNames from 'classnames'
 
 import * as ProcessUtils from '@core/processUtils'
-
 import Markdown from '@webapp/components/Markdown'
 import { useI18nT } from '@webapp/store/system'
 

@@ -1,12 +1,10 @@
 // test/unit/tests/254aiTranslateAllLabels.test.ts
+import { AiLimits } from '@common/ai/limits'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
-import { AiLimits } from '@common/ai/limits'
-
 import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { buildTranslationItems, runTranslateAllLabels } from '@webapp/ai/workflows/translateAllLabels'
-
 import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-ai-translate-all-labels-user' }

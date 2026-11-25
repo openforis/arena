@@ -1,20 +1,17 @@
 import { ArenaServer } from '@openforis/arena-server'
 
-import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
+import { uuidv4 } from '@core/uuid'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
-import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import { FileImportBaseJob } from '@server/modules/arenaImport/service/arenaImport/jobs/filesImportBaseJob'
 import SurveyFilesImportJob from '@server/modules/arenaImport/service/arenaImport/jobs/surveyFilesImportJob'
-
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
+import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SB from '../../utils/surveyBuilder'
-
 import { getContextUser } from '../config/context'
 
 describe('Survey files export/import - branding and doc-layout images, area of interest', () => {

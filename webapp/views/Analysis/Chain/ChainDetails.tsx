@@ -3,26 +3,23 @@ import './ChainDetails.scss'
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
+import * as Chain from '@common/analysis/chain'
 import * as A from '@core/arena'
-
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import * as Chain from '@common/analysis/chain'
-
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
-import { useSurvey } from '@webapp/store/survey'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-
+import { ButtonEditLockToggle } from '@webapp/components'
 import { useLocationPathMatcher, useOnBrowserBack, useOnPageUnload, useQuery } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/TabBar'
-import { ButtonEditLockToggle } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
+import { useSurvey } from '@webapp/store/survey'
+import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import AdvancedFunctionsMenu from './AdvancedFunctionsMenu'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
-import { useAppDispatch } from '@webapp/store'
 
 const ChainDetails = () => {
   const dispatch = useAppDispatch()

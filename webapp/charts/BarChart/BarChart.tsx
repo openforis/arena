@@ -1,9 +1,7 @@
 import { useCallback } from 'react'
-
-import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, Tooltip, Legend } from 'recharts'
+import { Bar, BarChart as ReChartsBarChart, Legend, Rectangle, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { Colors } from '@webapp/utils/colors'
-
 import { CartesianGrid, ChartWrapper, RotatedCustomAxisTick } from '../common'
 
 const layouts = {

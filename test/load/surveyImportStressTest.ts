@@ -4,20 +4,20 @@ import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { parseConfig, HELP_TEXT, type ParseConfigResult, type StressTestConfig } from './lib/config.ts'
+import { HELP_TEXT, parseConfig, type ParseConfigResult, type StressTestConfig } from './lib/config.ts'
 import {
-  login,
-  importSurveyZip,
-  getJobStatus,
-  deleteSurvey,
-  fetchSurveysByNamePrefix,
   createUser,
+  deleteSurvey,
   deleteUser,
   type FetchImpl,
+  fetchSurveysByNamePrefix,
+  getJobStatus,
+  importSurveyZip,
   type Job,
+  login,
 } from './lib/httpApi.ts'
-import { buildLoadTestUserCredentials, type UserCredentials } from './lib/userProvisioning.ts'
 import { formatSummary, type Outcome, type ResultEntry } from './lib/report.ts'
+import { buildLoadTestUserCredentials, type UserCredentials } from './lib/userProvisioning.ts'
 
 const JOB_POLL_INTERVAL_MS = 1000
 const MAX_CONSECUTIVE_POLL_ERRORS = 3

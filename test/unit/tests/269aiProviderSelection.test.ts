@@ -1,5 +1,5 @@
 import type { AiPolicy } from '@common/ai/policy'
-
+import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 import { getAiUnavailableActions } from '@webapp/ai/engines/engineUi'
 import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
@@ -10,7 +10,6 @@ import {
 } from '@webapp/ai/engines/resolveModel'
 import { getEffectiveProviderId, selectEngine } from '@webapp/ai/engines/selectEngine'
 import type { AiCapabilities, AiEngine, AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
-import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 
 const CLOUD: AiPolicy = { schema: 'cloud', data: 'cloud' }
 const LOCAL_URL = 'http://localhost:1234/v1'

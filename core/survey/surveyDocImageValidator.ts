@@ -1,16 +1,16 @@
+import {
+  type ArenaSurvey,
+  type ArenaSurveyDocImage,
+  ArenaValidationResult,
+  NodeDefExpressionValidator,
+  surveyDocImagePropKeys as propKeys,
+  SurveyDocImages,
+} from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-
-import {
-  NodeDefExpressionValidator,
-  SurveyDocImages,
-  surveyDocImagePropKeys as propKeys,
-  ArenaValidationResult,
-  type ArenaSurveyDocImage,
-  type ArenaSurvey,
-} from '@openforis/arena-core'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 

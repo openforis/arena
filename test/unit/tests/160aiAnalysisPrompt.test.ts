@@ -1,10 +1,8 @@
-import * as Survey from '@core/survey/survey'
-
 import { buildAssistantAnalysisPrompt } from '@common/ai/prompts/assistantAnalysis'
 import { buildDataQueryGeneratePrompt } from '@common/ai/prompts/dataQueryGenerate'
-
-import * as DataTest from '../../utils/dataTest'
+import * as Survey from '@core/survey/survey'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 // keep in sync with CANNED_ANSWERS in server/modules/ai/service/mockProvider.ts
 const cannedAnswerPatterns = [

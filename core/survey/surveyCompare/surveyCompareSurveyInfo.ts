@@ -1,8 +1,8 @@
+import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
-import * as SurveyFile from '@core/survey/surveyFile'
 import * as SurveyBranding from '@core/survey/surveyBranding'
-import * as ObjectUtils from '@core/objectUtils'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 import {
   SurveyCompareApplicabilityStatus,

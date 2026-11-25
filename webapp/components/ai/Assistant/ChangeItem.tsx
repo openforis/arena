@@ -4,18 +4,18 @@ import type { OperationConflict, OperationResult } from '@webapp/ai/changeSets/t
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import type { CardValue } from './changeSetCardModel'
 import { CardValueView } from './CardValueView'
 import {
   getCategoryUuid,
   getConflictReasonText,
   getItemDetailLines,
-  getItemLang,
   getItemKind,
+  getItemLang,
   getResultTitle,
   hasCardValue,
   isCategoryItem,
 } from './changeItemModel'
+import type { CardValue } from './changeSetCardModel'
 import type { ReviewItem } from './changeSetReviewModel'
 
 /**

@@ -2,9 +2,7 @@ import { DB } from '@openforis/arena-server'
 
 import * as User from '@core/user/user'
 import * as WhatsNew from '@core/whatsNew/whatsNew'
-
 import type { ServerOnlyPrefsKey } from '@server/modules/user/serverOnlyPrefs'
-
 import { TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 
 export type TestUser = {

@@ -1,21 +1,20 @@
 import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
-import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-
 import { buildRowContextDraft } from '@common/ai/prompts/cleaningRowContext'
+import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
+import * as Survey from '@core/survey/survey'
 import { toValidationListItems } from '@webapp/ai/tools/cleaning/validationList'
 import { useNotifyWarning } from '@webapp/components/hooks'
 import { DataExplorerState } from '@webapp/store/dataExplorer'
 import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanCleanseRecords, useUser } from '@webapp/store/user'
-
 import type { AssistantAreaStatus } from '../assistantAreas'
-import { useAssistantFeatureAvailability } from '../useAssistantFeatureAvailability'
 import { assistantPanelStore } from '../assistantPanelStore'
 import { assistantTurnRegistry } from '../assistantTurnRegistry'
+import { useAssistantFeatureAvailability } from '../useAssistantFeatureAvailability'
+
 import { getCleaningAreaStatus } from './cleaningArea'
 
 /**

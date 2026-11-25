@@ -1,12 +1,11 @@
 import './RecordMergePreviewModal.scss'
 
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
-
 import { Button, ResizableModal } from '@webapp/components'
 import RecordEditor from '@webapp/components/survey/Record'
-import { useRecord } from '@webapp/store/ui/record'
-import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useRecord } from '@webapp/store/ui/record'
 
 const initialHeight = 600
 const initialWidth = 1000

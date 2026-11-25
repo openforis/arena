@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { AiLimits } from '@common/ai/limits'
-
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { Button, ButtonIconDelete } from '@webapp/components/buttons'
 import { useConfirm, useNotifyError } from '@webapp/components/hooks'

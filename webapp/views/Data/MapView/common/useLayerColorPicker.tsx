@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 
 import { isHexColor } from '@core/colorUtils'
 import { escapeHtml } from '@core/stringUtils'
-
 import { useI18n } from '@webapp/store/system'
 
 /**

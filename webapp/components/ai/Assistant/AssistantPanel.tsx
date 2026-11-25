@@ -1,29 +1,29 @@
 import './Assistant.scss'
 
 import React, { useCallback, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import { useNavigate } from 'react-router'
 
+import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
-import { ButtonIconAdd, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
+import { ButtonIconAdd, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
+import { type AssistantArea, type AssistantAreaStatus, getTabAreas, isTabBarShown } from './assistantAreas'
 import { AssistantChat } from './AssistantChat'
 import { AssistantHistory } from './AssistantHistory'
-import { AssistantStartScreen } from './AssistantStartScreen'
-import { AssistantSuggestionList } from './AssistantSuggestionList'
-import { getTabAreas, isTabBarShown, type AssistantArea, type AssistantAreaStatus } from './assistantAreas'
 import { closeAssistantPanel } from './assistantPanelActions'
 import { assistantPanelStore, type AssistantPanelView } from './assistantPanelStore'
-import { useAssistantConversation, type AssistantConversationApi } from './useAssistantConversation'
-import { useAssistantPanel } from './useAssistantPanel'
+import { AssistantStartScreen } from './AssistantStartScreen'
+import { AssistantSuggestionList } from './AssistantSuggestionList'
 import type { SuggestionsByArea } from './suggestions/suggestionsModel'
 import { useVisibleSuggestions } from './suggestions/useVisibleSuggestions'
+import { type AssistantConversationApi, useAssistantConversation } from './useAssistantConversation'
+import { useAssistantPanel } from './useAssistantPanel'
 
 // the Record type makes a missing area a type error
 const areaTabLabelKeys: Record<AssistantArea, string> = {

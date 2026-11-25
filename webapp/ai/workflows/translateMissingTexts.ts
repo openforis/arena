@@ -2,22 +2,22 @@
  * The texts missing in a language (the rule of the "texts missing in <language>" suggestion), translated with the
  * calls of "AI: Translate labels": the chat batch of a Do it with many texts proposes them as one change set.
  */
-import * as NodeDef from '@core/survey/nodeDef'
 import { AiLimits } from '@common/ai/limits'
 import type { AiGenerateText } from '@common/ai/llm'
 import { translateItems } from '@common/ai/tasks/translation'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import { findTranslationSource, type TranslationSource } from '../changeSets/translationSource'
 import type { LabelKind } from '../changeSets/types'
 import {
-  TEXT_KINDS,
   getMissingLanguages,
   getSurveyLanguages,
   getTextNodeDefs,
+  TEXT_KINDS,
   toTextTargetKey,
 } from '../tools/design/missingTexts'
+
 import type { AiBatchGuard, AiBatchProgress } from './batchRun'
-import { TRANSLATION_BATCH_SIZE, translateRowsToLang, type TranslatedRows } from './translateAllLabels'
+import { type TranslatedRows, translateRowsToLang, TRANSLATION_BATCH_SIZE } from './translateAllLabels'
 
 // shortcut: one run takes at most this many texts (the review dialog of the card renders every change); the
 // suggestion shows again with the rest. Raise it when the review dialog is virtualised.

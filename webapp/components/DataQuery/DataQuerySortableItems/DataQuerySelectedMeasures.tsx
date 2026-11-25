@@ -1,13 +1,11 @@
 import { useCallback } from 'react'
 
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { Query } from '@common/model/query'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
-import { MeasureAggregateFunctionsButton } from './MeasureAggregateFunctionsButton'
 import { DataQuerySortableItems } from './DataQuerySortableItems'
+import { MeasureAggregateFunctionsButton } from './MeasureAggregateFunctionsButton'
 
 type DataQuerySelectedMeasuresProps = {
   nodeDefLabelType?: NodeDef.NodeDefLabelType

@@ -1,7 +1,7 @@
 import {
+  locationItemExtraDefName,
   samplingPointDataCategoryName,
   samplingPointDataWhispCategoryName,
-  locationItemExtraDefName,
 } from '@core/survey/category'
 
 export default {

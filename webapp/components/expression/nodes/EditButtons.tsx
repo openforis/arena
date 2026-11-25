@@ -1,5 +1,4 @@
 import * as Expression from '@core/expressionParser/expression'
-
 import { Button, ButtonDelete } from '@webapp/components/buttons'
 
 const EditButtons = (props) => {

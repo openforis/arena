@@ -1,35 +1,33 @@
-import * as A from '@core/arena'
-import { db, DbClient } from '@server/db/db'
-
 import {
-  NodeDefsFixer,
-  Objects,
-  type ArenaNodeDefPropsWithLayout,
-  type ArenaUser,
-  type ArenaSurvey,
-  type ArenaNodeDefEntity,
   ArenaAnyNodeDef,
-  type ArenaNodeDefPropsAdvanced,
-  type NodeDefType,
+  type ArenaNodeDefEntity,
   type ArenaNodeDefMap,
+  type ArenaNodeDefPropsAdvanced,
+  type ArenaNodeDefPropsWithLayout,
+  type ArenaSurvey,
+  type ArenaUser,
+  NodeDefsFixer,
+  type NodeDefType,
+  Objects,
 } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDef from '@core/survey/nodeDef'
+import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
-import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
+import * as Survey from '@core/survey/survey'
 import SystemError, { StatusCodes } from '@core/systemError'
-
-import * as ObjectUtils from '@core/objectUtils'
-
-import * as Log from '@server/log/log'
-import * as ActivityLog from '@common/activityLog/activityLog'
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as NodeDefRepository from '../repository/nodeDefRepository'
-import { markSurveyDraft } from '../../survey/repository/surveyRepository'
-import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import * as Log from '@server/log/log'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { markSurveyDraft } from '../../survey/repository/surveyRepository'
+import * as NodeDefRepository from '../repository/nodeDefRepository'
+
+import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
 
 const logger = Log.getLogger('NodeDefManager')
 

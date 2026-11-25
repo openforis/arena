@@ -1,7 +1,6 @@
+import AdmZip from 'adm-zip'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-
-import AdmZip from 'adm-zip'
 
 // Downloads the Arena Mobile web preview (release asset built by arena-mobile CI) into mobile-preview/,
 // served under /mobile-preview by the server and shown in the survey designer.

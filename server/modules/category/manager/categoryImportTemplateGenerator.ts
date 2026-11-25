@@ -1,17 +1,16 @@
 import {
+  type ArenaCategory,
+  type ArenaCategoryLevel,
+  type ArenaSurvey,
   PointFactory,
   Points,
-  type ArenaCategoryLevel,
-  type ArenaCategory,
-  type ArenaSurvey,
 } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
-
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { ExtraPropDef, type ExtraPropDefItem } from '@core/survey/extraPropDef'
+import * as Survey from '@core/survey/survey'
 
 const generateCategoryTemplate = () => {
   let category = Category.newCategory({ [Category.keysProps.name]: 'template' })

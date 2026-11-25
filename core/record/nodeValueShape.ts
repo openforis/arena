@@ -2,11 +2,11 @@
  * Shape and size of the value of an attribute, per attribute type: what the forms and the importers store. Used to
  * refuse a value written by the batch record edit that no form could have produced.
  */
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+import * as DateUtils from '@core/dateUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import { valuePropsCode, valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
-import * as DateUtils from '@core/dateUtils'
 import { isUuid } from '@core/uuid'
-import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
 type ShapeCheck = (value: unknown, nodeDef?: any) => boolean
 type PlainObject = Record<string, unknown>

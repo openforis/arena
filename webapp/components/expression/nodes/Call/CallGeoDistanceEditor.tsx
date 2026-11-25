@@ -2,13 +2,12 @@ import { useCallback, useState } from 'react'
 
 import { Arrays } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
-
+import * as NodeDef from '@core/survey/nodeDef'
 import { Button } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
-
 import Identifier from '../Identifier'
+
 import type { CallEditorProps } from './callEditorProps'
 
 const variablesFilterFn = (variable) => variable.root || [NodeDef.nodeDefType.coordinate].includes(variable.nodeDefType)

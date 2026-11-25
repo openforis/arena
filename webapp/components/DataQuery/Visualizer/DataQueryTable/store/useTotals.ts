@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { Query, Sort } from '@common/model/query'
-
 import { useFetchData } from '@webapp/components/DataQuery/store/actions/useFetchData'
 
 type TotalsState = { data?: Record<string, unknown>[] | null } | null

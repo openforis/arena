@@ -1,7 +1,6 @@
 import { type RefObject, useEffect } from 'react'
 
 import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilterCategories'
-
 import { Checkbox } from '@webapp/components/form'
 
 const customValidationCategoryId = 'customValidation'

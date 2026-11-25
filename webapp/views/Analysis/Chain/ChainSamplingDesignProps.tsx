@@ -1,17 +1,14 @@
 import { useCallback } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
-
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
-
-import { useSurvey } from '@webapp/store/survey'
-import { useChain, useChainEditable } from '@webapp/store/ui/chain'
-
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { useSurvey } from '@webapp/store/survey'
+import { useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import BaseUnitSelector from './BaseUnitSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'

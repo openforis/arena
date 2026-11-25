@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
+import { readSuggestionState, waitForSuggestionDetectors } from '../helpers/aiStorage'
 import {
   assistantPanel,
   lastAssistantAnswer,
@@ -11,7 +11,6 @@ import {
   selectAssistantArea,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
-import { readSuggestionState, waitForSuggestionDetectors } from '../helpers/aiStorage'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 

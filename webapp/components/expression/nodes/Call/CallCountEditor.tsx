@@ -1,7 +1,7 @@
 import * as Expression from '@core/expressionParser/expression'
 
-import { CallSingleParameterEditor } from './CallSingleParameterEditor'
 import type { CallEditorProps } from './callEditorProps'
+import { CallSingleParameterEditor } from './CallSingleParameterEditor'
 
 export const CallCountEditor = (props: CallEditorProps) => {
   const { expressionNode, onConfirm, variables } = props

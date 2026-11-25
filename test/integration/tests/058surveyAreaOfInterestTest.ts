@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
-import { Objects, type ArenaSurveyFile } from '@openforis/arena-core'
+import { type ArenaSurveyFile, Objects } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
@@ -11,18 +11,15 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyFile from '@core/survey/surveyFile'
-
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-
-import { getContextUser } from '../config/context'
-
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // The areas of interest are stored as survey files: the server provider reads them when records are evaluated.
 

@@ -1,11 +1,10 @@
-import { applyChangeSet, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import { cleaningTestSurvey } from '@test/unit/utils/aiCleaningTestUtils'
+import { type ApplierDeps, applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
+import { describeOperation } from '@webapp/ai/changeSets/describeOperation'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
-import { describeOperation } from '@webapp/ai/changeSets/describeOperation'
 import { RECORD_ATTRIBUTE_UPDATE } from '@webapp/ai/changeSets/recordEdits/types'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
-
-import { cleaningTestSurvey } from '@test/unit/utils/aiCleaningTestUtils'
 
 const changeSet: ChangeSet = {
   id: 'cs',

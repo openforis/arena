@@ -3,7 +3,6 @@
  * the server and translated with the calls of "AI: Translate labels": the chat batch of its Do it proposes them as one
  * change set.
  */
-import * as StringUtils from '@core/stringUtils'
 import {
   CATEGORY_ITEM_LABEL_TEXT_MAX,
   MISSING_LABELS_SERVER_PAGE_MAX,
@@ -12,16 +11,17 @@ import {
 import { AiLimits } from '@common/ai/limits'
 import type { AiGenerateText } from '@common/ai/llm'
 import { translateItems } from '@common/ai/tasks/translation'
-
+import * as StringUtils from '@core/stringUtils'
 import {
-  fetchMissingLabelsPage,
   type FetchMissingLabelsPage,
+  fetchMissingLabelsPage,
 } from '../changeSets/categoryItemLabels/categoryItemLabelsApi'
 import { CATEGORY_ITEM_LABEL_SET } from '../changeSets/categoryItemLabels/types'
 import { findTranslationSource, type TranslationSource } from '../changeSets/translationSource'
 import type { ChangeOperationDraft } from '../changeSets/types'
+
 import type { AiBatchGuard, AiBatchProgress, AiBatchStop } from './batchRun'
-import { TRANSLATION_BATCH_SIZE, translateRowsToLang } from './translateAllLabels'
+import { translateRowsToLang, TRANSLATION_BATCH_SIZE } from './translateAllLabels'
 
 // shortcut: one run takes at most this many items (the review dialog of the card renders every change); the
 // suggestion shows again with the rest. Raise it when the review dialog is virtualised.

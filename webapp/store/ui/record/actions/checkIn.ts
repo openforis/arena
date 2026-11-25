@@ -1,16 +1,15 @@
-import * as A from '@core/arena'
 import axios from 'axios'
 
 import { Dates } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
+import * as A from '@core/arena'
 import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
-
-import { I18nState } from '@webapp/store/system'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import { SurveyState } from '@webapp/store/survey'
+import { I18nState } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
 
 import * as ActionTypes from './actionTypes'

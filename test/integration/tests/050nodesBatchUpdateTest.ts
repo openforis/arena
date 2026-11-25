@@ -1,35 +1,29 @@
-import { db } from '@server/db/db'
-
+import * as ActivityLog from '@common/activityLog/activityLog'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as ObjectUtils from '@core/objectUtils'
 import * as ProcessUtils from '@core/processUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import * as ObjectUtils from '@core/objectUtils'
-import * as ActivityLog from '@common/activityLog/activityLog'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-
+import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { requireRecordCleansePermission, requireSurveyViewPermission } from '@server/modules/auth/authApiMiddleware'
+import * as RecordApi from '@server/modules/record/api/recordApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { updateNodesBatch } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
-
-import { getContextUser } from '../config/context'
-
-import * as RecordApi from '@server/modules/record/api/recordApi'
-import { requireRecordCleansePermission, requireSurveyViewPermission } from '@server/modules/auth/authApiMiddleware'
-
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { createFakeResponse } from '../../unit/utils/fakeExpress'
-
-import { collectRoutes } from '../../utils/routeUtils'
-import * as SB from '../../utils/surveyBuilder'
+import { createInProcessNodesBatchServiceDeps, TestRecordsUpdateThread } from '../../utils/nodesBatchTestUtils'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-import { createInProcessNodesBatchServiceDeps, TestRecordsUpdateThread } from '../../utils/nodesBatchTestUtils'
+import { collectRoutes } from '../../utils/routeUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 describe('Batch record edit (POST /records/nodes/update)', () => {
   let user: any

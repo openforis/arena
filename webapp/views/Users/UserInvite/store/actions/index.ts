@@ -1,5 +1,5 @@
-import { useOnUpdate } from './useOnUpdate'
 import { useOnInvite } from './useOnInvite'
+import { useOnUpdate } from './useOnUpdate'
 
 export const useActions = ({ userInvite, setUserInvite }) => ({
   onUpdate: useOnUpdate({ userInvite, setUserInvite }),

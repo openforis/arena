@@ -1,7 +1,7 @@
-import fs, { promises as fsp } from 'node:fs'
-import type { Readable } from 'node:stream'
 import { ncp } from 'ncp'
+import fs, { promises as fsp } from 'node:fs'
 import { join } from 'node:path'
+import type { Readable } from 'node:stream'
 
 import * as ProcessUtils from '@core/processUtils'
 import { isUuid, uuidv4 } from '@core/uuid'

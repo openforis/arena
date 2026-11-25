@@ -1,6 +1,6 @@
 import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
-import { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 
+import { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 import {
   createRecordEvaluationContext,
   RecordProvidersDefault,

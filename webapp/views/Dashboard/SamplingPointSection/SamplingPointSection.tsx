@@ -1,5 +1,4 @@
 import { TestId } from '@webapp/utils/testId'
-
 import { DashboardSection } from '../components/DashboardSection'
 import SamplingPointDataSummary from '../SamplingPointDataSummary'
 

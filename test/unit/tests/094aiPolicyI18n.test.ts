@@ -1,6 +1,5 @@
-import { createI18nAsync } from '@core/i18n/i18nFactory'
 import * as ActivityLog from '@common/activityLog/activityLog'
-
+import { createI18nAsync } from '@core/i18n/i18nFactory'
 import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES as languages, RESOURCES as resources } from '../utils/i18nParity'
 
 const errorKeys = ['aiPolicyRefused', 'aiPolicyInvalid', 'aiPolicyAboveCeiling', 'aiPolicyDataAboveSchema']

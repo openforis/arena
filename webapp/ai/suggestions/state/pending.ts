@@ -2,8 +2,9 @@
  * The pending suggestions of a bucket: read, replace, add (event detectors) and remove.
  */
 import type { AssistantSuggestion, SuggestionTarget } from '../types'
+
 import { own, setEntry } from './records'
-import { toBucket, type SuggestionUserState } from './types'
+import { type SuggestionUserState, toBucket } from './types'
 
 /**
  * Returns the pending suggestions of a bucket.

@@ -1,6 +1,6 @@
-import * as Validator from '@core/validation/validator'
-import * as Validation from '@core/validation/validation'
 import { User2FADevice } from '@core/user2FADevice'
+import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 const validateDevice = (existingDevices) => (device) =>
   Validator.validate(device, {

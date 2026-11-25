@@ -1,13 +1,12 @@
-import type { ArenaCategoryItem, ArenaTaxon } from '@openforis/arena-core'
 import type { Router } from 'express'
 
+import type { ArenaCategoryItem, ArenaTaxon } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import * as NodeDef from '@core/survey/nodeDef'
+import { contains, isBlank } from '@core/stringUtils'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
-import { isBlank, contains } from '@core/stringUtils'
-
 import SystemError from '@core/systemError'
 import * as Request from '@server/utils/request'
 import * as CategoryManager from '../../category/manager/categoryManager'

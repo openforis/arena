@@ -1,12 +1,12 @@
 import ExcelJS from 'exceljs'
+import type { Writable } from 'node:stream'
 
 import { Objects } from '@openforis/arena-core'
 
-import type { Writable } from 'node:stream'
-
-import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
-import { CsvField, CsvFieldItem } from './csvField'
 import { StreamUtils } from '../streamUtils'
+
+import { CsvField, CsvFieldItem } from './csvField'
+import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
 
 const headerCellStyle: Partial<ExcelJS.Style> = { font: { bold: true } }
 

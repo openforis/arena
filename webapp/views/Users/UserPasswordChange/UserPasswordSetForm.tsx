@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
-
+import * as Validation from '@core/validation/validation'
 import { PasswordInput, PasswordStrengthChecker } from '@webapp/components/form'
 import { FormItemWithValidation } from '@webapp/components/form/FormItemWithValidation'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'

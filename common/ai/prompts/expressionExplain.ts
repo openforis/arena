@@ -4,11 +4,10 @@
  * rendering verbatim into a side panel.
  */
 import * as ExpressionParser from '@core/expressionParser/expression'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { pq } from './promptSafety'
 import { getSiblingNodeDefs } from './nodeDefContext'
+import { pq } from './promptSafety'
 
 const allowedFunctions = Object.keys(ExpressionParser.functionNames || {})
 

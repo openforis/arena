@@ -2,16 +2,15 @@ import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
-
 import { getCurrentNodeDefs } from '../common/nodeDefLookup'
 import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { getResultBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
-import { getNodeDefPathNames, requireNodeDefByName, requireSurvey, toExpressionView } from './surveyLookup'
+
 import { getNodeDefIssues } from './surveyGetValidation'
+import { getNodeDefPathNames, requireNodeDefByName, requireSurvey, toExpressionView } from './surveyLookup'
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
 

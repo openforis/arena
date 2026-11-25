@@ -11,7 +11,6 @@ import {
   resolveAiAccessLevel,
 } from '@common/ai/accessLevel'
 import { AiFeatureCategory } from '@common/ai/features'
-
 import { FEATURE_GROUPS } from '@webapp/components/ai/UserAiSettingsPanel/featureGroups'
 
 const allOff = Object.fromEntries(Object.values(AiFeatureCategory).map((category) => [category, false])) as Record<

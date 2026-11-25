@@ -1,8 +1,8 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
 
-import { CallSingleParameterEditor } from './CallSingleParameterEditor'
 import type { CallEditorProps } from './callEditorProps'
+import { CallSingleParameterEditor } from './CallSingleParameterEditor'
 
 const numericVarFilterFn = (variable) =>
   variable.root || [NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(variable.nodeDefType)

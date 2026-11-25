@@ -1,4 +1,5 @@
 import { JobRepository } from '@openforis/arena-server'
+
 import { _notifyJobUpdateForTest as _notifyJobUpdate } from '../../../server/job/jobThreadExecutor'
 
 describe('jobThreadExecutor DB persistence', () => {

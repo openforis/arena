@@ -1,7 +1,13 @@
 import { MockLanguageModelV4 } from 'ai/test'
 
 import { buildConversationTitleInstruction } from '@common/ai/prompts/assistantConversationTitle'
-
+import {
+  cloudAccess,
+  createToolContext,
+  scriptedModel,
+  textStream,
+  toolCallStream,
+} from '@test/unit/utils/assistantTestUtils'
 import { buildAssistantSystemPrompt } from '@webapp/ai/agent/assistantSystemPrompt'
 import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { cleanConversationTitle, createConversation } from '@webapp/ai/conversations/conversationModel'
@@ -10,13 +16,6 @@ import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { conversationSetTitleTool } from '@webapp/ai/tools/common/conversationSetTitle'
 import { getTools, runTool } from '@webapp/ai/tools/registry'
 import { isHiddenToolPart } from '@webapp/components/ai/Assistant/assistantPanelModel'
-import {
-  cloudAccess,
-  createToolContext,
-  scriptedModel,
-  textStream,
-  toolCallStream,
-} from '@test/unit/utils/assistantTestUtils'
 
 const titleCallStream = (title: string): any => toolCallStream('c1', 'conversation_setTitle', { title })
 

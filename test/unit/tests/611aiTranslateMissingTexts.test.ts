@@ -1,23 +1,22 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
+import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
+import { createDetectorContext, withSavedNodeDefs, withTexts } from '@test/unit/utils/designSuggestionTestUtils'
 import { runSuggestionBatchTurn } from '@webapp/ai/agent/runSuggestionBatchTurn'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, ConversationToolPart } from '@webapp/ai/conversations/types'
 import { detectMissingTranslations } from '@webapp/ai/suggestions/detectors/missingTranslations'
 import {
+  getSuggestionBatchKind,
+  getSuggestionBatchToolKind,
   MISSING_TRANSLATIONS_CHAT_MAX,
   NEW_ENTRIES_DESCRIPTIONS_CHAT_MAX,
   SUGGESTION_BATCH_TOOL_NAMES,
-  getSuggestionBatchKind,
-  getSuggestionBatchToolKind,
-  withRemainingTime,
   type SuggestionBatchKind,
+  withRemainingTime,
 } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import { missingTextsTranslateTool, runBatchTool } from '@webapp/ai/tools/design/batchTools'
 import { buildMissingTextRows, runTranslateMissingTexts } from '@webapp/ai/workflows/translateMissingTexts'
-import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
-import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
-import { createDetectorContext, withSavedNodeDefs, withTexts } from '@test/unit/utils/designSuggestionTestUtils'
 
 const generateText = async () => ''
 const noGuard = async () => {}

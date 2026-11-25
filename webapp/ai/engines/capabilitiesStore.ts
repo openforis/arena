@@ -1,12 +1,11 @@
 /**
  * App instance of the AI capabilities store (current user, browser fetch, localStorage, shared settings cache).
  */
-import * as User from '@core/user/user'
 import { isLocalProviderId } from '@common/ai/providerIds'
-
+import * as User from '@core/user/user'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { isAiSettingsFetchError } from '@webapp/components/ai/hooks/aiSettingsCache'
 import { fetchAiSettingsOnce, invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
-import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { store as reduxStore } from '@webapp/store/store'
 import { UserState } from '@webapp/store/user'
 

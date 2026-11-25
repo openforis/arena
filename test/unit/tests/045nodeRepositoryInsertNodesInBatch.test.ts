@@ -1,7 +1,7 @@
 import pgPromise from 'pg-promise'
-import type { DbClient } from '@server/db/db'
 
 import * as Node from '@core/record/node'
+import type { DbClient } from '@server/db/db'
 import { insertNodesInBatch } from '@server/modules/record/repository/nodeRepository'
 
 const pgp = pgPromise()

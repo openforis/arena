@@ -1,14 +1,12 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import { toKeyText } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
-import { isPointInBounds, type LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
-
-import type { ActiveLayer, MapLayerPoint } from '@webapp/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type {
   LatLngLiteral,
   ScreenshotPlotCandidate,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { isPointInBounds, type LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
+import type { ActiveLayer, MapLayerPoint } from '@webapp/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 
 // the points of an active layer of Data › Map (the Records tab) that is a location attribute of a plot entity
 export type PlotLayer = {

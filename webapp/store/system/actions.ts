@@ -1,12 +1,12 @@
 import * as User from '@core/user/user'
 import analytics from '@webapp/service/analytics'
 import * as API from '@webapp/service/api'
-
 import { showJobMonitor } from '../app/job/actions'
-import { useI18n } from './i18n'
 import { MessageNotificationActions } from '../ui/messageNotification'
 import { NotificationActions } from '../ui/notification'
+
 import { SystemActionTypes } from './actionTypes'
+import { useI18n } from './i18n'
 
 export const initSystem = () => async (dispatch) => {
   try {

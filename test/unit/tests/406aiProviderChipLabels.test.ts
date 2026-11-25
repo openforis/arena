@@ -1,6 +1,6 @@
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
-import { getHostingIconClass, NEUTRAL_HOSTING_ICON } from '@webapp/components/ai/hostingIcons'
 import { getProviderChipFullLabel } from '@webapp/components/ai/Assistant/providerChip/providerChipModel'
+import { getHostingIconClass, NEUTRAL_HOSTING_ICON } from '@webapp/components/ai/hostingIcons'
 import { fakeT as t } from '../utils/fakeT'
 
 const ACCOUNT: AiProviderEntry = {

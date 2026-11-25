@@ -1,19 +1,16 @@
-import { useCallback, useEffect, type ReactElement } from 'react'
+import { type ReactElement, useCallback, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Survey from '@core/survey/survey'
-
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-
-import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { RecordState } from '@webapp/store/ui/record'
-
 import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { RecordState } from '@webapp/store/ui/record'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 type SurveyDefsLoaderProps = {
   children: ReactElement

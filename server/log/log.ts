@@ -1,5 +1,6 @@
-import path from 'node:path'
 import log4js from 'log4js'
+import path from 'node:path'
+
 import { ProcessEnv } from '@openforis/arena-server'
 
 // same file name used by arena-server (LOG_FILE_NAME), whose poller uploads it to S3

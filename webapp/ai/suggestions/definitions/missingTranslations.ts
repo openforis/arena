@@ -2,9 +2,9 @@
  * Card and prompt of the missing translations suggestion (missing translations).
  */
 import { getLanguageLabel } from '@core/app/languages'
-
 import { getSuggestionScopeKey } from '../detectors/designTargets'
 import { buildMissingTranslationsPrompt } from '../prompts/designPrompts'
+
 import type { SuggestionDefinition } from './types'
 
 /**

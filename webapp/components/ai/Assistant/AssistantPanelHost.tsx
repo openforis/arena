@@ -2,19 +2,18 @@ import React, { Suspense, useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
 
 import * as User from '@core/user/user'
-
 import { useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import { isAnalysisRoute } from './analysis/analysisArea'
-import { isCleaningRoute } from './cleaning/cleaningArea'
-import { useExplorerEditMode } from './cleaning/useCleaningArea'
 import { isAssistantShown, pickArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
 import { assistantTurnRegistry } from './assistantTurnRegistry'
+import { isCleaningRoute } from './cleaning/cleaningArea'
+import { useExplorerEditMode } from './cleaning/useCleaningArea'
+import { SuggestionsHost } from './suggestions/SuggestionsHost'
 import { useAssistantAreas } from './useAssistantAreas'
 import { useAssistantPanel } from './useAssistantPanel'
-import { SuggestionsHost } from './suggestions/SuggestionsHost'
 
 // the panel, the agent and the AI SDK load on the first open
 const AssistantPanel = React.lazy(() => import('./AssistantPanel'))

@@ -1,14 +1,11 @@
-import Job from '@server/job/job'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import SurveyCreatorJob from '@server/modules/odkImport/service/odkImport/metaImportJobs/surveyCreatorJob'
+import * as Survey from '@core/survey/survey'
+import Job from '@server/job/job'
 import CategoriesImportJob from '@server/modules/odkImport/service/odkImport/metaImportJobs/categoriesImportJob'
 import NodeDefsImportJob from '@server/modules/odkImport/service/odkImport/metaImportJobs/nodeDefsImportJob'
+import SurveyCreatorJob from '@server/modules/odkImport/service/odkImport/metaImportJobs/surveyCreatorJob'
 import * as XForm from '@server/modules/odkImport/service/odkImport/model/xform'
-
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { transportationXml } from '../../unit/tests/resources/transportationXform'
 import { getContextUser } from '../config/context'
 

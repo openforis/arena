@@ -1,6 +1,6 @@
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
-import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
+import * as Survey from '@core/survey/survey'
 
 import * as RecordUtils from './recordUtils'
 

@@ -1,5 +1,5 @@
-import { Objects, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaSurvey, ArenaSurveyNodeDefsIndex } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Objects, Surveys } from '@openforis/arena-core'
 
 // the arena-core index functions work on a survey: wrap the index alone in a survey-like object
 const toSurvey = (nodeDefsIndex: ArenaSurveyNodeDefsIndex): ArenaSurvey => ({ nodeDefsIndex }) as ArenaSurvey

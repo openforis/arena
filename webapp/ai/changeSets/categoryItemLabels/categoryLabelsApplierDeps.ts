@@ -1,9 +1,8 @@
 /**
  * CategoryLabelsApplierDeps on the app store: the request, the categories refresh and the suggestion event.
  */
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-
+import * as Survey from '@core/survey/survey'
 import type { SuggestionEvent } from '@webapp/ai/suggestions/detectors/types'
 import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import { surveyCategoryUpdated } from '@webapp/store/survey/actions/category'
@@ -11,7 +10,7 @@ import { resetSurveyDefs } from '@webapp/store/survey/actions/defs'
 import { metaUpdated } from '@webapp/store/survey/actions/metadata'
 
 import type { CategoryLabelsApplierDeps } from './applyCategoryItemLabels'
-import { putCategoryItemLabels, type PutCategoryItemLabels } from './categoryItemLabelsApi'
+import { type PutCategoryItemLabels, putCategoryItemLabels } from './categoryItemLabelsApi'
 
 /**
  * Creates the category dependencies of Apply.

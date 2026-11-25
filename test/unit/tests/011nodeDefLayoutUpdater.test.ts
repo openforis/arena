@@ -1,13 +1,11 @@
-import { uuidv4 } from '@core/uuid'
 import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
-
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import { getContextUser } from '../../integration/config/context'
-
 import * as DataTest from '../../utils/dataTest'
 
 const FORM_IN_NEW_PAGE_NAME = 'form_in_new_page'

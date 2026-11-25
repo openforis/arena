@@ -1,6 +1,5 @@
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
 
 const _isNodeDeleted = A.pipe(ActivityLog.getNodeDefUuid, A.isNil)
 

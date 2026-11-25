@@ -1,9 +1,9 @@
 import Job, { type JobParams } from '@server/job/job'
 
-import SurveyRdbSchemaCreationJob from './surveyRdbSchemaCreationJob'
+import RecordsUniquenessValidationJob from './recordsUniquenessValidationJob'
 import SurveyRdbDataTablesAndViewsCreationJob from './surveyRdbDataTablesAndViewsCreationJob'
 import SurveyRdbOlapDataTablesCreationJob from './surveyRdbOlapDataTablesCreationJob'
-import RecordsUniquenessValidationJob from './recordsUniquenessValidationJob'
+import SurveyRdbSchemaCreationJob from './surveyRdbSchemaCreationJob'
 
 export default class SurveyRdbCreationJob extends Job {
   static readonly type = 'SurveyRdbCreationJob'

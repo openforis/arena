@@ -1,20 +1,20 @@
-import type { MapServiceCapabilities } from '@core/map/customLayers/mapServiceCapabilities'
 import { MAP_CUSTOM_LAYERS_MAX } from '@core/map/customLayers/mapCustomLayer'
+import type { MapServiceCapabilities } from '@core/map/customLayers/mapServiceCapabilities'
 import {
   buildMapCustomLayers,
   canSubmit,
   createWmsDialogFormState,
   getAvailableFormats,
+  getLoadedTileUrl,
   getSubmitLabel,
   getSummary,
-  getLoadedTileUrl,
   getUrlLoadMode,
   isInsecureTileUrl,
   isLayerSelectable,
   toErrorMessage,
   type WmsDialogFormAction,
-  type WmsDialogFormState,
   wmsDialogFormReducer,
+  type WmsDialogFormState,
 } from '@webapp/components/MapContainer/workspace/customLayers/wms/wmsDialogForm'
 
 const wmsCapabilities: MapServiceCapabilities = {

@@ -2,13 +2,12 @@ import './SurveyAiPolicyEditor.scss'
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { aiPolicyDataClasses, type AiPolicy, type AiPolicyLevel } from '@common/ai/policy'
-
+import { type AiPolicy, aiPolicyDataClasses, type AiPolicyLevel } from '@common/ai/policy'
 import {
   fetchSurveyAiPolicy,
   invalidateSurveyAiPolicy,
-  updateSurveyAiPolicy,
   type SurveyAiPolicyClientState,
+  updateSurveyAiPolicy,
 } from '@webapp/ai/policy/surveyAiPolicyClient'
 import ButtonGroup from '@webapp/components/form/ButtonGroup'
 import { FormItem } from '@webapp/components/form/Input'

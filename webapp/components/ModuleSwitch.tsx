@@ -3,7 +3,7 @@ import './ModuleSwitch.scss'
 import React, { useEffect } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
 
-import { app, appModuleUri, type AppModule } from '@webapp/app/appModules'
+import { app, type AppModule, appModuleUri } from '@webapp/app/appModules'
 import { useIsInRoute } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 

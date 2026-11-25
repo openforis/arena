@@ -1,14 +1,15 @@
-import { Authorizer } from '@openforis/arena-core'
-import { StatusCodes } from '@core/systemError'
+import { useCallback } from 'react'
 
-import { SurveyActions } from '@webapp/store/survey'
-import { JobActions } from '@webapp/store/app'
+import { Authorizer } from '@openforis/arena-core'
+
 import * as JobSerialized from '@common/job/jobSerialized'
+import { StatusCodes } from '@core/systemError'
+import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
+import { JobActions } from '@webapp/store/app'
+import { SurveyActions } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useUser } from '@webapp/store/user'
-import * as API from '@webapp/service/api'
-import { useCallback } from 'react'
-import { useAppDispatch } from '@webapp/store'
 
 const sendSurveyCreateRequest = ({ newSurvey }) => {
   const { surveyId: cloneFromSurveyId } = newSurvey.cloneFrom || {}

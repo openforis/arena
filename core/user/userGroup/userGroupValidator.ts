@@ -1,10 +1,11 @@
 import type { ArenaUserGroup, ArenaUserGroupQualifier } from '@openforis/arena-core'
 
+import type { ValidatorFn } from '@core/validation/_validator/validatorFunctions'
+import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
+
 import * as UserGroup from './userGroup'
 import * as UserGroupQualifier from './userGroupQualifier'
-import * as Validator from '@core/validation/validator'
-import * as Validation from '@core/validation/validation'
-import type { ValidatorFn } from '@core/validation/_validator/validatorFunctions'
 
 /**
  * Like `Validator.validateItemPropUniqueness`, but excludes "self" from the comparison by occurrence

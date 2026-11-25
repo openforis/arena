@@ -1,8 +1,7 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as Survey from '@core/survey/survey'
 import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 describe('Survey.cloneNodeDef - meta hierarchy', () => {
   let user

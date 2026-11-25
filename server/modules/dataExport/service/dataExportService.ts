@@ -1,9 +1,11 @@
 import type { ArenaUser } from '@openforis/arena-core'
+
 import * as JobManager from '@server/job/jobManager'
+import type { DataExportOptions, DataMatrixExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
+
 import DataExportJob from './dataExportJob'
 import DataMatrixExportJob from './dataMatrixExportJob'
 import DataSummaryExportJob from './dataSummaryExportJob'
-import type { DataExportOptions, DataMatrixExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 
 export const startCsvDataExportJob = ({
   user,

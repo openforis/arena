@@ -4,7 +4,6 @@ import classNames from 'classnames'
 
 import type { AiDataClass } from '@common/ai/features'
 import type { AiHostingClass } from '@common/ai/policy'
-
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'

@@ -1,10 +1,8 @@
 import * as Category from '@core/survey/category'
-
 import Job from '@server/job/job'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipArchiver } from '@server/utils/file/zipArchiver'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '../manager/categoryManager'
 
 export default class CategoriesExportJob extends Job {

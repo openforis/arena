@@ -5,12 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ArenaAreaOfInterest, ArenaAreaOfInterestDescriptor, ArenaValidation } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
+import * as StringUtils from '@core/stringUtils'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import { SurveyAreaOfInterestValidator } from '@core/survey/surveyAreaOfInterestValidator'
-import * as StringUtils from '@core/stringUtils'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
-
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useNotifyWarning } from '@webapp/components/hooks'

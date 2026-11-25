@@ -1,12 +1,11 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeSet, NodeDefCreateOperation } from '@webapp/ai/changeSets/types'
 import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefProposeCreate'
 import { runTool } from '@webapp/ai/tools/registry'
-import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
-import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
 

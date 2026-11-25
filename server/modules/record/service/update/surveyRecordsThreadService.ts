@@ -1,14 +1,13 @@
 import { ClusterBus, type ClusterEvent, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-
 import * as Log from '@server/log/log'
 import ThreadManager from '@server/threads/threadManager'
 
-import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
-import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
-import * as RecordSocketsMap from './recordSocketsMap'
 import { NodesBatchReplies } from './nodesBatch/nodesBatchReplies'
+import * as RecordSocketsMap from './recordSocketsMap'
+import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
+import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('SurveyRecordsThreadService')
 

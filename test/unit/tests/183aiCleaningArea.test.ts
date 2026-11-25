@@ -1,27 +1,12 @@
-import en from '@core/i18n/resources/en'
-import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
+import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import {
   buildRowContextDraft,
   cleaningRowContextMarker,
   parseRowContext,
   toRowContextDisplayText,
 } from '@common/ai/prompts/cleaningRowContext'
-
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
-import { normalizeLoadedConversation } from '@webapp/components/ai/Assistant/assistantPanelModel'
-import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
-import { analysisTools } from '@webapp/ai/tools/analysis'
-import { createCleaningTools } from '@webapp/ai/tools/cleaning'
-import { createAssistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
-import { pickArea, type AssistantAreaStatus } from '@webapp/components/ai/Assistant/assistantAreas'
-import {
-  getCleaningAreaStatus,
-  isCleaningRoute,
-  startsAsDataConversation,
-} from '@webapp/components/ai/Assistant/cleaning/cleaningArea'
-
+import en from '@core/i18n/resources/en'
 import {
   assistantCleaningMockScripts,
   formatMockProposalAnswer,
@@ -29,8 +14,20 @@ import {
   proposeRowFixInput,
 } from '@server/modules/ai/service/mock/mockScriptsCleaning'
 import { createMockModel } from '@server/modules/ai/service/mockProvider'
-
 import { cleaningTestSurvey, fakeI18n, newFakeCleaningApi } from '@test/unit/utils/aiCleaningTestUtils'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
+import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
+import { analysisTools } from '@webapp/ai/tools/analysis'
+import { createCleaningTools } from '@webapp/ai/tools/cleaning'
+import { type AssistantAreaStatus, pickArea } from '@webapp/components/ai/Assistant/assistantAreas'
+import { normalizeLoadedConversation } from '@webapp/components/ai/Assistant/assistantPanelModel'
+import { createAssistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
+import {
+  getCleaningAreaStatus,
+  isCleaningRoute,
+  startsAsDataConversation,
+} from '@webapp/components/ai/Assistant/cleaning/cleaningArea'
 
 const available = { status: 'available' } as any
 const hidden = { area: 'cleaning', status: 'hidden', reasonKeys: [] }

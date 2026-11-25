@@ -3,8 +3,8 @@
  * scanning the array, because the name index of a draft survey may be stale after a rename, and only current node
  * definitions count (a deleted one is not there for the user).
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 export type NodeDefLookupOptions = {
   // analysis attributes exist only for the users who see the analysis (default false)

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
 import { Button } from '@webapp/components/buttons'
+import { useI18n } from '@webapp/store/system'
 
 import { formatMarkerText, LogLine } from './systemLogLines'
 

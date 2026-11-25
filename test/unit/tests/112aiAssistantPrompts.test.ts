@@ -1,11 +1,10 @@
-import { getLanguageLabel } from '@core/app/languages'
-
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
+import { getLanguageLabel } from '@core/app/languages'
 import { mockAnswerFor } from '@server/modules/ai/service/mockProvider'
-import { HISTORY_NOTES_RULE, buildAssistantSystemPrompt, describeView } from '@webapp/ai/agent/assistantSystemPrompt'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { buildAssistantSystemPrompt, describeView, HISTORY_NOTES_RULE } from '@webapp/ai/agent/assistantSystemPrompt'
 
 const asPrompt = (content: string): any => [{ role: 'system', content }]
 

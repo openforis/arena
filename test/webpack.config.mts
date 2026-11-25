@@ -1,7 +1,6 @@
+import { globSync } from 'glob'
 import fs from 'node:fs'
 import path from 'node:path'
-
-import { globSync } from 'glob'
 import type { Configuration, ModuleOptions, ResolveOptions } from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 

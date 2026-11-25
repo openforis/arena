@@ -1,8 +1,8 @@
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import ExpressionEditor from '@webapp/components/expression/ExpressionEditor'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
-import type { ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
 type NodeDefSingleExpressionPropProps = {
   canBeConstant?: boolean

@@ -1,12 +1,11 @@
 import { Transform } from 'node:stream'
 
 import { Schemata } from '@common/model/db'
+import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as A from '@core/arena'
+import * as Expression from '@core/expressionParser/expression'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
-import * as Expression from '@core/expressionParser/expression'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-
 import { DbOrder } from '@server/db'
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'

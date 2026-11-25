@@ -9,8 +9,8 @@ import { useDispatch } from 'react-redux'
 import { getAiErrorMessage } from '@webapp/ai/workflows'
 import type { AiBatchProgress, AiBatchStop } from '@webapp/ai/workflows/batchRun'
 import { type BatchRunControl, createBatchRunControl, settleBatchRun } from '@webapp/ai/workflows/batchRunControl'
-import { NotificationActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { getBatchStopText } from './batchStopText'
 

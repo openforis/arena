@@ -1,8 +1,8 @@
 /**
  * What the settings panel shows after "Test connection" of the local AI server. Pure.
  */
-import type { AiHostingClass } from '@common/ai/policy'
 import { getLocalServerHostingClass, getTargetAddressSpace } from '@common/ai/localServerAddress'
+import type { AiHostingClass } from '@common/ai/policy'
 
 import type { LocalServerProbeResult } from './localServerProbe'
 import type { AiEngineErrorInfo } from './types'

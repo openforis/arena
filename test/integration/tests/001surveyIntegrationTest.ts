@@ -1,7 +1,7 @@
-import * as SurveyIntegrationTest from './_survey/surveyTest'
-import * as CategoryTest from './_survey/categoryTest'
 import * as CategoryGeoPackageExportTest from './_survey/categoryGeoPackageExportTest'
+import * as CategoryTest from './_survey/categoryTest'
 import * as NodeDefTest from './_survey/nodeDefTest'
+import * as SurveyIntegrationTest from './_survey/surveyTest'
 
 describe('Survey Test', () => {
   // ==== SURVEY

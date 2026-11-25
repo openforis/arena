@@ -1,31 +1,29 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+
+import { NodeDefs } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
-
-import * as API from '@webapp/service/api'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
-
 import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { FormItem } from '@webapp/components/form/Input'
 import PanelRight from '@webapp/components/PanelRight'
-import TaxonomyList from '@webapp/components/survey/TaxonomyList'
-import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
+import TaxonomyList from '@webapp/components/survey/TaxonomyList'
+import * as API from '@webapp/service/api'
+import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { useTaxonomyByUuid } from '@webapp/store/survey/hooks'
-
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 import { TaxonomySelector } from '../TaxonomySelector'
 
 import { State, useNodeDefEditReadOnly } from './store'
-import { NodeDefs } from '@openforis/arena-core'
 
 const valueProps = Node.valuePropsTaxon
 

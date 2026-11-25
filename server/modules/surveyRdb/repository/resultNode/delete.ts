@@ -1,10 +1,9 @@
-import type { ArenaNodeDefEntity, ArenaChain, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaChain, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-
-import { db, DbClient } from '@server/db/db'
 import { TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as Survey from '@core/survey/survey'
+import { db, DbClient } from '@server/db/db'
 
 /**
  * Deletes the nodes of the result node table for the specified processing chain.

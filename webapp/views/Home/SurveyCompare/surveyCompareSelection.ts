@@ -1,9 +1,9 @@
 import {
+  getAllChanges,
   SurveyCompareApplicabilityStatus,
   SurveyCompareChange,
   SurveyCompareResult,
   SurveyCompareStatus,
-  getAllChanges,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 const getDiffs = (result: SurveyCompareResult): SurveyCompareChange[] => getAllChanges(result)

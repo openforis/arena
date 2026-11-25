@@ -1,7 +1,6 @@
 import type { DbClient } from '@server/db/db'
-import * as DB from '../../../../db'
-
 import { TableChain } from '../../../../../common/model/db'
+import * as DB from '../../../../db'
 
 /**
  * Delete processing chain(s) according to query parameters.

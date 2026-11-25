@@ -1,8 +1,8 @@
 import {
   createSafeHttpFetcher,
-  MAX_CONCURRENT_FETCHES,
   type HttpGet,
   type HttpResponse,
+  MAX_CONCURRENT_FETCHES,
 } from '@server/modules/geo/service/mapCapabilities/safeHttpFetcher'
 import { deleteSurveyConfigurationProp } from '@server/modules/survey/repository/surveyRepository'
 

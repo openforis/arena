@@ -1,10 +1,9 @@
 import { UserFactory } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import { getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
+import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 
 let survey: any
 

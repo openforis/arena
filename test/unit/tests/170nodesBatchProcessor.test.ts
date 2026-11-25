@@ -1,21 +1,19 @@
-import type { DbClient } from '@server/db/db'
-import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
-import { SystemError as ArenaSystemError, type ArenaUser } from '@openforis/arena-core'
+import { type ArenaUser, SystemError as ArenaSystemError } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
-
+import type { DbClient } from '@server/db/db'
+import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
 import {
   NodesBatchProcessorDeps,
   processNodesBatch,
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchProcessor'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'user-uuid', authGroups: [{ name: 'systemAdmin' }] } as unknown as ArenaUser
 const nobody = { uuid: 'nobody-uuid', authGroups: [] } as unknown as ArenaUser

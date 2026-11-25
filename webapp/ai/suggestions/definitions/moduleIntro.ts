@@ -2,8 +2,9 @@
  * Module introduction: card and prompt. Do it removes the card (no change set to wait for), and Do it or
  * Dismiss records the module as seen: it never comes back.
  */
-import { buildModuleIntroPrompt, isIntroModule, type IntroModule } from '../prompts/moduleIntro'
+import { buildModuleIntroPrompt, type IntroModule, isIntroModule } from '../prompts/moduleIntro'
 import type { AssistantSuggestion } from '../types'
+
 import type { SuggestionDefinition } from './types'
 
 /**

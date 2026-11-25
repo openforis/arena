@@ -1,11 +1,10 @@
-import type { ArenaMobileDataImportJobContext } from '../arenaMobileDataImportJobContext'
 import { isMobileAppVersionNotSupported, minMobileAppVersionRecordsUpload } from '@common/mobile'
 import { AppInfo } from '@core/app/appInfo'
 import SystemError from '@core/systemError'
-
 import Job, { type JobParams } from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import FileZip from '@server/utils/file/fileZip'
+import type { ArenaMobileDataImportJobContext } from '../arenaMobileDataImportJobContext'
 
 const checkMobileAppVersionSupported = async (arenaSurveyFileZip: FileZip) => {
   const { appInfo } = (await ArenaSurveyFileZip.getInfo(arenaSurveyFileZip)) ?? {}

@@ -1,6 +1,5 @@
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
 const _isChainDeleted = () => A.pipe(ActivityLog.getChainUuid, A.isNil)

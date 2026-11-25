@@ -1,9 +1,7 @@
-import type { DbClient } from '@server/db/db'
+import { Schemata } from '@common/model/db'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
-
-import { Schemata } from '@common/model/db'
-
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as ImportReportRepository from '@server/modules/importReport/repository/importReportRepository'
 

@@ -1,7 +1,8 @@
 import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
+
 import * as DateUtils from '@core/dateUtils'
+import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
 
 describe('time node def: includeSeconds', () => {
   it('NodeDef.isSecondsIncluded is false when the prop is not set', () => {

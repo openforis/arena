@@ -5,8 +5,7 @@
 import type { LanguageModel } from 'ai'
 
 import { AiLimits } from '@common/ai/limits'
-import { buildActivityLogSummaryRequest, type AiActivityLogEntry } from '@common/ai/tasks/activityLog'
-
+import { type AiActivityLogEntry, buildActivityLogSummaryRequest } from '@common/ai/tasks/activityLog'
 import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { streamTextChunks } from '../runtime/textGenerators'
 

@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
+import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { Button } from '@webapp/components/buttons'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import LoadingBar from '@webapp/components/LoadingBar'
-import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import {
   deleteProvider,
   fetchAdminProviders,

@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
-
 import { State } from '../state'
 
 export const useOnOutsideClick = ({ onClose }) =>

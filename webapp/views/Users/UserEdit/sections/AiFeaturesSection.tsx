@@ -1,7 +1,6 @@
 import React from 'react'
 
 import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
-
 import { UserEditSection } from '../UserEditSection'
 
 type Props = {

@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import * as AppState from '../state'
 
 export const stateKey = 'job'

@@ -1,10 +1,9 @@
-import { SystemError, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
-
-import * as RecordUtils from '../../utils/recordUtils'
-import * as DataTest from '../../utils/dataTest'
-import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
+import { type ArenaRecord, type ArenaSurvey, SystemError } from '@openforis/arena-core'
 
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
+import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
+import * as RecordUtils from '../../utils/recordUtils'
 
 let survey: ArenaSurvey = null
 let record: ArenaRecord = null

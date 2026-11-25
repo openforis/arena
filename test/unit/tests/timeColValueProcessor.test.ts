@@ -1,4 +1,5 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import { getColValueProcessor } from '@common/model/db/tables/dataNodeDef/dataColProps'
 import { nodeDefType } from '@core/survey/nodeDefType'
 

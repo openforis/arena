@@ -1,7 +1,7 @@
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import { isTimeoutError } from '@webapp/ai/tools/analysis/analysisApi'
 
-import { postRecordEdits, type PostRecordEdits } from './recordEditsClient'
+import { type PostRecordEdits, postRecordEdits } from './recordEditsClient'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation, type RecordEditResult } from './types'
 
 /**

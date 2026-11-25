@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 
 const surveyInfoForm = (page: Page) => ({

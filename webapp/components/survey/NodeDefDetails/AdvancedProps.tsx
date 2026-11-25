@@ -2,17 +2,15 @@ import { useCallback, useMemo } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyCycleKey } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
-
-import { FormItem, Input } from '@webapp/components/form/Input'
+import * as Validation from '@core/validation/validation'
 import Checkbox from '@webapp/components/form/Checkbox'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State, useNodeDefEditReadOnly } from './store'

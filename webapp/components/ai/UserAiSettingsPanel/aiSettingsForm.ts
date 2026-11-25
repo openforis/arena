@@ -9,7 +9,6 @@ import {
   resolveAiAccessLevel,
 } from '@common/ai/accessLevel'
 import { AiFeatureCategory, isAiCategoryOnByDefault } from '@common/ai/features'
-
 import type { AiAdminDefault, AiPublicProvider } from '@webapp/ai/engines/providerEntries'
 
 export type FeatureCategory = AiFeatureCategory

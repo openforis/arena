@@ -1,10 +1,11 @@
-import { type ArenaCategory, Points, type ArenaSRSIndex } from '@openforis/arena-core'
 import type { Feature } from 'geojson'
 
+import { type ArenaCategory, type ArenaSRSIndex, Points } from '@openforis/arena-core'
+
 import * as Category from '@core/survey/category'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { parsePoint } from '@core/survey/categoryItemPointParser'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 const locationExtraPropName = Category.locationItemExtraDefName
 

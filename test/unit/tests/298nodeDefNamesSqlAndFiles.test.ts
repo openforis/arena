@@ -1,19 +1,16 @@
 import type { ArenaNodeDefEntity, NodeDefType } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
 import { TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 import TableOlapData from '@common/model/db/tables/olapData/table'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
-
+import * as Validation from '@core/validation/validation'
 import * as DbUtils from '@server/db/dbUtils'
 import Job from '@server/job/job'
-import { checkNodeDef, checkNodeDefProps } from '@server/modules/nodeDef/repository/nodeDefWriteCheck'
 import type RChain from '@server/modules/analysis/service/rChain/rChain'
 import RFile from '@server/modules/analysis/service/rChain/rFile'
-
+import { checkNodeDef, checkNodeDefProps } from '@server/modules/nodeDef/repository/nodeDefWriteCheck'
 import * as SB from '../../utils/surveyBuilder'
 
 const getError = (fn: () => void) => {

@@ -1,12 +1,11 @@
-import { NodeDefs, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
   ArenaNodeDefEntity,
   ArenaNodeDefEntityChildPosition,
   ArenaNodeDefEntityLayoutChildItem,
 } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, NodeDefs } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 
 // layout of a node def: layout props by cycle key

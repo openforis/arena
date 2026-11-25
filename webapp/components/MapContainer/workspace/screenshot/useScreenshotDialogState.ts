@@ -1,11 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 import type L from 'leaflet'
 
-import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-
 import { useMapContextBaseLayer } from '@webapp/components/MapContainer/MapContext'
-import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
+import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { getFitToPlotZoom } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCaptureRules'
 import {
   buildScreenshotFileName,
@@ -21,8 +19,8 @@ import {
   getBaseMapName,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotStamp'
 import {
-  SCREENSHOT_FORMATS,
   type LatLngLiteral,
+  SCREENSHOT_FORMATS,
   type ScreenshotCaptureMode,
   type ScreenshotFormat,
   type ScreenshotImageAttributeOption,
@@ -30,9 +28,10 @@ import {
   type ScreenshotPlotCandidate,
   type ScreenshotTarget,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
-import type { LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
-import { useMapLayersPanel } from '@webapp/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type { ScreenshotStamp } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
+import type { LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useMapLayersPanel } from '@webapp/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 
 export type ScreenshotDialogState = {
   map: L.Map | null

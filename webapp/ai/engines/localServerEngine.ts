@@ -3,7 +3,7 @@
  * Loaded only through dynamic import: it pulls @ai-sdk/openai-compatible into the lazy AI bundle.
  */
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { extractReasoningMiddleware, type LanguageModelMiddleware, wrapLanguageModel, type LanguageModel } from 'ai'
+import { extractReasoningMiddleware, type LanguageModel, type LanguageModelMiddleware, wrapLanguageModel } from 'ai'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 

@@ -1,6 +1,6 @@
 import * as UserAccessRequestAccept from '@core/user/userAccessRequestAccept'
-import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 const validateSurveyNameUniqueness = (surveyInfosWithSameName: unknown[]) => (_propName: string, _item: unknown) =>
   surveyInfosWithSameName && surveyInfosWithSameName.length > 0 ? { key: Validation.messageKeys.nameDuplicate } : null

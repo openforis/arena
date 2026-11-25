@@ -1,8 +1,8 @@
 import './Carousel.scss'
 
 import { KeyboardEvent, ReactNode, useCallback, useState } from 'react'
-import classNames from 'classnames'
 import MobileStepper from '@mui/material/MobileStepper'
+import classNames from 'classnames'
 
 import { ButtonNext, ButtonPrevious } from '../buttons'
 

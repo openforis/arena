@@ -4,8 +4,8 @@
  */
 import { useEffect, useState } from 'react'
 
-import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import type { SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 
 type GenerationRef = { id: number; surveyId: number } | null

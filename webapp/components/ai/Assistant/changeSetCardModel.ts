@@ -2,17 +2,15 @@
  * What a change set card shows: one row per operation (name, what changes, before → after, result), whether the
  * survey changed since the proposal, and where a name links to in the form designer.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
+import * as Survey from '@core/survey/survey'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import { getNodeDefRefName } from '@webapp/ai/changeSets/operations'
+import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
 import { findTranslationSource, type TranslationSource } from '@webapp/ai/changeSets/translationSource'
-import { isNodeDefRefProp } from '@webapp/ai/changeSets/types'
 import type {
   ChangeOperation,
   ChangeSet,
@@ -23,6 +21,7 @@ import type {
   OperationConflict,
   OperationResult,
 } from '@webapp/ai/changeSets/types'
+import { isNodeDefRefProp } from '@webapp/ai/changeSets/types'
 import { TreeSelectViewMode } from '@webapp/model'
 
 export type CardExpressionItem = { expression: string; applyIf: string | null }

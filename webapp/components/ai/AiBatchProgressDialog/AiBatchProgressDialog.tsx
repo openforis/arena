@@ -3,13 +3,12 @@ import './AiBatchProgressDialog.scss'
 import { useCallback, useState } from 'react'
 
 import type { AiBatchProgress } from '@webapp/ai/workflows/batchRun'
+import { createConfirmationFocus } from '@webapp/components/ai/Assistant/confirmationFocus'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import ProgressBar from '@webapp/components/ProgressBar'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
-import { createConfirmationFocus } from '@webapp/components/ai/Assistant/confirmationFocus'
 
 import { getDismissAction } from './batchDismiss'
 import type { AiBatchRunState } from './useAiBatchRun'

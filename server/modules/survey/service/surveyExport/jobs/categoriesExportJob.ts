@@ -1,9 +1,7 @@
-import * as CategoryItem from '@core/survey/categoryItem'
 import { ArrayUtils } from '@core/arrayUtils'
-
+import * as CategoryItem from '@core/survey/categoryItem'
 import Job, { type JobParams } from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
-
 import { ExportFile } from '../exportFile'
 
 const itemsBatchSize = 10000

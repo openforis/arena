@@ -1,5 +1,4 @@
 import { createI18nAsync, supportedLanguages } from '@core/i18n/i18nFactory'
-
 import { isI18nKeyReason } from '@webapp/ai/changeSets/types'
 import { getConflictReasonText, getResultTitle } from '@webapp/components/ai/Assistant/changeItemModel'
 import { fakeT as t } from '../utils/fakeT'

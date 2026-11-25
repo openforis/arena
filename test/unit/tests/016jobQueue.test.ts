@@ -1,8 +1,8 @@
-import { JobStatus, UUIDs, type ArenaUser } from '@openforis/arena-core'
-import { JobRepository, WebSocketServer, type JobRow } from '@openforis/arena-server'
+import { type ArenaUser, JobStatus, UUIDs } from '@openforis/arena-core'
+import { JobRepository, type JobRow, WebSocketServer } from '@openforis/arena-server'
 
 import Job from '../../../server/job/job'
-import { JobQueue, type JobInfo } from '../../../server/job/jobQueue'
+import { type JobInfo, JobQueue } from '../../../server/job/jobQueue'
 import { jobStatus } from '../../../server/job/jobUtils'
 
 // the queue internals read by the tests (private in JobQueue)

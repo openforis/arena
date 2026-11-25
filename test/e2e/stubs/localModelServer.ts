@@ -3,9 +3,6 @@
  * and chat completions answered by the mock provider (the canned answers and the scripted turns).
  * It records every request so a spec can check what reached it.
  */
-import http, { type IncomingMessage, type ServerResponse } from 'node:http'
-import type { AddressInfo } from 'node:net'
-
 import type {
   LanguageModelV4CallOptions,
   LanguageModelV4Content,
@@ -14,6 +11,8 @@ import type {
   LanguageModelV4Prompt,
   LanguageModelV4StreamPart,
 } from '@ai-sdk/provider'
+import http, { type IncomingMessage, type ServerResponse } from 'node:http'
+import type { AddressInfo } from 'node:net'
 
 import { createMockModel } from '@server/modules/ai/service/mockProvider'
 

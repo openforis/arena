@@ -4,11 +4,10 @@ import { ArenaUserGroupQualifier, type ArenaValidation } from '@openforis/arena-
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as StringUtils from '@core/stringUtils'
-import { uuidv4 } from '@core/uuid'
 import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
 import { validateUserGroupQualifier } from '@core/user/userGroup/userGroupValidator'
+import { uuidv4 } from '@core/uuid'
 import * as Validation from '@core/validation/validation'
-
 import { Button, ButtonAdd, Fieldset } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 

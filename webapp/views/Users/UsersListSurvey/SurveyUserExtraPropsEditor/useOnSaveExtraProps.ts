@@ -2,10 +2,9 @@ import { useCallback } from 'react'
 import axios from 'axios'
 
 import * as User from '@core/user/user'
-
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { useSurveyId } from '@webapp/store/survey'
 import { useAppDispatch } from '@webapp/store'
+import { useSurveyId } from '@webapp/store/survey'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const useOnSaveExtraProps = ({ userToUpdate }) => {
   const dispatch = useAppDispatch()

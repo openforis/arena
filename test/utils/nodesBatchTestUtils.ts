@@ -1,7 +1,7 @@
-import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
-import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import { createNodesBatchReplyRegistry } from '@server/modules/record/service/update/nodesBatch/nodesBatchReplies'
 import { createDefaultNodesBatchServiceDeps } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
+import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
+import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
 
 const replies = createNodesBatchReplyRegistry()
 

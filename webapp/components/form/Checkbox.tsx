@@ -1,18 +1,17 @@
 import './Checkbox.scss'
 
-import { useCallback, type ReactElement } from 'react'
-import classNames from 'classnames'
-import MuiFormControlLabel from '@mui/material/FormControlLabel'
+import { type ReactElement, useCallback } from 'react'
 import MuiCheckbox from '@mui/material/Checkbox'
+import MuiFormControlLabel from '@mui/material/FormControlLabel'
 import MuiRadio from '@mui/material/Radio'
+import classNames from 'classnames'
 
+import type { ArenaValidation } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import { useI18n, useI18nT } from '@webapp/store/system'
-
 import { ButtonIconInfo } from '../buttons/ButtonIconInfo'
 import ValidationTooltip from '../ValidationTooltip'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 type CheckboxProps = {
   // when displayed without label, aligns the checkbox with labelled checkboxes or radio buttons in the same column

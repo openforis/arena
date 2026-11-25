@@ -1,22 +1,21 @@
 import classNames from 'classnames'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+
+import { Query } from '@common/model/query'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
-
-import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanEditRecord } from '@webapp/store/user'
-import { RecordActions, useRecordNode } from '@webapp/store/ui/record'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefTableCellBody'
+import { useAppDispatch } from '@webapp/store'
+import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
+import { RecordActions, useRecordNode } from '@webapp/store/ui/record'
+import { useAuthCanEditRecord } from '@webapp/store/user'
 
 import { useColumn } from './store'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
-import { Query } from '@common/model/query'
 
 type ColumnDataEditProps = {
   colWidth: number

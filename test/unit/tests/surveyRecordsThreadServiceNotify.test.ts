@@ -1,11 +1,12 @@
-import { ClusterBus, WebSocketServer, WebSocketEvent, RecordSocketAssociationRepository } from '@openforis/arena-server'
+import { ClusterBus, RecordSocketAssociationRepository, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+
 import { WebSocketEvents } from '../../../common/webSocket/webSocketEvents'
+import { SurveyRecordsThreadMap } from '../../../server/modules/record/service/update/surveyRecordsThreadMap'
 import {
-  RecordsUpdateThreadService,
   _handleClusterEventForTest as handleClusterEvent,
   createSequentialThreadMessagesNotifier,
+  RecordsUpdateThreadService,
 } from '../../../server/modules/record/service/update/surveyRecordsThreadService'
-import { SurveyRecordsThreadMap } from '../../../server/modules/record/service/update/surveyRecordsThreadMap'
 import { RecordsUpdateThreadMessageTypes } from '../../../server/modules/record/service/update/thread/recordsThreadMessageTypes'
 
 describe('RecordsUpdateThreadService notify functions', () => {

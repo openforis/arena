@@ -1,12 +1,10 @@
 import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-
 import Job, { type JobParams } from '@server/job/job'
-import * as FileUtils from '@server/utils/file/fileUtils'
-
-import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 const filesOutputDir = 'files'
 

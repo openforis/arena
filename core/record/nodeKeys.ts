@@ -1,8 +1,8 @@
 import type { ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 export const keys = {
   nodeId: 'nodeId',

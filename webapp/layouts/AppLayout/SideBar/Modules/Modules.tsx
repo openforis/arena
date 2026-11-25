@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react'
 
-import { useLang } from '@webapp/store/system'
+import type { ArenaUser } from '@openforis/arena-core'
 
-import * as SideBarModule from './utils'
+import { useLang } from '@webapp/store/system'
 
 import Module from './Module'
 import PopupMenu from './PopupMenu'
-import type { ArenaUser } from '@openforis/arena-core'
+import * as SideBarModule from './utils'
 
 type ModulesProps = {
   user?: ArenaUser

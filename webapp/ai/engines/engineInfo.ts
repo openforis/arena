@@ -3,7 +3,6 @@
  */
 import { AiLimits } from '@common/ai/limits'
 import { LOCAL_PROVIDER_TYPE } from '@common/ai/providerIds'
-
 import { getDefaultNameKey } from '@webapp/ai/providers/providerNames'
 
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'

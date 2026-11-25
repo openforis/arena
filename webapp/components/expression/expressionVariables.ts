@@ -1,9 +1,9 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { types as sqlTypes } from '@common/model/db/sql'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
-
 import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+
 import { ExpressionEditorType } from './expressionEditorType'
 
 // other node def types are treated as text

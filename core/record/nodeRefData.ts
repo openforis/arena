@@ -1,4 +1,4 @@
-import type { ArenaRecordNode, ArenaCategoryItem, ArenaRecordNodeRefData, ArenaTaxon } from '@openforis/arena-core'
+import type { ArenaCategoryItem, ArenaRecordNode, ArenaRecordNodeRefData, ArenaTaxon } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 

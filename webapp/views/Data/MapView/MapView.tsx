@@ -2,34 +2,33 @@ import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 import { useLocation } from 'react-router'
+
 import type { ArenaAnyNodeDef, ArenaCategoryLevel, ArenaSurvey } from '@openforis/arena-core'
 
 import { isHexColor } from '@core/colorUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyFile from '@core/survey/surveyFile'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-
-import * as API from '@webapp/service/api'
-import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
 import type { SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
 import type { MapRailTab, MapWorkspaceRecords } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
 import { findSearchSelectId } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
 import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
-
-import { SamplingPointDataLayer } from './SamplingPointDataLayer'
+import * as API from '@webapp/service/api'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { RecordEditModal } from '../common/RecordEditModal'
+
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
-import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
-import { useMapLayersPanel, type ActiveLayer } from './MapLayersPanel/MapLayersPanelContext'
+import { type ActiveLayer, useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
 import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
+import { SamplingPointDataLayer } from './SamplingPointDataLayer'
+import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 
 type LayerGroup = {
   label: string

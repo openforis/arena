@@ -6,18 +6,14 @@ import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as Record from '@core/record/record'
-
-import { debounceAction } from '@webapp/utils/reduxUtils'
-
-import { objectToFormData } from '@webapp/service/api'
-
-import { AppSavingActions } from '@webapp/store/app'
-import { I18nState } from '@webapp/store/system'
-import { SurveyState } from '@webapp/store/survey'
-
 import { appModules, appModuleUri } from '@webapp/app/appModules'
-
+import { objectToFormData } from '@webapp/service/api'
+import { AppSavingActions } from '@webapp/store/app'
+import { SurveyState } from '@webapp/store/survey'
+import { I18nState } from '@webapp/store/system'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as RecordState from '../state'
+
 import * as ActionTypes from './actionTypes'
 import { checkAndConfirmUpdateNode, recordNodesUpdate } from './common'
 import { enqueueNodeRequest } from './nodeRequestsQueue'

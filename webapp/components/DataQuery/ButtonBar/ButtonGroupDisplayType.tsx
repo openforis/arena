@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo } from 'react'
 
 import { Query } from '@common/model/query'
-
 import { ButtonGroup } from '@webapp/components/form'
-import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 import { useAppDispatch } from '@webapp/store'
+import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
 const { displayTypes, chartTypes, isChartTypeAvailable } = DataExplorerState
 

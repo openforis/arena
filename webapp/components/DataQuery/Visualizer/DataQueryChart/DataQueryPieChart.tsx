@@ -1,11 +1,11 @@
 import { Numbers, Objects } from '@openforis/arena-core'
 
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
 import { PieChart } from '@webapp/charts/PieChart'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { useI18n } from '@webapp/store/system'
 
 import { useDataQueryChartData } from './useDataQueryChartData'
-import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 const maxItems = 20
 const RADIAN = Math.PI / 180

@@ -2,7 +2,6 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, generateSurveyName, test } from '../fixtures'
 import { insertSampleSurvey } from '../fixtures/seed/sampleSurvey'
 import { getDropdown, selectDropdownItem } from '../helpers/dropdown'

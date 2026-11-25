@@ -1,18 +1,16 @@
 import { useCallback, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { useParams, useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Survey from '@core/survey/survey'
-
+import { useOnUpdate, useOnWebSocketEvent, useQuery } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
+import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { isEventOfOpenRecord } from '@webapp/store/ui/record/recordEventFilter'
-import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
-
-import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/hooks'
-import { useAppDispatch } from '@webapp/store'
 
 export const useLocalState = (props) => {
   const {

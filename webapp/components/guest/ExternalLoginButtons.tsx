@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { useI18n } from '@webapp/store/system'
 import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { fetchLoginProviders, getExternalLoginStartUrl } from '@webapp/service/api/authProviders'
+import { useI18n } from '@webapp/store/system'
 
 interface LoginProvider {
   id: string

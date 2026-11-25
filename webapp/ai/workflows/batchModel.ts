@@ -5,10 +5,9 @@
  */
 import { type AiFeatureKey, getAiFeatureMinDataClass } from '@common/ai/features'
 import type { AiGenerateText } from '@common/ai/llm'
-
 import { resolveModel } from '@webapp/ai/engines/resolveModel'
-
 import { createGatewayTextGenerator } from '../runtime/textGenerators'
+
 import { type AiBatchGuard, createAiBatchGuard } from './batchRun'
 
 export type AiBatchModel = { generateText: AiGenerateText; guard: AiBatchGuard }

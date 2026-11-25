@@ -1,5 +1,5 @@
-import { interceptDoubleClick } from '@webapp/components/MapContainer/workspace/tools/measure/measureDoubleClick'
 import type { DoubleClickTarget } from '@webapp/components/MapContainer/workspace/tools/measure/measureDoubleClick'
+import { interceptDoubleClick } from '@webapp/components/MapContainer/workspace/tools/measure/measureDoubleClick'
 import {
   geomanShapeOf,
   measureDrawOptions,

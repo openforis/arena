@@ -1,4 +1,5 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
 const newGeoDef = (props = {}) =>

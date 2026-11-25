@@ -1,12 +1,11 @@
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
+import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
 import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
 import { categoriesListTool, taxonomiesListTool } from '@webapp/ai/tools/design/refLists'
 import { getTools, runTool } from '@webapp/ai/tools/registry'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
-import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
 

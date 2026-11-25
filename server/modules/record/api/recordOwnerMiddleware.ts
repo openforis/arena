@@ -4,14 +4,12 @@ import { Authorizer } from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
-import * as UserUtils from '@core/user/user'
 import { StatusCodes } from '@core/systemError'
-
+import * as UserUtils from '@core/user/user'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as Request from '@server/utils/request'
 import UnauthorizedError from '@server/utils/unauthorizedError'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 const _requireNotOwnedRecordsViewAllowed =
   (getRecordUuids: (req: ExpressRequest) => string[]) =>

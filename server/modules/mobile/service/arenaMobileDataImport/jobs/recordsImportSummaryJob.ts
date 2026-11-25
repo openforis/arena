@@ -1,16 +1,14 @@
-import type { ArenaMobileDataImportJobContext } from '../arenaMobileDataImportJobContext'
-import SystemError from '@core/systemError'
 import * as Record from '@core/record/record'
-
+import SystemError from '@core/systemError'
 import Job, { type JobParams } from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
-
 import {
-  getRecordFormattedKeyValuesByDefUuid,
-  findExistingRecordSummary,
   determineRecordAction,
+  findExistingRecordSummary,
+  getRecordFormattedKeyValuesByDefUuid,
 } from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import type { ArenaMobileDataImportJobContext } from '../arenaMobileDataImportJobContext'
 
 /**
  * Reads every record contained in an Arena format zip and, for each one, determines whether it's new,

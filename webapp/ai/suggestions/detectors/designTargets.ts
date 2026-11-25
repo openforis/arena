@@ -1,12 +1,11 @@
 /**
  * Helpers shared by the Design detectors, resolvers and definitions.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import { isCurrentNodeDef } from '@webapp/ai/tools/common/nodeDefLookup'
-
 import type { AssistantSuggestion, SuggestionKind } from '../types'
+
 import type { DetectorContext } from './types'
 
 export type DesignDetectorScope = { survey: any; surveyId: number }

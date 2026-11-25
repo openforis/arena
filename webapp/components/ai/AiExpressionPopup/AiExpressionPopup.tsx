@@ -3,18 +3,16 @@ import './AiExpressionPopup.scss'
 
 import { useEffect, useRef, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
-
+import * as Survey from '@core/survey/survey'
 import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { Button } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
-import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyId } from '@webapp/store/survey'
-
 import { ADVANCED_EXPRESSION_SUFFIX } from '@webapp/components/expression/expressionEditorPopupState'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const expressionTypeFromQualifier = (qualifier) => {
   if (!qualifier) return 'validation'

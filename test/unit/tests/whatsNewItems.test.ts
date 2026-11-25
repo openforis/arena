@@ -8,9 +8,9 @@ import fs from 'fs'
 import path from 'path'
 
 import * as AuthGroup from '@core/auth/authGroup'
+import enWhatsNew from '@core/i18n/resources/en/whatsNew'
 import * as User from '@core/user/user'
 import * as WhatsNew from '@core/whatsNew/whatsNew'
-import enWhatsNew from '@core/i18n/resources/en/whatsNew'
 
 const { whatsNewAudiences, whatsNewItems } = WhatsNew
 

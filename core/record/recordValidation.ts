@@ -1,5 +1,5 @@
-import { RecordValidations } from '@openforis/arena-core'
 import type { ArenaRecordNode, ArenaValidation, ArenaValidationResult } from '@openforis/arena-core'
+import { RecordValidations } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResultUtils from '@core/validation/validationResult'

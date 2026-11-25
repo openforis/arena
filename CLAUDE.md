@@ -231,6 +231,15 @@ Never hard-code colors. Use the semantic theme tokens (Material Design 3 naming:
 - JS/TS (inline styles, `sx`, charts): `themeColors` from `@webapp/theme/tokens`.
 - Token values per theme (light/dark) are defined in `webapp/style/themes.scss` and mirrored in `webapp/theme/tokens.ts` (used by the MUI theme): keep them in sync.
 
+**Imports order:**
+Imports go in groups separated by a blank line, sorted alphabetically inside each group (`simple-import-sort/imports` ESLint rule, fixed by `eslint --fix`):
+
+1. side-effect imports (`import './Component.scss'`, `import 'dotenv/config'`): kept in the written order, because it matters
+2. external packages, `react` and `react-dom` first
+3. Open Foris packages (`@openforis/arena-core`, `@openforis/arena-server`, ...)
+4. project modules out of the current folder (`@common/*`, `@core/*`, `@server/*`, `@test/*`, `@webapp/*`, `../*`)
+5. modules in the same folder (`./*`)
+
 **Loops:**
 Prefer `for...of` loops over `Array.prototype.forEach`.
 

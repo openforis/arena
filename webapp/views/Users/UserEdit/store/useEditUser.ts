@@ -1,22 +1,22 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { Authorizer } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-import * as AuthGroup from '@core/auth/authGroup'
-import { Authorizer } from '@openforis/arena-core'
-
-import { useQuery } from '@webapp/components/hooks'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { useQuery } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/store/user'
 import { NotificationActions } from '@webapp/store/ui'
+import { useUser } from '@webapp/store/user'
 
 import { useActions } from './actions'
-import { useAppDispatch } from '@webapp/store'
 
 const getEditCapabilities = ({ user, surveyInfo, ready, userToUpdate = null }) => {
   const userToUpdateUuid = User.getUuid(userToUpdate)

@@ -3,22 +3,20 @@ import os from 'node:os'
 import path from 'node:path'
 
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Survey from '@core/survey/survey'
+import { getExtensionByFileFormat } from '@core/fileFormats'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import { getExtensionByFileFormat } from '@core/fileFormats'
+import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
-import UnauthorizedError from '@server/utils/unauthorizedError'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
-import * as DataImportService from '@server/modules/dataImport/service/dataImportService'
 import DataImportJob from '@server/modules/dataImport/service/dataImportJob/dataImportJob'
+import * as DataImportService from '@server/modules/dataImport/service/dataImportService'
 import DataImportValidationJob from '@server/modules/dataImport/service/dataImportValidationJob'
-
-import * as SB from '../../../utils/surveyBuilder'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import { toFileContent } from '../../../utils/flatDataImportTestUtils'
+import * as SB from '../../../utils/surveyBuilder'
 
 type FlatDataImportParams = Parameters<typeof DataImportService.startFlatDataImportJob>[0]
 type CollectDataImportParams = Parameters<typeof DataImportService.startCollectDataImportJob>[0]

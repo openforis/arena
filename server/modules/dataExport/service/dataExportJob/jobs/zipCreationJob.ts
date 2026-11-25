@@ -1,5 +1,4 @@
 import Job, { type JobParams } from '@server/job/job'
-
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipUtils } from '@server/utils/file/zipUtils'
 

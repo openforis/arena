@@ -3,7 +3,6 @@
  * or a new generation, reports the saved ones created since.
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
 
 import type { SuggestionGeneration } from './generation'

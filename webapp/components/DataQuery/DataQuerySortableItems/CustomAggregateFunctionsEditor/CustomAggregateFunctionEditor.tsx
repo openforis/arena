@@ -1,19 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import { ViewDataNodeDef } from '@common/model/db'
+import * as StringUtils from '@core/stringUtils'
 import { AggregateFunction, type AggregateFunctionItem } from '@core/survey/aggregateFunction'
 import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
-import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
-import { ViewDataNodeDef } from '@common/model/db'
-
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { FormItemWithValidation } from '@webapp/components/form/FormItemWithValidation'
 import { ButtonCancel, ButtonDelete, ButtonSave } from '@webapp/components'
+import { FormItemWithValidation } from '@webapp/components/form/FormItemWithValidation'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useAppDispatch } from '@webapp/store'
 import { useSurvey } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
+
 import { AggregateFunctionExpressionEditor } from './AggregateFunctionExpressionEditor'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type CustomAggregateFunctionEditorProps = {
   aggregateFunction: AggregateFunctionItem

@@ -1,5 +1,7 @@
 import { useCallback } from 'react'
 
+import type { ArenaValidation } from '@openforis/arena-core'
+
 import {
   getLanguageISO639part2Label,
   getLanguageLabel,
@@ -7,11 +9,9 @@ import {
   languageItemsSortedByEnLabel,
   standards,
 } from '@core/app/languages'
-
 import { useI18n } from '@webapp/store/system'
 
 import Dropdown from './Dropdown'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 type LanguageDropdownProps = {
   disabled?: boolean

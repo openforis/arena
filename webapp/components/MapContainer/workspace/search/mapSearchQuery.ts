@@ -1,5 +1,4 @@
 import { parseMapSearchQuery } from '@core/geo/coordinateQuery'
-
 import type { MapRecordCandidate } from '../mapWorkspaceTypes'
 
 export { parseMapSearchQuery }

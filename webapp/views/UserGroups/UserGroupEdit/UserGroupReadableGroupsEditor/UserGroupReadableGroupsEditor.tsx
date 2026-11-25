@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from 'react'
 import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
-
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 

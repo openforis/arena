@@ -1,10 +1,9 @@
-import type { ReactElement } from 'react'
 import { IconButton, Tooltip } from '@mui/material'
 import classNames from 'classnames'
+import type { ReactElement } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { useMapWorkspace } from '../MapWorkspaceContext'
 
 type ToolbarIconButtonProps = {

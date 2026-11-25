@@ -1,6 +1,6 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import {
   describeParentPath,

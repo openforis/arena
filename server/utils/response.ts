@@ -1,12 +1,11 @@
-import path from 'node:path'
-import type { Response as ExpressResponse } from 'express'
 import { ZipArchive } from 'archiver'
+import type { Response as ExpressResponse } from 'express'
+import path from 'node:path'
 
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import SystemError, { StatusCodes } from '@core/systemError'
-
 import * as Log from '@server/log/log'
 import * as FileUtils from '@server/utils/file/fileUtils'
 

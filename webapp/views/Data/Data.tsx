@@ -1,27 +1,24 @@
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
 import { Authorizer } from '@openforis/arena-core'
 
-import { appModuleUri, appModules, dataModules } from '@webapp/app/appModules'
-
+import * as Survey from '@core/survey/survey'
+import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
+import Record from '@webapp/components/survey/Record'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanPreviewDraftFormInDataEntry, useUser } from '@webapp/store/user'
-
-import ModuleSwitch from '@webapp/components/ModuleSwitch'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import Record from '@webapp/components/survey/Record'
-
 import { resetDataVis } from '@webapp/views/Data/Explorer/actions'
 
-import ValidationReport from './ValidationReport'
-import Records from './Records'
-import Explorer from './Explorer'
 import DataExport from './DataExport'
 import DataImport from './DataImport'
-import { MapView } from './MapView'
+import Explorer from './Explorer'
 import { FormPreview } from './FormPreview'
+import { MapView } from './MapView'
+import Records from './Records'
+import ValidationReport from './ValidationReport'
 
 const Data = () => {
   const dispatch = useDispatch()

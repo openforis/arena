@@ -1,8 +1,8 @@
 import type { ArenaRecordNode } from '@openforis/arena-core'
 
+import { valuePropsCode, valuePropsTaxon } from '@core/survey/nodeValueProps'
 import { NodeMeta } from '../_node/nodeMeta'
 import * as NodeRefData from '../nodeRefData'
-import { valuePropsCode, valuePropsTaxon } from '@core/survey/nodeValueProps'
 
 const { keys: refDataKeys } = NodeRefData
 const { metaKeys } = NodeMeta

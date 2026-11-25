@@ -3,18 +3,17 @@ import './NodeDefConversionDialog.scss'
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { NodeDefsActions } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
 import { Button, ButtonCancel } from '@webapp/components/buttons'
-import { FormItem } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import { NodeDefsActions } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 type NodeDefConversionDialogProps = {
   nodeDef: ArenaAnyNodeDef

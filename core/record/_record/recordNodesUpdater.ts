@@ -1,35 +1,35 @@
 import {
-  Objects,
-  RecordUpdater as CoreRecordUpdater,
-  RecordNodesUpdater as CoreRecordNodesUpdater,
-  RecordUpdateResult,
-  RecordNodeValues,
+  ArenaAnyNodeDef,
+  type ArenaCategoryItemProvider,
+  type ArenaNodeDefEntity,
   type ArenaRecord,
   type ArenaRecordNode,
-  type ArenaCategoryItemProvider,
   type ArenaRecordNodeRefData,
   type ArenaSurvey,
-  type ArenaNodeDefEntity,
-  ArenaAnyNodeDef,
+  Objects,
+  RecordNodesUpdater as CoreRecordNodesUpdater,
+  RecordNodeValues,
+  RecordUpdater as CoreRecordUpdater,
+  RecordUpdateResult,
 } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import * as NodeRefData from '../nodeRefData'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
-
-import { RecordEvaluationContext } from '../recordEvaluationContext'
-import * as RecordReader from './recordReader'
+import * as NodeRefData from '../nodeRefData'
 import { NodeValueFormatter } from '../nodeValueFormatter'
+import { RecordEvaluationContext } from '../recordEvaluationContext'
+
 import { updateAttributeValue } from './recordNodeValueUpdater'
+import * as RecordReader from './recordReader'
 
 const { createRootEntity, deleteNodes } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
-import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 import type { EntityKeysIndexCache } from './entityKeysIndexCache'
+import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 
 type ValuesByDefUuid = Record<string, any>
 // RecordEvaluationContext params, forwarded to arena-core

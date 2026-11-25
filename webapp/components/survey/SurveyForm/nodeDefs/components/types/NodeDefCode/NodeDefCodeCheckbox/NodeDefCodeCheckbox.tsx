@@ -1,6 +1,5 @@
 import { ArrayUtils } from '@core/arrayUtils'
 import * as CategoryItem from '@core/survey/categoryItem'
-
 import { useI18n } from '@webapp/store/system'
 
 type NodeDefCodeCheckboxProps = {

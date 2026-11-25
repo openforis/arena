@@ -1,15 +1,16 @@
 import { useCallback, useMemo } from 'react'
-import { LayersControl, LayerGroup } from 'react-leaflet'
+import { LayerGroup, LayersControl } from 'react-leaflet'
 
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
-import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
-import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
-import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 import {
-  isMapClusterFeature,
   type CreateRecordFromSamplingPointDataItem,
+  isMapClusterFeature,
   type RecordEditClickHandler,
 } from '../common/mapPointTypes'
+import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
+
+import { SamplingPointDataMarker } from './SamplingPointDataMarker'
+import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 
 type SamplingPointDataLayerProps = {
   levelIndex?: number

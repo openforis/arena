@@ -1,9 +1,9 @@
 import React from 'react'
+
 import * as A from '@core/arena'
-
 import * as Expression from '@core/expressionParser/expression'
-
 import { Button } from '@webapp/components/buttons'
+
 import type { ExpressionNodeComponentProps } from './expressionNode'
 
 const Logical = (props: ExpressionNodeComponentProps) => {

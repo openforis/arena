@@ -1,7 +1,14 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import {
+  newAnalysisToolContext,
+  newFakeAnalysisApi,
+  runTool,
+  userWithoutAccess,
+} from '@test/unit/utils/aiAnalysisTestUtils'
 import { createFindCategoryItemsTool } from '@webapp/ai/tools/analysis/findCategoryItems'
+import * as analysisToolResults from '@webapp/ai/tools/analysis/toolResults'
+import * as cleaningContext from '@webapp/ai/tools/cleaning/cleaningContext'
 import { resolveAttributeDefs } from '@webapp/ai/tools/cleaning/cleaningContext'
 import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
 import {
@@ -10,18 +17,8 @@ import {
   canViewCurrentSurvey,
 } from '@webapp/ai/tools/common/toolPermissions'
 import * as surveyLookup from '@webapp/ai/tools/design/surveyLookup'
-import * as analysisToolResults from '@webapp/ai/tools/analysis/toolResults'
-import * as cleaningContext from '@webapp/ai/tools/cleaning/cleaningContext'
-
-import {
-  newAnalysisToolContext,
-  newFakeAnalysisApi,
-  runTool,
-  userWithoutAccess,
-} from '@test/unit/utils/aiAnalysisTestUtils'
-
-import * as DataTest from '../../utils/dataTest'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 let survey: any
 

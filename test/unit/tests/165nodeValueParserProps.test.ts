@@ -1,10 +1,8 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-
-import { VALUE_PROP_DEFAULT, parseNodeValueProps } from '@core/record/nodeValueParser'
-
+import { parseNodeValueProps, VALUE_PROP_DEFAULT } from '@core/record/nodeValueParser'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SB from '../../utils/surveyBuilder'
 
 const stubCategoryItemProvider = { getItemByCodePaths: async () => null }

@@ -4,16 +4,15 @@
  * disconnect abort, maps errors to stable keys and records telemetry exactly once per call.
  */
 import type { LanguageModelV4, LanguageModelV4StreamPart } from '@ai-sdk/provider'
+
 import type { ArenaUser } from '@openforis/arena-core'
 
-import { ENV } from '@core/processUtils'
-import SystemError, { StatusCodes } from '@core/systemError'
 import { getAiFeature } from '@common/ai/features'
 import type { AiGatewayCall } from '@common/ai/wire'
 import { serializeGenerateResult, serializeStreamPart } from '@common/ai/wire'
-
+import { ENV } from '@core/processUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as Log from '@server/log/log'
-import * as Response from '@server/utils/response'
 import {
   closeSseStream,
   createSseEventWriter,
@@ -21,15 +20,16 @@ import {
   openSseStream,
   waitForDrain,
 } from '@server/modules/ai/api/serverSentEvents'
-
+import * as Response from '@server/utils/response'
 import * as AiTelemetry from '../aiTelemetry'
 import { assertFeatureEnabled } from '../featureGate'
-import * as ProviderResolver from '../providerResolver'
 import type { ProviderMeta } from '../providerResolver'
+import * as ProviderResolver from '../providerResolver'
+
 import { getCallSize, getEnforcedDataClass, parseGatewayRequest, sanitizeCall } from './callValidation'
 import { createDailyBudgetCharger, type DailyBudgetCharger } from './dailyBudget'
-import { assertPolicyAllows, type AiPolicyCheck } from './policy'
 import { formatErrorForLog, toAiSystemError, toAiWireError } from './errorMapping'
+import { type AiPolicyCheck, assertPolicyAllows } from './policy'
 import { createRateLimiter, type RateLimiter } from './rateLimiter'
 
 const TOO_MANY_REQUESTS = 429

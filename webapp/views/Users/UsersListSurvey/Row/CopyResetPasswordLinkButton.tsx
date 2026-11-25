@@ -2,10 +2,10 @@ import { useCallback } from 'react'
 
 import { Button } from '@webapp/components'
 import * as API from '@webapp/service/api'
-import { useSurveyId } from '@webapp/store/survey'
-import { copyToClipboard } from '@webapp/utils/domUtils'
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useAppDispatch } from '@webapp/store'
+import { useSurveyId } from '@webapp/store/survey'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { copyToClipboard } from '@webapp/utils/domUtils'
 
 const messageTypes = {
   passwordReset: 'passwordReset',

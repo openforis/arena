@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 import { AppSavingActions, JobActions } from '@webapp/store/app'
-
 import { MessageState } from '../state'
+
 import { fetchMessage } from './fetchMessage'
 
 export const sendMessage = () => async (dispatch, getState) => {

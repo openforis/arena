@@ -1,8 +1,8 @@
 import './Dropzone.scss'
 
 import { useCallback, useMemo, useState } from 'react'
-import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'
+import ReactDropzone from 'react-dropzone'
 
 import { Arrays, Strings } from '@openforis/arena-core'
 

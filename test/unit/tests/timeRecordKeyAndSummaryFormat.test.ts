@@ -1,6 +1,7 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
-import { formatTimeKeyValue } from '@webapp/views/Data/Records/recordKeyValuesExtractor'
+
 import { formatTimeSummaryValue } from '@server/modules/record/service/recordService'
+import { formatTimeKeyValue } from '@webapp/views/Data/Records/recordKeyValuesExtractor'
 
 describe('time formatting for record keys and record summary export', () => {
   it('formatTimeKeyValue truncates to HH:mm when includeSeconds is not set', () => {

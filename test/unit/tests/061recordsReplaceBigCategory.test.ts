@@ -1,20 +1,18 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
+import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as Record from '@core/record/record'
-import * as RecordValidation from '@core/record/recordValidation'
-import * as Node from '@core/record/node'
-import * as NodeRefData from '@core/record/nodeRefData'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../../integration/config/context'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-
-import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 const { nodeDefType } = NodeDef
 

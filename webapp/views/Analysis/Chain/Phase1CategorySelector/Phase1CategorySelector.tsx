@@ -1,11 +1,10 @@
 import * as Chain from '@common/analysis/chain'
-import * as Category from '@core/survey/category'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
+import * as Category from '@core/survey/category'
 import { FormItem } from '@webapp/components/form/Input'
-import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { useAppDispatch } from '@webapp/store'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 export const Phase1CategorySelector = () => {
   const dispatch = useAppDispatch()

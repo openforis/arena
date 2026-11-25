@@ -2,21 +2,18 @@ import { useCallback } from 'react'
 
 import { DataImportTemplateTypes } from '@core/dataImport'
 import { FileFormats } from '@core/fileFormats'
+import * as StringUtils from '@core/stringUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
-import * as StringUtils from '@core/stringUtils'
-
-import { FormItem, Input } from '@webapp/components/form/Input'
 import { ButtonDownload, ButtonMenu, ButtonMenuExport } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/ErrorBadge'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import UploadButton from '@webapp/components/form/UploadButton'
 import { useNotifyWarning } from '@webapp/components/hooks'
-
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
 import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 

@@ -5,7 +5,6 @@ import { useCallback } from 'react'
 import { Objects } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
-
 import { ButtonMenu } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 

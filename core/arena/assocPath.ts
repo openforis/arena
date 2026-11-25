@@ -1,6 +1,6 @@
-import { _curry3 } from './internal/_curry3'
 import { assoc } from './assoc'
 import { has } from './has'
+import { _curry3 } from './internal/_curry3'
 
 const _assocPath = (pathArray: Array<string | number>, value: any, object: any): any => {
   if (pathArray.length === 0) return value

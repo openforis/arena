@@ -1,19 +1,16 @@
-import * as A from '@core/arena'
-
 import { Surveys } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import * as Survey from '@core/survey/survey'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { State } from '../../store'
 
 import { useHasSurveyUserGroups } from './useHasSurveyUserGroups'
 import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
-import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
-
-import { State } from '../../store'
 import { useIsMaxKeysCountReached } from './useIsMaxKeysCountReached'
+import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
 
 export const useBasicProps = (props) => {
   const { state } = props

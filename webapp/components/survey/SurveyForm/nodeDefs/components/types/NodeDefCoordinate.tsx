@@ -1,27 +1,24 @@
 import './NodeDefCoordinate.scss'
 
 import { useCallback } from 'react'
-import { useSelector } from 'react-redux'
 import classNames from 'classnames'
+import { useSelector } from 'react-redux'
 
-import * as StringUtils from '@core/stringUtils'
+import type { ArenaNodeDefCoordinate } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { RecordState } from '@webapp/store/ui/record'
-
+import * as Survey from '@core/survey/survey'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { RecordState } from '@webapp/store/ui/record'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
-
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 import { MapTriggerButton } from '../MapTriggerButton'
-import type { ArenaNodeDefCoordinate } from '@openforis/arena-core'
 import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const numberFormat = NumberFormats.decimal({ decimalScale: 12 })

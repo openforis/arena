@@ -1,14 +1,12 @@
 import { useMemo } from 'react'
 import { Box } from '@mui/material'
 
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { PrintOrientations } from '@common/record/printableExport'
-
-import { FormItem } from '@webapp/components/form/Input'
+import * as NodeDef from '@core/survey/nodeDef'
 import { Dropdown } from '@webapp/components/form'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { useNodeDefEditReadOnly } from './store'
 

@@ -1,14 +1,13 @@
 import type { AiPolicy } from '@common/ai/policy'
 import SystemError from '@core/systemError'
-
 import { createConsentRequestQueue } from '@webapp/ai/engines/consentRequests'
 import { getAiEngineErrorView } from '@webapp/ai/engines/engineUi'
 import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
 import { loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import { createModelResolver, type LocalServerConsentAnswer } from '@webapp/ai/engines/resolveModel'
 import type { AiCapabilities, AiEngine, StorageLike } from '@webapp/ai/engines/types'
-import { isRunStoppingError } from '@webapp/ai/workflows/batchRun'
 import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import { isRunStoppingError } from '@webapp/ai/workflows/batchRun'
 import { LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
 const LOCAL_URL = 'http://localhost:1234/v1'

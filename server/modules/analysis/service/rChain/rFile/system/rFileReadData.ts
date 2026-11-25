@@ -1,18 +1,17 @@
 import { FlatDataExportColumnDataType, FlatDataExportModel } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import * as ApiRoutes from '@common/apiRoutes'
-
-import RFileSystem from './rFileSystem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import {
-  setVar,
-  arenaGetCSV,
   arenaDfColumnsAsCharacter,
   arenaDfColumnsAsLogical,
   arenaDfColumnsAsNumeric,
+  arenaGetCSV,
+  setVar,
 } from '../../rFunctions'
+
+import RFileSystem from './rFileSystem'
 
 const dataConversionTypes = { asCharacter: 'asCharacter', asLogical: 'asLogical', asNumeric: 'asNumeric' }
 

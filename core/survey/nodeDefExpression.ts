@@ -1,17 +1,15 @@
-import { NodeDefExpressionFactory } from '@openforis/arena-core'
 import type {
   ArenaLabels,
   ArenaNodeDefExpression,
   ArenaNodeDefExpressionFactoryParams,
   ValidationSeverity,
 } from '@openforis/arena-core'
+import { NodeDefExpressionFactory } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as ValidationResult from '@core/validation/validationResult'
-
-import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
+import * as ValidationResult from '@core/validation/validationResult'
 
 // placeholder: expression row added in the UI and not filled yet
 type NodeDefExpression = ArenaNodeDefExpression & { placeholder?: boolean }

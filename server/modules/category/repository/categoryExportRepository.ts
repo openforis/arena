@@ -4,7 +4,6 @@ import { Schemata } from '@openforis/arena-server'
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import * as CategoryItem from '@core/survey/categoryItem'
-
 import * as DbUtils from '@server/db/dbUtils'
 
 export const cumulativeAreaField = 'area_cumulative'

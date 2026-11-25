@@ -3,11 +3,8 @@ import axios, { type AxiosProgressEvent } from 'axios'
 import { FileProcessor } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
-
 import * as Node from '@core/record/node'
-
 import { Chunks } from '@webapp/utils/chunks'
-
 import { objectToFormData } from '../utils/apiUtils'
 
 type AxiosProgressHandler = (progressEvent: AxiosProgressEvent) => void

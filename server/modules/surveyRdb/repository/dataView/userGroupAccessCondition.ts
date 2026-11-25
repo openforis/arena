@@ -1,11 +1,10 @@
-import { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-
-import * as StringUtils from '@core/stringUtils'
-import * as NodeDefUtils from '@core/survey/nodeDef'
-import * as SurveyUtils from '@core/survey/survey'
+import { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
 import { ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDefUtils from '@core/survey/nodeDef'
+import * as SurveyUtils from '@core/survey/survey'
 
 type QualifierFilter = { nodeDef: ArenaAnyNodeDef; value: unknown }
 

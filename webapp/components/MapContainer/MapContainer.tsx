@@ -1,34 +1,32 @@
-import type { LatLngBoundsExpression } from 'leaflet'
 import './Map.scss'
 
-import { useEffect, type ReactNode } from 'react'
-import { GeoJSON, MapContainer as RLMapContainer, ZoomControl, useMap as useLeafletMap } from 'react-leaflet'
-
-import { ButtonSave } from '@webapp/components'
-
-import i18nInstance from '@core/i18n/i18nFactory'
-
-import { MapLayersControl } from './MapLayersControl'
-import { MapMarker } from './MapMarker'
-import { MapContextProvider } from './MapContext'
-import { useMap } from './useMap'
-
-import { UtmGrid } from './UtmGrid'
-import { INITIAL_ZOOM_LEVEL, MAP_MAX_ZOOM, MAP_MIN_ZOOM } from './mapZoom'
-import { MapInstanceBridge, MapWorkspaceProvider } from './workspace/MapWorkspaceContext'
-import { MapWorkspace } from './workspace/MapWorkspace'
-import { MapCustomOverlaysProvider } from './workspace/layers/MapCustomOverlaysContext'
-import { CustomOverlaysRegistrar } from './workspace/customLayers/CustomOverlaysRegistrar'
-import { MapCustomLayersProvider } from './workspace/customLayers/MapCustomLayersContext'
-import { useMapRailTabs } from './workspace/rail/useMapRailTabs'
-
-// start of workaround to show leaflet marker icon
+import { type ReactNode, useEffect } from 'react'
+import type { GeoJsonObject } from 'geojson'
+import type { LatLngBoundsExpression } from 'leaflet'
 import L from 'leaflet'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
-import type { GeoJsonObject } from 'geojson'
+import { GeoJSON, MapContainer as RLMapContainer, useMap as useLeafletMap, ZoomControl } from 'react-leaflet'
+
+import i18nInstance from '@core/i18n/i18nFactory'
+import { ButtonSave } from '@webapp/components'
+
+import { MapContextProvider } from './MapContext'
+import { MapLayersControl } from './MapLayersControl'
+import { MapMarker } from './MapMarker'
+import { INITIAL_ZOOM_LEVEL, MAP_MAX_ZOOM, MAP_MIN_ZOOM } from './mapZoom'
+import { useMap } from './useMap'
+import { UtmGrid } from './UtmGrid'
+import { CustomOverlaysRegistrar } from './workspace/customLayers/CustomOverlaysRegistrar'
+import { MapCustomLayersProvider } from './workspace/customLayers/MapCustomLayersContext'
+import { MapCustomOverlaysProvider } from './workspace/layers/MapCustomOverlaysContext'
+import { MapWorkspace } from './workspace/MapWorkspace'
+import { MapInstanceBridge, MapWorkspaceProvider } from './workspace/MapWorkspaceContext'
 import type { MapRailTab, MapWorkspaceRecords } from './workspace/mapWorkspaceTypes'
+import { useMapRailTabs } from './workspace/rail/useMapRailTabs'
+
+// workaround to show leaflet marker icon
 L.Marker.prototype.options.icon = L.icon({
   iconSize: [25, 41],
   iconAnchor: [10, 41],

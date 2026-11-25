@@ -4,9 +4,9 @@
  */
 import type { ArenaUser } from '@openforis/arena-core'
 
+import { AiFeatures, getAiFeature } from '@common/ai/features'
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { AiFeatures, getAiFeature } from '@common/ai/features'
 
 import { areFeaturesEnabledForUser, isCategoryEnabledForUser } from './aiUserPrefs'
 

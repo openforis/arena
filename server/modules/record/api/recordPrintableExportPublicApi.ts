@@ -1,7 +1,6 @@
 import type { Request, Response, Router } from 'express'
 
 import { StatusCodes } from '@core/systemError'
-
 import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
 
 export const init = (app: Router): void => {

@@ -1,5 +1,10 @@
 import * as Survey from '@core/survey/survey'
-
+import {
+  buildCategoryLabelsSurvey,
+  categoryLabelChangeSet,
+  categoryLabelOp,
+  categoryUuidOf,
+} from '@test/unit/utils/categoryLabelsTestUtils'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { buildCategoryLabelGroups } from '@webapp/components/ai/Assistant/categoryLabelCardModel'
 import {
@@ -7,13 +12,6 @@ import {
   getOperationConflicts,
   getPendingOperationIds,
 } from '@webapp/components/ai/Assistant/changeSetCardModel'
-
-import {
-  buildCategoryLabelsSurvey,
-  categoryLabelChangeSet,
-  categoryLabelOp,
-  categoryUuidOf,
-} from '@test/unit/utils/categoryLabelsTestUtils'
 
 let survey: any
 let speciesUuid: string

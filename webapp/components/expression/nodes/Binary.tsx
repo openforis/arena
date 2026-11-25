@@ -1,11 +1,10 @@
 import * as A from '@core/arena'
-
 import * as Expression from '@core/expressionParser/expression'
-
+import { useI18n } from '@webapp/store/system'
 import Dropdown from '../../form/Dropdown'
+
 import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './EditButtons'
-import { useI18n } from '@webapp/store/system'
 import type { ExpressionNodeComponentProps } from './expressionNode'
 
 const Binary = (props: ExpressionNodeComponentProps) => {

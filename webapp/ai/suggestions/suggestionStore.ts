@@ -12,18 +12,20 @@ import {
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
 import {
-  HELP_BUCKET,
   getBucketOfConversation,
   getInProgressConversationIds,
   getPendingOf,
   getTrackedOf,
+  HELP_BUCKET,
   normalizeSuggestionState,
   parseSuggestionState,
   selectVisible,
   shrinkSuggestionState,
-  withBucketTouched,
+  type SuggestionUserState,
   toBucket,
+  type TrackedSuggestion,
   withAdded,
+  withBucketTouched,
   withDismissed,
   withKind,
   withModuleSeen,
@@ -32,8 +34,6 @@ import {
   withoutTargets,
   withProgress,
   withSettled,
-  type SuggestionUserState,
-  type TrackedSuggestion,
 } from './suggestionState'
 import type { AssistantSuggestion, SettleOutcome, SuggestionKind } from './types'
 

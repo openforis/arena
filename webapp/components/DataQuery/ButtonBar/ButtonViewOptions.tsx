@@ -1,9 +1,8 @@
 import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
-import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 import { useAppDispatch } from '@webapp/store'
+import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
 type Props = {
   nodeDefLabelType: NodeDef.NodeDefLabelType

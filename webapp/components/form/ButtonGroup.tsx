@@ -1,9 +1,9 @@
 import './ButtonGroup.scss'
 
-import classNames from 'classnames'
-import * as A from '@core/arena'
 import MuiButtonGroup from '@mui/material/ButtonGroup'
+import classNames from 'classnames'
 
+import * as A from '@core/arena'
 import { Button } from '../buttons'
 
 type ButtonGroupProps = {

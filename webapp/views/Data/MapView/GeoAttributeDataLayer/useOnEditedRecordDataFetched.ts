@@ -4,7 +4,6 @@ import { Objects } from '@openforis/arena-core'
 
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
-
 import { useI18n } from '@webapp/store/system'
 
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'

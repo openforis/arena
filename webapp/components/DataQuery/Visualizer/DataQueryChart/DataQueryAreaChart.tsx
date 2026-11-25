@@ -1,6 +1,7 @@
-import { AreaChart } from '@webapp/charts/AreaChart'
-import { useDataQueryChartData } from './useDataQueryChartData'
 import type { NodeDefLabelType } from '@core/survey/nodeDef'
+import { AreaChart } from '@webapp/charts/AreaChart'
+
+import { useDataQueryChartData } from './useDataQueryChartData'
 
 type DataQueryAreaChartProps = {
   data: any[]

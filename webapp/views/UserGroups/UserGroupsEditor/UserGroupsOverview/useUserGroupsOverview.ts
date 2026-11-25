@@ -4,11 +4,10 @@ import axios from 'axios'
 import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
-
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
-import { useAppDispatch } from '@webapp/store'
 
 export type SurveyUserType = Record<string, unknown>
 

@@ -1,13 +1,12 @@
 import { useCallback } from 'react'
 
 import { FileFormats } from '@core/fileFormats'
-
 import { ButtonDownload } from '@webapp/components/buttons'
+import { useAppDispatch } from '@webapp/store'
 import { JobActions } from '@webapp/store/app'
-import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import { useAppDispatch } from '@webapp/store'
 
 /**
  * Close button of the job monitor of the schema summary export with AI descriptions: warning and Download.

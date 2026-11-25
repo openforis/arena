@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
-import { Label, Legend, ScatterChart as ReChartsScatterChart, Scatter, Tooltip, XAxis, YAxis } from 'recharts'
+import { Label, Legend, Scatter, ScatterChart as ReChartsScatterChart, Tooltip, XAxis, YAxis } from 'recharts'
+
 import { Objects } from '@openforis/arena-core'
 
 import { CartesianGrid, ChartWrapper } from '../common'

@@ -11,11 +11,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
 import * as SB from '../utils/surveyBuilder'
 import * as SurveyUtils from '../utils/surveyUtils'
 

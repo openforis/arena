@@ -1,13 +1,12 @@
 import React from 'react'
 import classNames from 'classnames'
 
-import { FormItem } from '@webapp/components/form/Input'
-
 import * as NodeDef from '@core/survey/nodeDef'
-
+import { FormItem } from '@webapp/components/form/Input'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
-import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 import type { NodeDefComponentProps, NodeDefFieldLockProps } from '../nodeDefComponentProps'
+
+import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 
 type NodeDefFormItemProps = Omit<NodeDefComponentProps, 'updateNode'> &
   NodeDefFieldLockProps & {

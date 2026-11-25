@@ -3,18 +3,18 @@
  * call: text-only prompt (plus tool calls and results for tool features), function tools for tool features
  * only, no files/provider options, capped output, bounded prompt size.
  */
-import SystemError, { StatusCodes } from '@core/systemError'
-import { isAiProviderId } from '@common/ai/providerIds'
 import {
+  type AiDataClass,
   AiFeaturePermission,
   getAiFeature,
   getMaxAiDataClass,
   isDeclaredDataClassAllowed,
   isGatewayFeature,
-  type AiDataClass,
 } from '@common/ai/features'
+import { isAiProviderId } from '@common/ai/providerIds'
 import { isSchemaTool } from '@common/ai/schemaTools'
 import type { AiGatewayCall, AiGatewayRequest } from '@common/ai/wire'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 const PAYLOAD_TOO_LARGE = 413
 const MAX_STOP_SEQUENCES = 4

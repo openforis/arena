@@ -1,9 +1,10 @@
+import { mergeOperationResults } from '@webapp/ai/changeSets/operationResults'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'
 import {
-  DISCARD_NOTE,
   canShowAfterSave,
   decideLoadedConversation,
+  DISCARD_NOTE,
   getProposedChangeSetId,
   getRetryBase,
   getToolRowLabel,
@@ -11,7 +12,6 @@ import {
   withApplyResults,
   withDiscarded,
 } from '@webapp/components/ai/Assistant/assistantPanelModel'
-import { mergeOperationResults } from '@webapp/ai/changeSets/operationResults'
 
 const createdAt = '2026-10-06T10:00:00.000Z'
 

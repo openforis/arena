@@ -1,4 +1,4 @@
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+import { convertArrayToReadableStream, MockLanguageModelV4 } from 'ai/test'
 
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'

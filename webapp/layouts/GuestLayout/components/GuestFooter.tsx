@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import * as ProcessUtils from '@core/processUtils'
-
 import { getUserManualUri } from '@webapp/app/appModules'
 import { useI18nT } from '@webapp/store/system'
 

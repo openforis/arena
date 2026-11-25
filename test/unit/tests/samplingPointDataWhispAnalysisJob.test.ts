@@ -4,10 +4,9 @@ import * as path from 'node:path'
 import { DEFAULT_SRS_INDEX } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
-
-import * as FileUtils from '@server/utils/file/fileUtils'
 import SamplingPointDataWhispAnalysisJob from '@server/modules/geo/service/whispSamplingPointData/samplingPointDataWhispAnalysisJob'
 import { WhispColumnsCollector } from '@server/modules/geo/service/whispSamplingPointData/whispResultsUtils'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 const csvContent = [
   'level_1_code,location_x,location_y,location_srs',

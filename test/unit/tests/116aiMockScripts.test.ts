@@ -1,10 +1,10 @@
 import { jsonSchema, stepCountIs, streamText } from 'ai'
 
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
+import { getScriptedStep, MOCK_SCRIPTS } from '@server/modules/ai/service/mock/mockScripts'
 import { createMockModel } from '@server/modules/ai/service/mockProvider'
-import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
-import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
+import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 
 // a nodeDef_get call and its result
 const nodeDefGet = (id: string): any[] => [toolCallMessage(id, 'nodeDef_get'), toolResultMessage(id, 'nodeDef_get')]

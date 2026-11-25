@@ -1,6 +1,5 @@
-import path from 'node:path'
-
 import { Locator, Page } from '@playwright/test'
+import path from 'node:path'
 
 // set WHATS_NEW_SCREENSHOTS_DIR to save the screenshots used in the "What's new" dialog (see core/whatsNew/README.md)
 const screenshotsDir = process.env.WHATS_NEW_SCREENSHOTS_DIR

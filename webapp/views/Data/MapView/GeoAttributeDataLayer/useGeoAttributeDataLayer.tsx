@@ -1,29 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-import { Objects, type ArenaAnyNodeDef } from '@openforis/arena-core'
+import { type ArenaAnyNodeDef, Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import { useDataQuery } from '@webapp/components/DataQuery/store'
+import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
+import { JobActions } from '@webapp/store/app'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { JobActions } from '@webapp/store/app'
-import * as API from '@webapp/service/api'
-
-import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
-import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
-import { fitLayerBounds } from './fitLayerBounds'
-import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
+import { useLayerColorPicker, useMapClusters, useMapLayerToggle } from '../common'
 import type {
   GeoAttributePointFeature,
   GeoAttributePointsFilter,
   GeoAttributePointsLoadedHandler,
 } from '../common/mapPointTypes'
-import { useAppDispatch } from '@webapp/store'
+
+import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
+import { fitLayerBounds } from './fitLayerBounds'
+import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
 const onGeoJsonDataExportComplete =
   ({ surveyId }) =>

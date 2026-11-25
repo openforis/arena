@@ -1,24 +1,21 @@
-import type { ArenaTaxon, ArenaTaxonomy, ArenaVernacularName } from '@openforis/arena-core'
 import toSnakeCase from 'to-snake-case'
 
+import type { ArenaTaxon, ArenaTaxonomy, ArenaVernacularName } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
-
 import * as A from '@core/arena'
-import * as Taxonomy from '@core/survey/taxonomy'
+import type { ExtraPropDefItems } from '@core/survey/extraPropDef'
 import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-
 import * as DB from '@server/db'
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-
 import {
-  updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
+  updateSurveySchemaTableProp,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
-import type { ExtraPropDefItems } from '@core/survey/extraPropDef'
 
 const searchTypes = {
   equals: 'equals',

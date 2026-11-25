@@ -1,16 +1,15 @@
 import './Breadcrumbs.scss'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router'
-
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs'
 import MuiLink from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
+import { Link, useLocation } from 'react-router'
 
 import * as AppModules from '@webapp/app/appModules'
 import { homeModules } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
 import { useIsSurveyDirty } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { computeBreadcrumbsMaxItems } from '@webapp/utils/breadcrumbsUtils'
 
 type CrumbItem = {

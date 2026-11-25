@@ -1,20 +1,19 @@
-import type { ArenaMobileDataImportJobContext } from './arenaMobileDataImportJobContext'
 import { Surveys, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-
 import Job, { type JobParams } from '@server/job/job'
+import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
 import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
+import * as RecordsUploadNotificationService from '../recordsUploadNotificationService'
+
+import type { ArenaMobileDataImportJobContext } from './arenaMobileDataImportJobContext'
 import ArenaFileReadJob from './jobs/arenaFileReadJob'
 import RecordsImportJob from './jobs/recordsImportJob'
-import * as RecordsUploadNotificationService from '../recordsUploadNotificationService'
 
 export default class ArenaMobileDataImportJob extends Job<ArenaMobileDataImportJobContext> {
   static readonly type = 'ArenaMobileDataImportJob'

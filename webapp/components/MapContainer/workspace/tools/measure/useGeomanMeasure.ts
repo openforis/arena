@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { Dispatch, RefObject } from 'react'
 import type L from 'leaflet'
+import type { Dispatch, RefObject } from 'react'
 
 import {
   finishMeasureDraw,

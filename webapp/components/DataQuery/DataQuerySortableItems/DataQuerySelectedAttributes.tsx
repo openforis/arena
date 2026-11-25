@@ -1,10 +1,8 @@
 import { useCallback } from 'react'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import { ArrayUtils } from '@core/arrayUtils'
-
 import { Query } from '@common/model/query'
-
+import { ArrayUtils } from '@core/arrayUtils'
+import * as NodeDef from '@core/survey/nodeDef'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { DataQuerySortableItems } from './DataQuerySortableItems'

@@ -1,10 +1,10 @@
-import { asyncBufferFromUrl, cachedAsyncBuffer, parquetMetadataAsync, parquetReadObjects } from 'hyparquet'
 import type { AsyncBuffer, FileMetaData } from 'hyparquet'
+import { asyncBufferFromUrl, cachedAsyncBuffer, parquetMetadataAsync, parquetReadObjects } from 'hyparquet'
 import { compressors } from 'hyparquet-compressors'
 
-import { readPartLength, SCENE_INDEX_REQUEST_INIT } from './sceneIndexFetch'
-import type { FetchLike } from './sceneIndexFetch'
 import { createSceneIndexCache } from './sceneIndexCache'
+import type { FetchLike } from './sceneIndexFetch'
+import { readPartLength, SCENE_INDEX_REQUEST_INIT } from './sceneIndexFetch'
 import { getRowGroupInfos, SCENE_INDEX_TILE_COLUMN } from './sceneIndexParts'
 import { compactSceneRow } from './sceneRows'
 import type { RowGroupInfo, SceneIndexReader, SceneIndexRow } from './sceneTypes'

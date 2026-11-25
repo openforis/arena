@@ -6,16 +6,14 @@ import { ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
-import * as API from '@webapp/service/api'
-import { surveyInfoToLabel, useNotifyError, useOtherSurveysList } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
-
-import { FormItem } from '@webapp/components/form/Input'
-import { Dropdown } from '@webapp/components/form'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
+import { Dropdown } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+import { surveyInfoToLabel, useNotifyError, useOtherSurveysList } from '@webapp/components/hooks'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
+import * as API from '@webapp/service/api'
+import { useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { getTaxonomyDuplicateCheck } from './taxonomyCloneDuplicateCheck'
 

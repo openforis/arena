@@ -1,14 +1,11 @@
 import { useCallback } from 'react'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
-
 import * as API from '@webapp/service/api'
-
-import { useSurveyId, SurveyActions } from '@webapp/store/survey'
-
-import { State } from '../state'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { debounceAction } from '@webapp/utils/reduxUtils'
+import { State } from '../state'
 
 export const useUpdate = ({ setState }) => {
   const dispatch = useAppDispatch()

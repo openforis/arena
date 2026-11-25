@@ -1,9 +1,7 @@
-import SystemError from '@core/systemError'
-
-import { getBatchStopText } from '@webapp/components/ai/AiBatchProgressDialog/batchStopText'
-
 import enAppErrorsModule from '@core/i18n/resources/en/appErrors'
 import enCommon from '@core/i18n/resources/en/common'
+import SystemError from '@core/systemError'
+import { getBatchStopText } from '@webapp/components/ai/AiBatchProgressDialog/batchStopText'
 
 const enAppErrors = enAppErrorsModule as unknown as Record<string, string>
 

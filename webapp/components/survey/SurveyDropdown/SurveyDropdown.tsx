@@ -1,10 +1,9 @@
 import './SurveyDropdown.scss'
 
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
-
 import { Dropdown } from '@webapp/components/form'
 import { SurveyType } from '@webapp/model'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 import { useSurveyDropdownOptions } from './useSurveyDropdownOptions'
 

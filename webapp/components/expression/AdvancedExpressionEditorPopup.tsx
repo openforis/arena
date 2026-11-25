@@ -1,19 +1,19 @@
 import './ExpressionEditorPopup.scss'
 
-import { useState, useCallback, useMemo } from 'react'
-import ReactCodeMirror from '@uiw/react-codemirror'
-import { javascript } from '@codemirror/lang-javascript'
+import { useCallback, useMemo, useState } from 'react'
 import { autocompletion } from '@codemirror/autocomplete'
+import { javascript } from '@codemirror/lang-javascript'
+import ReactCodeMirror from '@uiw/react-codemirror'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
-import * as Expression from '@core/expressionParser/expression'
-
-import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n, useI18nT } from '@webapp/store/system'
 
 import { useAutocompletionSource } from './useAutocompletionSource'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
 

@@ -1,9 +1,9 @@
 import {
+  type AiPolicy,
+  type AiPolicyLevel,
   aiPolicyLevels,
   clampDataToSchema,
   getPolicyLevelIndex,
-  type AiPolicy,
-  type AiPolicyLevel,
 } from '@common/ai/policy'
 
 export type PolicyLevelOption = { key: AiPolicyLevel; label: string; title: string; disabled: boolean }

@@ -1,4 +1,3 @@
-import type { ReviewItem } from '@webapp/components/ai/Assistant/changeSetReviewModel'
 import {
   getCategoryUuid,
   getItemDetailLines,
@@ -7,6 +6,7 @@ import {
   isCategoryItem,
   splitReviewItems,
 } from '@webapp/components/ai/Assistant/changeItemModel'
+import type { ReviewItem } from '@webapp/components/ai/Assistant/changeSetReviewModel'
 import { fakeT as t } from '../utils/fakeT'
 
 const nodeDefItem = (id: string, nodeDefUuid = `uuid-${id}`): ReviewItem => ({

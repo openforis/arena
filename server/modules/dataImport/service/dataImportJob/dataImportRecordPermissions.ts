@@ -1,7 +1,6 @@
-import { ArenaRecord, Authorizer, ArenaUser, type ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, ArenaRecord, type ArenaSurvey, ArenaUser, Authorizer } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 // see SurveyManager.fetchUserQualifierFilters

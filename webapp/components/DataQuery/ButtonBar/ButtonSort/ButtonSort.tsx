@@ -1,13 +1,11 @@
 import classNames from 'classnames'
 
 import { Query, Sort, SortCriteria } from '@common/model/query'
-
+import { Button } from '@webapp/components/buttons'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
-
-import { Button } from '@webapp/components/buttons'
-
 import { State } from '../store'
+
 import SortEditor from './SortEditor'
 
 type ButtonSortProps = {

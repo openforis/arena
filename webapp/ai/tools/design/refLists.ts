@@ -4,14 +4,14 @@
  */
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
 import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { getResultBudget, takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
+
 import { requireSurvey } from './surveyLookup'
 
 // the wrapper cuts a longer result at the end of its largest list (valid values, truncated: true): stay under the limit with some margin

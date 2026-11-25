@@ -1,11 +1,11 @@
-import { applyChangeSet, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
+import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
+import { type ApplierDeps, applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { getRequestFailure } from '@webapp/ai/changeSets/requestFailure'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
 import { runTool } from '@webapp/ai/tools/registry'
 import { getResultTitle } from '@webapp/components/ai/Assistant/changeItemModel'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
-import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
 import { fakeT as t } from '../utils/fakeT'
 
 const axiosError = (data: unknown) =>
