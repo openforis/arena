@@ -1,6 +1,5 @@
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
 
 const _isUserRemoved = () => A.pipe(ActivityLog.getTargetUserUuid, A.isNil)
 

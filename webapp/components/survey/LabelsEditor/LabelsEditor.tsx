@@ -1,26 +1,26 @@
 import './LabelsEditor.scss'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import * as A from '@core/arena'
 import classNames from 'classnames'
 
-import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyLangs, useSurveyPreferredLang, useSurveyId } from '@webapp/store/survey'
-import { useNotifyInfo, useNotifyError, useNotifyWarning } from '@webapp/components/hooks'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-import { Button } from '@webapp/components/buttons'
-import { Spinner } from '@webapp/components/Spinner'
-import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import * as A from '@core/arena'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
-import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
+import { Button } from '@webapp/components/buttons'
+import { useNotifyError, useNotifyInfo, useNotifyWarning } from '@webapp/components/hooks'
+import { Spinner } from '@webapp/components/Spinner'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useSurveyId, useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
-import Label from './Label'
 import ButtonToggle from './ButtonToggle'
+import Label from './Label'
 import { mergeTranslatedLabels } from './mergeTranslatedLabels'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 const MAX_PREVIEW_LANGUAGES = 1
 

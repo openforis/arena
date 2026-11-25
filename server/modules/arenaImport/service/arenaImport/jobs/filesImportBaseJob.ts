@@ -1,9 +1,7 @@
-import SystemError from '@core/systemError'
 import * as SurveyFile from '@core/survey/surveyFile'
-
-import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-
+import SystemError from '@core/systemError'
 import Job, { type JobParams } from '@server/job/job'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
 export class FileImportBaseJob extends Job {
   deletedFileUuids: string[]

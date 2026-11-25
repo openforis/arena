@@ -1,18 +1,18 @@
 import './nodeDefs.scss'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import * as A from '@core/arena'
 import classNames from 'classnames'
+import { useSelector } from 'react-redux'
 
-import { RecordNodes, Objects, type ArenaAnyNodeDef, type ArenaRecordNode } from '@openforis/arena-core'
+import { type ArenaAnyNodeDef, type ArenaRecordNode, Objects, RecordNodes } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
+import * as A from '@core/arena'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
+import * as Survey from '@core/survey/survey'
+import { useAppDispatch } from '@webapp/store'
 import {
   SurveyState,
   useIsNodeDefEnumerator,
@@ -20,19 +20,16 @@ import {
   useSurveyInfo,
   useSurveyPreferredLang,
 } from '@webapp/store/survey'
-import { useAuthCanEditQualifierAttributeValue } from '@webapp/store/user'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
-
-import * as NodeDefUiProps from './nodeDefUIProps'
-
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
+import { useAuthCanEditQualifierAttributeValue } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEditButtons from './components/NodeDefEditButtons'
+import NodeDefFormItem from './components/NodeDefFormItem'
 import NodeDefTableCellBody from './components/NodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/NodeDefTableCellHeader'
-import NodeDefFormItem from './components/NodeDefFormItem'
-import { useAppDispatch } from '@webapp/store'
+import * as NodeDefUiProps from './nodeDefUIProps'
 
 const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   const keyDefs = Survey.getNodeDefKeys(nodeDef)(survey)

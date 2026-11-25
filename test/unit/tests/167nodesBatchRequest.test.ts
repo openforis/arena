@@ -1,8 +1,8 @@
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import {
   groupEditsByRecord,
   parseNodesBatchRequest,
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchRequest'
-import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { failedResults } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
 
 const uuidOf = (prefix: string, n: number) => `${prefix}-0000-4000-8000-${String(n).padStart(12, '0')}`

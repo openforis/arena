@@ -3,14 +3,14 @@
  * the label and description of every node def, in the default language, translated into the other survey languages
  * with the model of resolveModel. The result is the review data of NodeDefsTranslationModal.
  */
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
-import * as StringUtils from '@core/stringUtils'
 import { AiLimits } from '@common/ai/limits'
 import type { AiGenerateText } from '@common/ai/llm'
 import { type AiTranslationItem, type AiTranslationResult, translateItems } from '@common/ai/tasks/translation'
-
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import type { TranslationSource } from '../changeSets/translationSource'
+
 import { resolveBatchModel } from './batchModel'
 import {
   type AiBatchCall,

@@ -1,5 +1,5 @@
-import { createConsentRequestQueue } from '@webapp/ai/engines/consentRequests'
 import type { AiPolicy } from '@common/ai/policy'
+import { createConsentRequestQueue } from '@webapp/ai/engines/consentRequests'
 import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
 import { loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import {

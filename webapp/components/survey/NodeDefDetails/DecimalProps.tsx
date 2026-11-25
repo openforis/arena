@@ -1,9 +1,8 @@
+import * as NodeDef from '@core/survey/nodeDef'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
-import * as NodeDef from '@core/survey/nodeDef'
-
-import { State, useNodeDefEditReadOnly } from './store'
 import NodeDefUnitFormItem from './NodeDefUnitFormItem'
+import { State, useNodeDefEditReadOnly } from './store'
 
 type DecimalPropsProps = {
   state: Record<string, any>

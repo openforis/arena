@@ -1,5 +1,5 @@
-import type FileZip from '@server/utils/file/fileZip'
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
+import type FileZip from '@server/utils/file/fileZip'
 
 const _getJson = async (zipFile: FileZip, entryName: string, defaultValue = null) => {
   const content = await zipFile.getEntryData(entryName)

@@ -7,10 +7,10 @@ import { TestId } from '@webapp/utils/testId'
 import {
   buildContextMeter,
   CONTEXT_RING_RADIUS,
+  type ContextMeter,
   getContextMeterShortText,
   getContextMeterText,
   getContextRingDashArray,
-  type ContextMeter,
 } from './contextMeterModel'
 
 /**

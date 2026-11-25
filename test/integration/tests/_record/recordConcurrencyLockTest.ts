@@ -1,18 +1,14 @@
-import { db } from '@server/db/db'
-
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { db } from '@server/db/db'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
-
-import { getContextUser, fetchFullContextSurvey } from '../../config/context'
-
 import * as RB from '../../../utils/recordBuilder'
-import * as SB from '../../../utils/surveyBuilder'
 import * as RecordUtils from '../../../utils/recordUtils'
+import * as SB from '../../../utils/surveyBuilder'
+import { fetchFullContextSurvey, getContextUser } from '../../config/context'
 
 // The real thread posts messages to the parent port, which doesn't exist in the main thread:
 // collect them instead, so the record processing logic can be exercised in-process.

@@ -1,13 +1,13 @@
 import { ServiceRegistry } from '@openforis/arena-core'
+import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 
 import * as AuthGroup from '@core/auth/authGroup'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import { uuidv4 } from '@core/uuid'
-
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as RecordApi from '@server/modules/record/api/recordApi'
 import { requireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
@@ -16,18 +16,16 @@ import {
   requireRecordMatchesUserGroupQualifiers,
   requireRecordReadableByUserGroup,
 } from '@server/modules/record/api/recordQualifierMiddleware'
-import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyApi from '@server/modules/survey/api/surveyApi'
-
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { getContextUser } from '@test/integration/config/context'
 import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
-import * as SB from '@test/utils/surveyBuilder'
 import * as RB from '@test/utils/recordBuilder'
 import * as RecordUtils from '@test/utils/recordUtils'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'
-import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
+import * as SB from '@test/utils/surveyBuilder'
 
 type Route = CollectedRoute
 

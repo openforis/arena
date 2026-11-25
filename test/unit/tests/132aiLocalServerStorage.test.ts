@@ -1,10 +1,10 @@
-import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
+import { memoryStorage, throwingStorage } from '@test/unit/utils/aiTestUtils'
 import {
   getLocalServerConsentKey,
   loadLocalServerConsent,
   saveLocalServerConsent,
 } from '@webapp/ai/engines/localServerConsent'
-import { memoryStorage, throwingStorage } from '@test/unit/utils/aiTestUtils'
+import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
 
 describe('local server settings', () => {
   test('the default URL is the LM Studio one', () => {

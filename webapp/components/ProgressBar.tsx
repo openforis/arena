@@ -1,7 +1,7 @@
 import './ProgressBar.scss'
 
-import classNames from 'classnames'
 import { LinearProgress } from '@mui/material'
+import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 

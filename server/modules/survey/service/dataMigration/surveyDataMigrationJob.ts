@@ -1,11 +1,12 @@
-import { Versions, type ArenaJobContext } from '@openforis/arena-core'
+import { type ArenaJobContext, Versions } from '@openforis/arena-core'
 
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
 import {
   getCurrentAppVersionStamp,
-  surveyDataMigrationSteps,
   SurveyDataMigrationStep,
+  surveyDataMigrationSteps,
 } from './surveyDataMigrationSteps'
 
 /**

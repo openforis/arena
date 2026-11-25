@@ -1,11 +1,9 @@
 import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
-
 import { ButtonDownload } from '@webapp/components/buttons'
 import { JobActions } from '@webapp/store/app'
 import { TestId } from '@webapp/utils/testId'
-
 import * as SurveyState from '../state'
 
 export const exportSurvey =

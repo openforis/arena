@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {

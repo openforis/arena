@@ -4,13 +4,12 @@ import classNames from 'classnames'
 import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
-import * as SurveyBranding from '@core/survey/surveyBranding'
 import type { BrandingImageDescriptor, SurveyLogoKey } from '@core/survey/surveyBranding'
-
-import { appModuleUri, dataModules, appModules } from '@webapp/app/appModules'
+import * as SurveyBranding from '@core/survey/surveyBranding'
+import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
-import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanCleanseRecords, useAuthCanEditSurvey } from '@webapp/store/user'
 

@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
-import { useRefreshTaxonomy } from './useRefreshTaxonomy'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+
+import { useRefreshTaxonomy } from './useRefreshTaxonomy'
 
 export const useUpdateTaxonomyExtraPropDef = ({ setState }) => {
   const dispatch = useAppDispatch()

@@ -1,12 +1,11 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
+import * as Survey from '@core/survey/survey'
+import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeOperation, ChangeSet } from '@webapp/ai/changeSets/types'
-import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 
 let survey: any
 

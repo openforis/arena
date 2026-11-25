@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react'
 
 import * as StringUtils from '@core/stringUtils'
-
-import { ServiceErrorActions, useI18n } from '@webapp/store/system'
-
 import Markdown from '@webapp/components/Markdown'
 import { useAppDispatch } from '@webapp/store'
+import { ServiceErrorActions, useI18n } from '@webapp/store/system'
 
 const appErrorsNamespace = 'appErrors:'
 const _toMessageKey = (key) => [key, StringUtils.prependIfMissing(appErrorsNamespace)(key)]

@@ -6,21 +6,16 @@ import { useCallback, useEffect, useMemo } from 'react'
 
 import { createLocalProviderId } from '@common/ai/providerIds'
 import { uuidv4 } from '@core/uuid'
-
-import * as API from '@webapp/service/api'
-import type { AiProviderRequest, AiProviderTestResponse } from '@webapp/service/api/ai/providers'
-
 import { getCurrentUserUuid, refreshAiCapabilities, testLocalServer } from '@webapp/ai/engines/capabilitiesStore'
 import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/localProviders'
-import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalServerTestView } from '@webapp/ai/engines/localServerTest'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
+import * as API from '@webapp/service/api'
+import type { AiProviderRequest, AiProviderTestResponse } from '@webapp/service/api/ai/providers'
 import { useI18nT } from '@webapp/store/system'
-
 import { getApiErrorMessage } from '../aiSettingsForm'
-import { getLocalDraftUrl } from './providerDraft'
-import { buildLocalProviderSave, buildAccountRequest, canSaveDraft, shouldBecomeDefault } from './providerSave'
-import { canListModels } from './providerModels'
+
 import {
   createInitialState,
   getProviderDialogView,
@@ -29,6 +24,9 @@ import {
   type ProviderDialogState,
   type ProviderDialogView,
 } from './providerDialogState'
+import { getLocalDraftUrl } from './providerDraft'
+import { canListModels } from './providerModels'
+import { buildAccountRequest, buildLocalProviderSave, canSaveDraft, shouldBecomeDefault } from './providerSave'
 import { buildTestKey, getInitialLocalTest, toFailedTestResult } from './providerTest'
 import {
   getProviderTypeGroups,

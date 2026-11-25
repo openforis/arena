@@ -1,7 +1,5 @@
 import * as Survey from '@core/survey/survey'
-
 import Job, { type JobParams } from '@server/job/job'
-
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
 export default class NodeDefsImportJob extends Job {

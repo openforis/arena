@@ -1,7 +1,6 @@
 import { Locator, Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import { Urls } from '../helpers/urls'

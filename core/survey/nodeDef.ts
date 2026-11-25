@@ -1,7 +1,5 @@
 import {
-  NodeDefs,
-  NodeDefType,
-  Objects,
+  ArenaAnyNodeDef,
   type ArenaLabels,
   type ArenaNodeDefBoolean,
   type ArenaNodeDefCode,
@@ -20,23 +18,24 @@ import {
   type ArenaNodeDefText,
   type ArenaNodeDefTime,
   type ArenaNodeDefValidations,
-  ArenaAnyNodeDef,
+  NodeDefs,
+  NodeDefType,
+  Objects,
 } from '@openforis/arena-core'
 
-import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
+import { ArrayUtils } from '@core/arrayUtils'
+import { extractCallFirstTwoArgs } from '@core/expressionParser/helpers/functionCallArgs'
+import { functionNames, userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { ArrayUtils } from '@core/arrayUtils'
-import { functionNames, userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
-import { extractCallFirstTwoArgs } from '@core/expressionParser/helpers/functionCallArgs'
-
+import { uuidv4 } from '@core/uuid'
 import * as TextUtils from '@webapp/utils/textUtils'
 
-import { nodeDefType } from './nodeDefType'
-import * as NodeDefLayout from './nodeDefLayout'
-import * as NodeDefValidations from './nodeDefValidations'
 import * as NodeDefExpression from './nodeDefExpression'
+import * as NodeDefLayout from './nodeDefLayout'
+import { nodeDefType } from './nodeDefType'
+import * as NodeDefValidations from './nodeDefValidations'
 import { valuePropsTaxon } from './nodeValueProps'
 
 // Any node def; the getters below are null-tolerant (a missing parent def is a common argument).

@@ -1,10 +1,9 @@
 import type { ArenaChain } from '@openforis/arena-core'
-import type { DbClient } from '@server/db/db'
 import { DB } from '@openforis/arena-server'
 
 import * as Chain from '@common/analysis/chain'
 import { TableChain } from '@common/model/db'
-
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 export const insertMany = (

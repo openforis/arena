@@ -1,14 +1,12 @@
 import { GeoPackageAPI } from '@ngageoint/geopackage'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import CategoryGeoPackageExportJob from '@server/modules/category/service/categoryGeoPackageExportJob'
-
+import * as FileUtils from '@server/utils/file/fileUtils'
 import { getContextSurveyId, getContextUser } from '../../config/context'
 
 export const categoryGeoPackageExportTest = async () => {

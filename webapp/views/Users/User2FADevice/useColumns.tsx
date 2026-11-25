@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 
-import { User2FADevice } from '@core/user2FADevice'
 import * as DateUtils from '@core/dateUtils'
-
+import { User2FADevice } from '@core/user2FADevice'
 import { ButtonIconEdit } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useUser } from '@webapp/store/user'

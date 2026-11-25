@@ -1,14 +1,12 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import * as SB from '../../utils/surveyBuilder'
-
+import * as Survey from '@core/survey/survey'
 import {
   buildPlotCandidates,
   planarDistance,
-  toPlotLayers,
   type PlotLayer,
+  toPlotLayers,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotPlotCandidates'
+import * as SB from '../../utils/surveyBuilder'
 
 const point = ({
   recordUuid,

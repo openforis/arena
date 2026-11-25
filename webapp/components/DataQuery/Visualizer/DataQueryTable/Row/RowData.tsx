@@ -1,11 +1,12 @@
 import classNames from 'classnames'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { ColumnData, ColumnDataEdit } from './Column'
 import LinkRecord from './LinkRecord'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type RowDataProps = {
   className?: string

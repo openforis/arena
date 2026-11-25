@@ -1,6 +1,6 @@
-import { _curry2 } from './internal/_curry2'
 import { assoc } from './assoc'
 import { dissoc } from './dissoc'
+import { _curry2 } from './internal/_curry2'
 import { remove } from './remove'
 
 const _dissocPath = (pathArray: Array<string | number>, object: any): any => {

@@ -1,11 +1,11 @@
 import http from 'node:http'
 import type { AddressInfo } from 'node:net'
 
+import { isNonPublicIpAddress } from '@common/ai/ipAddress'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
+import { assertBaseUrlAllowed, isAllowlisted } from '@server/modules/ai/service/baseUrlGuard'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { buildModel, buildUserModel } from '@server/modules/ai/service/providerRegistry'
-import { isNonPublicIpAddress } from '@common/ai/ipAddress'
-import { assertBaseUrlAllowed, isAllowlisted } from '@server/modules/ai/service/baseUrlGuard'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const lookupTo =

@@ -3,19 +3,17 @@ import './JobMonitor.scss'
 import React from 'react'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-
-import { useJob, JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
-
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
+import { useAppDispatch } from '@webapp/store'
+import { JobActions, useJob } from '@webapp/store/app'
+import { useI18n } from '@webapp/store/system'
 
 import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
 import JobLongRunningMessage from './JobLongRunningMessage'
 import JobProgress from './JobProgress'
 import JobTiming from './JobTiming'
-import { useAppDispatch } from '@webapp/store'
 
 const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null

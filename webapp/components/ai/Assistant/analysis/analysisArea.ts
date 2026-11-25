@@ -1,11 +1,9 @@
 import type { AiDataClass } from '@common/ai/features'
-import { appModuleUri, appModules, dataModules } from '@webapp/app/appModules'
-
 import { isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
 import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
-
-import { fromAvailability, type AssistantAreaStatus } from '../assistantAreas'
+import { appModules, appModuleUri, dataModules } from '@webapp/app/appModules'
+import { type AssistantAreaStatus, fromAvailability } from '../assistantAreas'
 
 type Availability = AiFeatureAvailability | AiEngineFeatureAvailability
 

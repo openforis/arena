@@ -1,11 +1,10 @@
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import Job, { type JobParams } from '@server/job/job'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
-import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
-
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryService from '@server/modules/category/service/categoryService'
 
 /**
  * Inserts a category for each code list in the Collect survey.

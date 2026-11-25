@@ -3,12 +3,11 @@
  * data). A state detector over the whole survey; only attributes whose list the designer lets change.
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { canUpdateNodeDefRef } from '@webapp/ai/changeSets/operations'
 import type { NodeDefRefProp } from '@webapp/ai/changeSets/types'
 import { getDesignNodeDefsDepthFirst } from '@webapp/ai/tools/design/surveyLookup'
-
 import type { AssistantSuggestion } from '../types'
+
 import { getDesignDetectorScope, newDesignSuggestion } from './designTargets'
 import type { DetectorContext, StateDetector } from './types'
 

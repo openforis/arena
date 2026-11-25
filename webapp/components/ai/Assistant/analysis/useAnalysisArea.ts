@@ -1,14 +1,12 @@
-import * as Survey from '@core/survey/survey'
-
 import type { AiFeatureKey } from '@common/ai/features'
-
+import * as Survey from '@core/survey/survey'
 import { getConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
-
 import type { AssistantAreaStatus } from '../assistantAreas'
 import { useAssistantFeatureAvailability } from '../useAssistantFeatureAvailability'
+
 import { getAnalysisAreaStatus, shouldShowRecordDataNotice } from './analysisArea'
 
 /**

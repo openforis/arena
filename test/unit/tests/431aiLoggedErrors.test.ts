@@ -1,5 +1,5 @@
-import { getHeldLockNames, holdSuggestionTurnLock } from '@webapp/ai/suggestions/suggestionConversation'
 import { reconcileInProgress } from '@webapp/ai/suggestions/reconcileInProgress'
+import { getHeldLockNames, holdSuggestionTurnLock } from '@webapp/ai/suggestions/suggestionConversation'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 

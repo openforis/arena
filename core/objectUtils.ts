@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 
-import * as StringUtils from './stringUtils'
 import * as DateUtils from './dateUtils'
+import * as StringUtils from './stringUtils'
 
 export const keys = {
   authGroups: 'authGroups',

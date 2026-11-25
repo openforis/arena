@@ -1,27 +1,25 @@
 import {
+  type ArenaAnyNodeDef,
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type ArenaSurvey,
   Dates,
   Objects,
   Records,
   Surveys,
-  type ArenaRecord,
-  type ArenaRecordNode,
-  type ArenaSurvey,
-  type ArenaAnyNodeDef,
 } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
-
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
-import SystemError from '@core/systemError'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { NodeValues } from '@core/record/nodeValues'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxon from '@core/survey/taxon'
+import SystemError from '@core/systemError'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 

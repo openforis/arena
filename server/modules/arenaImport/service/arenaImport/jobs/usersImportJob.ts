@@ -1,18 +1,17 @@
-import type FileZip from '@server/utils/file/fileZip'
 import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
-import type { DbClient } from '@server/db/db'
-import Job, { type JobParams } from '@server/job/job'
+
 import * as AuthGroup from '@core/auth/authGroup'
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import { UserInvitation } from '@core/user/userInvitation'
-import * as Survey from '@core/survey/survey'
-
-import * as UserManager from '@server/modules/user/manager/userManager'
-import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
-import * as UserInvitationsRepository from '@server/modules/user/repository/userInvitationRepository'
-
-import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import Job, { type JobParams } from '@server/job/job'
+import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
+import * as UserManager from '@server/modules/user/manager/userManager'
+import * as UserInvitationsRepository from '@server/modules/user/repository/userInvitationRepository'
+import type FileZip from '@server/utils/file/fileZip'
+import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
 const _associateToGroup = async (
   { userUuid, groupName }: { userUuid: string; groupName: string },

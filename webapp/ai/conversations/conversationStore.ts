@@ -3,8 +3,7 @@
  * windows, blocked storage). Nothing is sent to the server.
  */
 import { AiLimits } from '@common/ai/limits'
-
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 
 import { toSurveyKey } from './conversationModel'
 import type { Conversation } from './types'

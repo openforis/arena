@@ -1,7 +1,10 @@
 import type React from 'react'
-import ValidationTooltip from '../ValidationTooltip'
-import { FormItem } from './Input'
+
 import type { ArenaValidation } from '@openforis/arena-core'
+
+import ValidationTooltip from '../ValidationTooltip'
+
+import { FormItem } from './Input'
 
 type FormItemWithValidationProps = {
   children: React.ReactNode

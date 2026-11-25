@@ -1,6 +1,6 @@
-import * as A from '@core/arena'
-
 import { Objects } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 
 const keys = {
   oldPassword: 'oldPassword',

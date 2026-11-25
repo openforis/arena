@@ -2,20 +2,20 @@ import './SurveyDocLayoutEditor.scss'
 
 import { useCallback, useState } from 'react'
 
-import * as SurveyFile from '@core/survey/surveyFile'
-import * as DateUtils from '@core/dateUtils'
-import { SurveyDocImages, type ArenaSurveyDocImage } from '@openforis/arena-core'
+import { type ArenaSurveyDocImage, SurveyDocImages } from '@openforis/arena-core'
 
+import * as DateUtils from '@core/dateUtils'
+import * as SurveyFile from '@core/survey/surveyFile'
 import { ButtonAdd, Fieldset } from '@webapp/components'
-import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid, rowActionColumns } from '@webapp/components/DataGrid'
 import { Checkbox } from '@webapp/components/form'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import * as API from '@webapp/service/api'
 
 import SurveyDocImageEditor from './SurveyDocImageEditor'
 

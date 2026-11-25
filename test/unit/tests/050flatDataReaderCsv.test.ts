@@ -1,9 +1,7 @@
 import { Readable } from 'stream'
 
 import { FileFormats } from '@core/fileFormats'
-
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
-
 import { readHeadersAndRows } from '../../utils/flatDataImportTestUtils'
 
 const readCsv = async (content: string) =>

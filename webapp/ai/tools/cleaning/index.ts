@@ -1,12 +1,11 @@
-import { I18nState } from '@webapp/store/system'
-
 import type { AiTool } from '@webapp/ai/tools/types'
+import { I18nState } from '@webapp/store/system'
 
 import { axiosCleaningApi, type CleaningApi } from './cleaningApi'
 import { createRecordGetValuesTool } from './recordGetValuesTool'
 import { createRecordsProposeEditsTool } from './recordsProposeEditsTool'
-import { createValidationTools } from './validationTools'
 import type { CleaningI18n } from './validationRows'
+import { createValidationTools } from './validationTools'
 
 /**
  * Creates the tools of the cleaning area.

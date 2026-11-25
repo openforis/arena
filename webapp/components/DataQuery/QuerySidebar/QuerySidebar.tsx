@@ -1,14 +1,11 @@
 import './QuerySidebar.scss'
 
 import { Query } from '@common/model/query'
-
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
 import { ButtonGroup } from '@webapp/components/form'
-
 import { useIsAppSaving } from '@webapp/store/app'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-
 import QueryNodeDefsSelector from '../QueryNodeDefsSelector'
-import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 const { modes } = Query
 

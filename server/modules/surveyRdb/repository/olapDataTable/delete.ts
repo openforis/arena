@@ -1,7 +1,7 @@
-import type { ArenaChain, ArenaSurvey, ArenaNodeDefEntity } from '@openforis/arena-core'
+import type { ArenaChain, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
+
 import TableOlapData from '@common/model/db/tables/olapData/table'
 import * as Survey from '@core/survey/survey'
-
 import { db, DbClient } from '@server/db/db'
 
 export const clearOlapData = (

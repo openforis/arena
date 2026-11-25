@@ -1,11 +1,10 @@
 import { forwardRef } from 'react'
+
 import * as A from '@core/arena'
-
 import { TestId } from '@webapp/utils/testId'
-
-import * as SideBarModule from '../utils'
 import ModuleLink from '../ModuleLink'
 import SubModules from '../SubModules'
+import * as SideBarModule from '../utils'
 
 type ModuleProps = {
   disabled?: boolean

@@ -4,13 +4,13 @@ import type { ReactElement } from 'react'
 import * as User from '@core/user/user'
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
-
 import { baseLayers } from '../../baseLayers'
 import { useMapContextBaseLayer } from '../../MapContext'
 import { useCustomBaseMapMenuItems } from '../customLayers/useCustomBaseMapMenuItems'
 import { useMapContextActions } from '../mapContextActions'
-import { getSelectableBaseLayers } from './baseMapItems'
+
 import type { SelectableBaseLayerDef } from './baseMapItems'
+import { getSelectableBaseLayers } from './baseMapItems'
 import { MenuRadioItem } from './MenuItems'
 import { ToolbarMenu } from './ToolbarMenu'
 

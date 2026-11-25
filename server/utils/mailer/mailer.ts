@@ -1,7 +1,6 @@
 import { ArrayUtils } from '@core/arrayUtils'
-import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
-
+import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
 import * as MailerAmazonSES from '@server/utils/mailer/mailerAmazonSES'
 import * as MailerOffice365 from '@server/utils/mailer/mailerOffice365'

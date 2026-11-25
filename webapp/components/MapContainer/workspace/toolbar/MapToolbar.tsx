@@ -1,11 +1,11 @@
 import type { ReactElement } from 'react'
 
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
-
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import type { MapWorkspaceRecords } from '../mapWorkspaceTypes'
 import { MapSearchBox } from '../search/MapSearchBox'
 import type { FullScreenState } from '../tools/useFullScreen'
+
 import { AddDataMenu } from './AddDataMenu'
 import { BaseMapMenu } from './BaseMapMenu'
 import { DisplayMenu } from './DisplayMenu'

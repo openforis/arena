@@ -1,29 +1,25 @@
-import type { ArenaSurvey, ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefMap, ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
+import * as Srs from '@core/geo/srs'
 import { uuidv4 } from '@core/uuid'
 
-import * as Srs from '@core/geo/srs'
-
-import * as NodeDef from './nodeDef'
-import * as Category from './category'
-import * as Taxonomy from './taxonomy'
-
-import * as SurveySortKeys from './_survey/surveySortKeys'
-
-import * as SurveyConfig from './_survey/surveyConfig'
-import * as SurveyInfo from './_survey/surveyInfo'
-import * as SurveyCycle from './surveyCycle'
-import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
-import * as NodeDefLayoutUpdater from './nodeDefLayoutUpdater'
-import * as SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation'
-import * as SurveyCategories from './_survey/surveyCategories'
-import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
-import * as SurveyDependencies from './_survey/surveyDependencies'
-import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
-import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
 import * as SurveyAnalysis from './_survey/surveyAnalysis'
+import * as SurveyCategories from './_survey/surveyCategories'
+import * as SurveyConfig from './_survey/surveyConfig'
+import * as SurveyDependencies from './_survey/surveyDependencies'
+import * as SurveyInfo from './_survey/surveyInfo'
+import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
+import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
+import * as SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation'
+import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
+import * as SurveySortKeys from './_survey/surveySortKeys'
+import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
+import * as Category from './category'
+import * as NodeDef from './nodeDef'
+import * as NodeDefLayoutUpdater from './nodeDefLayoutUpdater'
+import * as SurveyCycle from './surveyCycle'
+import * as Taxonomy from './taxonomy'
 
 type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
 

@@ -5,9 +5,8 @@
 import { z } from 'zod'
 
 import SystemError, { StatusCodes } from '@core/systemError'
-
-import type { AiGenerateText } from '../llm'
 import { AiLimits } from '../limits'
+import type { AiGenerateText } from '../llm'
 import { safeParseJsonResponse } from '../parsing'
 import { buildTranslationPrompt } from '../prompts/translation'
 

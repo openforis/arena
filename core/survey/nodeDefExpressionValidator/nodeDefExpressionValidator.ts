@@ -1,9 +1,9 @@
+import type { ArenaSurvey, ArenaValidationResult } from '@openforis/arena-core'
 import {
+  ArenaAnyNodeDef,
   NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
   NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
-  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
-import type { ArenaSurvey, ArenaValidationResult } from '@openforis/arena-core'
 
 type FindReferencedNodeDefLastParams = {
   survey: ArenaSurvey

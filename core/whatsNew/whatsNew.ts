@@ -1,8 +1,9 @@
 import { Authorizer } from '@openforis/arena-core'
+
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
 
-import { WhatsNewAudience, WhatsNewItem, whatsNewAudiences, whatsNewItems } from './whatsNewItems'
+import { WhatsNewAudience, whatsNewAudiences, WhatsNewItem, whatsNewItems } from './whatsNewItems'
 
 export { whatsNewAudiences, whatsNewItems }
 export type { WhatsNewAudience, WhatsNewItem }

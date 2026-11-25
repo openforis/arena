@@ -2,8 +2,9 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import type { ReactElement, ReactNode } from 'react'
 
 import { useMapWorkspace } from '../MapWorkspaceContext'
-import { clampOpacity } from './customOverlays'
+
 import type { MapCustomOverlay } from './customOverlays'
+import { clampOpacity } from './customOverlays'
 
 export type { MapCustomOverlay, MapCustomOverlayGroup } from './customOverlays'
 

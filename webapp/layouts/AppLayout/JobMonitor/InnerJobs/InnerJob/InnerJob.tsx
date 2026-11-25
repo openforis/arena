@@ -1,13 +1,12 @@
 import { useEffect, useRef } from 'react'
 
-import * as JobSerialized from '@common/job/jobSerialized'
-
-import { useI18n } from '@webapp/store/system'
-
-import JobProgress from '../../JobProgress'
-import JobErrors from '../../JobErrors'
-import JobTiming from '../../JobTiming'
 import type { ArenaJobSerialized } from '@openforis/arena-core'
+
+import * as JobSerialized from '@common/job/jobSerialized'
+import { useI18n } from '@webapp/store/system'
+import JobErrors from '../../JobErrors'
+import JobProgress from '../../JobProgress'
+import JobTiming from '../../JobTiming'
 
 const getStatusIconClass = (innerJob, isCurrentJob) => {
   if (JobSerialized.isSucceeded(innerJob)) return 'icon-checkbox-checked'

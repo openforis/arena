@@ -1,26 +1,21 @@
 import type { ArenaTaxonomy } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import Job from '@server/job/job'
-
 import { languageCodesISO639part2 } from '@core/app/languages'
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
-import * as FlatDataReader from '@server/utils/file/flatDataReader'
-
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
+import SystemError from '@core/systemError'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-
+import Job from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import * as TaxonomyManager from '../manager/taxonomyManager'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
+import * as TaxonomyManager from '../manager/taxonomyManager'
 
 import TaxonCSVParser from './taxonCSVParser'
-import SystemError from '@core/systemError'
 
 const requiredColumns = ['code', 'scientific_name']
 const fixedColumns = new Set([...requiredColumns, 'family', 'genus'])

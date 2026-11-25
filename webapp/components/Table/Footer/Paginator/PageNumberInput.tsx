@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
-import { useI18nT } from '@webapp/store/system'
 import { TextInput } from '@webapp/components/form'
+import { useI18nT } from '@webapp/store/system'
 
 const removeNonDigits = (value: string): string => value.replaceAll(/\D/g, '')
 

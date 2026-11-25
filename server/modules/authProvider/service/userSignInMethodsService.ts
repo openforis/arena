@@ -1,8 +1,7 @@
 import * as User from '@core/user/user'
-
 import * as Log from '@server/log/log'
-import * as Mailer from '@server/utils/mailer'
 import * as UserManager from '@server/modules/user/manager/userManager'
+import * as Mailer from '@server/utils/mailer'
 
 import { getAuthProviderService } from './authProviderAdminService'
 

@@ -1,7 +1,7 @@
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import { DataExplorerActions as SliceActions } from './reducer'
 import { toExplorerQuery } from './explorerQuery'
+import { DataExplorerActions as SliceActions } from './reducer'
 
 type ShowQueryParams = {
   query: object

@@ -1,21 +1,20 @@
-import * as A from '@core/arena'
-
-import * as User from '@core/user/user'
 import { Authorizer } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import * as ProcessUtils from '@core/processUtils'
 
+import * as A from '@core/arena'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 import {
   analysisModules,
   appModules,
   appModuleUri,
   dataModules,
   designerModules,
-  homeModules,
-  userModules,
-  helpModules,
-  systemAdminModules,
   getUserManualUri,
+  helpModules,
+  homeModules,
+  systemAdminModules,
+  userModules,
 } from '@webapp/app/appModules'
 
 const keys = {

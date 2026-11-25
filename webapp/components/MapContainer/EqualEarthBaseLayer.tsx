@@ -1,8 +1,8 @@
-import { createElementObject, createLayerComponent, type LayerProps } from '@react-leaflet/core'
 import { maplibreGL } from '@maplibre/maplibre-gl-leaflet'
-import { setWorkerUrl } from 'maplibre-gl'
+import { createElementObject, createLayerComponent, type LayerProps } from '@react-leaflet/core'
 import type { MaplibreGL as MaplibreGLLayer } from 'leaflet'
 import type { GeoJSONSource, StyleSpecification } from 'maplibre-gl'
+import { setWorkerUrl } from 'maplibre-gl'
 
 // maplibre-gl v6 is ESM-only and can't have its worker bundled by webpack - the worker file
 // (and its own maplibre-gl-shared.mjs sibling chunk) is instead copied to this path verbatim by
@@ -11,10 +11,10 @@ import type { GeoJSONSource, StyleSpecification } from 'maplibre-gl'
 setWorkerUrl('/maplibre-gl/maplibre-gl-worker.mjs')
 
 import {
-  DEFAULT_BLEND_ZOOM_RANGE,
   blendCountryFeatureCollection,
-  getBlendFactor,
   type CountryFeatureCollection,
+  DEFAULT_BLEND_ZOOM_RANGE,
+  getBlendFactor,
 } from '@core/geo/equalEarthBlend'
 
 const COUNTRIES_GEOJSON_URL = '/geo/natural-earth-equal-earth-eq2merc.geojson'

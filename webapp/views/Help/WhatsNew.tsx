@@ -1,6 +1,6 @@
 import './WhatsNew.scss'
 
-import { WhatsNewCarousel, useWhatsNewVisibleItems } from '@webapp/components/WhatsNew'
+import { useWhatsNewVisibleItems, WhatsNewCarousel } from '@webapp/components/WhatsNew'
 import { useI18n } from '@webapp/store/system'
 
 export const WhatsNew = () => {

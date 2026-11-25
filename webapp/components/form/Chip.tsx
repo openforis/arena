@@ -1,6 +1,6 @@
-import type React from 'react'
 import MuiChip from '@mui/material/Chip'
 import classNames from 'classnames'
+import type React from 'react'
 
 type ChipProps = {
   className?: string

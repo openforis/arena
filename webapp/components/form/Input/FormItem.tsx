@@ -1,5 +1,5 @@
-import type React from 'react'
 import classNames from 'classnames'
+import type React from 'react'
 
 import { Objects } from '@openforis/arena-core'
 

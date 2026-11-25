@@ -2,10 +2,11 @@
  * What the user sees: the targets of a suggestion that are neither in progress nor dismissed (a counted target that
  * grew by its step since the dismissal shows again), and the area, expiry and cycle rules.
  */
-import { SUGGESTION_GROWTH_STEPS, type AssistantSuggestion, type SuggestionKind, type SuggestionTarget } from '../types'
+import { type AssistantSuggestion, SUGGESTION_GROWTH_STEPS, type SuggestionKind, type SuggestionTarget } from '../types'
+
 import { getPendingOf } from './pending'
 import { getNested, own } from './records'
-import { HELP_BUCKET, toBucket, type SuggestionUserState, type VisibilityParams } from './types'
+import { HELP_BUCKET, type SuggestionUserState, toBucket, type VisibilityParams } from './types'
 
 /**
  * Returns true when a dismissed counted target grew by at least its kind's step.

@@ -3,8 +3,8 @@
  */
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as ValidationResult from '@core/validation/validationResult'
 
 import type { NodeDefExpressionProp } from './types'

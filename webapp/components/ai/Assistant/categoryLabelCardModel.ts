@@ -1,12 +1,11 @@
 /**
  * Card model of category item label operations: one group per category, in proposal order.
  */
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-
+import * as Survey from '@core/survey/survey'
 import {
-  isCategoryItemLabelOperation,
   type CategoryItemLabelSetOperation,
+  isCategoryItemLabelOperation,
 } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import type { TranslationSource } from '@webapp/ai/changeSets/translationSource'
 import type { ChangeSetCardState, OperationResult } from '@webapp/ai/changeSets/types'

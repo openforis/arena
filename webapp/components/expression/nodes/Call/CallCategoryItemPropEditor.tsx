@@ -1,15 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { Objects, Strings, type ArenaCategoryLevel } from '@openforis/arena-core'
+import { type ArenaCategoryLevel, Objects, Strings } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as StringUtils from '@core/stringUtils'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { Button } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'

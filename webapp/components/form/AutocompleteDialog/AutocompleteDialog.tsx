@@ -1,10 +1,10 @@
 import './AutocompleteDialog.scss'
 
-import { useCallback, useRef, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import * as A from '@core/arena'
 
-import { useLocalState, State } from './store'
+import { State, useLocalState } from './store'
 
 type AutocompleteDialogProps = {
   inputField?: any

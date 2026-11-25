@@ -1,20 +1,19 @@
 import type { Response as ExpressResponse } from 'express'
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 import { FlatDataExportModel, PointFactory } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
+import * as Node from '@core/record/node'
 import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
-import { contentTypes, setContentTypeFile } from '@server/utils/response'
-import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import { ZipArchiver } from '@server/utils/file/zipArchiver'
-
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import { ZipArchiver } from '@server/utils/file/zipArchiver'
+import { contentTypes, setContentTypeFile } from '@server/utils/response'
 
 let templateFileValue = null
 {

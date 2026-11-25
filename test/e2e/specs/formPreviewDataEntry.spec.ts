@@ -1,12 +1,11 @@
 import type { Browser, BrowserContext } from '@playwright/test'
+
 import { DB } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 import * as WhatsNew from '@core/whatsNew/whatsNew'
-
 import { TestId } from '@webapp/utils/testId'
-
 import { BASE_URL, TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 import { expect, test, TestSurvey } from '../fixtures'
 import { Urls } from '../helpers/urls'

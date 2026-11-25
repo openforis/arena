@@ -1,5 +1,4 @@
 import * as Node from '@core/record/node'
-
 import {
   buildNodeFormData,
   buildRowAttributeNode,

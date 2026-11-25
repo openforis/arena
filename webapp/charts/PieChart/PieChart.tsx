@@ -1,5 +1,5 @@
 import type React from 'react'
-import { PieChart as ReChartsPieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
+import { Cell, Legend, Pie, PieChart as ReChartsPieChart, Tooltip } from 'recharts'
 
 import { ChartWrapper } from '../common'
 

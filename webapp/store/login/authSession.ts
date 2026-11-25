@@ -3,7 +3,7 @@
  */
 import axios, { type AxiosRequestConfig } from 'axios'
 
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 import { resetAiSession } from '@webapp/ai/session/resetAiSession'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 

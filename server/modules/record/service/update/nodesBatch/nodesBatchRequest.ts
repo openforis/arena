@@ -1,7 +1,7 @@
-import SystemError, { StatusCodes } from '@core/systemError'
-import { isNodeValueSizeValid } from '@core/record/nodeValueShape'
-import { isUuid } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+import { isNodeValueSizeValid } from '@core/record/nodeValueShape'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { isUuid } from '@core/uuid'
 
 import { NodesBatchEdit, NodesBatchMessageKeys, NodesBatchRecordEdit, NodesBatchRequest } from './nodesBatchTypes'
 

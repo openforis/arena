@@ -1,7 +1,7 @@
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import * as SB from '@test/utils/surveyBuilder'
 import type { ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
 import type { FetchMissingLabelsPage } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import {
@@ -9,8 +9,6 @@ import {
   type CategoryItemLabelSetOperation,
 } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
-
-import * as SB from '@test/utils/surveyBuilder'
 
 import { testUser } from './assistantTestUtils'
 

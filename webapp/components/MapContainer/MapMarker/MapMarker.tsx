@@ -2,8 +2,8 @@ import { Marker } from 'react-leaflet'
 
 import { useElevation } from '@webapp/views/Data/MapView/common/useElevation'
 
-import { useMapMarker } from './useMapMarker'
 import { MapMarkerPopup } from './MapMarkerPopup'
+import { useMapMarker } from './useMapMarker'
 
 export const MapMarker = (props) => {
   const { editable, point, title } = props

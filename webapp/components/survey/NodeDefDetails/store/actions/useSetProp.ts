@@ -3,16 +3,15 @@ import { useSelector } from 'react-redux'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { onUpdateKey, onUpdateMultiple } from '@core/survey/nodeDefPropUpdaters'
-
-import { NotificationActions } from '@webapp/store/ui'
+import * as Survey from '@core/survey/survey'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyState } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
+import { State } from '../state'
 
 import { useValidate } from './useValidate'
-import { State } from '../state'
-import { useAppDispatch } from '@webapp/store'
 
 const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {

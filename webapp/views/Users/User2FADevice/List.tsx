@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
-import Table from '@webapp/components/Table'
 import { appModuleUri, user2FADeviceModules } from '@webapp/app/appModules'
+import Table from '@webapp/components/Table'
 
-import { useUser2FADeviceColumns } from './useColumns'
 import User2FADeviceHeaderLeft from './HeaderLeft'
+import { useUser2FADeviceColumns } from './useColumns'
 
 export const User2FADeviceList = () => {
   const navigate = useNavigate()

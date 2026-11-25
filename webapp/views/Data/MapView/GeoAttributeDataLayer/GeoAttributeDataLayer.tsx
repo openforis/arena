@@ -5,16 +5,17 @@ import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
-import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
-import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
-import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 import {
-  isMapClusterFeature,
   type GeoAttributePointsFilter,
   type GeoAttributePointsLoadedHandler,
   type GeoAttributePopupRenderer,
+  isMapClusterFeature,
   type RecordEditClickHandler,
 } from '../common/mapPointTypes'
+import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
+
+import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
+import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 
 type GeoAttributeDataLayerProps = {
   activationKey?: string // changes on each request to show the layer: it is then shown and zoomed to

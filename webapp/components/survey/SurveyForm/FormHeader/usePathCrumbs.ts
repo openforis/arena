@@ -1,14 +1,13 @@
+import type { ArenaNodeDef, ArenaRecordNode, ArenaSurvey, LanguageCode } from '@openforis/arena-core'
 import { RecordNodeValueFormatter } from '@openforis/arena-core'
-import type { LanguageCode, ArenaRecordNode, ArenaNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useNodeDefLabelType, useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { useRecord } from '@webapp/store/ui/record'
+import { useNodeDefLabelType, useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 
 export type FormPathCrumb = {
   key: string

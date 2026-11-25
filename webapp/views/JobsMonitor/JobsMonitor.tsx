@@ -2,13 +2,13 @@ import './JobsMonitor.scss'
 
 import React, { useState } from 'react'
 
+import { Button } from '@webapp/components/buttons'
+import { DataGrid } from '@webapp/components/DataGrid'
+import Checkbox from '@webapp/components/form/Checkbox'
+import { useConfirmAsync } from '@webapp/components/hooks'
+import LoadingBar from '@webapp/components/LoadingBar'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
-import { useConfirmAsync } from '@webapp/components/hooks'
-import { DataGrid } from '@webapp/components/DataGrid'
-import LoadingBar from '@webapp/components/LoadingBar'
-import { Button } from '@webapp/components/buttons'
-import Checkbox from '@webapp/components/form/Checkbox'
 
 import { JobMonitorSummary, useJobsMonitor } from './useJobsMonitor'
 import { useJobsMonitorColumns } from './useJobsMonitorColumns'

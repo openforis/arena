@@ -1,8 +1,8 @@
-import * as DataTest from '../../utils/dataTest'
 import type { ArenaSurvey } from '@openforis/arena-core'
-import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
 
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
+import * as NodeDefExpressionUtils from '../../utils/nodeDefExpressionUtils'
 
 let survey: ArenaSurvey = null
 

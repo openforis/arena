@@ -1,6 +1,5 @@
 // test/unit/tests/259aiTranslateCategoryItemLabels.test.ts
 import type { MissingLabelsItem } from '@common/ai/categoryItemLabels'
-
 import { applyCategoryItemLabels } from '@webapp/ai/changeSets/categoryItemLabels/applyCategoryItemLabels'
 import { CATEGORY_ITEM_LABEL_SET } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import type { OperationResult } from '@webapp/ai/changeSets/types'

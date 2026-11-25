@@ -1,20 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import type { AssistantMessage } from '@webapp/ai/conversations/types'
-import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
-import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
-import { nodeDefGetTool } from '@webapp/ai/tools/design/nodeDefGet'
-import { expressionCheckTool } from '@webapp/ai/tools/design/expressionCheck'
-import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
-import { createCategoryItemsListMissingLabelsTool } from '@webapp/ai/tools/design/categoryItemsListMissingLabels'
-import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
-import { runTool, toAiSdkTools } from '@webapp/ai/tools/registry'
-
+import * as Survey from '@core/survey/survey'
 import {
   buildAssistantSurvey,
   createToolContext,
@@ -24,6 +12,16 @@ import {
   toolCallStream,
 } from '@test/unit/utils/assistantTestUtils'
 import { buildCategoryLabelsSurvey } from '@test/unit/utils/categoryLabelsTestUtils'
+import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import type { AssistantMessage } from '@webapp/ai/conversations/types'
+import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
+import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
+import { createCategoryItemsListMissingLabelsTool } from '@webapp/ai/tools/design/categoryItemsListMissingLabels'
+import { expressionCheckTool } from '@webapp/ai/tools/design/expressionCheck'
+import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
+import { nodeDefGetTool } from '@webapp/ai/tools/design/nodeDefGet'
+import { runTool, toAiSdkTools } from '@webapp/ai/tools/registry'
 
 const toolsDir = path.resolve(__dirname, '../../../webapp/ai/tools')
 const toolFiles = (): { file: string; source: string }[] =>

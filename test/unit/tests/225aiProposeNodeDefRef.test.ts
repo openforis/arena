@@ -1,18 +1,17 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
-
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
+import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { createRecordingApplierDeps } from '@test/unit/utils/categoryLabelsTestUtils'
+import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import type { ChangeSet, NodeDefUpdateOperation } from '@webapp/ai/changeSets/types'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
 import { runTool } from '@webapp/ai/tools/registry'
 import { buildCardRows } from '@webapp/components/ai/Assistant/changeSetCardModel'
-import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
-import { createRecordingApplierDeps } from '@test/unit/utils/categoryLabelsTestUtils'
-import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
 

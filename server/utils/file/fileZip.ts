@@ -1,8 +1,8 @@
 import type { Readable } from 'node:stream'
 import StreamZip from 'node-stream-zip'
 
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Log from '@server/log/log'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 const hiddenFilePaths = ['__MACOSX']
 

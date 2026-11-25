@@ -2,18 +2,17 @@
  * Validates a change set on a copy of the survey with the form designer's validators. A proposal that the designer
  * would refuse never reaches a card.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from '@core/survey/nodeDefEditGuards'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
-import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from '@core/survey/nodeDefEditGuards'
-
 import { getSurveyLanguages } from '@webapp/ai/tools/design/missingTexts'
 
-import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
 import { checkCategoryItemLabels } from './categoryItemLabels/checkCategoryItemLabels'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
+import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
 import { isAssistantNodeDefType } from './newNodeDef'
 import {
   applyOperationToSurvey,
@@ -23,11 +22,11 @@ import {
 } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
 import {
-  isNodeDefRefProp,
   type ChangeSet,
   type ChangeSetIssue,
   type ChangeSetPreview,
   type ExpressionSetOperation,
+  isNodeDefRefProp,
   type LabelSetOperation,
   type NodeDefCreateOperation,
   type NodeDefOperation,

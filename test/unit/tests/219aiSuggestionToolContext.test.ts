@@ -1,9 +1,3 @@
-import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
-import type { ChangeSet } from '@webapp/ai/changeSets/types'
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import type { Conversation } from '@webapp/ai/conversations/types'
-import { withSuggestionScope } from '@webapp/ai/suggestions/suggestionConversation'
-import type { AiToolContext } from '@webapp/ai/tools/types'
 import {
   cloudAccess,
   createToolContext,
@@ -12,6 +6,12 @@ import {
   textStream,
   toolCallStream,
 } from '@test/unit/utils/assistantTestUtils'
+import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
+import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import type { Conversation } from '@webapp/ai/conversations/types'
+import { withSuggestionScope } from '@webapp/ai/suggestions/suggestionConversation'
+import type { AiToolContext } from '@webapp/ai/tools/types'
 
 const SCOPE = { kind: 'missingTranslations' as const, targetKeys: ['a:labels'] }
 const changeSet = (id: string): ChangeSet => ({ id, surveyId: 7, summary: id, operations: [], createdAt: '' })

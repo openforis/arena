@@ -1,21 +1,20 @@
 import Job, { type JobParams } from '@server/job/job'
-
+import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import ActivityLogImportJob from './jobs/activityLogImportJob'
 import ArenaSurveyReaderJob from './jobs/arenaSurveyReaderJob'
-import SurveyCreatorJob from './jobs/surveyCreatorJob'
 import CategoriesImportJob from './jobs/categoriesImportJob'
-import TaxonomiesImportJob from './jobs/taxonomiesImportJob'
+import ChainsImportJob from './jobs/chainsImportJob'
+import CreateRdbJob from './jobs/createRdb'
+import FilesImportJob from './jobs/filesImportJob'
 import NodeDefsImportJob from './jobs/nodeDefsImportJob'
 import RecordsImportJob from './jobs/recordsImportJob'
-import FilesImportJob from './jobs/filesImportJob'
-import UsersImportJob from './jobs/usersImportJob'
-import ChainsImportJob from './jobs/chainsImportJob'
+import SurveyCreatorJob from './jobs/surveyCreatorJob'
 import SurveyFilesImportJob from './jobs/surveyFilesImportJob'
-import CreateRdbJob from './jobs/createRdb'
-import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
+import TaxonomiesImportJob from './jobs/taxonomiesImportJob'
+import UsersImportJob from './jobs/usersImportJob'
 
 const createInnerJobs = (params: Partial<JobParams>) => {
   const { backup = true, options = {} } = params

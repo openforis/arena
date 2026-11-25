@@ -2,13 +2,10 @@ import { useLayoutEffect, useState } from 'react'
 
 import { ColumnNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
-
-import { elementOffset } from '@webapp/utils/domUtils'
-
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useNodeDefsByUuids } from '@webapp/store/survey'
-
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { elementOffset } from '@webapp/utils/domUtils'
 
 import { useListenOnNodeUpdates } from './hooks/useListenToNodeUpdates'
 

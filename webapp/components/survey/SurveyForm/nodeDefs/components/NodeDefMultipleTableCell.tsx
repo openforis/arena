@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Taxon from '@core/survey/taxon'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Taxon from '@core/survey/taxon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import NodeDefMultipleEditDialog from './NodeDefMultipleEditDialog'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 const getNodeValues = (nodeDef, nodes, lang) => {
   const getNodeValue = (node) => {

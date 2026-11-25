@@ -1,19 +1,17 @@
 import { z } from 'zod'
 
 import { uuidv4 } from '@core/uuid'
-
-import { runTool } from '@webapp/ai/tools/registry'
-import { createRecordGetValuesTool } from '@webapp/ai/tools/cleaning/recordGetValuesTool'
-import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
-import { createValidationTools } from '@webapp/ai/tools/cleaning/validationTools'
-import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
-
 import {
   cleaningTestSurvey,
   fakeI18n,
   newCleaningToolContext,
   newFakeCleaningApi,
 } from '@test/unit/utils/aiCleaningTestUtils'
+import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
+import { createRecordGetValuesTool } from '@webapp/ai/tools/cleaning/recordGetValuesTool'
+import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
+import { createValidationTools } from '@webapp/ai/tools/cleaning/validationTools'
+import { runTool } from '@webapp/ai/tools/registry'
 
 let survey: any
 

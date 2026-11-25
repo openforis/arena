@@ -1,31 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { AiLimits } from '@common/ai/limits'
-
 import * as User from '@core/user/user'
-
 import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
 import { isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
 import { getAiCapabilitiesStore } from '@webapp/ai/engines/capabilitiesStore'
-import { Button } from '@webapp/components/buttons'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
+import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import type { AssistantArea } from './assistantAreas'
-import { assistantPanelStore } from './assistantPanelStore'
 import { RecordDataNotice } from './analysis/RecordDataNotice'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
+import type { AssistantArea } from './assistantAreas'
 import { AssistantComposerFooter } from './AssistantComposerFooter'
 import { AssistantContextNotice, useContextMeter } from './AssistantContextMeter'
-import { isNearBottom } from './chatScrollModel'
 import { AssistantConversationBar } from './AssistantConversationBar'
 import { AssistantMessageView } from './AssistantMessage'
+import { assistantPanelStore } from './assistantPanelStore'
+import { isNearBottom } from './chatScrollModel'
 import { shouldShowProviderRemoved } from './providerChip/providerChipModel'
 import { usePendingSuggestionRequest } from './suggestions/usePendingSuggestionRequest'
-import { useAssistantPanel } from './useAssistantPanel'
 import type { AssistantConversationApi } from './useAssistantConversation'
+import { useAssistantPanel } from './useAssistantPanel'
 
 /**
  * Messages and composer of the current conversation; blank until the first message of a new one.

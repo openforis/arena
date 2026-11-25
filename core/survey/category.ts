@@ -1,14 +1,12 @@
 import type { ArenaCategory, ArenaCategoryItem, ArenaCategoryLevel } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import { uuidv4 } from '@core/uuid'
-
 import * as ObjectUtils from '@core/objectUtils'
-
+import { uuidv4 } from '@core/uuid'
 import * as Validation from '@core/validation/validation'
 
-import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
+import * as CategoryLevel from './categoryLevel'
 import { ExtraPropDef, ExtraPropDefItem, ExtraPropDefItems } from './extraPropDef'
 
 export const maxCategoryItemsInIndex = 1000

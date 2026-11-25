@@ -1,17 +1,14 @@
 import './Chains.scss'
+
 import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
-
 import * as DateUtils from '@core/dateUtils'
-
-import { useSurveyPreferredLang } from '@webapp/store/survey'
-
-import { ButtonIconEdit } from '@webapp/components'
-import Table from '@webapp/components/Table'
-import ErrorBadge from '@webapp/components/ErrorBadge'
-
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { ButtonIconEdit } from '@webapp/components'
+import ErrorBadge from '@webapp/components/ErrorBadge'
+import Table from '@webapp/components/Table'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 import HeaderLeft from './HeaderLeft'
 

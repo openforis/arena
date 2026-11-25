@@ -4,24 +4,21 @@ import { type ElementType, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
 import * as ObjectUtils from '@core/objectUtils'
-
+import { ButtonSave } from '@webapp/components'
+import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
+import TabBar from '@webapp/components/TabBar'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { ButtonSave } from '@webapp/components'
-import TabBar from '@webapp/components/TabBar'
-import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
-
-import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
-import { SurveyInfoBrandingForm } from './SurveyInfoBrandingForm'
+import { useSurveyInfoForm } from './store'
 import { SurveyAiPolicyEditor } from './SurveyAiPolicyEditor'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
+import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
+import { SurveyInfoBrandingForm } from './SurveyInfoBrandingForm'
 import { SurveyInfoDocuments } from './SurveyInfoDocuments'
 import { SurveyInfoMap } from './SurveyInfoMap'
-
-import { useSurveyInfoForm } from './store'
 import { SurveySecurityEditor } from './SurveySecurityEditor'
 
 // a survey info tab: each one renders its own editor component with its own props

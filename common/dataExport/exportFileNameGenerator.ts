@@ -1,10 +1,10 @@
-import { Objects } from '@openforis/arena-core'
 import type { ArenaSurvey } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import { RecordCycle } from '@core/record/recordCycle'
 import * as DateUtils from '@core/dateUtils'
 import { getExtensionByFileFormat } from '@core/fileFormats'
+import { RecordCycle } from '@core/record/recordCycle'
+import * as Survey from '@core/survey/survey'
 
 // removes leading and trailing hyphens with a linear scan: a regular expression (e.g. /-+$/) could backtrack super-linearly (Sonar S5852, S8786)
 const trimHyphens = (value: string): string => {

@@ -1,6 +1,7 @@
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import AreaBasedEstimated from './AreaBasedEstimated'
 import RScriptEditor from './RScriptEditor'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type AnalysisPropsProps = {
   state: Record<string, any>

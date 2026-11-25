@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { useIsCategoriesRoute, useOnBrowserBack } from '@webapp/components/hooks'
 import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
-
+import { useIsCategoriesRoute, useOnBrowserBack } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { useActions } from './actions'

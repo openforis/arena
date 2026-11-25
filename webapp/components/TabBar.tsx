@@ -1,8 +1,10 @@
 import './TabBar.scss'
+
 import React, { useState } from 'react'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
+
 import { Button } from './buttons'
 
 type Tab = {

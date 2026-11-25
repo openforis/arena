@@ -15,16 +15,16 @@
  */
 import type { ArenaUser } from '@openforis/arena-core'
 
-import * as Request from '@server/utils/request'
+import { ENV } from '@core/processUtils'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SecretBox from '@server/utils/crypto/secretBox'
-import { ENV } from '@core/processUtils'
-
+import * as Request from '@server/utils/request'
 import * as AiProviderService from '../service/aiProviderService'
 import * as AiSettingsService from '../service/aiSettingsService'
-import * as ProviderResolver from '../service/providerResolver'
 import { getDisabledFeatureKeys } from '../service/featureGate'
 import { getAiPolicyCeilings } from '../service/policyCeilings'
+import * as ProviderResolver from '../service/providerResolver'
+
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 import { limitProviderCalls, releaseProviderCall } from './providerRateLimit'
 

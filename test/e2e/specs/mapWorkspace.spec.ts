@@ -1,10 +1,9 @@
+import { APIRequestContext, Locator, Page, request as playwrightRequest } from '@playwright/test'
 import fs from 'node:fs'
 
 import { DB } from '@openforis/arena-server'
-import { APIRequestContext, Locator, Page, request as playwrightRequest } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 import { expect, test } from '../fixtures'
 import { cluster, clusterImage, sampleRecords } from '../fixtures/seed/sampleSurveyModel'

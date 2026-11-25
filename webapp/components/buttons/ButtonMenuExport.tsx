@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 
 import { FileFormats } from '@core/fileFormats'
+import { useNotifyWarning } from '../hooks'
 
 import { ButtonDownload } from './ButtonDownload'
 import { ButtonMenu } from './ButtonMenu'
-import { useNotifyWarning } from '../hooks'
 
 const labelByFileFormat: Record<string, string> = {
   [FileFormats.csv]: 'common.exportToCSV',

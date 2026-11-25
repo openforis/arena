@@ -1,9 +1,8 @@
 import * as ApiRoutes from '@common/apiRoutes'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { arenaPutFile, dirCreate, unlink, zipr } from '../../rFunctions'
 
 import RFileSystem from './rFileSystem'
-
-import { arenaPutFile, dirCreate, unlink, zipr } from '../../rFunctions'
 
 /**
  * Abstract class to be extended by subclasses.

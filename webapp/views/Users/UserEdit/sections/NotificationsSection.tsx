@@ -1,5 +1,4 @@
 import { Switch } from '@webapp/components'
-
 import { UserEditSection, UserEditSectionRow } from '../UserEditSection'
 
 type Props = {

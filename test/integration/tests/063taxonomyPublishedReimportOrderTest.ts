@@ -2,18 +2,16 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
-
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
-
-import { getContextUser } from '../config/context'
-
 import * as SB from '../../utils/surveyBuilder'
 import * as SurveyUtils from '../../utils/surveyUtils'
+import { getContextUser } from '../config/context'
+
 import * as TaxonomyUtils from './_taxonomy/taxonomyUtils'
 
 // Re-importing a file into a published taxonomy changes the order of its taxa (e.g. to show the most frequent ones

@@ -1,7 +1,6 @@
 import * as A from '@core/arena'
-
-import { FormItem } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
 
 import { FormPropertyItem } from './FormPropertyItem'
 

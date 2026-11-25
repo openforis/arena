@@ -2,12 +2,11 @@ import './DimensionsSelector.scss'
 
 import { useCallback, useMemo } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import * as Survey from '@core/survey/survey'
 import { Dropdown } from '@webapp/components/form'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 type DimensionsSelectorProps = {
   chainUuid: string

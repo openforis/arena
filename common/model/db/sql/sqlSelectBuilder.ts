@@ -1,5 +1,5 @@
-import * as A from '@core/arena'
 import SqlBuilder from '@common/model/db/sql/sqlBuilder'
+import * as A from '@core/arena'
 
 // number or query param placeholder (e.g. $/offset/)
 type SqlLimitValue = number | string | null

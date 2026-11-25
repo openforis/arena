@@ -1,4 +1,5 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import { NodeValues } from '@core/record/nodeValues'
 import { nodeDefType } from '@core/survey/nodeDefType'
 

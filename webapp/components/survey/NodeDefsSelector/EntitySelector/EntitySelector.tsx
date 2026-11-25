@@ -1,15 +1,14 @@
 import './EntitySelector.scss'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as StringUtils from '@core/stringUtils'
+import type { ArenaValidation } from '@openforis/arena-core'
 
-import { TestId } from '@webapp/utils/testId'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import Dropdown from '@webapp/components/form/Dropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
-import Dropdown from '@webapp/components/form/Dropdown'
-import type { ArenaValidation } from '@openforis/arena-core'
+import { TestId } from '@webapp/utils/testId'
 
 const getDropdownItems = ({
   emptySelection,

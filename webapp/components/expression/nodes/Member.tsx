@@ -1,7 +1,7 @@
 import * as Expression from '@core/expressionParser/expression'
 
-import Identifier from './Identifier'
 import type { ExpressionNodeProps } from './expressionNode'
+import Identifier from './Identifier'
 
 type MemberProps = Pick<ExpressionNodeProps, 'node' | 'onChange' | 'variables'>
 

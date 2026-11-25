@@ -1,11 +1,9 @@
 import { ApiAuthMiddleware, ClusterBus, ProcessEnv } from '@openforis/arena-server'
 
 import { SystemLogConstants, SystemLogMessage } from '@common/systemLog/systemLogConstants'
-
 import * as Log from '@server/log/log'
-import * as Request from '@server/utils/request'
 import { createSseEventWriter, openSseStream } from '@server/modules/ai/api/serverSentEvents'
-
+import * as Request from '@server/utils/request'
 import { SystemLogClusterRelay } from '../service/systemLogClusterRelay'
 import { startSystemLogStreamSession } from '../service/systemLogStreamSession'
 

@@ -4,25 +4,24 @@
  */
 import type { ArenaUser } from '@openforis/arena-core'
 
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import SystemError from '@core/systemError'
 import * as User from '@core/user/user'
 import { uuidv4 } from '@core/uuid'
-import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
-
 import * as Log from '@server/log/log'
-
 import { RecordsUpdateThreadService } from '../surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '../thread/recordsThreadMessageTypes'
+
 import { NodesBatchReplies, NodesBatchReplyRegistry } from './nodesBatchReplies'
 import { groupEditsByRecord } from './nodesBatchRequest'
 import { NodesBatchProcessSlots, NodesBatchSlots } from './nodesBatchSlots'
 import {
+  failedResults,
   NodesBatchEdit,
   NodesBatchEditResult,
   NodesBatchMessageKeys,
   NodesBatchPersistMessage,
   NodesBatchRecordEdit,
-  failedResults,
 } from './nodesBatchTypes'
 
 const Logger = Log.getLogger('NodesBatchService')

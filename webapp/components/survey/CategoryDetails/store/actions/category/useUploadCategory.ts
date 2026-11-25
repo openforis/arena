@@ -2,14 +2,12 @@ import { useCallback } from 'react'
 import axios from 'axios'
 
 import * as A from '@core/arena'
-
-import { FileUtils } from '@webapp/utils/fileUtils'
+import { objectToFormData } from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
-import { objectToFormData } from '@webapp/service/api'
-
+import { FileUtils } from '@webapp/utils/fileUtils'
 import { State } from '../../state'
-import { useAppDispatch } from '@webapp/store'
 
 export const useUploadCategory = ({ setState }) => {
   const dispatch = useAppDispatch()

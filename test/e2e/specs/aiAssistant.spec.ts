@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import type { TestUser } from '../fixtures/testUsers'
 import { acceptConsentAndWait, reloadApp, setLocalProvider } from '../helpers/aiAnalysis'
@@ -18,9 +17,9 @@ import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 import {
   type LocalModelServerStub,
+  startLocalModelServer,
   STUB_CONTEXT_TOKENS,
   STUB_CONTEXT_USED_TOKENS,
-  startLocalModelServer,
 } from '../stubs/localModelServer'
 
 // the server must run with the mock provider (see test/e2e/README.md)

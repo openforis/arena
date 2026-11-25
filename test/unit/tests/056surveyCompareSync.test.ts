@@ -1,26 +1,25 @@
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
+
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as SurveyFile from '@core/survey/surveyFile'
-import * as Taxon from '@core/survey/taxon'
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
+import * as Survey from '@core/survey/survey'
 import {
-  SurveyCompareApplicabilityStatus,
-  SurveyCompareMatchType,
-  SurveyCompareReason,
-  SurveyCompareStatus,
   buildApplyPlan,
   buildSurveyInfoApplyPlan,
   compareSurveys,
   expandSelection,
+  SurveyCompareApplicabilityStatus,
+  SurveyCompareMatchType,
+  SurveyCompareReason,
+  SurveyCompareStatus,
 } from '@core/survey/surveyCompare'
-
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import { getSelectedDeletions } from '@webapp/views/Home/SurveyCompare/surveyCompareSelection'
-
 import * as SB from '../../utils/surveyBuilder'
 import {
   buildCategory,

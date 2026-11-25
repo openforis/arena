@@ -1,6 +1,6 @@
 import { AiFeaturePermission, getAiFeature, isGatewayFeature } from '@common/ai/features'
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { permissionMiddlewares } from '@server/modules/ai/api/aiMiddleware'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 describe('assistantCleaning feature', () => {
   test('is an assistant gateway feature on data, with a fixed data class and the record cleanse permission', () => {

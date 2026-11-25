@@ -1,24 +1,24 @@
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
+import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
 import { type SuggestionDefinition } from '@webapp/ai/suggestions/definitions'
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { moduleIntroDefinition } from '@webapp/ai/suggestions/definitions/moduleIntro'
 import { type DetectorContext } from '@webapp/ai/suggestions/detectors'
-import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import { buildModuleIntroSuggestion, moduleIntroDetector } from '@webapp/ai/suggestions/detectors/moduleIntro'
 import { buildModuleIntroPrompt } from '@webapp/ai/suggestions/prompts/moduleIntro'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   acceptSuggestion,
   buildSuggestionRequest,
   dismissSuggestion,
   isRequestForScope,
-  takeRequestForScope,
   type SuggestionDefinitions,
   type SuggestionRequestScope,
+  takeRequestForScope,
 } from '@webapp/ai/suggestions/suggestionActions'
 import { createSuggestionStore, type SuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion, SuggestionRequest } from '@webapp/ai/suggestions/types'
-import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
 
 const NOW = new Date('2026-10-11T12:00:00.000Z')
 const LATER = new Date('2026-10-12T12:00:00.000Z')

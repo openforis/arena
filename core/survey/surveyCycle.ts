@@ -1,9 +1,8 @@
 import { DateFormats } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
+import * as ObjectUtils from '@core/objectUtils'
 
 export const dateFormat = DateFormats.dateStorage
 

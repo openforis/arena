@@ -3,13 +3,13 @@ import type { ReactElement } from 'react'
 import { useMap } from 'react-leaflet'
 
 import { useNotifyWarning } from '@webapp/components/hooks'
-
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import { collectDataLatLngs } from '../tools/collectDataLatLngs'
-import { exitFullScreen } from '../tools/useFullScreen'
-import type { FullScreenState } from '../tools/useFullScreen'
-import { computeBounds } from '../tools/zoomToData'
 import { measureDistanceIconSrc } from '../tools/measure/measureIcons'
+import type { FullScreenState } from '../tools/useFullScreen'
+import { exitFullScreen } from '../tools/useFullScreen'
+import { computeBounds } from '../tools/zoomToData'
+
 import { ToolbarIconButton } from './ToolbarIconButton'
 
 const ZOOM_TO_DATA_PADDING = 32

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-
 import { useRecordsSummaryContext } from '../RecordsSummaryContext'
 import { surveyIncludesCleansingStep } from '../utils/surveyIncludesCleansingStep'
 

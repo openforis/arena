@@ -1,7 +1,6 @@
 import { expect, Page, Request } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import type { ArenaApi } from '../fixtures/arenaApi'
 
 import { writeLocalProviders } from './aiStorage'

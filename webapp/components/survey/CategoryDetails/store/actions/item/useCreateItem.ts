@@ -3,13 +3,11 @@ import axios from 'axios'
 
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
-
-import { State } from '../../state'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { State } from '../../state'
 
 export const useCreateItem = ({ setState }) => {
   const dispatch = useAppDispatch()

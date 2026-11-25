@@ -1,77 +1,73 @@
 import type { Response as ExpressResponse } from 'express'
-import * as fs from 'node:fs'
 import { randomBytes } from 'node:crypto'
+import * as fs from 'node:fs'
 
 import {
-  Authorizer,
-  RecordNodeValues,
-  Objects,
-  RecordExpressionEvaluator,
-  SurveyDocImages,
-  SurveyDocPlace,
-  type ArenaUser,
+  ArenaAnyNodeDef,
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
   type ArenaSurveyDocImage,
-  ArenaAnyNodeDef,
+  type ArenaUser,
+  Authorizer,
+  Objects,
+  RecordExpressionEvaluator,
+  RecordNodeValues,
+  SurveyDocImages,
+  SurveyDocPlace,
 } from '@openforis/arena-core'
 import { SurveyDocxGenerator, type SurveyDocxOptions, SurveyPdfGenerator } from '@openforis/arena-server'
 
-import * as Log from '@server/log/log'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { Query } from '@common/model/query'
 import {
   type PrintableExportScope,
   PrintableExportScopes,
   type PrintOrientation,
   PrintOrientations,
 } from '@common/record/printableExport'
-import { Query } from '@common/model/query'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
-import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as DateUtils from '@core/dateUtils'
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validation from '@core/validation/validation'
-
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { db, DbClient } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
+import * as Log from '@server/log/log'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import type { UploadedFile } from '@server/utils/file/uploadedFile'
 import * as Response from '@server/utils/response'
-
 import * as SurveyManager from '../../survey/manager/surveyManager'
-import * as RecordManager from '../manager/recordManager'
-import * as RecordFileManager from '../manager/recordFileManager'
-import * as ShareRepository from '../repository/recordPrintableExportShareRepository'
 import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
-
 import { NodesDeleteBatchPersister } from '../manager/nodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/nodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/nodesUpdateBatchPersister'
-import RecordsCloneJob from './recordsCloneJob'
-import RecordsValidationJob from './recordsValidationJob'
+import * as RecordFileManager from '../manager/recordFileManager'
+import * as RecordManager from '../manager/recordManager'
+import * as ShareRepository from '../repository/recordPrintableExportShareRepository'
+
 import { toQrPngBuffer } from './qrCodePng'
 import { upsertShareWithPdf } from './recordPrintableExportShareService'
+import RecordsCloneJob from './recordsCloneJob'
+import RecordsValidationJob from './recordsValidationJob'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
 import { resolveValidationReportParams } from './validationReportParams'
-import type { UploadedFile } from '@server/utils/file/uploadedFile'
 
 type PrintableDocumentGenerator = (options: SurveyDocxOptions) => Promise<{ buffer: Buffer; surveyName: string }>
 

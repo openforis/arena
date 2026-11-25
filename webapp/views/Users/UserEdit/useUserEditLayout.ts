@@ -1,6 +1,5 @@
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
-
 import { useUser } from '@webapp/store/user'
 
 import type { AccessSectionVisibility } from './sections/AccessSection'

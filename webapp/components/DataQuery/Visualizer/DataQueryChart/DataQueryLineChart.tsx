@@ -1,6 +1,7 @@
-import { LineChart } from '@webapp/charts/LineChart'
-import { useDataQueryChartData } from './useDataQueryChartData'
 import type { NodeDefLabelType } from '@core/survey/nodeDef'
+import { LineChart } from '@webapp/charts/LineChart'
+
+import { useDataQueryChartData } from './useDataQueryChartData'
 
 type DataQueryLineChartProps = {
   data: any[]

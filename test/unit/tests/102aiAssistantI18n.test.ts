@@ -1,5 +1,4 @@
 import { AiFeatureCategory } from '@common/ai/features'
-
 import {
   CYRILLIC,
   CYRILLIC_LANGUAGES,

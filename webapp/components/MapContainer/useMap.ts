@@ -1,10 +1,9 @@
-import type { LatLngTuple } from 'leaflet'
 import { useCallback, useMemo, useState } from 'react'
+import type { LatLngTuple } from 'leaflet'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
 import { useSurveySrsIndex } from '@webapp/store/survey'
 
 const calculateActualCenterPoint = ({ centerPoint, geoJson, markerPoint, srsIndex }) => {

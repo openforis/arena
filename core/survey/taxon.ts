@@ -1,10 +1,9 @@
 import type { ArenaTaxon, ArenaVernacularName } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import { uuidv4 } from '@core/uuid'
 
 type VernacularNamesByLang = Record<string, ArenaVernacularName[]>
 

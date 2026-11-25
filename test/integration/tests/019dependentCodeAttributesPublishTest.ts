@@ -1,24 +1,20 @@
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as Survey from '@core/survey/survey'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RB from '../../utils/recordBuilder'
-import * as SurveyUtils from '../../utils/surveyUtils'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import * as SurveyUtils from '../../utils/surveyUtils'
+import { getContextUser } from '../config/context'
 
 // Regression test for a bug where publishing a survey after editing only the message of a validation
 // rule on a parent (hierarchical) code attribute cleared the recorded values of every dependent code

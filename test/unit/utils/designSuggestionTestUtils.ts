@@ -1,13 +1,11 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
+import * as SB from '@test/utils/surveyBuilder'
 import type { LabelKind } from '@webapp/ai/changeSets/types'
 import type { SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
 import type { DetectorContext } from '@webapp/ai/suggestions/detectors'
 import type { SuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion, SuggestionKind } from '@webapp/ai/suggestions/types'
-
-import * as SB from '@test/utils/surveyBuilder'
 
 import { fakeT, getDefByName, testUser } from './assistantTestUtils'
 

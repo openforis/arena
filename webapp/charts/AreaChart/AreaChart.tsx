@@ -1,7 +1,6 @@
-import { Area, AreaChart as ReChartsAreaChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
+import { Area, AreaChart as ReChartsAreaChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
-
 import { ChartWrapper, RotatedCustomAxisTick } from '../common'
 
 const fillOpacity = '70'

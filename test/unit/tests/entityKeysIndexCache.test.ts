@@ -1,13 +1,12 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import type { ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
-import * as Record from '@core/record/record'
+
 import * as Node from '@core/record/node'
-
-import * as SB from '../../utils/surveyBuilder'
-import * as RB from '../../utils/recordBuilder'
-import * as SurveyUtils from '../../utils/surveyUtils'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 import { getContextUser } from '../../integration/config/context'
+import * as RB from '../../utils/recordBuilder'
+import * as SB from '../../utils/surveyBuilder'
+import * as SurveyUtils from '../../utils/surveyUtils'
 
 let survey: ArenaSurvey = null
 let record: ArenaRecord = null

@@ -2,11 +2,9 @@ import { useCallback } from 'react'
 import axios from 'axios'
 
 import * as Category from '@core/survey/category'
-
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
-
-import { State } from '../../state'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { State } from '../../state'
 
 export const useCreateLevel = ({ setState }) => {
   const dispatch = useAppDispatch()

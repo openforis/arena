@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 
 import { Query, Sort } from '@common/model/query'
-
 import { useQuerySortableVariables } from '@webapp/components/DataQuery/store'
 
 export const useSortEditor = ({ query }) => {

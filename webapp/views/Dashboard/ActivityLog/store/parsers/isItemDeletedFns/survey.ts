@@ -1,7 +1,5 @@
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
-
+import * as A from '@core/arena'
 import * as ActivityLogMessageParserUtils from '../utils'
 
 export default {

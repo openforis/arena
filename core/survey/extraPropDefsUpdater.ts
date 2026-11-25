@@ -1,7 +1,7 @@
 import * as Validation from '@core/validation/validation'
-import { validateExtraPropDef } from './extraPropDefValidator'
 
 import { ExtraPropDef, ExtraPropDefItem, ExtraPropDefItems } from './extraPropDef'
+import { validateExtraPropDef } from './extraPropDefValidator'
 
 const updateOrDeleteExtraDef = async ({
   extraPropDefs,

@@ -3,7 +3,6 @@ import type { NextFunction, Request, Response } from 'express'
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
-
 import * as Log from '@server/log/log'
 import * as ResponseUtils from '@server/utils/response'
 

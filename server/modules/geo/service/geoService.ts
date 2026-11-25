@@ -1,4 +1,5 @@
 import type { ArenaUser } from '@openforis/arena-core'
+
 import * as JobManager from '@server/job/jobManager'
 
 import { GeoJsonDataExportJob } from './geoJsonDataExportJob'

@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
 
-import { MessageStatus, Messages } from '@openforis/arena-core'
+import { Messages, MessageStatus } from '@openforis/arena-core'
 
 import * as DateUtils from '@core/dateUtils'
-
 import { ButtonIconEditOrView } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'

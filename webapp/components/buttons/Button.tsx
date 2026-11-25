@@ -6,7 +6,6 @@ import classNames from 'classnames'
 import { Objects } from '@openforis/arena-core'
 
 import { useI18nT } from '@webapp/store/system'
-
 import { TooltipNew } from '../TooltipNew'
 
 export type ButtonProps = Omit<MuiButtonProps, 'color' | 'title' | 'variant' | 'size'> & {

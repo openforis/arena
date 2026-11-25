@@ -3,19 +3,18 @@ import './RecordEditCard.scss'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 
-import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
-import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
 import {
   countOperationResults,
   getRetryOperationIds,
   getSelectableOperationIds,
   groupOperationsByRecord,
 } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
+import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
+import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import { Button } from '@webapp/components/buttons'
 import { useNotifyError } from '@webapp/components/hooks'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { runWithFailureNotice } from '../runWithFailureNotice'
 import { useOperationSelection } from '../useOperationSelection'
 

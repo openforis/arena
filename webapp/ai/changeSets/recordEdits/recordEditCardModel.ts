@@ -1,6 +1,5 @@
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from './types'
 

@@ -1,23 +1,19 @@
+import ExcelJS from 'exceljs'
 import { Readable } from 'node:stream'
 
-import ExcelJS from 'exceljs'
-
-import { FileFormats } from '@core/fileFormats'
 import * as Expression from '@core/expressionParser/expression'
+import { FileFormats } from '@core/fileFormats'
 import * as Node from '@core/record/node'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
-
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
-import { getContextUser } from '../config/context'
-
 import * as RB from '../../utils/recordBuilder'
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 const { nodeDefType } = NodeDef
 const cycle = Survey.cycleOneKey

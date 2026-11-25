@@ -2,7 +2,6 @@ import type { ArenaRecordNode } from '@openforis/arena-core'
 
 import { createRequireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
 import { getPendingNodeFromBody } from '@server/modules/record/api/recordQualifierMiddleware'
-
 import { callHandler, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const nodeOf = (recordUuid: string | undefined) =>

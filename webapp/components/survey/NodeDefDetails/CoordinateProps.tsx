@@ -1,9 +1,9 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { ColorInput } from '@webapp/components/ColorInput'
-import { FormItem } from '@webapp/components/form/Input'
-import { Checkbox } from '@webapp/components/form'
 import { ButtonIconInfo } from '@webapp/components/buttons'
+import { ColorInput } from '@webapp/components/ColorInput'
+import { Checkbox } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+
 import { State, useNodeDefEditReadOnly } from './store'
 
 type CoordinatePropsProps = {

@@ -1,21 +1,15 @@
-import type { JobParams } from '@server/job/job'
 import * as A from '@core/arena'
-
 import * as StringUtils from '@core/stringUtils'
-import * as Survey from '../../../../../../core/survey/survey'
-import * as Srs from '../../../../../../core/geo/srs'
-import * as User from '../../../../../../core/user/user'
-
+import type { JobParams } from '@server/job/job'
 import * as ActivityLog from '../../../../../../common/activityLog/activityLog'
-
+import * as Srs from '../../../../../../core/geo/srs'
+import * as Survey from '../../../../../../core/survey/survey'
+import * as User from '../../../../../../core/user/user'
 import Job from '../../../../../job/job'
-
 import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
-
-import * as SurveyUniqueNameGenerator from '../../../../survey/service/surveyUniqueNameGenerator'
-import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as SrsManager from '../../../../geo/manager/srsManager'
-
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as SurveyUniqueNameGenerator from '../../../../survey/service/surveyUniqueNameGenerator'
 import * as CollectSurvey from '../model/collectSurvey'
 
 export default class SurveyCreatorJob extends Job {

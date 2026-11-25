@@ -1,10 +1,9 @@
 import type { ArenaSurvey } from '@openforis/arena-core'
-import { db, type DbClient } from '@server/db/db'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { ViewDataNodeDef } from '@common/model/db'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { db, type DbClient } from '@server/db/db'
 import * as NodeKeysView from '../schemaRdb/nodeKeysView'
 
 // ====== CREATE

@@ -4,12 +4,11 @@ import type { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
-
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import type { SurveyUserType } from './useUserGroupsOverview'
 import UserCard from './UserCard'
+import type { SurveyUserType } from './useUserGroupsOverview'
 
 type Props = {
   group: ArenaUserGroup | null

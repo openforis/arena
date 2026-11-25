@@ -2,15 +2,13 @@ import { useCallback, useMemo } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
+import { ButtonSave } from '@webapp/components'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
-
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { ButtonSave } from '@webapp/components'
 
 type UserAuthGroupExtraPropsEditorProps = {
   onChange: (...args: any[]) => any

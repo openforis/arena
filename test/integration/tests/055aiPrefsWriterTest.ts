@@ -3,7 +3,6 @@ import type { ArenaUser } from '@openforis/arena-core'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import { db } from '@server/db/db'
 import { removeCopiedLegacyKeys } from '@server/modules/ai/service/aiPrefsWriter'
 import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
@@ -18,7 +17,6 @@ import {
   writeAiPrefs,
 } from '@server/modules/user/repository/userAiPrefsRepository'
 import * as SecretBox from '@server/utils/crypto/secretBox'
-
 import { getContextUser } from '@test/integration/config/context'
 import { legacyEnvelope } from '@test/unit/utils/secretBoxTestUtils'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'

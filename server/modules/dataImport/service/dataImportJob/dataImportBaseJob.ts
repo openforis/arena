@@ -1,19 +1,17 @@
-import { Dates, type ArenaRecord, type ArenaRecordNode } from '@openforis/arena-core'
+import { type ArenaRecord, type ArenaRecordNode, Dates } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-
 import Job, { type JobParams } from '@server/job/job'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
-
-import { RecordsDateModifiedBatchPersister } from '@server/modules/record/manager/recordsDateModifiedBatchPersister'
-import { RecordsValidationBatchPersister } from '@server/modules/record/manager/recordsValidationBatchPersister'
 import { NodesDeleteBatchPersister } from '@server/modules/record/manager/nodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/nodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/nodesUpdateBatchPersister'
 import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/rdbUpdatesBatchPersister'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { RecordsDateModifiedBatchPersister } from '@server/modules/record/manager/recordsDateModifiedBatchPersister'
+import { RecordsValidationBatchPersister } from '@server/modules/record/manager/recordsValidationBatchPersister'
 
 export default class DataImportBaseJob extends Job {
   currentRecord: ArenaRecord | null

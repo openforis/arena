@@ -1,17 +1,15 @@
 import { useCallback, useMemo } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { useAppDispatch } from '@webapp/store'
 import { useSurvey } from '@webapp/store/survey'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import { BaseUnitAttributeSelector } from './BaseUnitAttributeSelector'
-import { useAppDispatch } from '@webapp/store'
 
 export const StratumAttributeSelector = () => {
   const dispatch = useAppDispatch()

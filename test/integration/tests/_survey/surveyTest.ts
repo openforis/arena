@@ -1,9 +1,8 @@
-import { uuidv4 } from '../../../../core/uuid'
 import * as Survey from '../../../../core/survey/survey'
 import * as User from '../../../../core/user/user'
-
+import { uuidv4 } from '../../../../core/uuid'
 import * as SurveyManager from '../../../../server/modules/survey/manager/surveyManager'
-import { setContextSurvey, getContextUser } from '../../config/context'
+import { getContextUser, setContextSurvey } from '../../config/context'
 
 export const createSurveyTest = async () => {
   const user = getContextUser()

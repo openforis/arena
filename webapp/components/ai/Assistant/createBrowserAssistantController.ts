@@ -4,10 +4,10 @@
  */
 import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { runSuggestionBatchTurn } from '@webapp/ai/agent/runSuggestionBatchTurn'
-import { getSuggestionBatchKind } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { browserOpenConversations } from '@webapp/ai/conversations/openConversations'
+import { getSuggestionBatchKind } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import {
   holdSuggestionTurnLock,
   reportSuggestionSettle,
@@ -18,8 +18,8 @@ import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRe
 
 import { createCardAppliers } from './assistantCardAppliers'
 import {
-  createAssistantConversationController,
   type AssistantConversationController,
+  createAssistantConversationController,
 } from './assistantConversationController'
 import { assistantPanelStore } from './assistantPanelStore'
 import { assistantTurnRegistry } from './assistantTurnRegistry'

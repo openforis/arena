@@ -1,5 +1,5 @@
-import { marked } from 'marked'
 import DOMPurify from 'isomorphic-dompurify'
+import { marked } from 'marked'
 
 const markedOptions = {
   headerIds: false,

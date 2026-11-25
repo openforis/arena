@@ -1,7 +1,5 @@
-import Job from '@server/job/job'
-
 import * as Category from '@core/survey/category'
-
+import Job from '@server/job/job'
 import * as CategoryManager from '../manager/categoryManager'
 
 export class CategoryValidationJob extends Job {

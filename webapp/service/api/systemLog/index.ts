@@ -1,5 +1,4 @@
 import { SystemLogMessage } from '@common/systemLog/systemLogConstants'
-
 import { streamSse } from '@webapp/service/api/ai/streaming'
 
 type StreamSystemLogParams = {

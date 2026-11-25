@@ -1,10 +1,8 @@
 import type { Page } from '@playwright/test'
 
-import { TestId } from '@webapp/utils/testId'
-
-import { expect, test } from '../fixtures'
 import type { LocalProvider } from '@webapp/ai/engines/localProviders'
-
+import { TestId } from '@webapp/utils/testId'
+import { expect, test } from '../fixtures'
 import type { ArenaApi } from '../fixtures/arenaApi'
 import {
   collectRequestBodies,
@@ -12,6 +10,7 @@ import {
   isGatewayRequest,
   reopenLastConversation,
 } from '../helpers/aiAnalysis'
+import { readLocalProviders as readStoredLocalProviders, seedLocalProviders } from '../helpers/aiStorage'
 import {
   assistantPanel,
   designAreaLabel,
@@ -21,7 +20,6 @@ import {
   sendAssistantMessage,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
-import { readLocalProviders as readStoredLocalProviders, seedLocalProviders } from '../helpers/aiStorage'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 import { type LocalModelServerStub, startLocalModelServer } from '../stubs/localModelServer'

@@ -1,15 +1,14 @@
-import type React from 'react'
 import classNames from 'classnames'
+import type React from 'react'
 
 import * as ObjectUtils from '@core/objectUtils'
-
 import LoadingBar from '../LoadingBar'
 
-import Header from './Header'
 import Content from './Content'
 import { Footer } from './Footer'
-import { useTable } from './useTable'
+import Header from './Header'
 import type { TableRowsProps } from './tableProps'
+import { useTable } from './useTable'
 
 // default props as constants: new objects or functions at every render would re-render all the (memoized) rows
 const defaultKeyExtractor = ({ item }) => ObjectUtils.getUuid(item)

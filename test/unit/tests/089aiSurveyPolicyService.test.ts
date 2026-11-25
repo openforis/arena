@@ -2,10 +2,9 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import {
   getSurveyAiPolicy,
   parseAiPolicyBody,
-  updateSurveyAiPolicy,
   type SurveyAiPolicyDeps,
+  updateSurveyAiPolicy,
 } from '@server/modules/ai/service/surveyAiPolicyService'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const user: any = { uuid: 'admin-1' }

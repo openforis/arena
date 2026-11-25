@@ -1,9 +1,8 @@
+import { AiFeaturePermission, getAiFeature, isGatewayFeature } from '@common/ai/features'
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { AiFeaturePermission, getAiFeature, isGatewayFeature } from '@common/ai/features'
-
-import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as Response from '@server/utils/response'
 
 type Middleware = (req: any, res: any, next: (error?: unknown) => void) => unknown
 

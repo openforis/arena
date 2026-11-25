@@ -1,6 +1,5 @@
-import * as SideBarModule from '../utils'
-
 import ModuleLink from '../ModuleLink'
+import * as SideBarModule from '../utils'
 
 const SubModules = (props) => {
   const { disabled = false, module, pathname, sideBarOpened = false } = props

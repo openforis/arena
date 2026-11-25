@@ -1,23 +1,22 @@
 import './UserPasswordChange.scss'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
 import classNames from 'classnames'
+import { useParams } from 'react-router'
 
 import * as User from '@core/user/user'
-import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
-
-import * as API from '@webapp/service/api'
-
+import * as Validation from '@core/validation/validation'
 import { Button, ButtonBack } from '@webapp/components'
-import { useNotifyInfo } from '@webapp/components/hooks'
-import { UserPasswordSetForm } from './UserPasswordSetForm'
-import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useNotifyInfo } from '@webapp/components/hooks'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
+import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
+import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
+
+import { UserPasswordSetForm } from './UserPasswordSetForm'
 
 const defaultState = {
   form: UserPasswordChangeForm.newForm(),

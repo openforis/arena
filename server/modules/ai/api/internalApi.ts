@@ -4,19 +4,18 @@
  */
 import { generateText } from 'ai'
 
-import { ENV } from '@core/processUtils'
 import { getAiFeature } from '@common/ai/features'
 import { ARENA_DEFAULT_PROVIDER_ID } from '@common/ai/providerIds'
-import * as Request from '@server/utils/request'
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-
-import { assertFeatureEnabled } from '../service/featureGate'
+import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
 import * as Log from '@server/log/log'
-
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as Request from '@server/utils/request'
+import { assertFeatureEnabled } from '../service/featureGate'
 import { formatErrorForLog, toAiSystemError } from '../service/gateway/errorMapping'
 import { assertPolicyAllows } from '../service/gateway/policy'
 import * as ProviderResolver from '../service/providerResolver'
+
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const logger = Log.getLogger('AiInternalApi')

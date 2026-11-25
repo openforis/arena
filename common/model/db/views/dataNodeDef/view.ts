@@ -1,11 +1,10 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
 import * as Expression from '../../../../../core/expressionParser/expression'
 import * as StringUtils from '../../../../../core/stringUtils'
-
+import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
+import * as Survey from '../../../../../core/survey/survey'
 import TableDataNodeDef from '../../tables/dataNodeDef'
 import ColumnNodeDef from '../../tables/dataNodeDef/columnNodeDef'
 

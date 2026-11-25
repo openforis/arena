@@ -2,7 +2,6 @@ import './NodeDefBoolean.scss'
 
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { Radiobox } from '@webapp/components/form'
 import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 

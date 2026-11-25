@@ -1,5 +1,4 @@
 import { Fragment, useMemo, useState } from 'react'
-import classNames from 'classnames'
 import Collapse from '@mui/material/Collapse'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -7,6 +6,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import classNames from 'classnames'
 
 import { ButtonIconExpandToggle } from '@webapp/components'
 import { ButtonGroup, Checkbox, TextInput } from '@webapp/components/form'

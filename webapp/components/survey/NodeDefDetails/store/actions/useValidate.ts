@@ -3,12 +3,10 @@ import { useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
-
-import * as SurveyState from '@webapp/store/survey/state'
-
-import { NodeDefsActions } from '@webapp/store/survey'
-import { State } from '../state'
 import { useAppDispatch } from '@webapp/store'
+import { NodeDefsActions } from '@webapp/store/survey'
+import * as SurveyState from '@webapp/store/survey/state'
+import { State } from '../state'
 
 export const useValidate = ({ setState }) => {
   const dispatch = useAppDispatch()

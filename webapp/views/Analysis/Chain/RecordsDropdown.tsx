@@ -1,13 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { RecordSummary } from '@core/record/recordSummary'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as ObjectUtils from '@core/objectUtils'
-
+import { RecordSummary } from '@core/record/recordSummary'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { Dropdown } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
-import { Dropdown } from '@webapp/components/form'
 
 type RecordsDropdownProps = {
   disabled?: boolean

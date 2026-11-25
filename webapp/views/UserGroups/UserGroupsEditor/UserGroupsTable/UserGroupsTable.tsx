@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
 import { GridColDef } from '@mui/x-data-grid'
 
-import { useI18n } from '@webapp/store/system'
 import { DataGrid } from '@webapp/components/DataGrid'
 import LoadingBar from '@webapp/components/LoadingBar'
+import { useI18n } from '@webapp/store/system'
 
 import { useUserGroupsTable } from './useUserGroupsTable'
 

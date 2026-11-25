@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 
 import PanelRight from '@webapp/components/PanelRight'
 import { useSurveyId } from '@webapp/store/survey'
-
 import { MapContainer } from '../MapContainer'
+
 import { MapFileLayers } from './MapFileLayers'
 import { type SurveyFileRef, toSurveyMapFile } from './surveyMapFile'
 

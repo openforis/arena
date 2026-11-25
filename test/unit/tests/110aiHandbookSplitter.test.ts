@@ -1,14 +1,13 @@
+import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
 
-import AdmZip from 'adm-zip'
-
 import {
-  HANDBOOK_LANGS,
-  SECTION_MAX_CHARS,
   buildHandbook,
   checkHandbook,
+  HANDBOOK_LANGS,
   readDocxBlocks,
+  SECTION_MAX_CHARS,
   splitHandbook,
 } from '@webapp/ai/help/handbookSplitter'
 

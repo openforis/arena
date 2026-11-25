@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 
 import { Button } from '@webapp/components/buttons'
-
 import { State } from '../store'
+
 import DataQueriesPanel from './DataQueriesPanel'
 
 type ButtonManageQueriesProps = {

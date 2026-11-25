@@ -2,11 +2,10 @@
  * Assistant conversations, as stored in the browser (IndexedDB) and rendered by the panel.
  */
 import type { AiDataClass } from '@common/ai/features'
-
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { AiToolArea } from '@webapp/ai/tools/types'
-import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
 export type ConversationTextPart = { type: 'text'; text: string }
 

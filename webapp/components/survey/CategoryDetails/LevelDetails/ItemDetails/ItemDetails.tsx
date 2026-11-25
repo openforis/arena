@@ -1,27 +1,26 @@
 import './itemDetails.scss'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import classNames from 'classnames'
 import ErrorRounded from '@mui/icons-material/ErrorRounded'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import classNames from 'classnames'
+
+import type { ArenaCategoryItem, ArenaCategoryLevel } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
-
 import { Button, ButtonDelete } from '@webapp/components'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
 import { State, useActions } from '../../store'
+
 import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
-import type { ArenaCategoryItem, ArenaCategoryLevel } from '@openforis/arena-core'
 
 type ItemDetailsProps = {
   level: ArenaCategoryLevel

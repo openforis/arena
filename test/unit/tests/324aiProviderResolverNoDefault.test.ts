@@ -1,10 +1,9 @@
 import { MockLanguageModelV4 } from 'ai/test'
 
+import { formatErrorForLog } from '@server/modules/ai/service/gateway/errorMapping'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
-import { formatErrorForLog } from '@server/modules/ai/service/gateway/errorMapping'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 

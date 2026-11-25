@@ -1,19 +1,18 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import {
+  buildApplyPlan,
   SurveyCompareApplicabilityStatus,
   SurveyCompareMatchType,
   SurveyComparePropGroup,
   SurveyCompareReason,
   SurveyCompareStatus,
-  buildApplyPlan,
 } from '@core/survey/surveyCompare'
-
 import {
   addAttribute,
   buildSurvey,

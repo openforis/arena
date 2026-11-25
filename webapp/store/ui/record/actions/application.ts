@@ -1,8 +1,7 @@
 import * as StringUtils from '@core/stringUtils'
-
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 import { AppSavingActions } from '@webapp/store/app'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 const appErrorsNamespace = 'appErrors:'
 

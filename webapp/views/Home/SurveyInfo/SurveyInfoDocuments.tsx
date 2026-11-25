@@ -1,7 +1,6 @@
 import { type ArenaSurveyDocImage } from '@openforis/arena-core'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-
 import SurveyDocLayoutEditor from '../SurveyDocLayoutEditor'
 
 type Props = {

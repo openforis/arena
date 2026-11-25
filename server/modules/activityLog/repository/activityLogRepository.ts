@@ -1,20 +1,17 @@
 import camelize from 'camelize'
+
 import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
-
-import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
-import * as ProcessUtils from '@core/processUtils'
+import { Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-
 import * as Chain from '@common/analysis/chain'
-
+import * as A from '@core/arena'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
-import { Schemata } from '@openforis/arena-server'
 
 export const tableName = 'activity_log'
 

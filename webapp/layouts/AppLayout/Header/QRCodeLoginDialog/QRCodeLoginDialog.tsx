@@ -2,9 +2,8 @@ import './QRCodeLoginDialog.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { waitFor } from '@core/promiseUtils'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-
+import { waitFor } from '@core/promiseUtils'
 import { Button, Markdown, Modal, ModalBody, ModalFooter, QRCode, Spinner } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'

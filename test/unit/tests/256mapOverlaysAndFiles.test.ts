@@ -1,6 +1,6 @@
 import { clampOpacity, groupOverlays } from '@webapp/components/MapContainer/workspace/layers/customOverlays'
-import { getUploadedFileKind } from '@webapp/components/MapContainer/workspace/uploaded/uploadedFiles'
 import { computeBounds, isDataLayer } from '@webapp/components/MapContainer/workspace/tools/zoomToData'
+import { getUploadedFileKind } from '@webapp/components/MapContainer/workspace/uploaded/uploadedFiles'
 
 describe('Map overlays, uploaded files and zoom to data (256)', () => {
   test('clampOpacity keeps 0.05–1, NaN becomes 1', () => {

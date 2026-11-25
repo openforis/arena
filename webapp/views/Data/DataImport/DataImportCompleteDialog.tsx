@@ -1,12 +1,11 @@
 import classNames from 'classnames'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-
 import { Button } from '@webapp/components'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
-import { useI18n } from '@webapp/store/system'
 import Markdown from '@webapp/components/Markdown'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import JobErrors from '@webapp/layouts/AppLayout/JobMonitor/JobErrors'
+import { useI18n } from '@webapp/store/system'
 
 const determineContentKey = ({ jobType, dryRun, includeFiles, hasErrors }) => {
   const action = dryRun ? 'validation' : 'import'

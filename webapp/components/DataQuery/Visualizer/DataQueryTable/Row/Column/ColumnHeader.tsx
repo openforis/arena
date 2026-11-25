@@ -1,20 +1,18 @@
 import { Fragment } from 'react'
 
-import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as StringUtils from '@core/stringUtils'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
-import { Query, Sort, SortCriteria } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db'
-
-import { SortToggle } from '@webapp/components/Table'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
-
+import { Query, Sort, SortCriteria } from '@common/model/query'
+import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefTableCellHeader'
+import { SortToggle } from '@webapp/components/Table'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { useColumn } from './store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 /**
  * Returns the node def field (e.g. code, label) shown in the specified view column.

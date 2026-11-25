@@ -1,13 +1,10 @@
-import * as A from '@core/arena'
-
 import { DEFAULT_SRS, Objects, Surveys } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as AuthGroup from '@core/auth/authGroup'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as SamplingPolygon from '../samplingPolygon'
 
 export const keys = {

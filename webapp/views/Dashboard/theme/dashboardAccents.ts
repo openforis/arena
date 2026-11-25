@@ -1,7 +1,7 @@
-import type { ElementType } from 'react'
 import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined'
 import GroupOutlined from '@mui/icons-material/GroupOutlined'
 import StorageOutlined from '@mui/icons-material/StorageOutlined'
+import type { ElementType } from 'react'
 
 import { themeColors } from '@webapp/theme/tokens'
 

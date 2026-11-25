@@ -1,9 +1,10 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as Expression from '@core/expressionParser/expression'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
+import * as Survey from '@core/survey/survey'
 
 /**
  * Converts a Collect XPath expression into a valid JS expression.

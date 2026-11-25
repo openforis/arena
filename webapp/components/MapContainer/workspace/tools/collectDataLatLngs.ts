@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
-import { isDataLayer } from './zoomToData'
 import type { LatLngLiteral } from './zoomToData'
+import { isDataLayer } from './zoomToData'
 
 type LayerOptions = { interactive?: boolean; pane?: string }
 

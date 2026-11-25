@@ -1,56 +1,53 @@
 import * as fs from 'node:fs'
 
 import {
-  Authorizer,
-  ServiceRegistry,
-  type ArenaUser,
-  type ArenaSurvey,
-  type ArenaMessage,
-  type ArenaValidation,
   type ArenaAuthGroup,
   type ArenaI18n,
+  type ArenaMessage,
+  type ArenaSurvey,
+  type ArenaUser,
+  type ArenaValidation,
+  Authorizer,
+  ServiceRegistry,
   type UserTitle,
 } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
-import { db, DbClient } from '@server/db/db'
-
-import * as ProcessUtils from '@core/processUtils'
-import * as i18nFactory from '@core/i18n/i18nFactory'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import * as AuthGroup from '@core/auth/authGroup'
 import { Countries } from '@core/countries'
+import * as i18nFactory from '@core/i18n/i18nFactory'
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
+import type { UserAccessRequestAccept } from '@core/user/userAccessRequestAccept'
+import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
+import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as UserGroupInvitation from '@core/user/userGroupInvitation'
 import { UserInvitation } from '@core/user/userInvitation'
-import * as UserAccessRequest from '@core/user/userAccessRequest'
-import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
-import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
-import * as AuthGroup from '@core/auth/authGroup'
+import { UserPasswordChangeForm, type UserPasswordChangeFormData } from '@core/user/userPasswordChangeForm'
+import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
-import { UserPasswordChangeForm, type UserPasswordChangeFormData } from '@core/user/userPasswordChangeForm'
-import SystemError, { StatusCodes } from '@core/systemError'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-
-import UnauthorizedError from '@server/utils/unauthorizedError'
-import * as Mailer from '@server/utils/mailer'
-import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
+import { db, DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
-
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
-import * as SurveyManager from '../../survey/manager/surveyManager'
+import type { UploadedFile } from '@server/utils/file/uploadedFile'
+import * as Mailer from '@server/utils/mailer'
+import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as AuthManager from '../../auth/manager/authManager'
-import * as UserManager from '../manager/userManager'
+import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
+import * as UserManager from '../manager/userManager'
 
-import * as UserPasswordUtils from './userPasswordUtils'
 import { SystemAdminUserValidator } from './systemAdminUserValidator'
 import * as UserInviteService from './userInviteService'
+import * as UserPasswordUtils from './userPasswordUtils'
 import { UserRegistrationExpiredEmail } from './userRegistrationExpiredEmail'
-import type { UserAccessRequestAccept } from '@core/user/userAccessRequestAccept'
-import type { UploadedFile } from '@server/utils/file/uploadedFile'
 
 const Logger = Log.getLogger('UserService')
 

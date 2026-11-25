@@ -4,8 +4,8 @@
  */
 import { APICallError } from '@ai-sdk/provider'
 
-import SystemError, { StatusCodes } from '@core/systemError'
 import type { AiWireError } from '@common/ai/wire'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 const TOO_MANY_REQUESTS = 429
 

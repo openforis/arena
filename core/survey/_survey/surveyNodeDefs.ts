@@ -1,28 +1,27 @@
-import * as A from '@core/arena'
-
 import {
+  ArenaAnyNodeDef,
+  type ArenaCategory,
+  type ArenaNodeDefCode,
+  type ArenaNodeDefEntity,
+  type ArenaNodeDefMap,
+  type ArenaSurvey,
   Objects,
   Queue,
   Surveys,
   TraverseMethod,
-  type ArenaCategory,
-  type ArenaNodeDefCode,
-  type ArenaNodeDefEntity,
-  type ArenaSurvey,
-  ArenaAnyNodeDef,
-  type ArenaNodeDefMap,
 } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
-
+import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
+import * as Category from '../category'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefValidations from '../nodeDefValidations'
-import * as Category from '../category'
+
 import * as SurveyInfo from './surveyInfo'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
-import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 
 type NodeDefPredicate = (nodeDef: ArenaAnyNodeDef) => boolean
 type NodeDefVisitor = (nodeDef: ArenaAnyNodeDef) => void

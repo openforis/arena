@@ -1,5 +1,4 @@
 import Job, { type JobParams } from '@server/job/job'
-
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 export default class SurveyRdbSchemaCreationJob extends Job {

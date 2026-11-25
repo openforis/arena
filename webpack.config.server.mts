@@ -1,6 +1,7 @@
 import * as path from 'node:path'
 import webpack, { type Configuration } from 'webpack'
 import nodeExternals from 'webpack-node-externals'
+
 import mainConfig, { appVersion } from './webpack.config.mts'
 
 const nodeEnv = process.env.NODE_ENV

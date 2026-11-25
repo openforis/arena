@@ -1,9 +1,7 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
-
 import { useSurveyId } from '@webapp/store/survey'
-
 import { State } from '../state'
 
 export const useInit = ({ setState }) => {

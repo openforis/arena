@@ -5,8 +5,8 @@ import { uuidv4 } from '@core/uuid'
 import * as Log from '@server/log/log'
 
 import { JobQueue } from './jobQueue'
-import { jobRowToSummary, jobRowToMonitorSummary } from './jobUtils'
 import * as jobRepository from './jobRepository'
+import { jobRowToMonitorSummary, jobRowToSummary } from './jobUtils'
 
 const logger = Log.getLogger('JobManager')
 

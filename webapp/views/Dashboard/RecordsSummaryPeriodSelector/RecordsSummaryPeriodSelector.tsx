@@ -1,13 +1,11 @@
 import './RecordsSummaryPeriodSelector.scss'
 
 import * as DateUtils from '@core/dateUtils'
-
-import { useI18n } from '@webapp/store/system'
-
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useI18n } from '@webapp/store/system'
+import { useRecordsSummaryContext } from '../RecordsSummaryContext'
 
 import { useTimeRanges } from './store'
-import { useRecordsSummaryContext } from '../RecordsSummaryContext'
 
 type RecordsSummaryPeriodSelectorProps = {
   testId?: string

@@ -6,15 +6,14 @@
 import { useEffect } from 'react'
 
 import * as User from '@core/user/user'
-
 import { acceptSuggestion, takeRequestForScope } from '@webapp/ai/suggestions/suggestionActions'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-
 import type { AssistantArea } from '../assistantAreas'
 import { assistantPanelStore } from '../assistantPanelStore'
 import type { AssistantConversationApi } from '../useAssistantConversation'
 import { useAssistantPanel } from '../useAssistantPanel'
+
 import { canDoIt } from './suggestionsModel'
 
 /**

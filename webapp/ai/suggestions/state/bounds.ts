@@ -6,10 +6,11 @@
  * targets of the surveys not in use and the dismissals of targets that are gone.
  */
 import type { AssistantSuggestion } from '../types'
+
 import {
-  HELP_BUCKET,
-  emptySuggestionState,
   type DismissedEntry,
+  emptySuggestionState,
+  HELP_BUCKET,
   type InProgressEntry,
   type SuggestionUserState,
 } from './types'

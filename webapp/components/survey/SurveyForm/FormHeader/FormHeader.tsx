@@ -1,13 +1,15 @@
 import './formHeader.scss'
+
 import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
-
+import { Button } from '@webapp/components/buttons'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import { TreeSelectViewMode } from '@webapp/model'
+import { useAppDispatch } from '@webapp/store'
 import { NodeDefsActions, useIsSurveyDirty, useSurveyCycleKey } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
   useNodeDefLabelType,
@@ -15,16 +17,13 @@ import {
   useShowPageNavigation,
   useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-import { Button } from '@webapp/components/buttons'
-
-import FormEntryActions from '../components/FormEntryActions'
 import FormEditActions from '../components/FormEditActions'
-import { FormHeaderPath } from './FormHeaderPath'
+import FormEntryActions from '../components/FormEntryActions'
+
 import FormHeaderAdvancedButton from './FormHeaderAdvancedButton'
-import { useAppDispatch } from '@webapp/store'
+import { FormHeaderPath } from './FormHeaderPath'
 
 type FormHeaderProps = {
   disableLockUnlock?: boolean

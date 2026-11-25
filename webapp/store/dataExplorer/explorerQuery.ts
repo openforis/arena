@@ -1,7 +1,6 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 
 import { DataExplorerState } from './state'

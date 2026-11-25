@@ -1,9 +1,3 @@
-import {
-  isValidPrefsUpdate,
-  sqlPrefsParamIsObject,
-  sqlPrefsParamWithoutServerOnlyKeys,
-} from '@server/modules/user/serverOnlyPrefs'
-
 import en from '@core/i18n/resources/en/appErrors'
 import es from '@core/i18n/resources/es/appErrors'
 import fr from '@core/i18n/resources/fr/appErrors'
@@ -11,6 +5,11 @@ import ja from '@core/i18n/resources/ja/appErrors'
 import mn from '@core/i18n/resources/mn/appErrors'
 import pt from '@core/i18n/resources/pt/appErrors'
 import ru from '@core/i18n/resources/ru/appErrors'
+import {
+  isValidPrefsUpdate,
+  sqlPrefsParamIsObject,
+  sqlPrefsParamWithoutServerOnlyKeys,
+} from '@server/modules/user/serverOnlyPrefs'
 
 describe('The prefs of a user stay an object (542)', () => {
   test.each([

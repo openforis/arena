@@ -1,12 +1,11 @@
 import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { getLabelValue } from '@webapp/ai/changeSets/operations'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
-
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool, AiToolContext } from '../types'
+
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
 import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 

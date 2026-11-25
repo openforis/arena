@@ -1,11 +1,11 @@
 import type { ArenaRecord } from '@openforis/arena-core'
 
 import {
-  saveScreenshotToRecord,
-  startNodeSaveWaiter,
   type NodeSaveEvent,
   type NodeSaveHandlers,
+  saveScreenshotToRecord,
   type ScreenshotSaveDeps,
+  startNodeSaveWaiter,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
 
 const recordUuid = 'record-1'

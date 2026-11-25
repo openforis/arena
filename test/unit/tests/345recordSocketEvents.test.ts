@@ -2,7 +2,6 @@ import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
-
 import {
   buildNodesUpdateEvent,
   buildNodeValidationsUpdateEvent,

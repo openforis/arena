@@ -4,14 +4,12 @@ import { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
+import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
-
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
 const experimentalNodeDefTypes = new Set([])

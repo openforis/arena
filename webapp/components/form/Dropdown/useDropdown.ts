@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 export const useDropdown = ({

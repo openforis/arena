@@ -1,18 +1,15 @@
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
-
 import {
   getNextSortCriteria,
-  sortNodes,
   SortCriterion,
+  sortNodes,
 } from '@webapp/components/survey/SurveyForm/nodeDefs/components/types/nodeDefEntityTableRowsSort'
-
+import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import * as DataTest from '../../utils/dataTest'
-
-import { getContextUser } from '../../integration/config/context'
 
 let survey: any = {}
 let record: any = {}

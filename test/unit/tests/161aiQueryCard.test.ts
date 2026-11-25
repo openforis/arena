@@ -1,12 +1,9 @@
-import * as Survey from '@core/survey/survey'
 import { toQuery } from '@common/ai/tasks/dataQuery'
-
+import * as Survey from '@core/survey/survey'
 import { buildQueryCardModel } from '@webapp/components/ai/Assistant/analysis/queryCardModel'
-
-import { CYRILLIC, CYRILLIC_LANGUAGES, leafPaths, OTHER_LANGUAGES, RESOURCES } from '../utils/i18nParity'
-
-import * as DataTest from '../../utils/dataTest'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
+import { CYRILLIC, CYRILLIC_LANGUAGES, leafPaths, OTHER_LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
 let survey: any = null
 const cycle = Survey.cycleOneKey

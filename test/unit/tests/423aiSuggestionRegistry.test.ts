@@ -5,7 +5,7 @@ import {
   SUGGESTION_REGISTRY,
   TARGET_RESOLVERS,
 } from '@webapp/ai/suggestions/registry'
-import { SUGGESTION_GROWTH_STEPS, isSuggestionKind, type SuggestionKind } from '@webapp/ai/suggestions/types'
+import { isSuggestionKind, SUGGESTION_GROWTH_STEPS, type SuggestionKind } from '@webapp/ai/suggestions/types'
 
 const kinds = Object.keys(SUGGESTION_GROWTH_STEPS) as SuggestionKind[]
 

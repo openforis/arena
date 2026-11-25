@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { Urls } from '../helpers/urls'
 

@@ -1,15 +1,13 @@
 import * as Survey from '@core/survey/survey'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { TestId } from '@webapp/utils/testId'
-
 import { FormItem, Input } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 import CyclesEditor from './CyclesEditor'
-import SrsEditor from './SrsEditor'
 import LanguagesEditor from './LanguagesEditor'
+import SrsEditor from './SrsEditor'
 
 type SurveyInfoBasicFormProps = {
   surveyInfoObject: Record<string, any>

@@ -2,7 +2,6 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
 import * as Survey from '@core/survey/survey'
-
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { themeColors } from '@webapp/theme/tokens'

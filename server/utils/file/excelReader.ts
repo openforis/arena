@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs'
-
 import type { Readable } from 'node:stream'
 
 // converts an exceljs cell value into a plain value: formula, rich text, hyperlink and error cells are objects

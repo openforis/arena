@@ -4,12 +4,12 @@
  */
 import type { LanguageModelV4, LanguageModelV4CallOptions, LanguageModelV4FunctionTool } from '@ai-sdk/provider'
 
+import { AI_GATEWAY_URL, type AiGatewayCall, deserializeGenerateResult } from '@common/ai/wire'
 import SystemError from '@core/systemError'
-import { AI_GATEWAY_URL, deserializeGenerateResult, type AiGatewayCall } from '@common/ai/wire'
+import { createDeltaCoalescer } from '../engines/coalesceDeltas'
 
 import type { FetchLike } from './authorizedFetch'
 import { readSseParts } from './sseReader'
-import { createDeltaCoalescer } from '../engines/coalesceDeltas'
 
 const FORWARDED_OPTIONS = [
   'prompt',

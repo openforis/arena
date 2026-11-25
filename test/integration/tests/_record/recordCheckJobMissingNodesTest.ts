@@ -1,12 +1,10 @@
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
+import * as Survey from '@core/survey/survey'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
-
 import * as SB from '../../../utils/surveyBuilder'
 
 const entityName = 'root_entity'

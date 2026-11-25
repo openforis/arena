@@ -1,11 +1,11 @@
-import { Objects, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaCategory, ArenaSurvey } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Objects, Surveys } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { functionNames } from '@core/expressionParser/expression'
-
 import * as Category from '../category'
 import * as NodeDef from '../nodeDef'
+
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
 type CategoriesByUuid = Record<string, ArenaCategory>

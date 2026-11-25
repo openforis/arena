@@ -7,21 +7,21 @@ import type {
   ArenaTaxonomy,
   ArenaVernacularName,
 } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+
+import * as ObjectUtils from '@core/objectUtils'
 import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { CategoryItemsByCategoryUuid, TaxaByTaxonomyUuid } from '@core/survey/surveyCompare'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-import * as ObjectUtils from '@core/objectUtils'
-import { CategoryItemsByCategoryUuid, TaxaByTaxonomyUuid } from '@core/survey/surveyCompare'
-
-import FileZip from '@server/utils/file/fileZip'
-import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as CategoryService from '@server/modules/category/service/categoryService'
-import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import { db, type DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
+import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
+import FileZip from '@server/utils/file/fileZip'
 
 // object with props (published and draft) as exported in a backup
 type ObjectWithProps = {

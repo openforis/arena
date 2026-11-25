@@ -1,9 +1,10 @@
-import type { DbClient } from '@server/db/db'
 import type { ArenaChain } from '@openforis/arena-core'
 import { DB } from '@openforis/arena-server'
 
 import * as Chain from '@common/analysis/chain'
+import type { DbClient } from '@server/db/db'
 import { TableChain } from '../../../../../common/model/db'
+
 import { transformCallback } from './read'
 
 /**

@@ -1,4 +1,3 @@
-import { createAiSettingsCache } from '@webapp/components/ai/hooks/aiSettingsCache'
 import {
   buildInstanceCapability,
   createCapabilitiesStore,
@@ -8,6 +7,7 @@ import {
 import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { LocalServerProbeResult } from '@webapp/ai/engines/localServerProbe'
 import type { AiCapabilities } from '@webapp/ai/engines/types'
+import { createAiSettingsCache } from '@webapp/components/ai/hooks/aiSettingsCache'
 
 const settingsSnapshot = {
   featuresEnabled: true,

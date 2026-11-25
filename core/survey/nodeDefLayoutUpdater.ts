@@ -1,16 +1,15 @@
 import type {
-  ArenaNodeDefEntityChildPosition,
-  ArenaSurvey,
-  ArenaNodeDefEntity,
   ArenaAnyNodeDef,
+  ArenaNodeDefEntity,
+  ArenaNodeDefEntityChildPosition,
   ArenaNodeDefMap,
+  ArenaSurvey,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { uuidv4 } from '@core/uuid'
 
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 import { NodeDefLayoutSizes } from './nodeDefLayoutSizes'

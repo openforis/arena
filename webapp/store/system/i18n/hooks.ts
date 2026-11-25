@@ -1,9 +1,8 @@
 import { useCallback } from 'react'
-import { initReactI18next } from 'react-i18next'
 import detector from 'i18next-browser-languagedetector'
+import { initReactI18next } from 'react-i18next'
 
 import i18nInstance, { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
-
 import { UILanguageStorage } from '@webapp/service/storage/uiLanguage'
 import * as DomUtils from '@webapp/utils/domUtils'
 

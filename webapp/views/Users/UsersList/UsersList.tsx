@@ -2,16 +2,16 @@ import './UsersList.scss'
 
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
+
 import type { ArenaUser } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
-
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
-import { UserSurveysTable } from './UserSurveysTable'
 import { TableHeaderLeft } from './TableHeaderLeft'
+import { UserSurveysTable } from './UserSurveysTable'
 import { useUsersListColumns } from './useUsersListColumns'
 
 type UserRowExpandedProps = {

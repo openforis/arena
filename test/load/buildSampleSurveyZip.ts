@@ -3,8 +3,8 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+import { isWithinAllowedRoot, resolveValidatedOutputPath } from './lib/outputPath.ts'
 import { buildSampleSurveyZipBuffer } from './lib/sampleSurveyZip.ts'
-import { resolveValidatedOutputPath, isWithinAllowedRoot } from './lib/outputPath.ts'
 
 const DEFAULT_OUTPUT_PATH = './sample-survey.zip'
 

@@ -1,18 +1,17 @@
-import type { DbClient } from '@server/db/db'
 import type { ArenaCategory, ArenaCategoryItem } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
+
 import * as ObjectUtils from '@core/objectUtils'
-
-import Job, { type JobParams } from '@server/job/job'
-import type { OdkImportJobContext } from '../odkImportJobContext'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Survey from '@core/survey/survey'
 import BatchPersister from '@server/db/batchPersister'
+import type { DbClient } from '@server/db/db'
+import Job, { type JobParams } from '@server/job/job'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
-
+import type { ItextTranslations, XFormBodyControl } from '../model/xform'
 import * as XForm from '../model/xform'
-import type { XFormBodyControl, ItextTranslations } from '../model/xform'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 
 interface CategorySourceItem {
   code: string

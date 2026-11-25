@@ -1,5 +1,4 @@
 import { ButtonDelete } from '@webapp/components'
-
 import { UserEditSection } from '../UserEditSection'
 
 type Props = {

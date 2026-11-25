@@ -1,11 +1,11 @@
 import { Numbers, Objects, Points } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as DateUtils from '@core/dateUtils'
+import * as Record from '@core/record/record'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Record from '@core/record/record'
-import * as DateUtils from '@core/dateUtils'
+import * as Survey from '@core/survey/survey'
 
 // Items at a hierarchical category level can reuse the same code under different parent items
 // (e.g. per-plot numbering restarting at each sampling point), so matching by code alone is not

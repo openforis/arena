@@ -2,17 +2,15 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
-
-import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
-import { Button } from '@webapp/components/buttons'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { Button } from '@webapp/components/buttons'
 import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-
 import { TaxonomyCloneFromSurveyDialog } from '../TaxonomyCloneFromSurveyDialog'
-import { useAppDispatch } from '@webapp/store'
 
 type HeaderLeftProps = {
   headerProps?: Record<string, any>

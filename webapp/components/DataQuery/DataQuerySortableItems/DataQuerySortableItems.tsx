@@ -3,10 +3,8 @@ import './DataQuerySortableItems.scss'
 import { useRef } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { FormItem } from '@webapp/components/form/Input'
 import { useSortable } from '@webapp/components/hooks'
-
 import { useNodeDefsByUuids } from '@webapp/store/survey'
 
 import { DataQuerySortableItemChip } from './DataQuerySortableItemChip'

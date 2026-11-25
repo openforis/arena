@@ -1,11 +1,9 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { getMapLayerCardModel } from '@webapp/components/ai/Assistant/analysis/mapLayerCardModel'
 import { fitLayerBounds } from '@webapp/views/Data/MapView/GeoAttributeDataLayer/fitLayerBounds'
-
+import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import { getContextUser } from '../../integration/config/context'
 
 let survey: any = null
 const getUuid = (path: string) => NodeDef.getUuid(SurveyUtils.getNodeDefByPath({ survey, path }))

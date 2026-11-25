@@ -1,6 +1,4 @@
 import { useCallback, useState } from 'react'
-import { useI18n } from '@webapp/store/system'
-import { downloadBlobToFile } from '@webapp/utils/domUtils'
 
 import { ensureImageFileName } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
 import type {
@@ -10,9 +8,11 @@ import type {
 import type { ScreenshotDialogState } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotDialogState'
 import type { ScreenshotPreview } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
 import {
-  useScreenshotSave,
   type ScreenshotReplacePrompt,
+  useScreenshotSave,
 } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotSave'
+import { useI18n } from '@webapp/store/system'
+import { downloadBlobToFile } from '@webapp/utils/domUtils'
 
 // shown inside the dialog: app notifications are hidden while the map workspace is in full screen
 export type ScreenshotDoneNotice = { key: string; params: Record<string, string>; pending: boolean }

@@ -1,8 +1,8 @@
 /**
  * Instance ceilings of the survey AI policy: the most permissive level a survey may choose, per data class.
  */
+import { type AiPolicy, type AiPolicyLevel, aiPolicyLevels } from '@common/ai/policy'
 import { ENV } from '@core/processUtils'
-import { aiPolicyLevels, type AiPolicy, type AiPolicyLevel } from '@common/ai/policy'
 
 export type AiPolicyCeilingEnv = { aiPolicyMaxSchema?: string; aiPolicyMaxData?: string }
 

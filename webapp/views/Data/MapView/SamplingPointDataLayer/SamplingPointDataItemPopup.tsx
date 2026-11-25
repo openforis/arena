@@ -2,23 +2,20 @@ import { useCallback, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
-
 import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
 import { ButtonNext, ButtonPrevious } from '@webapp/components/buttons'
 import Markdown from '@webapp/components/Markdown'
-
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanCreateRecord } from '@webapp/store/user'
-
-import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
-import type { FlyToPointFunction } from '../common/useFlyToPoint'
 import type {
   CreateRecordFromSamplingPointDataItem,
   RecordEditClickHandler,
   SamplingPointFeature,
 } from '../common/mapPointTypes'
+import { useElevation } from '../common/useElevation'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
 
 const generateContent = ({ i18n, itemCodes, locationPoint, elevation }) => {
   const levelCodesList = itemCodes

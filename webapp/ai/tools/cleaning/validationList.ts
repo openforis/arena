@@ -1,8 +1,9 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import { Authorizer } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-import { Authorizer } from '@openforis/arena-core'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { CleaningI18n, getRowMessages, getRowRecordKeys } from './validationRows'
 

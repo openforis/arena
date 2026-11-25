@@ -1,3 +1,4 @@
+import type { GetObjectCommandOutput, HeadObjectCommandOutput, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3'
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
@@ -8,8 +9,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
-import type { GetObjectCommandOutput, HeadObjectCommandOutput, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3'
-
 import type { Readable } from 'node:stream'
 
 import * as ProcessUtils from '@core/processUtils'

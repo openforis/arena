@@ -3,7 +3,6 @@ import type { ReactElement } from 'react'
 import * as Survey from '@core/survey/survey'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
-
 import { useMapContextOptions } from '../../MapContext'
 import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 

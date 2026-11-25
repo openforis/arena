@@ -4,11 +4,9 @@ import * as schedule from 'node-schedule'
 
 import { runWithClusterLock } from '@openforis/arena-server'
 
-import * as Log from '@server/log/log'
-
 import * as DateUtils from '@core/dateUtils'
 import * as ProcessUtils from '@core/processUtils'
-
+import * as Log from '@server/log/log'
 import { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
 import * as TempFileRepositoryS3Bucket from '@server/modules/file/repository/tempFileRepositoryS3Bucket'
 

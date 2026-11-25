@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react'
 
 import { SortOrder } from '@core/sortOrder'
-
 import type { MapPointProperties } from '../common/mapPointTypes'
 
 // point of a layer listed in the panel (geo attribute or sampling point): record and parent only for geo attributes

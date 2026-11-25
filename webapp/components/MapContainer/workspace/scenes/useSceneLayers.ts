@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type L from 'leaflet'
 
 import { useNotifyError } from '@webapp/components/hooks'
-import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
 import { setGridLayerOpacity } from '@webapp/components/MapContainer/workspace/layers/customOverlays'
+import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
 import { useI18nT, useLang } from '@webapp/store/system'
 
 import { getSceneAttribution, getSceneOverlayId, removeBaseSceneOverlays } from './sceneLayerInfo'

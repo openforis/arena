@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test'
 
 import { getLocalProvidersKey, type LocalProvider } from '@webapp/ai/engines/localProviders'
-import type { SuggestionUserState } from '@webapp/ai/suggestions/state/types'
 import { INTRO_MODULES } from '@webapp/ai/suggestions/prompts/moduleIntro'
+import type { SuggestionUserState } from '@webapp/ai/suggestions/state/types'
 import { getSuggestionsKey } from '@webapp/ai/suggestions/suggestionStore'
 
 // The browser storage the AI specs seed and read. The keys and the shape of the state come from the app's own

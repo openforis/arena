@@ -1,31 +1,26 @@
 import './NodeDefGeo.scss'
 
-import classNames from 'classnames'
 import { useCallback, useState } from 'react'
+import classNames from 'classnames'
 import { useSelector } from 'react-redux'
 
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
-import { RecordState } from '@webapp/store/ui/record'
-
 import { Button, ButtonDownload, ButtonIconDelete, ExpansionPanel, MapContainer, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
 import { GeoPolygonInfo } from '@webapp/components/geo/GeoPolygonInfo'
 import { useConfirmAsync } from '@webapp/components/hooks'
-
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
+import { RecordState } from '@webapp/store/ui/record'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
-
 import { downloadTextToFile } from '@webapp/utils/domUtils'
 import { FileUtils } from '@webapp/utils/fileUtils'
-
 import * as NodeDefUiProps from '../../nodeDefUIProps'
-import { useAppDispatch } from '@webapp/store'
 import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const maxFileSize = 1

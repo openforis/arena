@@ -1,7 +1,7 @@
 import type { ArenaRecordNodesMap } from '@openforis/arena-core'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
 
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as API from '@webapp/service/api'
 
 // Records fetched on demand (see fetchRecordAndNodesOnce below), keyed by uuid and shared across hook

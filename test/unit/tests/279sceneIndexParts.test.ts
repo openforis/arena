@@ -1,6 +1,10 @@
 /**
  * Sentinel-2 index parts: which files a period reads, row-group statistics of `_tile` and pruning.
  */
+import {
+  createSceneIndexCache,
+  MAX_CACHED_ROW_GROUPS,
+} from '@webapp/components/MapContainer/workspace/scenes/sceneIndexCache'
 import { readPartLength } from '@webapp/components/MapContainer/workspace/scenes/sceneIndexFetch'
 import {
   getIndexPartUrls,
@@ -9,10 +13,6 @@ import {
   SCENE_INDEX_TILE_COLUMN,
   selectRowGroups,
 } from '@webapp/components/MapContainer/workspace/scenes/sceneIndexParts'
-import {
-  createSceneIndexCache,
-  MAX_CACHED_ROW_GROUPS,
-} from '@webapp/components/MapContainer/workspace/scenes/sceneIndexCache'
 import { getScenePeriod } from '@webapp/components/MapContainer/workspace/scenes/scenePeriod'
 import type { RowGroupInfo } from '@webapp/components/MapContainer/workspace/scenes/sceneTypes'
 

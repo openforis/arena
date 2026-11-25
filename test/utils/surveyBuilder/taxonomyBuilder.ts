@@ -1,5 +1,6 @@
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+
 import type { TaxonBuilder } from './taxonBuilder'
 
 export class TaxonomyBuilder {

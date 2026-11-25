@@ -1,16 +1,16 @@
-import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import { uuidv4 } from '@core/uuid'
 
-import { SurveyCompareParams, SurveyCompareStatus, SurveyCompareTaxonomyDiff } from './surveyCompareTypes'
 import {
   getTargetOnlyVernacularNames,
   indexTaxaByCode,
   updatableTaxonomyProps,
   vernacularNameKey,
 } from './surveyCompareTaxonomies'
+import { SurveyCompareParams, SurveyCompareStatus, SurveyCompareTaxonomyDiff } from './surveyCompareTypes'
 
 export interface TaxonomiesApplyPlan {
   taxonomiesToInsert: { taxonomy: any; taxa: any[] }[]

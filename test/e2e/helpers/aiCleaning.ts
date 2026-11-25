@@ -1,9 +1,9 @@
 import { expect, Page, Response } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
-import { sampleRecords, SampleRecord } from '../fixtures/seed/sampleSurveyModel'
 import type { ArenaApi } from '../fixtures/arenaApi'
+import { SampleRecord, sampleRecords } from '../fixtures/seed/sampleSurveyModel'
+
 import { reloadApp, setLocalProvider } from './aiAnalysis'
 import { sendAssistantMessage } from './assistantPanel'
 import { Urls } from './urls'

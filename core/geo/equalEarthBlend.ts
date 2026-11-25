@@ -1,4 +1,4 @@
-import { warpLonLatToEqualEarthInMercator, type LonLat } from './equalEarthProjection'
+import { type LonLat, warpLonLatToEqualEarthInMercator } from './equalEarthProjection'
 
 export interface BlendZoomRange {
   start: number

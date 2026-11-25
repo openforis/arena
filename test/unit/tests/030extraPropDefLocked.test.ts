@@ -1,5 +1,5 @@
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Category from '@core/survey/category'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 
 describe('ExtraPropDef locked flag', () => {

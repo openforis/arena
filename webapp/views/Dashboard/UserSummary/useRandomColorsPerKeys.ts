@@ -1,5 +1,6 @@
-import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { useMemo } from 'react'
+
+import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
 export const useRandomColorsPerKeys = ({ keys, selectedKeys, onlyDarkColors = false, onlyLightColors = false }) => {
   const colorsArray = useRandomColors(keys.length, { onlyDarkColors, onlyLightColors })

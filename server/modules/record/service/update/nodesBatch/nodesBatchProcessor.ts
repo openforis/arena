@@ -1,30 +1,30 @@
-import type { DbClient } from '@server/db/db'
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
-import type { ArenaRecordNode, ArenaRecord, ArenaSurvey, ArenaUser, ArenaValidation } from '@openforis/arena-core'
+import type { ArenaRecord, ArenaRecordNode, ArenaSurvey, ArenaUser, ArenaValidation } from '@openforis/arena-core'
+import { Authorizer } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
-import { Authorizer } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import SystemError from '@core/systemError'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
+import type { DbClient } from '@server/db/db'
 import type { QualifierFilter } from '@server/modules/record/repository/qualifierFiltersSqlConditions'
 import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
+
 import { checkBatchEdit, findUniquenessErrorKey } from './nodesBatchEditCheck'
 import { withSurveyUuid } from './nodesBatchRecordPermission'
 import {
-  NodesBatchEditResult,
-  NodesBatchMessageKeys,
-  NodesBatchPersistMessage,
-  NodesBatchRecordEdit,
   appliedResult,
-  NodesBatchEditStatus,
   conflictResult,
   failedResult,
   failedResults,
+  NodesBatchEditResult,
+  NodesBatchEditStatus,
+  NodesBatchMessageKeys,
+  NodesBatchPersistMessage,
+  NodesBatchRecordEdit,
 } from './nodesBatchTypes'
 
 // thrown by acquireRecordLockAndRun (records update thread) when the record stays locked for too long

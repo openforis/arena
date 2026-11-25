@@ -1,7 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react'
 
 import * as User from '@core/user/user'
-
 import {
   getAiCapabilitiesSnapshot,
   loadAiCapabilities,

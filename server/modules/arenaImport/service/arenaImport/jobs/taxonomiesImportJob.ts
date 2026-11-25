@@ -1,10 +1,7 @@
 import * as Taxonomy from '@core/survey/taxonomy'
-
 import Job, { type JobParams } from '@server/job/job'
-
-import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
-
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
 /**

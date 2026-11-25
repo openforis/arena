@@ -1,20 +1,18 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router'
 import axios from 'axios'
+import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
-
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-
-import { useQuery } from '@webapp/components/hooks'
-import { useUser, UserActions } from '@webapp/store/user'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { useSurveyId } from '@webapp/store/survey'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { useQuery } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
+import { useSurveyId } from '@webapp/store/survey'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { UserActions, useUser } from '@webapp/store/user'
 
 import { validateUserEdit } from './validate'
-import { useAppDispatch } from '@webapp/store'
 
 const prepareFormData = ({ userToUpdate }) => {
   const formData = new FormData()

@@ -1,30 +1,28 @@
 import * as fs from 'node:fs'
-import * as A from '@core/arena'
 
 import type { ArenaCategory, ArenaCategoryItem, ArenaSurvey } from '@openforis/arena-core'
 import { Objects, Points } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import Job from '@server/job/job'
-
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import { ExtraPropDef, type ExtraPropDataType, type ExtraPropDefItems } from '@core/survey/extraPropDef'
+import { type ExtraPropDataType, ExtraPropDef, type ExtraPropDefItems } from '@core/survey/extraPropDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as StringUtils from '@core/stringUtils'
-
+import Job from '@server/job/job'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportFlatDataParser from '../manager/categoryImportFlatDataParser'
+import * as CategoryManager from '../manager/categoryManager'
+
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
-import { CategoryValidationJob } from './categoryValidationJob'
 import * as CategoryService from './categoryService'
+import { CategoryValidationJob } from './categoryValidationJob'
 
 const toNumber = (value: unknown) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value)
 

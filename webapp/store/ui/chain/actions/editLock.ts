@@ -1,4 +1,5 @@
 import { ChainState } from '../state'
+
 import { ChainActionTypes } from './actionTypes'
 
 export const toggleEditLock = (dispatch, getState) => {

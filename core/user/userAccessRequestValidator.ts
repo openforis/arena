@@ -1,7 +1,7 @@
-import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as SurveyValidator from '@core/survey/surveyValidator'
-import * as Validator from '@core/validation/validator'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 export const validateUserAccessRequest = async (userAccessRequest: Record<string, unknown>) =>
   Validator.validate(userAccessRequest, {

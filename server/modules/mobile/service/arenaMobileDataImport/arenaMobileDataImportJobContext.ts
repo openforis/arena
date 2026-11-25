@@ -2,7 +2,6 @@ import type { ArenaJobContext } from '@openforis/arena-core'
 
 import type * as RecordManager from '@server/modules/record/manager/recordManager'
 import type FileZip from '@server/utils/file/fileZip'
-
 import type { UploadedRecordInfo } from '../recordsUploadedFromMobileEmail'
 
 type RecordsSummaryList = Awaited<ReturnType<typeof RecordManager.fetchRecordsSummaryBySurveyId>>['list']

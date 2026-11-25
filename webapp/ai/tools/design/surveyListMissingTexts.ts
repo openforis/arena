@@ -5,20 +5,19 @@
 import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import type { ChangeSet, LabelKind } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
-
 import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { getResultBudget } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool } from '../types'
+
 import {
-  TEXT_KINDS,
   getFilledLanguages,
   getMissingLanguages,
   getSurveyLanguages,
   getTextNodeDefs,
+  TEXT_KINDS,
   toTextTargetKey,
 } from './missingTexts'
 import { requireSurvey } from './surveyLookup'

@@ -1,5 +1,6 @@
 import * as A from '@core/arena'
 import { ArrayUtils } from '@core/arrayUtils'
+
 import { defaults, QueryItem } from './defaults'
 import { keys, modes } from './keys'
 

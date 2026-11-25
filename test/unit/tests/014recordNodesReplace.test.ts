@@ -1,18 +1,15 @@
 import { Surveys } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-
-import * as RecordUtils from '../../utils/recordUtils'
-import * as SurveyUtils from '../../utils/surveyUtils'
-
-import * as SB from '../../utils/surveyBuilder'
-import * as RB from '../../utils/recordBuilder'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { getContextUser } from '../../integration/config/context'
+import * as RB from '../../utils/recordBuilder'
+import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import * as SurveyUtils from '../../utils/surveyUtils'
 
 const { nodeDefType } = NodeDef
 

@@ -1,4 +1,5 @@
 import * as A from '@core/arena'
+
 import { TableConstants } from './constants'
 
 const _getUrlSearchParam = ({ param, defaultValue = null }) => {

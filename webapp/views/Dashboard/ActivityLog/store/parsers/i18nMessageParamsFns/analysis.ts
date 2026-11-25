@@ -1,8 +1,7 @@
-import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as ActivityLog from '@common/activityLog/activityLog'
+import * as A from '@core/arena'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 const _getChainLabel = (lang) => A.pipe(ActivityLog.getChainLabels, A.prop(lang))
 

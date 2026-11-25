@@ -1,18 +1,17 @@
 import { useCallback, useState } from 'react'
 
-import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
-
+import * as SurveyFile from '@core/survey/surveyFile'
 import { ButtonAdd } from '@webapp/components'
-import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid, rowActionColumns } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import { SurveyFilesMapPanel } from '@webapp/components/MapContainer/fileLayers'
+import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import * as API from '@webapp/service/api'
 
 import PreloadedMapLayerEditor from './PreloadedMapLayerEditor'
 

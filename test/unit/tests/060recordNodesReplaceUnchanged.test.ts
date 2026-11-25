@@ -1,13 +1,11 @@
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
-import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../../integration/config/context'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-
-import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 const { integer, text } = NodeDef.nodeDefType
 

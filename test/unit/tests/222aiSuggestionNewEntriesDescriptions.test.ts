@@ -1,23 +1,22 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
-import { newEntriesDescriptionsDefinition } from '@webapp/ai/suggestions/definitions/newEntriesDescriptions'
-import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
-import {
-  newEntriesDescriptionsDetector,
-  newEntriesDescriptionsResolver,
-} from '@webapp/ai/suggestions/detectors/newEntriesDescriptions'
 import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
-  TEST_NOW,
   buildSuggestion,
   createAddRecorder,
   createDetectorContext,
   describeContext,
+  TEST_NOW,
   withNodeDef,
   withSavedNodeDefs,
   withTexts,
 } from '@test/unit/utils/designSuggestionTestUtils'
+import { newEntriesDescriptionsDefinition } from '@webapp/ai/suggestions/definitions/newEntriesDescriptions'
+import {
+  newEntriesDescriptionsDetector,
+  newEntriesDescriptionsResolver,
+} from '@webapp/ai/suggestions/detectors/newEntriesDescriptions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 
 let survey: any
 

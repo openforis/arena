@@ -1,7 +1,7 @@
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+import { convertArrayToReadableStream, MockLanguageModelV4 } from 'ai/test'
 
 import { AiFeatures, getAiFeature } from '@common/ai/features'
-import { SCHEMA_TOOL_NAMES, isSchemaTool } from '@common/ai/schemaTools'
+import { isSchemaTool, SCHEMA_TOOL_NAMES } from '@common/ai/schemaTools'
 import {
   getEnforcedDataClass,
   parseGatewayRequest,
@@ -10,10 +10,9 @@ import {
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createPolicyEnforcer } from '@server/modules/ai/service/gateway/policy'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
-import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse, parseSseWrites } from '@test/unit/utils/fakeExpress'
+import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 
 const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]
 const toolResultTurn = (...toolNames: string[]) => [

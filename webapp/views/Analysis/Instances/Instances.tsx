@@ -3,9 +3,8 @@ import './Instances.scss'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-import * as User from '@core/user/user'
 import * as A from '@core/arena'
-
+import * as User from '@core/user/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'

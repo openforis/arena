@@ -1,13 +1,12 @@
 import SystemError from '@core/systemError'
-
 import FileZip from '@server/utils/file/fileZip'
 
 import {
   UsersBackupFile,
-  UsersBackupInfo,
-  UsersBackupUser,
   usersBackupFormatVersion,
+  UsersBackupInfo,
   usersBackupType,
+  UsersBackupUser,
 } from './usersBackupModel'
 
 const readJsonEntry = (fileZip: FileZip, entryName: string) => {

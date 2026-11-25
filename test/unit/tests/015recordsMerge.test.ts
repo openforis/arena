@@ -1,13 +1,12 @@
-import * as Record from '@core/record/record'
 import type { ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
-import * as Node from '@core/record/node'
 
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
-import { TestUtils } from '../../utils/testUtils'
 import { findNodeByPath, shiftDateModifiedIntoTheFuture } from '../../utils/recordUtils'
-
-import { getContextUser } from '../../integration/config/context'
+import { TestUtils } from '../../utils/testUtils'
 
 const { expectChildrenLengthToBe, expectValueToBe } = TestUtils
 

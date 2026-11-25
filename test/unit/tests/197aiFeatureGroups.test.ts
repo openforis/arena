@@ -1,7 +1,5 @@
 import { AiFeatureCategory, AiFeaturePermission, AiFeatures } from '@common/ai/features'
-
 import { FEATURE_GROUPS } from '@webapp/components/ai/UserAiSettingsPanel/featureGroups'
-
 import { LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
 const settingsByLang = namespaceByLanguage('userAiSettings')

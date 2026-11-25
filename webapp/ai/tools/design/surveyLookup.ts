@@ -1,12 +1,10 @@
 /**
  * Node definition helpers of the design tools (the lookup by name is shared: ../common/nodeDefLookup).
  */
-import * as Survey from '@core/survey/survey'
+import { closestNames } from '@common/ai/closestNames'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
-import { closestNames } from '@common/ai/closestNames'
-
+import * as Survey from '@core/survey/survey'
 import { findNodeDefByName, getCurrentNodeDefs } from '../common/nodeDefLookup'
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'

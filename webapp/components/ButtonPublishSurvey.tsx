@@ -1,17 +1,16 @@
-import { useAppDispatch } from '@webapp/store/hooks'
+import './ButtonPublishSurvey.scss'
+
 import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
-
 import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
+import { useAppDispatch } from '@webapp/store/hooks'
 import { SurveyActions, useIsSurveyDirty, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 
 import { Button } from './buttons'
 import { useKeyboardShiftKeyPressed } from './hooks'
-
-import './ButtonPublishSurvey.scss'
 
 type ButtonPublishSurveyProps = {
   className?: string

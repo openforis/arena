@@ -1,10 +1,10 @@
 import {
-  WhispColumnsCollector,
   extractWhispColumns,
   findNumericColumns,
   isWhispPropExcluded,
   toCellValue,
   toChunks,
+  WhispColumnsCollector,
 } from '@server/modules/geo/service/whispSamplingPointData/whispResultsUtils'
 
 const features = [

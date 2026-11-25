@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react'
 
+import type { ArenaCategoryLevel } from '@openforis/arena-core'
+
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-
 import { VirtualizedList } from '@webapp/components/VirtualizedList'
 import { useI18n } from '@webapp/store/system'
-
 import { State } from '../store'
+
 import ItemDetails from './ItemDetails'
-import type { ArenaCategoryLevel } from '@openforis/arena-core'
 
 type ItemsListProps = {
   items: any[]

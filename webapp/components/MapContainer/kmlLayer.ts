@@ -1,6 +1,6 @@
-import L from 'leaflet'
 import { kml } from '@tmcw/togeojson'
 import type { Feature, Geometry, Point } from 'geojson'
+import L from 'leaflet'
 
 import { buildKmlPopupHtml } from './kmlPopupContent'
 

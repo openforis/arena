@@ -1,5 +1,4 @@
 import { nodeDefType } from '@core/survey/nodeDef'
-
 import {
   arenaFileTypeFromMediatype,
   mapXFormTypeToNodeDefType,

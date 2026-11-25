@@ -2,11 +2,10 @@ import { useCallback } from 'react'
 
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-
+import { useAppDispatch } from '@webapp/store'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useUpdateCategoryItemExtraPropItem } from './useUpdateCategoryItemExtraPropItem'
-import { useAppDispatch } from '@webapp/store'
 
 export const useConvertGeoPackageCategoryToSimple = ({ setState }) => {
   const dispatch = useAppDispatch()

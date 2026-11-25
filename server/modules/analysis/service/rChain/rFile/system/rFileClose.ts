@@ -1,12 +1,9 @@
-import { quote } from '@core/stringUtils'
-
 import * as Chain from '@common/analysis/chain'
-
+import { quote } from '@core/stringUtils'
 import * as ApiRoutes from '../../../../../../../common/apiRoutes'
+import { arenaEndTime, arenaPut, arenaStartTime, asNumeric, paste, setVar, sysTime, unlinkWd } from '../../rFunctions'
 
 import RFileSystem from './rFileSystem'
-
-import { arenaEndTime, arenaStartTime, arenaPut, asNumeric, paste, setVar, sysTime, unlinkWd } from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {

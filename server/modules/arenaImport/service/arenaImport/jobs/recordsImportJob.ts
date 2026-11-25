@@ -1,17 +1,15 @@
 import type { ArenaRecord } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
-import Job, { type JobParams } from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
+import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 const NODES_INSERT_BATCH_SIZE = 10000
 

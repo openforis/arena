@@ -4,9 +4,9 @@ import { deserializeStreamPart, serializeGenerateResult, serializeStreamPart } f
 import { sanitizeCall } from '@server/modules/ai/service/gateway/callValidation'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
-import { createGatewayModel } from '@webapp/ai/runtime/gatewayModel'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { createGatewayModel } from '@webapp/ai/runtime/gatewayModel'
 
 const mapError = () => ({ key: 'aiProviderUnavailable' })
 const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]

@@ -4,27 +4,25 @@
  */
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-
 import {
   CATEGORY_ITEM_LABEL_TEXT_MAX,
   type MissingLabelsItem,
   type MissingLabelsPage,
 } from '@common/ai/categoryItemLabels'
-
+import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import {
-  fetchMissingLabelsPage,
   type FetchMissingLabelsPage,
+  fetchMissingLabelsPage,
 } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
-
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { getResultBudget } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
-import { createCategoryItemRefs, type CategoryItemRefs } from './categoryItemRefs'
+
+import { type CategoryItemRefs, createCategoryItemRefs } from './categoryItemRefs'
 import { requireSurvey } from './surveyLookup'
 
 export const LIST_MISSING_LABELS_SERVER_PAGE = 100

@@ -1,23 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useMap } from 'react-leaflet'
-import { latLngBounds } from 'leaflet'
 import axios from 'axios'
+import { latLngBounds } from 'leaflet'
+import { useMap } from 'react-leaflet'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
+import * as Survey from '@core/survey/survey'
 import { useIsMountedRef } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
-
+import { useAppDispatch } from '@webapp/store'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
-
-import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
+import { useLayerColorPicker, useMapClusters, useMapLayerToggle } from '../common'
 import type { SamplingPointFeature } from '../common/mapPointTypes'
-import { useAppDispatch } from '@webapp/store'
 
 const itemsPageSize = 10000
 

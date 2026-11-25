@@ -1,16 +1,13 @@
 import './SamplingPointDataSummary.scss'
 
-import { useEffect, useContext, useState, useMemo } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
-
+import * as Survey from '@core/survey/survey'
+import { PieChart } from '@webapp/charts/PieChart'
 import { countSamplingPointData } from '@webapp/service/api/categories'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
-import { PieChart } from '@webapp/charts/PieChart'
-
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
 const colorByStep = {

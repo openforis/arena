@@ -1,18 +1,16 @@
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Taxonomy from '@core/survey/taxonomy'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
-
+import { jobStatus } from '@server/job/jobUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
-import { jobStatus } from '@server/job/jobUtils'
-
-import { getContextUser } from '../../config/context'
 import * as SB from '../../../utils/surveyBuilder'
+import { getContextUser } from '../../config/context'
+
 import * as TaxonomyUtils from './taxonomyUtils'
 
 const taxonomyNameDefault = 'species_list'

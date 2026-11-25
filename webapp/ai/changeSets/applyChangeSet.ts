@@ -2,17 +2,17 @@
  * Applies the selected operations of a change set through the form designer's save path. Never called by a tool:
  * only the card's Apply button calls it.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
+import { applyCategoryItemLabels, type CategoryLabelsApplierDeps } from './categoryItemLabels/applyCategoryItemLabels'
+import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import { isDeepEqual } from './deepEqual'
 import { findValidationConflicts } from './designerRuleConflicts'
 import { findConflicts } from './findConflicts'
 import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
-import { getRequestFailure } from './requestFailure'
 import { isRecordEditOperation } from './recordEdits/types'
-import { applyCategoryItemLabels, type CategoryLabelsApplierDeps } from './categoryItemLabels/applyCategoryItemLabels'
-import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
+import { getRequestFailure } from './requestFailure'
 import type { ChangeSet, NodeDefOperation, OperationConflict, OperationResult } from './types'
 
 export type ApplierDeps = {

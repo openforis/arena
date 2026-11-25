@@ -1,25 +1,21 @@
 import { UUIDs } from '@openforis/arena-core'
 
-import { db } from '@server/db/db'
-import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
-import * as FileRepository from '@server/modules/record/repository/fileRepository'
+import { db } from '@server/db/db'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as FileRepository from '@server/modules/record/repository/fileRepository'
+import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // the thread posts messages to the parent port, which doesn't exist in the main thread: ignore them
 class TestRecordsUpdateThread extends RecordsUpdateThread {

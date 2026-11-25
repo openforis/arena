@@ -1,6 +1,6 @@
-import * as A from '@core/arena'
-
 import toSnakeCase from 'to-snake-case'
+
+import * as A from '@core/arena'
 
 export { toSnakeCase }
 

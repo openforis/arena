@@ -1,10 +1,11 @@
 import type { ArenaUser } from '@openforis/arena-core'
+
 import type { SurveyCompareResult } from '@core/survey/surveyCompare'
 import * as JobManager from '@server/job/jobManager'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 
-import SurveyCompareJob from './surveyCompareJob'
 import SurveyCompareApplyJob from './surveyCompareApplyJob'
+import SurveyCompareJob from './surveyCompareJob'
 import { readKeptJson } from './surveyCompareSource'
 
 export const startSurveyCompareJob = (params: {

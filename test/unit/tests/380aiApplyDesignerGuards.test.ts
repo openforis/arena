@@ -1,20 +1,19 @@
 import { UserFactory } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
-
-import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
-import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
-import type { ChangeSet } from '@webapp/ai/changeSets/types'
-import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
-import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefProposeCreate'
-import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
-import { runTool } from '@webapp/ai/tools/registry'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { createRecordingApplierDeps } from '@test/unit/utils/categoryLabelsTestUtils'
 import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
+import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
+import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
+import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
+import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefProposeCreate'
+import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
+import { runTool } from '@webapp/ai/tools/registry'
 
 let survey: any
 

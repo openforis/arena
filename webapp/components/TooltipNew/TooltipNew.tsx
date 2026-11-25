@@ -1,13 +1,12 @@
 import './TooltipNew.scss'
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
-import classNames from 'classnames'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import { Tooltip } from '@mui/material'
+import classNames from 'classnames'
 
 import { Objects } from '@openforis/arena-core'
 
 import { useI18nT } from '@webapp/store/system'
-
 import Markdown from '../Markdown'
 
 type TooltipNewProps = {

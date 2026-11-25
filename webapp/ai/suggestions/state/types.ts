@@ -2,7 +2,6 @@
  * Shape of the suggestions of one user as stored under `arena.ai.suggestions.<userUuid>`.
  */
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
-
 import type { AssistantSuggestion, SuggestionKind, SuggestionTarget } from '../types'
 
 // target key → the count when dismissed (counted kinds) or true

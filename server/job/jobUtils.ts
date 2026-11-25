@@ -1,6 +1,5 @@
-import * as A from '@core/arena'
-
 import * as JobSerialized from '@common/job/jobSerialized'
+import * as A from '@core/arena'
 
 export const jobStatus = {
   pending: 'pending',

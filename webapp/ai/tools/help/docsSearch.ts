@@ -1,8 +1,7 @@
 import { z } from 'zod'
 
-import { searchHandbook, type HandbookIndex } from '@webapp/ai/help/handbookSearch'
+import { type HandbookIndex, searchHandbook } from '@webapp/ai/help/handbookSearch'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
-
 import type { AiTool } from '../types'
 
 const inputSchema = z.object({

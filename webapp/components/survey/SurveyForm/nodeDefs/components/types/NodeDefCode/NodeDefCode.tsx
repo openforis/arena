@@ -11,15 +11,14 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
-
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
+import type { NodeDefComponentProps } from '../../nodeDefComponentProps'
 
-import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
-import type { NodeDefComponentProps } from '../../nodeDefComponentProps'
+import { useItems } from './store'
 
 type NodeDefCodeProps = NodeDefComponentProps & {
   removeNode: (...args: any[]) => any

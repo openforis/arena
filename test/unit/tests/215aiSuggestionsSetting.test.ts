@@ -4,7 +4,6 @@ import {
   AiFeatures,
   isAiCategoryOnByDefault,
 } from '@common/ai/features'
-
 import {
   defaultFeatureToggles as serverDefaults,
   isCategoryEnabledForUser,

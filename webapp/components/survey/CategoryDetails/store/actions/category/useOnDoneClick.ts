@@ -1,10 +1,9 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { State } from '../../state'
 import { useAppDispatch } from '@webapp/store'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { State } from '../../state'
 
 export const useOnDoneClick = ({ setState }) => {
   const navigate = useNavigate()

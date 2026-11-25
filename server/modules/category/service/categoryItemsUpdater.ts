@@ -1,15 +1,13 @@
 import type { ArenaCategory, ArenaCategoryItem, ArenaUser } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
-
 import * as A from '@core/arena'
 import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
-
 import BatchPersister from '@server/db/batchPersister'
 import type { DbClient } from '@server/db/db'
 import * as CategoryManager from '../manager/categoryManager'

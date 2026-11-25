@@ -1,5 +1,4 @@
 import { Query } from '@common/model/query'
-
 import { getEntityViewDataCountRequest } from '@webapp/service/api/surveyRdb'
 import { DataExplorerState } from '@webapp/store/dataExplorer/state'
 

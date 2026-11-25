@@ -1,17 +1,17 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Taxonomy from '@core/survey/taxonomy'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
-import * as ObjectUtils from '@core/objectUtils'
+import * as Taxonomy from '@core/survey/taxonomy'
 
-import { CategoryItemsByCategoryUuid, TaxaByTaxonomyUuid } from './surveyCompareTypes'
-import { buildNodeDefsIndex } from './surveyCompareNodeDefsIndex'
-import { normalizeNodeDef } from './surveyCompareNodeDefNormalizer'
 import { indexItemsByCodePath, normalizeCategory, normalizeItem } from './surveyCompareCategories'
-import { indexTaxaByCode, normalizeTaxon, normalizeTaxonomy } from './surveyCompareTaxonomies'
+import { normalizeNodeDef } from './surveyCompareNodeDefNormalizer'
+import { buildNodeDefsIndex } from './surveyCompareNodeDefsIndex'
 import { normalizeSurveyInfoProp } from './surveyCompareSurveyInfo'
+import { indexTaxaByCode, normalizeTaxon, normalizeTaxonomy } from './surveyCompareTaxonomies'
+import { CategoryItemsByCategoryUuid, TaxaByTaxonomyUuid } from './surveyCompareTypes'
 
 /**
  * Variants of the survey definition fingerprint.

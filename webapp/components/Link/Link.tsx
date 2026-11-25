@@ -1,5 +1,5 @@
-import type React from 'react'
 import MuiLink from '@mui/material/Link'
+import type React from 'react'
 
 const isUrlSafe = (url) => url && (url.startsWith('http://') || url.startsWith('https://'))
 

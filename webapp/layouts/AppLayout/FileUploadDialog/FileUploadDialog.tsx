@@ -3,10 +3,9 @@ import './FileUploadDialog.scss'
 import { useCallback, useState } from 'react'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter, ProgressBar } from '@webapp/components'
-
-import { FileUploadDialogActions, useFileUploadDialog } from '@webapp/store/ui'
 import { useOnValueChange } from '@webapp/components/hooks'
 import { useAppDispatch } from '@webapp/store'
+import { FileUploadDialogActions, useFileUploadDialog } from '@webapp/store/ui'
 
 const initialState: { files: File[]; uploadProgressPercent?: number; uploading?: boolean } = { files: [] }
 

@@ -1,8 +1,7 @@
 import Job, { type JobParams } from '@server/job/job'
-
-import SurveyExportJob from '../surveyExport/surveyExportJob'
 import ArenaImportJob from '../../../arenaImport/service/arenaImport/arenaImportJob'
 import { SurveyCreatorJobHelper } from '../surveyCreatorJobHelper'
+import SurveyExportJob from '../surveyExport/surveyExportJob'
 
 export default class SurveyCloneJob extends Job {
   static readonly type: string = 'SurveyCloneJob'

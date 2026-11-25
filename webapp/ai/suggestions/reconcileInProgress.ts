@@ -2,7 +2,7 @@
  * In-progress targets left by a reload or a closed tab during a Do it turn: settled from the stored conversation.
  */
 import type { Conversation } from '@webapp/ai/conversations/types'
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 
 import { getHeldLockNames, getSuggestionSettleOutcome, getSuggestionTurnLockName } from './suggestionConversation'
 import type { SuggestionStore } from './suggestionStore'

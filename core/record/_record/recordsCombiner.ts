@@ -1,19 +1,18 @@
-import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaRecord, ArenaRecordNode, ArenaSurvey } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import * as ObjectUtils from '@core/objectUtils'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { NodeValues } from '../nodeValues'
 import { RecordEvaluationContext } from '../recordEvaluationContext'
-import * as RecordReader from './recordReader'
 
-import { updateAttributeValue } from './recordNodeValueUpdater'
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
+import { updateAttributeValue } from './recordNodeValueUpdater'
+import * as RecordReader from './recordReader'
 
 type KeyValuesByDefUuid = Record<string, unknown>
 // entities (with the same uuid or keys) whose descendants must be merged
