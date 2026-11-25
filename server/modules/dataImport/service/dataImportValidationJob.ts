@@ -1,5 +1,5 @@
 import type { JobParams } from '@server/job/job'
-import DataImportJob from './DataImportJob/DataImportJob'
+import DataImportJob from './dataImportJob/dataImportJob'
 
 // dry run of the data import: the inner jobs do not persist anything (dryRun param)
 export default class DataImportValidationJob extends DataImportJob {

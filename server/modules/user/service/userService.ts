@@ -17,7 +17,7 @@ import { db, DbClient } from '@server/db/db'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
-import { Countries } from '@core/Countries'
+import { Countries } from '@core/countries'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserGroupInvitation from '@core/user/userGroupInvitation'

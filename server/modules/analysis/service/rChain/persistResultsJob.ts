@@ -4,12 +4,12 @@ import type FileZip from '@server/utils/file/fileZip'
 import type { JobParams } from '@server/job/job'
 import * as Record from '@core/record/record'
 
-import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/FlatDataImportJob'
-import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
+import FlatDataImportJob from '@server/modules/dataImport/service/dataImportJob/flatDataImportJob'
+import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/dataImportJob/dataImportFlatDataFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { RecordProvidersDefault } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
-import { RecordsProvider } from './RecordsProvider'
+import { RecordsProvider } from './recordsProvider'
 import { FileFormats } from '@core/fileFormats'
 
 export default class PersistResultsJob extends FlatDataImportJob {

@@ -4,7 +4,7 @@ import * as Node from '@core/record/node'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
-import DataImportBaseJob from './DataImportBaseJob'
+import DataImportBaseJob from './dataImportBaseJob'
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
 export default class EntitiesDeleteJob extends DataImportBaseJob {

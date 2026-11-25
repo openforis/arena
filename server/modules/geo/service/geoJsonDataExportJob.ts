@@ -6,7 +6,7 @@ import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatte
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SamplingPolygon from '@core/survey/SamplingPolygon'
+import * as SamplingPolygon from '@core/survey/samplingPolygon'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import i18nInstance from '@core/i18n/i18nFactory'
 

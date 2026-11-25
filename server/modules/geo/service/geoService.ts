@@ -1,8 +1,8 @@
 import type { ArenaUser } from '@openforis/arena-core'
 import * as JobManager from '@server/job/jobManager'
 
-import { GeoJsonDataExportJob } from './GeoJsonDataExportJob'
-import SamplingPointDataWhispJob from './whispSamplingPointData/SamplingPointDataWhispJob'
+import { GeoJsonDataExportJob } from './geoJsonDataExportJob'
+import SamplingPointDataWhispJob from './whispSamplingPointData/samplingPointDataWhispJob'
 
 const startGeoJsonCoordinateFeaturesGenerationJob = ({
   user,

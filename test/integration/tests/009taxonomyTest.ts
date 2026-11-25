@@ -2,6 +2,16 @@ import * as TaxonomyTests from './_taxonomy/taxonomyTests'
 import * as TaxonomyPublishedTests from './_taxonomy/taxonomyPublishedTests'
 
 describe('Taxonomy test', () => {
+  beforeAll(async () => {
+    await TaxonomyTests.setUpTaxonomyTests()
+    await TaxonomyPublishedTests.setUpTaxonomyPublishedTests()
+  })
+
+  afterAll(async () => {
+    await TaxonomyTests.tearDownTaxonomyTests()
+    await TaxonomyPublishedTests.tearDownTaxonomyPublishedTests()
+  })
+
   test('Taxonomy insert test', TaxonomyTests.taxonomyTests)
   test('Taxonomy update test', TaxonomyTests.taxonomyUpdateTest)
   test('Taxa insert test', TaxonomyTests.taxaInsertTest)

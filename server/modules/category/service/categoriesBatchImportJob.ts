@@ -9,7 +9,7 @@ import FileZip from '@server/utils/file/fileZip'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-import CategoryBatchImportJob from './CategoryBatchImportJob'
+import CategoryBatchImportJob from './categoryBatchImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 
 const extractCategoryNameFromZipEntryName = (entryName: string) => {
