@@ -5,7 +5,7 @@ import * as WhatsNew from '@core/whatsNew/whatsNew'
 import { useI18n } from '@webapp/store/system'
 
 import { Carousel } from '../Carousel'
-import Markdown from '../markdown'
+import Markdown from '../Markdown'
 
 type WhatsNewSlideProps = {
   item: WhatsNew.WhatsNewItem

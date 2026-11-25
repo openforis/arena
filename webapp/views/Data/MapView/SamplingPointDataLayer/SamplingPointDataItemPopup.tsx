@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 
 import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
 import { ButtonNext, ButtonPrevious } from '@webapp/components/buttons'
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'

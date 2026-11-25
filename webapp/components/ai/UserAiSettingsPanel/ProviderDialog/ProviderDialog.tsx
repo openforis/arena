@@ -8,7 +8,7 @@ import { getProviderNameText } from '@webapp/ai/providers/providerNames'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { TestId } from '@webapp/utils/testId'
 import { useI18nT } from '@webapp/store/system'
 

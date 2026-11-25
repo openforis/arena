@@ -1,7 +1,7 @@
 import * as SurveyCycle from '@core/survey/surveyCycle'
 
 import { ButtonIconDelete } from '@webapp/components'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 import DateContainer from './DateContainer'
 import type { ArenaValidation } from '@openforis/arena-core'

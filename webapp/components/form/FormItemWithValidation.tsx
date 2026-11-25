@@ -1,5 +1,5 @@
 import type React from 'react'
-import ValidationTooltip from '../validationTooltip'
+import ValidationTooltip from '../ValidationTooltip'
 import { FormItem } from './Input'
 import type { ArenaValidation } from '@openforis/arena-core'
 

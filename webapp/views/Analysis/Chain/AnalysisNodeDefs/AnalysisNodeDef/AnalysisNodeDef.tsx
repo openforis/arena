@@ -12,7 +12,7 @@ import { useChainEditable } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
-import WarningBadge from '@webapp/components/warningBadge'
+import WarningBadge from '@webapp/components/WarningBadge'
 import { useAppDispatch } from '@webapp/store'
 
 type AnalysisNodeDefProps = {

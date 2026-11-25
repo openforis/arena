@@ -6,7 +6,7 @@ import { SurveyPreloadedMapLayerValidator } from '@core/survey/surveyPreloadedMa
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
 import { MapFilePreview } from '@webapp/components/MapContainer/fileLayers'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { contentTypes } from '@webapp/service/api'
 

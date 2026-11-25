@@ -1,0 +1,157 @@
+import './ExpressionEditorPopup.scss'
+
+import * as A from '@core/arena'
+
+import * as Expression from '@core/expressionParser/expression'
+
+import { TestId } from '@webapp/utils/testId'
+
+import PanelRight from '@webapp/components/PanelRight'
+
+import { Button } from '../buttons'
+import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
+import { useExpressionEditorPopupState } from './expressionEditorPopupState'
+import AdvancedExpressionEditorPopup from './AdvancedExpressionEditorPopup'
+import BasicExpressionEditorPopup from './BasicExpressionEditorPopup'
+import { ExpressionEditorType } from './expressionEditorType'
+
+type ExpressionEditorPopupProps = {
+  canBeCall?: boolean // True if expression can be a function call
+  canBeConstant?: boolean // True if expression can be a constant value like a number or a string
+  excludeCurrentNodeDef?: boolean
+  expr?: Record<string, any> // AST expression
+  header?: string
+  includeAnalysis?: boolean
+  isBoolean?: boolean // True if expression returns a boolean condition
+  isContextParent?: boolean // True if the context node def is the parent of the current node def
+  mode?: any
+  // NOTE: One of the two above is passed on component creation
+  nodeDefUuidContext?: string // Entity
+  nodeDefUuidCurrent?: string // Attribute
+  onChange?: (...args: any[]) => any
+  onClose?: (...args: any[]) => any
+  onGenerateWithAi?: (...args: any[]) => any // if set, shows a button to generate the expression from a description via AI
+  query?: string // String representing the expression
+  textSearchHelpVisible?: boolean // True to show how to search text values (e.g. in the Data Explorer filter)
+  types?: any[] // allowed expression types
+}
+
+const ExpressionEditorPopup = (props: ExpressionEditorPopupProps) => {
+  const {
+    canBeCall = false,
+    canBeConstant = false,
+    excludeCurrentNodeDef = true,
+    expr = null,
+    header = '',
+    includeAnalysis = false,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onChange = () => {},
+    onClose = () => {},
+    onGenerateWithAi = null,
+    query = '',
+    textSearchHelpVisible = false,
+    types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
+  } = props
+
+  const {
+    advanced,
+    expressionCanBeApplied,
+    exprDraft,
+    exprDraftValid,
+    nodeDefCurrent,
+    onApply,
+    onToggleAdvancedEditor,
+    queryDraft,
+    updateDraftExpr,
+    updateDraftQuery,
+    variables,
+  } = useExpressionEditorPopupState({
+    canBeCall,
+    canBeConstant,
+    excludeCurrentNodeDef,
+    expr,
+    mode,
+    type: types,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
+    onChange,
+    query,
+    includeAnalysis,
+  })
+
+  return (
+    <PanelRight onClose={onClose} width="100vw" header={header}>
+      <div className="expression-editor-popup">
+        <div className="expression-editor-popup__toolbar">
+          {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
+            <Button
+              className="expression-editor-popup__toggle-advanced"
+              label={advanced ? 'nodeDefEdit:basic' : 'nodeDefEdit:advanced'}
+              onClick={onToggleAdvancedEditor}
+              size="small"
+              testId={TestId.expressionEditor.toggleModeBtn}
+            />
+          )}
+          {onGenerateWithAi && (
+            <ButtonAiGenerateExpression
+              onClick={onGenerateWithAi}
+              testId={TestId.expressionEditor.aiPopupBtn}
+              variant="outlined"
+            />
+          )}
+        </div>
+        {advanced ? (
+          <AdvancedExpressionEditorPopup
+            nodeDefCurrent={nodeDefCurrent}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
+            includeAnalysis={includeAnalysis}
+            isContextParent={isContextParent}
+            query={queryDraft}
+            updateDraftQuery={updateDraftQuery}
+            mode={mode}
+            textSearchHelpVisible={textSearchHelpVisible}
+          />
+        ) : (
+          <BasicExpressionEditorPopup
+            exprDraft={exprDraft}
+            exprDraftValid={exprDraftValid}
+            isBoolean={isBoolean}
+            nodeDefCurrent={nodeDefCurrent}
+            queryDraft={queryDraft}
+            updateDraftExpr={updateDraftExpr}
+            variables={variables}
+          />
+        )}
+
+        <div className="expression-editor-popup__footer">
+          <Button
+            disabled={A.isEmpty(query)}
+            iconClassName="icon-undo2 icon-12px"
+            label="common.reset"
+            onClick={() => onChange('')}
+            size="small"
+            variant="outlined"
+          />
+
+          <Button
+            className="btn-primary"
+            disabled={!expressionCanBeApplied}
+            iconClassName="icon-checkmark icon-12px"
+            label="common.apply"
+            onClick={onApply}
+            size="small"
+            testId={TestId.expressionEditor.applyBtn}
+          />
+
+          <Button label="common.cancel" onClick={onClose} size="small" variant="outlined" />
+        </div>
+      </div>
+    </PanelRight>
+  )
+}
+
+export default ExpressionEditorPopup

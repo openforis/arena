@@ -15,7 +15,7 @@ import { ButtonNew } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync } from '@webapp/components/hooks'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 

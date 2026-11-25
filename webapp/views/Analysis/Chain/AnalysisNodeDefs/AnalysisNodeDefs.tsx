@@ -11,7 +11,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useDataCountByEntityDefUuid } from '@webapp/store/surveyRdb/hooks'
 import { useI18n } from '@webapp/store/system'
 
-import ErrorBadge from '@webapp/components/errorBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 
 import { AnalysisNodeDefsHeader } from './AnalysisNodeDefsHeader'
 import { AnalysisNodeDef } from './AnalysisNodeDef'

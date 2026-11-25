@@ -11,7 +11,7 @@ import { useI18n } from '@webapp/store/system'
 import { ButtonIconCancel } from '@webapp/components/buttons'
 
 import { useOnUpdate } from '../../hooks'
-import ValidationTooltip from '../../validationTooltip'
+import ValidationTooltip from '../../ValidationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
 import { translatePlaceholder } from '../translatePlaceholder'
 import { getInputTitle } from './inputTitle'

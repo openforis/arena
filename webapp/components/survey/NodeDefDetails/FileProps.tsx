@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
+import ButtonGroup from '@webapp/components/form/ButtonGroup'
 
 import { State, useNodeDefEditReadOnly } from './store'
 import { NodeDefSingleExpressionProp } from './ExpressionsProp/NodeDefSingleExpressionProp'
