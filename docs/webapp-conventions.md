@@ -87,9 +87,8 @@ export const JobsHeader = ({ onRefresh, highlighted = false }: Props) => {
   TypeScript.
 - The JSX runtime is automatic. Import only what you use from `react`
   (`import { useState, type ReactNode } from 'react'`), and add `import React` only when the code uses `React.`.
-- Imports go in groups separated by a blank line (not enforced by lint): the stylesheet, then packages
-  (`react`, `react-redux`, MUI, `@openforis/arena-core`...), then `@common/*` and `@core/*`, then `@webapp/*`,
-  then relative imports.
+- Imports are grouped and sorted as described in CLAUDE.md "Imports order" (enforced by lint): the stylesheet
+  comes first, as a side-effect import.
 - Read domain objects with the `core` functional modules (`Survey.getNodeDefByUuid(uuid)(survey)`,
   `NodeDef.getLabel(nodeDef, lang)`). Take their types from `@openforis/arena-core` (see CLAUDE.md).
 - Test ids come from `webapp/utils/testId/index.js`. House components take a `testId` prop and plain
