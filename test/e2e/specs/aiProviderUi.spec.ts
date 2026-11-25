@@ -20,6 +20,7 @@ import {
   sendAssistantMessage,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
+import { expectDropdownValue, getDropdown } from '../helpers/dropdown'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 import { type LocalModelServerStub, startLocalModelServer } from '../stubs/localModelServer'
@@ -124,7 +125,7 @@ test.describe('AI provider list and dialog (mock provider, stub local server)', 
     await page.getByTestId(TestId.ai.providerTest).click()
     await expect(page.getByTestId(TestId.ai.providerTestResult)).toContainText('Answered')
     // the first listed model is chosen
-    await expect(page.getByTestId(TestId.ai.providerModel)).toHaveValue(stub!.modelId)
+    await expectDropdownValue(getDropdown(page.getByTestId(TestId.ai.providerDialog)), stub!.modelId)
     await page.locator(`input[data-testid="${TestId.ai.providerName}"]`).fill('Desk server')
     await page.getByTestId(TestId.ai.providerSave).click()
     await expect(page.getByTestId(TestId.ai.providerDialog)).toHaveCount(0)
@@ -158,7 +159,7 @@ test.describe('AI provider list and dialog (mock provider, stub local server)', 
 
     await page.getByTestId(TestId.ai.providerTest).click()
     await expect(page.getByTestId(TestId.ai.providerTestResult)).toContainText('Answered in')
-    await expect(page.getByTestId(TestId.ai.providerModel)).toHaveValue('mock')
+    await expectDropdownValue(getDropdown(page.getByTestId(TestId.ai.providerDialog)), 'mock')
     await page.locator(`input[data-testid="${TestId.ai.providerName}"]`).fill('Mock account')
     await page.getByTestId(TestId.ai.providerSave).click()
     await expect(page.getByTestId(TestId.ai.providerDialog)).toHaveCount(0)

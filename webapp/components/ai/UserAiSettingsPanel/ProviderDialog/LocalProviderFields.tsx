@@ -1,8 +1,11 @@
+import { useMemo } from 'react'
+
 import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
 import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
 import { Button } from '@webapp/components/buttons'
+import Dropdown from '@webapp/components/form/Dropdown'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Spinner } from '@webapp/components/Spinner'
 import { useI18n, useI18nT } from '@webapp/store/system'
@@ -108,6 +111,7 @@ export const LocalProviderFields = ({
   onTest,
 }: Props) => {
   const t = useI18nT()
+  const modelItems = useMemo(() => models.map((modelId) => ({ value: modelId, label: modelId })), [models])
   return (
     <>
       <FormItem label="userAiSettings:localServer.baseUrl" htmlFor={TestId.ai.providerBaseUrl}>
@@ -138,20 +142,14 @@ export const LocalProviderFields = ({
         <LocalTestResult view={test} />
       </output>
       <FormItem label="userAiSettings:localServer.model" htmlFor={TestId.ai.providerModel}>
-        <select
-          id={TestId.ai.providerModel}
-          className="provider-dialog__select"
-          value={model}
-          onChange={(event) => onModelChange(event.target.value)}
-          data-testid={TestId.ai.providerModel}
-        >
-          <option value="">{t('userAiSettings:localServer.modelPlaceholder')}</option>
-          {models.map((modelId) => (
-            <option key={modelId} value={modelId}>
-              {modelId}
-            </option>
-          ))}
-        </select>
+        <Dropdown
+          idInput={TestId.ai.providerModel}
+          clearable={false}
+          items={modelItems}
+          selection={modelItems.find((item) => item.value === model) ?? null}
+          placeholder={t('userAiSettings:localServer.modelPlaceholder')}
+          onChange={(item) => onModelChange(item.value)}
+        />
       </FormItem>
       <div className="provider-dialog__hint">{t('userAiSettings:localServer.help')}</div>
       <LocalConsentRevoke baseUrl={savedBaseUrl} />
