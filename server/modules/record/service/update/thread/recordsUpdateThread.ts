@@ -2,6 +2,7 @@ import { type ArenaRecord, type ArenaSurvey, Objects, Queue, SystemError } from 
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import { AppInfo } from '@core/app/appInfo'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
@@ -90,6 +91,7 @@ export class RecordsUpdateThread extends Thread {
 
     this.messageProcessorByType = {
       [RecordsUpdateThreadMessageTypes.recordInit]: this.processRecordInitMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.recordAppInfoUpdate]: this.processRecordAppInfoUpdateMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.recordReload]: this.processRecordReloadMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.nodePersist]: this.processRecordNodePersistMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.nodeDelete]: this.processRecordNodeDeleteMsg.bind(this),
@@ -259,9 +261,37 @@ export class RecordsUpdateThread extends Thread {
             record,
             timezoneOffset,
             lang,
+            appInfo: AppInfo.currentAppInfo,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
             nodesValidationListener: (validations) =>
               this.handleNodesValidationUpdated.bind(this)({ record, validations }),
+          },
+          t
+        )
+        await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
+      },
+    })
+  }
+
+  async processRecordAppInfoUpdateMsg(msg) {
+    const { surveyId, recordUuid, user, timezoneOffset, lang } = msg
+
+    const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
+
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+        record = await RecordManager.updateAppInfoDependents(
+          {
+            user,
+            survey,
+            record,
+            appInfo: AppInfo.currentAppInfo,
+            timezoneOffset,
+            lang,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+            nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
           },
           t
         )
@@ -329,6 +359,7 @@ export class RecordsUpdateThread extends Thread {
             node,
             timezoneOffset,
             lang,
+            appInfo: AppInfo.currentAppInfo,
             clearNonApplicableValues: isClearNonApplicableValuesEnabled(survey),
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
             nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
@@ -378,6 +409,7 @@ export class RecordsUpdateThread extends Thread {
             nodeUuid,
             timezoneOffset,
             lang,
+            appInfo: AppInfo.currentAppInfo,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
             nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
             clearNonApplicableValues: isClearNonApplicableValuesEnabled(survey),
@@ -408,7 +440,7 @@ export class RecordsUpdateThread extends Thread {
         isUuid(nodeUuid) ? NodeRepository.fetchNodeRecordUuid(msg.surveyId, nodeUuid, t) : null,
       logError: (message) => Logger.error(message),
       now: () => Date.now(),
-      persistNode: (params, t) => RecordManager.persistNode(params, t),
+      persistNode: (params, t) => RecordManager.persistNode({ ...params, appInfo: AppInfo.currentAppInfo }, t),
       findNodeDefUuidsToClear: (params) => RecordManager.findNodeDefUuidsToClearOnNodePersist(params),
       cacheRecord: async ({ msg, recordUuid, record, t }) => {
         const { recordsCache } = await this.getOrFetchSurveyData(msg)

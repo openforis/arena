@@ -17,6 +17,7 @@ const keys: (keyof RecordEvaluationContext)[] = [
   'areaOfInterestProvider',
   'timezoneOffset',
   'lang',
+  'appInfo',
 ]
 
 const extract = (params: Record<string, any>): RecordEvaluationContext => {

@@ -26,6 +26,15 @@ export default {
   editorTextSearchHelp:
     "Pesquise valores de texto com text_attr.includes('abc'), text_attr.startsWith('abc') ou text_attr.endsWith('abc'); adicione .toLowerCase() antes deles para ignorar maiúsculas e minúsculas, por exemplo, text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Retorna o identificador do aplicativo que edita o registro: "arena" (Arena) ou "am" (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Retorna o nome do aplicativo que edita o registro: "Arena" ou "Arena Mobile". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      'Avaliada quando o registro é criado e novamente quando é editado com outro aplicativo, plataforma ou versão do aplicativo',
+    appPlatform:
+      'Retorna a plataforma do aplicativo que edita o registro: "web", "android" ou "ios". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion: 'Retorna a versão do aplicativo que edita o registro. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp:
       'Retorna o valor da $t(extraProp.label) especificada de um item de categoria com o código informado',
     dateTimeDiff: 'Retorna a diferença (em minutos) entre 2 pares de data e hora',
@@ -48,6 +57,10 @@ export default {
     log10: 'Retorna o logaritmo de base 10 de X',
     max: 'Retorna o máximo dos argumentos',
     min: 'Retorna o mínimo dos argumentos',
+    nodeDateCreated:
+      'Retorna a data e hora de criação do nó especificado (atributo ou entidade) como valor de data e hora, ex.: nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Retorna a data e hora da última modificação do nó especificado como valor de data e hora; para uma entidade, a última vez em que a entidade ou algum de seus descendentes foi modificado, ex.: nodeDateModified(parent(this))',
     now: 'Retorna a data ou hora atual',
     parent: 'Retorna a entidade pai do nó especificado',
     pow: 'Retorna o valor de uma base elevada a uma potência',

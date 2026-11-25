@@ -26,6 +26,16 @@ export default {
   editorTextSearchHelp:
     "Textwerte mit text_attr.includes('abc'), text_attr.startsWith('abc') oder text_attr.endsWith('abc') durchsuchen; zum Ignorieren der Groß-/Kleinschreibung vorher .toLowerCase() ergänzen, z. B. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Gibt die Kennung der App zurück, die den Datensatz bearbeitet: "arena" (Arena) oder "am" (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Gibt den Namen der App zurück, die den Datensatz bearbeitet: "Arena" oder "Arena Mobile". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      'Wird beim Erstellen des Datensatzes ausgewertet und erneut, wenn er mit einer anderen App, Plattform oder App-Version bearbeitet wird',
+    appPlatform:
+      'Gibt die Plattform der App zurück, die den Datensatz bearbeitet: "web", "android" oder "ios". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion:
+      'Gibt die Version der App zurück, die den Datensatz bearbeitet. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp:
       'Gibt den Wert der angegebenen $t(extraProp.label) eines Kategorieelements mit dem angegebenen Code zurück',
     dateTimeDiff: 'Gibt die Differenz (in Minuten) zwischen zwei Datum-Uhrzeit-Paaren zurück',
@@ -48,6 +58,10 @@ export default {
     log10: 'Gibt den Logarithmus von X zur Basis 10 zurück',
     max: 'Gibt das Maximum der Argumente zurück',
     min: 'Gibt das Minimum der Argumente zurück',
+    nodeDateCreated:
+      'Gibt Datum und Uhrzeit der Erstellung des angegebenen Knotens (Attribut oder Entität) als Datum-Uhrzeit-Wert zurück, z. B. nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Gibt Datum und Uhrzeit der letzten Änderung des angegebenen Knotens als Datum-Uhrzeit-Wert zurück; bei einer Entität den Zeitpunkt der letzten Änderung der Entität oder eines ihrer Nachkommen, z. B. nodeDateModified(parent(this))',
     now: 'Gibt das aktuelle Datum bzw. die aktuelle Uhrzeit zurück',
     parent: 'Gibt die übergeordnete Entität des angegebenen Knotens zurück',
     pow: 'Gibt den Wert einer potenzierten Basis zurück',

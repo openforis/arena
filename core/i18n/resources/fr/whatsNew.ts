@@ -7,6 +7,15 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    appInfoAndNodeDateFunctions: {
+      title: "Nouvelles fonctions d'expression : application et dates des nœuds",
+      description: `Nouvelles fonctions pour les valeurs par défaut, les règles de pertinence et de validation :
+
+- **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()** : l'application qui modifie l'enregistrement (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), sa plateforme (\`web\`, \`android\` ou \`ios\`) et sa version. Elles sont évaluées à la création de l'enregistrement, puis à nouveau lorsqu'il est modifié avec une autre application, plateforme ou version de l'application : par ex. un attribut en **Lecture seule** avec la valeur par défaut \`appIdLabel()\` et **Valeur par défaut évaluée une seule fois** garde l'application qui a créé l'enregistrement.
+- **nodeDateCreated(node)**, **nodeDateModified(node)** : date et heure de création et de dernière modification d'un attribut ou d'une entité ; pour une entité, la dernière fois qu'une de ses valeurs a changé, par ex. \`nodeDateModified(parent(this))\`.
+
+Dans l'éditeur d'expressions simple, sélectionnez-les dans la liste **Fonction** : l'assistant des fonctions de date des nœuds liste les attributs accessibles depuis le nœud courant et les entités ancêtres.`,
+    },
     googleSignIn: {
       title: 'Connexion avec votre compte Google',
       description: `Sur la page de connexion, cliquez sur **Se connecter avec Google** pour vous connecter avec votre compte Google (Gmail ou Google Workspace) au lieu de saisir votre mot de passe.

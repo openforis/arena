@@ -7,6 +7,54 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    appInfoAndNodeDateFunctions: {
+      title: 'Nove funkcije izraza: podaci o aplikaciji i datumi čvorova',
+      description: `Nove funkcije za podrazumevane vrednosti, pravila relevantnosti i validacije:
+
+- **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()**: aplikacija u kojoj se zapis menja (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), njena platforma (\`web\`, \`android\` ili \`ios\`) i verzija. Izračunavaju se pri kreiranju zapisa i ponovo kada se zapis menja u drugoj aplikaciji, na drugoj platformi ili u drugoj verziji aplikacije: npr. atribut **Samo za čitanje** sa podrazumevanom vrednošću \`appIdLabel()\` i opcijom **Podrazumijevana vrijednost se izračunava samo jednom** čuva aplikaciju u kojoj je zapis kreiran.
+- **nodeDateCreated(node)**, **nodeDateModified(node)**: datum i vreme kreiranja i poslednje izmene atributa ili entiteta; za entitet, poslednji put kada se promenila neka od njegovih vrednosti, npr. \`nodeDateModified(parent(this))\`.
+
+U osnovnom uređivaču izraza izaberite ih sa liste **Funkcija**: alat za funkcije datuma čvorova prikazuje atribute dostupne iz trenutnog čvora i nadređene entitete.`,
+    },
+    googleSignIn: {
+      title: 'Prijava pomoću Google naloga',
+      description: `Na stranici za prijavu kliknite na **Prijavite se putem Google** da biste se prijavili pomoću svog Google naloga (Gmail ili Google Workspace) umesto unosa lozinke.
+
+Prvi put se Google nalog povezuje sa vašim Arena nalogom preko adrese e-pošte: koristite istu adresu e-pošte kao za Arena nalog. Pozvani korisnici takođe mogu da prihvate poziv pomoću Google naloga. Povežite ili prekinite vezu sa Google nalogom u **Moj profil > Načini prijave**; prijava e-poštom i lozinkom je i dalje dostupna.`,
+    },
+    twoFactorAuth: {
+      title: 'Dvofaktorska autentifikacija',
+      description: `Zaštitite svoj nalog **dvofaktorskom autentifikacijom (2FA)**: posle lozinke Arena traži verifikacioni kod koji generiše aplikacija za autentifikaciju na vašem telefonu (npr. Google Authenticator ili Authy).
+
+U **Moj profil > Sign-in & security** kliknite na **Upravljaj 2FA**, dodajte uređaj i skenirajte QR kod aplikacijom. Sačuvajte rezervne kodove prikazane na kraju: svaki od njih vam omogućava da se jednom prijavite ako izgubite telefon.`,
+    },
+    aiFeatures: {
+      title: 'AI funkcije',
+      description: `U **Moj profil > AI funkcije**, u odeljku **Šta AI može da vidi**, izaberite:
+
+- **Samo pomoć**: vaša pitanja i odlomci iz korisničkog priručnika za Arenu;
+- **+ Dizajn istraživanja**: i entiteti, atributi, oznake, kategorije i izrazi (bez vrednosti zapisa);
+- **+ Podaci zapisa**: i vrednosti zapisa i rezultati upita.
+
+Pomoću **Prilagodi** uključujete ili isključujete pojedinačne funkcije. U **Provajderi** koristite **Podrazumijevani provajder Arene** ili dodajte svoj: **Lokalni server** na vašem računaru ili u vašoj mreži (npr. LM Studio ili Ollama) ili provajdera u oblaku sa vašim API ključem (OpenAI, Anthropic, Google Gemini i drugi).`,
+    },
+    aiAssistant: {
+      title: 'AI asistent',
+      description: `Kliknite na dugme **AI asistent** u zaglavlju da biste otvorili panel koji radi na ekranu koji koristite:
+
+- **Dizajn**: pravi i menja istraživanje u dizajneru obrasca;
+- **Analiza**: odgovara na pitanja o podacima pomoću upita;
+- **Čišćenje**: traži greške u zapisima i predlaže ispravke;
+- **Pomoć**: odgovara na pitanja o Areni.
+
+Izmene koje predloži primenjuju se tek kada ih pregledate. **Prijedlozi** (npr. oznake koje nedostaju na nekom jeziku) pojavljuju se u panelu: kliknite na jedan da bi ga asistent izvršio.`,
+    },
+    surveyAiPolicy: {
+      title: 'AI politika istraživanja',
+      description: `U **Informacije o istraživanju > AI politika** administratori istraživanja biraju gde AI sme da obrađuje sadržaj istraživanja, posebno za **Dizajn istraživanja** i za **Podaci zapisa**: **Isključeno**, **Na ovom uređaju** (lokalni AI server), **Server organizacije** ili **Oblak**.
+
+Na sve korisnike istraživanja primenjuje se strožije od ove politike i ograničenja Arena servera.`,
+    },
     mobileUploadEmailNotification: {
       title: 'Obaveštenje e-poštom o zapisima otpremljenim iz Arena Mobile',
       description: `U **Informacije o istraživanju → Bezbjednost** označite **Obavesti administratore ankete e-poštom kada se zapisi otpreme iz Arena Mobile**: posle svakog otpremanja, svaki administrator ankete dobija e-poruku sa spiskom otpremljenih zapisa, njihovim ključnim vrednostima, informacijom da li su novi ili ažurirani, korisnikom koji ih je kreirao, datumima i brojem grešaka i upozorenja validacije.
@@ -118,6 +166,12 @@ Možete izabrati orijentaciju stranice (uspravna ili položena).`,
       description: `Kreirajte novo istraživanje iz **ODK obrasca** (XForm, .xml): u **Početna > Novo istraživanje > Uvezi** izaberite **ODK (.xml)** kao **Izvor**, a zatim kliknite na **Pokreni uvoz**. Pitanja iz obrasca postaju atributi, ponavljanja (repeats) višestruki entiteti, a liste izbora kategorije, sa oznakama na svim jezicima obrasca. Pre objavljivanja definišite ključne atribute korenskog entiteta i ispravite greške koje prikaže **Objavi**, ako ih ima.
 
 Zatim uvezite podatke prikupljene pomoću **ODK Collect** u **Podaci > Uvoz podataka > ODK / ODK Collect**: .zip datoteka sa jednom fasciklom po podnesku (ODK Briefcase izvoz). Već uvezeni podnesci se preskaču.`,
+    },
+    positionTracking: {
+      title: 'Praćenje položaja: beleženje puta pređenog na terenu',
+      description: `Označite **Praćenje položaja** na kartici **Osnovno** pojedinačnog atributa tipa **Geoprostorni**: u **Arena Mobile** vrednost atributa je put koji je korisnik prešao dok popunjava zapis, zabeležen praćenjem položaja uređaja.
+
+Put ne može da se menja ručno. Opcija se primenjuje samo na Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Dinamičko nabrajanje entiteta',

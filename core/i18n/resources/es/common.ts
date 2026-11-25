@@ -1286,6 +1286,8 @@ $t(common.appNameFull)
     or: 'O',
     group: 'Grupo ()',
     var: 'Variable',
+    ancestorEntities: 'Entidades antecesoras',
+    node: 'Nodo (atributo o entidad)',
     const: 'Valor constante',
     call: 'Función',
     operator: 'Operador',
