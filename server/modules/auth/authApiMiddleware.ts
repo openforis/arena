@@ -80,6 +80,14 @@ export const requireLoggedInUser = (req: ExpressRequest, res: ExpressResponse, n
   }
 }
 
+export const requireChangelogViewPermission = (req: ExpressRequest, res: ExpressResponse, next: NextFunction): void => {
+  if (User.canViewChangelog(Request.getUser(req))) {
+    next()
+    return
+  }
+  sendForbiddenError({ req, res })
+}
+
 export const requireSurveyUserExtraPropsEditPermission = async (
   req: ExpressRequest,
   res: ExpressResponse,

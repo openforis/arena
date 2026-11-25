@@ -113,7 +113,7 @@ const getHelpModule = (user, lang) =>
       { ...helpModules.userManual, uri: getUserManualUri(lang) },
       helpModules.about,
       helpModules.whatsNew,
-      ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
+      ...(User.canViewChangelog(user) ? [helpModules.changelog] : []),
       helpModules.termsOfService,
       helpModules.privacyPolicy,
     ],

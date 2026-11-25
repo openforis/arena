@@ -25,8 +25,8 @@ const Help = () => {
           component: WhatsNew,
           path: helpModules.whatsNew.path,
         },
-        // Changelog (system admins only)
-        ...(User.isSystemAdmin(user)
+        // Changelog (system admins, survey managers and survey admins)
+        ...(User.canViewChangelog(user)
           ? [
               {
                 component: Changelog,
