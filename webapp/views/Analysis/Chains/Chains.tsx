@@ -9,7 +9,7 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { ButtonIconEdit } from '@webapp/components'
 import Table from '@webapp/components/Table'
-import ErrorBadge from '@webapp/components/errorBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 

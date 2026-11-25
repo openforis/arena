@@ -16,7 +16,7 @@ import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurvey, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import { useNotifyWarning } from '@webapp/components/hooks'
-import { Modal, ModalBody } from '@webapp/components/modal'
+import { Modal, ModalBody } from '@webapp/components/Modal'
 import { ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'

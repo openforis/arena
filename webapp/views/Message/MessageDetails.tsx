@@ -25,7 +25,7 @@ import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
 import { DateInput } from '@webapp/components/form/DateTimeInput'
 import { useAppDispatch } from '@webapp/store'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 const notificationTypeItems = [MessageNotificationType.Email, MessageNotificationType.PushNotification].map(
   (notificationType) => ({

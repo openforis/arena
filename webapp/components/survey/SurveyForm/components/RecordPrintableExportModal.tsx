@@ -15,7 +15,7 @@ import {
   type PrintableExportScope,
 } from '@common/record/printableExport'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'

@@ -9,8 +9,8 @@ import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { FormItem } from '@webapp/components/form/Input'
-import Checkbox from '@webapp/components/form/checkbox'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
+import Checkbox from '@webapp/components/form/Checkbox'
+import ButtonGroup from '@webapp/components/form/ButtonGroup'
 
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'

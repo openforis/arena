@@ -11,7 +11,7 @@ import * as SamplingPolygon from '@core/survey/samplingPolygon'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { Button, ButtonIconEdit } from '@webapp/components'
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 

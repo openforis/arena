@@ -15,7 +15,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import { useLocationPathMatcher, useOnBrowserBack, useOnPageUnload, useQuery } from '@webapp/components/hooks'
-import TabBar from '@webapp/components/tabBar'
+import TabBar from '@webapp/components/TabBar'
 import { ButtonEditLockToggle } from '@webapp/components'
 
 import AdvancedFunctionsMenu from './AdvancedFunctionsMenu'

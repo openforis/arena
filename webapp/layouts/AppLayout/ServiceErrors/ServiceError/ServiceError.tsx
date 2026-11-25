@@ -4,7 +4,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import { ServiceErrorActions, useI18n } from '@webapp/store/system'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { useAppDispatch } from '@webapp/store'
 
 const appErrorsNamespace = 'appErrors:'

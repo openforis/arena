@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'

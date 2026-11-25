@@ -8,7 +8,7 @@ import * as StepVariable from '@common/analysis/stepVariable'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import ExpansionPanel from '@webapp/components/expansionPanel'
+import ExpansionPanel from '@webapp/components/ExpansionPanel'
 
 import AttributesSelector from './AttributesSelector/AttributesSelector'
 import EntitySelector from './EntitySelector'

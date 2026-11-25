@@ -1,1 +1,1 @@
-export { default } from './dataQueryTable'
+export { default } from './DataQueryTable'

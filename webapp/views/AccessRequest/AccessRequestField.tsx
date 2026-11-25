@@ -10,7 +10,7 @@ import { FormItem } from '@webapp/components/form/Input'
 
 import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 type AccessRequestInputFieldProps = {
   field: Record<string, any>

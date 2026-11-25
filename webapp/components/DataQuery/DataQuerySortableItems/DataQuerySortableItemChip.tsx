@@ -2,7 +2,7 @@ import { useCallback, type ReactNode } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import Chip from '@webapp/components/form/chip'
+import Chip from '@webapp/components/form/Chip'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'

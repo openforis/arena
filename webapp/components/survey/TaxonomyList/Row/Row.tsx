@@ -8,8 +8,8 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components/buttons'
-import ErrorBadge from '@webapp/components/errorBadge'
-import WarningBadge from '@webapp/components/warningBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
+import WarningBadge from '@webapp/components/WarningBadge'
 
 import { State, useLocalState } from './store'
 

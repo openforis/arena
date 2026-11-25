@@ -6,7 +6,7 @@ import { TestId } from '@webapp/utils/testId'
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import { UPLOAD_ACCEPT } from '../uploaded/uploadedFiles'
 import { useUploadMapFile } from '../uploaded/useUploadMapFile'
-import { MenuActionItem } from './menuItems'
+import { MenuActionItem } from './MenuItems'
 import { ToolbarMenu } from './ToolbarMenu'
 
 /**

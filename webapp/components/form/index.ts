@@ -1,11 +1,11 @@
-import ButtonGroup from './buttonGroup'
-import Checkbox from './checkbox'
+import ButtonGroup from './ButtonGroup'
+import Checkbox from './Checkbox'
 import Dropdown from './Dropdown'
 import EmailInput from './EmailInput'
-import LanguageDropdown from './languageDropdown'
-import OpenFileUploadDialogButton from './openFileUploadDialogButton'
-import Radiobox from './radiobox'
-import UploadButton from './uploadButton'
+import LanguageDropdown from './LanguageDropdown'
+import OpenFileUploadDialogButton from './OpenFileUploadDialogButton'
+import Radiobox from './Radiobox'
+import UploadButton from './UploadButton'
 
 export {
   ButtonGroup,

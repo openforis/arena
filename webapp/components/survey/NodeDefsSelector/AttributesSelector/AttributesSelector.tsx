@@ -6,7 +6,7 @@ import { Arrays } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import ExpansionPanel from '@webapp/components/expansionPanel'
+import ExpansionPanel from '@webapp/components/ExpansionPanel'
 import { Checkbox } from '@webapp/components/form'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'

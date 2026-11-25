@@ -4,7 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { Button, ButtonIconClose } from '@webapp/components/buttons'
-import { Modal } from '@webapp/components/modal'
+import { Modal } from '@webapp/components/Modal'
 import { useIsSurveyDirty } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'

@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 import { Button } from '../buttons'
 import { Checkbox } from '../form'
-import { Modal, ModalBody, ModalFooter } from '../modal'
+import { Modal, ModalBody, ModalFooter } from '../Modal'
 import { WhatsNewCarousel } from './WhatsNewCarousel'
 import { useWhatsNewUnseenItems } from './useWhatsNew'
 

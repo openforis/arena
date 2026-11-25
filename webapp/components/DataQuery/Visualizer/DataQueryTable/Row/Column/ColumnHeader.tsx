@@ -11,7 +11,7 @@ import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
-import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
+import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefTableCellHeader'
 
 import { useColumn } from './store'
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
