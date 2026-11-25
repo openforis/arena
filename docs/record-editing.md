@@ -45,8 +45,12 @@ The thread keeps two idle-expiring caches (`IdleTimeoutCache`):
 - **records** (`getOrFetchRecord`): reused only while their `date_modified` still matches the DB,
   otherwise reloaded (see [Several server instances](#several-server-instances)).
 
-Message types are in `thread/recordsThreadMessageTypes.js`: `recordInit`, `nodePersist`, `nodeDelete`,
-`recordReload`, `recordClear`, `surveyClear`, `threadKill`.
+Message types are in `thread/recordsThreadMessageTypes.js`: `recordInit`, `recordAppInfoUpdate`, `nodePersist`,
+`nodeDelete`, `recordReload`, `recordClear`, `surveyClear`, `threadKill`.
+
+The thread passes the app info (`AppInfo.currentAppInfo`: `arena`, web platform, Arena version) to the record
+updates, for the expression functions `appId()`, `appVersion()` and `appPlatform()`. Background jobs (imports,
+record merges) don't pass it: arena-core then keeps the values of the expressions using those functions.
 
 ## Opening and closing a record
 
@@ -79,7 +83,11 @@ sequenceDiagram
 2. associates the request's socket with the record (`record_socket_association` table, see below);
 3. marks the record read-only if it doesn't match the qualifiers of the user's group (records of other
    groups the user may only read);
-4. if the user can edit it and it has no nodes yet, posts `recordInit` to the thread.
+4. if the user can edit it and it has no nodes yet, posts `recordInit` to the thread; if it has nodes but was
+   last modified with another app or app version (`Records.isAppInfoChanged`, comparing `info.modifiedWith ??
+info.createdWith`), posts `recordAppInfoUpdate`: the thread runs `RecordManager.updateAppInfoDependents`, which
+   stores the app info in `record.info.modifiedWith` and evaluates again the expressions using the app info
+   functions (e.g. read-only attributes with the default value `appPlatform()`).
 
 Users whose role cannot edit records (Guest role, `surveyGuest` auth group, with the `recordView` permission only) see all the
 records (`Authorizer.canViewNotOwnedRecords`), restricted by the qualifiers of their user group if any; the

@@ -728,6 +728,26 @@ export const updateRecordDateModified = (
     [recordUuid, Dates.formatForStorage(dateModified)]
   )
 
+/**
+ * Updates the info of a record (e.g. the app that modified it last).
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {!string} params.recordUuid - The record uuid.
+ * @param {!object} params.info - The record info.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const updateRecordInfo = (
+  { surveyId, recordUuid, info }: { surveyId: number; recordUuid: string; info: object },
+  client: DbClient = db
+) =>
+  client.none(
+    `UPDATE ${getSchemaSurvey(surveyId)}.record
+     SET info = $2::jsonb
+     WHERE uuid = $1`,
+    [recordUuid, info]
+  )
+
 export const fetchRecordDateModified = async (
   { surveyId, recordUuid }: { surveyId: number; recordUuid: string },
   client: DbClient = db

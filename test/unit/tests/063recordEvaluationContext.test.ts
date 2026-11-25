@@ -28,7 +28,10 @@ describe('RecordEvaluationContext', () => {
       lang: 'en',
     })
     expect(context).toEqual({ user: { uuid: 'u1' }, survey: { id: 1 }, lang: 'en', ...RecordProvidersDefault })
-    const missingKeys = RecordEvaluationContext.keys.filter((key) => key !== 'timezoneOffset' && !context[key])
+    // timezoneOffset and appInfo (interactive edits only) are optional
+    const missingKeys = RecordEvaluationContext.keys.filter(
+      (key) => key !== 'timezoneOffset' && key !== 'appInfo' && !context[key]
+    )
     expect(missingKeys).toEqual([])
   })
 })

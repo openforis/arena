@@ -111,7 +111,8 @@ describe('Records merge Test', () => {
       recordSource: record2,
     })(record1)
 
-    expect(Object.values(nodesUpdated)).toHaveLength(30)
+    // including the existing entities updated in their date modified (ancestors of the merged nodes)
+    expect(Object.values(nodesUpdated)).toHaveLength(34)
 
     expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 4 })
 
