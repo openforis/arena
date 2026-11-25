@@ -32,8 +32,9 @@ webapp/
 ## Files and folders
 
 - New components are `.tsx`, hooks and helpers are `.ts`.
-- Component files use PascalCase and the component's name (`ContributorsCard.tsx` exports `ContributorsCard`).
-  Some old files are lowercase (`webapp/components/modal.js`, `webapp/components/form/checkbox.js`).
+- Component files use PascalCase and the component's name (`ContributorsCard.tsx` exports `ContributorsCard`),
+  like the folder of a component; other files (hooks, helpers, constants) and grouping folders (`form/`,
+  `expression/`) use camelCase.
 - A component with its own subcomponents, hooks or stylesheet gets a folder with the same name and an
   `index.ts` that re-exports its public parts (`export { SurveyCompare } from './SurveyCompare'`). Small
   single-file components can sit directly in the parent folder (`webapp/components/buttons/ButtonSplit.tsx`).
@@ -194,7 +195,7 @@ the action to its `store/actions/` and register it in `useActions`, as was done 
 - The app uses React Router 8: import its hooks from `react-router` (`useNavigate`, `useParams`).
 - Paths are declared as modules in `webapp/app/appModules.js`. Build URLs with `appModuleUri(module)`, e.g.
   `navigate(appModuleUri(userModules.userNew))`.
-- Each area renders its pages with `ModuleSwitch` (`webapp/components/moduleSwitch.js`), e.g.
+- Each area renders its pages with `ModuleSwitch` (`webapp/components/ModuleSwitch.tsx`), e.g.
   `webapp/views/SystemAdmin/SystemAdmin.tsx`. `webapp/layouts/AppLayout/AppLayout.tsx` lazy-loads the top-level
   areas.
 - A new page needs the module in `appModules.js` and a route in the parent `ModuleSwitch`. If it appears in the
@@ -211,7 +212,7 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
   `ButtonSplit`).
 - Form inputs (`webapp/components/form`): `Dropdown`, `Checkbox`, `ButtonGroup`, `TextInput`... `FormItem`
   (a label with an optional info tooltip) is in `webapp/components/form/Input`.
-- Dialogs: `Modal` with `ModalBody`/`ModalFooter` (`webapp/components/modal.js`), `ResizableModal`,
+- Dialogs: `Modal` with `ModalBody`/`ModalFooter` (`webapp/components/Modal.tsx`), `ResizableModal`,
   `PanelRight`. For confirmations and notifications use the hooks listed under "Global state".
 - Resizable side panels: `Split` (`webapp/components/Split.js`). Style any other resize handle with the
   `%pane-resize-handle` placeholder (`webapp/style/_layoutMixins.scss`), as the map rail panels do, so that every

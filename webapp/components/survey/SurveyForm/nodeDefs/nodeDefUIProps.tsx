@@ -8,17 +8,17 @@ import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValuePro
 
 import { NumberFormats } from '@webapp/components/form/Input'
 
-import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefBoolean from './components/types/NodeDefBoolean'
 import NodeDefCode from './components/types/NodeDefCode'
-import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefDate from './components/types/nodeDefDate'
-import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
-import NodeDefFile from './components/types/nodeDefFile'
-import NodeDefFormHeader from './components/types/nodeDefFormHeader'
-import NodeDefTaxon from './components/types/nodeDefTaxon'
-import NodeDefText from './components/types/nodeDefText'
-import NodeDefTime from './components/types/nodeDefTime'
-import NodeDefGeo from './components/types/nodeDefGeo'
+import NodeDefCoordinate from './components/types/NodeDefCoordinate'
+import NodeDefDate from './components/types/NodeDefDate'
+import NodeDefEntitySwitch from './components/types/NodeDefEntitySwitch'
+import NodeDefFile from './components/types/NodeDefFile'
+import NodeDefFormHeader from './components/types/NodeDefFormHeader'
+import NodeDefTaxon from './components/types/NodeDefTaxon'
+import NodeDefText from './components/types/NodeDefText'
+import NodeDefTime from './components/types/NodeDefTime'
+import NodeDefGeo from './components/types/NodeDefGeo'
 
 const { boolean, code, coordinate, date, decimal, entity, file, formHeader, geo, integer, taxon, text, time } =
   NodeDef.nodeDefType

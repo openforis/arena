@@ -1,7 +1,7 @@
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import Checkbox from '@webapp/components/form/checkbox'
+import Checkbox from '@webapp/components/form/Checkbox'
 import { ButtonIconEdit } from '@webapp/components'
 
 import { useCollectImportReportItem } from './store'

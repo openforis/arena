@@ -6,7 +6,7 @@ import classNames from 'classnames'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { guestModules } from '@webapp/app/appModules'
 import ResetPassword from '@webapp/views/ResetPassword'
 import ForgotPassword from '@webapp/views/ForgotPassword'

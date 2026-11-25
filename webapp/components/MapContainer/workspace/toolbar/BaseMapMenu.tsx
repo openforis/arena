@@ -11,7 +11,7 @@ import { useCustomBaseMapMenuItems } from '../customLayers/useCustomBaseMapMenuI
 import { useMapContextActions } from '../mapContextActions'
 import { getSelectableBaseLayers } from './baseMapItems'
 import type { SelectableBaseLayerDef } from './baseMapItems'
-import { MenuRadioItem } from './menuItems'
+import { MenuRadioItem } from './MenuItems'
 import { ToolbarMenu } from './ToolbarMenu'
 
 /**

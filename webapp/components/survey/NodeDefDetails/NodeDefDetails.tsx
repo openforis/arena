@@ -11,7 +11,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-import TabBar from '@webapp/components/tabBar'
+import TabBar from '@webapp/components/TabBar'
 
 import AdvancedProps from './AdvancedProps'
 import AnalysisEntitySelector from './AnalysisEntitySelector'

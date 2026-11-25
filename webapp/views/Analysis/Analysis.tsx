@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 
 import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 

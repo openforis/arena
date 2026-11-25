@@ -6,7 +6,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
+import ButtonGroup from '@webapp/components/form/ButtonGroup'
 
 import { State, useNodeDefEditReadOnly } from './store'
 

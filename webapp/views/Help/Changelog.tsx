@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import * as API from '@webapp/service/api'
 
 export const Changelog = () => {

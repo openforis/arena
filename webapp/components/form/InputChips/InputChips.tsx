@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import Dropdown from '../Dropdown'
 
 import { useLocalState, State } from './store'
-import Chip from '../chip'
+import Chip from '../Chip'
 import type { ArenaValidation } from '@openforis/arena-core'
 
 type InputChipsProps = {

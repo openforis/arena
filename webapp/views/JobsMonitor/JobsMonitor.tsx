@@ -8,7 +8,7 @@ import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
 import LoadingBar from '@webapp/components/LoadingBar'
 import { Button } from '@webapp/components/buttons'
-import Checkbox from '@webapp/components/form/checkbox'
+import Checkbox from '@webapp/components/form/Checkbox'
 
 import { JobMonitorSummary, useJobsMonitor } from './useJobsMonitor'
 import { useJobsMonitorColumns } from './useJobsMonitorColumns'

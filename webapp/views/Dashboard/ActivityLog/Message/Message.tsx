@@ -1,9 +1,9 @@
 import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'
-import ProfilePicture from '@webapp/components/profilePicture'
+import ProfilePicture from '@webapp/components/ProfilePicture'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 
 import { ActivityLogMessage } from '../store'
 

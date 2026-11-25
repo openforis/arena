@@ -1,5 +1,5 @@
 import { noHeaderModules } from '@webapp/app/appModules'
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { RecordNoHeader } from '@webapp/components/survey/Record/RecordNoHeader'
 
 const NoHeaderLayout = () => (

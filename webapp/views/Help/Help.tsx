@@ -1,6 +1,6 @@
 import * as User from '@core/user/user'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { appModules, helpModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 import { About } from './About'

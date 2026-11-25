@@ -11,7 +11,7 @@ import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } fro
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonSave } from '@webapp/components'
-import TabBar from '@webapp/components/tabBar'
+import TabBar from '@webapp/components/TabBar'
 import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
@@ -22,7 +22,7 @@ import { SurveyInfoDocuments } from './SurveyInfoDocuments'
 import { SurveyInfoMap } from './SurveyInfoMap'
 
 import { useSurveyInfoForm } from './store'
-import { SurveySecurityEditor } from './surveySecurityEditor'
+import { SurveySecurityEditor } from './SurveySecurityEditor'
 
 // a survey info tab: each one renders its own editor component with its own props
 type SurveyInfoTab = {

@@ -2,7 +2,7 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 
 import { ButtonIconFilter } from '@webapp/components/buttons'
-import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
+import ExpressionEditorPopup from '@webapp/components/expression/ExpressionEditorPopup'
 import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'

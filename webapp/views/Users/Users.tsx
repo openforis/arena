@@ -7,7 +7,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import { appModules, userModules } from '@webapp/app/appModules'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { useUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 

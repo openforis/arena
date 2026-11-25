@@ -3,7 +3,7 @@ import classNames from 'classnames'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { useI18nT } from '@webapp/store/system'
 
 const defaultTags = ['forestInventories', 'questionnaires', 'multiCycle', 'statisticalAnalysis']

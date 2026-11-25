@@ -13,7 +13,7 @@ import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilter
 import * as DomUtils from '@webapp/utils/domUtils'
 import { ButtonDownload } from '@webapp/components'
 import { ButtonIconFilter } from '@webapp/components/buttons'
-import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
+import ExpressionEditorPopup from '@webapp/components/expression/ExpressionEditorPopup'
 import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'

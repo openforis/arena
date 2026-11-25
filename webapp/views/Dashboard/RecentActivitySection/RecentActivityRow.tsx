@@ -1,6 +1,6 @@
 import * as DateUtils from '@core/dateUtils'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { useI18n } from '@webapp/store/system'
 
 import { ActivityLogMessage } from '../ActivityLog/store'

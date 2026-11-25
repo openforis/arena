@@ -7,7 +7,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { ExpansionPanel } from '@webapp/components'
-import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
+import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 

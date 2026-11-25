@@ -2,7 +2,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { TestId } from '@webapp/utils/testId'
 
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import NodeDefErrorBadge from '../NodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 import NodeDefAttributeLockToggle from '../NodeDefAttributeLockToggle'
