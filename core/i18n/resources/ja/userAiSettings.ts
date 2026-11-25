@@ -5,6 +5,7 @@ export default {
 
   model: 'モデル',
   modelOther: 'その他（モデルIDを入力）...',
+  modelChooseFromList: 'モデルの一覧から選択',
   baseUrl: 'ベースURL',
   apiKey: 'APIキー',
   apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',

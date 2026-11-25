@@ -123,6 +123,12 @@ describe('model discovery SSRF guard (262)', () => {
     expect(fetchCalls[0].init.headers['x-goog-api-key']).toBe('secret-key')
   })
 
+  test('the Anthropic list asks for the largest page (the default page holds only 20 models)', async () => {
+    await ModelDiscovery.listForProvider({ provider: 'anthropic', apiKey: 'secret-key' })
+    expect(fetchCalls).toHaveLength(1)
+    expect(new URL(fetchCalls[0].url).searchParams.get('limit')).toBe('1000')
+  })
+
   test('a Vertex AI API key lists no models (the model is typed) and makes no request', async () => {
     expect(await ModelDiscovery.listForProvider({ provider: 'google-vertex', apiKey: 'secret-key' })).toEqual([])
     expect(fetchCalls).toEqual([])

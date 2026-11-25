@@ -48,6 +48,26 @@ export const resolveFetchedModel = ({
 }
 
 /**
+ * Returns the options of the account Model select.
+ * @param {object} params - Parameters.
+ * @param {AiModel[]} params.models - Listed models.
+ * @param {string} params.model - Chosen model.
+ * @returns {AiModel[]} The listed models, with the chosen one first when it is not listed (an alias, a deployment).
+ */
+export const listModelOptions = ({ models, model }: { models: AiModel[]; model: string }): AiModel[] =>
+  model.trim() && !models.some((listed) => listed.id === model) ? [{ id: model }, ...models] : models
+
+/**
+ * Returns the model to show when the select is chosen again instead of the typed model.
+ * @param {object} params - Parameters.
+ * @param {AiModel[]} params.models - Listed models.
+ * @param {string} params.model - Typed model.
+ * @returns {string} The typed model (kept as an option), else the first listed.
+ */
+export const getModelToSelect = ({ models, model }: { models: AiModel[]; model: string }): string =>
+  model.trim() ? model : (models[0]?.id ?? model)
+
+/**
  * Returns true when the model list of an account draft can be requested.
  * @param {object} params - Spec, draft and saved provider, and the org-hosted base URLs.
  * @returns {boolean} True when the list can be fetched.

@@ -5,6 +5,7 @@ export default {
 
   model: 'Модель',
   modelOther: 'Другая (введите идентификатор модели)...',
+  modelChooseFromList: 'Выбрать из списка моделей',
   baseUrl: 'Базовый URL',
   apiKey: 'Ключ API',
   apiKeyPlaceholder: 'Вставьте ключ API вашего поставщика',
