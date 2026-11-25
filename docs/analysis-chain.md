@@ -173,7 +173,7 @@ Every call from R carries two credentials:
 ## Where the results go
 
 `PUT .../entities/:entityDefUuid/data` starts a `PersistResultsJob`
-(`server/modules/analysis/service/rChain/PersistResultsJob.ts`), a `FlatDataImportJob`: for every CSV
+(`server/modules/analysis/service/rChain/persistResultsJob.ts`), a `FlatDataImportJob`: for every CSV
 row it finds the record by `record_uuid` and the entity by `parent_uuid`, sets the analysis attribute
 values and persists them like any data import, as nodes in `survey_<id>.node` and in the entity's RDB
 table `survey_<id>_data.data_<entity>`, which has a column for each analysis attribute. Results are

@@ -12,7 +12,7 @@ import * as Record from '@core/record/record'
 import {
   findExistingRecordSummary,
   getRecordFormattedKeyValuesByDefUuid,
-} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
+} from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 

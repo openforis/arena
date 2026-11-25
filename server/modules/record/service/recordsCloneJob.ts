@@ -14,7 +14,7 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 
-import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
+import { NodesInsertBatchPersister } from '../manager/nodesInsertBatchPersister'
 
 export default class RecordsCloneJob extends Job {
   nodesInsertBatchPersister: NodesInsertBatchPersister

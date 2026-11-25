@@ -17,7 +17,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { findExistingRecordSummary } from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
+import { findExistingRecordSummary } from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
 
 import * as XForm from '../model/xform'
 import type { XmlElement } from '../model/xform'

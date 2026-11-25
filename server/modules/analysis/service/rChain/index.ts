@@ -22,8 +22,8 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
-import PersistResultsJob from './PersistResultsJob'
-import PersistOlapDataJob from '../olap/PersistOlapDataJob'
+import PersistResultsJob from './persistResultsJob'
+import PersistOlapDataJob from '../olap/persistOlapDataJob'
 
 export const generateScript = ({
   surveyId,

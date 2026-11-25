@@ -41,7 +41,7 @@ import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
 import SurveyLabelsImportJob from './surveyLabelsImportJob'
-import SurveysListExportJob from './SurveysListExportJob'
+import SurveysListExportJob from './surveysListExportJob'
 import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { findSurveyDocImageApplicable } from './surveyDocImageUtils'
 

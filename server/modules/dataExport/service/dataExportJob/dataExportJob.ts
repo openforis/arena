@@ -5,10 +5,10 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
-import CSVDataExtractionJob from './jobs/CSVDataExtractionJob'
-import CategoriesExportJob from './jobs/CategoriesExportJob'
-import FilesExportJob from './jobs/FilesExportJob'
-import ZipCreationJob from './jobs/ZipCreationJob'
+import CSVDataExtractionJob from './jobs/csvDataExtractionJob'
+import CategoriesExportJob from './jobs/categoriesExportJob'
+import FilesExportJob from './jobs/filesExportJob'
+import ZipCreationJob from './jobs/zipCreationJob'
 
 const createInternalJobs = (params: Partial<JobParams>) => {
   const { options } = params ?? {}

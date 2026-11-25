@@ -5,7 +5,7 @@ import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { Objects } from '@openforis/arena-core'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
-import { Countries } from '@core/Countries'
+import { Countries } from '@core/countries'
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 
