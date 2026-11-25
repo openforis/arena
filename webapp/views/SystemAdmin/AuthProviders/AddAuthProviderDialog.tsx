@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { Button } from '@webapp/components/buttons'
 import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { useI18n } from '@webapp/store/system'

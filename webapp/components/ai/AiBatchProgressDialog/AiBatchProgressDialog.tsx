@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react'
 
 import type { AiBatchProgress } from '@webapp/ai/workflows/batchRun'
 import { Button } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
-import ProgressBar from '@webapp/components/progressBar'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
+import ProgressBar from '@webapp/components/ProgressBar'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 

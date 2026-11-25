@@ -8,7 +8,7 @@ import * as DateUtils from '@core/dateUtils'
 import { RecordImportAction } from '@common/dataImport'
 
 import { Button } from '@webapp/components'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { useI18n } from '@webapp/store/system'
 import { useNodeDefRootKeys, useSurveyCycleKeys, useSurveyPreferredLang } from '@webapp/store/survey'

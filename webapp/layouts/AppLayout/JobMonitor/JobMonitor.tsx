@@ -8,7 +8,7 @@ import { useJob, JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 
 import { Button } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 
 import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'

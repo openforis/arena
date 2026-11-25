@@ -8,7 +8,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { useI18nT } from '@webapp/store/system'
 
-import Markdown from '../markdown'
+import Markdown from '../Markdown'
 
 type TooltipNewProps = {
   children: ReactNode

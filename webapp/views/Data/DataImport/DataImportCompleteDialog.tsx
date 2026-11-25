@@ -3,9 +3,9 @@ import classNames from 'classnames'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { Button } from '@webapp/components'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { useI18n } from '@webapp/store/system'
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import JobErrors from '@webapp/layouts/AppLayout/JobMonitor/JobErrors'
 
 const determineContentKey = ({ jobType, dryRun, includeFiles, hasErrors }) => {

@@ -11,7 +11,7 @@ import { useNotifyInfo, useNotifyError, useNotifyWarning } from '@webapp/compone
 
 import { Button } from '@webapp/components/buttons'
 import { Spinner } from '@webapp/components/Spinner'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'

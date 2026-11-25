@@ -14,7 +14,7 @@ import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
 import { useChain } from '@webapp/store/ui/chain'
 
 import { ButtonGroup } from '@webapp/components/form'
-import WarningBadge from '@webapp/components/warningBadge'
+import WarningBadge from '@webapp/components/WarningBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { DimensionsSelector } from './DimensionsSelector'

@@ -1,6 +1,6 @@
 import { userModules, user2FADeviceModules } from '@webapp/app/appModules'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 
 import { User2FADeviceDetails } from './Details'
 import { User2FADeviceList } from './List'

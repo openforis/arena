@@ -8,9 +8,9 @@ import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { ButtonDownload, ButtonMenu, ButtonMenuExport } from '@webapp/components/buttons'
-import ErrorBadge from '@webapp/components/errorBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import UploadButton from '@webapp/components/form/uploadButton'
+import UploadButton from '@webapp/components/form/UploadButton'
 import { useNotifyWarning } from '@webapp/components/hooks'
 
 import { useSurveyId } from '@webapp/store/survey'

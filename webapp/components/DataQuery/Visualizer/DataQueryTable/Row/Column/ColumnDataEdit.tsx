@@ -10,8 +10,8 @@ import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 import { RecordActions, useRecordNode } from '@webapp/store/ui/record'
 
-import ErrorBadge from '@webapp/components/errorBadge'
-import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellBody'
+import ErrorBadge from '@webapp/components/ErrorBadge'
+import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefTableCellBody'
 
 import { useColumn } from './store'
 import { useAppDispatch } from '@webapp/store'

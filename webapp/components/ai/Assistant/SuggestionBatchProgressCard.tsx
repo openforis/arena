@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type { ConversationToolPart } from '@webapp/ai/conversations/types'
 import type { SuggestionBatchKind, SuggestionBatchProgress } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import { Button } from '@webapp/components/buttons'
-import ProgressBar from '@webapp/components/progressBar'
+import ProgressBar from '@webapp/components/ProgressBar'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 

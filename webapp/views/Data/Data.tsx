@@ -9,7 +9,7 @@ import { appModuleUri, appModules, dataModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanPreviewDraftFormInDataEntry, useUser } from '@webapp/store/user'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import Record from '@webapp/components/survey/Record'
 

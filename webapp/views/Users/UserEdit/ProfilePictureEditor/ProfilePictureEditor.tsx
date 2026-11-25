@@ -9,7 +9,7 @@ import { useConfirm, useFileDrop, useOnValueChange } from '@webapp/components/ho
 import { useProfilePicture } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
-import UploadButton from '@webapp/components/form/uploadButton'
+import UploadButton from '@webapp/components/form/UploadButton'
 import { ButtonIconDelete } from '@webapp/components'
 
 const profilePicturePlaceholderImgSrc = '/img/user-profile-picture-default.png'

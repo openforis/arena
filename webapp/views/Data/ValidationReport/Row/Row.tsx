@@ -10,7 +10,7 @@ import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonIconEditOrView } from '@webapp/components'
-import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
+import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import { AskAssistantButton } from './AskAssistantButton'

@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
 
-import ProfilePicture from '@webapp/components/profilePicture'
+import ProfilePicture from '@webapp/components/ProfilePicture'
 import { ButtonIconEdit } from '@webapp/components'
 import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
