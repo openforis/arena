@@ -161,7 +161,6 @@ const getMovePropDiffs = ({ sourceNodeDef, targetNodeDef, sourceIndex, targetInd
 
 /**
  * Computes the differences between two matched node defs.
- * @param {object} params - The parameters.
  * @returns {SurveyComparePropDiff[]} - The prop differences.
  */
 export const getNodeDefPropDiffs = ({

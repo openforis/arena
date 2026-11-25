@@ -9,7 +9,6 @@ const quotaError = () =>
 
 /**
  * A Map-backed storage that throws the given error on writes while `failWrites` holds.
- * @param {object} [options] - Options.
  * @returns {object} The storage, its data and switches.
  */
 const fakeStorage = ({

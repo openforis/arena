@@ -82,7 +82,6 @@ export const readHeadersAndRows = async ({ stream, fileFormat }: { stream: Reada
 
 /**
  * Builds (in memory) a survey with a root entity (cluster), a multiple entity (plot) with attributes of several types and multiple entities with a taxon key (tree) and a coordinate key (sample_point).
- * @param {object} user - The user.
  * @returns {Promise<object>} - The survey.
  */
 export const buildTestSurvey = async (user: any) =>
@@ -117,7 +116,6 @@ export const buildTestSurvey = async (user: any) =>
  * Reads the rows of a file (in the specified format) using the reader used by the data import job
  * (rows converted into node values).
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {string} params.entityName - The name of the entity where data will be imported.
  * @param {FlatDataFileFormat} params.fileFormat - The file format (csv or xlsx).
  * @param {Rows} params.rows - The rows (first row: headers).

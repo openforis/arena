@@ -60,7 +60,6 @@ export const toolError = (code: string, message: string, details: Record<string,
 
 /**
  * Removes a fifth of the largest list or string of a value (a key that is empty or cannot be cut is dropped).
- * @param {unknown} value - The value.
  * @returns {unknown} A smaller copy, or the same value when there is nothing left to cut.
  */
 const shrinkOnce = (value: unknown): unknown => {
@@ -81,7 +80,6 @@ const shrinkOnce = (value: unknown): unknown => {
 
 /**
  * Shrinks a value until its JSON fits.
- * @param {unknown} value - The value.
  * @param {number} maxChars - Maximum JSON length.
  * @returns {unknown} The value that fits.
  */
@@ -97,7 +95,6 @@ const shrinkToFit = (value: unknown, maxChars: number): unknown => {
 
 /**
  * Wraps a value that is not an object, so `truncated: true` can be added to it.
- * @param {unknown} value - The value.
  * @returns {object} The value with `truncated: true`.
  */
 const toTruncatedObject = (value: unknown): Record<string, unknown> => {

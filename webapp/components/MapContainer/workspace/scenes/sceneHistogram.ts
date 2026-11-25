@@ -5,7 +5,6 @@ import type { MonthBucket, ScenePeriod, SceneResult } from './sceneTypes'
  * Counts scenes per calendar month of the period; months without scenes are kept with count 0.
  *
  * @param {SceneResult[]} scenes - Scenes (already filtered by cloud and coverage).
- * @param {ScenePeriod} period - The period.
  * @returns {MonthBucket[]} One bucket per month, oldest first.
  */
 export const getMonthHistogram = (scenes: SceneResult[], period: ScenePeriod): MonthBucket[] => {
@@ -28,7 +27,6 @@ export const getMonthHistogram = (scenes: SceneResult[], period: ScenePeriod): M
 /**
  * Returns the highest bucket count.
  *
- * @param {MonthBucket[]} buckets - Buckets.
  * @returns {number} Highest count, 0 when there is no bucket.
  */
 export const getHistogramMax = (buckets: MonthBucket[]): number => {

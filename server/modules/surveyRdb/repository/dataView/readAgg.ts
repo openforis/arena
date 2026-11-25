@@ -84,12 +84,9 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilter
  * aggregated by the given measures aggregate functions, grouped by the given dimensions and
  * filtered by the given filter.
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query used to filter the rows.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID used to tilter the records. If null, all records will be included.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be included.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
 export const countViewDataAgg = (params: ViewDataAggQueryParams, client: DbClient = db) => {
@@ -114,15 +111,9 @@ export const countViewDataAgg = (params: ViewDataAggQueryParams, client: DbClien
  * Runs a select query on a data view associated to an entity node definition,
  * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
- * @param {!Query} [params.query] - The query object.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID used to filter records. If null, all records will be considered.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
- * @param {number} [params.offset] - The query offset.
- * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = (

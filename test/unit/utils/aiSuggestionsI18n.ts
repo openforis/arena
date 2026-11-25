@@ -13,7 +13,6 @@ export const PLURAL_FORMS: Record<string, string[]> = Object.fromEntries(
 
 /**
  * Returns the aiSuggestions resource of a language.
- * @param {string} lang - Language.
  * @returns {Record<string, unknown>} The resource.
  */
 export const getResource = (lang: string): Record<string, unknown> => RESOURCES[lang].aiSuggestions
@@ -22,7 +21,6 @@ export const flatten = flattenTexts
 
 /**
  * Returns the sorted keys of a language, plural suffixes stripped.
- * @param {string} lang - Language.
  * @returns {string[]} The base keys.
  */
 export const baseKeys = (lang: string): string[] =>
@@ -42,7 +40,6 @@ export const enTextOf = (key: string): string => {
 
 /**
  * Returns the text at a dotted path of a language.
- * @param {string} lang - Language.
  * @param {string} path - Dotted path.
  * @returns {unknown} The text; undefined when missing.
  */
@@ -51,7 +48,6 @@ export const getText = (lang: string, path: string): unknown =>
 
 /**
  * Lists the texts a language must have for card keys: every plural form of its language for the plural keys.
- * @param {string} lang - Language.
  * @param {object} keys - Card keys.
  * @param {string[]} keys.plural - Keys with plural forms.
  * @param {string[]} keys.single - Keys without plural forms.
@@ -67,8 +63,6 @@ export const expectedTexts = (
 
 /**
  * Returns the text at a dotted path of another namespace (common, appErrors...) of a language.
- * @param {string} lang - Language.
- * @param {string} namespace - Namespace.
  * @param {string} path - Dotted path.
  * @returns {unknown} The text; undefined when missing.
  */

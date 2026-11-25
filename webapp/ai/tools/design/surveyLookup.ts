@@ -11,7 +11,6 @@ import type { AiToolContext } from '../types'
 
 /**
  * Groups node definitions by parent uuid (null for the root).
- * @param {object[]} nodeDefs - Node definitions.
  * @returns {Map<string|null, object[]>} The children per parent.
  */
 const groupByParent = (nodeDefs: any[]): Map<string | null, any[]> => {
@@ -41,15 +40,12 @@ const depthFirst = (childrenByParent: Map<string | null, any[]>): any[] => {
 
 /**
  * Returns the design node definitions depth-first (each entity followed by its descendants).
- * @param {object} survey - Survey.
  * @returns {object[]} The node definitions.
  */
 export const getDesignNodeDefsDepthFirst = (survey: any): any[] => depthFirst(groupByParent(getCurrentNodeDefs(survey)))
 
 /**
  * Returns the node definition with the given name, or throws nodeDefNotFound with the closest names.
- * @param {object} survey - Survey.
- * @param {string} name - Name.
  * @returns {object} The node definition.
  */
 export const requireNodeDefByName = (survey: any, name: string): any => {
@@ -62,7 +58,6 @@ export const requireNodeDefByName = (survey: any, name: string): any => {
 
 /**
  * Returns the survey of the context, or throws noSurvey.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {object} The survey.
  */
 export const requireSurvey = (ctx: AiToolContext): any => {
@@ -72,8 +67,6 @@ export const requireSurvey = (ctx: AiToolContext): any => {
 
 /**
  * Returns the names from the root to the node definition's parent.
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @returns {string[]} The ancestor names, root first.
  */
 export const getNodeDefPathNames = (survey: any, nodeDef: any): string[] => {
@@ -88,16 +81,12 @@ export const getNodeDefPathNames = (survey: any, nodeDef: any): string[] => {
 
 /**
  * Returns the label of a node definition in a language, or null.
- * @param {object} nodeDef - Node definition.
- * @param {string} lang - Language.
  * @returns {string|null} The label.
  */
 export const getLabelOrNull = (nodeDef: any, lang: string): string | null => NodeDef.getLabels(nodeDef)[lang] || null
 
 /**
  * Returns a short description of a node definition (name, type, label, parent, key and multiple flags when set).
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @param {string} lang - Label language.
  * @returns {object} The description.
  */

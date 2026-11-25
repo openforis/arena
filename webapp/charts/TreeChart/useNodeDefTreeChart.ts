@@ -26,7 +26,6 @@ interface Result {
  * keep label/tooltip functions up to date when the language or label type change).
  * The lifecycle effects read the TreeChart instance lazily from `ref.current`, so this hook can be
  * called regardless of whether the chart creation effect runs before or after it.
- * @param {Params} params - Parameters.
  * @returns {Result} i18n instance, wrapper DOM ref, and nodeLabelFunction, nodeTooltipFunction, nodeIconFunction.
  */
 export const useNodeDefTreeChart = ({ ref, nodeDefLabelType }: Params): Result => {

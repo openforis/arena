@@ -18,7 +18,6 @@ export type PostRecordEdits = (request: RecordEditsRequest) => Promise<RecordEdi
 
 /**
  * Sends edits to the batch record edit endpoint (synchronous: it answers when the edits are written).
- * @param {RecordEditsRequest} request - The request.
  * @returns {Promise<RecordEditResult[]>} One result per edit (index = position in the request).
  */
 export const postRecordEdits: PostRecordEdits = async ({ surveyId, signal, ...body }) => {

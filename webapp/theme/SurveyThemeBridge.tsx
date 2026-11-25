@@ -16,7 +16,6 @@ type Props = {
 /**
  * Applies the selected theme mode (light/dark) and the survey primary color to the MUI theme and to the CSS variables.
  *
- * @param {Props} props - The component props.
  * @returns {React.ReactElement} The themed children.
  */
 export const SurveyThemeBridge = (props: Props) => {

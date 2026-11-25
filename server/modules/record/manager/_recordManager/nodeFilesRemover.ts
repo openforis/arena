@@ -30,7 +30,6 @@ const _getFileUuidToRemove = ({ record, node }: { record: ArenaRecord; node: Are
  * Finds the files that are not referenced anymore by the nodes updated or deleted by a dependents update:
  * the files of the file attributes cleared because not applicable and the ones of the deleted nodes.
  * @param {!object} params - The parameters.
- * @param {!object} params.survey - The survey.
  * @param {!object} params.record - The record, as it was before the update.
  * @param {!object[]} params.nodes - The nodes updated by the dependents update (including the deleted ones).
  * @returns {FileToRemove[]} - The files to remove.
@@ -75,11 +74,8 @@ const _deleteFileContentSafely = async ({ surveyId, fileUuid, recordUuid }: File
  * Preview records: the files are deleted immediately, content (file system or S3 bucket) and DB row.
  * Missing file rows or contents are tolerated: the removal is best effort and never fails the update.
  * @param {!object} params - The parameters.
- * @param {!number} params.surveyId - The survey id.
  * @param {!FileToRemove[]} params.files - The files to remove.
  * @param {boolean} [params.isPreview] - True if the files belong to a preview record.
- * @param {object} tx - The database transaction.
- * @returns {Promise<void>} - The result promise.
  */
 export const removeFiles = async (
   { surveyId, files, isPreview = false }: { surveyId: number; files: FileToRemove[]; isPreview?: boolean },

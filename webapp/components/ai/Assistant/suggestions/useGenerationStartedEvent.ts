@@ -46,9 +46,7 @@ export const createGenerationStartNotifier = ({
 /**
  * Sends generationStarted; call it after the effect that feeds the controller, so the event finds the generation.
  * @param {object} params - Parameters.
- * @param {GenerationRef} params.generation - Current generation.
  * @param {boolean} params.active - Setting on, user logged in and Design available.
- * @returns {void}
  */
 export const useGenerationStartedEvent = ({
   generation,

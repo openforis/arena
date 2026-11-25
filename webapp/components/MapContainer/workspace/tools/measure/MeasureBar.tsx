@@ -77,8 +77,6 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
 
   /**
    * Handles Escape typed in the unit select, which the workspace shortcuts ignore.
-   * @param {React.KeyboardEvent} event - The key event.
-   * @returns {void}
    */
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     // useMapShortcuts skips text fields (a select is one) and defaultPrevented events: Escape is handled once
@@ -92,7 +90,6 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
    * Selects the mode of the toggle, ignoring the deselect click on the active one.
    * @param {React.MouseEvent} _event - The click event.
    * @param {MeasureMode|null} value - The clicked mode, null when the active one was clicked.
-   * @returns {void}
    */
   const onToggleChange = (_event: unknown, value: MeasureMode | null): void => {
     if (value) onModeChange(value)
@@ -101,7 +98,6 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
   /**
    * Reports the unit chosen in the select.
    * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event.
-   * @returns {void}
    */
   const onSelectChange = (event: ChangeEvent<HTMLSelectElement>): void =>
     onUnitChange(event.target.value as MeasureUnitOption)

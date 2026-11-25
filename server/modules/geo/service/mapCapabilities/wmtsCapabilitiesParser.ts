@@ -192,7 +192,6 @@ const buildRestTemplates = ({
  * @param {object} params - Parameters.
  * @param {XmlElement} params.layer - The Layer element.
  * @param {string} params.kvpHref - The GetTile endpoint.
- * @param {string} params.style - The style.
  * @param {string} params.matrixSetId - The tile matrix set identifier.
  * @param {string} params.prefix - The TileMatrix identifier prefix.
  * @param {Map<string, string>} params.dimensions - The dimension values.

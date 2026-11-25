@@ -39,7 +39,6 @@ type QueuedEvent = { event: SuggestionEvent; userUuid: string | null; surveyId: 
 /**
  * Returns the detector context of an input, or null when nothing may run (setting off, nobody logged in).
  * @param {SuggestionHostInput|null} input - Host input.
- * @param {SuggestionStore} store - Store.
  * @param {Function} now - Clock.
  * @returns {DetectorContext|null} The context.
  */
@@ -55,8 +54,6 @@ const contextOf = (
 
 /**
  * Returns true when a detector may run: its area is available, and a Design detector has draft defs it can edit.
- * @param {object} detector - Detector.
- * @param {DetectorContext} ctx - Context.
  * @returns {boolean} True when it runs.
  */
 const canRun = (detector: { area: AssistantArea; needsDraft: boolean }, ctx: DetectorContext): boolean =>
@@ -69,7 +66,6 @@ const canRun = (detector: { area: AssistantArea; needsDraft: boolean }, ctx: Det
  * @param {AiLog} log - Reports the error.
  * @param {string} what - What runs, for the log.
  * @param {Function} work - Detector work.
- * @returns {void}
  */
 const runSafely = (log: AiLog, what: string, work: () => unknown): void => {
   try {
@@ -83,10 +79,7 @@ const runSafely = (log: AiLog, what: string, work: () => unknown): void => {
 /**
  * Removes the targets of a kind that the resolver finds fixed: pending, in progress and dismissed ones (a suggestion
  * dismissed as a whole is no longer pending, and its dismissal must not hide the issue when it occurs again).
- * @param {TargetResolver} resolver - Resolver.
  * @param {DetectorContext} ctx - Context (with a generation).
- * @param {SuggestionGeneration} generation - Generation.
- * @returns {void}
  */
 const resolveKind = (resolver: TargetResolver, ctx: DetectorContext, generation: SuggestionGeneration): void => {
   const { userUuid, store, survey } = ctx
@@ -101,7 +94,6 @@ const resolveKind = (resolver: TargetResolver, ctx: DetectorContext, generation:
 /**
  * Returns true when a queued event belongs to the user and survey of the input (an untagged one belongs to any).
  * @param {QueuedEvent} queued - Queued event.
- * @param {SuggestionHostInput} input - Current input.
  * @returns {boolean} True when it may be handled.
  */
 const belongsTo = (queued: QueuedEvent, input: SuggestionHostInput): boolean =>
@@ -111,7 +103,6 @@ const belongsTo = (queued: QueuedEvent, input: SuggestionHostInput): boolean =>
 /**
  * Creates the controller of the suggestions host.
  * @param {object} params - Parameters.
- * @param {SuggestionStore} params.store - Store.
  * @param {Function} [params.now] - Clock.
  * @param {StateDetector[]} [params.stateDetectors] - State detectors (default: the registry).
  * @param {EventDetector[]} [params.eventDetectors] - Event detectors (default: the registry).
@@ -160,7 +151,6 @@ export const createSuggestionHostController = ({
   /**
    * Aborts and discards the derived controllers that no longer apply.
    * @param {(entry: object) => boolean} keep - True for an entry that stays.
-   * @returns {void}
    */
   const pruneAreaControllers = (keep: (entry: { generationId: number; area: AssistantArea }) => boolean): void => {
     for (const [key, entry] of areaControllers) {
@@ -174,7 +164,6 @@ export const createSuggestionHostController = ({
   /**
    * Returns the context a detector of an area receives: the generation gets a signal that also aborts with the setting
    * and the area.
-   * @param {DetectorContext} ctx - Context.
    * @param {AssistantArea} area - Area of the detector.
    * @returns {DetectorContext} The context.
    */
@@ -198,7 +187,6 @@ export const createSuggestionHostController = ({
 
   /**
    * Cancels the pending debounced run.
-   * @returns {void}
    */
   const cancel = (): void => {
     if (timer !== null) clearTimeout(timer)
@@ -207,7 +195,6 @@ export const createSuggestionHostController = ({
 
   /**
    * Runs the state detectors, then the resolvers (draft defs only), for the latest input.
-   * @returns {void}
    */
   const run = (): void => {
     timer = null
@@ -236,9 +223,6 @@ export const createSuggestionHostController = ({
 
   /**
    * Hands an event to the event detectors listening to it.
-   * @param {SuggestionEvent} event - Event.
-   * @param {DetectorContext} ctx - Context.
-   * @returns {void}
    */
   const dispatch = (event: SuggestionEvent, ctx: DetectorContext): void => {
     for (const detector of eventDetectors) {
@@ -252,7 +236,6 @@ export const createSuggestionHostController = ({
   /**
    * Handles the queued events that can run now and drops those of another user or survey.
    * @param {DetectorContext} ctx - Context of the latest input.
-   * @returns {void}
    */
   const flush = (ctx: DetectorContext): void => {
     if (queue.length === 0 || !input) return
@@ -270,8 +253,6 @@ export const createSuggestionHostController = ({
   /**
    * Runs at once on a new generation, or 1 s after the last change of survey or areas.
    * @param {DetectorContext} ctx - Context with a generation.
-   * @param {SuggestionGeneration} generation - Its generation.
-   * @returns {void}
    */
   const schedule = (ctx: DetectorContext, generation: SuggestionGeneration): void => {
     if (generation.id !== ranGenerationId) {

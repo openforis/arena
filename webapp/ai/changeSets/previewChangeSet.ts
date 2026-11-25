@@ -181,8 +181,6 @@ const isRename = (op: ChangeSet['operations'][number]): boolean => op.type === '
 /**
  * Returns the survey with its dependency graph when the change set renames a node def (the graph tells which node defs
  * use the old name in an expression). The graph holds uuids: it stays valid after the rename.
- * @param {ChangeSet} changeSet - Change set.
- * @param {object} survey - Survey.
  * @returns {Promise<object>} The survey to apply the operations to.
  */
 export const withDependencyGraphForRenames = async (changeSet: ChangeSet, survey: any): Promise<any> =>
@@ -190,7 +188,6 @@ export const withDependencyGraphForRenames = async (changeSet: ChangeSet, survey
 
 /**
  * Applies the operations in order to a copy of the survey, skipping (and reporting) those with structural issues.
- * @param {ChangeSet} changeSet - Change set.
  * @param {object} survey - Survey (not modified).
  * @param {Translate} t - Translator for the issue messages.
  * @returns {object} The draft survey, the issues (operation = index in the change set) and, per node definition
@@ -257,7 +254,6 @@ export const checkOtherExpressions = async (
 
 /**
  * Applies a change set to a copy of the survey and validates it as the form designer would.
- * @param {ChangeSet} changeSet - Change set.
  * @param {object} survey - Draft survey (not modified).
  * @param {object} options - Options.
  * @param {Translate} options.t - Translator for the issue messages.

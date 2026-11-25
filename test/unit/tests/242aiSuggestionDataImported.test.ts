@@ -82,7 +82,6 @@ const setup = ({
   /**
    * Moves the clock.
    * @param {Date} date - New date.
-   * @returns {void}
    */
   const setClock = (date: Date) => {
     clock = date

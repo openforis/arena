@@ -49,7 +49,6 @@ const getUsePercent = (statistics: StorageStatistics): number => {
 /**
  * One storage category (files or database) with title, subtitle, and progress meter.
  *
- * @param {StorageSummaryItemProps} props - The component props.
  * @returns {React.ReactElement} The item.
  */
 const StorageSummaryItem = (props: StorageSummaryItemProps) => {

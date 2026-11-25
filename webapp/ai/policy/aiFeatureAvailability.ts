@@ -79,23 +79,18 @@ export const resolveEffectivePolicy = ({
 
 /**
  * Returns true when the feature's entry point is rendered (usable or shown disabled).
- * @param {AiFeatureAvailability} availability - Availability.
  * @returns {boolean} True when shown.
  */
 export const isAiFeatureShown = (availability: AiFeatureAvailability): boolean => availability.status !== 'disabled'
 
 /**
  * Returns true when the feature can be used now.
- * @param {AiFeatureAvailability} availability - Availability.
  * @returns {boolean} True when usable.
  */
 export const isAiFeatureUsable = (availability: AiFeatureAvailability): boolean => availability.status === 'available'
 
 /**
  * Returns the translated data-location text, or null when there is no hosting class.
- * @param {object} params - Parameters.
- * @param {AiDataLocation} params.location - Location.
- * @param {Function} params.t - Translation function.
  * @returns {string|null} The text.
  */
 export const getAiDataLocationText = ({

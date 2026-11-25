@@ -49,7 +49,6 @@ const setup = ({
   }
   /**
    * Returns the visible suggestions of a cycle.
-   * @param {string} [cycle] - Current cycle.
    * @returns {object[]} The suggestions.
    */
   const visible = (cycle = '0') =>
@@ -62,7 +61,6 @@ const setup = ({
   /**
    * Moves the clock.
    * @param {Date} date - New date.
-   * @returns {void}
    */
   const setClock = (date: Date) => {
     clock = date
@@ -72,23 +70,19 @@ const setup = ({
 
 /**
  * Returns the event of a report opened in a cycle.
- * @param {string} [cycle] - Cycle key.
  * @returns {SuggestionEvent} The event.
  */
 const opened = (cycle = '0'): SuggestionEvent => ({ type: 'validationReportOpened', cycle })
 
 /**
  * Returns a countValidationReportRows stub that answers with a count.
- * @param {number} count - The count.
  * @returns {jest.Mock} The stub.
  */
 const countReturning = (count: number) => jest.fn(async (_params: unknown) => count)
 
 /**
  * Runs the detector once with a stubbed count.
- * @param {DetectorContext} ctx - Detector context.
  * @param {number} count - Count answered by the server.
- * @param {SuggestionEvent} [event] - Event.
  * @returns {Promise<jest.Mock>} The count stub.
  */
 const openWithCount = async (ctx: DetectorContext, count: number, event: SuggestionEvent = opened()) => {

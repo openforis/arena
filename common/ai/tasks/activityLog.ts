@@ -45,7 +45,6 @@ const toTimes = (entries: AiActivityLogEntry[]): number[] =>
 /**
  * Builds the summary request for the given activity log entries (newest first, as fetched).
  * @param {object} params - Parameters.
- * @param {string} params.surveyName - Survey name.
  * @param {AiActivityLogEntry[]} params.entries - The entries to summarize.
  * @returns {AiTextRequest} The system prompt and prompt.
  */

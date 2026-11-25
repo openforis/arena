@@ -86,7 +86,6 @@ export const canHaveData = (survey: ArenaSurvey): boolean => {
 }
 /**
  * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
- * @param survey - The survey object.
  * @returns True if all key attributes are using the sampling point data category.
  */
 export const canRecordBeIdentifiedBySamplingPointDataItem = (survey: ArenaSurvey): boolean => {

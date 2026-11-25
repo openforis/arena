@@ -20,7 +20,6 @@ export type PlotLayer = {
  * Keeps the active layers that are location attributes inside a multiple entity (the plot), with that entity.
  * @param {object} params - The parameters.
  * @param {Array<ActiveLayer>} params.activeLayers - The layers of the Records tab (their key is the attribute uuid).
- * @param {object} params.survey - The survey.
  * @param {string} params.lang - The language of the entity label.
  * @returns {Array<PlotLayer>} The plot layers; sampling point layers and layers outside an entity are dropped.
  */
@@ -60,7 +59,6 @@ const toKeyTexts = (ancestorsKeys: unknown[] = []): string[] =>
 /**
  * Builds the plot candidate of a point, when the point is valid.
  * @param {PlotLayer} layer - The layer of the point.
- * @param {MapLayerPoint} point - The point.
  * @returns {ScreenshotPlotCandidate|null} The candidate, or null for a point without coordinates or record.
  */
 const toCandidate = (layer: PlotLayer, point: MapLayerPoint): ScreenshotPlotCandidate | null => {

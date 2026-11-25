@@ -330,11 +330,7 @@ const propagateNotApplicable = (diffsById: Record<string, any>) => {
  * Sets applicability, dependencies and links of node def, category and taxonomy diffs (diffs are modified in place).
  * @param {object} params - The parameters.
  * @param {ApplicabilityContext} params.context - The applicability context.
- * @param {SurveyCompareNodeDefDiff[]} params.nodeDefDiffs - Node def diffs.
- * @param {SurveyCompareCategoryDiff[]} params.categoryDiffs - Category diffs.
- * @param {SurveyCompareTaxonomyDiff[]} params.taxonomyDiffs - Taxonomy diffs.
  * @param {any[]} params.otherChanges - Other changes the diffs can depend on (e.g. survey info).
- * @returns {void}
  */
 export const evaluateApplicability = ({
   context,

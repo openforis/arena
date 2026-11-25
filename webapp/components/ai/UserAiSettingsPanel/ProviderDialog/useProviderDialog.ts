@@ -70,7 +70,6 @@ type Params = {
 /**
  * Tests an account draft; a failed request becomes a failed result.
  * @param {AiProviderRequest} request - Request body.
- * @returns {Promise<AiProviderTestResponse>} The result.
  */
 const testAccountDraft = async (request: AiProviderRequest): Promise<AiProviderTestResponse> => {
   try {

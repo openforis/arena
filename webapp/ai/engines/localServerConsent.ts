@@ -16,22 +16,18 @@ const DEFAULT_DATA_CLASS: AiDataClass = 'schema'
 
 /**
  * Returns the localStorage key of the user's consent decisions.
- * @param {string} userUuid - User UUID.
  * @returns {string} The key.
  */
 export const getLocalServerConsentKey = (userUuid: string): string => `arena.ai.localServerConsent.${userUuid}`
 
 /**
  * Returns the key of the survey inside the consent map ('none' when there is no survey).
- * @param {number|null} [surveyId] - Survey id.
  * @returns {string} The key.
  */
 const surveyKey = (surveyId?: number | null): string => (surveyId ? String(surveyId) : 'none')
 
 /**
  * Reads the consent map of the user; unavailable storage or corrupt JSON give an empty map.
- * @param {StorageLike} storage - Storage.
- * @param {string} userUuid - User UUID.
  * @returns {ConsentMap} The map.
  */
 const readMap = (storage: StorageLike, userUuid: string): ConsentMap => {
@@ -56,8 +52,6 @@ const isEntryOf = (entry: ConsentEntry | undefined, baseUrl: string): entry is C
  * Returns the stored decision for the survey, or null when the user must be asked (none, another URL, or a
  * consent that does not reach the requested data class).
  * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
  * @param {number} [params.surveyId] - Survey (none for Help).
  * @param {string} params.baseUrl - Current server URL.
  * @param {AiDataClass} [params.dataClass] - Data class the request sends (the survey design when absent).
@@ -102,11 +96,8 @@ const getClassToStore = (
 /**
  * Stores the decision for the survey, server URL and data class.
  * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
  * @param {number} [params.surveyId] - Survey (none for Help).
  * @param {string} params.baseUrl - Server URL shown in the card.
- * @param {AiConsentDecision} params.decision - The decision.
  * @param {AiDataClass} [params.dataClass] - Data class the user was asked about (the survey design when absent).
  * @returns {boolean} False when the storage is unavailable or full.
  */
@@ -144,8 +135,6 @@ export const saveLocalServerConsent = ({
 /**
  * Returns whether the user has a consent, for any survey and data class, for the server URL.
  * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
  * @param {string} params.baseUrl - Server URL.
  * @returns {boolean} True when there is one to revoke.
  */
@@ -165,8 +154,6 @@ export const hasLocalServerConsent = ({
 /**
  * Removes the user's consent for the server URL, for every survey and data class: the next local request asks again.
  * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
  * @param {string} params.baseUrl - Server URL.
  * @returns {boolean} False when the storage is unavailable or could not be written.
  */

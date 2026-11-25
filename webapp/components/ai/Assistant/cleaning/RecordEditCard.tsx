@@ -38,7 +38,6 @@ type EditRowProps = {
 /**
  * Returns the translated text of an edit result.
  * @param {Function} t - Translation function (unescaped: the message is translated twice).
- * @param {OperationResult} result - The result.
  * @returns {string} The text.
  */
 const getResultText = (t: (key: string, params?: any) => string, result: OperationResult): string => {
@@ -49,7 +48,6 @@ const getResultText = (t: (key: string, params?: any) => string, result: Operati
 
 /**
  * One edit of the card: checkbox, path, from → to, preview badge, result.
- * @param {EditRowProps} props - Props.
  * @returns {React.ReactElement} The row.
  */
 const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowProps) => {
@@ -97,7 +95,6 @@ const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowP
 
 /**
  * Card of a record-edit change set: edits grouped by record, preview badges, Apply selected and Retry.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The card.
  */
 export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props) => {

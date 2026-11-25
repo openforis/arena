@@ -96,7 +96,6 @@ const getRemovalLabel = ({ change, result }: { change: SurveyCompareChange; resu
  * Returns the selected changes that delete something in this survey (elements only in this survey).
  * @param {object} params - Parameters.
  * @param {SurveyCompareResult} params.result - The comparison result.
- * @param {Set<string>} params.selectedIds - Selected ids.
  * @returns {{id: string, label: string, partial: boolean}[]} - The selected deletions (partial: removal of category items or taxa).
  */
 export const getSelectedDeletions = ({

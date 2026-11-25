@@ -19,7 +19,6 @@ type MapViewState = { center: LatLng; zoom: number; bounds: LatLngBoundsLiteral 
 
 /**
  * Reads the centre, zoom and bounds of the map.
- * @param {LeafletMap} map - The map.
  * @returns {MapViewState} The view.
  */
 const readView = (map: LeafletMap): MapViewState => {
@@ -61,7 +60,6 @@ export const MapStatusBar = ({ records }: { records?: MapWorkspaceRecords }): Re
     if (!attributionTarget) return undefined
     /**
      * Copies the attribution text into the title.
-     * @returns {void}
      */
     const syncTitle = (): void => {
       attributionTarget.setAttribute('title', attributionTarget.textContent ?? '')

@@ -51,7 +51,6 @@ export const resolveThemeMode = (preference: ThemePreference): ThemeMode =>
  * Applies the theme mode to the document (selects the CSS custom properties set defined in `themes.scss`).
  *
  * @param {ThemeMode} mode - The theme mode.
- * @returns {void}
  */
 export const applyThemeMode = (mode: ThemeMode): void => {
   document.documentElement.dataset.theme = mode
@@ -61,7 +60,6 @@ export const applyThemeMode = (mode: ThemeMode): void => {
  * Stores the theme preference and notifies the listeners.
  *
  * @param {ThemePreference} preference - The theme preference.
- * @returns {void}
  */
 export const setThemePreference = (preference: ThemePreference): void => {
   try {

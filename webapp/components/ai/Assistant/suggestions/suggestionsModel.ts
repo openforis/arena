@@ -35,7 +35,6 @@ export const getAvailableAreas = (statuses: AssistantAreaStatus[]): AssistantAre
 
 /**
  * Groups suggestions by area, keeping their order.
- * @param {AssistantSuggestion[]} suggestions - Suggestions.
  * @returns {SuggestionsByArea} The suggestions of each area.
  */
 export const groupSuggestionsByArea = (suggestions: AssistantSuggestion[]): SuggestionsByArea => {
@@ -70,7 +69,6 @@ export const getAssistantButtonLabel = ({ count, t }: { count: number; t: Sugges
  * @param {object} params - Parameters.
  * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language.
- * @param {SuggestionDefinitions} params.definitions - Definitions.
  * @param {AiLog} [params.log] - Reports a card that could not be described.
  * @returns {string|null} The text.
  */
@@ -98,7 +96,6 @@ export const getSuggestionCardText = ({
 /**
  * Returns the delay until the nearest expiry, so the cards hide on time.
  * @param {AssistantSuggestion[]} suggestions - Visible suggestions.
- * @param {Date} now - Now.
  * @returns {number|null} The delay in ms (0 when past); null when nothing expires.
  */
 export const getNextExpiryDelay = (suggestions: AssistantSuggestion[], now: Date): number | null => {

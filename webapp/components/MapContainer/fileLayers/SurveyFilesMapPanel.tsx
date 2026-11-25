@@ -16,7 +16,6 @@ type Props = {
 
 /**
  * Right panel with a map showing survey files (KML, KMZ, zipped Shapefile or GeoJSON).
- * @param {Props} props - The props.
  * @returns {React.ReactElement} The panel.
  */
 export const SurveyFilesMapPanel = (props: Props) => {

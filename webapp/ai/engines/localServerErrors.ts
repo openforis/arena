@@ -17,7 +17,6 @@ const UNREACHABLE_KEY = 'aiLocalServerUnreachable'
 
 /**
  * Tells whether an error is a user cancel or a timeout.
- * @param {any} error - The error.
  * @returns {boolean} True when abort-like.
  */
 const isAbortLike = (error: any): boolean => error?.name === 'AbortError' || error?.name === 'TimeoutError'
@@ -70,7 +69,6 @@ export const mapLocalServerFetchError = ({ error, baseUrl }: { error: unknown; b
  * redirects: the data class was decided from the configured address, a redirect could send the prompt elsewhere
  * (a refused redirect fails the fetch, which maps to the unreachable error).
  * @param {RequestInit} init - Request init.
- * @param {string} url - Request URL.
  * @returns {RequestInit} The init to use.
  */
 export const withAddressSpace = (init: RequestInit, url: string): RequestInit => {
@@ -93,7 +91,6 @@ const toUrlString = (input: RequestInfo | URL): string => {
 
 /**
  * Reads the beginning of an error response body, never throwing.
- * @param {Response} response - The response.
  * @returns {Promise<string>} The text (empty when unreadable).
  */
 const readBodyText = async (response: Response): Promise<string> => {
@@ -137,7 +134,6 @@ export const createLocalServerFetch = ({
 
 /**
  * Returns the key and params to show for a failed probe.
- * @param {unknown} error - The error.
  * @param {string} baseUrl - Server base URL.
  * @returns {AiEngineErrorInfo} The key and params.
  */

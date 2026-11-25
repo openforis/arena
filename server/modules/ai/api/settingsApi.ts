@@ -30,7 +30,6 @@ import { limitProviderCalls, releaseProviderCall } from './providerRateLimit'
 
 /**
  * Returns the body of GET /api/ai/settings: the settings, the providers and the instance fields.
- * @param {object} user - Arena user.
  * @returns {object} The settings body.
  */
 export const buildResponseBody = (user: SettingsUser) => ({
@@ -89,7 +88,6 @@ const jsonRoute =
 /**
  * Registers the AI settings and provider routes.
  * @param {object} app - Express router.
- * @returns {void}
  */
 export const init = (app): void => {
   app.get(

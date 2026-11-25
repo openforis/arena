@@ -281,12 +281,8 @@ When using `yarn watch`, the webpack dev server runs on port 9000 and proxies AP
 **Console Logging:**
 The ESLint config has `"no-console": "error"`. Use the `log4js` logger from `@server/log/log` on the server side instead of console.log.
 
-**JSDoc Required:**
-The project enforces comprehensive JSDoc comments. All functions should have:
-
-- Description ending with period
-- `@param` with type and description for each parameter
-- `@returns` with type and description
+**JSDoc:**
+Exported functions have a JSDoc description ending with a period. Add `@param` / `@returns` only when they say something the name and the TypeScript type don't: never `@param surveyId - The survey id.`, `@param params - Parameters.`, `@param client - The database client.` or `@returns The result.`.
 
 **Immutability:**
 Core domain objects are treated as immutable. Use Ramda or the provided utility functions for updates rather than mutating objects directly.

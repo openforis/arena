@@ -11,10 +11,6 @@ import type { CleaningI18n } from './validationRows'
 
 /**
  * Formats the value of a node.
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Cycle key.
- * @param {object} params.node - The node.
  * @returns {string|null} The formatted value, or null when empty.
  */
 export const formatNodeValue = ({ survey, cycle, node }: { survey: any; cycle: string; node: any }): string | null => {
@@ -24,10 +20,6 @@ export const formatNodeValue = ({ survey, cycle, node }: { survey: any; cycle: s
 
 /**
  * Returns the formatted root keys of a record.
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Cycle key.
- * @param {object} params.record - The record.
  * @returns {string} The key values, comma separated.
  */
 export const describeRecordKeys = ({ survey, cycle, record }: { survey: any; cycle: string; record: any }): string =>
@@ -35,7 +27,6 @@ export const describeRecordKeys = ({ survey, cycle, record }: { survey: any; cyc
 
 /**
  * Returns the label of a node def in the language, or its name when no language is given (for the model).
- * @param {object} nodeDef - The node def.
  * @param {string} [lang] - Label language.
  * @returns {string} The label or the name.
  */
@@ -45,10 +36,6 @@ const getNodeDefText = (nodeDef: any, lang?: string): string =>
 /**
  * Describes one entity of a path: its name, with its keys when it is the root or a multiple entity.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Cycle key.
- * @param {object} params.record - The record.
- * @param {object} params.entity - The entity.
  * @param {string} [params.lang] - Label language: labels instead of names.
  * @returns {string} E.g. tree[2].
  */
@@ -77,8 +64,6 @@ const describeEntity = ({
 
 /**
  * Returns the entity ancestors of a node, root first.
- * @param {object} record - The record.
- * @param {object} node - The node.
  * @returns {object[]} The ancestors.
  */
 const getAncestorsRootFirst = (record: any, node: any): any[] => {
@@ -94,10 +79,6 @@ const getAncestorsRootFirst = (record: any, node: any): any[] => {
 /**
  * Describes the path of a node with the keys of its ancestor entities.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Cycle key.
- * @param {object} params.record - The record.
- * @param {object} params.node - The node.
  * @param {string} [params.lang] - Label language: labels instead of names.
  * @returns {string} E.g. cluster[12] / plot[1] / tree[2] / dbh.
  */
@@ -128,11 +109,6 @@ export const describeNodePath = ({
 
 /**
  * Describes the parent entity of a node (its path with keys).
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Cycle key.
- * @param {object} params.record - The record.
- * @param {object} params.node - The node.
  * @returns {string} E.g. cluster[12] / plot[1] / tree[2].
  */
 export const describeParentPath = ({
@@ -152,9 +128,6 @@ export const describeParentPath = ({
 
 /**
  * Returns the record editor page of a node: its parent entity.
- * @param {object} params - Parameters.
- * @param {object} params.record - The record.
- * @param {object} params.node - The node.
  * @returns {{nodeUuid: string, nodeDefUuid: string}} The page entity.
  */
 export const getNodePage = ({ record, node }: { record: any; node: any }) => {
@@ -164,11 +137,6 @@ export const getNodePage = ({ record, node }: { record: any; node: any }) => {
 
 /**
  * Returns the translated validation messages of a node (empty when valid).
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
- * @param {object} params.node - The node.
- * @param {CleaningI18n} params.i18n - Translator.
  * @returns {string[]} The messages.
  */
 export const getNodeValidationMessages = ({

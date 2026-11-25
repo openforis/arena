@@ -47,14 +47,12 @@ const prefsKey = User.keysPrefs.mapCustomLayers
 
 /**
  * Reads the layers column of a row; anything malformed is dropped.
- * @param {LayersRow} row - The row.
  * @returns {MapCustomLayer[]|null} The layers, or null when no row was returned.
  */
 const toLayersOrNull = (row: LayersRow): MapCustomLayer[] | null => (row ? sanitizeMapCustomLayers(row.layers) : null)
 
 /**
  * Builds the path of the layers of a survey in the user prefs.
- * @param {number} surveyId - The survey id.
  * @returns {string[]} The jsonb path.
  */
 const userLayersPath = (surveyId: number): string[] => [prefsKey, String(surveyId)]
@@ -75,9 +73,6 @@ const freshLayersSql = (stored: string): string =>
 
 /**
  * Fetches the layers every user of a survey sees.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {MapCustomLayersDbClient} [client] - The database client.
  * @returns {Promise<MapCustomLayer[]>} The layers.
  */
 const fetchSurveyMapCustomLayers = async (
@@ -93,10 +88,8 @@ const fetchSurveyMapCustomLayers = async (
 /**
  * Appends layers to a survey in one statement, so two editors adding at once cannot exceed the limit.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {MapCustomLayer[]} params.layers - The layers to append.
  * @param {number} params.max - The maximum number of layers.
- * @param {MapCustomLayersDbClient} [client] - The database client.
  * @returns {Promise<MapCustomLayer[]|null>} All the survey layers, or null when the limit would be exceeded.
  */
 const appendSurveyMapCustomLayers = async (
@@ -118,10 +111,6 @@ const appendSurveyMapCustomLayers = async (
 
 /**
  * Removes a layer from a survey, keeping the order of the others.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.layerId - The layer id.
- * @param {MapCustomLayersDbClient} [client] - The database client.
  * @returns {Promise<MapCustomLayer[]|null>} The remaining layers, or null when the survey has none.
  */
 const removeSurveyMapCustomLayer = async (
@@ -149,10 +138,6 @@ const removeSurveyMapCustomLayer = async (
 
 /**
  * Fetches the layers a user added for themselves in a survey.
- * @param {object} params - Parameters.
- * @param {string} params.userUuid - The user uuid.
- * @param {number} params.surveyId - The survey id.
- * @param {MapCustomLayersDbClient} [client] - The database client.
  * @returns {Promise<MapCustomLayer[]>} The layers.
  */
 const fetchUserMapCustomLayers = async (
@@ -168,11 +153,8 @@ const fetchUserMapCustomLayers = async (
 /**
  * Appends layers to the user prefs of a survey in one statement.
  * @param {object} params - Parameters.
- * @param {string} params.userUuid - The user uuid.
- * @param {number} params.surveyId - The survey id.
  * @param {MapCustomLayer[]} params.layers - The layers to append.
  * @param {number} params.max - The maximum number of layers.
- * @param {MapCustomLayersDbClient} [client] - The database client.
  * @returns {Promise<MapCustomLayer[]|null>} All the user layers of the survey, or null when the limit would be exceeded.
  */
 const appendUserMapCustomLayers = async (
@@ -198,11 +180,6 @@ const appendUserMapCustomLayers = async (
 
 /**
  * Removes a layer from the user prefs of a survey, keeping the order of the others.
- * @param {object} params - Parameters.
- * @param {string} params.userUuid - The user uuid.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.layerId - The layer id.
- * @param {MapCustomLayersDbClient} [client] - The database client.
  * @returns {Promise<MapCustomLayer[]|null>} The remaining layers, or null when the user has none in the survey.
  */
 const removeUserMapCustomLayer = async (

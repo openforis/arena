@@ -114,7 +114,6 @@ const _determineRecordAccessByUserGroup = async ({
 /**
  * Parses the node carried by the body of a write request (a JSON string in multipart bodies). The query string is
  * never read: the route handler must read the node with this function too, so the checked node is the saved one.
- * @param {ExpressRequest} req - Express request.
  * @returns {ArenaRecordNode|null} The node, or null when the body has none.
  */
 export const getPendingNodeFromBody = (req: ExpressRequest): ArenaRecordNode | null => {

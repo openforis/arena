@@ -35,7 +35,6 @@ const toSingular = (token: string): string => {
 
 /**
  * Splits a text into search terms.
- * @param {string} text - Text.
  * @returns {string[]} The terms (lowercase, no accents, no stop words, singular).
  */
 export const tokenize = (text: string): string[] =>
@@ -59,7 +58,6 @@ export type HandbookSearchResult = HandbookSection & { truncated?: true }
 
 /**
  * Counts the terms of a section (title terms weigh more).
- * @param {HandbookSection} section - Section.
  * @returns {object} The term counts and the weighted length.
  */
 const countTerms = (section: HandbookSection): { termCounts: Map<string, number>; length: number } => {
@@ -78,7 +76,6 @@ const countTerms = (section: HandbookSection): { termCounts: Map<string, number>
 
 /**
  * Builds the search index of the handbook.
- * @param {Handbook} handbook - Handbook.
  * @returns {HandbookIndex} The index.
  */
 export const buildHandbookIndex = (handbook: Handbook): HandbookIndex => {
@@ -93,7 +90,6 @@ export const buildHandbookIndex = (handbook: Handbook): HandbookIndex => {
 
 /**
  * Computes the BM25 score of a section for the query terms.
- * @param {HandbookIndex} index - Index.
  * @param {IndexedSection} indexed - Section.
  * @param {string[]} terms - Query terms.
  * @returns {number} The score.
@@ -114,8 +110,6 @@ const scoreSection = (index: HandbookIndex, indexed: IndexedSection, terms: stri
 
 /**
  * Returns the sections that best match the query.
- * @param {HandbookIndex} index - Index.
- * @param {string} query - Query.
  * @param {object} [options] - Options.
  * @param {number} [options.limit] - Maximum number of sections.
  * @param {number} [options.maxChars] - Maximum text length per section.
@@ -148,7 +142,6 @@ const PART_SUFFIX = / \(\d+\/\d+\)$/
 /**
  * Returns the outline of the handbook ("<id> <title>" per line, parts merged). When it is too long, the deepest
  * levels are dropped.
- * @param {Handbook} handbook - Handbook.
  * @param {number} [maxChars] - Maximum length.
  * @returns {string} The outline.
  */

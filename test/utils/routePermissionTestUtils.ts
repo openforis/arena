@@ -28,7 +28,6 @@ export const buildUserWithoutGroups = (user: any) => ({
  * Creates a persisted non-admin user that is a member of a survey group.
  * @param {object} params - Parameters.
  * @param {object} params.admin - User performing the invitation.
- * @param {number} params.surveyId - Survey id.
  * @param {string} params.groupName - Survey group name (AuthGroup.groupNames).
  * @returns {Promise<any>} The user, with its auth groups.
  */
@@ -117,7 +116,6 @@ export const checkRouteAccess = async ({
  * Creates one persisted member per survey group (guests excluded), plus a user without groups and the system admin.
  * @param {object} params - Parameters.
  * @param {object} params.admin - System admin (also the inviter).
- * @param {number} params.surveyId - Survey id.
  * @returns {Promise<Record<string, any>>} Users by group name (`outsider` has no groups, `systemAdmin` is the admin).
  */
 export const createMembersOfAllGroups = async ({
@@ -156,8 +154,6 @@ export const deleteMembersOfAllGroups = async (members: Record<string, any>): Pr
  * @param {object} params - Parameters.
  * @param {object} params.route - Route with its handlers.
  * @param {Record<string, any>} params.members - Users by key (createMembersOfAllGroups).
- * @param {number} params.surveyId - Survey id.
- * @param {object} [params.body] - Request body.
  * @param {number} [params.handlerIndex] - Index of the middleware in the route chain.
  * @returns {Promise<Record<string, RouteAccess>>} The access by user key.
  */
@@ -198,7 +194,6 @@ export const accessGrantedTo = (members: Record<string, any>, allowed: string[])
  * @param {object} params - Parameters.
  * @param {object[]} params.routes - Routes to check.
  * @param {object} params.admin - System admin (also the inviter).
- * @param {number} params.surveyId - Survey id.
  * @returns {Promise<void>} Resolves when checked; the created users are deleted.
  */
 export const expectEditPermissionOnly = async ({
@@ -229,7 +224,6 @@ export const expectEditPermissionOnly = async ({
  * @param {object} params.route - Route with its handlers.
  * @param {object} [params.user] - Requesting user (undefined: not logged in).
  * @param {object} [params.params] - Route params (a route without `:surveyId` has none).
- * @param {object} [params.body] - Request body.
  * @returns {Promise<any>} The fake response (statusCode, body, writes).
  */
 export const runRouteChain = async ({

@@ -73,7 +73,6 @@ const prependPreamble = (rest: { role: ChatMessage['role']; text: string }[], pr
 
 /**
  * Converts the AI SDK prompt into chat messages; system content is prepended to the first user message.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @returns {ChatMessage[]} The chat messages.
  */
 export const vercelAiSdkMessagesFromPrompt = (prompt: LanguageModelV4Prompt): ChatMessage[] => {

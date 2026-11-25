@@ -32,8 +32,6 @@ const loadSceneIndexReader = (): Promise<SceneIndexReader> => {
 /**
  * Drops the session reader (parsed footers and cached rows) so the memory is released. The next search
  * loads a fresh one.
- *
- * @returns {void}
  */
 export const releaseSceneIndexReader = (): void => {
   readerPromise = null
@@ -42,8 +40,6 @@ export const releaseSceneIndexReader = (): void => {
 /**
  * Builds the key that identifies a search request.
  *
- * @param {string[]} tiles - Tiles.
- * @param {ScenePeriod} period - Period.
  * @param {number} attempt - Retry counter.
  * @returns {string} Request key.
  */

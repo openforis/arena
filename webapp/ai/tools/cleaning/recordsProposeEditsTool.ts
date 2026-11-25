@@ -97,8 +97,6 @@ export const createRecordsProposeEditsTool = ({
   inputSchema,
   /**
    * Builds the change set and hands it to the conversation; nothing is written.
-   * @param {Input} input - Tool input.
-   * @param {object} ctx - Tool context.
    * @returns {Promise<object>} The proposal result, or a tool error.
    */
   execute: async ({ summary, edits }, ctx) => {

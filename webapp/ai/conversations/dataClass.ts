@@ -10,7 +10,6 @@ export const isToolErrorOutput = (output: unknown): boolean =>
 
 /**
  * Returns the data class of a conversation.
- * @param {object} [conversation] - The conversation.
  * @returns {AiDataClass} Schema when missing, data when the stored value is unknown.
  */
 export const getConversationDataClass = (conversation?: { dataClass?: unknown } | null): AiDataClass => {
@@ -22,7 +21,6 @@ export const getConversationDataClass = (conversation?: { dataClass?: unknown } 
 /**
  * Raises the data class of a conversation; it never goes back down.
  * @param {object} params - Parameters.
- * @param {object} params.conversation - The conversation.
  * @param {AiDataClass} params.dataClass - Class of the content that entered the conversation.
  * @returns {object} The updated copy, or the same conversation when the class does not change.
  */

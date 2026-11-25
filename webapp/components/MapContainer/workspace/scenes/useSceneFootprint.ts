@@ -7,9 +7,7 @@ import { addSceneOutline, SCENE_FOOTPRINT_STYLE } from './sceneLeaflet'
 /**
  * Shows a dashed outline of the selected scene's MGRS 100 km square.
  *
- * @param {L.Map} map - Map.
  * @param {string|null} tile - Tile of the selected scene, or null.
- * @returns {void}
  */
 export const useSceneFootprint = (map: L.Map, tile: string | null): void => {
   useEffect(() => {

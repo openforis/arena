@@ -12,7 +12,6 @@ export type DesignDetectorScope = { survey: any; surveyId: number }
 
 /**
  * Returns the survey to inspect when Design detectors may run: a draft generation of a user who can edit.
- * @param {DetectorContext} ctx - Detector context.
  * @returns {DesignDetectorScope|null} The survey and its id; null when they must not run.
  */
 export const getDesignDetectorScope = (ctx: DetectorContext): DesignDetectorScope | null => {
@@ -24,10 +23,7 @@ export const getDesignDetectorScope = (ctx: DetectorContext): DesignDetectorScop
 /**
  * Builds a Design suggestion (cycle-independent, no expiry).
  * @param {object} params - Parameters.
- * @param {SuggestionKind} params.kind - Kind.
  * @param {string} params.scopeKey - Id part after the kind.
- * @param {number} params.surveyId - Survey id.
- * @param {string[]} params.targetKeys - Target keys.
  * @param {Date} params.now - Creation time.
  * @returns {AssistantSuggestion} The suggestion.
  */
@@ -56,7 +52,6 @@ export const newDesignSuggestion = ({
 
 /**
  * Returns an eligible node definition by uuid.
- * @param {object} survey - Survey.
  * @param {string} uuid - Node definition uuid.
  * @returns {object|null} The node definition; null when missing, deleted or not a design one.
  */
@@ -67,7 +62,6 @@ export const findDesignNodeDef = (survey: any, uuid: string): any => {
 
 /**
  * Returns the node definitions of a designer visit that are eligible and saved.
- * @param {object} survey - Survey.
  * @param {string[]} uuids - Uuids created during the visit.
  * @returns {object[]} The node definitions, in the given order.
  */
@@ -78,7 +72,6 @@ export const getNewSavedDesignNodeDefs = (survey: any, uuids: string[]): any[] =
 
 /**
  * Returns the node definition uuid of a target key (`<uuid>` or `<uuid>:<kind>`).
- * @param {string} targetKey - Target key.
  * @returns {string} The uuid.
  */
 export const getTargetNodeDefUuid = (targetKey: string): string => targetKey.split(':')[0]

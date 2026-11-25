@@ -178,10 +178,6 @@ const extractSchemaSummaryNodeDefs = (survey: ArenaSurvey, cycle: string) => {
 /**
  * Builds the schema summary row of a node def.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {object} params.nodeDef - Node def.
- * @param {string[]} params.languages - Survey languages.
- * @param {string} params.cycle - Cycle key.
  * @param {Record<string, string>|null} params.aiDescriptions - AI descriptions by uuid (null: no aiDescription column).
  * @param {string} params.fileFormat - csv or xlsx (formulas are neutralised for csv only).
  * @returns {object} The row.
@@ -269,7 +265,6 @@ const buildNodeDefItem = ({
 
 /**
  * Fetches the draft survey with its node defs (advanced props included).
- * @param {number|string} surveyId - Survey id.
  * @returns {Promise<object>} The survey.
  */
 const fetchSurvey = (surveyId: number): Promise<ArenaSurvey> =>
@@ -279,7 +274,6 @@ const DB_DEPS = { fetchSurvey }
 
 /**
  * Returns the default language of the survey (first language, else en).
- * @param {object} surveyInfo - Survey info.
  * @returns {string} The language code.
  */
 const getDefaultLang = (surveyInfo: ArenaSurvey): string =>
@@ -291,7 +285,6 @@ const getDefaultLang = (surveyInfo: ArenaSurvey): string =>
  * name), types and paths.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey with its node defs.
- * @param {string} params.cycle - Cycle key.
  * @returns {{surveyName: string, nodeDefs: {uuid: string, name: string, label?: string, type: string, parentPath: string}[]}} The items.
  */
 export const getSchemaSummaryAiItems = ({ survey, cycle }: { survey: ArenaSurvey; cycle: string }) => {
@@ -317,9 +310,6 @@ export const getSchemaSummaryAiItems = ({ survey, cycle }: { survey: ArenaSurvey
 
 /**
  * Fetches the survey and returns its node defs that need an AI description (see getSchemaSummaryAiItems).
- * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @returns {Promise<object>} The items.
  */
 export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle }: { surveyId: number; cycle: string }) =>
@@ -329,7 +319,6 @@ export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle }: { surveyId:
  * Builds the schema summary rows of a survey.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey with its node defs.
- * @param {string} params.cycle - Cycle key.
  * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
  * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
@@ -368,8 +357,6 @@ export const buildSchemaSummaryItems = ({
  * Fetches the survey (once) and builds its schema summary rows (see buildSchemaSummaryItems). The AI descriptions are
  * checked against the node defs of this survey.
  * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
  * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
@@ -407,9 +394,6 @@ export const generateSchemaSummaryItems = async (
 /**
  * Writes the schema summary (without AI descriptions) to the output stream (used by the R scripts' route).
  * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
- * @param {object} params.outputStream - Output stream.
  * @param {string} params.fileFormat - csv or xlsx.
  * @returns {Promise<void>} Resolves when written.
  */

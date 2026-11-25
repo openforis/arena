@@ -27,7 +27,6 @@ type AnyOperation = NodeDefOperation | NodeDefOperationDraft
 
 /**
  * Returns the uuid of the node definition the operation works on.
- * @param {ChangeOperation} op - Operation.
  * @returns {string} The uuid.
  */
 export const getOperationNodeDefUuid = (op: AnyOperation): string =>
@@ -35,7 +34,6 @@ export const getOperationNodeDefUuid = (op: AnyOperation): string =>
 
 /**
  * Returns a key identifying the property the operation changes (two operations with the same key conflict).
- * @param {ChangeOperation} op - Operation.
  * @returns {string|null} The key, null for creates.
  */
 export const getOperationTargetKey = (op: AnyOperation): string | null => {
@@ -46,8 +44,6 @@ export const getOperationTargetKey = (op: AnyOperation): string | null => {
 
 /**
  * Returns the value of a basic property.
- * @param {object} nodeDef - Node definition.
- * @param {NodeDefBasicProp} prop - Property.
  * @returns {string|boolean} The value (booleans default to false).
  */
 export const getBasicPropValue = (nodeDef: any, prop: NodeDefBasicProp): string | boolean =>
@@ -55,8 +51,6 @@ export const getBasicPropValue = (nodeDef: any, prop: NodeDefBasicProp): string 
 
 /**
  * Returns the value of an update property.
- * @param {object} nodeDef - Node definition.
- * @param {NodeDefUpdateProp} prop - Property.
  * @returns {string|boolean|null} The value; null for a reference that is not set.
  */
 export const getUpdatePropValue = (nodeDef: any, prop: NodeDefUpdateProp): string | boolean | null =>
@@ -66,8 +60,6 @@ export const getUpdatePropValue = (nodeDef: any, prop: NodeDefUpdateProp): strin
 
 /**
  * Tells whether the designer lets the category or taxonomy of a node definition change.
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @param {NodeDefRefProp} prop - Reference property.
  * @returns {boolean} True when it may change (CodeProps / TaxonProps rules).
  */
@@ -79,7 +71,6 @@ export const canUpdateNodeDefRef = (survey: any, nodeDef: any, prop: NodeDefRefP
 
 /**
  * Returns the category or taxonomy a reference points to.
- * @param {object} survey - Survey.
  * @param {NodeDefRefProp} prop - Reference property.
  * @param {string} uuid - Category or taxonomy uuid.
  * @returns {object|null} The category or taxonomy; null when it is not in the survey.
@@ -89,7 +80,6 @@ export const findNodeDefRef = (survey: any, prop: NodeDefRefProp, uuid: string):
 
 /**
  * Returns the name of the category or taxonomy a reference points to.
- * @param {object} survey - Survey.
  * @param {NodeDefRefProp} prop - Reference property.
  * @param {string|null} uuid - Category or taxonomy uuid.
  * @returns {string|null} The name; the uuid when it is not in the survey; null when not set.
@@ -103,9 +93,7 @@ export const getNodeDefRefName = (survey: any, prop: NodeDefRefProp, uuid: strin
 
 /**
  * Returns a label or description in a language.
- * @param {object} nodeDef - Node definition.
  * @param {LabelKind} kind - Labels or descriptions.
- * @param {string} lang - Language.
  * @returns {string|null} The text, null when missing or empty.
  */
 export const getLabelValue = (nodeDef: any, kind: LabelKind, lang: string): string | null => {
@@ -115,7 +103,6 @@ export const getLabelValue = (nodeDef: any, kind: LabelKind, lang: string): stri
 
 /**
  * Returns the current value of what an update operation changes (compared with its `from`).
- * @param {object} nodeDef - Node definition.
  * @param {ChangeOperation} op - A non-create operation.
  * @returns {unknown} The current value.
  */
@@ -142,8 +129,6 @@ const applyUpdate = (nodeDef: any, op: { prop: string; to: unknown }, survey: an
 
 /**
  * Applies a non-create operation to a node definition.
- * @param {object} nodeDef - Node definition.
- * @param {ChangeOperation} op - Operation.
  * @param {object} survey - Survey the node definition belongs to (the layout side effect of `multiple` reads it).
  * @returns {object} The updated node definition.
  */
@@ -157,8 +142,6 @@ export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation, survey: 
 
 /**
  * Applies an operation to a survey (a new survey object; the dependency graph is not rebuilt).
- * @param {object} survey - Survey.
- * @param {ChangeOperation} op - Operation.
  * @returns {object} The updated survey.
  */
 export const applyOperationToSurvey = (survey: any, op: AnyOperation): any => {

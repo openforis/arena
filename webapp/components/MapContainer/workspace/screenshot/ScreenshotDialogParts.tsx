@@ -40,8 +40,6 @@ export const ScreenshotPreviewBox = ({
 
 /**
  * Renders a notice under the preview (tiles left out, Equal Earth, errors).
- * @param {object} props - The props.
- * @param {ScreenshotNotice} props.notice - The notice.
  * @returns {React.ReactElement} The notice line.
  */
 export const ScreenshotNoticeLine = ({ notice }: { notice: ScreenshotNotice }): React.ReactElement => {

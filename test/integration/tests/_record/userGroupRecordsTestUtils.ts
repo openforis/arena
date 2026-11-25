@@ -71,7 +71,6 @@ export const restoreUserGroupService = (userGroupServicePrev: any): void => {
 
 /**
  * Creates and publishes the survey, its records and user groups, and adds the user to the "control" group.
- * @param {any} user - The user.
  * @returns {Promise<{survey: any, recordUuidsByClusterNo: {[clusterNo: number]: string}}>} - The survey and the record UUIDs by cluster number.
  */
 export const createSurveyWithUserGroupRecords = async (
@@ -119,9 +118,6 @@ export const createSurveyWithUserGroupRecords = async (
 
 /**
  * Removes the user from its user groups and deletes the survey (if created).
- * @param {object} params - The parameters.
- * @param {any} params.user - The user.
- * @param {any} [params.survey] - The survey.
  * @returns {Promise<void>} - Promise resolved when the data is deleted.
  */
 export const deleteSurveyWithUserGroupRecords = async ({ user, survey }: { user: any; survey?: any }) => {

@@ -8,8 +8,6 @@ import { type SuggestionUserState, toBucket } from './types'
 
 /**
  * Returns the pending suggestions of a bucket.
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
  * @returns {AssistantSuggestion[]} The suggestions (raw: dismissed and in-progress targets included).
  */
 export const getPendingOf = (state: SuggestionUserState, bucket: string): AssistantSuggestion[] =>
@@ -17,9 +15,6 @@ export const getPendingOf = (state: SuggestionUserState, bucket: string): Assist
 
 /**
  * Returns the state with the pending suggestions of a bucket replaced (an empty list removes the bucket).
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
- * @param {AssistantSuggestion[]} suggestions - Suggestions.
  * @returns {SuggestionUserState} The new state.
  */
 export const setPending = (
@@ -33,8 +28,6 @@ export const setPending = (
 
 /**
  * Returns the pending suggestion with an id.
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
  * @param {string} id - Suggestion id.
  * @returns {AssistantSuggestion|undefined} The suggestion.
  */
@@ -43,8 +36,6 @@ export const findPending = (state: SuggestionUserState, bucket: string, id: stri
 
 /**
  * Returns the state with one pending suggestion replaced in place (null or no target removes it).
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
  * @param {string} id - Suggestion id.
  * @param {AssistantSuggestion|null} next - Replacement.
  * @returns {SuggestionUserState} The new state.
@@ -77,8 +68,6 @@ export const mergeTargets = (current: SuggestionTarget[], added: SuggestionTarge
 
 /**
  * Adds a suggestion (event detectors); one with the same id keeps its fields and unites the targets.
- * @param {SuggestionUserState} state - State.
- * @param {AssistantSuggestion} suggestion - Suggestion.
  * @returns {SuggestionUserState} The new state (the same object when there is no target).
  */
 export const withAdded = (state: SuggestionUserState, suggestion: AssistantSuggestion): SuggestionUserState => {
@@ -94,9 +83,7 @@ export const withAdded = (state: SuggestionUserState, suggestion: AssistantSugge
 
 /**
  * Removes a pending suggestion; its in-progress and dismissed entries stay.
- * @param {SuggestionUserState} state - State.
  * @param {object} params - Parameters.
- * @param {string} params.bucket - Bucket.
  * @param {string} params.id - Suggestion id.
  * @returns {SuggestionUserState} The new state.
  */

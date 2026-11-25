@@ -4,7 +4,6 @@ import { parseXmlDocument, type XmlElement } from '@server/modules/geo/service/m
 /**
  * Builds a TileMatrixSet element.
  * @param {object} params - Parameters.
- * @param {string} params.id - The identifier.
  * @param {string} params.crs - The SupportedCRS.
  * @param {string} params.prefix - The TileMatrix identifier prefix.
  * @param {number} params.count - The number of matrices.

@@ -92,7 +92,6 @@ const readSurveyFileFromZip = async ({ filePath, fileUuid }): Promise<Buffer | n
  * Reads the source survey of a comparison and runs a function with it.
  * @param {SurveyCompareSourceRef} sourceRef - Reference to the source survey.
  * @param {Function} fn - Function receiving the source survey.
- * @param {any} [client] - Database client.
  * @returns {Promise<any>} - The result of the function.
  */
 export const withSource = async <T>(

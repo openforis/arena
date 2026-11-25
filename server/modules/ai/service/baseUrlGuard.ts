@@ -72,7 +72,6 @@ export const assertBaseUrlAllowed = async (
  * Runs {@link assertBaseUrlAllowed} for the providers whose base URL is typed by the user.
  * @param {object} cfg - Provider config.
  * @param {string} cfg.provider - Provider key.
- * @param {string} [cfg.baseUrl] - Base URL.
  * @param {object} [options] - Guard options (see assertBaseUrlAllowed).
  * @returns {Promise<void>} Resolves when allowed (or not applicable).
  */

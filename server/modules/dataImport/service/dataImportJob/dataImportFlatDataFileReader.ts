@@ -64,10 +64,8 @@ const _validateHeaders =
  * @param {!object} params - The parameters object.
  * @param {!string} [params.stream] - File stream to be read.
  * @param {!string} [params.fileFormat] - Format of the input file (csv or xlsx).
- * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.categoryItemProvider] - The category item provider module.
  * @param {!object} [params.taxonProvider] - The taxon provider module.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes or not.

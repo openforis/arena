@@ -9,7 +9,6 @@ export const MIN_POLYGON_VERTICES = 3
 
 /**
  * Tells whether a value looks like a Leaflet LatLng.
- * @param {unknown} value - The value to check.
  * @returns {boolean} True when the value is an object with finite lat and lng numbers.
  */
 const isLatLngLike = (value: unknown): value is LatLngLike => {
@@ -60,7 +59,6 @@ export const toOpenRing = (vertices: LatLngPair[]): LatLngPair[] => {
 
 /**
  * Converts [lat, lng] pairs into GeoJSON [lng, lat] positions.
- * @param {LatLngPair[]} pairs - The pairs.
  * @returns {number[][]} The GeoJSON positions.
  */
 const toPositions = (pairs: LatLngPair[]): number[][] => pairs.map(([lat, lng]) => [lng, lat])

@@ -17,7 +17,6 @@ describe('daily budget of the Arena default provider: the charger (322)', () => 
 
   /**
    * Builds a charger around a fake repository that records its calls.
-   * @param {object} params - Parameters.
    * @returns {object} The charger and the recorded calls.
    */
   const createCharger = ({
@@ -115,7 +114,6 @@ describe('daily budget: the gateway charges the Arena default only (322)', () =>
 
   /**
    * Builds the gateway dependencies; every step appends its name to `events`.
-   * @param {object} [params] - Parameters.
    * @returns {object} The dependencies, the model and the recorded events.
    */
   const createDeps = ({
@@ -159,8 +157,6 @@ describe('daily budget: the gateway charges the Arena default only (322)', () =>
 
   /**
    * Runs one gateway request.
-   * @param {object} body - Request body.
-   * @param {object} deps - Dependencies.
    * @returns {Promise<object>} The fake response.
    */
   const run = async (body: unknown, deps: any) => {

@@ -35,7 +35,6 @@ const getJobEvents = (job: any): SuggestionEvent[] => {
 
 /**
  * Returns the suggestion events of an action.
- * @param {any} action - Redux action.
  * @returns {SuggestionEvent[]} The events (none for most actions).
  */
 const getEvents = (action: any): SuggestionEvent[] => {

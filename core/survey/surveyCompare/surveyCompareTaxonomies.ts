@@ -36,7 +36,6 @@ export const normalizeTaxonomy = (taxonomy: any) =>
 
 /**
  * Key identifying a vernacular name in a taxon (language and name).
- * @param {any} vernacularName - The vernacular name.
  * @returns {string} - The key.
  */
 export const vernacularNameKey = (vernacularName: any): string =>
@@ -61,7 +60,6 @@ export const normalizeTaxon = (taxon: any) =>
 
 /**
  * Indexes taxa by code.
- * @param {any[]} taxa - The taxa.
  * @returns {Record<string, any>} - Taxa indexed by code.
  */
 export const indexTaxaByCode = (taxa: any[] = []): Record<string, any> =>
@@ -69,9 +67,6 @@ export const indexTaxaByCode = (taxa: any[] = []): Record<string, any> =>
 
 /**
  * Vernacular names of the target taxon that are not in the source one.
- * @param {object} params - The parameters.
- * @param {any} params.sourceTaxon - Source taxon.
- * @param {any} params.targetTaxon - Target taxon.
  * @returns {any[]} - The vernacular names only in the target taxon.
  */
 export const getTargetOnlyVernacularNames = ({ sourceTaxon, targetTaxon }): any[] => {
@@ -220,8 +215,6 @@ const newUnmatchedTaxonomyDiff = ({ taxonomy, taxa, added }): SurveyCompareTaxon
 /**
  * Compares the taxonomies (and their taxa) of two surveys. Taxonomies are matched by uuid, then by name; taxa by code.
  * @param {object} params - The parameters.
- * @param {any} params.sourceSurvey - Source survey.
- * @param {any} params.targetSurvey - Target survey.
  * @param {TaxaByTaxonomyUuid} [params.sourceTaxaByTaxonomyUuid] - Taxa of the source survey taxonomies.
  * @param {TaxaByTaxonomyUuid} [params.targetTaxaByTaxonomyUuid] - Taxa of the target survey taxonomies.
  * @returns {SurveyCompareTaxonomyDiff[]} - The taxonomy diffs, sorted by name.

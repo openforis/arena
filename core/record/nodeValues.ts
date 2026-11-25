@@ -166,7 +166,6 @@ const valueComparatorByNodeDefType: Record<string, ValueComparator> = {
 /**
  * Compares 2 attribute values according to their properties (depending on the attribute definition).
  * @param params - The function parameters.
- * @param params.survey - The survey object.
  * @param params.nodeDef - The node def of the compared values.
  * @param params.value - The 1st value to compare.
  * @param params.valueSearch - The 2nd value to compare.
@@ -229,7 +228,6 @@ const isTypeFastIndexable = (nodeDefType: string): boolean =>
  * caller. Do NOT reuse this outside of that context: hierarchical code attributes need the
  * record/parentNode-aware resolution in isValueEqual and are intentionally unsupported here.
  * @param params - The function parameters.
- * @param params.survey - The survey object.
  * @param params.nodeDef - The node def of the compared value.
  * @param params.value - The value to compute the key for.
  * @returns supported is false if the node def type isn't indexable this way; key is null when the value is empty (see above).
@@ -301,7 +299,6 @@ const getFastEqualityKeyInRecordContext = ({
  * produce the same key, regardless of their content (no separator character to collide on, unlike a plain join
  * or a doubled-separator escape - which is still ambiguous for values that are themselves runs of the separator
  * straddling a part boundary, e.g. ["\u0001\u0001", "X"] vs ["\u0001", "\u0001X"]).
- * @param keyParts - The key parts.
  * @returns The composite key.
  */
 const buildCompositeKey = (keyParts: string[]): string =>

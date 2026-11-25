@@ -28,7 +28,6 @@ const midnight = (date: Date, daysBefore: number): number =>
  * Returns the day group of a conversation, in local time.
  * @param {object} params - Parameters.
  * @param {string} params.updatedAt - Last update (ISO).
- * @param {Date} params.now - Current time.
  * @returns {ConversationDayKey} today (also for a later time), yesterday or earlier.
  */
 export const getConversationDayKey = ({ updatedAt, now }: { updatedAt: string; now: Date }): ConversationDayKey => {
@@ -40,7 +39,6 @@ export const getConversationDayKey = ({ updatedAt, now }: { updatedAt: string; n
 /**
  * Returns the conversations whose title contains the query.
  * @param {object} params - Parameters.
- * @param {Conversation[]} params.conversations - Conversations.
  * @param {string} params.query - Typed search (case and surrounding spaces ignored).
  * @returns {Conversation[]} The matching conversations; all of them for a blank query.
  */
@@ -58,9 +56,6 @@ export const filterConversations = ({
 
 /**
  * Groups conversations by day, newest first in each group.
- * @param {object} params - Parameters.
- * @param {Conversation[]} params.conversations - Conversations.
- * @param {Date} params.now - Current time.
  * @returns {ConversationDayGroup[]} Today, yesterday and earlier, without the empty groups.
  */
 export const groupConversationsByDay = ({
@@ -86,7 +81,6 @@ export const groupConversationsByDay = ({
  * Returns how the time of a row is shown.
  * @param {object} params - Parameters.
  * @param {string} params.updatedAt - Last update (ISO).
- * @param {Date} params.now - Current time.
  * @returns {Intl.DateTimeFormatOptions} The time for today and yesterday, the date before.
  */
 export const getConversationTimeFormat = ({
@@ -101,7 +95,6 @@ export const getConversationTimeFormat = ({
  * Formats the time of a row in the UI language.
  * @param {object} params - Parameters.
  * @param {string} params.updatedAt - Last update (ISO).
- * @param {Date} params.now - Current time.
  * @param {string} params.lang - UI language.
  * @returns {string} For example 14:52 or 3 Oct.
  */

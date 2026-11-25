@@ -10,7 +10,6 @@ import { type DismissedEntry, emptySuggestionState, type InProgressEntry, type S
 
 /**
  * Returns true for a valid target.
- * @param {unknown} value - Value.
  * @returns {boolean} True when valid.
  */
 const isTarget = (value: unknown): value is SuggestionTarget =>
@@ -20,7 +19,6 @@ const isTarget = (value: unknown): value is SuggestionTarget =>
 
 /**
  * Returns true for a valid suggestion.
- * @param {unknown} value - Value.
  * @returns {boolean} True when valid.
  */
 const isSuggestion = (value: unknown): value is AssistantSuggestion =>
@@ -38,7 +36,6 @@ const isSuggestion = (value: unknown): value is AssistantSuggestion =>
 
 /**
  * Parses a record, keeping the entries the parser accepts (Object.fromEntries: "__proto__" stays an own key).
- * @param {unknown} value - Raw value.
  * @param {Function} parseEntry - Receives the entry and its key; returns the parsed entry, or null to drop it.
  * @returns {Record<string, T>|null} The record, or null when nothing is left.
  */
@@ -68,7 +65,6 @@ const getKindOfId = (id: string): SuggestionKind | null => {
 
 /**
  * Parses the suggestions of a bucket.
- * @param {unknown} value - Raw value.
  * @returns {AssistantSuggestion[]|null} The valid suggestions, or null when none.
  */
 const parsePendingBucket = (value: unknown): AssistantSuggestion[] | null => {
@@ -79,7 +75,6 @@ const parsePendingBucket = (value: unknown): AssistantSuggestion[] | null => {
 
 /**
  * Parses a dismissed target value.
- * @param {unknown} value - Raw value.
  * @returns {number|true|null} The count or true, or null when invalid.
  */
 const parseDismissedValue = (value: unknown): number | true | null =>
@@ -88,7 +83,6 @@ const parseDismissedValue = (value: unknown): number | true | null =>
 /**
  * Parses the dismissed entry of a suggestion: `{ kind, targets }`, or the legacy record of targets alone (its values
  * are never strings, so a string `kind` tells the new shape).
- * @param {unknown} value - Raw value.
  * @param {string} id - Suggestion id.
  * @returns {DismissedEntry|null} The entry, or null when invalid.
  */
@@ -102,7 +96,6 @@ const parseDismissedEntry = (value: unknown, id: string): DismissedEntry | null 
 
 /**
  * Parses the in-progress entry of a suggestion (the kind is missing in the legacy shape).
- * @param {unknown} value - Raw value.
  * @param {string} id - Suggestion id.
  * @returns {InProgressEntry|null} The entry, or null when invalid.
  */
@@ -116,7 +109,6 @@ const parseInProgressEntry = (value: unknown, id: string): InProgressEntry | nul
 
 /**
  * Parses the last-written times of the buckets: finite numbers only.
- * @param {unknown} value - Raw value.
  * @returns {Record<string, number>|null} The times, or null when none is valid.
  */
 const parseTouchedAt = (value: unknown): Record<string, number> | null =>

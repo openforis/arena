@@ -15,7 +15,6 @@ const invalid = (reason: string): SystemError =>
 
 /**
  * Returns true for a plain object (not null, not an array).
- * @param {unknown} value - Value.
  * @returns {boolean} True for a plain object.
  */
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
@@ -62,7 +61,6 @@ export const parseAiDescriptionsFailedCount = (raw: unknown): number => {
  * Rejects the body of a tab opened before the deploy: it asks for server-generated descriptions, which no longer
  * exist, and would otherwise get an export silently without the column.
  * @param {object} body - Request parameters.
- * @returns {void}
  * @throws {SystemError} aiIncludeAiDescriptionsRemoved (400) when the body has includeAiDescriptions.
  */
 export const assertNoLegacyIncludeAiDescriptions = (body: Record<string, unknown>): void => {

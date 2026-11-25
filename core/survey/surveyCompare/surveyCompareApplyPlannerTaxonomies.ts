@@ -162,7 +162,6 @@ const planTaxonomyRemoval = ({ params, diff, plan }) => {
  * @param {SurveyCompareTaxonomyDiff[]} params.diffs - Taxonomy diffs.
  * @param {Set<string>} params.appliedIds - Ids of the changes to apply.
  * @param {TaxonomiesApplyPlan} params.plan - The plan to fill.
- * @returns {void}
  */
 export const planTaxonomies = ({
   params,

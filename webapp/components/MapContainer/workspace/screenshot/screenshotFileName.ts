@@ -13,7 +13,6 @@ const pad2 = (value: number): string => String(value).padStart(2, '0')
 
 /**
  * Formats a date as yyyy-mm-dd in local time.
- * @param {Date} date - The date.
  * @returns {string} The formatted date.
  */
 export const formatIsoDate = (date: Date): string =>
@@ -23,7 +22,6 @@ const FILE_NAME_SEPARATORS = new Set(['.', '_', '-'])
 
 /**
  * Returns a record key value as text.
- * @param {unknown} key - The key value.
  * @returns {string} The text; '' for missing values and objects.
  */
 export const toKeyText = (key: unknown): string =>
@@ -31,7 +29,6 @@ export const toKeyText = (key: unknown): string =>
 
 /**
  * Keeps letters, digits, dots, dashes and underscores; other runs become "_", separators at the ends are dropped.
- * @param {string} text - The text.
  * @returns {string} The sanitized text (possibly empty).
  */
 export const sanitizeFileNamePart = (text: string): string => {
@@ -49,7 +46,6 @@ export const sanitizeFileNamePart = (text: string): string => {
 
 /**
  * Cuts a text to a number of code points, never splitting a surrogate pair.
- * @param {string} text - The text.
  * @param {number} max - The max number of code points.
  * @returns {string} The cut text.
  */

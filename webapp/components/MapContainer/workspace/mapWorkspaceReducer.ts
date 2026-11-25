@@ -19,7 +19,6 @@ export const initialMapWorkspaceState = (railTab: MapRailTabKey | null): MapWork
 
 /**
  * Sets the rail tab, returning the same state when nothing changes so React skips the re-render.
- * @param {MapWorkspaceState} state - Current state.
  * @param {MapRailTabKey|null} railTab - The rail tab to set.
  * @returns {MapWorkspaceState} The new state.
  */
@@ -28,7 +27,6 @@ const withRailTab = (state: MapWorkspaceState, railTab: MapRailTabKey | null): M
 
 /**
  * Sets the active tool, returning the same state when nothing changes.
- * @param {MapWorkspaceState} state - Current state.
  * @param {MapToolKey|null} activeTool - The tool to set.
  * @returns {MapWorkspaceState} The new state.
  */
@@ -37,7 +35,6 @@ const withTool = (state: MapWorkspaceState, activeTool: MapToolKey | null): MapW
 
 /**
  * Sets the open dialog, returning the same state when nothing changes.
- * @param {MapWorkspaceState} state - Current state.
  * @param {MapDialogKey|null} dialog - The dialog to set.
  * @returns {MapWorkspaceState} The new state.
  */
@@ -46,8 +43,6 @@ const withDialog = (state: MapWorkspaceState, dialog: MapDialogKey | null): MapW
 
 /**
  * Applies a workspace action.
- * @param {MapWorkspaceState} state - Current state.
- * @param {MapWorkspaceAction} action - Action.
  * @returns {MapWorkspaceState} The next state (the same object when nothing changes).
  */
 export const mapWorkspaceReducer = (state: MapWorkspaceState, action: MapWorkspaceAction): MapWorkspaceState => {

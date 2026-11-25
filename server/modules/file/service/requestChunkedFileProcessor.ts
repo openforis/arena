@@ -83,8 +83,6 @@ export type ChunkedFileUploadResult = {
  * Processes an uploaded file request without merging the last chunked upload.
  * Returns the original file path for single-file uploads, chunk metadata for completed chunked uploads,
  * or null while chunks are still being uploaded.
- * @param {object} params - Function parameters.
- * @param {object} params.req - The HTTP request.
  * @returns {Promise<{filePath?: string, fileId?: string, totalChunks?: number, totalFileSize?: number}|null>} The file path or chunk metadata when upload is complete; otherwise null.
  */
 export const processChunkedFileForBackgroundMerge = async ({

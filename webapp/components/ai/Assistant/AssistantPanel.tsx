@@ -37,7 +37,6 @@ const areaTabLabelKeys: Record<AssistantArea, string> = {
  * Area tabs (disabled while an answer runs), not shown for a single area; a dot marks the tabs with suggestions.
  * @param {object} props - Props.
  * @param {AssistantAreaStatus[]} props.statuses - Area statuses.
- * @param {AssistantArea} props.area - Current area.
  * @param {boolean} props.busy - An answer is running.
  * @param {SuggestionsByArea} props.byArea - Visible suggestions of each area.
  * @returns {React.ReactElement} The tabs.
@@ -141,7 +140,6 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
  * @param {object} props - Props.
  * @param {AssistantAreaStatus|undefined} props.status - Status of the area.
  * @param {AssistantPanelView} props.view - Home, chat or one of the lists.
- * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @param {AssistantSuggestion[]} props.suggestions - Visible suggestions of the area.
  * @returns {React.ReactElement} The body.
@@ -212,8 +210,6 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
 
   /**
    * Esc closes the panel.
-   * @param {React.KeyboardEvent} event - Key event.
-   * @returns {void} Nothing.
    */
   const onKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key !== 'Escape') return

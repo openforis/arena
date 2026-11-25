@@ -161,7 +161,6 @@ export const selectShownConversation = (
 
 /**
  * Returns the key of a scope (history and the provider pick belong to it).
- * @param {AssistantConversationScope} scope - Scope.
  * @returns {string} The key.
  */
 const toScopeKey = ({ userUuid, surveyId, area }: AssistantConversationScope): string =>
@@ -220,7 +219,6 @@ export const createAssistantConversationController = (
   /**
    * Merges changes into the state and notifies the listeners.
    * @param {Partial<AssistantConversationState>} changes - State changes.
-   * @returns {void}
    */
   const set = (changes: Partial<AssistantConversationState>) => {
     state = { ...state, ...changes }
@@ -304,7 +302,6 @@ export const createAssistantConversationController = (
 
   /**
    * Loads the selected conversation, unless it is the one in memory.
-   * @returns {void}
    */
   const loadSelection = () => {
     loadToken += 1
@@ -634,7 +631,6 @@ export const createAssistantConversationController = (
    * Runs an Apply or Discard of a card unless another one runs (also blocks new turns meanwhile). It is tracked, so
    * logout waits for the results to be saved.
    * @param {Function} action - Receives the conversation id and the registry generation.
-   * @returns {Promise<void>} Resolves when done.
    */
   const runCardAction = async (action: (id: string, generation: number) => Promise<void>) => {
     const id = getShown()?.id

@@ -44,7 +44,6 @@ type ProposalContext = {
 
 /**
  * Builds a rejection of an edit.
- * @param {IndexedEdit} edit - The edit.
  * @param {EditRefusal} refusal - Why it is refused.
  * @returns {RecordEditRejection} The rejection.
  */
@@ -58,7 +57,6 @@ const reject = (edit: IndexedEdit, { code, message }: EditRefusal): RecordEditRe
 
 /**
  * Groups the edits by record, keeping their index in the proposal.
- * @param {RecordEditInput[]} edits - The edits.
  * @returns {Map<string, IndexedEdit[]>} Edits by record uuid, in proposal order.
  */
 const groupByRecord = (edits: RecordEditInput[]): Map<string, IndexedEdit[]> => {
@@ -75,8 +73,6 @@ const groupByRecord = (edits: RecordEditInput[]): Map<string, IndexedEdit[]> => 
  * Parses the value of an edit; an invalid value becomes a refusal with the translated parser message.
  * @param {object} params - Parameters.
  * @param {ProposalContext} params.context - Proposal context.
- * @param {object} params.record - The record.
- * @param {object} params.node - The node.
  * @param {object} params.nodeDef - Its definition.
  * @param {NodeValueInput} params.value - The value written by the model.
  * @returns {Promise<{parsed?: ParsedNodeValue, refusal?: EditRefusal}>} The parsed value or the refusal.
@@ -116,8 +112,6 @@ const parseEditValue = async ({
  * Checks and parses one edit of a loaded record.
  * @param {object} params - Parameters.
  * @param {ProposalContext} params.context - Proposal context.
- * @param {object} params.record - The record.
- * @param {IndexedEdit} params.edit - The edit.
  * @param {Set<string>} params.seenNodeUuids - Nodes already edited in this proposal.
  * @returns {Promise<{prepared?: PreparedEdit, refusal?: EditRefusal}>} The prepared edit or the refusal.
  */
@@ -165,7 +159,6 @@ const prepareEdit = async ({
  * Builds the operation drafts of the prepared edits of a record, with their preview.
  * @param {object} params - Parameters.
  * @param {ProposalContext} params.context - Proposal context.
- * @param {object} params.record - The record.
  * @param {PreparedEdit[]} params.prepared - Prepared edits.
  * @returns {Promise<ChangeOperationDraft[]>} The drafts, in proposal order.
  */
@@ -223,8 +216,6 @@ const cycleRefusal: EditRefusal = {
  * Proposes the edits of one record: loads it once, checks the permissions, parses and previews.
  * @param {object} params - Parameters.
  * @param {ProposalContext} params.context - Proposal context.
- * @param {string} params.recordUuid - Record uuid.
- * @param {IndexedEdit[]} params.edits - Its edits.
  * @returns {Promise<{drafts: ChangeOperationDraft[], rejected: RecordEditRejection[]}>} Drafts and rejections.
  */
 const proposeRecordEdits = async ({

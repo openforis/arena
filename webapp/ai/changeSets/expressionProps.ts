@@ -27,8 +27,6 @@ export const singleExpressionProps: readonly NodeDefExpressionProp[] = ['applica
 
 /**
  * Returns the expressions of an expression property.
- * @param {object} nodeDef - Node definition.
- * @param {NodeDefExpressionProp} prop - Property.
  * @returns {object[]} The expressions (empty when none).
  */
 export const getExpressionProp = (nodeDef: any, prop: NodeDefExpressionProp): any[] =>
@@ -38,8 +36,6 @@ export const getExpressionProp = (nodeDef: any, prop: NodeDefExpressionProp): an
 
 /**
  * Returns the node definition with the expressions of a property replaced.
- * @param {object} nodeDef - Node definition.
- * @param {NodeDefExpressionProp} prop - Property.
  * @param {object[]} expressions - New expressions.
  * @returns {object} The updated node definition.
  */
@@ -57,7 +53,6 @@ export const setExpressionProp = (nodeDef: any, prop: NodeDefExpressionProp, exp
  * @param {object} params.nodeDef - Node definition the expression belongs to.
  * @param {NodeDefExpressionProp} params.prop - Property (sets the context).
  * @param {string} params.exprString - Expression.
- * @param {Translate} params.t - Translator.
  * @returns {Promise<string|null>} The translated error, or null when valid.
  */
 export const checkExpressionString = async ({
@@ -91,11 +86,7 @@ export const checkExpressionString = async ({
 /**
  * Checks an expression and its applyIf.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {object} params.nodeDef - Node definition.
- * @param {NodeDefExpressionProp} params.prop - Property.
  * @param {object} params.expression - Node definition expression.
- * @param {Translate} params.t - Translator.
  * @returns {Promise<string[]>} The messages (empty when valid); applyIf messages start with "applyIf: ".
  */
 export const checkNodeDefExpression = async ({

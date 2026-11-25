@@ -7,8 +7,6 @@ const PLOT_HALF_SIZE_DEGREES = 0.01
 /**
  * Builds the overlay registry id of a scene layer.
  *
- * @param {string} sceneId - Scene id.
- * @param {SceneBandMix} bandMix - Band mix.
  * @param {boolean} asBase - True when used as base map.
  * @returns {string} Overlay id.
  */
@@ -52,7 +50,6 @@ export const boundsAroundPoint = (lat: number, lng: number, halfSizeDegrees = PL
  *
  * @param {Array<{id: string}>} overlays - Registered overlays.
  * @param {(id: string) => void} removeOverlay - Registry remove function.
- * @returns {void}
  */
 export const removeBaseSceneOverlays = (overlays: Array<{ id: string }>, removeOverlay: (id: string) => void): void => {
   for (const overlay of overlays) {

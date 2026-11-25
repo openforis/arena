@@ -74,7 +74,6 @@ const aiPrefsKey: ServerOnlyPrefsKey = 'ai'
  * Removes the AI settings and providers (`prefs.ai`) of the user, so a test does not inherit the AI access level,
  * toggles, providers or default provider that the previous test left on the shared worker user. The usage counters
  * (`prefs.aiUsage`) are kept.
- * @param {TestUser} user - The user.
  * @returns {Promise<void>} - Resolves when the prefs are reset.
  */
 export const resetTestUserAiPrefs = async (user: TestUser): Promise<void> => {
@@ -110,10 +109,7 @@ export const getWorkerDataEditor = (parallelIndex: number): TestUser => ({
  * Inserts the user if missing, adds it to the survey editor group of the survey and sets the survey as its
  * current survey (and marks the "What's new" items as seen).
  * @param {object} params - Parameters.
- * @param {TestUser} params.user - The user.
- * @param {number} params.surveyId - Survey id.
  * @param {string} [params.groupName] - Survey group name (default surveyEditor).
- * @returns {Promise<void>} - Resolves when done.
  */
 export const insertSurveyEditor = ({
   user,

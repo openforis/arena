@@ -94,7 +94,6 @@ export const testMapApiKey = async ({ provider }: { provider: string; apiKey: st
  * Reads the layers of a WMS / WMTS service through the Arena server (browsers cannot read most capabilities documents
  * because of CORS; the server request is SSRF-safe).
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.url - The service URL typed by the user.
  * @returns {Promise<import('@core/map/customLayers/mapServiceCapabilities').MapServiceCapabilities>} The capabilities summary; rejects with the server error key.
  */
@@ -108,8 +107,6 @@ export const fetchMapServiceCapabilities = async ({ surveyId, url }) => {
 
 /**
  * Fetches the custom map layers of a survey: those shared with everyone and those of the current user.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @returns {Promise<{surveyLayers: object[], userLayers: object[]}>} The layers.
  */
 export const fetchMapCustomLayers = async ({ surveyId }) => {
@@ -120,7 +117,6 @@ export const fetchMapCustomLayers = async ({ surveyId }) => {
 /**
  * Stores new custom map layers.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.scope - "survey" (everyone in the survey) or "user" (only me).
  * @param {object[]} params.layers - The layers (MapCustomLayer).
  * @returns {Promise<object[]>} All the layers of that scope.
@@ -137,9 +133,7 @@ export const addMapCustomLayers = async ({ surveyId, scope, layers }) => {
 /**
  * Deletes a stored custom map layer.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.scope - "survey" or "user".
- * @param {string} params.layerId - The layer id.
  * @returns {Promise<object[]>} The remaining layers of that scope.
  */
 export const deleteMapCustomLayer = async ({ surveyId, scope, layerId }) => {

@@ -22,7 +22,6 @@ const areaIntroKeys: Record<AssistantArea, string> = {
  * Home page of an area: its first suggestions, then its latest conversations (the area's intro when there are
  * neither), and the button that starts a new conversation.
  * @param {object} props - Props.
- * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @param {AssistantSuggestion[]} props.suggestions - Visible suggestions of the area.
  * @returns {React.ReactElement} The start screen.

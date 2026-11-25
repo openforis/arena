@@ -122,7 +122,6 @@ export class RecordsUpdateThread extends Thread {
    * @param {!string[]} params.nodeDefUuidsToClear - The uuids of the node definitions whose values would be cleared.
    * @param {!object[]} params.nodesToRestore - The nodes (as stored) the client must restore if the user cancels.
    * @param {string[]} [params.nodeUuidsToRemove] - The uuids of nodes not stored yet the client must remove if the user cancels.
-   * @returns {void}
    */
   postClearNonApplicableValuesConfirm({
     msg,
@@ -513,8 +512,6 @@ export class RecordsUpdateThread extends Thread {
    * getOrFetchRecord's staleness check would consider the cached record stale on every single write,
    * forcing a full record reload on the next message.
    * @param {!object} params - The parameters.
-   * @param {!number} params.surveyId - The survey id.
-   * @param {!string} params.recordUuid - The record uuid.
    * @param {!object} params.record - The record to cache.
    * @param {!object} params.recordsCache - The cache to store the record into.
    * @param {!object} params.t - The transaction client used by the write.

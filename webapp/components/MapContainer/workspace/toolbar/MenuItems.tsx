@@ -86,7 +86,6 @@ type MenuRadioItemProps = {
  * Menu item of a single-choice group (label already translated, e.g. a base map name).
  * @param {object} props - Component props.
  * @param {string} props.itemKey - Item key (test id suffix).
- * @param {string} props.label - Label.
  * @param {boolean} props.checked - Whether it is the selected choice.
  * @param {Function} props.onSelect - Called when chosen.
  * @returns {React.ReactElement} The item.

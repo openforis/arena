@@ -13,8 +13,6 @@ const normalize = (value: unknown): unknown => {
 
 /**
  * Deep equality of JSON-like values (key order ignored, undefined treated as null).
- * @param {unknown} a - First value.
- * @param {unknown} b - Second value.
  * @returns {boolean} True when equal.
  */
 export const isDeepEqual = (a: unknown, b: unknown): boolean =>

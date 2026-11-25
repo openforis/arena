@@ -30,7 +30,6 @@ export const getMessageCategoryId = (key: string): string => {
 
 /**
  * Collects the errors and warnings of a validation and of its fields.
- * @param {object} validation - The validation.
  * @returns {ValidationResultEntry[]} Key and severity of each result.
  */
 export const collectValidationResults = (validation: any): ValidationResultEntry[] => {
@@ -54,7 +53,6 @@ export const collectValidationResults = (validation: any): ValidationResultEntry
 /**
  * Returns the record keys of a report row, as text.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.row - The report row.
  * @returns {string} The key values, comma separated.
  */
@@ -69,7 +67,6 @@ export const getRowRecordKeys = ({ survey, row }: { survey: any; row: any }): st
 /**
  * Returns the path of the definition a report row is about (the counted child for count errors), by names.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.row - The report row.
  * @returns {string} The path, e.g. cluster/plot/tree/dbh.
  */
@@ -81,8 +78,6 @@ export const getRowNodeDefPath = ({ survey, row }: { survey: any; row: any }): s
 /**
  * Returns the translated messages of a report row.
  * @param {object} params - Parameters.
- * @param {CleaningI18n} params.i18n - Translator.
- * @param {object} params.survey - The survey.
  * @param {object} params.row - The report row.
  * @returns {string[]} The messages.
  */

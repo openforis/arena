@@ -50,7 +50,6 @@ const buildRecordWithManyErrors = (): SampleRecord => {
 
 /**
  * Navigates inside the app, as a user reaches a page from the sidebar (no reload).
- * @param {Page} page - The page.
  * @param {string} uri - Route to go to.
  * @returns {Promise<void>} Resolves when the route is pushed.
  */
@@ -63,7 +62,6 @@ const navigateInApp = async (page: Page, uri: string): Promise<void> => {
 
 /**
  * Counts the chat requests the stub local server received.
- * @param {LocalModelServerStub} stub - The stub.
  * @returns {number} The count.
  */
 const countChatRequests = (stub: LocalModelServerStub): number =>
@@ -71,7 +69,6 @@ const countChatRequests = (stub: LocalModelServerStub): number =>
 
 /**
  * Opens the panel on an area and waits until the area is available (its home page shows only then).
- * @param {Page} page - The page.
  * @param {string} label - Area tab label.
  * @returns {Promise<void>} Resolves when the area is usable.
  */
@@ -85,9 +82,6 @@ const openArea = async (page: Page, label: string): Promise<void> => {
 
 /**
  * Reads what the suggestion store holds for one suggestion of a survey.
- * @param {Page} page - The page.
- * @param {string} userUuid - User uuid.
- * @param {number} surveyId - Survey id.
  * @param {string} id - Suggestion id.
  * @returns {Promise<{ pending: boolean, inProgress: boolean, dismissed: DismissedTargets } | null>} The stored
  * parts, or null while the user has no stored state yet.
@@ -111,9 +105,6 @@ const readStoredSuggestion = async (
 
 /**
  * Waits until the store holds a suggestion as pending and not in progress (an absent state keeps waiting).
- * @param {Page} page - The page.
- * @param {string} userUuid - User uuid.
- * @param {number} surveyId - Survey id.
  * @param {string} id - Suggestion id.
  * @returns {Promise<void>} Resolves when the suggestion is pending.
  */

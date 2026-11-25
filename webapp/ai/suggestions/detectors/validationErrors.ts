@@ -19,7 +19,6 @@ type CountValidationReportRows = CleaningApi['countValidationReportRows']
 
 /**
  * Returns the id of the validation errors suggestion of a cycle.
- * @param {string} cycle - Cycle key.
  * @returns {string} The id.
  */
 export const getValidationErrorsSuggestionId = (cycle: string): string => `validationErrors:${cycle}`
@@ -27,8 +26,6 @@ export const getValidationErrorsSuggestionId = (cycle: string): string => `valid
 /**
  * Builds the validation errors suggestion of a cycle.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {number} params.count - Number of report rows.
  * @param {Date} params.createdAt - Creation date.
  * @returns {AssistantSuggestion} The suggestion.
@@ -56,8 +53,6 @@ export const buildValidationErrorsSuggestion = ({
 
 /**
  * Tells whether the event is a report opened in the cycle of the generation, with the Cleaning area available.
- * @param {SuggestionEvent} event - The event.
- * @param {SuggestionGeneration} generation - The current generation.
  * @param {AssistantArea[]} availableAreas - Areas available to the user.
  * @returns {boolean} True to count the messages.
  */
@@ -117,8 +112,6 @@ export const createValidationErrorsDetector = ({
   on: ['validationReportOpened'],
   /**
    * Counts the messages of the cycle and replaces the suggestion (removed below the threshold).
-   * @param {SuggestionEvent} event - The event.
-   * @param {object} ctx - Detector context.
    * @returns {Promise<void>} Resolves when the store is updated.
    */
   handle: async (event, ctx) => {

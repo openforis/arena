@@ -17,7 +17,6 @@ const NO_CANDIDATES: MapRecordCandidate[] = []
 
 /**
  * Tells whether a result can be selected.
- * @param {MapSearchResult|undefined} result - The result.
  * @returns {boolean} True for coordinates and records.
  */
 const isSelectable = (result: MapSearchResult | undefined): boolean =>
@@ -25,7 +24,6 @@ const isSelectable = (result: MapSearchResult | undefined): boolean =>
 
 /**
  * Finds the next selectable result.
- * @param {MapSearchResult[]} results - The results.
  * @param {number} from - Index to start from (included).
  * @param {1|-1} step - Search direction.
  * @returns {number} The index, or -1 when there is none.
@@ -61,13 +59,11 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
   /**
    * Marks a result as active.
    * @param {number} index - Index of the result.
-   * @returns {void}
    */
   const setActiveIndex = (index: number): void => setActive({ results, index })
 
   /**
    * Removes the marker of the searched place from the map.
-   * @returns {void}
    */
   const removeMarker = useCallback(() => {
     markerRef.current?.remove()
@@ -78,7 +74,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   /**
    * Gets the text of a result.
-   * @param {MapSearchResult} result - The result.
    * @returns {string} The label.
    */
   const getLabel = (result: MapSearchResult): string => {
@@ -98,7 +93,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
    * Flies to coordinates and marks them until the next search.
    * @param {number} lat - Latitude.
    * @param {number} lng - Longitude.
-   * @returns {void}
    */
   const goToCoordinates = (lat: number, lng: number): void => {
     removeMarker()
@@ -118,8 +112,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   /**
    * Selects a result: flies to the coordinates (marking them) or selects the record.
-   * @param {MapSearchResult|undefined} result - The result.
-   * @returns {void}
    */
   const select = (result: MapSearchResult | undefined): void => {
     if (!result || !isSelectable(result)) return
@@ -177,8 +169,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   /**
    * Handles the keyboard in the input: arrows move, Enter selects, Escape clears or leaves.
-   * @param {KeyboardEvent<HTMLInputElement>} event - The key event.
-   * @returns {void}
    */
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
     switch (event.key) {

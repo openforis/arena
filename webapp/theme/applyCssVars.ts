@@ -21,7 +21,6 @@ export const buildCssVarMap = ({ primaryColor = null }: BuildCssVarMapParams = {
  * Applies (or removes, when the value is null) CSS variables on documentElement.
  *
  * @param {Record<string, string|null>} varMap - Map of CSS variable name to value.
- * @returns {void}
  */
 export const applyCssVars = (varMap: Record<string, string | null>): void => {
   const { style } = document.documentElement

@@ -101,7 +101,6 @@ export const startNodeSaveWaiter = ({
   /**
    * Settles the result once, then stops listening.
    * @param {NodeSaveResult} value - The result.
-   * @returns {void}
    */
   const finish = (value: NodeSaveResult): void => {
     if (settled) return
@@ -113,7 +112,6 @@ export const startNodeSaveWaiter = ({
 
   /**
    * Tells whether a socket event is about the record being updated.
-   * @param {NodeSaveEvent} event - The event.
    * @returns {boolean} True for this record.
    */
   const isForRecord = (event: NodeSaveEvent): boolean => event?.recordUuid === recordUuid

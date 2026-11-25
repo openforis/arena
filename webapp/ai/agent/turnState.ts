@@ -51,7 +51,6 @@ const appendToPart = (message: AssistantMessage, type: 'text' | 'reasoning', tex
  * Starts a turn: adds the user message and an empty streaming answer to the conversation.
  * @param {object} params - Parameters.
  * @param {Conversation} params.conversation - Conversation before the turn.
- * @param {string} params.userMessage - User message.
  * @param {string} [params.displayText] - What the chat shows instead of the user message.
  * @param {Function} params.onUpdate - Called with every new conversation object.
  * @returns {TurnState} The turn state.
@@ -86,7 +85,6 @@ export const createTurnState = ({
   /**
    * Makes the conversation current and reports it.
    * @param {Conversation} next - New conversation.
-   * @returns {void}
    */
   const set = (next: Conversation) => {
     current = { ...next, updatedAt: new Date().toISOString() }
@@ -95,7 +93,6 @@ export const createTurnState = ({
   /**
    * Updates the answer of the turn.
    * @param {Function} update - Maps the answer to its new version.
-   * @returns {void}
    */
   const updateAnswer = (update: (message: AssistantMessage) => AssistantMessage) =>
     set({

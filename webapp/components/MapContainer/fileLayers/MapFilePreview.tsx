@@ -18,7 +18,6 @@ type Props = {
 
 /**
  * Small map previewing a file (KML, KMZ, zipped Shapefile or GeoJSON); nothing without a file or map access.
- * @param {Props} props - The props.
  * @returns {React.ReactElement|null} The map.
  */
 export const MapFilePreview = (props: Props) => {

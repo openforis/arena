@@ -15,7 +15,6 @@ type Entry = {
 
 /**
  * Returns the key two requests share when they must show one dialog.
- * @param {LocalServerConsentRequest} request - The request.
  * @returns {string} The key (survey, server URL and data class: the consent is stored per all three).
  */
 const keyOf = ({ surveyId, baseUrl, dataClass }: LocalServerConsentRequest): string =>
@@ -33,7 +32,6 @@ export const createConsentRequestQueue = () => {
 
   /**
    * Refreshes the pending snapshot and notifies the subscribers.
-   * @returns {void}
    */
   const changed = (): void => {
     const first = entries[0]
@@ -86,8 +84,6 @@ export const createConsentRequestQueue = () => {
     /**
      * Answers a request (unknown ids are ignored).
      * @param {number} id - Request id.
-     * @param {LocalServerConsentAnswer} answer - The answer.
-     * @returns {void}
      */
     answer: (id: number, answer: LocalServerConsentAnswer): void => {
       const index = entries.findIndex((entry) => entry.id === id)
@@ -98,7 +94,6 @@ export const createConsentRequestQueue = () => {
     },
     /**
      * Cancels every pending request (login, logout: a dialog must not outlive the user who triggered it).
-     * @returns {void}
      */
     cancelAll: (): void => {
       const cancelled = entries.splice(0, entries.length)

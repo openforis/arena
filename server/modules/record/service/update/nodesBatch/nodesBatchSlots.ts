@@ -34,10 +34,6 @@ export const defaultNodesBatchSlotLimits: NodesBatchSlotLimits = { perUser: 1, p
 
 /**
  * Adds a delta to the counter of a key, dropping the key at zero.
- * @param {Map} counters - The counters.
- * @param {string|number} key - The key.
- * @param {number} delta - The delta.
- * @returns {void}
  */
 const addToCounter = <K>(counters: Map<K, number>, key: K, delta: number): void => {
   const count = (counters.get(key) ?? 0) + delta
@@ -47,7 +43,6 @@ const addToCounter = <K>(counters: Map<K, number>, key: K, delta: number): void 
 
 /**
  * Creates the slots of a process.
- * @param {NodesBatchSlotLimits} [limits] - The limits.
  * @returns {NodesBatchSlots} The slots.
  */
 export const createNodesBatchSlots = (limits: NodesBatchSlotLimits = defaultNodesBatchSlotLimits): NodesBatchSlots => {

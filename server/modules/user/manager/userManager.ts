@@ -89,7 +89,6 @@ const _determineGroupsToAddTo = async (
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user performing the operation.
  * @param {!object} params.group - The group to check.
- * @param {object} [params.surveyInfo] - The survey info.
  */
 const _checkGroupBelongsToSurvey = ({
   user,
@@ -293,13 +292,9 @@ export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUser
 /**
  * Fetches the users (with their auth groups and invitation), optionally paginated, filtered and sorted.
  * @param {object} params - The parameters.
- * @param {number} [params.offset] - The offset.
  * @param {boolean} [params.onlyAccepted] - Whether to fetch only the users who accepted the invitation.
- * @param {number} [params.limit] - The limit.
  * @param {string} [params.search] - The search text.
  * @param {string} [params.sortBy] - The sort field.
- * @param {string} [params.sortOrder] - The sort order.
- * @param {object} [client] - The db client.
  * @returns {Promise<import('@openforis/arena-core').ArenaUser[]>} - The users.
  */
 export const fetchUsers = (

@@ -26,11 +26,7 @@ export type CategoryLabelsApplierDeps = {
 /**
  * Sets the same result on every operation.
  * @param {Map<string, OperationResult>} results - Results (updated).
- * @param {CategoryItemLabelSetOperation[]} operations - Operations.
- * @param {OperationStatus} status - Status.
- * @param {string} message - Message.
  * @param {object} [params] - Message params.
- * @returns {void}
  */
 const setAll = (
   results: Map<string, OperationResult>,
@@ -44,7 +40,6 @@ const setAll = (
 
 /**
  * Converts an operation to its server update.
- * @param {CategoryItemLabelSetOperation} op - Operation.
  * @returns {CategoryItemLabelUpdate} The update.
  */
 const toUpdate = ({ itemUuid, lang, text, expectedText }: CategoryItemLabelSetOperation): CategoryItemLabelUpdate => ({
@@ -59,7 +54,6 @@ const toUpdate = ({ itemUuid, lang, text, expectedText }: CategoryItemLabelSetOp
  * @param {CategoryItemLabelsUpdateAnswer} answer - Server answer.
  * @param {CategoryItemLabelSetOperation[]} operations - Operations sent.
  * @param {Map<string, OperationResult>} results - Results (updated).
- * @returns {void}
  */
 const setAnswerResults = (
   answer: CategoryItemLabelsUpdateAnswer,
@@ -89,7 +83,6 @@ const setAnswerResults = (
 /**
  * Sends one chunk of operations and sets their results.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
  * @param {CategoryItemLabelSetOperation[]} params.operations - Operations of the chunk.
  * @param {CategoryLabelsApplierDeps} params.deps - Server call.
  * @param {Map<string, OperationResult>} params.results - Results (updated).
@@ -121,7 +114,6 @@ const applyChunk = async ({
  * Applies category item label operations, one server request per chunk; the store is updated once, at the end (a
  * reload per chunk would reload the survey under the next one).
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
  * @param {CategoryItemLabelSetOperation[]} params.operations - Selected category operations without a result yet.
  * @param {Function} params.getSurvey - Returns the open survey.
  * @param {CategoryLabelsApplierDeps} [params.deps] - Server call and store updates (none: not supported here).

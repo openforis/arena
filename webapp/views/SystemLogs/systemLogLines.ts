@@ -161,7 +161,6 @@ export const mergeLines = (lines: LogLine[], newLines: LogLine[]): LogLine[] => 
 
 /**
  * Merges new lines keeping only the most recent ones.
- * @param {LogLine[]} lines - Current lines.
  * @param {LogLine[]} newLines - Lines to append.
  * @param {number} maxLines - Maximum number of lines to keep.
  * @returns {LogLine[]} - The resulting lines.
@@ -191,7 +190,6 @@ const isFilterEmpty = ({ text, levels, excludedInstanceIds = [], hideHttpRequest
  * Filters the lines by instance, text (case insensitive), level and type (HTTP requests).
  * Markers and lines without a level are kept, unless their instance is excluded.
  * @param {LogLine[]} lines - Lines to filter.
- * @param {LogLinesFilter} filter - The filter.
  * @returns {LogLine[]} - The filtered lines.
  */
 export const filterLines = (lines: LogLine[], filter: LogLinesFilter): LogLine[] => {

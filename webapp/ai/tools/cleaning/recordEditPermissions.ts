@@ -11,10 +11,6 @@ export type EditRefusal = { code: string; message: string }
 /**
  * Checks that the user may edit the record: published survey, step and ownership (group qualifiers are checked by
  * GET /record, which refuses records outside them).
- * @param {object} params - Parameters.
- * @param {object} params.user - The user.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
  * @returns {EditRefusal|null} Why it can't be edited, or null.
  */
 export const checkRecordEditable = ({
@@ -43,10 +39,6 @@ export const checkRecordEditable = ({
 
 /**
  * Checks that the value of the attribute may be set by hand by the user.
- * @param {object} params - Parameters.
- * @param {object} params.user - The user.
- * @param {object} params.survey - The survey.
- * @param {object} params.nodeDef - The node definition.
  * @returns {EditRefusal|null} Why it can't be edited, or null.
  */
 export const checkAttributeEditable = ({
@@ -82,9 +74,7 @@ const nodeEditRefusalMessages: Record<NodeEditRefusal, (attributeName: string) =
  * Checks that the node is editable and applicable in all its ancestor entities ("editable if" / "applicable if" of the
  * survey), as the form enforces.
  * @param {object} params - Parameters.
- * @param {object} params.record - The record.
  * @param {object} params.node - The attribute node.
- * @param {object} params.nodeDef - The node definition.
  * @returns {EditRefusal|null} Why it can't be edited, or null.
  */
 export const checkNodeEditable = ({

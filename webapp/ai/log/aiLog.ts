@@ -10,7 +10,6 @@ export type AiLog = (message: string, error?: unknown) => void
  * Logs a problem the app recovered from.
  * @param {string} message - What failed and what the app did instead.
  * @param {unknown} [error] - The error, when there is one.
- * @returns {void}
  */
 export const logAiWarning = (message: string, error?: unknown): void => {
   // eslint-disable-next-line no-console

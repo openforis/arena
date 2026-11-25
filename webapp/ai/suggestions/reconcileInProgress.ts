@@ -36,7 +36,6 @@ const loadSafely = async (
  * @param {Function} [params.getHeldLockNames] - Names of the Web Locks held now: a conversation whose turn lock is
  * held runs in another tab and is left alone.
  * @param {AiLog} [params.log] - Reports what could not be read.
- * @returns {Promise<void>} Resolves when done.
  */
 export const reconcileInProgress = async ({
   store,

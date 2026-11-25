@@ -6,7 +6,6 @@ type Props = { onNewConversation: () => void }
 
 /**
  * Message shown instead of the composer when a conversation with record data can no longer continue.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The notice.
  */
 export const RecordDataNotice = ({ onNewConversation }: Props) => {

@@ -608,11 +608,8 @@ export const deleteNodeDefsValidationMessageLabels = async (
 /**
  * Fetches all virtual entities.
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
  * @param {number} [params.offset] - The select query offset.
  * @param {number} [params.limit] - The select query limit.
- * @param {BaseProtocol} [client] - The database client.
- * @returns {Promise<any[]>} - The result promise.
  */
 export const fetchVirtualEntities = (
   params: { surveyId: number; offset?: number; limit?: number | null },
@@ -639,10 +636,6 @@ export const fetchVirtualEntities = (
 
 /**
  * Count virtual entities.
- * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
- * @param {BaseProtocol} [client] - The database client.
- * @returns {Promise<number>} - The result promise.
  */
 export const countVirtualEntities = (params: { surveyId: number }, client: DbClient = DB) => {
   const { surveyId } = params

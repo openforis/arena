@@ -29,7 +29,6 @@ const uuidOf = (survey: any, name: string): string =>
 /**
  * Builds a survey whose root has no label and `count` labelled attributes.
  * @param {number} count - Number of attributes.
- * @param {string[]} languages - Survey languages.
  * @returns {Promise<object>} The survey.
  */
 const buildWideSurvey = (count: number, languages: string[]) =>

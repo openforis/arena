@@ -68,7 +68,6 @@ export const startSurveyCompareApplyJob = async ({
 /**
  * Fetches the fingerprints (SHA-256, strict and structural) of a survey definition.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {boolean} [params.draft] - Whether to use the draft (default) or the published version of the survey.
  * @returns {Promise<{strict: string, structural: string}>} - The fingerprints.
  */

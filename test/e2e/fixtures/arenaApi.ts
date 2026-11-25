@@ -74,7 +74,6 @@ export class ArenaApi {
 
   /**
    * Sends a GET request and returns its status and body without checking them (to test refused requests).
-   * @param {string} url - The URL.
    * @returns {Promise<{status: number, body: unknown}>} - The status and the JSON body (null when it is not JSON).
    */
   async getRaw(url: string): Promise<{ status: number; body: unknown }> {
@@ -150,7 +149,6 @@ export class ArenaApi {
    * @param {string} [provider.name] - Display name.
    * @param {string} provider.model - Model id.
    * @param {string} [provider.baseUrl] - Base URL (openai-compatible, vercel-ai-sdk).
-   * @param {string} [provider.apiKey] - API key.
    * @returns {Promise<{provider: Record<string, any>, settings: Record<string, any>}>} - The new entry and the settings.
    */
   async addAiAccountProvider(provider: {
@@ -174,7 +172,6 @@ export class ArenaApi {
 
   /**
    * Sets the default AI provider of the test user.
-   * @param {string} providerId - Provider id.
    * @returns {Promise<void>} - Resolves when saved.
    */
   async setAiDefaultProvider(providerId: string): Promise<void> {
@@ -206,8 +203,6 @@ export class ArenaApi {
 
   /**
    * Counts the validation report rows of a cycle, without filters (what the report shows before any filter).
-   * @param {number} surveyId - Survey id.
-   * @param {string} [cycle] - Cycle key.
    * @returns {Promise<number>} - The count.
    */
   async countValidationReportRows(surveyId: number, cycle = '0'): Promise<number> {
@@ -217,7 +212,6 @@ export class ArenaApi {
 
   /**
    * Returns the uuid of the root entity of the published survey.
-   * @param {number} surveyId - Survey id.
    * @returns {Promise<string>} - The uuid.
    */
   async getRootNodeDefUuid(surveyId: number): Promise<string> {
@@ -232,10 +226,8 @@ export class ArenaApi {
   /**
    * Starts a flat data (CSV) import that inserts new records into the root entity (one upload, no chunks).
    * @param {object} params - Parameters.
-   * @param {number} params.surveyId - Survey id.
    * @param {string} params.nodeDefUuid - Root entity uuid.
    * @param {string} params.csv - CSV content (header with the key attribute names).
-   * @param {string} [params.cycle] - Cycle key.
    * @returns {Promise<{ uuid: string }>} - The job started.
    */
   async startFlatDataImport({
@@ -290,7 +282,6 @@ export class ArenaApi {
    * @param {string} [params.cloneFromCycle] - Cycle of the survey to clone.
    * @param {string} params.name - Name of the clone.
    * @param {string} params.label - Label of the clone.
-   * @param {string} [params.lang] - Language.
    * @returns {Promise<number>} - The id of the clone.
    */
   async cloneSurvey({
@@ -316,7 +307,6 @@ export class ArenaApi {
 
   /**
    * Returns the AI policy of a survey.
-   * @param {number} surveyId - Survey id.
    * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
    */
   async getSurveyAiPolicy(surveyId: number): Promise<any> {
@@ -325,8 +315,6 @@ export class ArenaApi {
 
   /**
    * Sets the AI policy of a survey (the test user is a system administrator).
-   * @param {number} surveyId - Survey id.
-   * @param {{schema: string, data: string}} policy - Policy.
    * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
    */
   async putSurveyAiPolicy(surveyId: number, policy: { schema: string; data: string }): Promise<any> {

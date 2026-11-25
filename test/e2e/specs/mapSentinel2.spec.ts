@@ -13,7 +13,6 @@ const DRAWN_AREA_OUTLINE = 'path[stroke-dasharray="2 4"]'
 
 /**
  * Makes every request to the scene index fail, as if the network were down.
- * @param {Page} page - The page.
  * @returns {Promise<{aborted: function(): number}>} Resolves once the route is set, with a counter of the aborted requests.
  */
 const blockSceneIndex = async (page: Page): Promise<{ aborted: () => number }> => {
@@ -27,7 +26,6 @@ const blockSceneIndex = async (page: Page): Promise<{ aborted: () => number }> =
 
 /**
  * Opens Data › Map and waits for the top bar (same helper as Part 1's mapWorkspace.spec.ts).
- * @param {Page} page - The page.
  * @returns {Promise<void>} Resolves when the bar is shown.
  */
 const openMap = async (page: Page): Promise<void> => {
@@ -38,7 +36,6 @@ const openMap = async (page: Page): Promise<void> => {
 
 /**
  * Opens Data › Map and flies to coordinates with the search box (zoom 14: one or two Sentinel-2 tiles in view).
- * @param {Page} page - The page.
  * @param {string} query - Coordinates, e.g. '41.9, 12.5'.
  * @returns {Promise<void>} Resolves at zoom 14.
  */
@@ -52,7 +49,6 @@ const goToCoordinates = async (page: Page, query: string): Promise<void> => {
 
 /**
  * Opens the Sentinel-2 tab from the Imagery menu.
- * @param {Page} page - The page.
  * @returns {Promise<void>} Resolves when the panel is visible.
  */
 const openScenesPanel = async (page: Page): Promise<void> => {
@@ -65,7 +61,6 @@ const openScenesPanel = async (page: Page): Promise<void> => {
 /**
  * Returns a page point at an offset from the centre of the Leaflet map (south-east: away from the left rail,
  * the search marker at the centre and the zoom buttons at the bottom right).
- * @param {Page} page - The page.
  * @param {number} dx - Horizontal offset in pixels.
  * @param {number} dy - Vertical offset in pixels.
  * @returns {Promise<{x: number, y: number}>} The point in page coordinates.

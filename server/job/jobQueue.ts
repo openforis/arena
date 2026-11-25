@@ -85,7 +85,6 @@ export class JobQueue {
    * all, and what does it look like" queries below - a user with multiple outstanding jobs is an
    * inherently lossy case for these (the webapp's job monitor only ever shows one job at a time).
    *
-   * @param userUuid - The user UUID.
    * @returns Job info for the user or null if none exists.
    */
   private _getJobInfoByUserUuid(userUuid: string): JobInfo | null {
@@ -113,7 +112,6 @@ export class JobQueue {
 
   /**
    * Get the summary for a specific job.
-   * @param jobUuid - The job UUID.
    * @returns Job summary or null if not found.
    */
   getJobSummary(jobUuid: string): JobSummary | null {
@@ -125,7 +123,6 @@ export class JobQueue {
    * Returns the summary of the specified job: the active job summary (if running), the last summary received from the
    * job thread or, if the job has not started yet, a summary created from the job info.
    * The job info itself is never returned: it contains the job params (e.g. the user who started the job).
-   * @param jobInfo - The job info.
    * @returns The job summary.
    */
   private _getJobSummary(jobInfo: JobInfo): JobSummary {
@@ -155,7 +152,6 @@ export class JobQueue {
 
   /**
    * Get the running job summary for a specific user.
-   * @param userUuid - The user UUID.
    * @returns Job summary or null if user has no running jobs.
    */
   getRunningJobSummaryByUserUuid(userUuid: string): JobSummary | null {
@@ -165,7 +161,6 @@ export class JobQueue {
 
   /**
    * Delete job info after a delay to give clients time to fetch updated status.
-   * @param jobUuid - The job UUID.
    */
   private deleteJobInfo({ jobUuid }: { jobUuid: string }): void {
     // delay job info canceling; give time to clients to fetch the updated job
@@ -184,8 +179,6 @@ export class JobQueue {
    * and is NOT routed through _startNextJob's serialization chain - see _startNextJobInternal's
    * identity-based (indexOf) re-resolution, which exists specifically to stay correct in the
    * face of that.
-   *
-   * @param userUuid - The user UUID.
    */
   async cancelJobByUserUuid(userUuid: string): Promise<void> {
     const jobUuids = this._jobUuidsByUserUuid[userUuid]
@@ -219,7 +212,6 @@ export class JobQueue {
    * Cancels a single job by its uuid, regardless of which user owns it - the admin-scoped
    * counterpart to cancelJobByUserUuid above (which cancels ALL of a user's outstanding jobs).
    * Used by the Jobs Monitor's per-row cancel action.
-   * @param jobUuid - The job UUID.
    * @param options - Object with canceledByAdmin, propagated to the client so the owning user's
    *   Job Monitor dialog can explain why their job ended instead of silently closing.
    */
@@ -272,7 +264,6 @@ export class JobQueue {
 
   /**
    * Callback when a job ends.
-   * @param job - The job object.
    */
   onJobEnd(job: { uuid: string }): void {
     const jobInfo = this._jobInfoByUuid[job.uuid]
@@ -298,7 +289,6 @@ export class JobQueue {
 
   /**
    * Callback when a job updates its status.
-   * @param job - The job object.
    */
   onJobUpdate(job: JobSummary): void {
     // runs in main thread; can safely modify internal variables
@@ -345,7 +335,6 @@ export class JobQueue {
 
   /**
    * Execute a job thread.
-   * @param jobInfo - The job info.
    */
   // protected: subclasses (the tests) replace the execution of the jobs
   protected _executeJob(jobInfo: JobInfo): void {

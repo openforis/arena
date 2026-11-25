@@ -39,7 +39,6 @@ export type CustomBaseLayerDef = {
 
 /**
  * Builds the Leaflet options of a custom layer.
- * @param {MapCustomLayer} layer - The layer.
  * @returns {CustomLayerTileOptions} The options.
  */
 const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
@@ -53,7 +52,6 @@ const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
 
 /**
  * Tells how to create the Leaflet layer of a custom layer.
- * @param {MapCustomLayer} layer - The layer.
  * @returns {CustomLayerLeafletConfig} WMS: the GetMap endpoint and its parameters; WMTS and XYZ: the tile template.
  */
 export const getCustomLayerLeafletConfig = (layer: MapCustomLayer): CustomLayerLeafletConfig => {

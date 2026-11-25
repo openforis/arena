@@ -7,7 +7,6 @@ import {
 
 /**
  * Runs a function expected to throw a SystemError.
- * @param {Function} fn - The function.
  * @returns {SystemError} The thrown error.
  */
 const thrownBy = (fn: () => unknown): SystemError => {

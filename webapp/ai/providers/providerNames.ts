@@ -42,7 +42,6 @@ export const getDefaultNameKey = ({ name, providerType }: { name: string; provid
  * @param {object} params - Parameters.
  * @param {string} params.name - Stored name.
  * @param {string} params.providerType - Stored provider type.
- * @param {TFunction} params.t - Translation function.
  * @returns {string} The translated default name, or the name the user typed.
  */
 export const getProviderNameText = ({

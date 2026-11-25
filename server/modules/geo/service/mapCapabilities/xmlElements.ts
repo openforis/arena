@@ -89,7 +89,6 @@ export const findPath = (element: XmlElement | undefined, names: string[]): XmlE
 
 /**
  * Returns the text content (text and CDATA) of an element.
- * @param {XmlElement|undefined} element - The element.
  * @returns {string} The trimmed text; empty when there is none.
  */
 export const textOf = (element: XmlElement | undefined): string => {
@@ -111,7 +110,6 @@ export const childText = (element: XmlElement | undefined, name: string): string
 
 /**
  * Returns an attribute by local name ("href" matches "xlink:href").
- * @param {XmlElement|undefined} element - The element.
  * @param {string} name - The local name.
  * @returns {string|undefined} The value.
  */

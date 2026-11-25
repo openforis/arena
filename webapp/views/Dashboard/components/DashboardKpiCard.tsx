@@ -114,7 +114,6 @@ const KpiHeader = (props: KpiHeaderProps) => {
 /**
  * KPI card showing a title and a value, with optional accent and expandable details.
  *
- * @param {DashboardKpiCardProps} props - The component props.
  * @returns {React.ReactElement} The card.
  */
 export const DashboardKpiCard = (props: DashboardKpiCardProps) => {

@@ -42,7 +42,6 @@ const XML_LIKE_CONTENT_TYPES = new Set(['', 'text/plain', 'application/octet-str
 
 /**
  * Resolves a host name with the operating system resolver, returning every address.
- * @param {string} hostname - The host name.
  * @returns {Promise<Array<{address: string, family: number}>>} The addresses.
  */
 const defaultDnsLookup: DnsLookup = (hostname) => dnsPromises.lookup(hostname, { all: true })
@@ -62,7 +61,6 @@ export const buildAxiosConfig = (config: SafeRequestConfig): AxiosRequestConfig 
 
 /**
  * Sends the GET request with axios.
- * @param {string} url - The URL.
  * @param {SafeRequestConfig} config - The request configuration.
  * @returns {Promise<HttpResponse>} The response.
  */
@@ -212,7 +210,6 @@ export const toFetchError = (
  * Tells whether a response body can be a capabilities document.
  * @param {object} params - Parameters.
  * @param {string} params.contentType - The lower-case Content-Type header.
- * @param {string} params.body - The body.
  * @returns {boolean} True for XML content types, and for generic ones when the body starts with "<".
  */
 const isXmlResponse = ({ contentType, body }: { contentType: string; body: string }): boolean => {
@@ -253,7 +250,6 @@ const headerText = (value: unknown): string => (typeof value === 'string' ? valu
 
 /**
  * Checks the status and the type of a response and decodes its body.
- * @param {HttpResponse} response - The response.
  * @returns {FetchedText} The body (decoded, byte order mark removed) and the content type.
  * @throws {SystemError} redirectNotFollowed, fetchFailed or notCapabilities.
  */

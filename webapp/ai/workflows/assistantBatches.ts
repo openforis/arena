@@ -93,7 +93,6 @@ const toTextDrafts = (
 
 /**
  * Returns the categories to translate that exist: the targets of the suggestion, or every category.
- * @param {object} survey - Survey.
  * @param {string[]} uuids - Category uuids (none: all).
  * @returns {object[]} The categories, with their names.
  */
@@ -107,8 +106,6 @@ const toCategories = (survey: any, uuids: string[]) => {
 
 /**
  * Returns the parent path of a node definition (the root left out), as the data dictionary export sends it.
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @returns {string} Names of the ancestors, joined by "/".
  */
 const getParentPath = (survey: any, nodeDef: any): string => {
@@ -124,7 +121,6 @@ const getParentPath = (survey: any, nodeDef: any): string => {
 /**
  * Loads the entries to describe: the targets of the suggestion (all entries when none) without a description in any
  * language.
- * @param {LoadParams} params - Parameters.
  * @returns {object} The rows (at most the limit of a run) and the number left over.
  */
 const loadDescriptionRows = ({ survey, scope }: LoadParams) => {
@@ -166,7 +162,6 @@ const createPhasedProgress = (estimatedTotals: number[], onProgress: (progress: 
 
 /**
  * Writes the descriptions in the default language, then translates them into the other survey languages.
- * @param {RunParams} params - Parameters.
  * @returns {Promise<RunResult>} The texts made, by node definition and language.
  */
 const runDescriptions = async ({
@@ -299,9 +294,7 @@ export const getAssistantBatchKind = (kind: SuggestionBatchKind): BatchKindDef =
  * Loads the texts of a batch.
  * @param {object} params - Parameters.
  * @param {SuggestionBatchKind} params.kind - Batch.
- * @param {object} params.survey - Survey.
  * @param {SuggestionScope} params.scope - Language (key) and targets (none: all).
- * @param {AbortSignal} params.signal - Signal.
  * @param {AssistantBatchDeps} [params.deps] - Test dependencies.
  * @returns {Promise<object>} The rows and the number of texts that cannot be sent.
  */
@@ -329,7 +322,6 @@ export const loadAssistantBatch = ({
  * @param {object[]} params.rows - Rows of loadAssistantBatch.
  * @param {number} params.skippedCount - Texts that cannot be sent (counted as failed).
  * @param {string} [params.providerId] - Provider of the conversation.
- * @param {AbortSignal} params.signal - Signal.
  * @param {Function} params.onProgress - Requests done and total, with the estimated time left.
  * @param {Function} [params.resolveBatch] - Resolves the model of a feature (tests).
  * @param {AssistantBatchDeps} [params.deps] - Test dependencies.

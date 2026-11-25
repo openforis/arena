@@ -7,7 +7,6 @@ const NON_DATA_PANES = new Set(['tilePane', 'tooltipPane'])
 
 /**
  * Returns the bounds of the finite points.
- * @param {LatLngLiteral[]} points - Points.
  * @returns {BoundsLiteral|null} The bounds, or null when there is no finite point.
  */
 export const computeBounds = (points: LatLngLiteral[]): BoundsLiteral | null => {
@@ -31,7 +30,6 @@ export const computeBounds = (points: LatLngLiteral[]): BoundsLiteral | null => 
  * @param {object} layerInfo - What is known about the layer.
  * @param {boolean} layerInfo.isGridLayer - Whether it is a tile (grid) layer.
  * @param {boolean} [layerInfo.interactive] - Its `interactive` option (false for the UTM grid).
- * @param {string} [layerInfo.pane] - Its pane.
  * @returns {boolean} True for data layers.
  */
 export const isDataLayer = ({

@@ -21,7 +21,6 @@ export type LocalProvider = {
 
 /**
  * Returns the localStorage key of the user's local providers.
- * @param {string} userUuid - User UUID.
  * @returns {string} The key.
  */
 export const getLocalProvidersKey = (userUuid: string): string => `arena.ai.localProviders.${userUuid}`
@@ -29,7 +28,6 @@ export const getLocalProvidersKey = (userUuid: string): string => `arena.ai.loca
 /**
  * Returns the base URL to store: trimmed, without trailing slashes, http(s) only, without credentials, query or
  * fragment, at most 2048 chars.
- * @param {unknown} value - Raw value.
  * @returns {string|null} The URL, or null when it is not a plain http(s) URL.
  */
 export const normalizeLocalProviderBaseUrl = (value: unknown): string | null => {
@@ -81,9 +79,6 @@ export const normalizeLocalProviders = (input: unknown): LocalProvider[] => {
 
 /**
  * Reads the user's local providers; unavailable storage or corrupt JSON give an empty list.
- * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
  * @returns {LocalProvider[]} The providers.
  */
 export const loadLocalProviders = ({
@@ -104,10 +99,6 @@ export const loadLocalProviders = ({
 
 /**
  * Stores the user's local providers (normalized before saving).
- * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
- * @param {LocalProvider[]} params.providers - Providers.
  * @returns {boolean} False when the storage is unavailable or full.
  */
 export const saveLocalProviders = ({

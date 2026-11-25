@@ -9,14 +9,12 @@ import type { EventDetector } from './types'
 
 /**
  * Returns the suggestion id of the introduction of a module.
- * @param {string} module - Module.
  * @returns {string} The id.
  */
 export const getModuleIntroId = (module: string): string => `moduleIntro:${module}`
 
 /**
  * Returns the introduction of a module (Help: no survey, no cycle, no expiry; the target is the module).
- * @param {IntroModule} module - Module.
  * @param {Date} now - Creation time.
  * @returns {AssistantSuggestion} The suggestion.
  */

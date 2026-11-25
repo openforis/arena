@@ -10,7 +10,6 @@ export const stateKey = survey
 // ====== READ
 /**
  * Returns the survey currently loaded in the store.
- * @param {unknown} state - The Redux state.
  * @returns {import('@openforis/arena-core').ArenaSurvey} The survey.
  */
 export const getSurvey = (state) => A.prop(survey)(state)

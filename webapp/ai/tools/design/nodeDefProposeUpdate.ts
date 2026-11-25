@@ -75,7 +75,6 @@ const isRefInputProp = (prop: string): prop is RefInputProp => (refInputProps as
 /**
  * Refuses a value whose type does not fit the property.
  * @param {UpdateChange} change - The proposed change.
- * @returns {void}
  */
 const checkValueType = ({ prop, value }: UpdateChange): void => {
   const expected = STRING_PROPS.has(prop) ? 'string' : 'boolean'
@@ -89,8 +88,6 @@ const checkValueType = ({ prop, value }: UpdateChange): void => {
 
 /**
  * Converts a category or taxonomy change: checks the node definition type and resolves the name.
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @param {UpdateChange} change - The change (prop categoryName or taxonomyName, string value).
  * @returns {ChangeOperationDraft} The draft.
  */
@@ -123,7 +120,6 @@ const toRefDraft = (survey: any, nodeDef: any, change: UpdateChange): ChangeOper
 /**
  * Converts the model's changes to update operations, recording the current values.
  * @param {UpdateChange[]} changes - Proposed changes.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {ChangeOperationDraft[]} The drafts, in order.
  */
 const toUpdateDrafts = (changes: UpdateChange[], ctx: AiToolContext): ChangeOperationDraft[] => {

@@ -137,8 +137,6 @@ export const getSamplingNodeDefChild =
 /**
  * Returns the available reporting data node defs
  * (code attribute definitions belonging to the base unit or its ancestors).
- * @param params - The parameters.
- * @param params.chain - The chain.
  * @returns Function returning the available reporting data node defs of the specified survey.
  */
 export const getAvailableReportingDataNodeDefs =

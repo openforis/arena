@@ -62,7 +62,6 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
 
   /**
    * Tells every subscriber that the cache changed.
-   * @returns {void} Nothing.
    */
   const notify = () => {
     for (const listener of listeners) listener()

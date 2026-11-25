@@ -93,7 +93,6 @@ export const MOCK_SCRIPTS: MockScript[] = [
 
 /**
  * Returns the text of a message content.
- * @param {LanguageModelV4Prompt[number]['content']} content - The content.
  * @returns {string} The text parts joined.
  */
 const contentText = (content: LanguageModelV4Prompt[number]['content']): string =>
@@ -101,7 +100,6 @@ const contentText = (content: LanguageModelV4Prompt[number]['content']): string 
 
 /**
  * Finds the assistant marker in the system messages.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @returns {string|null} The marker, or null.
  */
 const findMarker = (prompt: LanguageModelV4Prompt): string | null => {
@@ -111,7 +109,6 @@ const findMarker = (prompt: LanguageModelV4Prompt): string | null => {
 
 /**
  * Returns the index of the last user message.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @returns {number} The index, -1 when none.
  */
 const lastUserIndex = (prompt: LanguageModelV4Prompt): number => {
@@ -124,7 +121,6 @@ const lastUserIndex = (prompt: LanguageModelV4Prompt): number => {
 // tool results since the last user message = steps already played in this turn
 /**
  * Counts the tool results after a message index.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @param {number} fromIndex - Index of the last user message.
  * @returns {number} The count.
  */
@@ -140,7 +136,6 @@ const countToolResults = (prompt: LanguageModelV4Prompt, fromIndex: number): num
 // output of the last tool result after the last user message (the json value; a text value parsed when it is JSON)
 /**
  * Returns the output of the last tool result after a message index.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @param {number} fromIndex - Index of the last user message.
  * @returns {unknown} The output value, null when none.
  */
@@ -162,7 +157,6 @@ const getLastToolOutput = (prompt: LanguageModelV4Prompt, fromIndex: number): un
 
 /**
  * Resolves the text or the tool call input of a step computed from the user message or the last tool output.
- * @param {MockScriptStep} step - Step.
  * @param {MockScriptParams} params - Parameters of the computed values.
  * @returns {PlayedMockScriptStep} The step with its computed values resolved.
  */
@@ -175,8 +169,6 @@ const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScr
 
 /**
  * Returns the scripted step to play for a prompt.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
- * @param {MockScript[]} [scripts] - Scripts.
  * @returns {PlayedMockScriptStep|null} The step; null when the prompt has no assistant marker (the canned answers apply).
  */
 export const getScriptedStep = (
@@ -195,14 +187,12 @@ export const getScriptedStep = (
 
 /**
  * Returns the id of the scripted tool call.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @returns {string} The id.
  */
 const toolCallId = (prompt: LanguageModelV4Prompt): string => `mock-call-${prompt.length}`
 
 /**
  * Returns the generate content of a step.
- * @param {PlayedMockScriptStep} step - Step.
  * @param {LanguageModelV4Prompt} prompt - Prompt (for the tool call id).
  * @returns {{content: LanguageModelV4Content[], finishReason: object}} Content and finish reason.
  */
@@ -223,7 +213,6 @@ export const toScriptedContent = (step: PlayedMockScriptStep, prompt: LanguageMo
 
 /**
  * Returns the stream parts of a step.
- * @param {PlayedMockScriptStep} step - Step.
  * @param {LanguageModelV4Prompt} prompt - Prompt (for the tool call id).
  * @returns {LanguageModelV4StreamPart[]} The parts, finish included.
  */
@@ -246,8 +235,6 @@ export const toScriptedStreamParts = (
 
 /**
  * Returns the stream of a step.
- * @param {PlayedMockScriptStep} step - Step.
- * @param {LanguageModelV4Prompt} prompt - Prompt.
  * @returns {ReadableStream<LanguageModelV4StreamPart>} The stream.
  */
 export const toScriptedStream = (

@@ -8,9 +8,6 @@ import * as Survey from '@core/survey/survey'
 
 /**
  * Tells whether a node definition is locked by publication: it was published and the survey is not a template.
- * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {object} params.nodeDef - Node definition.
  * @returns {boolean} True when published and not in a template.
  */
 export const isLockedByPublication = ({ survey, nodeDef }: { survey: any; nodeDef: any }): boolean =>
@@ -21,7 +18,6 @@ export const isLockedByPublication = ({ survey, nodeDef }: { survey: any; nodeDe
  * the designer would not let change: a published attribute keeps its category and taxonomy (except in a template),
  * because its records already hold values of them. A value equal to the current one is not a change.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
  * @param {object} params.nodeDef - Node definition before the update.
  * @param {object} params.props - Props about to be saved.
  * @returns {string[]} The locked props that change, in `categoryUuid`, `taxonomyUuid` order.
@@ -46,9 +42,7 @@ export const getLockedRefPropsChanged = ({
 /**
  * Tells whether the designer disables the "multiple" control of a node definition.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
  * @param {object} params.nodeDef - Node definition (undefined: disabled).
- * @param {string} params.cycle - Cycle key.
  * @returns {boolean} True when "multiple" cannot be edited.
  */
 export const isMultipleEditDisabled = ({
@@ -70,9 +64,6 @@ export const isMultipleEditDisabled = ({
 
 /**
  * Tells whether the maximum number of key attributes of the parent entity is reached.
- * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {object} params.nodeDef - Node definition.
  * @returns {boolean} True when reached.
  */
 export const isMaxKeysCountReached = ({ survey, nodeDef }: { survey: any; nodeDef: any }): boolean => {

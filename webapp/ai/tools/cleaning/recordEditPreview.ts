@@ -14,7 +14,6 @@ export type PreviewEdit = { node: any; value: any; refData: Record<string, unkno
 
 /**
  * Returns true when a validation has errors (warnings don't count).
- * @param {object|null} validation - The validation.
  * @returns {boolean} Whether it has errors.
  */
 const hasErrors = (validation: any): boolean => Boolean(validation) && Validation.isError(validation)
@@ -61,16 +60,10 @@ const countNewErrors = ({
  * Applies edits to a copy of a record, updates its dependents and validation, and tells per edit whether it fixes
  * the attribute's errors. Cross-record uniqueness is not previewed (the server checks it at Apply).
  * @param {object} params - Parameters.
- * @param {object} params.user - The user.
- * @param {object} params.survey - The survey.
  * @param {object} params.record - The record (not modified).
  * @param {PreviewEdit[]} params.edits - Nodes with their new value and ref data.
- * @param {object} params.categoryItemProvider - Category item provider.
- * @param {object} params.taxonProvider - Taxon provider.
  * @param {number} params.timezoneOffset - Browser timezone offset (expressions with dates).
  * @param {string} params.lang - Survey language.
- * @param {CleaningI18n} params.i18n - Translator.
- * @returns {Promise<object>} { recordAfter, previewByNodeUuid, recordNewErrors }.
  */
 export const computeRecordEditPreview = async ({
   user,

@@ -58,7 +58,6 @@ export const newAreaOfInterestDescriptor = ({
 /**
  * Returns the areas of interest of the survey.
  *
- * @param {object} surveyOrSurveyInfo - The survey or the survey info.
  * @returns {AreaOfInterestDescriptor[]} - The descriptors (empty if none).
  */
 export const getAreasOfInterest = (surveyOrSurveyInfo: any): ArenaAreaOfInterestDescriptor[] =>
@@ -67,7 +66,6 @@ export const getAreasOfInterest = (surveyOrSurveyInfo: any): ArenaAreaOfInterest
 /**
  * Returns the label of an area of interest in a language, or its name if it has no label in that language.
  *
- * @param {string} lang - The language code.
  * @returns {(descriptor: AreaOfInterestDescriptor) => string} - Function returning the label of a descriptor.
  */
 export const getLabel =
@@ -78,7 +76,6 @@ export const getLabel =
 /**
  * Returns the names of the areas of interest, in the survey order.
  *
- * @param {object} surveyOrSurveyInfo - The survey or the survey info.
  * @returns {string[]} - The names.
  */
 export const getAreaOfInterestNames = (surveyOrSurveyInfo: any): string[] =>
@@ -87,7 +84,6 @@ export const getAreaOfInterestNames = (surveyOrSurveyInfo: any): string[] =>
 /**
  * Returns the UUIDs of the area of interest files.
  *
- * @param {object} surveyOrSurveyInfo - The survey or the survey info.
  * @returns {string[]} - The file UUIDs.
  */
 export const getAreaOfInterestFileUuids = (surveyOrSurveyInfo: any): string[] =>
@@ -97,7 +93,6 @@ export const getAreaOfInterestFileUuids = (surveyOrSurveyInfo: any): string[] =>
  * Returns the summaries ({ uuid, props: { type, name, size } }) of the area of interest files, used by survey
  * export/import and by the Arena Mobile survey package.
  *
- * @param {object} surveyOrSurveyInfo - The survey or the survey info.
  * @returns {object[]} - The file summaries.
  */
 export const getAreaOfInterestFileSummaries = (

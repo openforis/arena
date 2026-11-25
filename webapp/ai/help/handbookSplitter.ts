@@ -246,7 +246,6 @@ export const buildHandbook = ({ xml, lang }: { xml: string; lang: string }): Han
 
 /**
  * Checks that the handbook looks complete.
- * @param {Handbook} handbook - Handbook.
  * @param {number} [minIds] - Minimum number of distinct section ids.
  * @returns {string|null} The problem, or null when it looks complete.
  */

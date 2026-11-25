@@ -73,8 +73,6 @@ export const createResilientStorage = ({
   /**
    * Marks the storage as unusable for the session.
    * @param {string} reason - What happened.
-   * @param {unknown} [error] - The error.
-   * @returns {void}
    */
   const block = (reason: string, error?: unknown): void => {
     if (!blocked) log(`${reason}: the AI data of this session stays in memory`, error)
@@ -83,9 +81,6 @@ export const createResilientStorage = ({
 
   /**
    * Stores a value, shrinking it while the storage is full.
-   * @param {ResilientStorageBackend} storage - Storage.
-   * @param {string} key - Key.
-   * @param {string} value - Value.
    * @param {Function} [shrink] - Smaller values for a full storage.
    * @returns {string|null} The value that was stored, or null when none fit.
    */

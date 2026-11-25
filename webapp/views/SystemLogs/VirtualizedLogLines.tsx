@@ -131,7 +131,6 @@ const useRowHeights = () => {
 /**
  * Renders only the visible log lines, following the end of the log while scrolled to the bottom.
  * Long lines wrap: the height of the rendered lines is measured.
- * @param {Props} props - The props.
  * @returns {React.ReactElement} - The list.
  */
 export const VirtualizedLogLines = ({ lines, instanceColors = null }: Props): React.ReactElement => {

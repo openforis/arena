@@ -26,7 +26,6 @@ const popup = (page: Page): Locator => page.locator('.leaflet-popup')
 
 /**
  * Opens the popup of a point from the Records tab of the rail (the map flies to the point and opens its popup).
- * @param {Page} page - The page.
  * @param {string} label - The label of the point in the list (its keys).
  * @returns {Promise<void>} Resolves when the popup is open.
  */

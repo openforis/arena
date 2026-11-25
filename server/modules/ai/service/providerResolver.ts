@@ -55,7 +55,6 @@ const adminDefaultConfig = (): ProviderConfig | null =>
 /**
  * Resolves an account provider of the user.
  * @param {object} params - Parameters.
- * @param {object} params.user - Arena user.
  * @param {string} params.providerId - `acct:` id.
  * @param {boolean} params.decrypt - Decrypt the key (false for descriptions).
  * @returns {ResolvedProviderConfig} The resolved config.
@@ -83,7 +82,6 @@ const resolveAccountConfig = ({
 /**
  * Resolves the provider config of a call.
  * @param {object} params - Parameters.
- * @param {object} params.user - Arena user.
  * @param {string} [params.providerId] - Requested provider id (format validated by parseGatewayRequest); the call is
  *   refused without one.
  * @param {object|null} [params.adminConfig] - Admin default config (injectable for tests).
@@ -179,7 +177,6 @@ export const resolveModelForUser = async ({
  * call then fails with aiApiKeyUnreadable).
  * @param {object} params - Parameters.
  * @param {object} params.user - The Arena user object.
- * @param {string} params.providerId - Provider id.
  * @param {ProviderConfig|null} [params.adminConfig] - Admin default config (injectable for tests).
  * @returns {ProviderMeta} Provenance info (empty when the provider cannot be resolved).
  */

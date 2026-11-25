@@ -94,7 +94,6 @@ export const AI_BATCH_GUARD_RECHECK_MS = 5000
  * once every `recheckMs`.
  * @param {object} params - Parameters.
  * @param {string} params.feature - Feature key.
- * @param {number} params.surveyId - Survey id.
  * @param {string} params.dataClass - Data class sent by the feature.
  * @param {string|null} params.hostingClass - Hosting class of the engine the run uses.
  * @param {AiBatchGuardDeps} params.deps - Fresh reads of the settings and the policy.
@@ -136,7 +135,6 @@ const AI_BATCH_RATE_LIMIT_RETRIES = 3
 /**
  * Waits `ms`, or less when the signal aborts.
  * @param {number} ms - Time to wait.
- * @param {AbortSignal} [signal] - Cancellation signal.
  * @returns {Promise<void>} Settles after the wait or at the abort.
  */
 const waitUnlessAborted = (ms: number, signal?: AbortSignal): Promise<void> =>
@@ -162,8 +160,6 @@ const UNUSABLE_ANSWER_KEYS: ReadonlySet<string> = new Set(['aiTranslationInvalid
 
 /**
  * Waits for the guard, but not longer than the signal: a stop must not wait for a slow check.
- * @param {AiBatchGuard} guard - The guard.
- * @param {AbortSignal} [signal] - Cancellation signal.
  * @returns {Promise<void>} Settles with the guard, or when the signal aborts (the caller then sees the abort).
  */
 const guardUnlessAborted = (guard: AiBatchGuard, signal?: AbortSignal): Promise<void> => {
@@ -180,11 +176,9 @@ const guardUnlessAborted = (guard: AiBatchGuard, signal?: AbortSignal): Promise<
 /**
  * Runs one call: the guard first, then the call.
  * @param {object} params - Parameters.
- * @param {AiBatchCall} params.call - The call.
  * @param {number} params.index - Index of the call.
  * @param {AiBatchGuard} params.guard - Check run before the call.
  * @param {Function} params.onResult - Called with the result of a successful call.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {number} params.rateLimitWaitMs - How long to wait before repeating a call the gateway rate-limited.
  * @returns {Promise<CallOutcome>} What succeeded and failed (counted, the run goes on), and the cause that stops the run.
  */
@@ -241,7 +235,6 @@ const runCall = async <T>({
  * @param {object} params - Parameters.
  * @param {unknown} params.error - What the call threw.
  * @param {number} params.retries - Repeats already made after a rate limit.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {boolean} params.canSplit - Whether the call can be split in halves.
  * @returns {string} cancelled, retry (after a wait), stop (the run), split (run the halves) or failed (go on).
  */
@@ -302,11 +295,9 @@ const runHalves = async <T>({
  * A run that stops after at least one result returns what it has, with the stop; the calls not run count as failed.
  * A run that stops with no result throws (the abort error of a cancel, else the error).
  * @param {object} params - Parameters.
- * @param {AiBatchCall[]} params.calls - The calls.
  * @param {AiBatchGuard} params.guard - Check run before each call.
  * @param {Function} params.onResult - Called with the result and the index of each successful call.
  * @param {Function} [params.onProgress] - Called with { done, total } at the start and after each call.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {number} [params.rateLimitWaitMs] - Wait before repeating a rate-limited call (3 repeats, then the run stops).
  * @returns {Promise<AiBatchRunResult>} The summed size of the failed calls and of the calls not run, and the stop.
  */

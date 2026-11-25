@@ -42,21 +42,18 @@ const ACTIONS: Record<AiUnavailableReason, AiUnavailableAction[]> = {
 
 /**
  * Returns the i18n key (common namespace) of a reason.
- * @param {AiUnavailableReason} reason - Reason.
  * @returns {string} The key.
  */
 export const getAiUnavailableReasonKey = (reason: AiUnavailableReason): string => `aiEngine.unavailable.${reason}`
 
 /**
  * Returns the actions that would fix a reason.
- * @param {AiUnavailableReason} reason - Reason.
  * @returns {AiUnavailableAction[]} The actions, most direct first.
  */
 export const getAiUnavailableReasonActions = (reason: AiUnavailableReason): AiUnavailableAction[] => ACTIONS[reason]
 
 /**
  * Returns where the data goes with the engine (the props of AiDataLocationBadge).
- * @param {AiSelectedEngine} engine - Engine.
  * @returns {AiDataLocation} The location.
  */
 export const toDataLocation = (engine: AiSelectedEngine): AiDataLocation =>
@@ -79,8 +76,6 @@ export const toDataLocation = (engine: AiSelectedEngine): AiDataLocation =>
 /**
  * Returns an availability without an engine.
  * @param {object} params - Parameters.
- * @param {string} params.status - Status.
- * @param {AiUnavailableReason[]} [params.reasons] - Reasons.
  * @param {string[]} [params.reasonKeys] - i18n keys of the texts.
  * @param {boolean} params.surveyScoped - The request belongs to a survey.
  * @returns {AiEngineFeatureAvailability} The availability.
@@ -111,7 +106,6 @@ const notAvailable = ({
  * @param {AiPolicy|null} params.effective - Effective policy (null while loading).
  * @param {AiDataClass} params.dataClass - Data class of the request.
  * @param {boolean} params.surveyScoped - The request belongs to a survey (false: checked against the instance ceilings).
- * @param {AiCapabilities} params.capabilities - Capabilities.
  * @param {string|null} [params.providerId] - The conversation's provider (default: the user's default).
  * @returns {AiEngineFeatureAvailability} The availability.
  */

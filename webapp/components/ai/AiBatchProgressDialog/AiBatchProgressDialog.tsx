@@ -25,7 +25,6 @@ const toPercent = ({ done, total }: AiBatchProgress): number => (total > 0 ? Mat
 /**
  * Progress bar and "N of M AI requests done" (indeterminate until the calls are known).
  * @param {object} props - Props.
- * @param {AiBatchProgress|null} props.progress - Progress.
  * @param {boolean} props.stopping - Whether a stop was requested.
  * @returns {React.ReactElement} The status.
  */

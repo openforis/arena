@@ -46,7 +46,6 @@ export type OverlayLayoutInput = {
 /**
  * Cuts a text with an ellipsis so that it fits a width.
  * @param {object} params - The parameters.
- * @param {string} params.text - The text.
  * @param {number} params.maxWidth - The available width, in px.
  * @param {string} params.font - The canvas font.
  * @param {TextMeasure} params.measure - Measures a text in a font.
@@ -83,7 +82,6 @@ export const truncateText = ({
 /**
  * Lays out a column of text lines from the first line of the strip.
  * @param {object} params - The parameters.
- * @param {Array<string>} params.lines - The lines.
  * @param {number} params.x - Left edge (align left) or right edge (align right).
  * @param {number} params.firstLineY - Middle of the first line.
  * @param {number} params.maxWidth - The available width.

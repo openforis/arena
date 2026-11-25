@@ -65,8 +65,6 @@ export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => (
 
 /**
  * Sends the edits of a record to the records update thread and waits for the reply.
- * @param {RequestContext} context - The request context.
- * @param {string} recordUuid - The record uuid.
  * @param {NodesBatchRecordEdit[]} edits - The edits to apply.
  * @returns {Promise<NodesBatchEditResult[]>} The results (failed with appErrors:aiApplyTimeout without reply before the request deadline).
  */
@@ -105,8 +103,6 @@ const sendRecordEdits = async (
 /**
  * Sends the edits of a record; a failure to send fails only the edits of this record. The returned promise never
  * rejects, so it can wait for the others without an unhandled rejection.
- * @param {RequestContext} context - The request context.
- * @param {string} recordUuid - The record uuid.
  * @param {NodesBatchRecordEdit[]} edits - The edits to apply.
  * @returns {Promise<NodesBatchEditResult[]>} The results.
  */
@@ -135,7 +131,6 @@ type NodesBatchParams = {
 /**
  * Sends the edits record by record to the records update thread and collects the results.
  * @param {NodesBatchParams} params - The request.
- * @param {NodesBatchServiceDeps} deps - The dependencies.
  * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index.
  */
 const runNodesBatch = async (
@@ -194,10 +189,7 @@ const runUntilHung = async (batch: Promise<NodesBatchEditResult[]>): Promise<Nod
  * the records update thread checks the permissions and the edits inside the record lock.
  * A user has one batch at a time, and a survey and the process a few: the others get a 429.
  * @param {NodesBatchParams} params - The request.
- * @param {object} params.user - The user.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.cycle - The survey cycle of the records.
- * @param {NodesBatchEdit[]} params.edits - The edits.
  * @param {number|null} [params.timezoneOffset] - The client timezone offset (for expressions using the current time).
  * @param {string|null} [params.lang] - The client language.
  * @param {NodesBatchServiceDeps} [deps] - The dependencies (tests).

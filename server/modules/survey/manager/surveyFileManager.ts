@@ -165,8 +165,6 @@ export const deleteFilesAndContent = async (
 /**
  * Deletes file rows and content by UUID.
  * @param {object} params - Delete parameters.
- * @param {number} params.surveyId - Survey identifier.
- * @param {Array<string>} params.fileUuids - File UUIDs.
  * @param {Array<object>} [params.fallbackFileSummaries] - Summaries for content whose rows were rolled back.
  * @param {object} [client] - Optional database client.
  * @returns {Promise<void>} A promise resolved after deletion.

@@ -11,7 +11,6 @@ const BEHAVIOUR_OPERATION_TYPES = new Set(['expression.set', 'nodeDef.update'])
 
 /**
  * Returns the changes that alter how the survey behaves: expressions, and properties such as key and category.
- * @param {ChangeSet} changeSet - Change set.
  * @returns {string[]} Operation ids.
  */
 export const getBehaviourOperationIds = (changeSet: ChangeSet): string[] =>
@@ -20,7 +19,6 @@ export const getBehaviourOperationIds = (changeSet: ChangeSet): string[] =>
 /**
  * Returns the operations that start unselected.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
  * @param {boolean} params.compact - The change set is reviewed in the dialog (not every change is listed on the card).
  * @returns {string[]} Operation ids: the behaviour changes of a compact card, none otherwise.
  */

@@ -226,7 +226,6 @@ export class FormDesigner {
 
   /**
    * Returns the names of the children of the specified entity, in the order they are displayed.
-   * @param {string} entityName - Entity name.
    * @returns {Promise<string[]>} - Child names.
    */
   async childNames(entityName: string): Promise<string[]> {

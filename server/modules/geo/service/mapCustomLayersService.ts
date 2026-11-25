@@ -24,15 +24,11 @@ export type MapCustomLayersService = {
 /**
  * Creates the service storing the custom map layers of a survey ("Everyone in this survey", in the survey config)
  * and of a user ("Only me", in the user prefs, per survey).
- * @param {MapCustomLayersRepositoryType} repository - The repository.
  * @returns {MapCustomLayersService} The service.
  */
 export const createMapCustomLayersService = (repository: MapCustomLayersRepositoryType): MapCustomLayersService => {
   /**
    * Fetches the survey layers and the layers the user added in the survey.
-   * @param {object} params - Parameters.
-   * @param {number} params.surveyId - The survey id.
-   * @param {string} params.userUuid - The user uuid.
    * @returns {Promise<object>} The survey layers and the user layers.
    */
   const fetchMapCustomLayers = async ({ surveyId, userUuid }: { surveyId: number; userUuid: string }) => {
@@ -46,9 +42,6 @@ export const createMapCustomLayersService = (repository: MapCustomLayersReposito
   /**
    * Validates and appends layers to a scope.
    * @param {object} params - Parameters.
-   * @param {number} params.surveyId - The survey id.
-   * @param {string} params.userUuid - The user uuid.
-   * @param {MapCustomLayerScope} params.scope - The scope.
    * @param {unknown} params.layers - The layers sent by the client.
    * @returns {Promise<MapCustomLayer[]>} All the layers of the scope.
    * @throws {SystemError} invalidLayers, or tooManyLayers when the limit would be exceeded.
@@ -67,11 +60,6 @@ export const createMapCustomLayersService = (repository: MapCustomLayersReposito
 
   /**
    * Removes a layer from a scope.
-   * @param {object} params - Parameters.
-   * @param {number} params.surveyId - The survey id.
-   * @param {string} params.userUuid - The user uuid.
-   * @param {MapCustomLayerScope} params.scope - The scope.
-   * @param {string} params.layerId - The layer id.
    * @returns {Promise<MapCustomLayer[]>} The remaining layers of the scope.
    */
   const removeMapCustomLayer = async ({ surveyId, userUuid, scope, layerId }: ScopeParams & { layerId: string }) => {

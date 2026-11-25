@@ -21,7 +21,6 @@ export const CATEGORY_ITEM_TRANSLATIONS_KIND = 'categoryItemTranslations'
  * Returns the categories with labels missing in a language, with their counts.
  * @param {MissingLabelsCounts} counts - Counts by category uuid and language.
  * @param {object[]} categories - Survey categories, in display order.
- * @param {string} lang - Language.
  * @returns {SuggestionTarget[]} The targets.
  */
 const getLanguageTargets = (counts: MissingLabelsCounts, categories: any[], lang: string): SuggestionTarget[] =>
@@ -36,7 +35,6 @@ const getLanguageTargets = (counts: MissingLabelsCounts, categories: any[], lang
  * @param {MissingLabelsCounts} counts - Server counts.
  * @param {object} survey - Survey (categories and languages; counts of anything else are ignored).
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
  * @param {Date} params.now - Creation time.
  * @returns {AssistantSuggestion[]} The suggestions, in survey language order.
  */
@@ -79,9 +77,6 @@ const THROTTLED_EVENTS = new Set<SuggestionEvent['type']>([
 
 /**
  * Returns the throttle key: user, survey and languages (a save that adds a language is never throttled).
- * @param {DetectorContext} ctx - Detector context.
- * @param {number} surveyId - Survey id.
- * @param {object} survey - Survey.
  * @returns {string} The key.
  */
 const getThrottleKey = (ctx: DetectorContext, surveyId: number, survey: any): string => {
@@ -111,7 +106,6 @@ export const createCategoryItemTranslationsDetector = ({
   /**
    * Cancels the trailing fetch of a key, if any.
    * @param {string} key - Throttle key.
-   * @returns {void}
    */
   const cancelTrailing = (key: string): void => {
     trailing.get(key)?.()
@@ -119,7 +113,6 @@ export const createCategoryItemTranslationsDetector = ({
 
   /**
    * Fetches the counts and stores the suggestions (no throttle check).
-   * @param {DetectorContext} ctx - Detector context.
    * @returns {Promise<void>} Resolves when stored, failed or dropped.
    */
   const fetchAndStore = async (ctx: DetectorContext): Promise<void> => {
@@ -135,7 +128,6 @@ export const createCategoryItemTranslationsDetector = ({
     lastFetchAt.set(key, { time: ctx.now().getTime(), request })
     /**
      * Frees the throttle of this request (never a newer request's entry), as nothing landed.
-     * @returns {void}
      */
     const release = (): void => {
       if (lastFetchAt.get(key)?.request === request) lastFetchAt.delete(key)
@@ -169,7 +161,6 @@ export const createCategoryItemTranslationsDetector = ({
    * @param {string} key - Throttle key.
    * @param {DetectorContext} ctx - Context of the throttled trigger.
    * @param {number} delayMs - Time left in the window.
-   * @returns {void}
    */
   const scheduleTrailing = (key: string, ctx: DetectorContext, delayMs: number): void => {
     cancelTrailing(key)
@@ -192,9 +183,7 @@ export const createCategoryItemTranslationsDetector = ({
 
   /**
    * Tells whether a frequent trigger came too soon after the last fetch of the same key; returns the time left.
-   * @param {SuggestionEvent} event - Event.
    * @param {string} key - Throttle key.
-   * @param {number} time - Current time.
    * @returns {number} Time left in the window (0 when the trigger may fetch now).
    */
   const getTimeLeft = (event: SuggestionEvent, key: string, time: number): number => {

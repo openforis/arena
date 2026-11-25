@@ -39,7 +39,6 @@ type ScreenshotOptionsFieldsProps = {
 /**
  * Renders the Capture, Include and Save to fields of the screenshot dialog (mockup ScreenshotDialog).
  * @param {object} props - The props.
- * @param {ScreenshotOptions} props.options - The options.
  * @param {Function} props.onOptionChange - Changes an option.
  * @param {ScreenshotTarget} props.target - Where the image goes.
  * @param {Function} props.onTargetChange - Changes the target.

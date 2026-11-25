@@ -235,7 +235,6 @@ const castTypeToSql = (tokens: Token[], index: number): { sql: string; length: n
 /**
  * Checks that the parentheses are balanced, so that the expression cannot close the ones it is wrapped into.
  * @param {Token[]} tokens - The expression tokens.
- * @returns {void}
  */
 const checkParentheses = (tokens: Token[]): void => {
   let depth = 0

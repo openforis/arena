@@ -61,9 +61,7 @@ export const fetchUserInvitationBySurveyAndUserUuid = (
 /**
  * Checks if the user has invitations (not removed) to surveys other than the specified one.
  * @param {!object} params - The parameters.
- * @param {!string} params.userUuid - UUID of the user.
  * @param {!string} params.surveyUuid - UUID of the survey to exclude.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<boolean>} - True if the user has been invited to other surveys.
  */
 export const existsUserInvitationInOtherSurveys = (

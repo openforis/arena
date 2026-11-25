@@ -78,7 +78,6 @@ const sameScope = (a: AssistantPanelScope | null, b: AssistantPanelScope | null)
 
 /**
  * Returns the view of a conversation id: its chat, or the home page without one.
- * @param {string|null} conversationId - Conversation id.
  * @returns {AssistantPanelView} The view.
  */
 const viewOf = (conversationId: string | null): AssistantPanelView => (conversationId ? 'chat' : 'home')
@@ -97,7 +96,6 @@ export const createAssistantPanelStore = ({
   /**
    * Merges changes into the state and notifies the listeners.
    * @param {Partial<AssistantPanelState>} changes - State changes.
-   * @returns {void}
    */
   const set = (changes: Partial<AssistantPanelState>) => {
     state = { ...state, ...changes }
@@ -106,15 +104,12 @@ export const createAssistantPanelStore = ({
   /**
    * Returns the remembered open conversation of an area.
    * @param {AssistantPanelScope|null} scope - User and survey.
-   * @param {AssistantArea|null} area - Area.
    * @returns {string|null} The conversation id, or null.
    */
   const openIdOf = (scope: AssistantPanelScope | null, area: AssistantArea | null): string | null =>
     scope && area ? openConversations.get({ ...scope, area }) : null
   /**
    * Remembers (or forgets, with null) the conversation of the current area.
-   * @param {string|null} conversationId - Conversation id.
-   * @returns {void}
    */
   const remember = (conversationId: string | null) => {
     if (state.scope && state.area) openConversations.set({ ...state.scope, area: state.area, conversationId })

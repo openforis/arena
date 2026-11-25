@@ -17,9 +17,6 @@ const keepKey = (key: string): string => key
 
 /**
  * Returns the stored design errors and warnings of a node definition (the ones the designer shows).
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
- * @param {Translate} t - Translator.
  * @returns {NodeDefIssue[]} The issues.
  */
 export const getNodeDefIssues = (survey: any, nodeDef: any, t: Translate): NodeDefIssue[] =>
@@ -27,7 +24,6 @@ export const getNodeDefIssues = (survey: any, nodeDef: any, t: Translate): NodeD
 
 /**
  * Returns the node definitions with design errors or warnings, depth-first.
- * @param {object} survey - Survey.
  * @returns {object[]} The node definitions.
  */
 const getNodeDefsWithIssues = (survey: any): any[] =>
@@ -35,7 +31,6 @@ const getNodeDefsWithIssues = (survey: any): any[] =>
 
 /**
  * Returns the names of the node definitions with design errors or warnings, depth-first.
- * @param {object|null} survey - Survey.
  * @returns {string[]} The names.
  */
 export const getNodeDefNamesWithIssues = (survey: any): string[] =>
@@ -51,8 +46,6 @@ const describeIssues = (survey: any, nodeDef: any, t: Translate) => ({
 /**
  * Builds the list of the node definitions with design errors or warnings, within the result budget.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {Translate} params.t - Translator.
  * @param {number} [params.maxNodeDefs] - Cap on the listed node definitions.
  * @returns {object} `{ total, truncated, nodeDefs }`.
  */

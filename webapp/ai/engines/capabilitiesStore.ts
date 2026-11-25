@@ -77,7 +77,6 @@ export const testLocalServer = ({
 
 /**
  * Tells the subscribers that something they derive from the capabilities changed (e.g. a consent decision).
- * @returns {void}
  */
 export const notifyAiCapabilities = (): void => capabilitiesStore.notify()
 
@@ -97,7 +96,6 @@ export const getAiCapabilitiesSnapshot = (): AiCapabilities =>
 
 /**
  * Drops the capabilities of the previous user (login, logout).
- * @returns {void}
  */
 export const resetAiCapabilities = (): void => capabilitiesStore.reset()
 

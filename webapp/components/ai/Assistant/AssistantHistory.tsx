@@ -25,7 +25,6 @@ type RowProps = {
 
 /**
  * One conversation of the list: opens it, or deletes it (the button shows on hover and focus).
- * @param {RowProps} props - Props.
  * @returns {React.ReactElement} The row.
  */
 const HistoryRow = ({ item, title, current, time, busy, onOpen, onDelete }: RowProps) => (
@@ -69,7 +68,6 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
   /**
    * Deletes a conversation once the user confirms (it can't be restored).
    * @param {string} id - Conversation id.
-   * @returns {void} Nothing.
    */
   const onDelete = (id: string) =>
     confirm({

@@ -13,7 +13,6 @@ export const TEXT_KINDS: readonly LabelKind[] = ['labels', 'descriptions']
 
 /**
  * Returns the survey languages, default language first.
- * @param {object} survey - Survey.
  * @returns {string[]} The language codes.
  */
 export const getSurveyLanguages = (survey: any): string[] =>
@@ -21,9 +20,7 @@ export const getSurveyLanguages = (survey: any): string[] =>
 
 /**
  * Tells whether a label or description is filled in a language (a blank text counts as missing).
- * @param {object} nodeDef - Node definition.
  * @param {LabelKind} kind - Labels or descriptions.
- * @param {string} lang - Language.
  * @returns {boolean} True when filled.
  */
 export const isTextFilled = (nodeDef: any, kind: LabelKind, lang: string): boolean =>
@@ -31,9 +28,7 @@ export const isTextFilled = (nodeDef: any, kind: LabelKind, lang: string): boole
 
 /**
  * Returns the languages in which a text is filled, in survey order.
- * @param {object} nodeDef - Node definition.
  * @param {LabelKind} kind - Labels or descriptions.
- * @param {string[]} languages - Survey languages.
  * @returns {string[]} The languages.
  */
 export const getFilledLanguages = (nodeDef: any, kind: LabelKind, languages: string[]): string[] =>
@@ -41,9 +36,7 @@ export const getFilledLanguages = (nodeDef: any, kind: LabelKind, languages: str
 
 /**
  * Returns the languages a text is missing in; none when it is filled in no language (nothing to translate from).
- * @param {object} nodeDef - Node definition.
  * @param {LabelKind} kind - Labels or descriptions.
- * @param {string[]} languages - Survey languages.
  * @returns {string[]} The languages.
  */
 export const getMissingLanguages = (nodeDef: any, kind: LabelKind, languages: string[]): string[] => {
@@ -54,7 +47,6 @@ export const getMissingLanguages = (nodeDef: any, kind: LabelKind, languages: st
 
 /**
  * Returns the saved design node definitions in survey hierarchy order (an unsaved one cannot take proposals yet).
- * @param {object} survey - Survey.
  * @returns {object[]} The node definitions.
  */
 export const getTextNodeDefs = (survey: any): any[] =>
@@ -62,7 +54,6 @@ export const getTextNodeDefs = (survey: any): any[] =>
 
 /**
  * Returns the target key of a text of a node definition.
- * @param {string} nodeDefUuid - Node definition uuid.
  * @param {LabelKind} kind - Labels or descriptions.
  * @returns {string} `<uuid>:<kind>`.
  */

@@ -17,7 +17,6 @@ export const initialMeasureState: MeasureState = { phase: 'idle', vertices: [], 
 
 /**
  * Applies a Geoman change (vertex added or cursor moved) to the state.
- * @param {MeasureState} state - The current state.
  * @param {LatLngPair[]} vertices - The vertices of the shape being drawn.
  * @param {LatLngPair[]} latLngs - The lat/lngs of the event: the vertices, plus the cursor when it moved.
  * @returns {MeasureState} The next state.
@@ -31,8 +30,6 @@ const applyChange = (state: MeasureState, vertices: LatLngPair[], latLngs: LatLn
 
 /**
  * Reduces the measure state.
- * @param {MeasureState} state - The current state.
- * @param {MeasureAction} action - The action.
  * @returns {MeasureState} The next state.
  */
 export const measureReducer = (state: MeasureState, action: MeasureAction): MeasureState => {

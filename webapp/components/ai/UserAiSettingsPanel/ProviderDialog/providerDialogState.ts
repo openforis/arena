@@ -83,7 +83,6 @@ const resetModels = (models: ModelsState): ModelsState => ({ ...NO_MODELS, reque
 
 /**
  * Returns the state of a new draft: no list, test or error.
- * @param {ProviderDialogState} state - State.
  * @param {ProviderDraft} draft - The new draft.
  * @param {ProviderDialogStep} step - The step to show.
  * @returns {ProviderDialogState} The new state.
@@ -123,7 +122,6 @@ export const createInitialState = ({
 /**
  * Returns the draft with a key edit: any edit (also removing it or keeping it) bumps the counter, so a test of an
  * older key never matches.
- * @param {ProviderDraft} draft - Draft.
  * @param {Partial<ProviderDraft>} patch - The key fields.
  * @returns {ProviderDraft} The draft.
  */
@@ -135,7 +133,6 @@ const withKeyEdit = (draft: ProviderDraft, patch: Partial<ProviderDraft>): Provi
 
 /**
  * Returns the state after a list answer: a stale answer changes nothing.
- * @param {ProviderDialogState} state - State.
  * @param {number} requestId - The request the answer belongs to.
  * @param {Partial<ModelsState>} patch - The models state to apply.
  * @returns {ProviderDialogState} The new state, or the same one for a stale answer.
@@ -145,7 +142,6 @@ const withModelsAnswer = (state: ProviderDialogState, requestId: number, patch: 
 
 /**
  * Returns the state after the model list arrived: the draft keeps its model (or takes the first listed one).
- * @param {ProviderDialogState} state - State.
  * @param {AiModel[]} list - Listed models.
  * @returns {ProviderDialogState} The new state.
  */
@@ -157,7 +153,6 @@ const withModelsLoaded = (state: ProviderDialogState, list: AiModel[]): Provider
 
 /**
  * Returns the state after a local test: the address as stored, the model the server lists, and the result.
- * @param {ProviderDialogState} state - State.
  * @param {object} action - The `localTested` action.
  * @returns {ProviderDialogState} The new state.
  */
@@ -172,8 +167,6 @@ const withLocalTested = (
 
 /**
  * Returns the draft after a field edit, or null when the action is not one.
- * @param {ProviderDraft} draft - Draft.
- * @param {ProviderDialogAction} action - Action.
  * @returns {ProviderDraft|null} The new draft.
  */
 const reduceDraftEdit = (draft: ProviderDraft, action: ProviderDialogAction): ProviderDraft | null => {
@@ -201,8 +194,6 @@ const reduceDraftEdit = (draft: ProviderDraft, action: ProviderDialogAction): Pr
 
 /**
  * Returns the state after the test or save progress, or null when the action is not one.
- * @param {ProviderDialogState} state - State.
- * @param {ProviderDialogAction} action - Action.
  * @returns {ProviderDialogState|null} The new state.
  */
 const reduceProgress = (state: ProviderDialogState, action: ProviderDialogAction): ProviderDialogState | null => {
@@ -228,8 +219,6 @@ const reduceProgress = (state: ProviderDialogState, action: ProviderDialogAction
 
 /**
  * Returns the state after an action.
- * @param {ProviderDialogState} state - State.
- * @param {ProviderDialogAction} action - Action.
  * @returns {ProviderDialogState} The new state (the same one when nothing changes).
  */
 export const providerDialogReducer = (
@@ -287,7 +276,6 @@ export type ProviderDialogView = {
 /**
  * Returns what the dialog shows and enables for a state.
  * @param {object} params - Parameters.
- * @param {ProviderDialogState} params.state - State.
  * @param {SavedProvider|null} params.saved - Saved provider (edit), null to add.
  * @param {string[]} params.allowlist - Org-hosted base URLs.
  * @returns {ProviderDialogView} The view.

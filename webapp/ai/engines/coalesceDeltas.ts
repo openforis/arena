@@ -51,7 +51,6 @@ export const createDeltaCoalescer = ({
   /**
    * Sends the delta that is waiting, if any.
    * @param {TransformStreamDefaultController} controller - The stream controller.
-   * @returns {void}
    */
   const flush = (controller: TransformStreamDefaultController<LanguageModelV4StreamPart>) => {
     if (timer !== null) timers.clearTimer(timer)

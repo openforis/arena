@@ -25,7 +25,6 @@ export const buildInvalidTreeRecord = (): SampleRecord => {
 
 /**
  * Returns the rows of the validation report.
- * @param {Page} page - The page.
  * @returns {import('@playwright/test').Locator} The rows.
  */
 export const reportRows = (page: Page) =>
@@ -34,7 +33,6 @@ export const reportRows = (page: Page) =>
 /**
  * Opens the validation report and waits until it has the expected number of rows
  * (record validations are updated asynchronously, so the report is reloaded until then).
- * @param {Page} page - The page.
  * @param {number} count - Expected number of rows.
  * @returns {Promise<void>} Resolves when the report has that many rows.
  */
@@ -87,14 +85,12 @@ export const askAssistantAboutFirstRow = async (page: Page): Promise<void> => {
 
 /**
  * Returns the record-edit card of the conversation (the last one).
- * @param {Page} page - The page.
  * @returns {import('@playwright/test').Locator} The card.
  */
 export const recordEditCard = (page: Page) => page.getByTestId(TestId.aiCleaning.card).last()
 
 /**
  * Applies the selected edits of the card and waits for the result of the first edit.
- * @param {Page} page - The page.
  * @param {string} status - Expected result status (applied, conflict, failed).
  * @returns {Promise<void>} Resolves when the result is shown.
  */

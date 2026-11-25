@@ -65,7 +65,6 @@ const DEFAULT_OPTIONS: OptionsChoice = {
 
 /**
  * Reads the map centre when the dialog opens (plots are sorted by distance from it).
- * @param {L.Map|null} map - The map.
  * @returns {LatLngLiteral|null} The centre.
  */
 const readCenter = (map: L.Map | null): LatLngLiteral | null => {
@@ -75,7 +74,6 @@ const readCenter = (map: L.Map | null): LatLngLiteral | null => {
 
 /**
  * Reads the map view when the dialog opens (only the plots inside it are listed), before a capture moves the map.
- * @param {L.Map|null} map - The map.
  * @returns {LatLngBoundsLiteral|null} The bounds.
  */
 const readBounds = (map: L.Map | null): LatLngBoundsLiteral | null => {

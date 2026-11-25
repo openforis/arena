@@ -37,7 +37,6 @@ export const collectAttributions = ({
 
 /**
  * Formats the coordinates printed in the stamp (Lat, Lon notation of the status bar).
- * @param {LatLngLiteral|null} [point] - The point.
  * @returns {string} The coordinates, or an empty string without a valid point.
  */
 export const formatStampCoordinates = (point?: LatLngLiteral | null): string =>

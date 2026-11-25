@@ -77,7 +77,6 @@ const testAccountProvider = async (id: string): Promise<boolean> => {
  * Removes a local provider from this browser; the default goes back to Arena default when it was this provider.
  * @param {object} params - Parameters.
  * @param {string} params.id - Local provider id.
- * @param {string} params.defaultProviderId - Default provider id.
  * @returns {Promise<boolean>} False when the browser storage could not be written (nothing changed).
  */
 const removeLocalProvider = async ({ id, defaultProviderId }: { id: string; defaultProviderId: string }) => {
@@ -184,7 +183,6 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
   /**
    * Opens the dialog on a saved provider.
    * @param {AiProviderEntry} entry - The provider.
-   * @returns {void} Nothing.
    */
   const openEdit = useCallback(
     (entry: AiProviderEntry) => {
@@ -200,8 +198,6 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
 
   /**
    * Runs a menu action of a row; a failure is shown to the user.
-   * @param {ProviderRow} row - The row.
-   * @param {ProviderMenuAction} action - The action.
    * @returns {Promise<void>} Resolves when the action ended.
    */
   const runAction = useCallback(
@@ -226,18 +222,15 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
 
   /**
    * Opens the dialog on a new provider.
-   * @returns {void} Nothing.
    */
   const openAdd = useCallback(() => setDialog({ saved: null }), [])
   /**
    * Closes the dialog.
-   * @returns {void} Nothing.
    */
   const closeDialog = useCallback(() => setDialog(null), [])
   /**
    * Closes the dialog after a save. The dialog already refreshed the cache and the capabilities; the key flags come
    * with the settings.
-   * @returns {void} Nothing.
    */
   const onDialogSaved = useCallback(() => {
     setDialog(null)

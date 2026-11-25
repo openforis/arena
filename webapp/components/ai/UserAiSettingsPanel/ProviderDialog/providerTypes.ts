@@ -177,7 +177,6 @@ export const getProviderTypeGroups = ({
  * Returns the dialog type of a stored provider type.
  * @param {object} params - Parameters.
  * @param {string} params.type - Stored type.
- * @param {string|null} params.baseUrl - Base URL.
  * @param {string[]} params.allowlist - Org-hosted base URLs.
  * @returns {ProviderDialogType|null} The dialog type, or null for an unknown type.
  */

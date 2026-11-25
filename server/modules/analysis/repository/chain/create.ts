@@ -10,10 +10,7 @@ import { transformCallback } from './read'
 /**
  * Create a processing chain.
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
  * @param {!object} params.chain - The processing chain.
- * @param {BaseProtocol} [client] - The database client.
- * @returns {Promise<Chain>} - The result promise.
  */
 type ChainToInsert = Omit<ArenaChain, 'validation'> & { validation?: ArenaChain['validation'] }
 
@@ -35,12 +32,9 @@ export const insertChain = (params: { surveyId: number; chain: ArenaChain }, cli
 /**
  * Create a processing chain including R scripts.
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
  * @param {!object} params.chain - The processing chain.
  * @param {string|null} [params.scriptCommon] - The common R script.
  * @param {string|null} [params.scriptEnd] - The end R script.
- * @param {BaseProtocol} [client] - The database client.
- * @returns {Promise<Chain>} - The result promise.
  */
 export const insertChainFull = (
   params: {

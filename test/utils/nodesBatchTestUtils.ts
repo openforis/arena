@@ -24,7 +24,6 @@ export class TestRecordsUpdateThread extends RecordsUpdateThread {
 
 /**
  * Builds the dependencies of the nodes batch service that send the batch messages to an in-process thread.
- * @param {TestRecordsUpdateThread} thread - The thread.
  * @returns {object} The dependencies.
  */
 export const createInProcessNodesBatchServiceDeps = (thread: TestRecordsUpdateThread) => ({

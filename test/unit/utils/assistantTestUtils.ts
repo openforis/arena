@@ -11,8 +11,6 @@ export const testUser: any = { uuid: 'user-1', name: 'Tester', authGroups: [] }
 
 /**
  * Translation stub: the key followed by the params as JSON.
- * @param {string} key - Key.
- * @param {object} [params] - Params.
  * @returns {string} The "translation".
  */
 export const fakeT = (key: string, params?: Record<string, unknown>): string =>
@@ -53,8 +51,6 @@ export const buildAssistantSurvey = async ({
 
 /**
  * Returns the node definition with the given name (scans the array: the name index may be stale in tests).
- * @param {object} survey - Survey.
- * @param {string} name - Name.
  * @returns {object} The node definition.
  */
 export const getDefByName = (survey: any, name: string): any => {
@@ -102,7 +98,6 @@ export const finish = (unified: string) => ({ type: 'finish', finishReason: { un
 
 /**
  * Builds a model stream that answers with the given text.
- * @param {string} text - Text.
  * @returns {ReadableStream} The stream.
  */
 export const textStream = (text: string): any =>
@@ -116,8 +111,6 @@ export const textStream = (text: string): any =>
 
 /**
  * Builds a model stream that calls a tool.
- * @param {string} toolCallId - Tool call id.
- * @param {string} toolName - Tool name.
  * @param {unknown} [input] - Tool input (default: the tool name as summary).
  * @returns {ReadableStream} The stream.
  */

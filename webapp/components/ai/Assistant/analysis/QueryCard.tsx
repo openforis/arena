@@ -19,7 +19,6 @@ type RowProps = { label: string; values: string[] }
 
 /**
  * One labelled line of the card; nothing when there is no value.
- * @param {RowProps} props - Props.
  * @returns {React.ReactElement|null} The line.
  */
 const QueryCardRow = ({ label, values }: RowProps) => {
@@ -34,7 +33,6 @@ const QueryCardRow = ({ label, values }: RowProps) => {
 
 /**
  * Card of a query proposed by the assistant, with the buttons that show it in the Explorer.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The card.
  */
 export const QueryCard = ({ entry }: Props) => {

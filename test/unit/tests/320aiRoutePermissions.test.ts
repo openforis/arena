@@ -20,7 +20,6 @@ const findRoute = (routes: Route[], method: string, path: string): Route => {
 
 /**
  * Returns the position of a handler in a route chain, failing the test when it is missing.
- * @param {Route} route - The route.
  * @param {Function} handler - The handler to look for.
  * @returns {number} Its index.
  */

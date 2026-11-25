@@ -31,7 +31,6 @@ const TITLE_ID = 'map-screenshot-title'
  * Chooses the notice to show: the last action error, else the capture notice, else a capture error.
  * @param {object} params - The parameters.
  * @param {ScreenshotNotice|null} params.actionError - Error of the last action.
- * @param {ScreenshotPreview} params.preview - The preview.
  * @returns {ScreenshotNotice|null} The notice.
  */
 const getDialogNotice = ({
@@ -76,7 +75,6 @@ export const ScreenshotDialog = (): React.ReactElement => {
   /**
    * Closes the dialog on user request (Cancel, X, Escape, backdrop). While the replace prompt is open it answers
    * "keep" first; while saving without a prompt it does nothing.
-   * @returns {void}
    */
   const onRequestClose = useCallback(() => {
     if (replacePrompt) {

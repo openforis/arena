@@ -21,7 +21,6 @@ const formatPropertyValue = (value: unknown): string =>
  * Binds a popup with the properties of a feature as plain text (the file comes from the user; KML popups are sanitized in kmlLayer).
  * @param {object} feature - The GeoJSON feature.
  * @param {L.Layer} layer - The layer of the feature.
- * @returns {void}
  */
 const bindPropertiesPopup = (feature: { properties?: Record<string, unknown> | null }, layer: L.Layer): void => {
   const entries = Object.entries(feature.properties ?? {})
@@ -58,7 +57,6 @@ const readKmzTexts = async (file: File): Promise<string[]> => {
 
 /**
  * Reads a KML, KMZ, zipped Shapefile or GeoJSON file into Leaflet layers (not added to the map).
- * @param {File} file - The file.
  * @param {UploadedFileKind} kind - Its kind (from its extension).
  * @returns {Promise<L.Layer[]>} One layer per KML document / Shapefile layer, one for a GeoJSON file.
  * @throws {Error} When the file cannot be parsed.
@@ -103,7 +101,6 @@ export const getReadErrorDetails = (error: unknown): string =>
  * Applies an opacity to an uploaded layer: markers, lines and polygons (fill at half), ground overlays.
  * @param {L.Layer} layer - The layer (groups are walked).
  * @param {number} opacity - Opacity 0–1.
- * @returns {void}
  */
 export const setUploadedLayerOpacity = (layer: L.Layer, opacity: number): void => {
   if (layer instanceof L.LayerGroup) {

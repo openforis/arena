@@ -21,7 +21,6 @@ export const isIntroModule = (module: string): module is IntroModule => (INTRO_M
 
 /**
  * Returns the prompt of the introduction of a module.
- * @param {IntroModule} module - Module.
  * @returns {string} The prompt.
  */
 export const buildModuleIntroPrompt = (module: IntroModule): string =>

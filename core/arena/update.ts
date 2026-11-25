@@ -5,9 +5,6 @@ import { _curry3 } from './internal/_curry3'
  *
  * @param {*} index - The index to replace.
  * @param {*} value - The new value.
- * @param {*} list - The array.
- *
- * @returns {Array} - The result.
  */
 export const update = _curry3((index: number, value: any, list: any[]): any[] => {
   if (index >= list.length || index < -list.length) return list

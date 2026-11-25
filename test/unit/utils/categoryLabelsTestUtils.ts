@@ -37,7 +37,6 @@ export const buildCategoryLabelsSurvey = async ({
 
 /**
  * Returns the uuid of a category of the survey.
- * @param {object} survey - Survey.
  * @param {string} name - Category name.
  * @returns {string} The uuid.
  */
@@ -88,7 +87,6 @@ export const categoryLabelOp = ({
 
 /**
  * Builds a change set of survey 7.
- * @param {object[]} operations - Operations.
  * @param {string} [id] - Change set id.
  * @returns {ChangeSet} The change set.
  */
@@ -171,7 +169,6 @@ export const fakeCategoryItem = (ref: string, labels?: Record<string, string>): 
 
 /**
  * Tells whether a text is blank.
- * @param {string} [text] - Text.
  * @returns {boolean} True when empty or only spaces.
  */
 const isBlankText = (text?: string): boolean => (text ?? '').trim() === ''

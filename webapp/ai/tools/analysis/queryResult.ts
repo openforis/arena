@@ -33,9 +33,6 @@ const getMeasureColumns = ({ query, getDef }: { query: any; getDef: (uuid: strin
 
 /**
  * Returns the columns of the result of a query, as the Explorer shows them.
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.query - The query.
  * @returns {QueryResultColumn[]} The columns.
  */
 export const getQueryResultColumns = ({ survey, query }: { survey: any; query: any }): QueryResultColumn[] => {

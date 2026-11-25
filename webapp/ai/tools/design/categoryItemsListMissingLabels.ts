@@ -73,8 +73,6 @@ type PageParams = {
 
 /**
  * Returns the category with a name, or fails for the model.
- * @param {object} survey - Survey.
- * @param {string} categoryName - Category name.
  * @returns {object} The category.
  */
 export const requireCategory = (survey: any, categoryName: string): any => {
@@ -87,10 +85,6 @@ export const requireCategory = (survey: any, categoryName: string): any => {
 
 /**
  * Fails when a conversation started by Do it on this suggestion asks for another category.
- * @param {AiToolContext} ctx - Tool context.
- * @param {string} categoryUuid - Category uuid.
- * @param {string} categoryName - Category name.
- * @returns {void}
  */
 export const checkScope = (ctx: AiToolContext, categoryUuid: string, categoryName: string): void => {
   const scope = ctx.suggestionScope
@@ -104,7 +98,6 @@ export const checkScope = (ctx: AiToolContext, categoryUuid: string, categoryNam
 
 /**
  * Returns the survey languages, failing when lang is not one of them.
- * @param {object} survey - Survey.
  * @param {string} lang - Requested language.
  * @returns {string[]} The survey languages, default first.
  */
@@ -118,9 +111,6 @@ const requireSurveyLanguage = (survey: any, lang: string): string[] => {
 
 /**
  * Returns the items whose label in lang is in a pending card (not applied nor discarded yet).
- * @param {AiToolContext} ctx - Tool context.
- * @param {string} categoryUuid - Category uuid.
- * @param {string} lang - Language.
  * @returns {Set<string>} The item uuids.
  */
 const getPendingItemUuids = (ctx: AiToolContext, categoryUuid: string, lang: string): Set<string> => {
@@ -161,8 +151,6 @@ const toListedItem = (item: MissingLabelsItem, lang: string, languages: string[]
  * Consumes the items of a server page until the limit or the JSON budget is reached.
  * @param {MissingLabelsItem[]} items - Server items.
  * @param {PageState} state - Collected items (updated).
- * @param {PageParams} params - Parameters.
- * @returns {void}
  */
 const collectItems = (items: MissingLabelsItem[], state: PageState, params: PageParams): void => {
   const { refs, surveyId, categoryUuid, lang, languages, pendingItemUuids, limit, maxChars } = params
@@ -187,7 +175,6 @@ const collectItems = (items: MissingLabelsItem[], state: PageState, params: Page
 
 /**
  * Returns the note telling the model how to go on.
- * @param {string|null} nextCursor - Next cursor.
  * @param {number} pendingCount - Labels of this category and language in pending cards.
  * @param {string|null} example - An item of the propose tool input, null when nothing is listed.
  * @returns {string} The note.
@@ -226,7 +213,6 @@ const toCursorFailure = (error: any, cursor: string | null): AiToolFailure | nul
 /**
  * Fetches a server page; a cursor the server refuses becomes a failure the model can act on.
  * @param {FetchMissingLabelsPage} fetchPage - Page fetcher.
- * @param {Parameters<FetchMissingLabelsPage>[0]} params - Request parameters.
  * @returns {Promise<MissingLabelsPage>} The page.
  */
 const fetchServerPage = async (

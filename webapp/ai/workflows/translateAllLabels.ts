@@ -69,7 +69,6 @@ type ProgressListener = (progress: AiBatchProgress) => void
  * @param {string} params.kind - Item kind (prompt hint).
  * @param {ItemInfo} params.info - Node def and field of the item.
  * @param {number} params.maxChars - Longest text the task accepts.
- * @returns {void}
  */
 const addItem = (
   acc: TranslationItems,
@@ -88,7 +87,6 @@ const addItem = (
 /**
  * Builds the texts to translate (label and description of each node def, in the default language).
  * @param {object} params - Parameters.
- * @param {object[]} params.nodeDefs - Node defs.
  * @param {string} params.defaultLang - Default language of the survey.
  * @param {number} [params.maxChars] - Longest text the task accepts.
  * @returns {TranslationItems} The items, the node def of each item id, and the number of texts too long.
@@ -192,7 +190,6 @@ export type TranslatedRows<R> = {
  * @param {number} [params.maxLength] - Longest text kept: a longer one counts as not produced.
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {AiBatchGuard} params.guard - Check run before each call.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener.
  * @param {Function} [params.translate] - The translation task (tests).
  * @param {number} [params.batchSize] - Items per call.
@@ -291,13 +288,10 @@ const applyTranslations = (
 /**
  * Builds the review data of every node def (the result of the old job's beforeSuccess, plus the failed count).
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
  * @param {string} params.defaultLang - Default language.
- * @param {string[]} params.languages - Survey languages.
  * @param {string[]} params.otherLangs - Languages other than the default one.
  * @param {AiTranslationsByNodeDef} params.aiByNodeDef - AI suggestions by node def uuid.
  * @param {number} params.failedCount - Translations the AI did not produce.
- * @returns {NodeDefsTranslationResult} The result.
  */
 const buildNodeDefsTranslationResult = ({
   survey,
@@ -344,7 +338,6 @@ const buildNodeDefsTranslationResult = ({
  * @param {object} params.survey - Survey with its node defs (the store's survey).
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {AiBatchGuard} params.guard - Check run before each call.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener ({ done, total } calls).
  * @param {Function} [params.translate] - The translation task (tests).
  * @param {number} [params.batchSize] - Items per call.
@@ -430,8 +423,6 @@ const hasTextToTranslate = (survey: any): boolean => {
  * Translates every label and description of the survey with the model of the translation feature.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey with its node defs (the store's survey).
- * @param {number} params.surveyId - Survey id.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener.
  * @returns {Promise<NodeDefsTranslationResult>} The review data.
  */

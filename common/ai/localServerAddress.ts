@@ -75,7 +75,6 @@ export const getLocalServerHostingClass = (url: string, allowlist: string[]): Ai
 
 /**
  * Returns the fetch `targetAddressSpace` to request for a URL (Chrome Local Network Access), or null.
- * @param {string} url - Request URL.
  * @returns {'local'|null} 'local' for private, link-local, CGNAT and .local hosts; null otherwise.
  */
 export const getTargetAddressSpace = (url: string): 'local' | null => {

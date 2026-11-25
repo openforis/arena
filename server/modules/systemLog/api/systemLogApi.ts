@@ -31,7 +31,6 @@ const parseMaxLines = (value: unknown): number => {
  * Streams the last lines of the log files of all the server instances and then the lines appended to them
  * (like `tail -f`), until the client disconnects.
  * @param {object} params - The parameters.
- * @param {object} params.res - The Express response.
  * @param {number} params.maxLines - Number of lines sent initially for every instance.
  * @returns {Promise<void>} - Resolved once the stream is started.
  */

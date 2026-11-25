@@ -41,8 +41,6 @@ type CategoryLabelItem = CategoryLabelsInput['items'][number]
 /**
  * Converts one proposed item to an operation draft.
  * @param {CategoryLabelItem} item - Proposed label.
- * @param {object} survey - Survey.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {ChangeOperationDraft} The draft.
  */
 const toDraft = (

@@ -45,7 +45,6 @@ let appCache: SurveyAiPolicyCache | null = null
 /**
  * Registers the cache of the app, the one `resetSurveyAiPolicyCache` empties.
  * @param {SurveyAiPolicyCache} cache - The app cache.
- * @returns {void}
  */
 export const registerAppSurveyAiPolicyCache = (cache: SurveyAiPolicyCache): void => {
   appCache = cache
@@ -54,7 +53,6 @@ export const registerAppSurveyAiPolicyCache = (cache: SurveyAiPolicyCache): void
 /**
  * Empties the app cache (login and logout): another user must not see policies, or answers in flight, of the
  * previous one. Does nothing when the app cache was never created.
- * @returns {void}
  */
 export const resetSurveyAiPolicyCache = (): void => {
   appCache?.reset()
@@ -76,7 +74,6 @@ export const createSurveyAiPolicyCache = ({
 
   /**
    * Returns the survey's entry, creating it when missing.
-   * @param {number} surveyId - Survey id.
    * @returns {Entry} The entry.
    */
   const getEntry = (surveyId: number): Entry => {
@@ -90,8 +87,6 @@ export const createSurveyAiPolicyCache = ({
 
   /**
    * Tells the listeners that a survey's entry changed.
-   * @param {number} surveyId - Survey id.
-   * @returns {void}
    */
   const notify = (surveyId: number): void => {
     for (const listener of listeners) listener(surveyId)
@@ -99,10 +94,8 @@ export const createSurveyAiPolicyCache = ({
 
   /**
    * Stores a value as the fresh one and notifies.
-   * @param {number} surveyId - Survey id.
    * @param {Entry} entry - The survey entry.
    * @param {SurveyAiPolicyClientState} value - The value to store.
-   * @returns {void}
    */
   const store = (surveyId: number, entry: Entry, value: SurveyAiPolicyClientState): void => {
     entry.value = value
@@ -123,7 +116,6 @@ export const createSurveyAiPolicyCache = ({
   /**
    * Starts a new generation, dropping the in-flight request.
    * @param {Entry} entry - The survey entry.
-   * @returns {void}
    */
   const nextGeneration = (entry: Entry): void => {
     entry.generation += 1
@@ -132,7 +124,6 @@ export const createSurveyAiPolicyCache = ({
 
   /**
    * Starts the shared request of a survey.
-   * @param {number} surveyId - Survey id.
    * @param {Entry} entry - The survey entry.
    * @returns {Promise<Fetched>} The server answer; stored only when no newer generation started meanwhile.
    */
@@ -168,7 +159,6 @@ export const createSurveyAiPolicyCache = ({
   /**
    * Drops the cached value and the request in flight, and starts a new request. Its caller gets the server's own
    * answer, never the cached value.
-   * @param {number} surveyId - Survey id.
    * @param {Entry} entry - The survey entry.
    * @returns {Promise<SurveyAiPolicyClientState>} The new request.
    */

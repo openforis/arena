@@ -68,8 +68,6 @@ export const createRecordGetValuesTool = ({
   inputSchema,
   /**
    * Resolves the record, loads it once and reads the attributes.
-   * @param {Input} input - Tool input.
-   * @param {object} ctx - Tool context.
    * @returns {Promise<object>} The values, or a tool error.
    */
   execute: async ({ recordUuid, recordKeys, attributes, parentNodeUuid }, ctx) => {

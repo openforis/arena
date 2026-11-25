@@ -5,8 +5,6 @@ import { _curry2 } from './internal/_curry2'
  *
  * @param {*} fn - The mapping function.
  * @param {*} functor - The array or object to map.
- *
- * @returns {*} - The result.
  */
 export const map = _curry2((fn: (value: any) => any, functor: any): any => {
   if (Array.isArray(functor)) return functor.map((item) => fn(item))

@@ -30,7 +30,6 @@ export type SuggestionSend = (
 
 /**
  * Returns the store bucket of the suggestion of a request: Help suggestions belong to no survey.
- * @param {SuggestionRequest} request - Request.
  * @returns {number|null} The survey id of the bucket.
  */
 export const getRequestBucketSurveyId = (request: Pick<SuggestionRequest, 'area' | 'surveyId'>): number | null =>
@@ -40,7 +39,6 @@ export const getRequestBucketSurveyId = (request: Pick<SuggestionRequest, 'area'
  * Returns the request text the chat shows for a card: the card's key with `card` replaced by `request`
  * ("missingTranslations.card" → "missingTranslations.request", "dataImported.cardOne" → "dataImported.requestOne").
  * @param {object} params - Parameters.
- * @param {SuggestionDefinition} params.definition - Definition.
  * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language.
  * @returns {string} The text, in the interface language.
@@ -66,7 +64,6 @@ export const getSuggestionRequestText = ({
  * @param {number|null} params.surveyId - Survey open now.
  * @param {string|null} params.cycle - Cycle now.
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language of the prompt.
- * @param {SuggestionDefinitions} [params.definitions] - Definitions.
  * @param {Function} [params.newId] - Request id factory.
  * @param {AiLog} [params.log] - Reports a prompt that could not be built.
  * @returns {SuggestionRequest|null} The request; null without a target or a prompt.
@@ -121,7 +118,6 @@ export const buildSuggestionRequest = ({
 
 /**
  * Returns true when a request was made for this user, survey, cycle and area.
- * @param {SuggestionRequest} request - Request.
  * @param {SuggestionRequestScope} scope - Scope of the chat.
  * @returns {boolean} True when it may be sent here.
  */
@@ -159,8 +155,6 @@ export const takeRequestForScope = ({
  * @param {object} params - Parameters.
  * @param {SuggestionRequest} params.request - Claimed request.
  * @param {SuggestionSend} params.send - The conversation hook's send.
- * @param {SuggestionStore} [params.store] - Store.
- * @param {SuggestionDefinitions} [params.definitions] - Definitions.
  * @returns {Promise<string|null>} The new conversation id; null when nothing was sent (nothing changes). A rejected
  * send propagates and marks nothing.
  */
@@ -191,9 +185,6 @@ export const acceptSuggestion = async ({
  * @param {object} params - Parameters.
  * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
  * @param {string} params.userUuid - User.
- * @param {SuggestionStore} [params.store] - Store.
- * @param {SuggestionDefinitions} [params.definitions] - Definitions.
- * @returns {void}
  */
 export const dismissSuggestion = ({
   suggestion,

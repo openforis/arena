@@ -124,7 +124,6 @@ const noEngine = (selection: { unavailable: string[] }, dataClass: AiDataClass) 
 
 /**
  * Returns the selected engine, or throws aiNoEngineAvailable with the reason.
- * @param {AiEngineSelection} selection - The selection.
  * @param {AiDataClass} dataClass - Data class of the request.
  * @param {AiEngineErrorInfo|null} [probeError] - Why the last probe of the request's local provider failed.
  * @returns {AiSelectedEngine} The engine.
@@ -147,7 +146,6 @@ const assertSelected = (
  * is offered data tools). Nothing is asked or created here.
  * @param {object} params - Parameters.
  * @param {AiPolicy|null} params.effective - Effective policy.
- * @param {AiCapabilities} params.capabilities - Capabilities.
  * @param {string} [params.providerId] - Requested provider.
  * @param {AiDataClass} params.dataClass - Class of the request.
  * @param {Function} [params.declare] - The turn's declaration.
@@ -177,7 +175,6 @@ const selectForTurn = ({
 
 /**
  * Returns the probe-based capability of the selected local provider.
- * @param {Context} context - Request context.
  * @param {AiSelectedEngine} engine - The selected local engine.
  * @returns {AiLocalServerCapability} The capability.
  */
@@ -195,7 +192,6 @@ const getLocalCapability = (context: Context, engine: AiSelectedEngine): AiLocal
 export const createModelResolver = (deps: ModelResolverDeps) => {
   /**
    * Returns the consent storage parameters of the request (the local provider's normalized base URL).
-   * @param {Context} context - Request context.
    * @param {AiLocalServerCapability} capability - The local provider's capability.
    * @returns {object} Storage, user, survey, base URL and data class.
    */
@@ -209,7 +205,6 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
 
   /**
    * Creates the gateway model (POST /api/ai/model) of the selected provider.
-   * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected gateway engine.
    * @param {AiPolicy} policy - The effective policy the engine was selected with.
    * @returns {ResolvedModel} The model, the engine and the policy.
@@ -225,9 +220,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
 
   /**
    * Creates the model with the local server engine of the provider.
-   * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
-   * @param {AiLocalServerCapability} capability - Its capability.
    * @param {AiPolicy} policy - The effective policy the engine was selected with.
    * @returns {Promise<ResolvedModel>} The model, the engine and the policy.
    */
@@ -243,9 +236,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
 
   /**
    * Asks the user to confirm the local provider; only Continue goes on (no other provider is tried).
-   * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
-   * @param {AiLocalServerCapability} capability - Its capability.
    * @returns {Promise<void>} Resolves on Continue.
    * @throws {SystemError} aiProviderChooseAnother for "Choose another provider", aiLocalServerConsentCancelled otherwise.
    */
@@ -318,7 +309,6 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
   /**
    * Creates the model of a local provider: checks the policy and declares the turn's class, asks when this survey has
    * no consent for its URL at that class, then checks again (a local request is never checked by the server).
-   * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @returns {Promise<ResolvedModel>} The model, the engine and the policy.
    */

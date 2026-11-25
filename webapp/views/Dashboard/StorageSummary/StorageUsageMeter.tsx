@@ -25,7 +25,6 @@ export const getStorageUsageFillColor = (percent: number): string => {
 /**
  * Horizontal storage usage meter with threshold-based fill color.
  *
- * @param {StorageUsageMeterProps} props - The component props.
  * @returns {React.ReactElement} The meter.
  */
 export const StorageUsageMeter = (props: StorageUsageMeterProps) => {

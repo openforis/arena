@@ -14,7 +14,6 @@ export const userWithoutAccess = { uuid: 'no-access-user', authGroups: [] }
 /**
  * Returns a user belonging to the given group of the survey.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string} params.groupName - Auth group name (e.g. dataCleanser).
  * @returns {object} The user.
  */
@@ -26,7 +25,6 @@ export const newSurveyUser = ({ survey, groupName }: { survey: any; groupName: s
 /**
  * Returns a tool context for the analysis tools.
  * @param {object} params - Parameters (any context prop can be overridden).
- * @param {object} params.survey - The survey.
  * @param {object} [params.user] - The user (system admin by default).
  * @returns {object} The context.
  */
@@ -89,9 +87,7 @@ export const newFakeAnalysisApi = (overrides: Partial<Record<keyof AnalysisApi, 
 /**
  * Validates the input with the tool's schema (as the AI SDK does), then runs the tool; a failure the tool throws
  * becomes the error result the registry gives the model.
- * @param {object} tool - The tool.
  * @param {object} input - The raw input.
- * @param {object} ctx - The tool context.
  * @returns {Promise<any>} The tool output.
  */
 export const runTool = async (tool: any, input: unknown, ctx: any) => {

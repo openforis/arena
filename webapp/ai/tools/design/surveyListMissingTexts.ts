@@ -70,7 +70,6 @@ type SlotFilter = {
 
 /**
  * Returns every text slot (node definition × kind) in hierarchy order; the index is the cursor.
- * @param {object} survey - Survey.
  * @returns {Slot[]} The slots.
  */
 const getSlots = (survey: any): Slot[] =>
@@ -113,8 +112,6 @@ const getScopeFilter = (scope: SuggestionScope | null): ((slot: Slot) => boolean
 
 /**
  * Tells whether a slot is still to write: missing in the language (or empty everywhere), not pending, in scope.
- * @param {Slot} slot - Slot.
- * @param {SlotFilter} filter - Filter.
  * @returns {boolean} True when listed.
  */
 const isWanted = (slot: Slot, filter: SlotFilter): boolean => {
@@ -135,8 +132,6 @@ const isWanted = (slot: Slot, filter: SlotFilter): boolean => {
 
 /**
  * Returns the language to list, refusing a missing or foreign one.
- * @param {MissingTextsInput} input - Tool input.
- * @param {string[]} languages - Survey languages.
  * @returns {string|null} The language; null with onlyEmpty.
  */
 const checkLanguage = (input: MissingTextsInput, languages: string[]): string | null => {
@@ -159,9 +154,7 @@ const checkLanguage = (input: MissingTextsInput, languages: string[]): string | 
 
 /**
  * Builds the item of a text missing in a language, with its source text.
- * @param {Slot} slot - Slot.
  * @param {string} lang - Missing language.
- * @param {string[]} languages - Survey languages.
  * @returns {MissingTextItem} The item.
  */
 const toSourceItem = (slot: Slot, lang: string, languages: string[]): MissingTextItem => {
@@ -180,7 +173,6 @@ const toSourceItem = (slot: Slot, lang: string, languages: string[]): MissingTex
 
 /**
  * Builds the item of a text empty in every language.
- * @param {Slot} slot - Slot.
  * @returns {MissingTextItem} The item.
  */
 const toEmptyItem = (slot: Slot): MissingTextItem => ({
@@ -193,8 +185,6 @@ const toEmptyItem = (slot: Slot): MissingTextItem => ({
 /**
  * Lists one page of the texts still to write.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {MissingTextsInput} params.input - Tool input.
  * @param {SuggestionScope|null} params.scope - Scope of an accepted suggestion.
  * @param {ChangeSet[]} params.pendingChangeSets - Cards not applied yet.
  * @param {number} [params.maxChars] - JSON budget of the page.

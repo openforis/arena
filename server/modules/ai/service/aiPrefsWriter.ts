@@ -54,7 +54,6 @@ export const createDefaultAiPrefsWriterDeps = (): AiPrefsWriterDeps => ({
 
 /**
  * Returns the user with the AI prefs as stored.
- * @param {ArenaUser} user - The user.
  * @param {object|null} aiPrefs - Stored AI prefs.
  * @returns {ArenaUser} The user with those prefs (the other prefs are the user's own).
  */
@@ -66,9 +65,6 @@ export const withStoredAiPrefs = (user: ArenaUser, aiPrefs: StoredAiPrefs | null
  * another user was copied and is removed instead (one query, only when there are old keys to upgrade).
  * @param {object} params - Parameters.
  * @param {object|null} params.aiPrefs - The AI prefs about to be stored.
- * @param {ArenaUser} params.user - The user.
- * @param {Queryable} params.client - The transaction.
- * @param {AiPrefsWriterDeps} params.deps - Dependencies.
  * @returns {Promise<object|null>} The AI prefs to store; the same object when no key changed.
  */
 const upgradeOldKeys = async ({
@@ -94,9 +90,7 @@ const upgradeOldKeys = async ({
  * the user row is locked, so it must not wait for the network; it may throw to refuse the write (nothing is stored).
  * Nothing is written when the change returns null and no old key needs to be encrypted again.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {AiPrefsChange} params.change - Receives the latest stored AI prefs, returns the ones to store (or null).
- * @param {AiPrefsWriterDeps} [params.deps] - Dependencies.
  * @returns {Promise<ArenaUser>} The user with the AI prefs as stored.
  */
 export const changeAiPrefs = async ({

@@ -68,7 +68,6 @@ const heldLength = (text: string): number => {
  * Sends the text and the tool calls read from the tail.
  * @param {Tail} tail - The tail read.
  * @param {Controller} controller - The stream controller.
- * @returns {void}
  */
 const enqueueTail = ({ calls, text }: Tail, controller: Controller): void => {
   if (text) {

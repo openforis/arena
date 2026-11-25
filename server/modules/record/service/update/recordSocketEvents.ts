@@ -13,7 +13,6 @@ export type RecordSocketEvent = { type: string; content: unknown }
 /**
  * Builds the nodesUpdate event.
  * @param {object} params - The parameters.
- * @param {string} params.recordUuid - The record uuid.
  * @param {object} params.updatedNodes - The updated nodes by uuid.
  * @returns {RecordSocketEvent|null} The event, or null when no node was updated.
  */

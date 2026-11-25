@@ -38,7 +38,6 @@ type SceneRowProps = {
  * One scene: thumbnail, date, tile, cloud and coverage; the selected row shows its layer actions.
  *
  * @param {object} props - Props.
- * @param {SceneResult} props.scene - Scene.
  * @param {boolean} props.selected - Whether the row is selected.
  * @param {SceneBandMix} props.bandMix - Band mix of new layers.
  * @param {ReadonlySet<string>} props.pendingIds - Overlay ids being loaded.
@@ -153,7 +152,6 @@ type ScenesResultsProps = Omit<SceneRowProps, 'scene' | 'selected'> & {
  * @param {SceneResult[]} props.scenes - Scenes to list (filtered and sorted).
  * @param {string|null} props.monthKey - Month filter, or null.
  * @param {string|null} props.selectedId - Selected scene id.
- * @param {SceneSort} props.sort - Sort.
  * @param {boolean} props.stale - Whether a newer search is running.
  * @param {Function} props.onSortChange - Called with the new sort.
  * @returns {React.ReactElement} The results.

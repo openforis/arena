@@ -51,7 +51,6 @@ export const getScenePanelStatus = (input: ScenePanelStatusInput): ScenePanelSta
 /**
  * Returns the i18n message of a status.
  *
- * @param {ScenePanelStatusKind} status - Status.
  * @param {number} tileCount - Number of tiles searched.
  * @returns {ScenePanelMessage|null} Message key and params, or null when the status has no message.
  */

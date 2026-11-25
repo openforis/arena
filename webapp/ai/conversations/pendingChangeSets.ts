@@ -7,7 +7,6 @@ import type { Conversation } from './types'
 
 /**
  * Returns true when a card is neither applied nor discarded.
- * @param {ChangeSetCardState} cardState - Card state.
  * @returns {boolean} True when pending.
  */
 export const isChangeSetPending = (cardState: ChangeSetCardState): boolean =>
@@ -15,7 +14,6 @@ export const isChangeSetPending = (cardState: ChangeSetCardState): boolean =>
 
 /**
  * Returns the change sets of the pending cards of a conversation.
- * @param {Conversation} conversation - Conversation.
  * @returns {ChangeSet[]} The change sets.
  */
 export const getPendingChangeSets = (conversation: Pick<Conversation, 'changeSets'>): ChangeSet[] =>

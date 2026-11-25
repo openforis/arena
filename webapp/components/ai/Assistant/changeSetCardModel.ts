@@ -65,8 +65,6 @@ const expressionPropTitleKeys: Record<NodeDefExpressionProp, string> = {
 /**
  * Returns a node definition, existing or created by the change set.
  * @param {string} uuid - Node definition uuid.
- * @param {ChangeSet} changeSet - Change set.
- * @param {object} survey - Survey.
  * @returns {object|null} The node definition; null when unknown.
  */
 const findNodeDef = (uuid: string, changeSet: ChangeSet, survey: any): any => {
@@ -81,8 +79,6 @@ const findNodeDef = (uuid: string, changeSet: ChangeSet, survey: any): any => {
 /**
  * Returns the name of a node definition, existing or created by the change set.
  * @param {string} uuid - Node definition uuid.
- * @param {ChangeSet} changeSet - Change set.
- * @param {object} survey - Survey.
  * @returns {string} The name (the uuid when unknown).
  */
 export const findNodeDefName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
@@ -93,8 +89,6 @@ export const findNodeDefName = (uuid: string, changeSet: ChangeSet, survey: any)
 /**
  * Returns the text a proposed label or description translates: the same text in another survey language.
  * @param {LabelSetOperation} op - Label operation.
- * @param {ChangeSet} changeSet - Change set.
- * @param {object} survey - Survey.
  * @returns {TranslationSource|null} The source; null when no other language has the text.
  */
 const findLabelSource = (op: LabelSetOperation, changeSet: ChangeSet, survey: any): TranslationSource | null => {
@@ -110,7 +104,6 @@ const findLabelSource = (op: LabelSetOperation, changeSet: ChangeSet, survey: an
 
 /**
  * Converts a basic value to a card value.
- * @param {string|boolean|null} value - Value.
  * @returns {CardValue} The card value.
  */
 const toBasicValue = (value: string | boolean | null): CardValue =>
@@ -118,7 +111,6 @@ const toBasicValue = (value: string | boolean | null): CardValue =>
 
 /**
  * Converts an update value to a card value: categories and taxonomies by name.
- * @param {object} survey - Survey.
  * @param {object} op - Update operation.
  * @param {string|boolean|null} value - Its from or to value.
  * @returns {CardValue} The card value.
@@ -244,7 +236,6 @@ const toChangeRow = (
 /**
  * Returns the rows of a card.
  * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
  * @param {object} params.survey - Current survey (names of existing node definitions).
  * @param {string} params.lang - Survey preferred language (label of a new node definition).
  * @returns {CardRow[]} One row per operation, in order.
@@ -277,7 +268,6 @@ export const buildCardRows = ({
 
 /**
  * Returns the operations that can still be applied (not applied yet, card not discarded).
- * @param {ChangeSetCardState} cardState - Card state.
  * @returns {string[]} Operation ids.
  */
 export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] => {
@@ -291,9 +281,6 @@ export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] 
 /**
  * Returns the pending operations that conflict with the current survey, each with its reason (a plain reason such as
  * valueChanged, or an i18n key with its params when the designer's rules refuse it).
- * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
- * @param {object} params.survey - Current survey.
  * @returns {OperationConflict[]} The conflicts, in operation order.
  */
 export const getOperationConflicts = ({
@@ -310,9 +297,6 @@ export const getOperationConflicts = ({
 
 /**
  * Returns the nearest page node definition containing a node definition.
- * @param {object} nodeDef - Node definition.
- * @param {object} survey - Survey.
- * @param {string} cycle - Cycle.
  * @returns {object} The page node definition.
  */
 const findPageNodeDef = (nodeDef: any, survey: any, cycle: string): any => {
@@ -327,9 +311,7 @@ const findPageNodeDef = (nodeDef: any, survey: any, cycle: string): any => {
  * Returns how to show a node definition in the form designer: select it ("all node definitions" tree mode) or
  * open the nearest page that contains it.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
  * @param {string} params.nodeDefUuid - Node definition.
- * @param {string} params.cycle - Current cycle.
  * @param {string} params.viewMode - Tree select view mode of the designer.
  * @returns {NodeDefNavigation|null} The navigation; null when the node definition doesn't exist (yet).
  */

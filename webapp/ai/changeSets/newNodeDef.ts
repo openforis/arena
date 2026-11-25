@@ -31,7 +31,6 @@ export const isAssistantNodeDefType = (type: string): type is AssistantNodeDefTy
 /**
  * Returns the designer's default props: a multiple entity is a table, a single entity a form in the parent page.
  * @param {object} params - Parameters.
- * @param {string} params.type - Type.
  * @param {string[]} params.cycles - Cycles of the node definition.
  * @param {boolean} params.multiple - Multiple entity.
  * @returns {object} The props.
@@ -57,15 +56,12 @@ const nonEmpty = (texts: Record<string, string> | undefined) => (texts && Object
  * Creates a node definition for a proposal. Not temporary: its uuid is final, so later operations can refer to it.
  * @param {object} params - Parameters.
  * @param {object} params.parent - Parent entity.
- * @param {string} params.type - Type.
  * @param {string[]} [params.cycles] - Cycles (default: those of the parent, so the node definition exists wherever its
  * parent does).
- * @param {string} params.name - Name.
  * @param {object} [params.labels] - Labels by language.
  * @param {object} [params.descriptions] - Descriptions by language.
  * @param {boolean} [params.key] - Key attribute.
  * @param {boolean} [params.multiple] - Multiple (default: true for entities, as in the designer).
- * @param {boolean} [params.readOnly] - Read only.
  * @returns {object} The node definition.
  */
 export const createProposedNodeDef = ({

@@ -53,7 +53,6 @@ const parseProviderId = (value: unknown): string | undefined => {
 
 /**
  * Validates the envelope of a gateway request (the call itself is checked by sanitizeCall).
- * @param {unknown} body - Request body.
  * @returns {AiGatewayRequest} The request.
  */
 export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {

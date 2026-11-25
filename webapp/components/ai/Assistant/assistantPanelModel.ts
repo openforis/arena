@@ -15,7 +15,6 @@ const LABEL_PARAM_NAMES = ['name', 'text', 'query']
 
 /**
  * Picks the tool input values a row label can show.
- * @param {unknown} input - Tool input.
  * @returns {Record<string, string>} The label parameters.
  */
 const toLabelParams = (input: unknown): Record<string, string> => {
@@ -65,7 +64,6 @@ export const getProposedChangeSetId = (part: ConversationToolPart): string | nul
 
 /**
  * Returns what Retry resends: the conversation without the failed pair, and the user message of that pair.
- * @param {Conversation} conversation - Conversation.
  * @returns {{base: Conversation, text: string, displayText?: string}|null} Null when the last answer did not fail.
  */
 export const getRetryBase = (
@@ -92,7 +90,6 @@ export const getRetryBase = (
  * @param {string} params.text - Note.
  * @param {string} params.changeSetId - Card.
  * @param {string} params.now - Date.
- * @param {Function} params.idFactory - Id factory.
  * @returns {ApplyNoteMessage} The message.
  */
 const toNote = ({
@@ -118,7 +115,6 @@ type NoteParams = { conversation: Conversation; changeSetId: string; now?: strin
 /**
  * Stores the results of an Apply on the card and adds the summary for the model.
  * @param {object} params - Parameters.
- * @param {Conversation} params.conversation - Conversation.
  * @param {string} params.changeSetId - Card.
  * @param {OperationResult[]} params.results - Results of the Apply.
  * @param {string} params.note - Summary for the model (summarizeResults).
@@ -150,7 +146,6 @@ export const withApplyResults = ({
 /**
  * Marks a card discarded and tells the model.
  * @param {object} params - Parameters.
- * @param {Conversation} params.conversation - Conversation.
  * @param {string} params.changeSetId - Card.
  * @param {string} [params.now] - Date (tests).
  * @param {Function} [params.idFactory] - Id factory (tests).

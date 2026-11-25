@@ -27,9 +27,6 @@ export const categoryRemovalChangeId = (uuid: string): string => `categoryRemova
 
 /**
  * Matches the categories of two surveys: by uuid first, then by name.
- * @param {object} params - The parameters.
- * @param {any} params.sourceSurvey - Source survey.
- * @param {any} params.targetSurvey - Target survey.
  * @returns {CategoryMatch[]} - The matches (unmatched categories have only source or target).
  */
 export const matchCategories = ({ sourceSurvey, targetSurvey }): CategoryMatch[] => {

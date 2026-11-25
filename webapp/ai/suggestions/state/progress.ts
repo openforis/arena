@@ -11,10 +11,7 @@ import { getVisibleTargets } from './visibility'
 
 /**
  * Returns the state with the in-progress entry of a suggestion replaced (null or no target removes it).
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
  * @param {string} id - Suggestion id.
- * @param {InProgressEntry|null} entry - Entry.
  * @returns {SuggestionUserState} The new state.
  */
 export const setInProgress = (
@@ -29,9 +26,7 @@ export const setInProgress = (
 
 /**
  * Marks the visible targets of a suggestion in progress for a conversation (Do it); pending is unchanged.
- * @param {SuggestionUserState} state - State.
  * @param {object} params - Parameters.
- * @param {string} params.bucket - Bucket.
  * @param {string} params.id - Suggestion id.
  * @param {string} params.conversationId - Accepting conversation.
  * @param {string[]} [params.targetKeys] - Only the visible targets with these keys (the ones sent); all when omitted.
@@ -61,10 +56,8 @@ export const withProgress = (
 /**
  * Ends the in-progress entries of a conversation: settled dismisses their targets still in the gap (with the current
  * count), failed shows them again.
- * @param {SuggestionUserState} state - State.
  * @param {object} params - Parameters.
  * @param {string} params.conversationId - Conversation.
- * @param {SettleOutcome} params.outcome - Outcome.
  * @returns {SuggestionUserState} The new state.
  */
 export const withSettled = (
@@ -92,7 +85,6 @@ export const withSettled = (
 
 /**
  * Returns the conversations that have targets in progress.
- * @param {SuggestionUserState} state - State.
  * @returns {string[]} The unique conversation ids.
  */
 export const getInProgressConversationIds = (state: SuggestionUserState): string[] => {
@@ -105,7 +97,6 @@ export const getInProgressConversationIds = (state: SuggestionUserState): string
 
 /**
  * Returns the bucket that has targets in progress for a conversation.
- * @param {SuggestionUserState} state - State.
  * @param {string} conversationId - Conversation.
  * @returns {string|null} The bucket; null when the conversation has nothing in progress.
  */

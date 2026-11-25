@@ -81,7 +81,6 @@ export const trimmedOrNull = (value: unknown): string | null => {
 /**
  * Throws when a value typed for a provider is longer than the limit of its field.
  * @param {object} input - The values typed (untrusted).
- * @returns {void}
  * @throws {SystemError} aiProviderFieldTooLong (400) with the field and its limit.
  */
 export const assertFieldLengths = (input: Record<string, unknown>): void => {
@@ -96,7 +95,6 @@ export const assertFieldLengths = (input: Record<string, unknown>): void => {
 /**
  * Throws when the user already has the most providers that can be saved.
  * @param {readonly unknown[]} providers - The providers stored.
- * @returns {void}
  * @throws {SystemError} aiProviderLimitReached (409) with the limit.
  */
 export const assertProviderCountBelowLimit = (providers: readonly unknown[]): void => {

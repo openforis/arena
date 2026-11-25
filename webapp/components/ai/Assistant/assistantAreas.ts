@@ -21,14 +21,12 @@ export type AssistantAreaStatus = {
 
 /**
  * Returns a hidden status.
- * @param {AssistantArea} area - Area.
  * @returns {AssistantAreaStatus} The status.
  */
 const hidden = (area: AssistantArea): AssistantAreaStatus => ({ area, status: 'hidden', reasonKeys: [] })
 
 /**
  * Returns an unavailable status.
- * @param {AssistantArea} area - Area.
  * @param {string[]} reasonKeys - Reason i18n keys.
  * @returns {AssistantAreaStatus} The status.
  */
@@ -57,7 +55,6 @@ const isProviderLevelProblem = (availability: AiEngineFeatureAvailability): bool
 
 /**
  * Maps the availability of a feature (B) to an area status.
- * @param {AssistantArea} area - Area.
  * @param {AiFeatureAvailability|AiEngineFeatureAvailability} availability - Feature availability.
  * @param {boolean} [canSwitchProvider] - A provider row can be picked in the chat (hasPickableProvider).
  * @returns {AssistantAreaStatus} The status.

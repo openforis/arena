@@ -6,8 +6,6 @@ import { _equals } from './internal/_equals'
  *
  * @param {*} value - The value to search for.
  * @param {*} list - The array or string.
- *
- * @returns {boolean} - The result.
  */
 export const includes = _curry2((value: any, list: any): boolean => {
   if (typeof list === 'string') return list.includes(value)

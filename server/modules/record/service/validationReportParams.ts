@@ -58,8 +58,6 @@ const _buildRecordAccessFilters = async ({ user, survey }: { user: ArenaUser; su
  * on the records the user can read (owner and user group qualifiers).
  * @param {object} params - The parameters.
  * @param {User} params.user - The user requesting the report.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.cycle - The survey cycle.
  * @param {object} [params.query] - The query with the records filter expression.
  * @param {string[]} [params.attributeDefUuids] - Uuids of the attribute defs to include.
  * @param {string[]} [params.messageTypeKeys] - Validation message keys to include.

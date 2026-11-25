@@ -105,9 +105,6 @@ const getSurveyInfoDiffApplicability = ({ key, source, target, published, diffKe
 
 /**
  * Compares the survey info (languages, labels, cycles, SRS, ...) of two surveys.
- * @param {object} params - The parameters.
- * @param {any} params.sourceSurvey - Source survey.
- * @param {any} params.targetSurvey - Target survey.
  * @returns {SurveyCompareSurveyInfoDiff[]} - One diff for every different prop.
  */
 export const compareSurveyInfo = ({ sourceSurvey, targetSurvey }): SurveyCompareSurveyInfoDiff[] => {
@@ -202,7 +199,6 @@ const getAreaOfInterestFileEntries = (survey: any): SurveyFileEntry[] => {
 /**
  * Returns the survey files referenced by the survey info (preloaded map layers, survey doc images, branding images,
  * areas of interest).
- * @param {any} survey - The survey.
  * @returns {SurveyFileEntry[]} - The file entries.
  */
 export const getSurveyFileEntries = (survey: any): SurveyFileEntry[] => [
@@ -238,9 +234,6 @@ const newSurveyFileDiff = ({
  * Compares the survey files (preloaded map layers, survey doc images, branding images, areas of interest) of two
  * surveys. Files are matched by name (branding images by slot, areas of interest by area name) and compared by size
  * and labels (areas of interest also by summary).
- * @param {object} params - The parameters.
- * @param {any} params.sourceSurvey - Source survey.
- * @param {any} params.targetSurvey - Target survey.
  * @returns {SurveyCompareSurveyFileDiff[]} - The survey file diffs (identical files excluded).
  */
 export const compareSurveyFiles = ({ sourceSurvey, targetSurvey }): SurveyCompareSurveyFileDiff[] => {
@@ -385,10 +378,6 @@ const planSurveyFileDiff = ({ context, diff }) => {
 /**
  * Builds the changes to the survey info and to the survey files needed to apply the selected changes.
  * @param {object} params - The parameters.
- * @param {any} params.sourceSurvey - Source survey.
- * @param {any} params.targetSurvey - Target survey.
- * @param {SurveyCompareSurveyInfoDiff[]} params.surveyInfoDiffs - Survey info diffs.
- * @param {SurveyCompareSurveyFileDiff[]} params.surveyFileDiffs - Survey file diffs.
  * @param {Set<string>} params.appliedIds - Ids of the changes to apply.
  * @returns {SurveyInfoApplyPlan} - The plan.
  */

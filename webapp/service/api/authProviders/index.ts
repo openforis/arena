@@ -11,7 +11,6 @@ export const fetchLoginProviders = async () => {
 /**
  * Start URL of a sign-in with an external provider (a full page navigation, not an API call).
  * @param {object} params - The parameters.
- * @param {string} params.providerId - The provider id.
  * @param {Record<string, string>} [params.query] - Query params (invitation, name, ticket, returnTo).
  * @returns {string} - The URL.
  */

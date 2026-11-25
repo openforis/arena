@@ -4,7 +4,6 @@
 
 /**
  * Returns true for a non-array object.
- * @param {unknown} value - Value.
  * @returns {boolean} True for a plain object.
  */
 export const isPlainObject = (value: unknown): value is Record<string, unknown> =>
@@ -12,8 +11,6 @@ export const isPlainObject = (value: unknown): value is Record<string, unknown> 
 
 /**
  * Returns the own value of a key (inherited keys such as "constructor" are not values).
- * @param {Record<string, T>} record - Record.
- * @param {string} key - Key.
  * @returns {T|undefined} The value.
  */
 export const own = <T>(record: Record<string, T>, key: string): T | undefined =>
@@ -21,8 +18,6 @@ export const own = <T>(record: Record<string, T>, key: string): T | undefined =>
 
 /**
  * Returns a record with one entry set (moved last) or, with null, removed.
- * @param {Record<string, T>} record - Record.
- * @param {string} key - Key.
  * @param {T|null} value - Value, or null to remove.
  * @returns {Record<string, T>} The new record.
  */
@@ -34,7 +29,6 @@ export const setEntry = <T>(record: Record<string, T>, key: string, value: T | n
 /**
  * Sets (or removes, with null) the entry of a suggestion id in a bucket; an emptied bucket is removed.
  * @param {Record<string, Record<string, T>>} record - Record by bucket and id.
- * @param {string} bucket - Bucket.
  * @param {string} id - Suggestion id.
  * @param {T|null} value - Value, or null to remove.
  * @returns {Record<string, Record<string, T>>} The new record.
@@ -52,7 +46,6 @@ export const setNested = <T>(
 /**
  * Returns the entry of a suggestion id in a bucket.
  * @param {Record<string, Record<string, T>>} record - Record by bucket and id.
- * @param {string} bucket - Bucket.
  * @param {string} id - Suggestion id.
  * @returns {T|undefined} The entry.
  */

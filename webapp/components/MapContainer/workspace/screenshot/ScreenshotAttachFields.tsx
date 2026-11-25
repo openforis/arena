@@ -29,7 +29,6 @@ type ScreenshotAttachFieldsProps = {
  * @param {Array<ScreenshotImageAttributeOption>} props.attributeOptions - Image attributes of the plot.
  * @param {ScreenshotImageAttributeOption|null} props.attribute - The selected attribute.
  * @param {Function} props.onAttributeChange - Selects an attribute by uuid.
- * @param {string} props.fileName - The file name.
  * @param {Function} props.onFileNameChange - Changes the file name.
  * @returns {React.ReactElement} The fields.
  */

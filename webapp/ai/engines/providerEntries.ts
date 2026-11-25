@@ -130,7 +130,6 @@ export const getArenaDefaultEntry = (adminDefault: AiAdminDefault | null): AiPro
  * @param {AiPublicProvider[]} params.accountProviders - Account providers from the settings.
  * @param {LocalProvider[]} params.localProviders - Local providers of this browser.
  * @param {object} params.local - Capability of each local provider, by id.
- * @param {AiAdminDefault|null} params.adminDefault - Admin default.
  * @returns {AiProviderEntry[]} The entries.
  */
 export const buildProviderEntries = ({

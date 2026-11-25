@@ -22,9 +22,7 @@ const sha256 = (content: string): string => createHash('sha256').update(content)
 /**
  * Computes the fingerprints (SHA-256 hashes, strict and structural) of a survey definition.
  * @param {object} params - The parameters.
- * @param {any} params.survey - The survey.
  * @param {CategoryItemsByCategoryUuid} params.itemsByCategoryUuid - Category items by category uuid.
- * @param {TaxaByTaxonomyUuid} params.taxaByTaxonomyUuid - Taxa by taxonomy uuid.
  * @returns {SurveyFingerprint} - The fingerprints.
  */
 export const computeSurveyFingerprint = ({
@@ -47,9 +45,7 @@ export const computeSurveyFingerprint = ({
 /**
  * Fetches a survey and computes the fingerprints of its definition.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {boolean} [params.draft] - Whether to use the draft (default) or the published version of the survey.
- * @param {any} [client] - Database client.
  * @returns {Promise<SurveyFingerprint>} - The fingerprints.
  */
 export const fetchSurveyFingerprint = async (

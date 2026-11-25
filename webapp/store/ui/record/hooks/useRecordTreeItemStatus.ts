@@ -55,7 +55,6 @@ const EMPTY_PAGE_EVAL: PageEvalResult = {
  * Resolves the page entity for a page def from Redux state.
  *
  * @param pageNodeDefUuid - Page entity node def UUID
- * @param state - Redux state
  * @returns Page entity node, or null when unresolved
  */
 const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
@@ -74,7 +73,6 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
  * count toward completion. Matches arena-core empty-stats → 100% behavior.
  *
  * @param pageNodeDefUuid - Page entity node def UUID
- * @param state - Redux state
  * @returns True when the page has own key/required (or conditionally required) attributes
  */
 const pageHasOwnCompletableAttributes = (pageNodeDefUuid: string, state: unknown): boolean => {
@@ -132,7 +130,6 @@ const getPageCompletionPercent = ({
  * @param uuid - Page node def UUID
  * @param descendantPageUuidsByPage - Per-page descendant lists
  * @param record - Active record
- * @param state - Redux state
  * @param options - Evaluation options
  * @param options.instanceScoped - Whether to scope validation to the current entity instance
  * @returns Page evaluation flags
@@ -185,7 +182,6 @@ const evaluatePage = (
  * @param scopedUuids - Page UUIDs in the collapsed subtree
  * @param descendantPageUuidsByPage - Per-page descendant lists
  * @param record - Active record
- * @param state - Redux state
  * @param instanceScoped - Whether page evaluation uses instance scoping
  * @returns Aggregated tree item status
  */
@@ -223,7 +219,6 @@ const rollupCollapsedStatus = (
 /**
  * Status for a non-multiple tree page: own page when expanded, subtree rollup when collapsed.
  *
- * @param state - Redux state
  * @param params - Tree item parameters
  * @param options - Evaluation options
  * @param options.instanceScoped - Whether to use instance-scoped page validation
@@ -263,7 +258,6 @@ const getNonMultipleTreeItemStatus = (
  * Resolves the ancestor entity UUID that scopes aggregation for a multiple page.
  *
  * @param pageNodeDef - Multiple page node def
- * @param state - Redux state
  * @returns Parent entity UUID, or null when the parent cannot be resolved
  */
 const getMultiplePageScopeEntityUuid = (pageNodeDef: ArenaAnyNodeDef, state: unknown): string | null => {

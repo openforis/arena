@@ -9,10 +9,6 @@ import { db, DbClient } from '@server/db/db'
  * Deletes the nodes of the result node table for the specified processing chain.
  *
  * @param {!object} params - Filter parameters.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.entity - The entity.
- * @param {!string} params.cycle - The survey cycle.
- * @param {!pgPromise.IDatabase} client - The database client.
  */
 export const deleteNodeResultsByChainUuid = (
   {

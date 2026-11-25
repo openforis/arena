@@ -34,7 +34,6 @@ const LABEL_REQUEST = 'Change the label of cluster_id to Cluster identifier'
 
 /**
  * Reads the local providers this browser stores for the logged-in user.
- * @param {Page} page - The page.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @returns {Promise<LocalProvider[]>} The stored providers ([] when none).
  */
@@ -44,7 +43,6 @@ const readLocalProviders = async (page: Page, api: ArenaApi): Promise<LocalProvi
 /**
  * Runs an action of a provider row's ⋯ menu.
  * @param {Page} page - The page (on the user profile).
- * @param {string} providerId - Provider id.
  * @param {string} action - Menu action (makeDefault, test, edit, remove).
  * @returns {Promise<void>} Resolves after the click.
  */
@@ -58,7 +56,6 @@ const providerChip = (page: Page) => assistantPanel(page).getByTestId(TestId.aiA
 
 /**
  * Opens the assistant on the form designer, on a new conversation of the Design area.
- * @param {Page} page - The page.
  * @returns {Promise<void>} Resolves when the composer is shown.
  */
 const openNewDesignConversation = async (page: Page): Promise<void> => {
@@ -69,7 +66,6 @@ const openNewDesignConversation = async (page: Page): Promise<void> => {
 
 /**
  * Chooses Arena default from the provider chip (nothing sent before), then checks a message goes to Arena default.
- * @param {Page} page - The page.
  * @param {any[]} gatewayBodies - The bodies of the gateway requests, as collected since the conversation opened.
  * @returns {Promise<void>} Resolves when the answer has come.
  */

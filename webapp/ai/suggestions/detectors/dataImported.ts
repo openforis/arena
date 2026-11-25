@@ -46,7 +46,6 @@ export const getImportedRecordsCount = (job: any): number => {
 /**
  * Tells whether the job belongs to the user and the survey of the generation.
  * @param {object} job - Serialized job.
- * @param {SuggestionGeneration} generation - The current generation.
  * @returns {boolean} True when it does.
  */
 const isJobOfGeneration = (job: any, generation: SuggestionGeneration): boolean =>
@@ -55,8 +54,6 @@ const isJobOfGeneration = (job: any, generation: SuggestionGeneration): boolean 
 /**
  * Tells whether the pending suggestion already holds the job (the same update can arrive twice).
  * @param {SuggestionStore} store - Suggestion store.
- * @param {SuggestionGeneration} generation - The current generation.
- * @param {string} jobUuid - Job uuid.
  * @returns {boolean} True when it does.
  */
 const isPendingJob = (store: SuggestionStore, generation: SuggestionGeneration, jobUuid: string): boolean =>
@@ -71,9 +68,7 @@ const isPendingJob = (store: SuggestionStore, generation: SuggestionGeneration, 
  * Removes what the state holds of the older imports (their dismissals would pile up, one per import, for good).
  * @param {object} params - Parameters.
  * @param {SuggestionStore} params.store - Suggestion store.
- * @param {SuggestionGeneration} params.generation - The current generation.
  * @param {string} params.jobUuid - Uuid of the new import job, which keeps its own entry.
- * @returns {void}
  */
 const forgetOlderImports = ({
   store,
@@ -96,7 +91,6 @@ const forgetOlderImports = ({
 /**
  * Builds the data imported suggestion.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
  * @param {string} params.jobUuid - Uuid of the import job.
  * @param {number} params.count - Records added or changed.
  * @param {Date} params.createdAt - Creation date.
@@ -130,9 +124,6 @@ export const dataImportedDetector: EventDetector = {
   on: ['jobSucceeded'],
   /**
    * Replaces the suggestion with the latest import of records into the active survey.
-   * @param {object} event - The event.
-   * @param {object} ctx - Detector context.
-   * @returns {void}
    */
   handle: (event, ctx) => {
     const { generation } = ctx

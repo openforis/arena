@@ -51,7 +51,6 @@ const INDEXES: [name: string, keyPath: string | string[]][] = [
  * the upgrade, so a version bump must find what an older version left.
  * @param {IDBDatabase} db - Database being upgraded.
  * @param {IDBTransaction} transaction - The version change transaction.
- * @returns {void}
  */
 export const ensureConversationsSchema = (db: IDBDatabase, transaction: IDBTransaction): void => {
   const store = db.objectStoreNames.contains(STORE)
@@ -72,8 +71,6 @@ const openDatabase = (indexedDB: IDBFactory): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
     /**
      * Opens the database at a version (any version when omitted).
-     * @param {number} [version] - Version.
-     * @returns {void}
      */
     const open = (version?: number): void => {
       const request =
@@ -94,7 +91,6 @@ const openDatabase = (indexedDB: IDBFactory): Promise<IDBDatabase> =>
 /**
  * Returns the ids of the conversations of a survey, whoever owns them (a key cursor: no conversation is loaded).
  * @param {IDBIndex} index - The userSurvey index (its keys are [userUuid, surveyKey]).
- * @param {number} surveyKey - Survey key.
  * @returns {Promise<string[]>} The conversation ids.
  */
 const getPrimaryKeysOfSurvey = (index: IDBIndex, surveyKey: number): Promise<string[]> =>
@@ -151,7 +147,6 @@ const createIndexedDbStore = (
   /**
    * Runs work on the open connection; if it was closed in the meantime, once more on a new one.
    * @param {Function} work - Work on the database.
-   * @returns {Promise<T>} The result.
    */
   const withDb = async <T>(work: (db: IDBDatabase) => Promise<T>): Promise<T> => {
     try {

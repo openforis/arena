@@ -49,7 +49,6 @@ export const selectDropdownItem = async ({
 /**
  * Checks that the dropdown shows the specified value (or no value, when the expected value is empty).
  * @param {Locator} dropdown - The dropdown locator.
- * @param {string} expectedLabel - Expected value label.
  * @returns {Promise<void>} - Resolves when the check completes.
  */
 export const expectDropdownValue = async (dropdown: Locator, expectedLabel: string): Promise<void> => {

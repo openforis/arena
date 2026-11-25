@@ -10,7 +10,6 @@ export const SEARCH_MAX_RESULTS = 20
 
 /**
  * Returns true when the name or a label contains the (lower-case) text.
- * @param {object} nodeDef - Node definition.
  * @param {string} text - Lower-case text.
  * @returns {boolean} True when it matches.
  */

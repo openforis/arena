@@ -55,7 +55,6 @@ const splitLines = (text: string): string[] => text.split('\n').map((line) => li
 /**
  * Reads the last complete lines of a file, reading it backwards in chunks so that memory usage is bounded.
  * @param {object} params - The parameters.
- * @param {string} params.filePath - Path of the file.
  * @param {number} params.maxLines - Maximum number of lines to return.
  * @param {number} [params.maxBytes] - Maximum number of bytes to read.
  * @returns {Promise<LastLinesResult>} - The lines and the offset where tailing must continue.

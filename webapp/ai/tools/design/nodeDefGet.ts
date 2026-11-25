@@ -18,7 +18,6 @@ export const CHILDREN_MAX = 50
 
 /**
  * Returns the expressions of every expression property, as the model needs them.
- * @param {object} nodeDef - Node definition.
  * @returns {object} The expressions per property.
  */
 const getExpressionsView = (nodeDef: any) => {
@@ -31,7 +30,6 @@ const getExpressionsView = (nodeDef: any) => {
 
 /**
  * Returns the names of the design children of an entity.
- * @param {object} survey - Survey.
  * @param {object} nodeDef - Entity definition.
  * @returns {string[]} The child names.
  */
@@ -42,7 +40,6 @@ const getChildNames = (survey: any, nodeDef: any): string[] =>
 
 /**
  * Returns the child names of an entity, capped.
- * @param {object} survey - Survey.
  * @param {object} nodeDef - Entity definition.
  * @returns {object} `{ children, childrenTotal?, childrenTruncated? }`.
  */
@@ -55,8 +52,6 @@ const getChildrenView = (survey: any, nodeDef: any) => {
 
 /**
  * Describes one node definition in full for the model.
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @param {Translate} t - Translator (design errors and warnings).
  * @returns {object} The description.
  */
@@ -83,9 +78,6 @@ export const describeNodeDef = (survey: any, nodeDef: any, t: Translate) => {
 
 /**
  * Describes a node definition and keeps the result within the tool result budget (drops expression messages if needed).
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
- * @param {Translate} t - Translator.
  * @returns {object} The description.
  */
 export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Translate, maxChars?: number) => {

@@ -45,7 +45,6 @@ export const isProviderChoiceError = (errorKey: string | null | undefined): bool
 /**
  * Returns the actions offered for the reasons, once each, in the reasons' order.
  * @param {object} params - Parameters.
- * @param {AiUnavailableReason[]} params.reasons - Reasons.
  * @param {boolean} params.canChangePolicy - The user may edit this survey's AI policy (and the request has a survey).
  * @returns {AiUnavailableAction[]} The actions.
  */

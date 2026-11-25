@@ -6,7 +6,6 @@ import { createSseParser as createV5StreamParser } from '@common/ai/sseParser'
 
 /**
  * Pushes the chunks to a new parser, one push per chunk, then ends it.
- * @param {...string} chunks - Chunks.
  * @returns {object[]} The parsed events.
  */
 const parseChunks = (...chunks) => {

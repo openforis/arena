@@ -13,9 +13,7 @@ const translate = (result: any, t: Translate): string =>
 
 /**
  * Walks a validation and its field validations, with the dotted field path.
- * @param {object|null} validation - Validation.
  * @param {object} options - Options.
- * @param {Translate} options.t - Translator.
  * @param {Set<string>} options.ignoredFields - Top-level fields to skip.
  * @param {boolean} options.warnings - Whether to include warnings.
  * @param {string} [prefix] - Field path so far.
@@ -47,8 +45,6 @@ const collectIssues = (
 
 /**
  * Collects the translated error messages of a validation, recursively, with the dotted field path.
- * @param {object|null} validation - Validation.
- * @param {Translate} t - Translator.
  * @returns {{field: string, message: string}[]} The messages.
  */
 export const collectValidationIssues = (validation: any, t: Translate): { field: string; message: string }[] => {
@@ -62,7 +58,6 @@ export const collectValidationIssues = (validation: any, t: Translate): { field:
 /**
  * Collects the errors and warnings of a stored node definition validation, as the designer shows them.
  * @param {object|null} validation - Node definition validation.
- * @param {Translate} t - Translator.
  * @returns {NodeDefIssue[]} The issues.
  */
 export const collectNodeDefIssues = (validation: any, t: Translate): NodeDefIssue[] =>

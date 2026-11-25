@@ -68,7 +68,6 @@ const createConnectLookup =
 
 /**
  * Returns the body of a request as bytes (the bodies the AI SDK and the discovery send).
- * @param {BodyInit|null|undefined} body - Request body.
  * @returns {Buffer|null} The bytes, or null when there is no body.
  * @throws {TypeError} When the body is of a kind that is not supported (stream, blob, form data).
  */
@@ -108,9 +107,7 @@ const toFetchError = (error: unknown): Error =>
 /**
  * Throws when the host is an IP address the guard does not allow (a socket does no lookup for an IP, so the connect
  * lookup never sees it).
- * @param {URL} url - The URL.
  * @param {string[]} allowlist - Org-hosted base URLs.
- * @returns {void}
  */
 const assertLiteralAddressAllowed = (url: URL, allowlist: string[]): void => {
   const hostname = url.hostname.replace(/^\[|\]$/g, '')
@@ -122,7 +119,6 @@ const assertLiteralAddressAllowed = (url: URL, allowlist: string[]): void => {
  * success, and at most 64 KiB for an error.
  * @param {http.IncomingMessage} incoming - The response.
  * @param {number} maxBodyBytes - The most the body may bring.
- * @returns {void}
  */
 const capBody = (incoming: http.IncomingMessage, maxBodyBytes: number): void => {
   const status = incoming.statusCode ?? 0
@@ -137,7 +133,6 @@ const capBody = (incoming: http.IncomingMessage, maxBodyBytes: number): void => 
 /**
  * Sends the request and resolves with its response as soon as the headers arrive (the body streams).
  * @param {object} params - Parameters.
- * @param {URL} params.url - The URL.
  * @param {RequestInit} params.init - Fetch options.
  * @param {Function|undefined} params.lookup - Socket lookup, undefined for an allowlisted host.
  * @param {number} params.maxBodyBytes - The most the body of the response may bring.

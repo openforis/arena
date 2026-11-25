@@ -8,7 +8,6 @@ import type { AssistantSuggestion } from '../types'
 /**
  * Returns the node definitions of the targets that still exist.
  * @param {AssistantSuggestion} suggestion - Suggestion (visible targets).
- * @param {object|null} survey - Survey.
  * @returns {object[]} The node definitions, in target order.
  */
 export const getTargetNodeDefs = (suggestion: AssistantSuggestion, survey: any): any[] => {
@@ -21,7 +20,6 @@ export const getTargetNodeDefs = (suggestion: AssistantSuggestion, survey: any):
 /**
  * Returns the names of the targets that still exist.
  * @param {AssistantSuggestion} suggestion - Suggestion (visible targets).
- * @param {object|null} survey - Survey.
  * @returns {string[]} The names.
  */
 export const getTargetNodeDefNames = (suggestion: AssistantSuggestion, survey: any): string[] =>

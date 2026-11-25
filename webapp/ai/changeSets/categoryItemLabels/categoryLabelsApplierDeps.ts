@@ -15,7 +15,6 @@ import { type PutCategoryItemLabels, putCategoryItemLabels } from './categoryIte
 /**
  * Creates the category dependencies of Apply.
  * @param {object} params - Parameters.
- * @param {Function} params.dispatch - Redux dispatch.
  * @param {Function} params.getSurvey - Returns the survey in the store.
  * @param {PutCategoryItemLabels} [params.put] - Server call (default: the endpoint).
  * @param {Function} [params.notify] - Suggestion events (default: notifySuggestionEvent).

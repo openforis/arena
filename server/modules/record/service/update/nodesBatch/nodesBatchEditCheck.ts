@@ -29,7 +29,6 @@ export type BatchEditCheck =
 
 /**
  * Returns true when the attribute can be edited by a batch edit (editable, and not a file).
- * @param {object} nodeDef - The node definition.
  * @returns {boolean} Whether batch edits are allowed.
  */
 export const isNodeDefBatchEditable = (nodeDef: ArenaAnyNodeDef): boolean =>
@@ -38,10 +37,7 @@ export const isNodeDefBatchEditable = (nodeDef: ArenaAnyNodeDef): boolean =>
 /**
  * Checks an edit against the record reloaded inside the record lock.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
  * @param {string} params.recordUuid - The uuid of the record being edited (authorised in `applyEditsInLock`).
- * @param {NodesBatchRecordEdit} params.edit - The edit.
  * @returns {BatchEditCheck} The node and its definition, or the result of a refused edit.
  */
 export const checkBatchEdit = ({
@@ -94,7 +90,6 @@ export const checkBatchEdit = ({
 
 /**
  * Collects the error keys of a validation and of its nested field validations.
- * @param {object} validation - The validation.
  * @returns {string[]} The error keys.
  */
 const collectErrorKeys = (validation: ArenaValidation): string[] => {

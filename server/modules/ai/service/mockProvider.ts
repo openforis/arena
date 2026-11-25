@@ -66,7 +66,6 @@ const CANNED_ANSWERS: [RegExp, CannedAnswer][] = [
 
 /**
  * Returns the canned answer for the feature the prompt belongs to.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @returns {string} The answer.
  */
 export const mockAnswerFor = (prompt: LanguageModelV4Prompt): string => {

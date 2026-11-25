@@ -29,7 +29,6 @@ export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState })
 
   /**
    * Zooms the map to the data, or warns when there is none.
-   * @returns {void}
    */
   const zoomToData = useCallback(() => {
     const bounds = computeBounds(collectDataLatLngs(map))

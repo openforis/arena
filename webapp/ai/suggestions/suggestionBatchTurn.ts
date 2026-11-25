@@ -25,7 +25,6 @@ export type SuggestionBatchProgress = AiBatchProgress & { remainingMs?: number; 
 
 /**
  * Returns the batch of a tool row.
- * @param {string} toolName - Tool name.
  * @returns {SuggestionBatchKind|null} The batch; null for a tool of the model.
  */
 export const getSuggestionBatchToolKind = (toolName: string): SuggestionBatchKind | null =>

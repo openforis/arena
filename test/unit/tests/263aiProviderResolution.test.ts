@@ -149,7 +149,6 @@ describe('provider resolution by id (263)', () => {
 
   /**
    * Runs the gateway handler with a resolver and returns the response and the policy checks.
-   * @param {unknown} body - Request body.
    * @param {any} user - Caller.
    * @param {any} resolveModel - Model resolver dependency.
    * @returns {Promise<{res: any, checks: any[]}>} The response and the checks.

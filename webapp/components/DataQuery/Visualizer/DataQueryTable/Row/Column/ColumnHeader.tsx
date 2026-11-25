@@ -18,7 +18,6 @@ import { useColumn } from './store'
  * Returns the node def field (e.g. code, label) shown in the specified view column.
  * @param {object} params - Parameters.
  * @param {string} params.columnName - View column name.
- * @param {object} params.nodeDef - Node definition.
  * @returns {string} The field name.
  */
 const getFieldByViewColumnName = ({ columnName, nodeDef }) => {

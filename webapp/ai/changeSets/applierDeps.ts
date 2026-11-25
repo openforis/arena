@@ -11,7 +11,6 @@ import { createCategoryLabelsApplierDeps } from './categoryItemLabels/categoryLa
 /**
  * Creates the applier dependencies.
  * @param {object} params - Parameters.
- * @param {Function} params.dispatch - Redux dispatch.
  * @param {Function} params.getState - Redux getState.
  * @returns {ApplierDeps} The dependencies.
  */

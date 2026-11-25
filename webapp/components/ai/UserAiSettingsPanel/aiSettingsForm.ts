@@ -29,7 +29,6 @@ export const defaultFeatureToggles = (): FeatureToggles =>
 /**
  * Returns a loaded switch: a stored boolean, else the category default.
  * @param {unknown} value - Stored value.
- * @param {FeatureCategory} category - Category.
  * @returns {boolean} The switch.
  */
 const toToggle = (value: unknown, category: FeatureCategory): boolean =>
@@ -72,7 +71,6 @@ export const createEmptyForm = (): FormState => ({
 
 /**
  * Returns the body of PUT /api/ai/settings for the form (no provider field: the server keeps the providers).
- * @param {FormState} form - Form.
  * @returns {SettingsUpdate} The update.
  */
 export const buildSettingsUpdate = (form: FormState): SettingsUpdate => ({
@@ -106,7 +104,6 @@ export const settingsToForm = (data: AiSettings): FormState => {
 
 /**
  * Returns the form with a new access level; a higher level switches on the features it adds.
- * @param {FormState} form - Form.
  * @param {AiAccessLevel} accessLevel - New level.
  * @returns {FormState} The new form.
  */
@@ -141,7 +138,6 @@ export const countAccessLevelFeatures = ({
  * @param {*} [params.key] - Error key of the response (with or without the `appErrors:` prefix).
  * @param {Record<string, unknown>} [params.params] - Parameters of the key.
  * @param {string} [params.message] - Message to show when there is no key.
- * @param {TFunction} params.t - Translation function.
  * @returns {string} The text.
  */
 export const getErrorText = ({
@@ -165,7 +161,6 @@ export const getErrorText = ({
  * Returns the text of a failed API call.
  * @param {object} params - Parameters.
  * @param {*} params.error - Axios error.
- * @param {TFunction} params.t - Translation function.
  * @returns {string} The appErrors text when the response has a key, else the error message.
  */
 export const getApiErrorMessage = ({ error, t }: { error: any; t: TFunction }): string => {

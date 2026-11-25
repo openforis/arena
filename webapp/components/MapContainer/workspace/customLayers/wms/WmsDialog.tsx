@@ -116,7 +116,6 @@ export const WmsDialog = (): React.ReactElement => {
 
   /**
    * Closes the dialog on user request (Cancel, Escape, backdrop), except while the layers are being saved.
-   * @returns {void}
    */
   const onRequestClose = useCallback(() => {
     if (!savingRef.current) onClose()

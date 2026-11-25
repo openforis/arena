@@ -23,7 +23,6 @@ export const withSuggestionScope = (conversation: Conversation, scope: Suggestio
 
 /**
  * Returns the last answer of a conversation.
- * @param {Conversation} conversation - Conversation.
  * @returns {AssistantMessage|null} The answer.
  */
 const getLastAnswer = (conversation: Conversation): AssistantMessage | null => {
@@ -36,7 +35,6 @@ const getLastAnswer = (conversation: Conversation): AssistantMessage | null => {
 
 /**
  * Returns the outcome of a Do it conversation, or null while it is not known yet.
- * @param {Conversation} conversation - Conversation.
  * @param {object} [options] - Options.
  * @param {boolean} [options.running] - A streaming answer is live (false: a leftover of a reload, counted as stopped).
  * @returns {SettleOutcome|null} The outcome.
@@ -60,7 +58,6 @@ export const getSuggestionSettleOutcome = (
  * Reports the outcome of a Do it conversation to the suggestion store, when it is known.
  * @param {object} params - Parameters.
  * @param {Conversation} params.conversation - Conversation (after a turn or a card action).
- * @param {SuggestionStore} [params.store] - Store.
  * @param {boolean} [params.running] - A streaming answer is live.
  * @returns {SettleOutcome|null} The reported outcome.
  */
@@ -81,7 +78,6 @@ export const reportSuggestionSettle = ({
 
 /**
  * Returns the name of the Web Lock held by the tab running a turn of a Do it conversation.
- * @param {string} conversationId - Conversation id.
  * @returns {string} The lock name.
  */
 export const getSuggestionTurnLockName = (conversationId: string): string => `arena.ai.suggestionTurn.${conversationId}`
@@ -102,7 +98,6 @@ const getLockManager = (): LockManager | null => (typeof navigator !== 'undefine
  * @param {Promise<unknown>} params.done - The turn; settles when it ends.
  * @param {LockManager|null} [params.locks] - Web Locks manager (the browser's by default).
  * @param {AiLog} [params.log] - Reports a lock that could not be taken.
- * @returns {void}
  */
 export const holdSuggestionTurnLock = ({
   conversationId,

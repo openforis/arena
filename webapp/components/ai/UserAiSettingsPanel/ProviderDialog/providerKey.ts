@@ -9,7 +9,6 @@ export type KeyParams = { spec: ProviderTypeSpec; draft: ProviderDraft; saved: S
 
 /**
  * Returns true when a key was typed.
- * @param {ProviderDraft} draft - Draft.
  * @returns {boolean} True when the key field is not blank.
  */
 export const isApiKeyTyped = (draft: ProviderDraft): boolean => draft.apiKey.trim().length > 0
@@ -67,7 +66,6 @@ export const canRemoveKey = (params: KeyParams): boolean => {
 /**
  * Returns the `apiKey` field of a request: the typed key, an empty string to remove the saved key, else nothing (the
  * server keeps the saved key).
- * @param {ProviderDraft} draft - Draft.
  * @returns {{apiKey?: string}} The field.
  */
 export const getApiKeyRequestField = (draft: ProviderDraft): { apiKey?: string } => {

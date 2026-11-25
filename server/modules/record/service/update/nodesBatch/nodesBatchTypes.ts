@@ -61,14 +61,12 @@ export type NodesBatchPersistReply = { requestId: string; recordUuid: string; re
 /**
  * Builds an applied result.
  * @param {number} index - The edit index in the request.
- * @returns {NodesBatchEditResult} The result.
  */
 export const appliedResult = (index: number): NodesBatchEditResult => ({ index, status: NodesBatchEditStatus.applied })
 
 /**
  * Builds a conflict result (the value changed since the proposal, or the node is gone).
  * @param {number} index - The edit index in the request.
- * @returns {NodesBatchEditResult} The result.
  */
 export const conflictResult = (index: number): NodesBatchEditResult => ({
   index,
@@ -80,7 +78,6 @@ export const conflictResult = (index: number): NodesBatchEditResult => ({
  * @param {number} index - The edit index in the request.
  * @param {string} messageKey - The i18n key of the reason.
  * @param {object} [params] - The message params.
- * @returns {NodesBatchEditResult} The result.
  */
 export const failedResult = (
   index: number,
@@ -95,7 +92,6 @@ export const failedResult = (
 
 /**
  * Builds a failed result for each edit.
- * @param {{index: number}[]} edits - The edits.
  * @param {string} messageKey - The i18n key of the reason.
  * @param {object} [params] - The message params.
  * @returns {NodesBatchEditResult[]} The results.

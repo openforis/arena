@@ -19,7 +19,6 @@ const _getNodeDefLabelPath = ({ survey, lang, nodeDef }: { survey: any; lang: st
  * Generates the list of labels (with their path, root entity excluded) of the node definitions whose values will be cleared:
  * cleared multiple entities first, then the attributes not inside them.
  * @param {!object} params - The parameters.
- * @param {!object} params.survey - The survey.
  * @param {!string} params.lang - The language of the labels.
  * @param {!string[]} params.nodeDefUuidsToClear - The uuids of the node definitions whose values will be cleared.
  * @returns {string[]} - The labels, as markdown list items.
@@ -51,7 +50,6 @@ export const getNodeDefLabelsToShow = ({
 /**
  * Prepares the nodes (as stored on the server) to restore in the record being edited.
  * They are marked as dirty so that they replace the nodes being edited locally.
- * @param {!object[]} nodesToRestore - The nodes to restore.
  * @returns {object} - The nodes to restore indexed by uuid.
  */
 export const prepareNodesToRestore = (nodesToRestore: any[]): Record<string, any> =>

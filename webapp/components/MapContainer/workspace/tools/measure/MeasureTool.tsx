@@ -43,7 +43,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   /**
    * Keeps the bar element and isolates it from the map mouse events.
    * @param {HTMLDivElement|null} element - The bar element, null on unmount.
-   * @returns {void}
    */
   const setBarElement = useCallback((element: HTMLDivElement | null): void => {
     barRef.current = element
@@ -54,7 +53,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
 
   /**
    * Translates the symbol of a unit.
-   * @param {MeasureUnit} unit - The unit.
    * @returns {string} The localized symbol.
    */
   const unitLabel = useCallback((unit: MeasureUnit): string => t(`mapWorkspace.measure.unitSymbols.${unit}`), [t])
@@ -64,7 +62,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   useEffect(
     /**
      * Mirrors the running total in the tooltip of the finished layer.
-     * @returns {void}
      */
     () => {
       if (finishedLayer && total) finishedLayer.setTooltipContent(total)
@@ -89,7 +86,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   /**
    * Switches to the tool of the selected mode.
    * @param {MeasureMode} nextMode - The selected mode.
-   * @returns {void}
    */
   const onModeChange = useCallback(
     (nextMode: MeasureMode): void => dispatchWorkspace({ type: 'startTool', tool: toolOfMeasureMode(nextMode) }),
@@ -99,7 +95,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   /**
    * Stores the chosen unit of the active mode.
    * @param {MeasureUnitOption} unit - The chosen unit.
-   * @returns {void}
    */
   const onUnitChange = useCallback(
     (unit: MeasureUnitOption): void => {
@@ -114,7 +109,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
 
   /**
    * Ends the tool.
-   * @returns {void}
    */
   const onDone = useCallback((): void => dispatchWorkspace({ type: 'endTool' }), [dispatchWorkspace])
 

@@ -28,7 +28,6 @@ import {
 
 /**
  * Returns the user-facing settings (no secrets) for the AI settings panel.
- * @param {object} user - Arena user.
  * @returns {any} The access level, toggles, default provider and the public entries of the account providers.
  */
 export const getPublicSettings = (user) => {
@@ -59,7 +58,6 @@ export const buildSavedAiPrefs = ({ existing, update }) =>
 /**
  * Saves the profile part of the AI settings (access level and toggles) on the latest stored AI prefs.
  * @param {object} args - Update args.
- * @param {object} args.user - The user.
  * @param {object} args.update - Request body (untrusted).
  * @param {object} [args.deps] - Writer dependencies (see aiPrefsWriter).
  * @returns {Promise<any>} The user with the AI prefs as stored.

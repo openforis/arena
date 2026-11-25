@@ -12,7 +12,6 @@ type SseResponse = {
 
 /**
  * Sends the SSE headers (no buffering by proxies).
- * @param {SseResponse} res - Express response.
  */
 export const openSseStream = (res: SseResponse): void => {
   res.setHeader('Content-Type', 'text/event-stream')
@@ -24,7 +23,6 @@ export const openSseStream = (res: SseResponse): void => {
 
 /**
  * Returns a function writing one JSON `data:` frame.
- * @param {SseResponse} res - Express response.
  * @returns {Function} Writer taking the data to send; it answers false when the socket buffer is full.
  */
 export const createSseEventWriter =
@@ -35,7 +33,6 @@ export const createSseEventWriter =
 /**
  * Waits until the socket buffer has room again; it also resolves when the client goes away or the signal aborts, so
  * a client that never reads cannot hold the call.
- * @param {SseResponse} res - Express response.
  * @param {AbortSignal} [signal] - Aborted when the call is cancelled (timeout).
  * @returns {Promise<void>} Resolves when writing can go on, or must stop.
  */
@@ -56,7 +53,6 @@ export const waitForDrain = (res: SseResponse, signal?: AbortSignal): Promise<vo
 
 /**
  * Writes the `[DONE]` frame and ends the response.
- * @param {SseResponse} res - Express response.
  */
 export const closeSseStream = (res: SseResponse): void => {
   res.write('data: [DONE]\n\n')
@@ -65,7 +61,6 @@ export const closeSseStream = (res: SseResponse): void => {
 
 /**
  * Returns true when nothing can be written any more (response ended or client gone).
- * @param {SseResponse} res - Express response.
  * @returns {boolean} True when closed.
  */
 export const isSseClosed = (res: SseResponse): boolean => !!res.writableEnded || !!res.destroyed

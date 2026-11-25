@@ -66,7 +66,6 @@ const noRedirectFetch: FetchLike = (input, init) => fetch(input, { ...init, redi
 /**
  * Throws when a provider that needs an API key has none.
  * @param {string} provider - Provider identifier.
- * @param {string} [apiKey] - The API key.
  */
 const assertApiKey = (provider: string, apiKey?: string): void => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })

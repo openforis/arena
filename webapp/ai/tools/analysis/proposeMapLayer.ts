@@ -38,7 +38,6 @@ export type ProposedMapLayer = {
 
 /**
  * Returns true for the attributes that can be shown as a map layer.
- * @param {object} nodeDef - Node definition.
  * @returns {boolean} True for a coordinate or geo attribute.
  */
 export const isMapLayerDef = (nodeDef: any): boolean => NodeDef.isCoordinate(nodeDef) || NodeDef.isGeo(nodeDef)
@@ -46,7 +45,6 @@ export const isMapLayerDef = (nodeDef: any): boolean => NodeDef.isCoordinate(nod
 /**
  * Returns the proposed layer of a successful map_proposeLayer tool part, or null.
  * @param {object} part - Tool part.
- * @param {string} part.toolName - Tool name.
  * @param {unknown} part.output - Tool output.
  * @returns {ProposedMapLayer|null} The proposed layer.
  */
@@ -69,7 +67,6 @@ export const getProposedMapLayer = (part: { toolName: string; output: unknown })
 /**
  * Builds the invalid proposal error.
  * @param {string} message - What is wrong.
- * @param {any} survey - The survey.
  * @returns {object} The error output with the valid layer names.
  */
 const invalidProposal = (message: string, survey: any) => ({
@@ -82,8 +79,6 @@ const invalidProposal = (message: string, survey: any) => ({
 
 /**
  * Validates the proposal.
- * @param {ProposeMapLayerInput} input - Tool input.
- * @param {any} survey - The survey.
  * @returns {object} The error output, or the layer node definition (null when only coordinates are given).
  */
 const validate = (input: ProposeMapLayerInput, survey: any): { error: object } | { nodeDef: any } => {
@@ -105,8 +100,6 @@ const validate = (input: ProposeMapLayerInput, survey: any): { error: object } |
 
 /**
  * Validates the proposed layer and shows it to the user as a card.
- * @param {ProposeMapLayerInput} input - Tool input.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {object} The layer, or the valid layer names.
  */
 const proposeMapLayer = (input: ProposeMapLayerInput, ctx: AiToolContext) => {

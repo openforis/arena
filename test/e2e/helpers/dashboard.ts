@@ -6,7 +6,6 @@ import { Urls } from './urls'
 
 /**
  * Deletes the current survey (or template) from the dashboard, confirming the deletion with its name.
- * @param {Page} page - The page.
  * @param {string} surveyName - Name of the current survey.
  * @returns {Promise<void>} - Resolves when the survey has been deleted.
  */

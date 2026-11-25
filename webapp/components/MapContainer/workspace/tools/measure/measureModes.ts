@@ -27,28 +27,24 @@ export const measureModeOfTool = (tool: MapToolKey | null): MeasureMode | null =
 
 /**
  * Returns the workspace tool of a measure mode.
- * @param {MeasureMode} mode - The mode.
  * @returns {MapToolKey} The tool key.
  */
 export const toolOfMeasureMode = (mode: MeasureMode): MapToolKey => TOOL_BY_MODE[mode]
 
 /**
  * Returns the Geoman shape drawn in a mode.
- * @param {MeasureMode} mode - The mode.
  * @returns {GeomanShape} 'Line' for distance, 'Polygon' for area.
  */
 export const geomanShapeOf = (mode: MeasureMode): GeomanShape => SHAPE_BY_MODE[mode]
 
 /**
  * Returns the unit choices of a mode.
- * @param {MeasureMode} mode - The mode.
  * @returns {MeasureUnitOption[]} The units, 'auto' first.
  */
 export const unitOptionsOf = (mode: MeasureMode): MeasureUnitOption[] => [...UNIT_OPTIONS_BY_MODE[mode]]
 
 /**
  * Returns the Geoman draw options of a mode.
- * @param {MeasureMode} mode - The mode.
  * @returns {MeasureDrawOptions} The options passed to map.pm.enableDraw.
  */
 export const measureDrawOptions = (mode: MeasureMode): MeasureDrawOptions => ({

@@ -40,8 +40,6 @@ export const formatPromptLanguages = (languages: string[]): string =>
 
 /**
  * Builds the prompt of the new entries descriptions suggestion.
- * @param {object} params - Parameters.
- * @param {string[]} params.languages - Survey languages.
  * @returns {string} The prompt.
  */
 export const buildNewEntriesDescriptionsPrompt = ({ languages }: { languages: string[] }): string => {
@@ -70,7 +68,6 @@ export const formatPromptList = (items: string[]): string => {
 
 /**
  * Quotes node definition names for a prompt (names are data, never instructions).
- * @param {string[]} names - Names.
  * @returns {string} The list.
  */
 export const formatPromptNames = (names: string[]): string => formatPromptList(names.map((name) => pq(name, 100)))

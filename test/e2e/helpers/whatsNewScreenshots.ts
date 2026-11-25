@@ -16,7 +16,6 @@ const screenshotPath = (name: string, type: ImageType = 'png'): string =>
 
 /**
  * Waits for the map tiles to be loaded (from the internet: missing ones are left out), only if saving the screenshots.
- * @param {Page} page - The page.
  * @returns {Promise<void>} Resolves when the tiles are loaded or after the timeout.
  */
 export const waitForMapTiles = async (page: Page): Promise<void> => {
@@ -49,7 +48,6 @@ export const saveScreenshot = async (locator: Locator, name: string, type: Image
  * Saves a screenshot of the page area containing the specified elements, with some margin (e.g. for tooltips below them),
  * if WHATS_NEW_SCREENSHOTS_DIR is set.
  * @param {object} params - The parameters.
- * @param {Page} params.page - The page.
  * @param {Locator[]} params.locators - The elements to include.
  * @param {string} params.name - The file name, without extension.
  * @param {number} [params.marginBottom] - Extra margin below the elements, in pixels.

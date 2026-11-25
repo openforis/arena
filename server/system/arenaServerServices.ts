@@ -5,7 +5,6 @@ import { SurveyDataMigrationServiceArena } from '@server/modules/survey/service/
 
 /**
  * Registers the Arena implementations of arena-server services, replacing the arena-server defaults.
- * @param {!ServiceRegistry} serviceRegistry - The service registry.
  * @returns {ServiceRegistry} - The service registry.
  */
 export const registerArenaServerServices = (serviceRegistry: ServiceRegistry): ServiceRegistry =>

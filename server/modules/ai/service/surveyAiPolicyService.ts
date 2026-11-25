@@ -70,7 +70,6 @@ const isSamePolicy = (a: AiPolicy, b: AiPolicy): boolean => a.schema === b.schem
 /**
  * Validates a policy sent by the client: both classes with a valid level, and record data not more permissive than
  * the survey design (`aiPolicyDataAboveSchema`).
- * @param {unknown} body - Request body.
  * @returns {AiPolicy} The policy.
  */
 export const parseAiPolicyBody = (body: unknown): AiPolicy => {
@@ -88,7 +87,6 @@ export const parseAiPolicyBody = (body: unknown): AiPolicy => {
 
 /**
  * Returns the survey AI policy, the instance ceilings and the effective policy.
- * @param {number} surveyId - Survey id.
  * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
  * @returns {Promise<SurveyAiPolicyState>} The policy state.
  */
@@ -106,8 +104,6 @@ export const getSurveyAiPolicy = async (
  * @param {object} params - Parameters.
  * @param {AiPolicy} params.requested - Requested policy.
  * @param {AiPolicy} params.from - Current normalized policy.
- * @param {AiPolicy} params.ceilings - Instance ceilings.
- * @returns {void}
  */
 const assertChangesWithinCeilings = ({
   requested,
@@ -132,7 +128,6 @@ const assertChangesWithinCeilings = ({
  * Validates and stores the survey AI policy; logs the change in the survey activity log.
  * @param {object} params - Parameters.
  * @param {ArenaUser} params.user - Acting user (permission checked by the route).
- * @param {number} params.surveyId - Survey id.
  * @param {unknown} params.policy - Requested policy (request body).
  * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
  * @returns {Promise<SurveyAiPolicyState>} The new policy state.

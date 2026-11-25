@@ -188,9 +188,7 @@ const fetchTaxa = async ({ surveyId, taxonomyUuid, draft }, client: DbClient) =>
 /**
  * Fetches a survey with the items of its categories and its taxa.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {boolean} [params.draft] - Whether to fetch the draft (default) or the published version.
- * @param {any} [client] - Database client.
  * @returns {Promise<{survey: ArenaSurvey, itemsByCategoryUuid: CategoryItemsByCategoryUuid, taxaByTaxonomyUuid: TaxaByTaxonomyUuid, usedNodeDefUuids: string[]}>} - The survey, the items, the taxa and all the node def uuids (deleted ones included).
  */
 export const fetchSurveyFromDb = async (

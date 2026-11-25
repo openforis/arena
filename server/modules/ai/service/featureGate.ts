@@ -21,7 +21,6 @@ const isDisabledByFlag = (flags: unknown, feature: string): boolean =>
  * @param {string} feature - Feature key.
  * @param {ArenaUser} user - Acting user (null for system calls: only the env checks apply).
  * @param {GateEnv} [env] - Env values (injectable for tests).
- * @returns {void}
  */
 export const assertFeatureEnabled = (feature: string, user: ArenaUser | null, env: GateEnv = ENV): void => {
   if (!env.aiFeaturesEnabled) {

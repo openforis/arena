@@ -48,7 +48,6 @@ const LocalAnswered = ({ view }: { view: LocalServerTestView }) => {
  * Result of the local test (or of the app's last probe of the saved server).
  * @param {object} props - Props.
  * @param {LocalServerTestView|null} props.view - The result, null before a test.
- * @returns {React.ReactElement|null} The result.
  */
 const LocalTestResult = ({ view }: { view: LocalServerTestView | null }) => {
   const i18n = useI18n()
@@ -94,7 +93,6 @@ type Props = {
 
 /**
  * Step 2 for a Local server: URL with Test, the result, the Model select and the setup help.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The fields.
  */
 export const LocalProviderFields = ({

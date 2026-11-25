@@ -26,7 +26,6 @@ export type DraftTest = { key: string; account: AiProviderTestResponse | null; l
  * Returns the key of the values a test runs on; the key edit counter stands for the typed key.
  * @param {object} params - Parameters.
  * @param {ProviderTypeSpec} params.spec - Type spec.
- * @param {ProviderDraft} params.draft - Draft.
  * @returns {string} The key.
  */
 export const buildTestKey = ({ spec, draft }: { spec: ProviderTypeSpec; draft: ProviderDraft }): string => {
@@ -121,11 +120,9 @@ export const toFailedTestResult = (error: any): AiProviderTestResponse => {
 /**
  * Returns the text of an account test result; a refused local URL gets the hint to add a Local server.
  * @param {object} params - Parameters.
- * @param {AiProviderTestResponse} params.result - Result.
  * @param {ProviderTypeSpec} params.spec - Type spec.
  * @param {string} params.baseUrl - Tested base URL.
  * @param {string[]} params.allowlist - Org-hosted base URLs.
- * @param {TFunction} params.t - Translation function.
  * @returns {string} The text.
  */
 export const getAccountTestMessage = ({

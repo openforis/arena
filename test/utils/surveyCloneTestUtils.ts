@@ -18,7 +18,6 @@ export const createCloneTargetSurvey = (user: any, rootEntityName: string): Prom
 
 /**
  * Deletes the surveys one at a time (each drops its schemas), skipping the ones not created.
- * @param {object[]} surveys - The surveys.
  * @returns {Promise<void>} Resolves when deleted.
  */
 export const deleteSurveys = (surveys: any[]): Promise<void> =>

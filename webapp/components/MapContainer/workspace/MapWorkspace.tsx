@@ -42,7 +42,6 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
   /**
    * Stores the root element and shares it as the portal container.
    * @param {HTMLDivElement|null} element - The root element.
-   * @returns {void}
    */
   const setRoot = useCallback(
     (element: HTMLDivElement | null) => {

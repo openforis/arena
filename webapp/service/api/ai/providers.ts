@@ -93,8 +93,6 @@ export const removeProvider = async (id: string): Promise<{ settings: SettingsBo
 
 /**
  * Sets the default provider.
- * @param {object} params - Parameters.
- * @param {string} params.providerId - Provider id.
  * @returns {Promise<{settings: object}>} The settings.
  */
 export const setDefaultProvider = async ({

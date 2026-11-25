@@ -6,7 +6,6 @@ import { Urls } from './urls'
 
 /**
  * Waits for the job shown in the job monitor to end (the job progress bar has the job status as class name).
- * @param {Page} page - The page.
  * @returns {Promise<string>} - The final job status ('succeeded' or 'failed').
  */
 export const waitForJobEnd = async (page: Page): Promise<string> => {
@@ -26,7 +25,6 @@ const startPublish = async (page: Page) => {
 
 /**
  * Publishes the current survey and checks that the publish job completes successfully.
- * @param {Page} page - The page.
  * @returns {Promise<void>} - Resolves when the survey has been published.
  */
 export const publishSurvey = async (page: Page): Promise<void> => {
@@ -40,7 +38,6 @@ export const publishSurvey = async (page: Page): Promise<void> => {
 
 /**
  * Tries to publish the current survey and checks that the publish job fails with the specified errors.
- * @param {Page} page - The page.
  * @param {string[]} errors - Expected error messages.
  * @returns {Promise<void>} - Resolves when the errors have been checked and the job dialog closed.
  */

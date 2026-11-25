@@ -44,7 +44,6 @@ const toMonthKey = (year: number, monthIndex: number): string => `${year}-${Stri
 /**
  * Returns the absolute month number (year × 12 + month index) of a date in UTC.
  *
- * @param {Date} date - Date.
  * @returns {number} Absolute month number.
  */
 const toAbsoluteMonth = (date: Date): number => date.getUTCFullYear() * MONTHS_PER_YEAR + date.getUTCMonth()
@@ -69,7 +68,6 @@ export const getScenePeriod = (months: number, now: Date): ScenePeriod => {
 /**
  * Lists the calendar months (YYYY-MM, UTC) touched by a period, oldest first.
  *
- * @param {ScenePeriod} period - The period.
  * @returns {string[]} Month keys.
  */
 export const getPeriodMonthKeys = (period: ScenePeriod): string[] => {
@@ -86,7 +84,6 @@ export const getPeriodMonthKeys = (period: ScenePeriod): string[] => {
  * Tells whether an ISO datetime falls inside a period (both ends included).
  *
  * @param {string} datetime - ISO 8601 datetime.
- * @param {ScenePeriod} period - The period.
  * @returns {boolean} True when inside.
  */
 export const isInPeriod = (datetime: string, period: ScenePeriod): boolean => {
@@ -132,7 +129,6 @@ export const formatSceneDate = (datetime: string, locale: string): string =>
 /**
  * Formats a period as a date range, e.g. "Apr 11 – Oct 11, 2026".
  *
- * @param {ScenePeriod} period - The period.
  * @param {string} locale - BCP 47 locale.
  * @returns {string} Formatted range.
  */

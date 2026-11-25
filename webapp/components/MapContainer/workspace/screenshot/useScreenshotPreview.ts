@@ -79,7 +79,6 @@ const NO_IMAGE: ComposedImage = { blob: null, url: null, composing: false, error
  * Captures run one after the other (fit to plot moves the map); stale results are dropped.
  * State is only set when a capture ends: "loading" is derived from the request (react-hooks set-state-in-effect).
  * @param {object} params - The parameters.
- * @param {L.Map|null} params.map - The map.
  * @param {boolean} params.includeData - Whether markers and measurements are captured.
  * @param {ScreenshotPlotCandidate|null} params.capturePlot - The plot to fit, or null for the current view.
  * @param {number} params.fitZoom - The fit-to-plot zoom.
@@ -273,7 +272,6 @@ const useComposedImage = ({
 /**
  * Builds the screenshot preview: the image saved or downloaded is exactly the one shown.
  * @param {object} params - The parameters.
- * @param {L.Map|null} params.map - The map.
  * @param {ScreenshotOptions} params.options - Capture mode and what to include.
  * @param {ScreenshotFormat} params.format - The image format of the target.
  * @param {ScreenshotPlotCandidate|null} params.plot - The selected plot.

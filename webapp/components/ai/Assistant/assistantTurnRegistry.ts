@@ -92,7 +92,6 @@ export const assistantTurnRegistry = createAssistantTurnRegistry()
 
 /**
  * Aborts every running assistant turn for a reset (logout): their last state is saved but they no longer update the UI.
- * @returns {void}
  */
 export const abortAssistantTurns = (): void => assistantTurnRegistry.abortAll()
 

@@ -21,7 +21,6 @@ export const HISTORY_NOTES_RULE =
 
 /**
  * Describes the current view for the model.
- * @param {AiCurrentView} view - Current view.
  * @param {object|null} survey - Survey (null: the selected node definition is not described).
  * @returns {string|null} E.g. "Module: designer / formDesigner. Selected node definition: `tree`."; null without module.
  */
@@ -36,7 +35,6 @@ export const describeView = (view: AiCurrentView, survey: any): string | null =>
 /**
  * Builds the system prompt of an area.
  * @param {object} params - Parameters.
- * @param {AssistantPromptArea} params.area - Area.
  * @param {AiToolContext} params.ctx - Tool context of the turn.
  * @param {string|null} params.outline - Handbook outline (Help only).
  * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
@@ -102,7 +100,6 @@ const buildAreaPrompt = ({
 /**
  * Builds the system prompt of a turn.
  * @param {object} params - Parameters.
- * @param {AssistantPromptArea} params.area - Area.
  * @param {AiToolContext} params.ctx - Tool context of the turn.
  * @param {string|null} params.outline - Handbook outline (Help only).
  * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).

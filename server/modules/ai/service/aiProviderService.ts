@@ -113,7 +113,6 @@ const KEY_REQUIRED_TYPES = new Set<string>([
 
 /**
  * Returns an untrusted value of a request (parsed JSON) as text for an error message, cut to the given length.
- * @param {unknown} value - The value.
  * @param {number} maxLength - Maximum length.
  * @returns {string} The text.
  */
@@ -139,7 +138,6 @@ const badRequest = (key: string, params: Record<string, unknown> = {}): SystemEr
 
 /**
  * Returns the result of a test that failed with the error.
- * @param {unknown} error - The error.
  * @param {boolean} [timedOut] - True when the timeout aborted the test.
  * @returns {AiProviderTestResult} The failed result: the key and params of the error as the gateway maps it.
  */
@@ -220,7 +218,6 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
 /**
  * Returns the type when it can be stored (the mock only on test servers), else throws aiProviderInvalid.
  * @param {unknown} type - Requested type (untrusted).
- * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {string} The type.
  */
 const assertType = (type: unknown, deps: AiProviderServiceDeps): string => {
@@ -245,7 +242,6 @@ const findOwnProvider = (prefs: AiProviderPrefs, id: unknown): StoredAiProvider 
 /**
  * Returns the model of the call: the input's when sent, else the saved one.
  * @param {string} type - Provider type.
- * @param {AiProviderInput} input - Request input.
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
  * @returns {string|null} The model.
  */
@@ -258,7 +254,6 @@ const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider
 /**
  * Returns the base URL of the call: the input's when sent, else the saved one; null for fixed-URL types.
  * @param {string} type - Provider type.
- * @param {AiProviderInput} input - Request input.
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
  * @returns {string|null} The base URL.
  * @throws {SystemError} aiBaseUrlNotAllowed (400) for a URL with credentials, a query or a fragment.
@@ -277,7 +272,6 @@ const pickBaseUrl = (type: string, input: AiProviderInput, saved: StoredAiProvid
  * @param {object} params - Parameters.
  * @param {AiProviderPrefs} params.prefs - The user's provider prefs.
  * @param {AiProviderInput} params.input - Request input (untrusted).
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {ResolvedCallConfig} The config with the typed key only, the saved provider and whether the endpoint is unchanged.
  */
 const resolveCallConfig = ({
@@ -303,9 +297,7 @@ const resolveCallConfig = ({
  * (an empty string means "no key").
  * @param {object} params - Parameters.
  * @param {ResolvedCallConfig} params.resolved - Resolved call config.
- * @param {AiProviderInput} params.input - Request input.
  * @param {ArenaUser} params.user - The user (the stored key is bound to them).
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {ResolvedCallConfig} The config with the key.
  */
 const withStoredKey = ({
@@ -327,7 +319,6 @@ const withStoredKey = ({
 /**
  * Throws when a provider that needs a key has none.
  * @param {AiProviderCallConfig} cfg - Call config.
- * @returns {void}
  */
 const assertKeyPresent = (cfg: AiProviderCallConfig): void => {
   if (KEY_REQUIRED_TYPES.has(cfg.provider) && !cfg.apiKey)
@@ -337,7 +328,6 @@ const assertKeyPresent = (cfg: AiProviderCallConfig): void => {
 /**
  * Throws when the config lacks a model or a required base URL.
  * @param {AiProviderCallConfig} cfg - Call config.
- * @returns {void}
  */
 const assertCompleteConfig = (cfg: AiProviderCallConfig): void => {
   if (!cfg.model) throw badRequest('aiModelMissing', { provider: cfg.provider })
@@ -348,7 +338,6 @@ const assertCompleteConfig = (cfg: AiProviderCallConfig): void => {
 /**
  * Throws when the config cannot make a call (model, base URL, key).
  * @param {AiProviderCallConfig} cfg - Call config.
- * @returns {void}
  */
 const validateConfig = (cfg: AiProviderCallConfig): void => {
   assertCompleteConfig(cfg)
@@ -358,7 +347,6 @@ const validateConfig = (cfg: AiProviderCallConfig): void => {
 /**
  * Returns true when the call uses exactly the saved values of a saved provider (same model, endpoint and key).
  * @param {ResolvedCallConfig} resolved - Resolved call config.
- * @param {AiProviderInput} input - Request input.
  * @returns {boolean} Whether the saved values are used.
  */
 const usesSavedValues = (resolved: ResolvedCallConfig, input: AiProviderInput): boolean =>
@@ -377,7 +365,6 @@ const replaceProvider = (prefs: AiProviderPrefs, provider: StoredAiProvider): Ai
 
 /**
  * Returns the secret box of the dependencies.
- * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {KeyCipher} The secret box.
  */
 const cipherOf = (deps: AiProviderServiceDeps): KeyCipher => ({
@@ -388,7 +375,6 @@ const cipherOf = (deps: AiProviderServiceDeps): KeyCipher => ({
 
 /**
  * Returns the dependencies of the AI prefs writer.
- * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {AiPrefsWriterDeps} The writer dependencies.
  */
 const writerDepsOf = (deps: AiProviderServiceDeps): AiPrefsWriterDeps => ({
@@ -403,9 +389,7 @@ const writerDepsOf = (deps: AiProviderServiceDeps): AiPrefsWriterDeps => ({
  * Changes the latest stored provider prefs of the user (the old slot keys are dropped). The change runs while the
  * user row is locked: it must not wait for the network and may throw to refuse the write.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {ProviderPrefsChange} params.change - Receives the latest provider prefs, returns the ones to store (or null).
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {Promise<{user: ArenaUser, prefs: AiProviderPrefs}>} The user and the provider prefs as stored.
  */
 const commitProviderPrefs = async ({
@@ -445,11 +429,8 @@ const isSameTestedProvider = (current: StoredAiProvider, tested: StoredAiProvide
  * Stamps the result of a test on the stored provider, unless it was removed or edited while the test ran (the
  * result is then about something that is no longer stored).
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {StoredAiProvider} params.tested - The provider as it was when the test began.
  * @param {boolean} params.ok - Whether the test passed.
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
- * @returns {Promise<void>} Resolves when done.
  */
 const stampTestResult = async ({
   user,
@@ -480,7 +461,6 @@ const stampTestResult = async ({
  * @param {string|null} params.apiKey - Plain key.
  * @param {ArenaUser} params.user - The user that owns the provider.
  * @param {object} params.provider - The provider as it will be stored (id, type and base URL).
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {string|null} The encrypted key, or null when there is no key.
  */
 const encryptKey = ({
@@ -502,9 +482,7 @@ const encryptKey = ({
 /**
  * Runs the test and throws its error when it fails (add and edit save only a working provider).
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {AiProviderCallConfig} params.cfg - Call config.
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {Promise<void>} Resolves when the test passed.
  */
 const assertTestPasses = async ({
@@ -525,7 +503,6 @@ const assertTestPasses = async ({
  * Returns true when the stored key can be decrypted.
  * @param {StoredAiProvider} provider - Stored provider.
  * @param {string} userUuid - The user that owns the provider.
- * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {boolean} Whether the key is readable (false when there is none).
  */
 const isKeyReadable = (provider: StoredAiProvider, userUuid: string, deps: AiProviderServiceDeps): boolean => {
@@ -542,7 +519,6 @@ const isKeyReadable = (provider: StoredAiProvider, userUuid: string, deps: AiPro
  * Returns the public entry of a stored provider.
  * @param {StoredAiProvider} provider - Stored provider.
  * @param {string} userUuid - The user that owns the provider.
- * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {PublicAiProvider} The entry.
  */
 const toPublic = (provider: StoredAiProvider, userUuid: string, deps: AiProviderServiceDeps): PublicAiProvider =>
@@ -558,8 +534,6 @@ const toPublic = (provider: StoredAiProvider, userUuid: string, deps: AiProvider
 
 /**
  * Returns the public entries of the user's account providers.
- * @param {ArenaUser} user - The user.
- * @param {AiProviderServiceDeps} [deps] - Dependencies.
  * @returns {PublicAiProvider[]} The entries, in stored order.
  */
 export const getPublicProviders = (
@@ -585,9 +559,7 @@ const normalizeInput = (input: AiProviderInput): AiProviderInput => {
 /**
  * Tests a draft or a saved provider; stamps `lastTest*` only for a saved provider tested with its saved values.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {AiProviderInput} params.input - Draft (`type`, `model`, `baseUrl`, `apiKey`) or `id` plus changed fields.
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<AiProviderTestResult>} The result (an incomplete config is a failed result, not an error).
  */
 export const testProvider = async ({
@@ -617,9 +589,7 @@ export const testProvider = async ({
 /**
  * Lists the models of a draft or a saved provider (same key rules and base URL guard as a call).
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {AiProviderInput} params.input - Draft or `id` plus changed fields.
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<{models: AiProviderModel[]}>} The models.
  */
 export const listProviderModels = async ({
@@ -648,9 +618,7 @@ export const listProviderModels = async ({
  * Adds an account provider: validates, encrypts the key, re-runs the test, saves with a new `acct:` id.
  * The first provider becomes the default when the default is Arena default and no admin default exists.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {AiProviderInput} params.input - `type`, `name`, `model`, `baseUrl`, `apiKey` (an `id` is ignored).
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<{user: ArenaUser, provider: PublicAiProvider}>} The updated user and the new entry.
  * @throws {SystemError} aiProviderLimitReached (409) when the user has the most providers that can be saved.
  */
@@ -714,11 +682,9 @@ export const addProvider = async ({
  * Returns the encrypted key to store after an edit: a typed key replaces the stored one ('' clears it); an omitted
  * key stays only on the same endpoint.
  * @param {object} params - Parameters.
- * @param {AiProviderInput} params.input - Request input.
  * @param {ResolvedCallConfig} params.resolved - Resolved call config.
  * @param {StoredAiProvider} params.saved - Saved provider.
  * @param {ArenaUser} params.user - The user that owns the provider.
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {string|null} The encrypted key.
  */
 const keyToStore = ({
@@ -748,7 +714,6 @@ const keyToStore = ({
  * @param {StoredAiProvider} params.current - The stored provider.
  * @param {StoredAiProvider} params.tested - The provider as it was when the test began.
  * @param {boolean} params.keyTyped - Whether the request replaces the key.
- * @returns {void}
  */
 const assertUnchangedSinceTest = ({
   current,
@@ -768,11 +733,8 @@ const assertUnchangedSinceTest = ({
  * Tests the values of an edit that changes the model, the endpoint or the key: they are saved only when the test
  * passes. Returns null for an edit that keeps the saved values (a rename), which needs no test.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
- * @param {AiProviderInput} params.input - Request input.
  * @param {ResolvedCallConfig} params.unkeyed - Resolved config of the edit, without the stored key.
  * @param {StoredAiProvider} params.saved - The provider as stored when the request began.
- * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {Promise<Partial<StoredAiProvider>|null>} The tested values to store, or null when nothing was tested.
  */
 const testEditedValues = async ({
@@ -807,10 +769,8 @@ const testEditedValues = async ({
  * The type never changes (another type is another provider). The edit is applied to the stored provider: a provider
  * removed or changed by another request while the test ran is a 404 or a 409, never a silent overwrite.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {string} params.id - Provider id (route parameter, untrusted).
  * @param {AiProviderInput} params.input - Changed fields (`apiKey` omitted = keep).
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<{user: ArenaUser, provider: PublicAiProvider}>} The updated user and entry.
  */
 export const updateProvider = async ({
@@ -845,9 +805,7 @@ export const updateProvider = async ({
 /**
  * Removes a provider; a removed default becomes Arena default.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {string} params.id - Provider id (route parameter, untrusted).
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<{user: ArenaUser}>} The updated user.
  */
 export const removeProvider = async ({
@@ -881,9 +839,7 @@ export const removeProvider = async ({
  * Sets the default provider. `acct:` ids must be the user's; `local:` ids live in a browser, so only their format is
  * checked; `arena-default` is always accepted.
  * @param {object} params - Parameters.
- * @param {ArenaUser} params.user - The user.
  * @param {unknown} params.providerId - Provider id (untrusted).
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<{user: ArenaUser}>} The user.
  */
 export const setDefaultProvider = async ({
@@ -911,7 +867,6 @@ export const setDefaultProvider = async ({
  * failure is logged and the user is returned as it was, so a settings read never fails because of it.
  * @param {object} params - Parameters.
  * @param {ArenaUser} params.user - The user (as loaded for this request).
- * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<ArenaUser>} The user with the stored AI prefs (the same user when there was nothing to do).
  */
 export const upgradeLegacyProviderKeys = async ({

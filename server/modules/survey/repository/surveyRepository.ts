@@ -41,7 +41,6 @@ const _getSurveySelectFields = (alias = '') => {
  *   legacy file paths to migrate, so callers should pass the "current fully-migrated" stamp value (see
  *   `getCurrentAppVersionStamp` in `surveyDataMigrationSteps.js`) rather than leaving this unset, otherwise the
  *   survey would be treated as pending a data migration and become unavailable (503) until the next migration run.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<object>} - The newly inserted survey row.
  */
 export const insertSurvey = (
@@ -316,7 +315,6 @@ export const fetchSurveyIdsAndNames = (client: DbClient = db) =>
  * Used to prioritize the startup data migration: surveys ordered this way have their more
  * recently active (and therefore more likely to be opened again soon) surveys migrated first,
  * reducing the window in which any given survey is temporarily unavailable while migrating.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
  */
 export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
@@ -324,8 +322,6 @@ export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
 
 /**
  * Fetches the app version a survey was last migrated to.
- * @param {!number} surveyId - The survey ID.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<{ appVersion: string|null }|null>} - The app version, or null if the survey doesn't exist.
  */
 export const fetchSurveyAppVersionById = (surveyId: number, client: DbClient = db) =>
@@ -334,10 +330,8 @@ export const fetchSurveyAppVersionById = (surveyId: number, client: DbClient = d
 /**
  * Fetches a survey by id.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey ID.
  * @param {boolean} [params.draft] - Whether to fetch the draft props.
  * @param {boolean} [params.backup] - Whether to fetch both draft and published props.
- * @param {import('@server/db/db').DbClient} [client] - The database client.
  * @returns {Promise<import('@openforis/arena-core').ArenaSurvey>} - The survey.
  */
 export const fetchSurveyById = (
@@ -366,8 +360,6 @@ export const fetchFilesTotalSpace = (surveyId: number, client: DbClient = db) =>
 
 /**
  * Fetches the raw AI policy stored in the survey configuration (one-column select by primary key).
- * @param {number} surveyId - The survey id.
- * @param {import('@server/db/db').DbClient} [client] - The database client.
  * @returns {Promise<object|null>} The stored value (untrusted JSON), or null when not set.
  */
 export const fetchSurveyAiPolicy = (surveyId: number, client: DbClient = db): Promise<unknown> =>
@@ -396,9 +388,6 @@ export const fetchTemporarySurveyIds = (
 // ============== UPDATE
 /**
  * Marks the survey as draft (it has unpublished changes).
- * @param {number} surveyId - The survey ID.
- * @param {import('@server/db/db').DbClient} [client] - The database client.
- * @returns {Promise<null>} - The result promise.
  */
 export const markSurveyDraft = (surveyId: number, client: DbClient = db) =>
   client.none(`UPDATE survey SET draft = true, date_modified = ${dbNow} WHERE id = $1`, [surveyId])
@@ -433,10 +422,7 @@ export const updateSurveyOwner = (
 /**
  * Updates the app version associated to the specified survey.
  * @param {object} params - The update parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.version - The app version to associate to the survey.
- * @param {DbClient} [client] - The database client.
- * @returns {Promise<null>} - The result promise.
  */
 export const updateSurveyAppVersion = (
   { surveyId, version }: { surveyId: number; version: string },

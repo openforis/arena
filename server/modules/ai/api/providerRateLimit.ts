@@ -19,7 +19,6 @@ const releases = new WeakMap<object, () => void>()
  * Frees the in-flight slot that the rate limit middleware took for the response (once; nothing when it took none).
  * The route calls it when its handler settles.
  * @param {object} res - Express response of the call.
- * @returns {void}
  */
 export const releaseProviderCall = (res: object): void => {
   releases.get(res)?.()

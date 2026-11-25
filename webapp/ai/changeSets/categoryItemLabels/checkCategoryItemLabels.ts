@@ -13,11 +13,7 @@ type FieldIssue = { field: string; message: string }
 /**
  * Checks one operation: its category exists, its language is a survey language, its label is not set twice.
  * @param {object} params - Parameters.
- * @param {CategoryItemLabelSetOperation} params.op - Operation.
- * @param {object} params.survey - Survey.
- * @param {string[]} params.languages - Survey languages.
  * @param {Set<string>} params.seenKeys - Labels of the earlier operations (updated).
- * @param {Translate} params.t - Translator.
  * @returns {FieldIssue[]} The issues.
  */
 const checkOperation = ({
@@ -48,9 +44,7 @@ const checkOperation = ({
 
 /**
  * Returns the issues of the category item label operations of a change set.
- * @param {ChangeSet} changeSet - Change set.
  * @param {object} survey - Draft survey.
- * @param {Translate} t - Translator.
  * @returns {ChangeSetIssue[]} The issues (operation = index in the change set).
  */
 export const checkCategoryItemLabels = (changeSet: ChangeSet, survey: any, t: Translate): ChangeSetIssue[] => {
