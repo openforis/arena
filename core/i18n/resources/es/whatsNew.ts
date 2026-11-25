@@ -7,6 +7,15 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    appInfoAndNodeDateFunctions: {
+      title: 'Nuevas funciones de expresión: aplicación y fechas de los nodos',
+      description: `Nuevas funciones para valores predeterminados y reglas de relevancia y validación:
+
+- **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()**: la aplicación que modifica el registro (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), su plataforma (\`web\`, \`android\` o \`ios\`) y su versión. Se evalúan al crear el registro y de nuevo cuando se modifica con otra aplicación, plataforma o versión de la aplicación: p. ej., un atributo de **Solo lectura** con el valor predeterminado \`appIdLabel()\` y **Valor predeterminado evaluado solo una vez** conserva la aplicación que creó el registro.
+- **nodeDateCreated(node)**, **nodeDateModified(node)**: fecha y hora de creación y de última modificación de un atributo o entidad; para una entidad, la última vez que cambió alguno de sus valores, p. ej. \`nodeDateModified(parent(this))\`.
+
+En el editor de expresiones básico, selecciónelas en la lista **Función**: el asistente de las funciones de fecha de los nodos muestra los atributos accesibles desde el nodo actual y las entidades antecesoras.`,
+    },
     googleSignIn: {
       title: 'Inicio de sesión con su cuenta de Google',
       description: `En la página de inicio de sesión, haga clic en **Iniciar sesión con Google** para iniciar sesión con su cuenta de Google (Gmail o Google Workspace) en lugar de escribir su contraseña.

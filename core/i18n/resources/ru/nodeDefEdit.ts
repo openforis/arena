@@ -26,6 +26,16 @@ export default {
   editorTextSearchHelp:
     "Ищите текстовые значения с помощью text_attr.includes('abc'), text_attr.startsWith('abc') или text_attr.endsWith('abc'); добавьте перед ними .toLowerCase(), чтобы не учитывать регистр, например text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Возвращает идентификатор приложения, в котором редактируется запись: «arena» (Arena) или «am» (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Возвращает название приложения, в котором редактируется запись: «Arena» или «Arena Mobile». $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      'Вычисляется при создании записи и повторно, когда запись редактируется в другом приложении, на другой платформе или в другой версии приложения',
+    appPlatform:
+      'Возвращает платформу приложения, в котором редактируется запись: «web», «android» или «ios». $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion:
+      'Возвращает версию приложения, в котором редактируется запись. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp: 'Возвращает значение указанного $t(extraProp.label) элемента категории с указанным кодом',
     dateTimeDiff: 'Возвращает разницу (в минутах) между двумя парами дата-время',
     distance: 'Возвращает расстояние (в метрах) между указанными координатами',
@@ -46,6 +56,10 @@ export default {
     log10: 'Возвращает логарифм X по основанию 10',
     max: 'Возвращает максимум из аргументов',
     min: 'Возвращает минимум из аргументов',
+    nodeDateCreated:
+      'Возвращает дату и время создания указанного узла (атрибута или сущности) в виде значения даты-времени, например nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Возвращает дату и время последнего изменения указанного узла в виде значения даты-времени; для сущности — время последнего изменения самой сущности или любого из её потомков, например nodeDateModified(parent(this))',
     now: 'Возвращает текущую дату или время',
     parent: 'Возвращает родительскую сущность указанного узла',
     pow: 'Возвращает значение основания, возведенного в степень',

@@ -41,6 +41,16 @@ const determineAncestorMultipleEntityDefUuid = ({
   return NodeDef.getUuid(ancestorMultipleEntityDef)
 }
 
+/**
+ * Counts the updated values: the updated attributes (entities can be updated only in their meta or date modified).
+ * @param {!object} params - The parameters.
+ * @param {!object} params.survey - The survey.
+ * @param {!Array} params.nodes - The updated nodes.
+ * @returns {number} - The number of updated values.
+ */
+const countUpdatedValues = ({ survey, nodes }: { survey: ArenaSurvey; nodes: ArenaRecordNode[] }): number =>
+  nodes.filter((node) => !NodeDef.isEntity(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))).length
+
 type FlatDataFileReader = Awaited<ReturnType<typeof DataImportFlatDataFileReader.createReaderFromStream>>
 
 export default class FlatDataImportJob extends DataImportBaseJob {
@@ -348,7 +358,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
         this.insertedRecordsUuids.add(recordUuid)
       } else if (nodesUpdatedArray.length > 0) {
-        this.updatedValues += nodesUpdatedArray.length
+        this.updatedValues += countUpdatedValues({ survey: this.context.survey, nodes: nodesUpdatedArray })
         this.updatedRecordsUuids.add(recordUuid)
       }
       this.updateFilesSummary({ originalRecord: record, nodesUpdatedArray })
@@ -425,7 +435,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     const recordUuid = Record.getUuid(recordUpdated)
     if (nodesChanged.length > 0 && !this.insertedRecordsUuids.has(recordUuid)) {
-      this.updatedValues += nodesChanged.length
+      this.updatedValues += countUpdatedValues({ survey: this.context.survey, nodes: nodesChanged })
       this.updatedRecordsUuids.add(recordUuid)
     }
   }

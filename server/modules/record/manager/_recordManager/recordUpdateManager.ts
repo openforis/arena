@@ -1,4 +1,5 @@
 import {
+  type ArenaAppInfo,
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaRecordNodePointer,
@@ -8,6 +9,7 @@ import {
   RecordNodePointers,
   Records,
   SurveyDependencyType,
+  Surveys,
 } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -53,6 +55,7 @@ export const initNewRecord = async (
     record,
     timezoneOffset,
     lang,
+    appInfo,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     createMultipleEntities = true,
@@ -62,6 +65,7 @@ export const initNewRecord = async (
     record: ArenaRecord
     timezoneOffset?: number
     lang: string
+    appInfo?: ArenaAppInfo
     nodesUpdateListener?: (nodes: NodesByUuid) => void
     nodesValidationListener?: (validation: ArenaValidation) => void
     createMultipleEntities?: boolean
@@ -80,6 +84,7 @@ export const initNewRecord = async (
       node: rootNode,
       timezoneOffset,
       lang,
+      appInfo,
       nodesUpdateListener,
       nodesValidationListener,
       system: true,
@@ -95,6 +100,7 @@ export const initNewRecord = async (
       record: recordWithRootEntity,
       timezoneOffset,
       lang,
+      appInfo,
       nodesUpdateListener,
       nodesValidationListener,
     },
@@ -112,6 +118,7 @@ const _applyGroupQualifierValues = async (
     record,
     timezoneOffset,
     lang,
+    appInfo,
     nodesUpdateListener,
     nodesValidationListener,
   }: {
@@ -120,6 +127,7 @@ const _applyGroupQualifierValues = async (
     record: ArenaRecord
     timezoneOffset?: number
     lang: string
+    appInfo?: ArenaAppInfo
     nodesUpdateListener: (nodes: NodesByUuid) => void
     nodesValidationListener: (validation: ArenaValidation) => void
   },
@@ -146,6 +154,7 @@ const _applyGroupQualifierValues = async (
         node: nodeWithValue,
         timezoneOffset,
         lang,
+        appInfo,
         nodesUpdateListener,
         nodesValidationListener,
         system: true,
@@ -293,6 +302,7 @@ export const persistNode = (
     node,
     timezoneOffset,
     lang,
+    appInfo,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     system = false,
@@ -305,6 +315,7 @@ export const persistNode = (
     node: ArenaRecordNode
     timezoneOffset?: number | null
     lang?: string | null
+    appInfo?: ArenaAppInfo
     nodesUpdateListener?: (nodes: NodesByUuid) => void
     nodesValidationListener?: (validation: ArenaValidation) => void
     system?: boolean
@@ -321,6 +332,7 @@ export const persistNode = (
       node,
       timezoneOffset,
       lang,
+      appInfo,
       clearNonApplicableValues,
       nodesUpdateFn: (user, survey, record, node, t) => {
         const nodeUuid = Node.getUuid(node)
@@ -331,7 +343,7 @@ export const persistNode = (
           return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
         }
         return NodeCreationManager.insertNode(
-          { user, survey, record, node, system, createMultipleEntities, timezoneOffset, lang },
+          { user, survey, record, node, system, createMultipleEntities, timezoneOffset, lang, appInfo },
           t
         )
       },
@@ -352,6 +364,7 @@ export const deleteNode = (
     nodeUuid,
     timezoneOffset,
     lang,
+    appInfo,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     clearNonApplicableValues = false,
@@ -362,6 +375,7 @@ export const deleteNode = (
     nodeUuid: string
     timezoneOffset?: number
     lang?: string
+    appInfo?: ArenaAppInfo
     nodesUpdateListener?: (nodes: NodesByUuid) => void
     nodesValidationListener?: (validation: ArenaValidation) => void
     clearNonApplicableValues?: boolean
@@ -376,6 +390,7 @@ export const deleteNode = (
       node: Record.getNodeByUuid(nodeUuid)(record),
       timezoneOffset,
       lang,
+      appInfo,
       clearNonApplicableValues,
       nodesUpdateFn: (user, survey, record, node, t) =>
         NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
@@ -384,6 +399,82 @@ export const deleteNode = (
     },
     t
   )
+
+/**
+ * Evaluates again the expressions using the app info functions (appId, appVersion, appPlatform)
+ * when the record has been modified last with another app (or app version) and stores the app info in the record.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user editing the record.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.record - The record.
+ * @param {!object} params.appInfo - The app editing the record.
+ * @param {number} [params.timezoneOffset] - The client timezone offset.
+ * @param {string} [params.lang] - The language used to evaluate the expressions.
+ * @param {Function} [params.nodesUpdateListener] - Listener notified with the updated nodes.
+ * @param {Function} [params.nodesValidationListener] - Listener notified with the updated validations.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<object>} - The updated record.
+ */
+export const updateAppInfoDependents = (
+  {
+    user,
+    survey,
+    record,
+    appInfo,
+    timezoneOffset,
+    lang,
+    nodesUpdateListener = null,
+    nodesValidationListener = null,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    record: ArenaRecord
+    appInfo: ArenaAppInfo
+    timezoneOffset?: number
+    lang?: string
+    nodesUpdateListener?: (nodes: NodesByUuid) => void
+    nodesValidationListener?: (validation: ArenaValidation) => void
+  },
+  client: DbClient = db
+): Promise<ArenaRecord> => {
+  if (!Records.isAppInfoChanged(appInfo)(record)) return Promise.resolve(record)
+
+  return client.tx(async (t) => {
+    const info = { ...record.info, modifiedWith: appInfo }
+    await RecordRepository.updateRecordInfo(
+      { surveyId: Survey.getId(survey), recordUuid: Record.getUuid(record), info },
+      t
+    )
+    let recordUpdated: ArenaRecord = { ...record, info }
+
+    const appInfoDependentNodes: NodesByUuid = {}
+    for (const nodeDef of Surveys.getAppInfoDependents({ survey })) {
+      for (const node of Records.getNodesByDefUuid(nodeDef.uuid)(recordUpdated)) {
+        appInfoDependentNodes[node.uuid] = node
+      }
+    }
+    if (A.isEmpty(appInfoDependentNodes)) return recordUpdated
+
+    const { record: recordWithDependents, nodes } = await _onNodesUpdate(
+      {
+        user,
+        survey,
+        record: recordUpdated,
+        nodesUpdated: appInfoDependentNodes,
+        timezoneOffset,
+        lang,
+        appInfo,
+        clearNonApplicableValues: false,
+        nodesUpdateListener,
+        nodesValidationListener,
+      },
+      t
+    )
+    recordUpdated = recordWithDependents
+    await _afterNodesUpdate({ survey, record: recordUpdated, nodes, nodesValidationListener }, t)
+    return recordUpdated
+  })
+}
 
 export const { deleteNodesByUuids } = NodeUpdateManager
 
@@ -400,6 +491,7 @@ const _updateNodeAndValidateRecordUniqueness = (
     node,
     timezoneOffset,
     lang,
+    appInfo,
     clearNonApplicableValues = false,
     nodesUpdateFn,
     nodesUpdateListener = null,
@@ -411,6 +503,7 @@ const _updateNodeAndValidateRecordUniqueness = (
     node: ArenaRecordNode
     timezoneOffset?: number
     lang: string
+    appInfo?: ArenaAppInfo
     clearNonApplicableValues?: boolean
     nodesUpdateFn: (
       user: ArenaUser,
@@ -438,6 +531,7 @@ const _updateNodeAndValidateRecordUniqueness = (
         nodesUpdated,
         timezoneOffset,
         lang,
+        appInfo,
         clearNonApplicableValues,
         nodesUpdateListener,
         nodesValidationListener,
@@ -525,6 +619,7 @@ const _onNodesUpdate = async (
     nodesUpdated,
     timezoneOffset,
     lang,
+    appInfo,
     clearNonApplicableValues,
     nodesUpdateListener,
     nodesValidationListener,
@@ -535,6 +630,7 @@ const _onNodesUpdate = async (
     nodesUpdated: NodesByUuid
     timezoneOffset?: number
     lang: string
+    appInfo?: ArenaAppInfo
     clearNonApplicableValues: boolean
     nodesUpdateListener: (nodes: NodesByUuid) => void
     nodesValidationListener: (validation: ArenaValidation) => void
@@ -549,7 +645,7 @@ const _onNodesUpdate = async (
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
     await NodeUpdateManager.updateNodesDependents(
-      { user, survey, record, nodes: nodesUpdated, timezoneOffset, lang, clearNonApplicableValues },
+      { user, survey, record, nodes: nodesUpdated, timezoneOffset, lang, appInfo, clearNonApplicableValues },
       t
     )
   if (nodesUpdateListener) {

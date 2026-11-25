@@ -3,6 +3,8 @@ export const RecordsUpdateThreadMessageTypes = {
   threadInit: 'threadInit',
 
   recordInit: 'recordInit',
+  // record opened for editing: app info dependent expressions evaluated again if the app changed
+  recordAppInfoUpdate: 'recordAppInfoUpdate',
   recordReload: 'recordReload',
   nodePersist: 'nodePersist',
   nodeDelete: 'nodeDelete',

@@ -1,3 +1,5 @@
+import type { ArenaAppInfo } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import { ENV } from '@core/processUtils'
 
@@ -19,9 +21,10 @@ const keys = {
   version: 'version',
 } as const
 
-const currentAppInfo = {
+const currentAppInfo: ArenaAppInfo = {
   [keys.appId]: arenaAppId,
   [keys.version]: ENV.applicationVersion,
+  [keys.platform]: 'web',
 }
 
 const getAppId = A.propOr(arenaAppId, keys.appId)

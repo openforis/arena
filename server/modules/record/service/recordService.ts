@@ -13,6 +13,7 @@ import {
   Objects,
   RecordExpressionEvaluator,
   RecordNodeValues,
+  Records,
   SurveyDocImages,
   SurveyDocPlace,
 } from '@openforis/arena-core'
@@ -28,6 +29,7 @@ import {
   PrintOrientations,
 } from '@common/record/printableExport'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import { AppInfo } from '@core/app/appInfo'
 import * as A from '@core/arena'
 import * as DateUtils from '@core/dateUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -412,10 +414,12 @@ export const checkIn = async ({
   if (preview || (Survey.isPublished(surveyInfo) && !readOnly && Authorizer.canEditRecord(user, record))) {
     // Create record thread
     const thread = RecordsUpdateThreadService.getOrCreatedThread()
-    // initialize record if empty
-    if (nodesEmpty) {
+    // initialize record if empty, otherwise evaluate again the app info dependent expressions (if the app changed)
+    if (nodesEmpty || Records.isAppInfoChanged(AppInfo.currentAppInfo)(record)) {
       thread.postMessage({
-        type: RecordsUpdateThreadMessageTypes.recordInit,
+        type: nodesEmpty
+          ? RecordsUpdateThreadMessageTypes.recordInit
+          : RecordsUpdateThreadMessageTypes.recordAppInfoUpdate,
         user,
         surveyId,
         cycle,
@@ -892,7 +896,10 @@ export const mergeRecords = (
     return {
       record: recordTargetUpdated,
       nodesCreated: nodesArray.filter((node) => Node.isCreated(node)).length,
-      nodesUpdated: nodesArray.filter((node) => Node.isUpdated(node)).length,
+      // updated values: entities can be updated only in their meta or date modified
+      nodesUpdated: nodesArray.filter(
+        (node) => Node.isUpdated(node) && !NodeDef.isEntity(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
+      ).length,
     }
   })
 

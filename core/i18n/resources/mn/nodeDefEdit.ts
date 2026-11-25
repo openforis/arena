@@ -26,6 +26,14 @@ export default {
   editorTextSearchHelp:
     "Текст утгуудыг text_attr.includes('abc'), text_attr.startsWith('abc') эсвэл text_attr.endsWith('abc') ашиглан хайна; том, жижиг үсгийг ялгахгүйгээр хайхын тулд өмнө нь .toLowerCase() нэмнэ үү, жишээ нь text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Бичлэгийг засварлаж буй аппын танигчийг буцаана: "arena" (Arena) эсвэл "am" (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Бичлэгийг засварлаж буй аппын нэрийг буцаана: "Arena" эсвэл "Arena Mobile". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote: 'Бичлэг үүсгэх үед, мөн өөр апп, платформ эсвэл аппын хувилбараар засварлах үед дахин тооцоологдоно',
+    appPlatform:
+      'Бичлэгийг засварлаж буй аппын платформыг буцаана: "web", "android" эсвэл "ios". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion: 'Бичлэгийг засварлаж буй аппын хувилбарыг буцаана. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp: 'Заасан кодтой ангиллын элементийн заасан $t(extraProp.label)-ийн утгыг буцаана',
     dateTimeDiff: '2 огноо-цагийн хоорондох ялгааг (минутаар) буцаана',
     distance: 'Заасан координатуудын хоорондох зайг (метрээр) буцаана',
@@ -46,6 +54,10 @@ export default {
     log10: 'X-ийн 10-н суурьтай логарифмыг буцаана',
     max: 'Аргументуудын хамгийн их утгыг буцаана',
     min: 'Аргументуудын хамгийн бага утгыг буцаана',
+    nodeDateCreated:
+      'Заасан зангилааны (шинж чанар эсвэл объект) үүсгэсэн огноо, цагийг огноо-цагийн утгаар буцаана, жишээ нь nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Заасан зангилааны сүүлд өөрчлөгдсөн огноо, цагийг огноо-цагийн утгаар буцаана; объектын хувьд тухайн объект эсвэл түүний аль нэг удам сүүлд өөрчлөгдсөн цаг, жишээ нь nodeDateModified(parent(this))',
     now: 'Одоогийн огноо эсвэл цагийг буцаана',
     parent: 'Заасан зангилааны эцэг объектыг буцаана',
     pow: 'Суурийн утгыг зэрэгт өргөсөн утгыг буцаана',

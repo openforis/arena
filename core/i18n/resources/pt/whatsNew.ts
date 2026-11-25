@@ -7,6 +7,54 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    appInfoAndNodeDateFunctions: {
+      title: 'Novas funções de expressão: informações do aplicativo e datas dos nós',
+      description: `Novas funções para valores padrão e regras de relevância e validação:
+
+- **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()**: o aplicativo que edita o registro (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), sua plataforma (\`web\`, \`android\` ou \`ios\`) e sua versão. São avaliadas quando o registro é criado e novamente quando é editado com outro aplicativo, plataforma ou versão do aplicativo: por ex., um atributo **Somente leitura** com o valor padrão \`appIdLabel()\` e **Valor padrão avaliado apenas uma vez** mantém o aplicativo que criou o registro.
+- **nodeDateCreated(node)**, **nodeDateModified(node)**: data e hora de criação e da última modificação de um atributo ou entidade; para uma entidade, a última vez em que algum de seus valores mudou, por ex. \`nodeDateModified(parent(this))\`.
+
+No editor de expressões básico, selecione-as na lista **Função**: o construtor das funções de data dos nós lista os atributos acessíveis a partir do nó atual e as entidades ancestrais.`,
+    },
+    googleSignIn: {
+      title: 'Entre com sua conta Google',
+      description: `Na página de login, clique em **Entrar com Google** para entrar com sua conta Google (Gmail ou Google Workspace) em vez de digitar sua senha.
+
+Na primeira vez, a conta Google é vinculada à sua conta do Arena pelo endereço de e-mail: use o mesmo endereço de e-mail da sua conta do Arena. Os usuários convidados também podem aceitar o convite com o Google. Vincule ou desvincule sua conta Google em **Meu perfil > Métodos de início de sessão**; o login com e-mail e senha continua disponível.`,
+    },
+    twoFactorAuth: {
+      title: 'Autenticação de dois fatores',
+      description: `Proteja sua conta com a **autenticação de dois fatores (2FA)**: depois da senha, o Arena pede um código de verificação gerado por um aplicativo autenticador no seu celular (p. ex. Google Authenticator ou Authy).
+
+Em **Meu perfil > Sign-in & security**, clique em **Gerenciar 2FA**, adicione um dispositivo e escaneie o código QR com o aplicativo. Guarde os códigos de backup exibidos no final: cada um deles permite entrar uma vez se você perder o celular.`,
+    },
+    aiFeatures: {
+      title: 'Recursos de IA',
+      description: `Em **Meu perfil > Recursos de IA**, escolha **O que a IA pode ver**:
+
+- **Só ajuda**: suas perguntas e trechos do manual do usuário do Arena;
+- **+ Estrutura do inventário**: também entidades, atributos, rótulos, categorias e expressões (sem valores dos registros);
+- **+ Dados dos registros**: também os valores dos registros e os resultados das consultas.
+
+Com **Personalizar** você ativa ou desativa cada recurso individualmente. Em **Provedores**, use o provedor **Padrão do Arena** ou adicione os seus: um **Servidor local** no seu computador ou na sua rede (p. ex. LM Studio ou Ollama) ou um provedor na nuvem com sua chave de API (OpenAI, Anthropic, Google Gemini e outros).`,
+    },
+    aiAssistant: {
+      title: 'Assistente de IA',
+      description: `Clique no botão **Assistente de IA** no cabeçalho para abrir um painel que trabalha na tela que você está usando:
+
+- **Design**: cria e altera o inventário no designer de formulários;
+- **Análise**: responde a perguntas sobre os dados com consultas;
+- **Limpeza**: procura erros nos registros e propõe correções;
+- **Ajuda**: responde a perguntas sobre o Arena.
+
+As alterações propostas só são aplicadas depois que você as revisa. **Sugestões** (p. ex. rótulos faltando em um idioma) aparecem no painel: clique em uma delas para que o assistente a execute.`,
+    },
+    surveyAiPolicy: {
+      title: 'Política de IA do inventário',
+      description: `Em **Informações do inventário > Política de IA**, os administradores do inventário escolhem onde a IA pode processar o conteúdo do inventário, separadamente para a **Estrutura do inventário** e os **Dados dos registros**: **Desativado**, **Neste dispositivo** (um servidor de IA local), **Servidor da organização** ou **Nuvem**.
+
+A mais restritiva entre esta política e os limites do servidor do Arena se aplica a todos os usuários do inventário.`,
+    },
     mobileUploadEmailNotification: {
       title: 'Notificação por e-mail dos registros enviados do Arena Mobile',
       description: `Em **Informações do inquérito → Segurança**, marque **Notificar os administradores do inquérito por e-mail quando registros forem enviados do Arena Mobile**: após cada envio, cada administrador do inquérito recebe um e-mail com a lista dos registros enviados, seus valores-chave, se são novos ou atualizados, o usuário que os criou, as datas e o número de erros e avisos de validação.
@@ -118,6 +166,12 @@ Pode escolher a orientação da página (vertical ou horizontal).`,
       description: `Crie um novo inventário a partir de um **formulário ODK** (XForm, .xml): em **Início > Novo inventário > Importar**, selecione **ODK (.xml)** como **Origem** e clique em **Iniciar importação**. As perguntas do formulário tornam-se atributos, as repetições (repeats) entidades múltiplas e as listas de opções categorias, com as etiquetas em todas as línguas do formulário. Antes de publicar, defina os atributos-chave da entidade raiz e corrija os erros indicados por **Publicar**, se existirem.
 
 Depois, importe os dados recolhidos com o **ODK Collect** em **Dados > Importação de dados > ODK / ODK Collect**: um ficheiro .zip com uma pasta por submissão (exportação do ODK Briefcase). As submissões já importadas são ignoradas.`,
+    },
+    positionTracking: {
+      title: 'Rastreamento de posição: registre o caminho percorrido em campo',
+      description: `Marque **Rastreamento de posição** na aba **Básico** de um atributo **Geoespacial** único: no **Arena Mobile**, o valor do atributo é o caminho percorrido pelo usuário enquanto preenche o registro, gravado por meio do rastreamento da posição do dispositivo.
+
+O caminho não pode ser editado manualmente. A opção se aplica somente ao Arena Mobile.`,
     },
     dynamicEnumerator: {
       title: 'Enumeração dinâmica de entidades',
