@@ -5,6 +5,7 @@ export default {
 
   model: 'Загвар',
   modelOther: 'Бусад (загварын нэрийг бичнэ үү)...',
+  modelChooseFromList: 'Загваруудын жагсаалтаас сонгох',
   baseUrl: 'Үндсэн URL',
   apiKey: 'API түлхүүр',
   apiKeyPlaceholder: 'Үйлчилгээ үзүүлэгчийнхээ API түлхүүрийг буулгана уу',

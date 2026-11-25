@@ -6,6 +6,8 @@ import { createDraft, type ProviderDraft } from '@webapp/components/ai/UserAiSet
 import { isApiKeyCleared, isApiKeyMissing } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerKey'
 import {
   canListModels,
+  getModelToSelect,
+  listModelOptions,
   resolveFetchedModel,
 } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerModels'
 import {
@@ -330,6 +332,17 @@ describe('provider dialog draft (267)', () => {
     expect(buildAccountRequest({ spec: compatible, draft: renamed, saved: unlisted })).toMatchObject({
       model: 'private-model',
     })
+  })
+
+  test('back to the list from a typed model: an unlisted one stays as the first option', () => {
+    const models = [{ id: 'claude-haiku-4-5-20251001' }, { id: 'claude-opus-5-5' }]
+    // an alias the provider lists under its full id
+    expect(getModelToSelect({ models, model: 'claude-haiku-4-5' })).toBe('claude-haiku-4-5')
+    expect(listModelOptions({ models, model: 'claude-haiku-4-5' })).toEqual([{ id: 'claude-haiku-4-5' }, ...models])
+    expect(listModelOptions({ models, model: 'claude-opus-5-5' })).toEqual(models)
+    // an emptied model takes the first listed, so the select shows what is chosen
+    expect(getModelToSelect({ models, model: ' ' })).toBe('claude-haiku-4-5-20251001')
+    expect(listModelOptions({ models, model: '' })).toEqual(models)
   })
 
   test('local test: passes when the server answered and the chosen model is listed', () => {
