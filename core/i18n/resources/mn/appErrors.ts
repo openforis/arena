@@ -1,4 +1,24 @@
 export default {
+  authProvider: {
+    notFound: 'Нэвтрэх үйлчилгээ үзүүлэгч олдсонгүй',
+    readOnly: 'Энэ үйлчилгээ үзүүлэгчийг серверийн тохиргоонд тодорхойлсон тул энд өөрчлөх боломжгүй',
+    idAlreadyUsed: '"{{id}}" танигчийг өөр үйлчилгээ үзүүлэгч ашиглаж байна',
+    encryptionKeyMissing:
+      'Клиентийн нууц түлхүүрүүдийн шифрлэлтийн түлхүүр (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY) тохируулагдаагүй байна',
+    validation: 'Зарим талбар буруу байна',
+    iconInvalid: 'Дүрс тэмдэг буруу байна: 100 KB хүртэлх PNG эсвэл SVG файл ашиглана уу',
+    identityNotFound: 'Холбогдсон бүртгэл олдсонгүй',
+    lastSignInMethod: 'Энэ бол сүүлийн нэвтрэх арга: эхлээд нууц үг тохируулах эсвэл өөр үйлчилгээ үзүүлэгч холбоно уу',
+    idInvalid: 'Танигч буруу байна: жижиг үсэг, тоо болон зураас ашиглана уу (64 хүртэл тэмдэгт)',
+    typeInvalid: 'Үйлчилгээ үзүүлэгчийн төрөл буруу байна',
+    labelInvalid: 'Товчны шошго заавал шаардлагатай (64 хүртэл тэмдэгт)',
+    issuerInvalid: 'Issuer URL буруу байна (https шаардлагатай)',
+    tenantInvalid: 'Tenant буруу байна',
+    clientIdRequired: 'Клиентийн ID заавал шаардлагатай',
+    scopesMissingOpenid: 'Scope-уудад "openid" заавал орсон байх ёстой',
+    emailDomainInvalid: 'Имэйлийн домэйн буруу байна',
+    clientSecretRequired: 'Клиентийн нууц түлхүүр заавал шаардлагатай',
+  },
   mapCustomLayers: {
     urlInvalid: 'Үйлчилгээний URL буруу байна',
     urlNotAllowed: 'Зөвхөн нийтийн http болон https хаяг ашиглах боломжтой',
