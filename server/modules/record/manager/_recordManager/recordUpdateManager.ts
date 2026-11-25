@@ -415,7 +415,7 @@ export const deleteNode = (
  * @param {object} [client] - The database client.
  * @returns {Promise<object>} - The updated record.
  */
-export const updateAppInfoDependents = async (
+export const updateAppInfoDependents = (
   {
     user,
     survey,
@@ -437,7 +437,7 @@ export const updateAppInfoDependents = async (
   },
   client: DbClient = db
 ): Promise<ArenaRecord> => {
-  if (!Records.isAppInfoChanged(appInfo)(record)) return record
+  if (!Records.isAppInfoChanged(appInfo)(record)) return Promise.resolve(record)
 
   return client.tx(async (t) => {
     const info = { ...record.info, modifiedWith: appInfo }
