@@ -21,7 +21,7 @@ const pluginReactHooksCompat = pluginReactHooks as unknown as ESLint.Plugin
 export default defineConfig([
   // 1. TypeScript Configuration
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -53,7 +53,7 @@ export default defineConfig([
 
   // 2. React and React Hooks Configuration
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     plugins: {
       react: pluginReact,
       'react-hooks': pluginReactHooksCompat,
@@ -125,7 +125,7 @@ export default defineConfig([
 
   // 5. Prettier Integration (Must be the LAST configuration)
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.mts'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     plugins: {
       prettier: pluginPrettier,
     },
