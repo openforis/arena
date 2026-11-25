@@ -9,10 +9,10 @@ An ODK importer mirroring this one lives in `server/modules/odkImport/` (design:
 
 ## Entry points
 
-| Flow                                                                                                                            | API (handler file)                                                                              | Job                                                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| New survey from a Collect file (survey creation form, "Collect" source)                                                         | `POST /survey/collect-import` (`server/modules/collectImport/api/collectImportApi.ts`)          | `CollectImportJob` (`server/modules/collectImport/service/collectImport/collectImportJob.ts`)         |
-| More records into a survey previously imported from Collect (`webapp/views/App/views/Data/DataImport/DataImportCollectView.js`) | `POST /survey/:surveyId/data-import/collect` (`server/modules/dataImport/api/dataImportApi.ts`) | `CollectDataImportJob` (`server/modules/collectImport/service/collectImport/collectDataImportJob.ts`) |
+| Flow                                                                                                                   | API (handler file)                                                                              | Job                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| New survey from a Collect file (survey creation form, "Collect" source)                                                | `POST /survey/collect-import` (`server/modules/collectImport/api/collectImportApi.ts`)          | `CollectImportJob` (`server/modules/collectImport/service/collectImport/collectImportJob.ts`)         |
+| More records into a survey previously imported from Collect (`webapp/views/Data/DataImport/DataImportCollectView.tsx`) | `POST /survey/:surveyId/data-import/collect` (`server/modules/dataImport/api/dataImportApi.ts`) | `CollectDataImportJob` (`server/modules/collectImport/service/collectImport/collectDataImportJob.ts`) |
 
 Both jobs are registered in `server/job/jobCreator.ts` (jobs run in a worker thread, re-created from their type).
 
@@ -142,7 +142,7 @@ left out (and reported as not resolved) even if the conversion itself was right.
 error/warning, code parent) produces a report item (`core/survey/collectImportReportItem.ts`), with `resolved` set
 when it was converted. Items go to the `import_report` table of the survey schema; the survey prop `collectReport`
 gets `issuesTotal` (all items, converted ones included) and `issuesResolved` (starts at 0, changed only when a user
-toggles an item). Users review and export it from `webapp/views/App/views/Home/CollectImportReport/` (linked from
+toggles an item). Users review and export it from `webapp/views/Home/CollectImportReport/` (linked from
 the dashboard when `issuesTotal > 0`; API in `collectImportApi.js`).
 
 The job also saves the survey prop `collectNodeDefsInfoByPath`: Collect node def path (e.g. `/cluster/plot/tree`) to

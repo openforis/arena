@@ -21,11 +21,8 @@ import { ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
-import { DataExportOptionsPanel } from '@webapp/views/App/views/Data/DataExport/DataExportOptionsPanel'
-import {
-  dataExportOptions,
-  defaultDataExportOptionsSelection,
-} from '@webapp/views/App/views/Data/DataExport/dataExportOptions'
+import { DataExportOptionsPanel } from '@webapp/views/Data/DataExport/DataExportOptionsPanel'
+import { dataExportOptions, defaultDataExportOptionsSelection } from '@webapp/views/Data/DataExport/dataExportOptions'
 
 import { DataMatrixExportForm } from './DataMatrixExportForm'
 

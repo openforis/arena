@@ -1,5 +1,5 @@
 import { appModules } from '@webapp/app/appModules'
-import * as SideBarModule from '@webapp/views/App/SideBar/Modules/utils'
+import * as SideBarModule from '@webapp/layouts/AppLayout/SideBar/Modules/utils'
 
 const surveyUuid = 'survey-1'
 const surveyInfo = { uuid: surveyUuid, published: true, props: {} }

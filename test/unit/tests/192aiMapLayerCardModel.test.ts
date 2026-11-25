@@ -1,7 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { getMapLayerCardModel } from '@webapp/components/ai/Assistant/analysis/mapLayerCardModel'
-import { fitLayerBounds } from '@webapp/views/App/views/Data/MapView/GeoAttributeDataLayer/fitLayerBounds'
+import { fitLayerBounds } from '@webapp/views/Data/MapView/GeoAttributeDataLayer/fitLayerBounds'
 
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'

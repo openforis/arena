@@ -1,0 +1,7 @@
+@use '~@webapp/style/vars' as *;
+
+.users-access-request-list {
+  .icon.accepted {
+    color: $colorSuccess;
+  }
+}

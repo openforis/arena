@@ -1,5 +1,5 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
-import { formatTimeKeyValue } from '@webapp/views/App/views/Data/Records/recordKeyValuesExtractor'
+import { formatTimeKeyValue } from '@webapp/views/Data/Records/recordKeyValuesExtractor'
 import { formatTimeSummaryValue } from '@server/modules/record/service/recordService'
 
 describe('time formatting for record keys and record summary export', () => {
