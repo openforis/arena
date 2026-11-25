@@ -1415,7 +1415,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     group: 'Groupe ()',
     var: 'Variable',
     ancestorEntities: 'Entités ancêtres',
-    siblingAttributes: 'Attributs voisins',
     node: 'Nœud (attribut ou entité)',
     const: 'Valeur constante',
     call: 'Fonction',

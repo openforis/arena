@@ -17,21 +17,21 @@ const toItem = ({ nodeDef, lang }) => {
 }
 
 /**
- * Returns the attributes sharing the parent entity with the specified node def (the node def itself excluded).
- * @param {!object} params - The parameters.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.nodeDefCurrent - The node def the expression belongs to.
- * @returns {Array} - The sibling attribute defs.
+ * Returns the groups (by entity) of the attributes reachable from the current node def (the variables of the
+ * expression editor: attributes of the ancestor entities and of their single entities), the current one excluded.
+ * @param {!Array} variables - The expression editor variables (grouped by parent entity).
+ * @param {!object} nodeDefCurrent - The node def the expression belongs to.
+ * @returns {Array} - The attribute groups.
  */
-const getSiblingAttributeDefs = ({ survey, nodeDefCurrent }) => {
-  const parentDef = Survey.getNodeDefParent(nodeDefCurrent)(survey)
-  if (!parentDef) return []
-  return Survey.getNodeDefChildren({ nodeDef: parentDef, includeAnalysis: false })(survey).filter(
-    (childDef) =>
-      !NodeDef.isEntity(childDef) &&
-      Expression.isValidExpressionType(childDef) &&
-      !NodeDef.isEqual(childDef)(nodeDefCurrent)
-  )
+const getReachableAttributeGroups = ({ variables, nodeDefCurrent }) => {
+  const isAttributeVariable = (variable) =>
+    variable.nodeDefType !== NodeDef.nodeDefType.entity &&
+    variable.value !== Expression.thisVariable &&
+    variable.uuid !== NodeDef.getUuid(nodeDefCurrent)
+  return (variables ?? [])
+    .filter((group) => !!group.options)
+    .map((group) => ({ label: group.label, options: group.options.filter(isAttributeVariable) }))
+    .filter((group) => group.options.length > 0)
 }
 
 /**
@@ -56,7 +56,7 @@ type CallNodeDateEditorProps = CallEditorProps & {
 }
 
 const CallNodeDateEditor = (props: CallNodeDateEditorProps) => {
-  const { callee, expressionNode, nodeDefCurrent, onConfirm } = props
+  const { callee, expressionNode, nodeDefCurrent, onConfirm, variables } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -64,18 +64,15 @@ const CallNodeDateEditor = (props: CallNodeDateEditorProps) => {
 
   const items = useMemo(() => {
     if (!nodeDefCurrent) return []
-    const groups = [
-      {
-        label: i18n.t('expressionEditor.siblingAttributes'),
-        options: getSiblingAttributeDefs({ survey, nodeDefCurrent }).map((nodeDef) => toItem({ nodeDef, lang })),
-      },
-      {
-        label: i18n.t('expressionEditor.ancestorEntities'),
-        options: getAncestorEntityDefs({ survey, nodeDefCurrent }).map((nodeDef) => toItem({ nodeDef, lang })),
-      },
+    const ancestorEntitiesGroup = {
+      label: i18n.t('expressionEditor.ancestorEntities'),
+      options: getAncestorEntityDefs({ survey, nodeDefCurrent }).map((nodeDef) => toItem({ nodeDef, lang })),
+    }
+    return [
+      ...getReachableAttributeGroups({ variables, nodeDefCurrent }),
+      ...(ancestorEntitiesGroup.options.length > 0 ? [ancestorEntitiesGroup] : []),
     ]
-    return groups.filter((group) => group.options.length > 0)
-  }, [i18n, lang, nodeDefCurrent, survey])
+  }, [i18n, lang, nodeDefCurrent, survey, variables])
 
   const argumentName = expressionNode?.arguments?.[0]?.name
   const selection = argumentName

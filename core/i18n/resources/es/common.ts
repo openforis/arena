@@ -1287,7 +1287,6 @@ $t(common.appNameFull)
     group: 'Grupo ()',
     var: 'Variable',
     ancestorEntities: 'Entidades antecesoras',
-    siblingAttributes: 'Atributos hermanos',
     node: 'Nodo (atributo o entidad)',
     const: 'Valor constante',
     call: 'Función',

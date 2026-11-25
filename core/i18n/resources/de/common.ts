@@ -1421,7 +1421,6 @@ Den Elementen wird die Zusatzeigenschaft „${locationItemExtraDefName}“ hinzu
     group: 'Gruppe ()',
     var: 'Variable',
     ancestorEntities: 'Übergeordnete Entitäten',
-    siblingAttributes: 'Geschwisterattribute',
     node: 'Knoten (Attribut oder Entität)',
     const: 'Konstanter Wert',
     call: 'Funktion',
