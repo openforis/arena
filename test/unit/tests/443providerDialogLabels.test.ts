@@ -26,8 +26,9 @@ describe('provider dialog input labels (443)', () => {
     for (const file of files) {
       const source = read(file)
       for (const [, target] of source.matchAll(/htmlFor=\{([\w.]+)\}/g)) {
-        const idSets = source.split(`id={${target}}`).length - 1
-        expect([file, target, idSets > 0]).toEqual([file, target, true])
+        // a Dropdown sets the id of its input with idInput (its id would also be the test id of the wrapper)
+        const idSet = [`id={${target}}`, `idInput={${target}}`].some((attribute) => source.includes(attribute))
+        expect([file, target, idSet]).toEqual([file, target, true])
       }
     }
   })

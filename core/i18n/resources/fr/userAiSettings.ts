@@ -5,6 +5,7 @@ export default {
 
   model: 'Modèle',
   modelOther: 'Autre (saisir un identifiant de modèle)...',
+  modelChooseFromList: 'Choisir dans la liste des modèles',
   baseUrl: 'URL de base',
   apiKey: 'Clé API',
   apiKeyPlaceholder: 'Collez la clé API de votre fournisseur',

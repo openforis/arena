@@ -4,6 +4,7 @@ export default {
     'In dieser Bereitstellung fehlt AI_USER_KEY_ENCRYPTION_SECRET. Persönliche API-Schlüssel können erst gespeichert werden, nachdem ein Administrator die Einstellung konfiguriert hat.',
   model: 'Modell',
   modelOther: 'Anderes Modell (Modell-ID eingeben) ...',
+  modelChooseFromList: 'Aus der Modellliste wählen',
   baseUrl: 'Basis-URL',
   apiKey: 'API-Schlüssel',
   apiKeyPlaceholder: 'API-Schlüssel Ihres Anbieters einfügen',

@@ -1,4 +1,7 @@
+import { useMemo } from 'react'
+
 import { Button } from '@webapp/components/buttons'
+import Dropdown from '@webapp/components/form/Dropdown'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { PasswordInput } from '@webapp/components/form/PasswordInput'
 import { Spinner } from '@webapp/components/Spinner'
@@ -9,7 +12,7 @@ import { StatusPill } from '../StatusPill'
 import { type ApiKeyFieldState, getApiKeyFieldState } from './apiKeyField'
 import type { ModelsState, ProviderDialogView } from './providerDialogState'
 import type { ProviderDraft } from './providerDraft'
-import { type AiModel, OTHER_MODEL_VALUE } from './providerModels'
+import { type AiModel, getModelToSelect, listModelOptions, OTHER_MODEL_VALUE } from './providerModels'
 import { getAccountTestMessage } from './providerTest'
 import { BASE_URL_PLACEHOLDERS, MODEL_PLACEHOLDERS, type ProviderTypeSpec, type SavedProvider } from './providerTypes'
 import type { ProviderDialogActions } from './useProviderDialog'
@@ -178,32 +181,46 @@ type ModelFieldProps = {
 const ModelField = (props: ModelFieldProps) => {
   const { model, placeholder, models, useSelect, fetching, error } = props
   const t = useI18nT()
+  // the id is the label, the provider's name of the model its description; "Other" switches to the text input
+  const items = useMemo(
+    () => [
+      ...listModelOptions({ models, model }).map(({ id, description }) => ({ value: id, label: id, description })),
+      { value: OTHER_MODEL_VALUE, label: t('userAiSettings:modelOther') },
+    ],
+    [model, models, t]
+  )
   return (
     <FormItem label="userAiSettings:model" htmlFor={TestId.ai.providerModel}>
       <div className="provider-dialog__field">
         <div className="provider-dialog__row">
           <div className="provider-dialog__grow">
             {useSelect ? (
-              <select
-                id={TestId.ai.providerModel}
-                className="provider-dialog__select"
-                value={model}
-                onChange={(event) => props.onSelect(event.target.value)}
-                data-testid={TestId.ai.providerModel}
-              >
-                {models.map((listed) => (
-                  <option key={listed.id} value={listed.id}>
-                    {listed.description ? `${listed.id} — ${listed.description}` : listed.id}
-                  </option>
-                ))}
-                <option value={OTHER_MODEL_VALUE}>{t('userAiSettings:modelOther')}</option>
-              </select>
+              <Dropdown
+                idInput={TestId.ai.providerModel}
+                clearable={false}
+                items={items}
+                selection={items.find((item) => item.value === model) ?? null}
+                onChange={(item) => props.onSelect(item.value)}
+              />
             ) : (
               <Input id={TestId.ai.providerModel} value={model} onChange={props.onChange} placeholder={placeholder} />
             )}
           </div>
           {fetching && <span className="provider-dialog__hint">{t('common.loading')}</span>}
         </div>
+        {/* a typed or unlisted saved model shows the text input: the list stays one click away */}
+        {!useSelect && models.length > 0 && (
+          <div className="provider-dialog__hint">
+            <button
+              type="button"
+              className="provider-dialog__link"
+              onClick={() => props.onSelect(getModelToSelect({ models, model }))}
+              data-testid={TestId.ai.providerModelChooseFromList}
+            >
+              {t('userAiSettings:modelChooseFromList')}
+            </button>
+          </div>
+        )}
         {error && (
           <div role="alert" className="provider-dialog__hint provider-dialog__hint--error">
             {t('userAiSettings:modelsFetchFailed', { message: error, interpolation: { escapeValue: false } })}
