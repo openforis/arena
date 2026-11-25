@@ -1,4 +1,8 @@
 export const functionNames = {
+  appId: 'appId',
+  appIdLabel: 'appIdLabel',
+  appPlatform: 'appPlatform',
+  appVersion: 'appVersion',
   avg: 'avg',
   categoryItemProp: 'categoryItemProp',
   count: 'count',
@@ -19,6 +23,8 @@ export const functionNames = {
   log10: 'log10',
   max: 'max',
   min: 'min',
+  nodeDateCreated: 'nodeDateCreated',
+  nodeDateModified: 'nodeDateModified',
   now: 'now',
   numberToWords: 'numberToWords',
   parent: 'parent',

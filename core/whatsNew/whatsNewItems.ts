@@ -29,6 +29,11 @@ export type WhatsNewItem = {
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
   {
+    id: 'appInfoAndNodeDateFunctions',
+    version: '3.0.1',
+    audience: whatsNewAudiences.surveyAdmin,
+  },
+  {
     id: 'googleSignIn',
     version: '3.0.0',
     audience: whatsNewAudiences.all,

@@ -4,6 +4,10 @@ const { functionNames, modes } = Expression
 
 const functionExamples = {
   [modes.json]: {
+    [functionNames.appId]: `appId() = 'am' (Arena Mobile), appId() = 'arena' (Arena)`,
+    [functionNames.appIdLabel]: `appIdLabel() = 'Arena Mobile', appIdLabel() = 'Arena'`,
+    [functionNames.appPlatform]: `appPlatform() = 'android', appPlatform() = 'ios', appPlatform() = 'web'`,
+    [functionNames.appVersion]: `appVersion() = '3.0.1', appIdLabel() + ' ' + appVersion()`,
     [functionNames.categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
     [functionNames.dateTimeDiff]: 'dateTimeDiff(date_1, time_1, date_2, time_2)',
     [functionNames.first]: 'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
@@ -24,6 +28,10 @@ const functionExamples = {
     [functionNames.log10]: 'log10(100) = 2',
     [functionNames.max]: 'max(3,1,2) = 3',
     [functionNames.min]: 'min(3,1) = 1',
+    [functionNames.nodeDateCreated]:
+      'nodeDateCreated(parent(this)), nodeDateCreated(entity_name), nodeDateCreated(attribute_name)',
+    [functionNames.nodeDateModified]:
+      'nodeDateModified(parent(this)), nodeDateModified(entity_name), nodeDateModified(attribute_name)',
     [functionNames.now]: 'now()',
     [functionNames.numberToWords]: `numberToWords(numeric_attribute_name) = 'one hundred twenty-three'`,
     [functionNames.parent]: `parent(this), parent($context), parent(node_name)`,

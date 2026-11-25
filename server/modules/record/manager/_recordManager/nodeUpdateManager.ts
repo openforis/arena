@@ -1,4 +1,5 @@
 import {
+  type ArenaAppInfo,
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
@@ -280,6 +281,7 @@ export const updateRequiredFlags = ({
  * @param {!object} params.nodes - The updated nodes, indexed by UUID.
  * @param {number} [params.timezoneOffset] - The client timezone offset.
  * @param {string} [params.lang] - The language used to evaluate the expressions (survey default language if not specified).
+ * @param {object} [params.appInfo] - The app editing the record (interactive edits only).
  * @param {boolean} [params.persistNodes] - Whether to persist the updated nodes (true by default).
  * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
  * @param {boolean} [params.clearNonApplicableValues] - Whether to clear the values of the non applicable nodes.
@@ -294,6 +296,7 @@ export const updateNodesDependents = async (
     nodes,
     timezoneOffset,
     lang,
+    appInfo,
     persistNodes = true,
     sideEffect = false,
     clearNonApplicableValues = false,
@@ -304,6 +307,7 @@ export const updateNodesDependents = async (
     nodes: NodesByUuid
     timezoneOffset?: number
     lang?: string
+    appInfo?: ArenaAppInfo
     persistNodes?: boolean
     sideEffect?: boolean
     clearNonApplicableValues?: boolean
@@ -313,7 +317,13 @@ export const updateNodesDependents = async (
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
     // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
     // fall back to the survey default when no UI language was provided (e.g. background jobs)
-    ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang: lang ?? Survey.getDefaultLanguage(survey) }),
+    ...createRecordEvaluationContext({
+      user,
+      survey,
+      timezoneOffset,
+      lang: lang ?? Survey.getDefaultLanguage(survey),
+      appInfo,
+    }),
     record,
     nodes,
     sideEffect,

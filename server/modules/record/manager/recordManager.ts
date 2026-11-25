@@ -422,6 +422,7 @@ export const assocRefDataToNodes = async (
 
 export {
   initNewRecord,
+  updateAppInfoDependents,
   updateRecordStepInTransaction,
   persistNode,
   updateNode,

@@ -26,6 +26,15 @@ export default {
   editorTextSearchHelp:
     "Search text values with text_attr.includes('abc'), text_attr.startsWith('abc') or text_attr.endsWith('abc'); add .toLowerCase() before them to ignore the case, e.g. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Returns the identifier of the app editing the record: "arena" (Arena) or "am" (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Returns the name of the app editing the record: "Arena" or "Arena Mobile". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      'Evaluated when the record is created and again when it is edited with another app, platform or app version',
+    appPlatform:
+      'Returns the platform of the app editing the record: "web", "android" or "ios". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion: 'Returns the version of the app editing the record. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp:
       'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
     dateTimeDiff: 'Returns the difference (in minutes) from 2 date-time couples',
@@ -48,6 +57,10 @@ export default {
     log10: 'Returns the base 10 logarithm of X',
     max: 'Returns the maximum of the arguments',
     min: 'Returns the minimum of the arguments',
+    nodeDateCreated:
+      'Returns the creation date and time of the specified node (attribute or entity) as a datetime value, e.g. nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Returns the last modified date and time of the specified node as a datetime value; for an entity, the last time it or any of its descendants was modified, e.g. nodeDateModified(parent(this))',
     now: 'Returns the current date or time',
     parent: 'Returns the parent entity of the specified node',
     pow: 'Returns the value of a base raised to a power',

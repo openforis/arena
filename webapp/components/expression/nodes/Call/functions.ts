@@ -12,6 +12,7 @@ import { CallGeoDistanceToAOIBoundaryEditor } from './CallGeoDistanceToAOIBounda
 import { CallIncludesEditor } from './CallIncludesEditor'
 import { CallIsEmptyEditor } from './CallIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './CallIsNotEmptyEditor'
+import { CallNodeDateCreatedEditor, CallNodeDateModifiedEditor } from './CallNodeDateEditor'
 import { CallNumberToWordsEditor } from './CallNumberToWordsEditor'
 import { CallTaxonPropEditor } from './CallTaxonPropEditor'
 import { CallTaxonVernacularNameEditor } from './CallTaxonVernacularNameEditor'
@@ -35,6 +36,18 @@ type CallFunction = {
 }
 
 export const functions: Record<string, CallFunction> = {
+  [functionNames.appId]: {
+    callee: functionNames.appId,
+  },
+  [functionNames.appIdLabel]: {
+    callee: functionNames.appIdLabel,
+  },
+  [functionNames.appPlatform]: {
+    callee: functionNames.appPlatform,
+  },
+  [functionNames.appVersion]: {
+    callee: functionNames.appVersion,
+  },
   [functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
     component: CallCategoryItemPropEditor,
@@ -78,6 +91,14 @@ export const functions: Record<string, CallFunction> = {
   [functionNames.isNotEmpty]: {
     label: 'isNotEmpty(...)',
     component: CallIsNotEmptyEditor,
+  },
+  [functionNames.nodeDateCreated]: {
+    label: 'nodeDateCreated(...)',
+    component: CallNodeDateCreatedEditor,
+  },
+  [functionNames.nodeDateModified]: {
+    label: 'nodeDateModified(...)',
+    component: CallNodeDateModifiedEditor,
   },
   [functionNames.now]: {
     callee: functionNames.now,

@@ -21,12 +21,12 @@ const extractFunctionLabel = ({ i18n, functionKey, func }) => {
 
 const deprecatedFunctionNames = new Set([Expression.functionNames.distance])
 
-type CallProps = Pick<ExpressionNodeProps, 'node' | 'onChange'> & {
+type CallProps = Pick<ExpressionNodeProps, 'node' | 'nodeDefCurrent' | 'onChange'> & {
   variables: any[]
 }
 
 const Call = (props: CallProps) => {
-  const { node: expressionNode, variables, onChange } = props
+  const { node: expressionNode, nodeDefCurrent, variables, onChange } = props
 
   const i18n = useI18n()
 
@@ -104,7 +104,7 @@ const Call = (props: CallProps) => {
       {editDialogOpen && (
         <CallEditorDialog functionName={selectedItem.label} onClose={closeEditDialog}>
           {selectedFunctionComponent &&
-            React.createElement(selectedFunctionComponent, { expressionNode, onConfirm, variables })}
+            React.createElement(selectedFunctionComponent, { expressionNode, nodeDefCurrent, onConfirm, variables })}
         </CallEditorDialog>
       )}
     </div>
