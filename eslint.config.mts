@@ -60,15 +60,15 @@ export default defineConfig([
         {
           groups: [
             // side-effect imports (stylesheets, dotenv/config, polyfills): their order matters, they are not sorted
-            ['^\\u0000'],
+            [String.raw`^\u0000`],
             // external packages, react first
-            ['^react$', '^react-dom', '^@?\\w'],
+            ['^react$', '^react-dom', String.raw`^@?\w`],
             // Open Foris packages (arena-core, arena-server...)
             ['^@openforis/'],
             // project modules out of the current folder
-            ['^@(common|core|server|test|webapp)(/.*)?$', '^\\.\\.'],
+            ['^@(common|core|server|test|webapp)(/.*)?$', String.raw`^\.\.`],
             // modules in the same folder
-            ['^\\.'],
+            [String.raw`^\.`],
           ],
         },
       ],
