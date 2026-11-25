@@ -209,6 +209,9 @@ Database migrations (`public` schema and per-survey schemas) live in `@openforis
 **TypeScript only:**
 The codebase is TypeScript only (`.ts` / `.tsx`; `.mts` / `.cts` for the ESM / CommonJS tool configs, e.g. `webpack.config.mts`, `babel.config.cts`): `tsconfig.json` and the ESLint config cover only TypeScript files. Run `yarn typecheck` to verify types.
 
+**File and folder names:**
+camelCase for every module that is not a React component, also when it exports a class (`dataImportJob.ts` exports `DataImportJob`, `jobQueue.ts`, `itemsCache.ts`), and for folders grouping modules (`dataImportJob/`, `form/`). PascalCase only for React component files and the folders named after a component (`ContributorsCard.tsx`, `ExpansionPanel/`); see `docs/webapp-conventions.md`. Hooks are `useXxx.ts`.
+
 **TypeScript version:**
 TypeScript 7 (native) is used for `tsc`, installed as the `@typescript/native` alias; the `typescript` package is an alias of `@typescript/typescript6` because typescript-eslint still needs the TypeScript 6 JavaScript API.
 
