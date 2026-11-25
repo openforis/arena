@@ -2,15 +2,14 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
-
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import Table from '@webapp/components/Table/Table'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import HeaderLeft from './HeaderLeft'
-import RowHeader from './RowHeader'
 import Row from './Row'
+import RowHeader from './RowHeader'
 
 type TaxonomyListProps = {
   canSelect?: boolean

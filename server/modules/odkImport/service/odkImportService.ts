@@ -1,6 +1,8 @@
-import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
+
 import * as JobManager from '@server/job/jobManager'
 import * as OdkImportReportManager from '../manager/odkImportReportManager'
+
 import OdkImportJob from './odkImport/odkImportJob'
 
 /**

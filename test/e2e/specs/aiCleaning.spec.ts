@@ -1,11 +1,11 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { ArenaApi } from '../fixtures/arenaApi'
 import { plot, tree } from '../fixtures/seed/sampleSurveyModel'
 import { getWorkerDataEditor, insertSurveyEditor } from '../fixtures/testUsers'
+import { acceptConsentAndWait, collectRequestBodies, isGatewayRequest } from '../helpers/aiAnalysis'
 import {
   applyCardAndCheckStatus,
   askAssistantAboutFirstRow,
@@ -15,7 +15,6 @@ import {
   recordEditCard,
   useLocalServer,
 } from '../helpers/aiCleaning'
-import { acceptConsentAndWait, collectRequestBodies, isGatewayRequest } from '../helpers/aiAnalysis'
 import { assistantPanel, openAssistantPanel } from '../helpers/assistantPanel'
 import { RecordForm } from '../helpers/recordForm'
 import { openRecord } from '../helpers/records'

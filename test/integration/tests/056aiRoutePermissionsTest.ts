@@ -1,15 +1,10 @@
 import { AiFeatures } from '@common/ai/features'
-
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
-
 import * as AiApi from '@server/modules/ai/api/aiApi'
 import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import { getContextUser } from '@test/integration/config/context'
-import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
-import * as SB from '@test/utils/surveyBuilder'
 import {
   accessGrantedTo,
   checkRouteAccess,
@@ -19,6 +14,8 @@ import {
   outsiderKey,
   systemAdminKey,
 } from '@test/utils/routePermissionTestUtils'
+import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
+import * as SB from '@test/utils/surveyBuilder'
 
 type Route = CollectedRoute
 

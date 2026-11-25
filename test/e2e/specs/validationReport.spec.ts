@@ -1,10 +1,9 @@
 import { Page, Response } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { getTaxon } from '../fixtures/seed/sampleRecordDisplay'
-import { cluster, plot, sampleRecords, SampleRecord, tree } from '../fixtures/seed/sampleSurveyModel'
+import { cluster, plot, SampleRecord, sampleRecords, tree } from '../fixtures/seed/sampleSurveyModel'
 import { RecordForm } from '../helpers/recordForm'
 import { openRecord, unlockRecord } from '../helpers/records'
 import { Urls } from '../helpers/urls'

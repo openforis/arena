@@ -1,11 +1,10 @@
 import * as Survey from '@core/survey/survey'
-
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
+import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
 import { runTool } from '@webapp/ai/tools/registry'
 import { getOperationConflicts } from '@webapp/components/ai/Assistant/changeSetCardModel'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
-import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
 
 const publish = (target: any): any =>
   Survey.getNodeDefsArray(target).reduce(

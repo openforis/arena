@@ -1,34 +1,33 @@
 import type {
+  ArenaAnyNodeDef,
   ArenaChain,
   ArenaNodeDefEntityChildPosition,
+  ArenaNodeDefMap,
+  ArenaNodeDefPropsAdvanced,
   ArenaSurvey,
   ArenaUser,
   ArenaValidation,
-  ArenaAnyNodeDef,
-  ArenaNodeDefPropsAdvanced,
   NodeDefType,
-  ArenaNodeDefMap,
 } from '@openforis/arena-core'
-import * as A from '@core/arena'
 
-import * as Survey from '@core/survey/survey'
+import { ColumnNodeDef } from '@common/model/db'
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
+import type { AggregateFunctionItem } from '@core/survey/aggregateFunction'
+import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
-import * as Validation from '@core/validation/validation'
-import * as ObjectUtils from '@core/objectUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
-import type { AggregateFunctionItem } from '@core/survey/aggregateFunction'
-import { ColumnNodeDef } from '@common/model/db'
-
+import * as Validation from '@core/validation/validation'
 import { db, DbClient } from '@server/db/db'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as DbUtils from '@server/db/dbUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 import type { NodeDefPropsUpdate } from '../repository/nodeDefRepository'
-import * as DbUtils from '@server/db/dbUtils'
 
 const fetchSurvey = ({ surveyId, cycle }: { surveyId: number; cycle?: string }, client: DbClient = db) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId(

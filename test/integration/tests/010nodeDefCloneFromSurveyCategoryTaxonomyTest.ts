@@ -1,14 +1,11 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
-
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SB from '../../utils/surveyBuilder'
 import { createCloneTargetSurvey, deleteSurveys } from '../../utils/surveyCloneTestUtils'
-
 import { getContextUser } from '../config/context'
 
 const { nodeDefType } = NodeDef

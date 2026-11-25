@@ -5,6 +5,8 @@ import {
   getVisibleTargets,
   parseSuggestionState,
   selectVisible,
+  type SuggestionUserState,
+  type VisibilityParams,
   withAdded,
   withDismissed,
   withKind,
@@ -13,8 +15,6 @@ import {
   withoutTargets,
   withProgress,
   withSettled,
-  type SuggestionUserState,
-  type VisibilityParams,
 } from '@webapp/ai/suggestions/suggestionState'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 

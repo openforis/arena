@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 import * as Chain from '@common/analysis/chain'
-
 import { AppSavingActions } from '@webapp/store/app'
 import { SurveyActions, SurveyState } from '@webapp/store/survey'
 import { ChainActionTypes } from '@webapp/store/ui/chain/actions/actionTypes'

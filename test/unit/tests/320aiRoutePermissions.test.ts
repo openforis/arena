@@ -1,7 +1,6 @@
 import * as AiApi from '@server/modules/ai/api/aiApi'
 import { requireAiFeaturePermission, requireAiFeaturesEnabled } from '@server/modules/ai/api/aiMiddleware'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-
 import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
 
 type Route = CollectedRoute

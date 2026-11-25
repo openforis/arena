@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { useAppDispatch } from '@webapp/store'
 
 /**
  * Returns a function that (after confirmation) starts the job generating the Whisp analysis

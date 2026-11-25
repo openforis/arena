@@ -1,15 +1,4 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
-import { getTargetNodeDefNames } from '@webapp/ai/suggestions/definitions/designTargetNames'
-import { entityWithoutKeyDefinition } from '@webapp/ai/suggestions/definitions/entityWithoutKey'
-import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
-import {
-  entityWithoutKeyDetector,
-  entityWithoutKeyResolver,
-  isEntityWithoutKey,
-} from '@webapp/ai/suggestions/detectors/entityWithoutKey'
-import { formatPromptList } from '@webapp/ai/suggestions/prompts/designPrompts'
 import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
   buildSuggestion,
@@ -19,6 +8,16 @@ import {
   withNodeDef,
   withSavedNodeDefs,
 } from '@test/unit/utils/designSuggestionTestUtils'
+import { getTargetNodeDefNames } from '@webapp/ai/suggestions/definitions/designTargetNames'
+import { entityWithoutKeyDefinition } from '@webapp/ai/suggestions/definitions/entityWithoutKey'
+import {
+  entityWithoutKeyDetector,
+  entityWithoutKeyResolver,
+  isEntityWithoutKey,
+} from '@webapp/ai/suggestions/detectors/entityWithoutKey'
+import { formatPromptList } from '@webapp/ai/suggestions/prompts/designPrompts'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 
 let survey: any
 

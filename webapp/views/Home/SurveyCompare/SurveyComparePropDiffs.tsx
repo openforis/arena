@@ -1,5 +1,4 @@
 import { SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareTypes'
-
 import { useSurveyLangs } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 

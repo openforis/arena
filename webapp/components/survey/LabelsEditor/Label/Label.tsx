@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import { Input } from '@webapp/components/form/Input'
 
 import Badge from './Badge'

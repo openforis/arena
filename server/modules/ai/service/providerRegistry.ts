@@ -17,10 +17,10 @@ import { createVertex } from '@ai-sdk/google-vertex'
 import { createOpenAI } from '@ai-sdk/openai'
 import type { LanguageModelV4 } from '@ai-sdk/provider'
 
+import { AiProvider } from '@common/ai/aiProvider'
 import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
 
-import { AiProvider } from '@common/ai/aiProvider'
 import { assertProviderBaseUrlAllowed, type GuardOptions } from './baseUrlGuard'
 import { createGuardedFetch, DEFAULT_MAX_BODY_BYTES } from './guardedFetch'
 import { createMockModel, MOCK_PROVIDER } from './mockProvider'

@@ -1,31 +1,27 @@
-import type { ArenaUser, ArenaTaxon, ArenaTaxonomy } from '@openforis/arena-core'
-import * as A from '@core/arena'
-import * as ObjectUtils from '@core/objectUtils'
+import type { ArenaTaxon, ArenaTaxonomy, ArenaUser } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import SystemError, { StatusCodes } from '@core/systemError'
 import { languageCodesISO639part2 } from '@core/app/languages'
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
+import type { ExtraPropDefItem } from '@core/survey/extraPropDef'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validator from '@core/validation/validator'
-import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
-
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
 import {
   publishSurveySchemaTableProps,
   unpublishSurveySchemaTableProps,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
-import type { ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 // vernacular language codes and extra prop names are used as export column names and in expressions:
 // check them before saving

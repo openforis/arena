@@ -1,4 +1,5 @@
 /* eslint jest/expect-expect: ['warn', { assertFunctionNames: ['expect', 'expectPoint'] }] */
+import type { MapRecordCandidate } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
 import {
   buildMapSearchResults,
   findRecordCandidates,
@@ -6,7 +7,6 @@ import {
   findSingleRecordMatch,
   parseMapSearchQuery,
 } from '@webapp/components/MapContainer/workspace/search/mapSearchQuery'
-import type { MapRecordCandidate } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
 
 const candidate = (label: string): MapRecordCandidate => ({ id: `id-${label}`, label, lat: 0, lng: 0 })
 

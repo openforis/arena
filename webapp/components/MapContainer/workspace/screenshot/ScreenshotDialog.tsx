@@ -5,9 +5,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
-
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { ScreenshotAttachFields } from '@webapp/components/MapContainer/workspace/screenshot/ScreenshotAttachFields'
 import {
@@ -22,9 +19,11 @@ import type { ScreenshotNotice } from '@webapp/components/MapContainer/workspace
 import { useScreenshotActions } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotActions'
 import { useScreenshotDialogState } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotDialogState'
 import {
-  useScreenshotPreview,
   type ScreenshotPreview,
+  useScreenshotPreview,
 } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const TITLE_ID = 'map-screenshot-title'
 

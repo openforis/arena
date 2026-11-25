@@ -1,18 +1,17 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-import * as SurveyFile from '@core/survey/surveyFile'
 import * as ObjectUtils from '@core/objectUtils'
+import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import {
-  SurveyCompareApplyPlan,
-  SurveyCompareParams,
   buildApplyPlan,
   buildSurveyInfoApplyPlan,
   compareSurveys,
   expandSelection,
+  SurveyCompareApplyPlan,
+  SurveyCompareParams,
 } from '@core/survey/surveyCompare'
-
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as DbUtils from '@server/db/dbUtils'
 import Job, { type JobParams } from '@server/job/job'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
@@ -23,11 +22,10 @@ import * as SurveyRepository from '@server/modules/survey/repository/surveyRepos
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
-import * as DbUtils from '@server/db/dbUtils'
 
+import type { SurveyCompareJobContext } from './surveyCompareJobContext'
 import { SurveyCompareSource, withSource } from './surveyCompareSource'
 import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
-import type { SurveyCompareJobContext } from './surveyCompareJobContext'
 
 /**
  * Applies the selected changes of a survey comparison to the survey with the specified id.

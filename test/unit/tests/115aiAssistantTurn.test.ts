@@ -1,20 +1,6 @@
-import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
+import { convertArrayToReadableStream, MockLanguageModelV4 } from 'ai/test'
 
 import { Query } from '@common/model/query'
-
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
-import {
-  DEFAULT_ASSISTANT_LIMITS,
-  CONTEXT_FULL_ERROR_KEY,
-  NO_ANSWER_ERROR_KEY,
-  TOOL_CALL_TEXT_ERROR_KEY,
-  assistantAreaFeatures,
-  ASSISTANT_MAX_STEPS,
-  getLastStepCheck,
-  runAssistantTurn,
-} from '@webapp/ai/agent/runAssistantTurn'
-import type { AiTool } from '@webapp/ai/tools/types'
 import {
   cloudAccess,
   createToolContext,
@@ -24,6 +10,19 @@ import {
   textStream,
   toolCallStream,
 } from '@test/unit/utils/assistantTestUtils'
+import {
+  ASSISTANT_MAX_STEPS,
+  assistantAreaFeatures,
+  CONTEXT_FULL_ERROR_KEY,
+  DEFAULT_ASSISTANT_LIMITS,
+  getLastStepCheck,
+  NO_ANSWER_ERROR_KEY,
+  runAssistantTurn,
+  TOOL_CALL_TEXT_ERROR_KEY,
+} from '@webapp/ai/agent/runAssistantTurn'
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
+import type { AiTool } from '@webapp/ai/tools/types'
 
 const answerOf = (conversation: Conversation): AssistantMessage => conversation.messages.at(-1) as AssistantMessage
 

@@ -3,7 +3,7 @@
  * badge and the batch guard all read it here. Rules: a survey feature is checked against its survey's effective policy
  * (no survey: off), the Help chat against the instance ceilings (no ceilings known: off). Pure: transports are injected.
  */
-import { normalizeAiPolicy, type AiPolicy } from '@common/ai/policy'
+import { type AiPolicy, normalizeAiPolicy } from '@common/ai/policy'
 
 import { isSurveyScopedFeature, resolveEffectivePolicy } from './aiFeatureAvailability'
 

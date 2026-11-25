@@ -5,7 +5,6 @@
 import { stripTrailingSlashes } from '@common/ai/allowlist'
 import { withDefaultHttpScheme } from '@common/ai/localServerAddress'
 import { normalizeProviderName } from '@common/ai/providerIds'
-
 import { normalizeLocalProviderBaseUrl } from '@webapp/ai/engines/localProviders'
 import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
 

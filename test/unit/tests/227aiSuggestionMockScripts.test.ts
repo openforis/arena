@@ -1,15 +1,15 @@
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
-import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
+import { getScriptedStep, MOCK_SCRIPTS } from '@server/modules/ai/service/mock/mockScripts'
 import {
   assistantSuggestionMockScripts,
   formatMockDescriptionsAnswer,
 } from '@server/modules/ai/service/mock/mockScriptsSuggestions'
+import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
 import {
   buildMissingTranslationsPrompt,
   buildNewEntriesDescriptionsPrompt,
 } from '@webapp/ai/suggestions/prompts/designPrompts'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
-import { systemMessage, toolCallMessage, toolResultMessage, userMessage } from '@test/unit/utils/aiTestUtils'
 
 const designSystem = systemMessage(`${assistantMarkers.design}\nYou are the design assistant.`)
 

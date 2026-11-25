@@ -8,7 +8,6 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
-
 import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 

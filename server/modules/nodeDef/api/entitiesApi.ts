@@ -1,7 +1,7 @@
 import type { Router } from 'express'
-import * as Request from '@server/utils/request'
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as Request from '@server/utils/request'
 import * as NodeDefService from '../service/nodeDefService'
 
 export const init = (app: Router) => {

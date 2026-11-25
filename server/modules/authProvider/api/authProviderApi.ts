@@ -1,13 +1,12 @@
-import type { ArenaUser } from '@openforis/arena-core'
 import type { NextFunction, Response as ExpressResponse, Router } from 'express'
 
-import * as User from '@core/user/user'
+import type { ArenaUser } from '@openforis/arena-core'
 
+import * as User from '@core/user/user'
+import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import UnauthorizedError from '@server/utils/unauthorizedError'
-
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as AuthProviderAdminService from '../service/authProviderAdminService'
 import * as UserSignInMethodsService from '../service/userSignInMethodsService'

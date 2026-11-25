@@ -1,6 +1,6 @@
-import * as A from '@core/arena'
+import { ArenaI18n, DateFormats, Dates } from '@openforis/arena-core'
 
-import { DateFormats, Dates, ArenaI18n } from '@openforis/arena-core'
+import * as A from '@core/arena'
 
 const {
   add,

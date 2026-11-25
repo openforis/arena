@@ -1,13 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
-import { getCategoryItemLabelKey, isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
-import { describeOperation, summarizeResults } from '@webapp/ai/changeSets/describeOperation'
-import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
-import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
-import { proposeChangeSet } from '@webapp/ai/tools/design/proposeChangeSet'
-import { buildCardRows, getPendingOperationIds } from '@webapp/components/ai/Assistant/changeSetCardModel'
+import * as Survey from '@core/survey/survey'
 import { createToolContext, fakeT, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
   buildCategoryLabelsSurvey,
@@ -17,6 +9,13 @@ import {
   categoryUuidOf,
   createApplierDepsStub,
 } from '@test/unit/utils/categoryLabelsTestUtils'
+import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
+import { getCategoryItemLabelKey, isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import { describeOperation, summarizeResults } from '@webapp/ai/changeSets/describeOperation'
+import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
+import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
+import { proposeChangeSet } from '@webapp/ai/tools/design/proposeChangeSet'
+import { buildCardRows, getPendingOperationIds } from '@webapp/components/ai/Assistant/changeSetCardModel'
 
 let survey: any
 let speciesUuid: string

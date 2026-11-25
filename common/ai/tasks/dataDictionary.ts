@@ -4,7 +4,6 @@
 import { z } from 'zod'
 
 import SystemError, { StatusCodes } from '@core/systemError'
-
 import type { AiGenerateText } from '../llm'
 import { safeParseJsonResponse } from '../parsing'
 import { buildDataDictionaryPrompt } from '../prompts/dataDictionary'

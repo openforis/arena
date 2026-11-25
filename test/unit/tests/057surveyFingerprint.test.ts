@@ -1,6 +1,5 @@
 import * as Survey from '@core/survey/survey'
-import { SurveyFingerprintType, buildSurveyFingerprintContent } from '@core/survey/surveyCompare'
-
+import { buildSurveyFingerprintContent, SurveyFingerprintType } from '@core/survey/surveyCompare'
 import {
   addAttribute,
   buildSurvey,

@@ -1,21 +1,18 @@
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RB from '../../utils/recordBuilder'
-import * as SurveyUtils from '../../utils/surveyUtils'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import * as SurveyUtils from '../../utils/surveyUtils'
+import { getContextUser } from '../config/context'
 
 // Publishing a survey after adding (or removing) a "required if" condition must recompute the
 // "required if" flags (parent node meta cReq) of the existing records and re-validate the attributes.

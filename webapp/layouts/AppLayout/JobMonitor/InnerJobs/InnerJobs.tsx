@@ -1,5 +1,4 @@
 import * as JobSerialized from '@common/job/jobSerialized'
-
 import { ExpansionPanel } from '@webapp/components'
 
 import InnerJob from './InnerJob'

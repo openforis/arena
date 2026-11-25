@@ -5,7 +5,6 @@
 import { AiProvider } from '@common/ai/aiProvider'
 import { isOrgHostedUrl } from '@common/ai/localServerAddress'
 import { getDefaultProviderName, LOCAL_PROVIDER_TYPE } from '@common/ai/providerIds'
-
 import type { AiPublicProvider } from '@webapp/ai/engines/providerEntries'
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
 import { ORG_SERVER_NAME } from '@webapp/ai/providers/providerNames'

@@ -1,12 +1,11 @@
 import type { Router } from 'express'
-import * as Request from '@server/utils/request'
-import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
-import * as JobUtils from '@server/job/jobUtils'
 
+import * as JobUtils from '@server/job/jobUtils'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
+import * as Request from '@server/utils/request'
+import { requireRecordCreatePermission } from '../../auth/authApiMiddleware'
 import * as DataImportService from '../service/dataImportService'
 import { DataImportTemplateService } from '../service/dataImportTemplateService'
-
-import { requireRecordCreatePermission } from '../../auth/authApiMiddleware'
 
 const uriPrefix = '/survey/:surveyId/data-import'
 

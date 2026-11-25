@@ -1,11 +1,11 @@
-import { useCallback, type ReactNode } from 'react'
+import { type ReactNode, useCallback } from 'react'
+
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import Chip from '@webapp/components/form/Chip'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type DataQuerySortableItemChipProps = {
   children?: ReactNode

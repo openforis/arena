@@ -3,8 +3,8 @@ import './WhatsNew.scss'
 import { useCallback } from 'react'
 
 import * as WhatsNew from '@core/whatsNew/whatsNew'
-
 import { Carousel } from '../Carousel'
+
 import { WhatsNewSlide } from './WhatsNewSlide'
 
 type WhatsNewCarouselProps = {

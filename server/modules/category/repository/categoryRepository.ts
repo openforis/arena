@@ -1,31 +1,30 @@
-import type { DbClient } from '@server/db/db'
-import * as A from '@core/arena'
-
 import {
-  Objects,
-  Strings,
+  type ArenaCategory,
   type ArenaCategoryItem,
   type ArenaCategoryLevel,
   type ArenaValidation,
-  type ArenaCategory,
+  Objects,
+  Strings,
 } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
+import * as A from '@core/arena'
+import { ArrayUtils } from '@core/arrayUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import type { DbClient } from '@server/db/db'
 import {
   bulkUpdateSurveySchemaTableProp,
-  updateSurveySchemaTableProp,
+  deleteSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableRecords,
-  deleteSurveySchemaTableProp,
+  updateSurveySchemaTableProp,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as DB from '../../../db'
 import { db } from '../../../db/db'
 import * as DbUtils from '../../../db/dbUtils'
 
-import { ArrayUtils } from '@core/arrayUtils'
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryExportRepository from './categoryExportRepository'
 
 const itemDBTransformCallback =

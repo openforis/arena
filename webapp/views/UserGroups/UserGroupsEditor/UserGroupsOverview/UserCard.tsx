@@ -1,7 +1,6 @@
 import React from 'react'
 
 import * as User from '@core/user/user'
-
 import ProfilePicture from '@webapp/components/ProfilePicture'
 
 import type { SurveyUserType } from './useUserGroupsOverview'

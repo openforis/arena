@@ -1,24 +1,22 @@
 import type { Router } from 'express'
+
+import { Authorizer } from '@openforis/arena-core'
 import { ApiEndpoint } from '@openforis/arena-server'
 
 import { minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload } from '@common/mobile'
-
-import * as Request from '@server/utils/request'
-import * as Response from '@server/utils/response'
-import * as FileUtils from '@server/utils/file/fileUtils'
-
-import * as Survey from '@core/survey/survey'
-import * as User from '@core/user/user'
-import { Authorizer } from '@openforis/arena-core'
 import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
-
+import * as User from '@core/user/user'
 import * as Log from '@server/log/log'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { omitServerOnlyPrefsFromUser } from '@server/modules/user/serverOnlyPrefs'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import * as RecordService from '../../record/service/recordService'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
-import * as RecordService from '../../record/service/recordService'
 
 const Logger = Log.getLogger('AuthAPI')
 

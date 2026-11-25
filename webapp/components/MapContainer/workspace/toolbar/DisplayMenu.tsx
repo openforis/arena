@@ -2,9 +2,9 @@ import type { ReactElement, ReactNode } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import { useSurveyInfo } from '@webapp/store/survey'
-
 import { useMapContextOptions } from '../../MapContext'
 import { useMapContextActions } from '../mapContextActions'
+
 import { getDisplayMenuSections } from './displayMenuItems'
 import { MenuCheckItem, MenuSectionHeader } from './MenuItems'
 import { ToolbarMenu } from './ToolbarMenu'

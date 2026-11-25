@@ -1,17 +1,14 @@
 import { useState } from 'react'
 
-import * as A from '@core/arena'
+import type { ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import { FormItem } from '@webapp/components/form/Input'
-import { useSurvey } from '@webapp/store/survey'
-
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-
+import { useSurvey } from '@webapp/store/survey'
 import { useNodeDefEditReadOnly } from '../store'
-import type { ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
 type AnalysisEntitySelectorProps = {
   onChange: (...args: any[]) => any

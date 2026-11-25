@@ -1,9 +1,9 @@
 import {
-  DEFAULT_BLEND_ZOOM_RANGE,
   blendCountryFeatureCollection,
   blendLonLat,
-  getBlendFactor,
   type CountryFeatureCollection,
+  DEFAULT_BLEND_ZOOM_RANGE,
+  getBlendFactor,
 } from '@core/geo/equalEarthBlend'
 
 describe('equalEarthBlend', () => {

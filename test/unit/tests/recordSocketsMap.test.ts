@@ -1,4 +1,5 @@
 import { RecordSocketAssociationRepository } from '@openforis/arena-server'
+
 import * as RecordSocketsMap from '../../../server/modules/record/service/update/recordSocketsMap'
 
 describe('recordSocketsMap', () => {

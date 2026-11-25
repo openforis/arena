@@ -1,11 +1,11 @@
 import type { ArenaChain, ArenaSurvey, ArenaValidation } from '@openforis/arena-core'
 
-import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
-import * as Validator from '@core/validation/validator'
+import * as StringUtils from '@core/stringUtils'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as Survey from '@core/survey/survey'
+import * as Validator from '@core/validation/validator'
 
 export const keys = {
   entityOrCategory: 'entityOrCategory',

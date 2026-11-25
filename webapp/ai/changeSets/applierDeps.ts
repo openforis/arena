@@ -1,9 +1,9 @@
 /**
  * ApplierDeps on the app store: the same thunks and actions as the form designer's useSaveEdits.
  */
+import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 import * as SurveyState from '@webapp/store/survey/state'
 import * as SurveyStatusState from '@webapp/store/survey/status/state'
-import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 
 import type { ApplierDeps } from './applyChangeSet'
 import { createCategoryLabelsApplierDeps } from './categoryItemLabels/categoryLabelsApplierDeps'

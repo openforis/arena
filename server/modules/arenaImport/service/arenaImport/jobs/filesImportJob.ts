@@ -1,12 +1,11 @@
-import type { JobParams } from '@server/job/job'
 import { Objects } from '@openforis/arena-core'
 
-import SystemError from '@core/systemError'
 import * as SurveyFile from '@core/survey/surveyFile'
-
+import SystemError from '@core/systemError'
+import type { JobParams } from '@server/job/job'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
+
 import { FileImportBaseJob } from './filesImportBaseJob'
 
 export default class FilesImportJob extends FileImportBaseJob {

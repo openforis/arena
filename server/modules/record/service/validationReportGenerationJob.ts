@@ -1,5 +1,4 @@
 import type { Readable } from 'node:stream'
-import Job, { type JobParams } from '@server/job/job'
 
 import * as DateUtils from '@core/dateUtils'
 import i18nInstance from '@core/i18n/i18nFactory'
@@ -7,11 +6,11 @@ import * as RecordValidationReportItem from '@core/record/recordValidationReport
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ValidationResult from '@core/validation/validationResult'
 import { ValidationUtils } from '@core/validation/validationUtils'
-
-import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import Job, { type JobParams } from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as RecordManager from '../manager/recordManager'
+
 import { resolveValidationReportParams } from './validationReportParams'
 
 export default class VaidationReportGenerationJob extends Job {

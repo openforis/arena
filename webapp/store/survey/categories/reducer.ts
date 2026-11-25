@@ -1,7 +1,7 @@
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as SurveyActions from '../actions'
+
 import * as State from './state'
 
 const actionHandlers = {

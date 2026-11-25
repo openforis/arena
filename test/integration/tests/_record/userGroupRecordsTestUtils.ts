@@ -5,10 +5,8 @@ import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import * as RB from '../../../utils/recordBuilder'
 import * as SB from '../../../utils/surveyBuilder'
 

@@ -1,15 +1,15 @@
-import type { Readable } from 'node:stream'
 import * as fs from 'node:fs'
-import * as A from '@core/arena'
+import type { Readable } from 'node:stream'
 
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
-import * as Validation from '@core/validation/validation'
-import * as StringUtils from '@core/stringUtils'
-import SystemError from '@core/systemError'
-
-import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import { Strings } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import SystemError from '@core/systemError'
+import * as Validation from '@core/validation/validation'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const defaultLevelName = 'level_1'
 

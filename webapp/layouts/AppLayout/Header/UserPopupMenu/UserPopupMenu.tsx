@@ -4,24 +4,20 @@ import { useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
-
-import { clickedOutside } from '@webapp/utils/domUtils'
-import { TestId } from '@webapp/utils/testId'
-
+import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
+import ProfilePicture from '@webapp/components/ProfilePicture'
+import { useAppDispatch } from '@webapp/store'
 import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
-
-import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
-import ProfilePicture from '@webapp/components/ProfilePicture'
-
 import {
   useAuthCanCreateSurvey,
   useAuthCanCreateTemplate,
   useAuthCanEditTemplates,
   useOnNewSurveyClick,
 } from '@webapp/store/user/hooks'
-import { useAppDispatch } from '@webapp/store'
+import { clickedOutside } from '@webapp/utils/domUtils'
+import { TestId } from '@webapp/utils/testId'
 
 const Separator = () => <div className="user-popup-menu__sep" />
 

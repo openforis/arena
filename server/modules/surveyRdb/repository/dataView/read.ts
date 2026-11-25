@@ -1,40 +1,36 @@
-import type { UserGroupAccessFilters } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
-import type { DbClient } from '@server/db/db'
-import * as A from '@core/arena'
 import camelize from 'camelize'
 
 import {
-  Objects,
-  type ArenaRecord,
-  type ArenaSurvey,
-  type ArenaRecordNode,
   ArenaAnyNodeDef,
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type ArenaSurvey,
+  Objects,
 } from '@openforis/arena-core'
 
+import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
+import * as A from '@core/arena'
 import { quote } from '@core/stringUtils'
-
-import { db } from '../../../../db/db'
-import * as DbUtils from '../../../../db/dbUtils'
-
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as Record from '../../../../../core/record/record'
-import * as Expression from '../../../../../core/expressionParser/expression'
-
-import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
-import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
-import { Query, Sort } from '../../../../../common/model/query'
+import type { DbClient } from '@server/db/db'
+import type { UserGroupAccessFilters } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
 import {
-  ViewDataNodeDef,
-  TableNode,
   ColumnNodeDef,
-  TableRecord,
   Schemata,
   TableDataNodeDef,
+  TableNode,
+  TableRecord,
+  ViewDataNodeDef,
 } from '../../../../../common/model/db'
 import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
-
-import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
+import { Query, Sort } from '../../../../../common/model/query'
+import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
+import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
+import * as Expression from '../../../../../core/expressionParser/expression'
+import * as Record from '../../../../../core/record/record'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as Survey from '../../../../../core/survey/survey'
+import { db } from '../../../../db/db'
+import * as DbUtils from '../../../../db/dbUtils'
 
 import { getUserGroupAccessCondition } from './userGroupAccessCondition'
 

@@ -1,6 +1,5 @@
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { endWriteStream, writeStreamAndWaitForEnd } from '@server/utils/ioUtils'
-
 import { getChunkFileName } from '../tempFileUtils'
 
 export const deleteFile = async ({ fileNameOrPath }: { fileNameOrPath: string }) => {

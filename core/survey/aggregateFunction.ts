@@ -1,6 +1,5 @@
-import { uuidv4 } from '@core/uuid'
-
 import * as ObjectUtils from '@core/objectUtils'
+import { uuidv4 } from '@core/uuid'
 
 const keys = {
   dateCreated: 'dateCreated',

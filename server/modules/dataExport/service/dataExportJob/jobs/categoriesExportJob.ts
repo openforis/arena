@@ -1,12 +1,10 @@
-import Job, { type JobParams } from '@server/job/job'
-
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
-
-import * as FileUtils from '@server/utils/file/fileUtils'
-import { toSafeFileName } from '@server/utils/file/fileNames'
+import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
+import Job, { type JobParams } from '@server/job/job'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import { toSafeFileName } from '@server/utils/file/fileNames'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 const categoriesOutputFolderName = 'categories'
 

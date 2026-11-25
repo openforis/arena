@@ -1,15 +1,14 @@
-import { uuidv4 } from '@core/uuid'
-import * as A from '@core/arena'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
 
-import * as Survey from '../../../core/survey/survey'
+import * as A from '@core/arena'
+import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as NodeDefLayout from '../../../core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '../../../core/survey/nodeDefLayoutUpdater'
+import * as Survey from '../../../core/survey/survey'
 
-import type { ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
-
-import NodeDefBuilder from './nodeDefBuilder'
 import type NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
+import NodeDefBuilder from './nodeDefBuilder'
 
 export default class NodeDefEntityBuilder extends NodeDefBuilder {
   childBuilders: Array<NodeDefEntityBuilder | NodeDefAttributeBuilder>

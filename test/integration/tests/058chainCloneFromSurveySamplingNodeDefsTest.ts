@@ -1,19 +1,17 @@
 import type { ArenaChain, ArenaNodeDefEntity } from '@openforis/arena-core'
-import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+
+import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
-import * as Chain from '@common/analysis/chain'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as ChainRepository from '@server/modules/analysis/repository/chain'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import * as AnalysisManager from '@server/modules/analysis/manager'
-import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import { NodeDefAreaBasedEstimateManager } from '@server/modules/nodeDef/manager/nodeDefAreaBasedEstimateManager'
-
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SB from '../../utils/surveyBuilder'
-
 import { getContextUser } from '../config/context'
 
 const { nodeDefType, keysPropsAdvanced } = NodeDef

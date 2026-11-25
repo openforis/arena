@@ -2,14 +2,15 @@ import { useCallback, useMemo } from 'react'
 import { CircleMarker } from 'react-leaflet'
 
 import { MarkerTooltip, useLayerMarker } from '../common'
-import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
-import type { FlyToPointFunction } from '../common/useFlyToPoint'
 import type {
   CreateRecordFromSamplingPointDataItem,
   RecordEditClickHandler,
   SamplingPointFeature,
   SetMarkerByKey,
 } from '../common/mapPointTypes'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
+
+import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 
 const markerRadius = 10
 

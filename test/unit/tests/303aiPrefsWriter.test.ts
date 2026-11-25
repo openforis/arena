@@ -1,7 +1,7 @@
+import { changeAiPrefs } from '@server/modules/ai/service/aiPrefsWriter'
 import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
-import { changeAiPrefs } from '@server/modules/ai/service/aiPrefsWriter'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { createAiPrefsStore } from '@test/unit/utils/aiPrefsStoreTestUtils'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'

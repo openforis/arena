@@ -1,7 +1,5 @@
-import * as A from '@core/arena'
-
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-
+import * as A from '@core/arena'
 import { db, DbClient } from '@server/db/db'
 
 export const fetchNodesHierarchyKeys = (

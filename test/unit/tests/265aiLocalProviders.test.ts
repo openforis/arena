@@ -1,3 +1,4 @@
+import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 import {
   getLocalProvidersKey,
   loadLocalProviders,
@@ -7,7 +8,6 @@ import {
   saveLocalProviders,
 } from '@webapp/ai/engines/localProviders'
 import type { StorageLike } from '@webapp/ai/engines/types'
-import { memoryStorage } from '@test/unit/utils/aiTestUtils'
 
 const NEW_KEY = 'arena.ai.localProviders.u1'
 

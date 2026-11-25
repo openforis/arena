@@ -1,12 +1,11 @@
+import * as Srs from '@core/geo/srs'
+import * as Node from '@core/record/node'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Node from '@core/record/node'
-import * as Srs from '@core/geo/srs'
-
-import * as SB from '../surveyBuilder'
 import * as RB from '../recordBuilder'
+import * as SB from '../surveyBuilder'
 import * as SurveyUtils from '../surveyUtils'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 export const createTestSurvey = ({ user }) =>
   SB.survey(

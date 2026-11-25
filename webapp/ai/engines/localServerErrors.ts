@@ -1,9 +1,8 @@
 /**
  * Error mapping and fetch wrapper of the local AI server: specific, translated errors instead of generic failures.
  */
-import SystemError, { StatusCodes } from '@core/systemError'
-
 import { getTargetAddressSpace } from '@common/ai/localServerAddress'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import type { AiEngineErrorInfo } from './types'
 

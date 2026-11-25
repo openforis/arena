@@ -2,9 +2,9 @@ import { PassThrough } from 'node:stream'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { endWriteStream, writeReadableToWritable } from '@server/utils/ioUtils'
+import { getChunkFileName } from '../tempFileUtils'
 
 import { createS3BucketRepository } from './fileRepositoryS3BucketCommon'
-import { getChunkFileName } from '../tempFileUtils'
 
 export { checkCanAccessS3Bucket } from './fileRepositoryS3BucketCommon'
 

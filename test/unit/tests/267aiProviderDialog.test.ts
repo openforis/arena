@@ -1,7 +1,8 @@
-import type { AiPublicProvider } from '@webapp/ai/engines/providerEntries'
 import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
+import type { AiPublicProvider } from '@webapp/ai/engines/providerEntries'
 import type { AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
 import { getProviderMonogram } from '@webapp/components/ai/ProviderMonogram/providerMonogram'
+import { createDraft, type ProviderDraft } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
 import { isApiKeyCleared, isApiKeyMissing } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerKey'
 import {
   canListModels,
@@ -28,7 +29,6 @@ import {
   type SavedProvider,
   toSavedProvider,
 } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerTypes'
-import { createDraft, type ProviderDraft } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
 
 const allowlist = ['http://gpu.org.example:8000/v1']
 const openai = getProviderTypeSpec('openai')

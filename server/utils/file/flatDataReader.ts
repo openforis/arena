@@ -1,13 +1,13 @@
-import type { Readable } from 'node:stream'
 import { parse } from '@fast-csv/parse'
+import type { Readable } from 'node:stream'
 
 import { SystemError } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
 
-import * as FileUtils from './fileUtils'
 import { ExcelReader } from './excelReader'
+import * as FileUtils from './fileUtils'
 
 type Row = Record<string, any>
 type HeadersListener = ((headers: string[]) => void | Promise<void>) | null

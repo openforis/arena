@@ -2,7 +2,7 @@
 // Usage: node render.mts <work-dir> video <from-frame> <to-frame> <out.mp4> [scale] [crf]
 //        node render.mts <work-dir> stills <t1,t2,...> <out-dir>
 import { spawn } from 'node:child_process'
-import { existsSync, readFileSync, mkdirSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { createRequire, stripTypeScriptTypes } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'

@@ -3,10 +3,8 @@
  * Called after the model is resolved and before the provider is called, so a refusal never reaches the provider.
  */
 import type { AiDataClass } from '@common/ai/features'
-import { assertHostingAllowed, getEffectiveAiPolicy, normalizeAiPolicy, type AiPolicy } from '@common/ai/policy'
-
+import { type AiPolicy, assertHostingAllowed, getEffectiveAiPolicy, normalizeAiPolicy } from '@common/ai/policy'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-
 import { getAiPolicyCeilings } from '../policyCeilings'
 
 /**

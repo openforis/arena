@@ -1,6 +1,6 @@
-import type { ArenaSurvey, ArenaNodeDefEntity } from '@openforis/arena-core'
-import TableOlapData from '@common/model/db/tables/olapData/table'
+import type { ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
 
+import TableOlapData from '@common/model/db/tables/olapData/table'
 import { db, DbClient } from '@server/db/db'
 
 export const createOlapDataTable = (

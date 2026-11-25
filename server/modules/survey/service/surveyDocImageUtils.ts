@@ -1,4 +1,4 @@
-import { SurveyDocImages, type ArenaSurveyDocImage } from '@openforis/arena-core'
+import { type ArenaSurveyDocImage, SurveyDocImages } from '@openforis/arena-core'
 
 /**
  * Returns the first image in surveyDocImages that matches the given documentPlace and passes the isApplicable check.

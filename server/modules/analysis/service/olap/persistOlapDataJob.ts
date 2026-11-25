@@ -1,18 +1,17 @@
-import { FileNames, type ArenaNodeDefEntity, type ArenaSurvey, type ArenaChain } from '@openforis/arena-core'
+import { type ArenaChain, type ArenaNodeDefEntity, type ArenaSurvey, FileNames } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import { FileFormats } from '@core/fileFormats'
-import * as StringUtils from '@core/stringUtils'
 import * as Chain from '@common/analysis/chain'
 import TableOlapData from '@common/model/db/tables/olapData/table'
-
+import { FileFormats } from '@core/fileFormats'
+import * as StringUtils from '@core/stringUtils'
+import * as Survey from '@core/survey/survey'
 import BatchPersister from '@server/db/batchPersister'
 import Job, { type JobParams } from '@server/job/job'
-import FileZip from '@server/utils/file/fileZip'
-import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import FileZip from '@server/utils/file/fileZip'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const insertBatchSize = 1000
 const zipEntryNamePrefix = 'OLAP_'

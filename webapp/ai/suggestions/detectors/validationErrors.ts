@@ -1,14 +1,14 @@
 /**
  * Validation errors suggestion: many validation messages in the current cycle (Cleaning area), counted when the report opens.
  */
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 import type { CleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
-
-import type { AssistantSuggestion } from '../types'
 import type { SuggestionGeneration } from '../generation'
-import type { EventDetector, SuggestionEvent } from './types'
+import type { AssistantSuggestion } from '../types'
+
 import { getSuggestionExpiresAt } from './suggestionExpiry'
+import type { EventDetector, SuggestionEvent } from './types'
 
 export const VALIDATION_MESSAGES_THRESHOLD = 20
 

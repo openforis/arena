@@ -4,22 +4,20 @@ import { UUIDs } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobSerialized from '@common/job/jobSerialized'
-
-import * as API from '@webapp/service/api'
-
-import { JobActions } from '@webapp/store/app'
-import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { Dropzone, Fieldset } from '@webapp/components'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
+import { JobActions } from '@webapp/store/app'
+import { useSurveyId } from '@webapp/store/survey'
+import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
+import { ArenaImportPreviewDialog } from './ArenaImportPreviewDialog'
 import { defaultChunkSize, FileUploadChunkSizeDropdown } from './FileUploadChunkSizeDropdown'
 import { ImportStartButton } from './ImportStartButton'
-import { ArenaImportPreviewDialog } from './ArenaImportPreviewDialog'
-import { useAppDispatch } from '@webapp/store'
 
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters

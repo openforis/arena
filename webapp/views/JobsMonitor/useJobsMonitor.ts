@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import * as API from '@webapp/service/api'
 import useInterval from '@webapp/components/hooks/useInterval'
+import * as API from '@webapp/service/api'
 
 export type JobMonitorSummary = {
   uuid: string

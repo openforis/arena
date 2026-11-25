@@ -1,7 +1,8 @@
-import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
+
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+import type { DbClient } from '@server/db/db'
 import type { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 const wgs84SrsId = '4326'

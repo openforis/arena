@@ -3,7 +3,6 @@ import { Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
-
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'

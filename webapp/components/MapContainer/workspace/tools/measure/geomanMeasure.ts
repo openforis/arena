@@ -1,7 +1,7 @@
+// loads leaflet and Geoman, which patches the global L
+import './leafletGeoman'
+
 import L from 'leaflet'
-// Geoman patches the global L created by leaflet, so it must be imported after it.
-import '@geoman-io/leaflet-geoman-free'
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 
 import type {
   GeomanShape,

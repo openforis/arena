@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
 import type L from 'leaflet'
+import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
 
 import { escapeHtml } from '@core/stringUtils'
-
 import { useNotifyError } from '@webapp/components/hooks'
 import { fetchSurveyFileAsFile, type SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
 import {
@@ -11,7 +10,6 @@ import {
   readFileLayerGroup,
 } from '@webapp/components/MapContainer/workspace/uploaded/readUploadedFile'
 import { useSurveyId } from '@webapp/store/survey'
-
 import { useMapLayerToggle } from '../common'
 
 type Props = {

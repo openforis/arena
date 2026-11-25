@@ -1,6 +1,8 @@
 import type { ArenaUser } from '@openforis/arena-core'
+
 import BatchPersister from '@server/db/batchPersister'
 import { RdbUpdates } from '@server/modules/surveyRdb/repository/rdbUpdates'
+
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 
 const BATCH_SIZE = 10000

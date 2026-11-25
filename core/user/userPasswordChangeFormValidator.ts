@@ -1,5 +1,5 @@
-import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 import { UserPasswordChangeForm } from './userPasswordChangeForm'
 import { UserPasswordValidator } from './userPasswordValidator'

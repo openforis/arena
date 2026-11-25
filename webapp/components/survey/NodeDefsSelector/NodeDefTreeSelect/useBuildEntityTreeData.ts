@@ -1,9 +1,8 @@
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
+import * as Survey from '@core/survey/survey'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'

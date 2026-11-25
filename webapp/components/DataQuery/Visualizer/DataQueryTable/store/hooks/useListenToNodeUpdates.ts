@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react'
+
 import type { ArenaRecordNode } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as Validation from '@core/validation/validation'
 import { Query } from '@common/model/query'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as Validation from '@core/validation/validation'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-
-import { AppSavingActions } from '@webapp/store/app'
 import { useAppDispatch } from '@webapp/store'
+import { AppSavingActions } from '@webapp/store/app'
 
 const updateValues = ({ data, nodes }: { data: any[]; nodes: Record<string, ArenaRecordNode> }): any[] => {
   let dataUpdated = data

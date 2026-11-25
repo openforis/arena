@@ -1,25 +1,21 @@
 import { ConflictResolutionStrategy } from '@common/dataImport'
-
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
-
 import {
   findExistingRecordSummary,
   getRecordFormattedKeyValuesByDefUuid,
 } from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import { getContextUser } from '../config/context'
-
 import * as RB from '../../utils/recordBuilder'
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 const refDataName = 'big_ref_data'
 const keyDefName = 'key_attribute'

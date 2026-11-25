@@ -1,10 +1,9 @@
 import type { ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid'
 
 import { ExtraPropDef, ExtraPropDefItem, ExtraPropDefItems } from './extraPropDef'
 

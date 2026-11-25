@@ -5,12 +5,11 @@ import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
-
 import { useConfirm } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyId } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { useAppDispatch } from '@webapp/store'
 
 type SurveyUserType = Record<string, unknown>
 type UserGroupMemberType = Record<string, unknown>

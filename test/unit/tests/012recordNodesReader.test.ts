@@ -1,12 +1,11 @@
-import * as Record from '@core/record/record'
 import type { ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
-import * as Node from '@core/record/node'
 
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import * as DataTest from '../../utils/dataTest'
-
-import { getContextUser } from '../../integration/config/context'
 
 let survey: ArenaSurvey = null
 let record: ArenaRecord = null

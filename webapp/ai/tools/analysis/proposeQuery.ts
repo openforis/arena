@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 import { toQuery } from '@common/ai/tasks/dataQuery'
-
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 import { getQueryChartType } from '@webapp/store/dataExplorer/explorerQuery'

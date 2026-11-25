@@ -1,3 +1,4 @@
+import { memoryStorage, throwingStorage } from '@test/unit/utils/aiTestUtils'
 import {
   getLocalServerConsentKey,
   hasLocalServerConsent,
@@ -5,7 +6,6 @@ import {
   revokeLocalServerConsent,
   saveLocalServerConsent,
 } from '@webapp/ai/engines/localServerConsent'
-import { memoryStorage, throwingStorage } from '@test/unit/utils/aiTestUtils'
 
 const URL_A = 'http://localhost:1234/v1'
 const URL_B = 'http://localhost:5678/v1'

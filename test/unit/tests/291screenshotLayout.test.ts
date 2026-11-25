@@ -1,8 +1,8 @@
 import {
   computeOverlayLayout,
   OVERLAY_STYLE,
-  truncateText,
   type OverlayText,
+  truncateText,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotLayout'
 
 // deterministic text widths: 7 px per character in bold, 6 px otherwise

@@ -2,11 +2,9 @@ import React from 'react'
 
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
-
 import { UserEditSection } from '../UserEditSection'
 import { UserExtraPropsEditor } from '../UserExtraPropsEditor'
 

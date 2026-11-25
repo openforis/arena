@@ -1,13 +1,12 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
+import * as Survey from '@core/survey/survey'
+import { buildAssistantSurvey, fakeT, getDefByName, testUser } from '@test/unit/utils/assistantTestUtils'
+import * as SB from '@test/utils/surveyBuilder'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
-import { buildAssistantSurvey, fakeT, getDefByName, testUser } from '@test/unit/utils/assistantTestUtils'
-import * as SB from '@test/utils/surveyBuilder'
 
 let survey: any
 let counter = 0

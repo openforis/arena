@@ -1,5 +1,4 @@
 import { isMultipleEditDisabled } from '@core/survey/nodeDefEditGuards'
-
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 export const useIsMultipleEditDisabled = ({ nodeDef }) => {

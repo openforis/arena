@@ -1,13 +1,11 @@
-import * as A from '@core/arena'
-
 import { JavascriptExpressionParser } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ExpressionConstants from './expressionConstants'
-import * as ExpressionUtils from './helpers/utils'
-
 import { types } from './helpers/types'
+import * as ExpressionUtils from './helpers/utils'
 
 const { modes, thisVariable, contextVariable } = ExpressionConstants
 export { modes, thisVariable, contextVariable }

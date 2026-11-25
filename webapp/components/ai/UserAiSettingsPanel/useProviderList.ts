@@ -5,20 +5,18 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import { ARENA_DEFAULT_PROVIDER_ID } from '@common/ai/providerIds'
-
-import * as API from '@webapp/service/api'
-
 import {
   getAiCapabilitiesSnapshot,
   getCurrentUserUuid,
   refreshAiCapabilities,
 } from '@webapp/ai/engines/capabilitiesStore'
 import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/localProviders'
-import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalProviderStatus } from '@webapp/ai/engines/providerEntries'
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
+import * as API from '@webapp/service/api'
 import { useI18nT } from '@webapp/store/system'
 
 import { type AiSettings, getApiErrorMessage, type TFunction } from './aiSettingsForm'

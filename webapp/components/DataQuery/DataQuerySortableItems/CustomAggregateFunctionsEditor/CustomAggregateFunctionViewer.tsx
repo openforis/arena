@@ -1,5 +1,5 @@
-import Checkbox from '@webapp/components/form/Checkbox'
 import { ButtonIconEdit } from '@webapp/components'
+import Checkbox from '@webapp/components/form/Checkbox'
 
 type CustomAggregateFunctionViewerProps = {
   fn: Record<string, any>

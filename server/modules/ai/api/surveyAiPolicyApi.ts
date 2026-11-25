@@ -5,12 +5,10 @@
  *   PUT /api/survey/:surveyId/ai-policy  (survey admin)  body { schema, data } → same shape
  */
 import { canEditSurveyAiPolicy } from '@common/ai/policy'
-
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as Request from '@server/utils/request'
-
-import { getSurveyAiPolicy, updateSurveyAiPolicy, type SurveyAiPolicyState } from '../service/surveyAiPolicyService'
+import { getSurveyAiPolicy, type SurveyAiPolicyState, updateSurveyAiPolicy } from '../service/surveyAiPolicyService'
 
 export type SurveyAiPolicyResponse = SurveyAiPolicyState & { canEdit: boolean }
 

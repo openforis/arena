@@ -9,10 +9,10 @@ import path from 'node:path'
 
 import { RecordValidator } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 const surveyDir = process.env.PERF_SURVEY_DIR as string

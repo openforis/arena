@@ -1,8 +1,7 @@
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import type { AiTool } from '../types'
 
 export const viewGetCurrentTool: AiTool<Record<string, never>> = {

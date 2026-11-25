@@ -1,9 +1,9 @@
 import {
-  MIN_LINE_VERTICES,
-  MIN_POLYGON_VERTICES,
   measureArea,
   measureLength,
   measurePerimeter,
+  MIN_LINE_VERTICES,
+  MIN_POLYGON_VERTICES,
 } from '@webapp/components/MapContainer/workspace/tools/measure/measureGeometry'
 import type {
   LatLngPair,

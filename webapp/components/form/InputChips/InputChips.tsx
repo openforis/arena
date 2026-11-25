@@ -2,11 +2,12 @@ import './InputChips.scss'
 
 import classNames from 'classnames'
 
+import type { ArenaValidation } from '@openforis/arena-core'
+
+import Chip from '../Chip'
 import Dropdown from '../Dropdown'
 
-import { useLocalState, State } from './store'
-import Chip from '../Chip'
-import type { ArenaValidation } from '@openforis/arena-core'
+import { State, useLocalState } from './store'
 
 type InputChipsProps = {
   className?: string

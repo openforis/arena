@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import type { ThemeMode } from './tokens'
 import {
   getThemePreference,
   onSystemThemeModeChange,
   resolveThemeMode,
   setThemePreference as storeThemePreference,
   themeChangeEventType,
-  themePreferences,
   type ThemePreference,
+  themePreferences,
 } from './themeMode'
+import type { ThemeMode } from './tokens'
 
 type UseThemeModeResult = {
   mode: ThemeMode

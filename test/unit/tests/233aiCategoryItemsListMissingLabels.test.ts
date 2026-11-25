@@ -1,14 +1,4 @@
 import { AiLimits } from '@common/ai/limits'
-
-import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
-import {
-  categoryItemsListMissingLabelsTool,
-  createCategoryItemsListMissingLabelsTool,
-} from '@webapp/ai/tools/design/categoryItemsListMissingLabels'
-import { runTool } from '@webapp/ai/tools/registry'
-import type { AiToolContext } from '@webapp/ai/tools/types'
-import type { ChangeSet } from '@webapp/ai/changeSets/types'
-
 import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 import {
   buildCategoryLabelsSurvey,
@@ -16,9 +6,17 @@ import {
   categoryLabelOp,
   categoryUuidOf,
   createFakeMissingLabelsServer,
-  fakeCategoryItem,
   type FakeCategoryItem,
+  fakeCategoryItem,
 } from '@test/unit/utils/categoryLabelsTestUtils'
+import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import { createCategoryItemRefs } from '@webapp/ai/tools/design/categoryItemRefs'
+import {
+  categoryItemsListMissingLabelsTool,
+  createCategoryItemsListMissingLabelsTool,
+} from '@webapp/ai/tools/design/categoryItemsListMissingLabels'
+import { runTool } from '@webapp/ai/tools/registry'
+import type { AiToolContext } from '@webapp/ai/tools/types'
 
 let survey: any
 let speciesUuid: string

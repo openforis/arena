@@ -1,20 +1,18 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router'
 
-import * as User from '@core/user/user'
 import * as JobSerialized from '@common/job/jobSerialized'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import * as AppWebSocket from '@webapp/app/appWebSocket'
+import * as User from '@core/user/user'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { fetchJob } from '@webapp/service/api'
-
-import { SystemErrorActions } from '@webapp/store/system'
-import { JobActions, useJob } from '@webapp/store/app'
-import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { useUser } from '@webapp/store/user'
-import { useSurveyId } from '@webapp/store/survey'
 import { useAppDispatch } from '@webapp/store'
+import { JobActions, useJob } from '@webapp/store/app'
+import { useSurveyId } from '@webapp/store/survey'
+import { SystemErrorActions } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { useUser } from '@webapp/store/user'
 
 export const useOpenWebSocket = () => {
   const dispatch = useAppDispatch()

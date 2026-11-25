@@ -1,6 +1,6 @@
-import * as Validation from '@core/validation/validation'
-
 import { Objects } from '@openforis/arena-core'
+
+import * as Validation from '@core/validation/validation'
 
 const validPasswordRegExp = new RegExp(/^\S+$/)
 const passwordStrengthRegExp = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d).{8,}$/)

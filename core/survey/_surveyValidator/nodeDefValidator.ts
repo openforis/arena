@@ -1,19 +1,17 @@
 import {
-  NodeDefExpressionValidator,
+  ArenaAnyNodeDef,
   type ArenaSurvey,
   type ArenaValidation,
-  ArenaAnyNodeDef,
+  NodeDefExpressionValidator,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import { isHexColor } from '@core/colorUtils'
-import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
-
-import * as Survey from '../survey'
+import * as Validator from '@core/validation/validator'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
+import * as Survey from '../survey'
 
 import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
 import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'

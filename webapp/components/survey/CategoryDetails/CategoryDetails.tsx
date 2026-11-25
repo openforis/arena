@@ -1,32 +1,29 @@
 import './CategoryDetails.scss'
 
-import { useParams } from 'react-router'
 import classNames from 'classnames'
+import { useParams } from 'react-router'
 
 import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
-
-import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { Button, ButtonDownload, ButtonIconInfo, ButtonMenu } from '@webapp/components'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
+import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useAppDispatch } from '@webapp/store'
 import { useCategoryByName, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
-import { TestId } from '@webapp/utils/testId'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { FileUtils } from '@webapp/utils/fileUtils'
-
-import { Button, ButtonDownload, ButtonIconInfo, ButtonMenu } from '@webapp/components'
-import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
-
+import { TestId } from '@webapp/utils/testId'
 import { ExtraPropDefsEditorPanel } from '../ExtraPropDefsEditor'
+
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
-
 import { State, useActions, useLocalState } from './store'
-import { useAppDispatch } from '@webapp/store'
 
 const MAX_LEVELS = 5
 

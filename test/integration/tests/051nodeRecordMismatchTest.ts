@@ -1,20 +1,16 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as RecordApi from '@server/modules/record/api/recordApi'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { requireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
-
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { collectRoutes, getRouteHandler } from '@test/utils/routeUtils'
 import { callHandler, createFakeResponse } from '../../unit/utils/fakeExpress'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-import { collectRoutes, getRouteHandler } from '@test/utils/routeUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 describe('Per-node endpoint: node of another record', () => {
   let survey: any

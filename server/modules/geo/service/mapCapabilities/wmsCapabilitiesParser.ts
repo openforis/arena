@@ -1,8 +1,8 @@
-import { MAP_CUSTOM_LAYER_URL_MAX_LENGTH, isHttpUrl } from '@core/map/customLayers/mapCustomLayer'
+import { isHttpUrl, MAP_CUSTOM_LAYER_URL_MAX_LENGTH } from '@core/map/customLayers/mapCustomLayer'
 import {
-  MAX_CAPABILITIES_LAYERS,
   type MapServiceCapabilities,
   type MapServiceLayer,
+  MAX_CAPABILITIES_LAYERS,
   toMapImageFormats,
 } from '@core/map/customLayers/mapServiceCapabilities'
 import { resolveServiceHref } from '@server/modules/geo/service/mapCapabilities/capabilitiesUrl'

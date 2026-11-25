@@ -1,5 +1,5 @@
-import type { Writable } from 'node:stream'
 import { ZipArchive } from 'archiver'
+import type { Writable } from 'node:stream'
 
 export class ZipArchiver {
   private readonly archiver: ZipArchive

@@ -2,24 +2,21 @@ import './UserInvite.scss'
 
 import { useCallback } from 'react'
 
-import * as AuthGroup from '@core/auth/authGroup'
 import { Authorizer } from '@openforis/arena-core'
+
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-
-import { useSurveyInfo } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
-
 import { Button, Markdown } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
-
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
 import DropdownUserRole from '../DropdownUserRole'
 
 import { useInviteUser } from './store'

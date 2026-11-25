@@ -2,7 +2,7 @@
  * The socket events sent after a record update, shared by the records update thread (single node edits) and the batch
  * processor, so both send the same content.
  */
-import { Objects, type ArenaRecord, type ArenaValidation } from '@openforis/arena-core'
+import { type ArenaRecord, type ArenaValidation, Objects } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'

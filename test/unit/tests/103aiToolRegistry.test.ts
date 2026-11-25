@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 import { AI_TOOL_NAME_PATTERN, getTools, toWebMcpDescriptor } from '@webapp/ai/tools/registry'
 import type { AiTool } from '@webapp/ai/tools/types'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 
 const makeTool = (name: string, overrides: Partial<AiTool> = {}): AiTool => ({
   name,

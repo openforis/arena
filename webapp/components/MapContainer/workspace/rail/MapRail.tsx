@@ -1,13 +1,13 @@
 import { useId, useRef } from 'react'
-import type { KeyboardEvent, ReactElement } from 'react'
 import { IconButton } from '@mui/material'
 import classNames from 'classnames'
+import type { KeyboardEvent, ReactElement } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { useMapWorkspace, WorkspaceLeafletProvider } from '../MapWorkspaceContext'
 import type { MapRailTab } from '../mapWorkspaceTypes'
+
 import { RAIL_PANEL_MAX_WIDTH, RAIL_PANEL_MIN_WIDTH, useRailPanelResize } from './useRailPanelResize'
 
 const DEFAULT_PANEL_WIDTH = 288

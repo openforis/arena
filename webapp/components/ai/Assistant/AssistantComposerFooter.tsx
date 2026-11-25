@@ -4,8 +4,8 @@ import { TestId } from '@webapp/utils/testId'
 
 import type { AssistantArea } from './assistantAreas'
 import { AssistantContextUsage } from './AssistantContextMeter'
-import type { ContextMeter } from './contextMeterModel'
 import { AssistantSentDataChip } from './AssistantSentDataChip'
+import type { ContextMeter } from './contextMeterModel'
 import { AssistantProviderChip } from './providerChip/AssistantProviderChip'
 import type { AssistantConversationApi } from './useAssistantConversation'
 

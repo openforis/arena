@@ -1,11 +1,11 @@
+import './ImagePreview.scss'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { heicTo } from 'heic-to'
 
-import { useI18n } from '@webapp/store/system'
 import LoadingBar from '@webapp/components/LoadingBar'
-
-import './ImagePreview.scss'
+import { useI18n } from '@webapp/store/system'
 
 const initialState = { error: false, loading: true }
 

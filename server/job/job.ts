@@ -1,9 +1,9 @@
-import { JobBase, JobStatus } from '@openforis/arena-core'
 import type { ArenaJobContext, ArenaUser } from '@openforis/arena-core'
+import { JobBase, JobStatus } from '@openforis/arena-core'
 
+import SystemError from '@core/systemError'
 import { db, DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
-import SystemError from '@core/systemError'
 
 // i18n key with namespace, e.g. "appErrors:generic" or "validationErrors:nameInvalid"
 const namespacedKeyRegex = /^[A-Za-z]+:/

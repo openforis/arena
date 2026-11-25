@@ -4,10 +4,10 @@
  */
 import { isChangeSetPending } from '@webapp/ai/conversations/pendingChangeSets'
 import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 
 import { SUGGESTION_DEFINITIONS } from './registry'
-import { suggestionStore, type SuggestionStore } from './suggestionStore'
+import { type SuggestionStore, suggestionStore } from './suggestionStore'
 import type { SettleOutcome, SuggestionScope } from './types'
 
 /**

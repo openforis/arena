@@ -3,7 +3,6 @@ import { useMemo } from 'react'
 import { type AiDataClass, getAiFeature, getAiFeatureMinDataClass } from '@common/ai/features'
 import type { AiPolicy } from '@common/ai/policy'
 import * as User from '@core/user/user'
-
 import { isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
 import { getAiCapabilitiesStore } from '@webapp/ai/engines/capabilitiesStore'
 import {

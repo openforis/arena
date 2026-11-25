@@ -1,11 +1,9 @@
 import './ImportSummary.scss'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
-
 import { Button } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
-
 import { State, useActions } from '../store'
 
 import TableHeader from './TableHeader'

@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { State } from '../state'
+
 import { useValidate } from './useValidate'
 
 /**

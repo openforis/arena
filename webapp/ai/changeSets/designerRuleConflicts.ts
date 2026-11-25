@@ -2,9 +2,10 @@
  * The form designer's guards, run again on the current survey when a card is shown or applied: a card proposed
  * before the survey was published, or before another edit, may now break a rule that the proposal respected.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
+import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import { getOperationNodeDefUuid } from './operations'
 import {
   applyOperations,
@@ -13,7 +14,6 @@ import {
   withDependencyGraphForRenames,
 } from './previewChangeSet'
 import { isRecordEditOperation } from './recordEdits/types'
-import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import type { ChangeSet, ConflictReason, NodeDefOperation, OperationConflict } from './types'
 
 type KeyedMessage = { key: string; params: Record<string, unknown> }

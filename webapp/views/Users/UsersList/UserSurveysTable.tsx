@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
+
 import type { ArenaUser } from '@openforis/arena-core'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as AuthGroup from '@core/auth/authGroup'
-
 import LoadingBar from '@webapp/components/LoadingBar'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'

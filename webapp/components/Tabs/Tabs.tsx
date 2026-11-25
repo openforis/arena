@@ -1,9 +1,9 @@
 import './Tabs.scss'
 
 import { useState } from 'react'
-import classNames from 'classnames'
-import MuiTabs from '@mui/material/Tabs'
 import MuiTab from '@mui/material/Tab'
+import MuiTabs from '@mui/material/Tabs'
+import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 

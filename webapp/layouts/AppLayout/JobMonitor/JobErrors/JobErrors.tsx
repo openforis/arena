@@ -1,15 +1,12 @@
 import * as JobSerialized from '@common/job/jobSerialized'
 import { ValidationUtils } from '@core/validation/validationUtils'
-
-import { htmlToString } from '@webapp/utils/domUtils'
-
-import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
 import { ExpansionPanel } from '@webapp/components'
-import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import ValidationFieldMessages from '@webapp/components/ValidationFieldMessages'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { htmlToString } from '@webapp/utils/domUtils'
 
 const toValidation = (fields) => ({
   valid: false,

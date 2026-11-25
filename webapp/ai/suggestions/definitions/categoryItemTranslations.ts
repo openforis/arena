@@ -3,10 +3,10 @@
  * as a batch in the chat (runSuggestionBatchTurn), not as a model turn.
  */
 import { getLanguageLabel } from '@core/app/languages'
-
 import { CATEGORY_ITEM_TRANSLATIONS_KIND } from '../detectors/categoryItemTranslations'
 import { getSuggestionScopeKey } from '../detectors/designTargets'
 import { buildCategoryItemTranslationsPrompt } from '../prompts/designPrompts'
+
 import { getLanguageDisplayName } from './missingTranslations'
 import type { SuggestionDefinition } from './types'
 

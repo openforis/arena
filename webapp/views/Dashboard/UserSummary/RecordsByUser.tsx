@@ -1,12 +1,10 @@
 import { useContext, useMemo } from 'react'
 
 import { BarChart } from '@webapp/charts/BarChart'
-
 import { useI18n } from '@webapp/store/system'
-
+import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
-import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
 
 export const RecordsByUser = () => {
   const i18n = useI18n()

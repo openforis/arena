@@ -1,10 +1,10 @@
-import type { ArenaValidation, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import { AggregateFunction, AggregateFunctionItem } from '@core/survey/aggregateFunction'
 import { AggregateFunctionExpression } from '@core/survey/aggregateFunctionExpression'
-import * as Validator from '@core/validation/validator'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 // validator of the SQL expression, allowing only the specified columns
 const validateExpression = (columnNames: string[]) => (propName: string, aggregateFunction: AggregateFunctionItem) => {

@@ -2,14 +2,13 @@
  * Review of a long change set (pure): above COMPACT_CARD_MAX_INLINE changes the chat shows a compact card and the
  * changes are reviewed in a dialog, grouped by entity (category labels by category) or by kind of change.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import type { TranslationSource } from '@webapp/ai/changeSets/translationSource'
 import type { ChangeOperation, ChangeSetCardState, OperationResult, OperationStatus } from '@webapp/ai/changeSets/types'
 
 import { buildCategoryLabelGroups } from './categoryLabelCardModel'
-import { buildCardRows, findNodeDefName, type CardDetail, type CardValue } from './changeSetCardModel'
+import { buildCardRows, type CardDetail, type CardValue, findNodeDefName } from './changeSetCardModel'
 
 // up to this many changes the card lists them in the chat
 export const COMPACT_CARD_MAX_INLINE = 5

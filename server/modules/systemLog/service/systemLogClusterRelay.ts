@@ -1,8 +1,7 @@
 import type { ClusterEvent } from '@openforis/arena-server'
 
-import { uuidv4 } from '@core/uuid'
-
 import { SystemLogMessage } from '@common/systemLog/systemLogConstants'
+import { uuidv4 } from '@core/uuid'
 
 import { LogFileStream, LogFileTailOptionsSubset, startLogFileStream } from './logFileStream'
 

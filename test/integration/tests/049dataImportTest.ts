@@ -1,5 +1,5 @@
-import { getContextUser } from '../config/context'
 import { fileFormats } from '../../utils/flatDataImportTestUtils'
+import { getContextUser } from '../config/context'
 
 import * as DataImportTest from './_record/dataImportTest'
 

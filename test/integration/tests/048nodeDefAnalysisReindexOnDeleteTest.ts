@@ -1,14 +1,12 @@
 import type { ArenaChain } from '@openforis/arena-core'
-import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
-
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SB from '../../utils/surveyBuilder'
-
 import { getContextUser } from '../config/context'
 
 const { nodeDefType } = NodeDef

@@ -7,7 +7,6 @@ import {
   SurveyCompareChildItemDiff,
   SurveyCompareStatus,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
-
 import { Checkbox } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 

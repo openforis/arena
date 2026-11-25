@@ -1,16 +1,14 @@
-import type { JobParams } from '@server/job/job'
-import * as A from '@core/arena'
-
 import { PointFactory, Points } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef, type ExtraPropDefItems } from '@core/survey/extraPropDef'
-import * as CollectImportJobContext from '../collectImportJobContext'
-
+import * as Survey from '@core/survey/survey'
+import type { JobParams } from '@server/job/job'
 import * as CategoryManager from '../../../../category/manager/categoryManager'
 import CategoryImportJob, { CategoryImportInternalJob } from '../../../../category/service/categoryImportJob'
 import * as CategoryImportJobParams from '../../../../category/service/categoryImportJobParams'
+import * as CollectImportJobContext from '../collectImportJobContext'
 
 const keysExtra = {
   x: 'x',

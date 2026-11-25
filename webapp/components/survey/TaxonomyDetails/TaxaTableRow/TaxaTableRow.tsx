@@ -1,9 +1,9 @@
-import * as A from '@core/arena'
+import type { ArenaTaxon } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-import type { ArenaTaxon } from '@openforis/arena-core'
 
 type TaxaTableRowProps = {
   extraPropsDefsArray: any[]

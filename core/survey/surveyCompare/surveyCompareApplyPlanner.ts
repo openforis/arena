@@ -1,20 +1,20 @@
-import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 
+import { CategoriesApplyPlan, newCategoriesApplyPlan, planCategories } from './surveyCompareApplyPlannerCategories'
+import { newTaxonomiesApplyPlan, planTaxonomies, TaxonomiesApplyPlan } from './surveyCompareApplyPlannerTaxonomies'
 import {
+  getAllChanges,
   SurveyCompareApplicabilityStatus,
   SurveyCompareNodeDefDiff,
   SurveyCompareParams,
   SurveyComparePropGroup,
   SurveyCompareResult,
   SurveyCompareStatus,
-  getAllChanges,
 } from './surveyCompareTypes'
-import { CategoriesApplyPlan, newCategoriesApplyPlan, planCategories } from './surveyCompareApplyPlannerCategories'
-import { TaxonomiesApplyPlan, newTaxonomiesApplyPlan, planTaxonomies } from './surveyCompareApplyPlannerTaxonomies'
 
 export interface NodeDefUpdate {
   nodeDefUuid: string

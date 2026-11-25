@@ -1,6 +1,7 @@
 import type { ArenaCategoryLevel } from '@openforis/arena-core'
 
 import * as CategoryLevel from '@core/survey/categoryLevel'
+
 import { ExtraPropDef, ExtraPropDefItem } from './extraPropDef'
 
 const geometryPointColumnsSuffixes = ['_x', '_y', '_srs']

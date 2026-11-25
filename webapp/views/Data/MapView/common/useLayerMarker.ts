@@ -1,5 +1,6 @@
-import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 import { useEffect, useRef } from 'react'
+
+import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 
 import type { MapPointMarker, SetMarkerByKey } from './mapPointTypes'
 

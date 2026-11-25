@@ -1,7 +1,6 @@
 import './ContributorsCard.scss'
 
 import { useI18n } from '@webapp/store/system'
-
 import { filterActiveContributors, UserCountRow } from '../utils/filterActiveContributors'
 
 type ContributorsDetailProps = { userCounts: UserCountRow[] }

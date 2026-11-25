@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
-
 import type { MapRailTab, MapWorkspaceVariant } from '../mapWorkspaceTypes'
 import { scenesRailTab } from '../scenes/scenesRailTab'
+
 import { LayersPanel } from './LayersPanel'
 import { LegendPanel } from './LegendPanel'
 

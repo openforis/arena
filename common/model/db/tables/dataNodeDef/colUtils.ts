@@ -1,7 +1,8 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
 // MOVE import from table
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+
 import * as ColProps from './dataColProps'
 
 const getValuesByColumnName = ({

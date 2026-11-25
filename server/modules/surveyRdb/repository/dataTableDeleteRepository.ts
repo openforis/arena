@@ -1,10 +1,9 @@
-import type { DbClient } from '@server/db/db'
 import type { ArenaSurvey } from '@openforis/arena-core'
 import { DB } from '@openforis/arena-server'
 
 import { TableDataNodeDef } from '@common/model/db'
-
 import * as Survey from '@core/survey/survey'
+import type { DbClient } from '@server/db/db'
 
 export const deleteRowsByRecordUuid = (
   { survey, recordUuid }: { survey: ArenaSurvey; recordUuid: string },

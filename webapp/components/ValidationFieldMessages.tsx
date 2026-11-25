@@ -1,11 +1,9 @@
 import './ValidationFieldMessages.scss'
 
 import { ValidationUtils } from '@core/validation/validationUtils'
-
+import Markdown from '@webapp/components/Markdown'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
-import Markdown from '@webapp/components/Markdown'
 
 const ValidationFieldMessages = (props) => {
   const {

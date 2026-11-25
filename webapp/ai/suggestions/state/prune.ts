@@ -4,8 +4,9 @@
  * kind and by id, never by what is pending.
  */
 import type { AssistantSuggestion, SuggestionKind } from '../types'
+
 import { setDismissed } from './dismissed'
-import { getPendingOf, findPending, replacePending, setPending } from './pending'
+import { findPending, getPendingOf, replacePending, setPending } from './pending'
 import { setInProgress } from './progress'
 import { getNested, own, setEntry } from './records'
 import type { DismissedTargets, SuggestionUserState, TrackedSuggestion } from './types'

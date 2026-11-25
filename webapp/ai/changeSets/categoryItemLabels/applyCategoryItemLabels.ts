@@ -3,18 +3,17 @@
  * CATEGORY_ITEM_LABELS_UPDATE_MAX (each one transaction, compare and set on the label each one was proposed over).
  * Their conflicts come from the answers.
  */
-import * as Survey from '@core/survey/survey'
-
 import {
   CATEGORY_ITEM_LABELS_UPDATE_MAX,
   type CategoryItemLabelsUpdateAnswer,
   type CategoryItemLabelUpdate,
 } from '@common/ai/categoryItemLabels'
-
-import type { ChangeSet, OperationResult, OperationStatus } from '../types'
+import * as Survey from '@core/survey/survey'
 import { getRequestFailure } from '../requestFailure'
+import type { ChangeSet, OperationResult, OperationStatus } from '../types'
+
 import type { PutCategoryItemLabels } from './categoryItemLabelsApi'
-import { getCategoryItemLabelKey, type CategoryItemLabelSetOperation } from './types'
+import { type CategoryItemLabelSetOperation, getCategoryItemLabelKey } from './types'
 
 export type CategoryLabelsApplierDeps = {
   putCategoryItemLabels: PutCategoryItemLabels

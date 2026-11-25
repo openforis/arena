@@ -2,10 +2,9 @@ import './UploadButton.scss'
 
 import { useCallback } from 'react'
 
-import { useI18n } from '@webapp/store/system'
 import { useAppDispatch } from '@webapp/store'
+import { useI18n } from '@webapp/store/system'
 import { FileUploadDialogActions } from '@webapp/store/ui'
-
 import { Button } from '../buttons'
 
 type OpenFileUploadDialogButtonProps = {

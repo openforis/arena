@@ -3,10 +3,9 @@ import './About.scss'
 import { useEffect, useState } from 'react'
 
 import * as ProcessUtils from '@core/processUtils'
-
 import Markdown from '@webapp/components/Markdown'
-import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
 
 const initialVersion = ProcessUtils.ENV.applicationVersion
 

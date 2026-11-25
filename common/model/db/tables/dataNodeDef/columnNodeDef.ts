@@ -1,11 +1,10 @@
 import toSnakeCase from 'to-snake-case'
 
-import { NodeDefs, RecordNodeValues, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaNodeDefCoordinate } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, NodeDefs, RecordNodeValues } from '@openforis/arena-core'
 
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import { Query } from '../../../query'
-
 import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef

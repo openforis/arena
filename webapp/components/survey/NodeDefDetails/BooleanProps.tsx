@@ -1,11 +1,9 @@
-import { useEffect, useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import * as A from '@core/arena'
-
-import { FormItem } from '@webapp/components/form/Input'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import ButtonGroup from '@webapp/components/form/ButtonGroup'
+import { FormItem } from '@webapp/components/form/Input'
 
 import { State, useNodeDefEditReadOnly } from './store'
 

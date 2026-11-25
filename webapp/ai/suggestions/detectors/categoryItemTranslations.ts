@@ -2,18 +2,16 @@
  * Category item labels missing in a survey language. The counts come from Arena's server; the event
  * detector fetches them, this file turns them into suggestions.
  */
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-
 import type { MissingLabelsCounts } from '@common/ai/categoryItemLabels'
-
+import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import {
-  fetchMissingLabelsCounts,
   type FetchMissingLabelsCounts,
+  fetchMissingLabelsCounts,
 } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
-
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 import type { AssistantSuggestion, SuggestionTarget } from '../types'
+
 import { getDesignDetectorScope, newDesignSuggestion } from './designTargets'
 import type { DetectorContext, EventDetector, SuggestionEvent, TargetResolver } from './types'
 

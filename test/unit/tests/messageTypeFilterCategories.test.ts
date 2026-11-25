@@ -1,7 +1,7 @@
 import {
+  expandMessageTypeFilterCategoriesToKeys,
   MessageTypeFilterCategories,
   MessageTypeFilterCategoryIds,
-  expandMessageTypeFilterCategoriesToKeys,
 } from '@core/validation/messageTypeFilterCategories'
 
 describe('messageTypeFilterCategories', () => {

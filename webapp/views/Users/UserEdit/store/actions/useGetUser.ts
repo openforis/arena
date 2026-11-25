@@ -1,11 +1,10 @@
 import { useCallback } from 'react'
 
 import * as User from '@core/user/user'
-
 import * as API from '@webapp/service/api'
-import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { useSurveyUuid } from '@webapp/store/survey/hooks'
+import { useUser } from '@webapp/store/user'
 
 import { validateUserEdit } from './validate'
 

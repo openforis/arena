@@ -1,6 +1,5 @@
-import { createRefDataProviders } from '@webapp/ai/tools/cleaning/refDataProviders'
-
 import { newFakeCleaningApi } from '@test/unit/utils/aiCleaningTestUtils'
+import { createRefDataProviders } from '@webapp/ai/tools/cleaning/refDataProviders'
 
 const signal = new AbortController().signal
 

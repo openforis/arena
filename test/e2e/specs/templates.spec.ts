@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, generateSurveyName, test } from '../fixtures'
 import { deleteCurrentSurvey } from '../helpers/dashboard'
 import { getDropdown, selectDropdownItem } from '../helpers/dropdown'

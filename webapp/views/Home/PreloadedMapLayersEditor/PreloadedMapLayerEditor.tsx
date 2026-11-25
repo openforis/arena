@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
-import * as Validation from '@core/validation/validation'
 import { SurveyPreloadedMapLayerValidator } from '@core/survey/surveyPreloadedMapLayerValidator'
-
+import * as Validation from '@core/validation/validation'
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
 import { MapFilePreview } from '@webapp/components/MapContainer/fileLayers'
-import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import { contentTypes } from '@webapp/service/api'
 
 const accept = {

@@ -2,14 +2,14 @@ import './InputChips.scss'
 
 import classNames from 'classnames'
 
+import type { ArenaValidation } from '@openforis/arena-core'
+
 import { ButtonAdd } from '@webapp/components/buttons'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
-
+import Chip from '../Chip'
 import { SimpleTextInput } from '../SimpleTextInput'
 
-import { useLocalState, State } from './store'
-import Chip from '../Chip'
-import type { ArenaValidation } from '@openforis/arena-core'
+import { State, useLocalState } from './store'
 
 type InputChipsTextProps = {
   className?: string

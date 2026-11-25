@@ -4,7 +4,6 @@
  */
 import type { AiDataClass } from '@common/ai/features'
 import { type AiPolicy, getAllowedLevel } from '@common/ai/policy'
-
 import {
   type AiDataLocation,
   type AiFeatureAvailability,

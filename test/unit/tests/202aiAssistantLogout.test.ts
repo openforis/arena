@@ -1,10 +1,10 @@
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { createMemoryConversationStore, getConversationStore } from '@webapp/ai/conversations/conversationStore'
-import { createOpenConversations, browserOpenConversations } from '@webapp/ai/conversations/openConversations'
+import { browserOpenConversations, createOpenConversations } from '@webapp/ai/conversations/openConversations'
 import { createAssistantLogout, resetAssistantOnLogout } from '@webapp/components/ai/Assistant/assistantLogout'
-import { createAssistantTurnRegistry } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 import { assistantPanelStore, initialAssistantPanelState } from '@webapp/components/ai/Assistant/assistantPanelStore'
+import { createAssistantTurnRegistry } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 
 describe('assistant logout and clear conversations (202)', () => {
   test('logout stops the answers, waits for their saves, then resets the panel', async () => {

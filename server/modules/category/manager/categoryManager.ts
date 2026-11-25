@@ -1,42 +1,40 @@
 import type {
+  ArenaCategory,
   ArenaCategoryItem,
   ArenaCategoryLevel,
-  ArenaValidation,
-  ArenaCategory,
-  ArenaUser,
   ArenaSurvey,
+  ArenaUser,
+  ArenaValidation,
 } from '@openforis/arena-core'
-import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import SystemError, { StatusCodes } from '@core/systemError'
+import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import * as Validation from '@core/validation/validation'
-import * as Validator from '@core/validation/validator'
-import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
-
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 import { ExtraPropDef, type ExtraPropDefItem } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
-
+import * as Survey from '@core/survey/survey'
+import SystemError, { StatusCodes } from '@core/systemError'
+import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import {
   publishSurveySchemaTableProps,
   unpublishSurveySchemaTableProps,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as CategoryValidator from '../categoryValidator'
+import * as CategoryRepository from '../repository/categoryRepository'
+
 import * as CategoryExportManager from './categoryExportManager'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
-import * as CategoryRepository from '../repository/categoryRepository'
 
 export {
   initializeSurveyCategoryItemsIndexes,

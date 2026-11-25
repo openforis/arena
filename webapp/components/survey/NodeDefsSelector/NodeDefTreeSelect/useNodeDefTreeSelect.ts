@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
-import { useSurvey } from '@webapp/store/survey'
-import { useBuildTreeData } from './useBuildEntityTreeData'
 import { useOnValueChange } from '@webapp/components/hooks'
+import { useSurvey } from '@webapp/store/survey'
+
+import { useBuildTreeData } from './useBuildEntityTreeData'
 
 /**
  * Collects item keys that have at least one real (visible) child.

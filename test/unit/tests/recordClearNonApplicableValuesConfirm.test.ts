@@ -1,15 +1,13 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import {
   getNodeDefLabelsToShow,
   prepareNodesToRestore,
 } from '@webapp/store/ui/record/actions/clearNonApplicableValuesConfirmUtils'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-user-uuid', props: {} }
 

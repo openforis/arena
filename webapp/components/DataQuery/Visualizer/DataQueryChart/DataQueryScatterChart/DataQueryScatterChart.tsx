@@ -4,19 +4,18 @@ import { Objects } from '@openforis/arena-core'
 
 import { ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
+import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as ObjectUtils from '@core/objectUtils'
-
-import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { ScatterChart } from '@webapp/charts/ScatterChart'
+import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
+import { useAppDispatch } from '@webapp/store'
 import { DataExplorerActions } from '@webapp/store/dataExplorer'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
 import { useDataQueryChartData } from '../useDataQueryChartData'
+
 import { DataQueryScatterChartTooltip } from './DataQueryScatterChartTooltip'
-import { useAppDispatch } from '@webapp/store'
 
 const maxItems = 5000
 

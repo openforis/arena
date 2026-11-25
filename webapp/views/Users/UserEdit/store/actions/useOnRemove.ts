@@ -1,15 +1,13 @@
 import axios from 'axios'
 import { useNavigate } from 'react-router'
 
-import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
-
+import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useConfirm } from '@webapp/components/hooks'
 import { useAppDispatch } from '@webapp/store'
+import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const useOnRemove = ({ userToUpdate }) => {
   const dispatch = useAppDispatch()

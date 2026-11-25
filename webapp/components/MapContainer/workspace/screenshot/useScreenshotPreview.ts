@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type L from 'leaflet'
 
-import { getScaleBar, metersPerPixel } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
 import {
   captureMapAtPlot,
   captureMapView,
@@ -23,6 +22,7 @@ import type {
   ScreenshotOptions,
   ScreenshotPlotCandidate,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { getScaleBar, metersPerPixel } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
 
 const SCALE_BAR_MAX_WIDTH_PX = 100
 

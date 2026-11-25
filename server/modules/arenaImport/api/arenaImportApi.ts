@@ -1,10 +1,9 @@
 import type { Router } from 'express'
-import * as Survey from '@core/survey/survey'
 
+import * as Survey from '@core/survey/survey'
 import * as JobUtils from '@server/job/jobUtils'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as Request from '@server/utils/request'
-
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ArenaImportService from '../service/arenaImportService'
 

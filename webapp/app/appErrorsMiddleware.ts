@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-import { ServiceErrorActions } from '@webapp/store/system'
-import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { singleFlight } from '@webapp/app/singleFlight'
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
+import { ServiceErrorActions } from '@webapp/store/system'
 
 const tokenRefreshEndpoint = '/auth/token/refresh'
 

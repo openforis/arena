@@ -1,26 +1,26 @@
 import './NodeDefTaxon.scss'
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { connect } from 'react-redux'
+
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import { FormItem } from '@webapp/components/form/Input'
-
-import * as Taxon from '@core/survey/taxon'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as StringUtils from '@core/stringUtils'
-
-import { TestId } from '@webapp/utils/testId'
-import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Taxon from '@core/survey/taxon'
+import { FormItem } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import { TestId } from '@webapp/utils/testId'
+import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 import NodeDefErrorBadge from '../NodeDefErrorBadge'
 import NodeDeleteButton from '../NodeDeleteButton'
+
 import NodeDefTaxonInputField from './NodeDefTaxonInputField'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
-import type { NodeDefComponentProps } from '../nodeDefComponentProps'
 
 const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon
 

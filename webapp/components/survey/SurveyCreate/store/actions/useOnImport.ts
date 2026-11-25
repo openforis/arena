@@ -5,7 +5,6 @@ import { FileProcessor } from '@openforis/arena-core'
 
 import { objectToFormData } from '@webapp/service/api'
 import { Chunks } from '@webapp/utils/chunks'
-
 import { importSources } from '../importSources'
 
 const urlBySource = {

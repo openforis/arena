@@ -6,10 +6,8 @@ import { Button, ButtonCancel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import Markdown from '@webapp/components/Markdown'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
-
 import { useI18nT } from '@webapp/store/system'
 import { useDialogConfirm } from '@webapp/store/ui'
-
 import { TestId } from '@webapp/utils/testId'
 
 const DialogConfirm = () => {

@@ -1,5 +1,6 @@
-import type { ArenaAreaOfInterest } from '@openforis/arena-core'
 import type { Position } from 'geojson'
+
+import type { ArenaAreaOfInterest } from '@openforis/arena-core'
 
 type GeoJsonObject = {
   type?: string

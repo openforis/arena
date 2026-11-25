@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 
 import { SurveyCompareChange, SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareTypes'
-
 import { useI18n } from '@webapp/store/system'
 
 import {

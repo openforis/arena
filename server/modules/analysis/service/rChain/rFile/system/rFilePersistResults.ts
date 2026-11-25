@@ -1,11 +1,11 @@
-import type RChain from '../../rChain'
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
+
 import * as ApiRoutes from '@common/apiRoutes'
 import * as NodeDef from '@core/survey/nodeDef'
+import type RChain from '../../rChain'
+import { arenaPutFile, arenaWaitForJobToComplete, setVar, writeCsv, zipr } from '../../rFunctions'
 
 import DfResults from './dfResults'
-
-import { writeCsv, arenaPutFile, zipr, arenaWaitForJobToComplete, setVar } from '../../rFunctions'
 import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
 
 const persistScriptJobVar = 'persistScriptJob'

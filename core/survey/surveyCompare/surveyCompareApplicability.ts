@@ -1,6 +1,8 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
+import { nodeDefChangeId, NodeDefMatches } from './surveyCompareNodeDefs'
+import { getChildren, NodeDefsIndex } from './surveyCompareNodeDefsIndex'
 import {
   SurveyCompareApplicabilityStatus,
   SurveyCompareCategoryDiff,
@@ -11,8 +13,6 @@ import {
   SurveyCompareStatus,
   SurveyCompareTaxonomyDiff,
 } from './surveyCompareTypes'
-import { NodeDefsIndex, getChildren } from './surveyCompareNodeDefsIndex'
-import { NodeDefMatches, nodeDefChangeId } from './surveyCompareNodeDefs'
 
 export interface ApplicabilityContext {
   sourceSurvey: any

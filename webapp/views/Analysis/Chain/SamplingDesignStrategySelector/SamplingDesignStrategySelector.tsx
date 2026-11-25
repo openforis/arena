@@ -2,11 +2,10 @@ import type { ArenaChain } from '@openforis/arena-core'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { useChainEditable } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
+import { useChainEditable } from '@webapp/store/ui/chain'
 
 type SamplingDesignStrategySelectorProps = {
   chain: ArenaChain

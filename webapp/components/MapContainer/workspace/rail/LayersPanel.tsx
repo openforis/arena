@@ -1,11 +1,11 @@
-import type { ReactElement } from 'react'
 import classNames from 'classnames'
+import type { ReactElement } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
-
 import { groupOverlays } from '../layers/customOverlays'
 import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 import { useMapWorkspace } from '../MapWorkspaceContext'
+
 import { CustomOverlayRow } from './CustomOverlayRow'
 
 /**

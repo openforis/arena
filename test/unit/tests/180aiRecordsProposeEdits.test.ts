@@ -2,9 +2,6 @@ import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
-
-import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
-
 import {
   cleaningTestRecord,
   cleaningTestSurvey,
@@ -15,7 +12,7 @@ import {
   runTool,
   validateWholeRecord,
 } from '@test/unit/utils/aiCleaningTestUtils'
-
+import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
 import * as RecordUtils from '../../utils/recordUtils'
 
 let survey: any

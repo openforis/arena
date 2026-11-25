@@ -2,11 +2,10 @@ import { useCallback } from 'react'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { useAppDispatch } from '@webapp/store'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 export const Phase2AsSamplingPointDataSelector = () => {
   const dispatch = useAppDispatch()

@@ -1,11 +1,9 @@
 import type { ArenaTaxonomy } from '@openforis/arena-core'
 
-import type RChain from '../../rChain'
+import * as ApiRoutes from '@common/apiRoutes'
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
-import * as ApiRoutes from '@common/apiRoutes'
-
+import type RChain from '../../rChain'
 import { arenaGet, dfVar, setVar } from '../../rFunctions'
 
 export default class ListTaxonomies {

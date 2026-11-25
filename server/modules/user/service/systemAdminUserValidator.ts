@@ -1,6 +1,6 @@
-import * as Validator from '@core/validation/validator'
-import * as Validation from '@core/validation/validation'
 import { UserPasswordValidator } from '@core/user/userPasswordValidator'
+import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 const validate = ({ email, password }: { email: string; password: string }) =>
   Validator.validate(

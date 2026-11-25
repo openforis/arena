@@ -1,9 +1,9 @@
 import axios from 'axios'
 
 import { AppSavingActions } from '@webapp/store/app'
-
-import { MessageState } from '../state'
 import { NotificationActions } from '../../notification'
+import { MessageState } from '../state'
+
 import { resetMessage } from './resetMessage'
 
 export const deleteMessage =

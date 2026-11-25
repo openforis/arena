@@ -1,16 +1,14 @@
 /**
  * System prompt of a turn, by area, from the tool context.
  */
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { buildAssistantAnalysisPrompt } from '@common/ai/prompts/assistantAnalysis'
 import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
 import { buildConversationTitleInstruction } from '@common/ai/prompts/assistantConversationTitle'
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 import { getEffectiveQueryLang } from '@common/ai/tasks/dataQuery'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { getNodeDefNamesWithIssues } from '@webapp/ai/tools/design/surveyGetValidation'
 import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 

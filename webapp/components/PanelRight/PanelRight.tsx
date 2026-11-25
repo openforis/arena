@@ -6,7 +6,6 @@ import classNames from 'classnames'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { Button, ButtonIconClose } from '../buttons'
 
 type PanelRightProps = {

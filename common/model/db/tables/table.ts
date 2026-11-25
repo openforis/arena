@@ -1,5 +1,4 @@
 import * as StringUtils from '@core/stringUtils'
-
 import * as SQL from '../sql'
 
 // common column set

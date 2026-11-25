@@ -1,9 +1,8 @@
-import type RChain from '../rChain'
 import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
-import { arenaInfo, sourceWithTryCatch, source } from '../rFunctions'
+import type RChain from '../rChain'
 import { isPathInsideDir } from '../rChainDir'
+import { arenaInfo, source, sourceWithTryCatch } from '../rFunctions'
 
 const _contentSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
 

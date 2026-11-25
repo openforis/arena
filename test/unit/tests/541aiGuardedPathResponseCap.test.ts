@@ -1,8 +1,8 @@
 import http from 'node:http'
 import type { AddressInfo } from 'node:net'
 
-import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
 import { toAiSystemError } from '@server/modules/ai/service/gateway/errorMapping'
+import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
 
 const MIB = 1024 * 1024
 const TOO_LARGE = 'aiProviderResponseTooLarge'

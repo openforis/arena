@@ -1,5 +1,6 @@
 import Table from '../table'
 import TableSurvey from '../tableSurvey'
+
 import tranformCallback from './transformCallback'
 
 const columnSet = {

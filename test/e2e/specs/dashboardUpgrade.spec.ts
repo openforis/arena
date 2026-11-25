@@ -1,7 +1,6 @@
 import { DB } from '@openforis/arena-server'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 import { expect, test } from '../fixtures'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'

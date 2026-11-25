@@ -1,11 +1,9 @@
 import path from 'node:path'
 
 import * as A from '@core/arena'
-
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 

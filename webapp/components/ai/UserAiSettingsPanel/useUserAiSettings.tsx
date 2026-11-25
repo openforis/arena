@@ -5,11 +5,9 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import type { AiAccessLevel } from '@common/ai/accessLevel'
-
-import * as API from '@webapp/service/api'
-
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
+import * as API from '@webapp/service/api'
 import { useI18n, useI18nT } from '@webapp/store/system'
 
 import {

@@ -1,14 +1,13 @@
-import { Numbers, Objects, Points, type ArenaCategoryItem, type ArenaValidation } from '@openforis/arena-core'
+import { type ArenaCategoryItem, type ArenaValidation, Numbers, Objects, Points } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryItem from '@core/survey/categoryItem'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
-
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
-import { useI18n } from '@webapp/store/system'
 import { useSurveySrsIndex } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const pointNumericFields = new Set(['x', 'y'])
 

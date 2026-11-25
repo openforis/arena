@@ -1,9 +1,8 @@
 import type { Request as ExpressRequest } from 'express'
+
 import { isUuid } from '@core/uuid'
-
-import * as Request from '../../../utils/request'
 import * as FileUtils from '../../../utils/file/fileUtils'
-
+import * as Request from '../../../utils/request'
 import * as TempFileManager from '../manager/tempFileManager'
 
 const getFileContentOrPath = (req: ExpressRequest) => {

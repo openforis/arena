@@ -1,7 +1,6 @@
-import { forwardRef, useCallback, useEffect, type MutableRefObject } from 'react'
+import { forwardRef, type MutableRefObject, useCallback, useEffect } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import TreeChart from '@webapp/charts/TreeChart'
 import { highlightClassName, type TreeChartNode } from '@webapp/charts/TreeChart/TreeChart'
 import { useNodeDefTreeChart } from '@webapp/charts/TreeChart/useNodeDefTreeChart'

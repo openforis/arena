@@ -1,5 +1,4 @@
 import en from '@core/i18n/resources/en'
-
 import {
   getLevelsAbove,
   getPolicyLevelOptions,

@@ -1,10 +1,8 @@
 import { useCallback } from 'react'
 
 import * as A from '@core/arena'
-
-import { useI18nT } from '@webapp/store/system'
 import { Dropdown } from '@webapp/components/form'
-
+import { useI18nT } from '@webapp/store/system'
 import { TableConstants } from '../../constants'
 
 type Props = {

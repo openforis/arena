@@ -1,8 +1,8 @@
 import {
   ArenaValidation,
-  ValidationFactory,
   ArenaValidationFields,
   ArenaValidationResult,
+  ValidationFactory,
   Validations,
 } from '@openforis/arena-core'
 

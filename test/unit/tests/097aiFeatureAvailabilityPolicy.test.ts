@@ -1,6 +1,5 @@
 import { aiPolicyDataClasses } from '@common/ai/policy'
 import en from '@core/i18n/resources/en'
-
 import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiCapabilities } from '@webapp/ai/engines/types'
 import {

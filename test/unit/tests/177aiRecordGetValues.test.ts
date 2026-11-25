@@ -1,13 +1,8 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
-import { createRecordGetValuesTool } from '@webapp/ai/tools/cleaning/recordGetValuesTool'
-import { findRecordUuidByKeys } from '@webapp/ai/tools/cleaning/recordLookup'
-import { getRecordValues } from '@webapp/ai/tools/cleaning/recordValues'
-
 import {
   cleaningTestRecord,
   cleaningTestSurvey,
@@ -16,6 +11,9 @@ import {
   newFakeCleaningApi,
   runTool,
 } from '@test/unit/utils/aiCleaningTestUtils'
+import { createRecordGetValuesTool } from '@webapp/ai/tools/cleaning/recordGetValuesTool'
+import { findRecordUuidByKeys } from '@webapp/ai/tools/cleaning/recordLookup'
+import { getRecordValues } from '@webapp/ai/tools/cleaning/recordValues'
 
 let survey: any
 let record: any

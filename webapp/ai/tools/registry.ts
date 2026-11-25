@@ -5,12 +5,11 @@
 import { jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
 
-import { isHostingAllowed, type AiPolicy } from '@common/ai/policy'
-
+import { type AiPolicy, isHostingAllowed } from '@common/ai/policy'
 import * as Survey from '@core/survey/survey'
 
 import { ALL_TOOLS } from './allTools'
-import { TOOL_RESULT_MAX_CHARS, limitToolResult, toolError } from './common/toolResult'
+import { limitToolResult, TOOL_RESULT_MAX_CHARS, toolError } from './common/toolResult'
 import { AiToolFailure } from './toolFailure'
 import type { AiTool, AiToolArea, AiToolContext } from './types'
 

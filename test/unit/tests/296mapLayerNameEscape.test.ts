@@ -1,10 +1,9 @@
 import { isHexColor } from '@core/colorUtils'
 import { escapeHtml } from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
-
 import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-map-marker-color-user' }

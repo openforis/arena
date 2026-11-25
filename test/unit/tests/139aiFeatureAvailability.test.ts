@@ -1,6 +1,4 @@
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
-
-import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, leafPaths, RESOURCES } from '../utils/i18nParity'
 import { createCapabilitiesStore, isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
 import {
   getAiEngineFeatureAvailability,
@@ -17,6 +15,7 @@ import type {
 } from '@webapp/ai/engines/types'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { fakeT as t } from '../utils/fakeT'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, leafPaths, RESOURCES } from '../utils/i18nParity'
 
 const DEFAULT_POLICY: AiPolicy = { schema: 'cloud', data: 'onDevice' }
 

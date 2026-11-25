@@ -1,13 +1,11 @@
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Node from '@core/record/node'
-
+import * as Survey from '@core/survey/survey'
 import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 const { nodeDefType } = NodeDef
 

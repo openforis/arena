@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
 import { ExpansionPanel } from '@webapp/components'
+import { useAppDispatch } from '@webapp/store'
+import { SystemActions, useI18n, useSystemError, useSystemStatusReady } from '@webapp/store/system'
 
 import Routes from './Routes'
-import { useAppDispatch } from '@webapp/store'
 
 type ErrorFallbackProps = {
   error: Record<string, any>

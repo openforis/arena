@@ -1,7 +1,7 @@
 /**
  * The entry point of views, buttons and the middleware for suggestion events; the suggestions host subscribes to it.
  */
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 
 import type { SuggestionEvent } from './detectors/types'
 

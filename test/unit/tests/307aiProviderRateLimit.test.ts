@@ -1,9 +1,9 @@
-import * as SettingsApi from '@server/modules/ai/api/settingsApi'
 import {
   createProviderRateLimit,
   limitProviderCalls,
   releaseProviderCall,
 } from '@server/modules/ai/api/providerRateLimit'
+import * as SettingsApi from '@server/modules/ai/api/settingsApi'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { collectRoutes } from '@test/utils/routeUtils'

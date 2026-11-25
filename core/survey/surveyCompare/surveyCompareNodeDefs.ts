@@ -1,5 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { normalizeNodeDef } from './surveyCompareNodeDefNormalizer'
+import { getChildren, NodeDefsIndex } from './surveyCompareNodeDefsIndex'
 import {
   SurveyCompareMatchType,
   SurveyCompareMatchTypeValue,
@@ -8,8 +10,6 @@ import {
   SurveyComparePropGroup,
   SurveyCompareStatus,
 } from './surveyCompareTypes'
-import { NodeDefsIndex, getChildren } from './surveyCompareNodeDefsIndex'
-import { normalizeNodeDef } from './surveyCompareNodeDefNormalizer'
 import { areNormalizedValuesEqual, getDifferentKeys } from './surveyCompareValues'
 
 export interface NodeDefMatches {

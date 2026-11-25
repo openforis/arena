@@ -6,14 +6,13 @@ import { ArenaUserGroup } from '@openforis/arena-core'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { validateUserGroup } from '@core/user/userGroup/userGroupValidator'
 import * as Validation from '@core/validation/validation'
-
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useConfirm } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyId } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
-import { useAppDispatch } from '@webapp/store'
 
 // appModules.js is a plain JS module without explicit types: TS infers appModuleUri's parameter shape
 // from its default value (appModules.home), which happens to include an `icon` field that userModules

@@ -1,10 +1,7 @@
 import * as DateUtils from '@core/dateUtils'
-
-import { useI18n } from '@webapp/store/system'
-import ProfilePicture from '@webapp/components/ProfilePicture'
-
 import Markdown from '@webapp/components/Markdown'
-
+import ProfilePicture from '@webapp/components/ProfilePicture'
+import { useI18n } from '@webapp/store/system'
 import { ActivityLogMessage } from '../store'
 
 const getMessageClassName = ({ message }) => `activity-log__message 

@@ -1,43 +1,40 @@
 import {
+  type ArenaRecord,
+  type ArenaRecordNode,
+  type ArenaRecordNodePointer,
+  type ArenaSurvey,
+  type ArenaUser,
+  type ArenaValidation,
   RecordNodePointers,
   Records,
   SurveyDependencyType,
-  type ArenaRecordNodePointer,
-  type ArenaUser,
-  type ArenaRecord,
-  type ArenaRecordNode,
-  type ArenaSurvey,
-  type ArenaValidation,
 } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
-
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
-import * as Node from '@core/record/node'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
-
 import { db, DbClient } from '@server/db/db'
-import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
-import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
-import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
-import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
-import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import * as RecordValidationManager from './recordValidationManager'
-import * as NodeCreationManager from './nodeCreationManager'
-import * as NodeUpdateManager from './nodeUpdateManager'
-import { NodeRdbManager } from './nodeRDBManager'
 import * as DbUtils from '@server/db/dbUtils'
+import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
+import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
+
+import * as NodeCreationManager from './nodeCreationManager'
+import { NodeRdbManager } from './nodeRDBManager'
+import * as NodeUpdateManager from './nodeUpdateManager'
+import * as RecordValidationManager from './recordValidationManager'
 
 type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
 

@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
-
 // the defs module alone: the actions index pulls in the whole component tree (jsdom), which the unit bundle cannot load
 import { resetSurveyDefs } from '../actions/defs'
 import * as SurveyState from '../state'

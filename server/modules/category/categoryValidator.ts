@@ -1,24 +1,23 @@
-import * as A from '@core/arena'
-
 import {
-  Points,
+  type ArenaCategory,
   type ArenaCategoryItem,
   type ArenaCategoryLevel,
-  type ArenaValidation,
-  type ArenaCategory,
   type ArenaSurvey,
+  type ArenaValidation,
+  Points,
 } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as Validator from '@core/validation/validator'
-import * as Validation from '@core/validation/validation'
-import * as ValidationResult from '@core/validation/validationResult'
+import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as Validator from '@core/validation/validator'
 
 const keys = {
   children: 'children',

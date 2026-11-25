@@ -2,16 +2,16 @@
  * Compares a change set with the current draft survey: an operation whose `from` no longer matches is a conflict and
  * is never applied (the card shows it as stale).
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
+import { type CategoryItemLabelSetOperation, isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import { isDeepEqual } from './deepEqual'
 import { findStructuralConflicts } from './designerRuleConflicts'
 import { findNodeDefRef, getOperationCurrentValue } from './operations'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from './recordEdits/types'
-import { isCategoryItemLabelOperation, type CategoryItemLabelSetOperation } from './categoryItemLabels/types'
-import { isNodeDefRefProp } from './types'
 import type { ChangeOperation, ChangeSet, ConflictReason, NodeDefCreateOperation, OperationConflict } from './types'
+import { isNodeDefRefProp } from './types'
 
 const isNameTaken = (survey: any, name: unknown, ownUuid: string): boolean =>
   Survey.getNodeDefsArray(survey).some(

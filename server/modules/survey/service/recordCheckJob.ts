@@ -1,28 +1,27 @@
-import type { DbClient } from '@server/db/db'
-import * as A from '@core/arena'
-
 import {
-  Objects,
-  type ArenaUser,
+  ArenaAnyNodeDef,
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
-  ArenaAnyNodeDef,
+  type ArenaUser,
+  Objects,
 } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as A from '@core/arena'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
-import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import * as DbUtils from '@server/db/dbUtils'
 import BatchPersister from '@server/db/batchPersister'
+import type { DbClient } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import Job, { type JobParams } from '@server/job/job'
-import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
+import * as SurveyManager from '../manager/surveyManager'
+
 import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
 
 // Per-record/per-step tracing is too noisy to leave on for routine runs, but invaluable when a

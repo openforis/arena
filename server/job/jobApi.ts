@@ -1,4 +1,5 @@
 import type { Router } from 'express'
+
 import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'

@@ -1,6 +1,6 @@
-import SystemError, { StatusCodes } from '@core/systemError'
 import type { Response as ExpressResponse } from 'express'
 
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as Response from '@server/utils/response'
 
 // the parts of an express response used by Response.sendErr, recording what is sent

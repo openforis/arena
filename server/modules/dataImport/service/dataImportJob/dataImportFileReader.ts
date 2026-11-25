@@ -1,5 +1,5 @@
-import FileZip from '@server/utils/file/fileZip'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import FileZip from '@server/utils/file/fileZip'
 
 const directories = {
   files: 'files',

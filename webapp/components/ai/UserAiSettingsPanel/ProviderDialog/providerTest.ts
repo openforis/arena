@@ -5,8 +5,8 @@
 import { getLocalServerTestView, type LocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import type { AiLocalServerCapability } from '@webapp/ai/engines/types'
 import type { AiProviderTestResponse } from '@webapp/service/api/ai/providers'
-
 import { getErrorText, type TFunction } from '../aiSettingsForm'
+
 import { isAccountBaseUrlUsable, shouldShowLocalUrlHint } from './providerAddress'
 import {
   createDraft,

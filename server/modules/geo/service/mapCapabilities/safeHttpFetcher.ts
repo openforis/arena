@@ -1,8 +1,7 @@
+import axios, { type AxiosRequestConfig } from 'axios'
 import { promises as dnsPromises } from 'node:dns'
 import http from 'node:http'
 import https from 'node:https'
-
-import axios, { type AxiosRequestConfig } from 'axios'
 
 import { classifyIpAddress, isNonPublicIpAddress } from '@common/ai/ipAddress'
 import { isMapCustomLayersError, newMapCustomLayersError } from '@server/modules/geo/service/mapCustomLayersErrors'

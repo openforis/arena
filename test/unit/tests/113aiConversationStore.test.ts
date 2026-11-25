@@ -1,7 +1,7 @@
 import { IDBFactory } from 'fake-indexeddb'
 
 import { createConversation, toConversationTitle } from '@webapp/ai/conversations/conversationModel'
-import { openConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
+import { type ConversationStore, openConversationStore } from '@webapp/ai/conversations/conversationStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
 
 const at = (seconds: number) => new Date(Date.UTC(2026, 9, 7, 10, 0, seconds))

@@ -1,10 +1,9 @@
 import type { Page } from '@playwright/test'
 
-import { toBucket, type DismissedTargets } from '@webapp/ai/suggestions/state/types'
+import { type DismissedTargets, toBucket } from '@webapp/ai/suggestions/state/types'
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
-import { sampleRecords, type SampleRecord } from '../fixtures/seed/sampleSurveyModel'
+import { type SampleRecord, sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import {
   acceptConsentAndWait,
   analysisAreaLabel,
@@ -22,7 +21,7 @@ import {
   selectAssistantArea,
 } from '../helpers/assistantPanel'
 import { Urls } from '../helpers/urls'
-import { startLocalModelServer, type LocalModelServerStub } from '../stubs/localModelServer'
+import { type LocalModelServerStub, startLocalModelServer } from '../stubs/localModelServer'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'

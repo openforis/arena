@@ -1,5 +1,5 @@
-import { once } from 'node:stream'
 import type { Readable, Writable } from 'node:stream'
+import { once } from 'node:stream'
 
 export const writeStreamAndWaitForEnd = async ({
   writeStream,

@@ -2,13 +2,12 @@ import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
-import { nodeDefExpressionProps, type NodeDefExpressionProp } from '@webapp/ai/changeSets/types'
-
+import { type NodeDefExpressionProp, nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { applyIfTextSchema, expressionTextSchema } from '../common/toolSchemas'
 import type { AiTool } from '../types'
+
 import { proposeChangeSet, summarySchema, textItemSchema, toTextMap } from './proposeChangeSet'
 import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 

@@ -1,5 +1,6 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import * as NodeDef from '@core/survey/nodeDef'
 
 type NodeDefInfoIconProps = {
   lang: string

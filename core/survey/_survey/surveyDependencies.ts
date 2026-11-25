@@ -1,13 +1,12 @@
-import { Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
+  ArenaNodeDefMap,
   ArenaSurvey,
   ArenaSurveyDependencyGraph,
   SurveyDependencyType,
-  ArenaNodeDefMap,
 } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Surveys } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
 import type { DependencyType } from './surveyDependencyTypes'

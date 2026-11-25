@@ -4,9 +4,8 @@ import { useSelector } from 'react-redux'
 import { Button } from '@webapp/components/buttons'
 import { MapContainer } from '@webapp/components/MapContainer'
 import PanelRight from '@webapp/components/PanelRight'
-
-import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { RecordState } from '@webapp/store/ui/record'
+import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 type MapTriggerButtonProps = {
   disabled?: boolean

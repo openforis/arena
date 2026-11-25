@@ -1,20 +1,17 @@
 import { useCallback } from 'react'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-
-import * as Taxonomy from '@core/survey/taxonomy'
 import { FileFormats } from '@core/fileFormats'
-
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as API from '@webapp/service/api'
-
+import { useAppDispatch } from '@webapp/store'
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
-import { FileUtils } from '@webapp/utils/fileUtils'
 import { NotificationActions } from '@webapp/store/ui'
-
+import { FileUtils } from '@webapp/utils/fileUtils'
 import { State } from '../state'
+
 import { useRefreshTaxonomy } from './useRefreshTaxonomy'
-import { useAppDispatch } from '@webapp/store'
 
 const allowedFileFormats = new Set([FileFormats.csv, FileFormats.xlsx])
 

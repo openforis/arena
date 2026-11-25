@@ -2,16 +2,15 @@
  * Missing translations suggestion: texts missing in a survey language (state detector, recomputed on every survey change).
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import {
-  TEXT_KINDS,
   getMissingLanguages,
   getSurveyLanguages,
   getTextNodeDefs,
+  TEXT_KINDS,
   toTextTargetKey,
 } from '@webapp/ai/tools/design/missingTexts'
-
 import type { AssistantSuggestion } from '../types'
+
 import { getDesignDetectorScope, newDesignSuggestion } from './designTargets'
 import type { DetectorContext, StateDetector } from './types'
 

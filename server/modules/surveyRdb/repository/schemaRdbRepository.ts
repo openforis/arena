@@ -1,6 +1,5 @@
 import { Schemata } from '@common/model/db'
 import TableOlapData from '@common/model/db/tables/olapData/table'
-
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 

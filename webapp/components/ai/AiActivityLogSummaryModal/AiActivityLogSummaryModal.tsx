@@ -3,15 +3,14 @@ import './AiActivityLogSummaryModal.scss'
 import { useCallback, useMemo } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
 import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
-import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
-import { Modal, ModalBody } from '@webapp/components/Modal'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
 import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
-import { useI18n, useI18nT } from '@webapp/store/system'
+import { Modal, ModalBody } from '@webapp/components/Modal'
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useI18n, useI18nT } from '@webapp/store/system'
 
 type AiActivityLogSummaryModalProps = {
   onClose: (...args: any[]) => any

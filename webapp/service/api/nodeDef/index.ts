@@ -1,5 +1,6 @@
-import type { ArenaAnyNodeDef, ArenaNodeDefPropsAdvanced } from '@openforis/arena-core'
 import axios from 'axios'
+
+import type { ArenaAnyNodeDef, ArenaNodeDefPropsAdvanced } from '@openforis/arena-core'
 
 // ==== READ
 export const fetchNodeDef = async ({ surveyId, nodeDefUuid }: { surveyId: number; nodeDefUuid: string }) => {

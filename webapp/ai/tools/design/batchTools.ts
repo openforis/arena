@@ -6,19 +6,18 @@
 import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { SUGGESTION_BATCH_TOOL_NAMES, type SuggestionBatchKind } from '@webapp/ai/suggestions/suggestionBatchTurn'
 import {
+  type AssistantBatchDeps,
   getAssistantBatchKind,
   loadAssistantBatch,
   runAssistantBatch,
-  type AssistantBatchDeps,
 } from '@webapp/ai/workflows/assistantBatches'
 import type { resolveBatchModel } from '@webapp/ai/workflows/batchModel'
-
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
+
 import { requireCategory } from './categoryItemsListMissingLabels'
 import { getSurveyLanguages } from './missingTexts'
 import { proposeChangeSet } from './proposeChangeSet'

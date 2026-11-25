@@ -1,10 +1,8 @@
-import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { Schemata } from '@common/model/db'
-
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { getUserGroupAccessCondition } from '@server/modules/surveyRdb/repository/dataView/userGroupAccessCondition'
-
 import * as SB from '../../utils/surveyBuilder'
 
 const user = { uuid: 'test-data-explorer-access-checks-user' }

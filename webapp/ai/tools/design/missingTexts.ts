@@ -2,9 +2,8 @@
  * The missing-texts rule shared by the missing translations suggestion and survey_listMissingTexts: a text is
  * missing in a language when it is blank there and filled in another survey language.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import { getLabelValue } from '@webapp/ai/changeSets/operations'
 import type { LabelKind } from '@webapp/ai/changeSets/types'
 

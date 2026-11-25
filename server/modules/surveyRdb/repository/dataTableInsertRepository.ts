@@ -1,13 +1,12 @@
-import type { DbClient } from '@server/db/db'
-import type { ArenaSurvey, ArenaAnyNodeDef, ArenaNodeDefEntity } from '@openforis/arena-core'
-import { insertAllQueryBatch } from '@server/db/dbUtils'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
 
 import { Schemata, TableDataNodeDef } from '@common/model/db'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeRefData from '@core/record/nodeRefData'
 import * as Node from '@core/record/node'
-
+import * as NodeRefData from '@core/record/nodeRefData'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import type { DbClient } from '@server/db/db'
+import { insertAllQueryBatch } from '@server/db/dbUtils'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
 const getSelectQuery = ({

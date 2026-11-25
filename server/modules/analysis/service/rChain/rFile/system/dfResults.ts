@@ -1,11 +1,12 @@
-import type RChain from '../../rChain'
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
-import { quote } from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+
 import { ColumnNodeDef, TableNode, ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
+import { quote } from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import type RChain from '../../rChain'
+import { dfVar, rm, setVar, sqldf } from '../../rFunctions'
 
 const categoryTempVar = 'Category'
 const categoryValuesTempVar = 'Category_values'

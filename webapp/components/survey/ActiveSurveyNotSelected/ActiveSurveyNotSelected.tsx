@@ -1,10 +1,10 @@
 import './ActiveSurveyNotSelected.scss'
 
-import { Link } from 'react-router'
 import { Trans } from 'react-i18next'
+import { Link } from 'react-router'
 
-import { TransTitle } from '@webapp/components/TransTitle'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { TransTitle } from '@webapp/components/TransTitle'
 import { useOnNewSurveyClick } from '@webapp/store/user/hooks'
 
 export const ActiveSurveyNotSelected = () => {

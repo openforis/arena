@@ -1,12 +1,10 @@
-import * as User from '@core/user/user'
 import { getLanguageLabel } from '@core/app/languages'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurveyId, useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
-import { UserActions, useUser } from '@webapp/store/user'
-
+import * as User from '@core/user/user'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { useAppDispatch } from '@webapp/store'
+import { useSurveyId, useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { UserActions, useUser } from '@webapp/store/user'
 
 export const SurveyPreferredLanguageSelector = () => {
   const dispatch = useAppDispatch()

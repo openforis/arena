@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import * as UiState from '../state'
 
 export const stateKey = 'dialogConfirm'

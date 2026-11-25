@@ -1,21 +1,20 @@
 import type { Router } from 'express'
-import * as Request from '@server/utils/request'
-import { parseItemsLimit } from './categoryItemsLimit'
-import * as Response from '@server/utils/response'
-import { sendRouteError } from '@server/utils/sendRouteError'
 
-import * as Survey from '@core/survey/survey'
+import { FileFormats } from '@core/fileFormats'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as ObjectUtils from '@core/objectUtils'
-import { FileFormats } from '@core/fileFormats'
-
-import * as FileUtils from '@server/utils/file/fileUtils'
+import * as Survey from '@core/survey/survey'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
-import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as CategoryService from '../service/categoryService'
+
+import { parseItemsLimit } from './categoryItemsLimit'
 
 // props edited by the category editor: the other ones have dedicated routes (e.g. extradef, with validation)
 const categoryUpdatablePropKeys = [

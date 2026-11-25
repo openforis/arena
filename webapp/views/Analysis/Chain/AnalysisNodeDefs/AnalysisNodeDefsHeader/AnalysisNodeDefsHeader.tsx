@@ -1,15 +1,14 @@
 import './AnalysisNodeDefsHeader.scss'
+
 import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
-
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { Button } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useAppDispatch } from '@webapp/store'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 type AnalysisNodeDefsHeaderProps = {
   toggleShowSamplingNodeDefs: () => void

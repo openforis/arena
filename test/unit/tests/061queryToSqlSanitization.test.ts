@@ -1,5 +1,5 @@
-import * as Expression from '@core/expressionParser/expression'
 import { Sort } from '@common/model/query'
+import * as Expression from '@core/expressionParser/expression'
 import * as DbUtils from '@server/db/dbUtils'
 
 const identifier = (name: string) => ({ type: 'Identifier', name })

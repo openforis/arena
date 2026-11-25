@@ -1,14 +1,12 @@
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import * as User from '@core/user/user'
-
 import { PanelRight } from '@webapp/components'
-
-import { useSurveyUuid } from '@webapp/store/survey/hooks'
-
-import { UserAuthGroupExtraPropsEditor } from '../../UserEdit/UserAuthGroupExtraPropsEditor'
-import { useOnSaveExtraProps } from './useOnSaveExtraProps'
 import { useOnValueChange } from '@webapp/components/hooks'
+import { useSurveyUuid } from '@webapp/store/survey/hooks'
+import { UserAuthGroupExtraPropsEditor } from '../../UserEdit/UserAuthGroupExtraPropsEditor'
+
+import { useOnSaveExtraProps } from './useOnSaveExtraProps'
 
 const buildUserUpdated = ({ surveyUuid, userToUpdate }) => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)

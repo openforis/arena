@@ -1,8 +1,8 @@
 import { useCallback, useLayoutEffect, useRef } from 'react'
 import type { KeyboardEvent, RefObject } from 'react'
 
-import { isEditableTarget, resolveMapShortcut } from './shortcuts/mapShortcuts'
 import type { MapShortcutAction } from './shortcuts/mapShortcuts'
+import { isEditableTarget, resolveMapShortcut } from './shortcuts/mapShortcuts'
 
 export type MapShortcutHandlers = Partial<Record<MapShortcutAction, () => void>>
 

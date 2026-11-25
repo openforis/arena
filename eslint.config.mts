@@ -1,18 +1,15 @@
-import type { ESLint } from 'eslint'
-import { defineConfig } from 'eslint/config'
-import globals from 'globals'
-import pluginReact from 'eslint-plugin-react'
-import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginTypeScript from '@typescript-eslint/eslint-plugin'
 import parserTypeScript from '@typescript-eslint/parser'
-
-// Testing Plugins
-import pluginJest from 'eslint-plugin-jest'
-import pluginPlaywright from 'eslint-plugin-playwright' // Used for Playwright Test E2E tests
-
-// Formatting Plugins
+import type { ESLint } from 'eslint'
+import { defineConfig } from 'eslint/config'
 import configPrettier from 'eslint-config-prettier'
+import pluginJest from 'eslint-plugin-jest'
+import pluginPlaywright from 'eslint-plugin-playwright'
 import pluginPrettier from 'eslint-plugin-prettier'
+import pluginReact from 'eslint-plugin-react'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
+import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort'
+import globals from 'globals'
 
 // the rule types of these plugins don't match ESLint 10's yet
 const pluginTypeScriptCompat = pluginTypeScript as unknown as ESLint.Plugin
@@ -51,7 +48,34 @@ export default defineConfig([
     },
   },
 
-  // 2. React and React Hooks Configuration
+  // 2. Imports order (groups separated by a blank line, alphabetical inside each group)
+  {
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+    plugins: {
+      'simple-import-sort': pluginSimpleImportSort,
+    },
+    rules: {
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            // side-effect imports (stylesheets, dotenv/config, polyfills): their order matters, they are not sorted
+            [String.raw`^\u0000`],
+            // external packages, react first
+            ['^react$', '^react-dom', String.raw`^@?\w`],
+            // Open Foris packages (arena-core, arena-server...)
+            ['^@openforis/'],
+            // project modules out of the current folder
+            ['^@(common|core|server|test|webapp)(/.*)?$', String.raw`^\.\.`],
+            // modules in the same folder
+            [String.raw`^\.`],
+          ],
+        },
+      ],
+    },
+  },
+
+  // 3. React and React Hooks Configuration
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     plugins: {
@@ -79,7 +103,7 @@ export default defineConfig([
 
   // --- TESTING CONFIGURATIONS (APPLIES ONLY TO TEST FILES) ---
 
-  // 3. Jest (Unit/Integration Tests) Configuration
+  // 4. Jest (Unit/Integration Tests) Configuration
   {
     // Apply this to files matching Jest naming convention
     files: ['test/**/*.ts', 'test/**/*.mts', '**/*.test.ts', '**/*.spec.ts'],
@@ -105,7 +129,7 @@ export default defineConfig([
     },
   },
 
-  // 4. Playwright Test (E2E Tests) Configuration
+  // 5. Playwright Test (E2E Tests) Configuration
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['test/e2e/**/*.ts'],
@@ -123,7 +147,7 @@ export default defineConfig([
 
   // --- FINAL FORMATTING & IGNORE ---
 
-  // 5. Prettier Integration (Must be the LAST configuration)
+  // 6. Prettier Integration (Must be the LAST configuration)
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     plugins: {
@@ -137,10 +161,11 @@ export default defineConfig([
     },
   },
 
-  // 6. Ignore Configuration
+  // 7. Ignore Configuration
   {
     ignores: [
       'node_modules/',
+      '.yarn/',
       'dist/',
       'build/',
       '.cache/',

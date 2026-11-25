@@ -1,21 +1,20 @@
 import { useSelector } from 'react-redux'
 
-import { Objects, Records, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaRecord } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Objects, Records } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as RecordCore from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as RecordCore from '@core/record/record'
-
+import * as Survey from '@core/survey/survey'
 import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
-import * as RecordState from '../state'
 import {
   getMultiplePageScopeEntityUuid as resolveMultiplePageScopeEntityUuid,
   getPageEntity as resolvePageEntity,
   hasUnresolvedMultipleAncestor,
 } from '../recordPageEntity'
+import * as RecordState from '../state'
 
 export type TreeItemStatus = {
   hasErrors: boolean

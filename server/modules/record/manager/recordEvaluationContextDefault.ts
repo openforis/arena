@@ -1,10 +1,9 @@
-import type { ArenaUser, ArenaSurvey, LanguageCode } from '@openforis/arena-core'
+import type { ArenaSurvey, ArenaUser, LanguageCode } from '@openforis/arena-core'
 
 import type { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
-
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 /**
  * Providers used by the expression evaluator on the server.

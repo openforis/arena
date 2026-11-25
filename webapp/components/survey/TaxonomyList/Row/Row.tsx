@@ -2,14 +2,12 @@ import './Row.scss'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-
 import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import WarningBadge from '@webapp/components/WarningBadge'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { State, useLocalState } from './store'
 

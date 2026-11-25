@@ -1,8 +1,8 @@
 import type { Response as ExpressResponse } from 'express'
+
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import SystemError, { StatusCodes } from '@core/systemError'
-
 import * as Log from '@server/log/log'
 
 import * as Response from './response'

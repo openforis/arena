@@ -1,17 +1,15 @@
 import http from 'node:http'
 import type { AddressInfo } from 'node:net'
 
-import { ENV } from '@core/processUtils'
+import { AiFeatureCategory } from '@common/ai/features'
 import * as AuthGroup from '@core/auth/authGroup'
+import { ENV } from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import { AiFeatureCategory } from '@common/ai/features'
-
 import * as AiApi from '@server/modules/ai/api/aiApi'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import { readAiPrefs, writeAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
-
 import { getContextUser } from '@test/integration/config/context'
 import { createSurveyMember, deleteUsers, runRouteChain } from '@test/utils/routePermissionTestUtils'
 import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'

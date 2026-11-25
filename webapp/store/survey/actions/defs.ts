@@ -1,13 +1,12 @@
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-
+import * as Survey from '@core/survey/survey'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import * as API from '@webapp/service/api'
 import { LoaderActions } from '@webapp/store/ui/loader'
-
 import * as SurveyState from '../state'
 import * as SurveyStatusState from '../status/state'
+
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 const loadSurveyDefs =
   ({ navigate, draft, includeAnalysis, validate, showLoader = true }) =>

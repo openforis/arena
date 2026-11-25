@@ -1,15 +1,15 @@
 import './ScriptEditor.scss'
-
-import { useEffect, useRef } from 'react'
-
-import AceEditor from 'react-ace'
-import * as ace from 'ace-builds'
-
+// the ace modules below register themselves on the global ace, so it must be loaded first
+import 'ace-builds'
 import 'ace-builds/webpack-resolver'
 import 'ace-builds/src-noconflict/mode-r'
 import 'ace-builds/src-noconflict/theme-github'
 import 'ace-builds/src-noconflict/ext-searchbox'
 import 'ace-builds/src-noconflict/ext-language_tools'
+
+import { useEffect, useRef } from 'react'
+import * as ace from 'ace-builds'
+import AceEditor from 'react-ace'
 
 const aceLangTools = ace.require('ace/ext/language_tools')
 const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools

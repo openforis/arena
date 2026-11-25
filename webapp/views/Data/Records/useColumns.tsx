@@ -1,26 +1,24 @@
 import { useMemo } from 'react'
 
-import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as Validation from '@core/validation/validation'
-import * as DateUtils from '@core/dateUtils'
 import { Authorizer } from '@openforis/arena-core'
 
-import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-
+import * as A from '@core/arena'
+import * as DateUtils from '@core/dateUtils'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Validation from '@core/validation/validation'
 import { ButtonIconEditOrView } from '@webapp/components'
 import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
 import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
-
-import { TestId } from '@webapp/utils/testId'
-import { useUser } from '@webapp/store/user'
+import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRootSummaryDefs, useSurveyHasFileAttributes, useSurveySrsIndex } from '@webapp/store/survey/hooks'
+import { useUser } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
-import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
+import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordOwnerColumn } from './RecordOwnerColumn'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {

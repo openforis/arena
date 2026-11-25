@@ -1,5 +1,5 @@
-import { jobRowToMonitorSummary, jobStatus } from '../../../server/job/jobUtils'
 import * as JobSerialized from '@common/job/jobSerialized'
+import { jobRowToMonitorSummary, jobStatus } from '../../../server/job/jobUtils'
 
 describe('jobRowToMonitorSummary', () => {
   test('extends jobRowToSummary with dateCreated, user and survey display fields', () => {

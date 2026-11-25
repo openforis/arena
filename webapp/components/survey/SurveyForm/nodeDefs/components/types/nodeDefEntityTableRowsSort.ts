@@ -1,8 +1,8 @@
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import * as CoreRecord from '@core/record/record'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
+import * as CoreRecord from '@core/record/record'
 import { SortOrder } from '@core/sortOrder'
+import * as NodeDef from '@core/survey/nodeDef'
 
 export interface SortCriterion {
   by: string // column node def uuid

@@ -1,8 +1,6 @@
-import Job, { type JobParams } from '@server/job/job'
-
-import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
-
+import * as Validation from '@core/validation/validation'
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '../../../manager/surveyManager'
 
 export default class SurveyInfoValidationJob extends Job {

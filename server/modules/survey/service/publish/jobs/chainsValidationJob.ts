@@ -2,11 +2,10 @@ import * as Chain from '@common/analysis/chain'
 import * as ChainValidator from '@common/analysis/chainValidator'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
+import * as DbUtils from '@server/db/dbUtils'
 import Job, { type JobParams } from '@server/job/job'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as DbUtils from '@server/db/dbUtils'
 
 export default class ChainsValidationJob extends Job {
   static readonly type: string = 'ChainsValidationJob'

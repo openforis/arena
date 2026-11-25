@@ -1,29 +1,27 @@
 import {
-  RecordNodesUpdater,
-  type ArenaUser,
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
+  type ArenaUser,
+  RecordNodesUpdater,
 } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-import * as ObjectUtils from '@core/objectUtils'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { db, DbClient } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
-import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
+import * as NodeRepository from '../../repository/nodeRepository'
 import * as RecordFileManager from '../recordFileManager'
+
 import { findFilesToRemove, removeFiles } from './nodeFilesRemover'
-import * as DbUtils from '@server/db/dbUtils'
 
 type NodesByUuid = { [nodeUuid: string]: ArenaRecordNode }
 

@@ -2,9 +2,7 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Category from '@core/survey/category'
-
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-
 import { State } from '../state'
 
 export const useEdit = ({ setState }) => {

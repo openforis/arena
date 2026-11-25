@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+
 import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 import { useConfirmAsync } from '@webapp/components/hooks'
+import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
 export type UserExtraPropItem = {
   uuid: string

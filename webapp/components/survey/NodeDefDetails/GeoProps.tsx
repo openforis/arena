@@ -1,5 +1,4 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { ButtonIconInfo } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'

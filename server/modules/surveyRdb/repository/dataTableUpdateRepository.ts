@@ -1,21 +1,22 @@
-import type { DbClient } from '@server/db/db'
 import type {
+  ArenaAnyNodeDef,
+  ArenaNodeDefEntity,
   ArenaRecord,
   ArenaRecordNode,
   ArenaSurvey,
-  ArenaNodeDefEntity,
-  ArenaAnyNodeDef,
 } from '@openforis/arena-core'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
+
 import { Schemata, TableDataNodeDef } from '@common/model/db'
 import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-import { type RdbUpdate, RdbUpdateTypes, RdbUpdates } from './rdbUpdates'
+
+import { type RdbUpdate, RdbUpdates, RdbUpdateTypes } from './rdbUpdates'
 
 const types = RdbUpdateTypes
 

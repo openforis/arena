@@ -3,13 +3,14 @@
  * the save, and the view derived from it. Every change of the state is an action, so the async work (list, test, save)
  * only reports what happened. Pure.
  */
-import { shouldShowLocalUrlHint, isOrgServerUrlRefused } from './providerAddress'
+import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
+
+import { isOrgServerUrlRefused, shouldShowLocalUrlHint } from './providerAddress'
 import { createDraft, isDraftDirty, type ProviderDraft } from './providerDraft'
 import { canRemoveKey, isApiKeyCleared, isApiKeyMissing } from './providerKey'
 import { type AiModel, listLocalModels, OTHER_MODEL_VALUE, pickLocalModel, resolveFetchedModel } from './providerModels'
 import { canSaveDraft } from './providerSave'
 import { buildTestKey, canTestDraft, type DraftTest } from './providerTest'
-import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import {
   getProviderTypeSpec,
   type ProviderDialogType,

@@ -1,22 +1,19 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-
-import {
-  checkAttributeEditable,
-  checkNodeEditable,
-  checkRecordEditable,
-} from '@webapp/ai/tools/cleaning/recordEditPermissions'
-
-import * as RecordUtils from '../../utils/recordUtils'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import {
   cleaningAdminUser,
   cleaningTestRecord,
   cleaningTestSurvey,
   newCleaningSurveyUser,
 } from '@test/unit/utils/aiCleaningTestUtils'
+import {
+  checkAttributeEditable,
+  checkNodeEditable,
+  checkRecordEditable,
+} from '@webapp/ai/tools/cleaning/recordEditPermissions'
+import * as RecordUtils from '../../utils/recordUtils'
 
 let survey: any
 

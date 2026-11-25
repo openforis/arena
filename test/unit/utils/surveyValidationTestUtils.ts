@@ -1,8 +1,8 @@
 /**
  * Helpers to give a test survey stored node definition validations.
  */
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 import { getDefByName } from './assistantTestUtils'

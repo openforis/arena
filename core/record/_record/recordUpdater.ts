@@ -1,10 +1,9 @@
-import { Records, Dates } from '@openforis/arena-core'
 import type { ArenaRecord, ArenaRecordNode, ArenaRecordNodesMap, ArenaValidation } from '@openforis/arena-core'
+import { Dates, Records } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as Validation from '@core/validation/validation'
 import * as Node from '@core/record/node'
+import * as Validation from '@core/validation/validation'
 
 import { keys } from './recordKeys'
 import * as RecordReader from './recordReader'

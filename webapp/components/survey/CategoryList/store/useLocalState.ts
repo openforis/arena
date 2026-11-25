@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-import { State } from './state'
 import { useOnValueChange } from '@webapp/components/hooks'
+
+import { State } from './state'
 
 export const useLocalState = (props) => {
   const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props

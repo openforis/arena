@@ -1,11 +1,10 @@
 import * as A from '@core/arena'
-
-import * as Validator from '@core/validation/validator'
-import * as Validation from '@core/validation/validation'
-import * as ValidationResult from '@core/validation/validationResult'
-import * as UserValidator from '@core/user/userValidator'
 import * as User from '@core/user/user'
 import { UserPasswordValidator } from '@core/user/userPasswordValidator'
+import * as UserValidator from '@core/user/userValidator'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
+import * as Validator from '@core/validation/validator'
 
 const getProp = (propName: string, defaultValue: unknown = undefined) => A.pathOr(defaultValue, propName.split('.'))
 

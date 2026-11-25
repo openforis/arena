@@ -24,12 +24,12 @@ import {
   getReviewLabelText,
   getSelectionState,
   groupReviewItems,
-  toggleSelection,
   type ReviewFilter,
   type ReviewGroup,
   type ReviewGroupBy,
   type ReviewItem,
   type SelectionState,
+  toggleSelection,
 } from './changeSetReviewModel'
 import type { ChangeSetSelection } from './useChangeSetSelection'
 import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'

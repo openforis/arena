@@ -1,5 +1,4 @@
 import en from '@core/i18n/resources/en/common'
-
 import type { AssistantMessageUsage } from '@webapp/ai/conversations/types'
 import { buildContextMeter, getContextMeterText } from '@webapp/components/ai/Assistant/contextMeterModel'
 

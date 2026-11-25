@@ -1,14 +1,12 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
-
+import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { getQueryChartType, toExplorerQuery } from '@webapp/store/dataExplorer/explorerQuery'
 import { showQuery } from '@webapp/store/dataExplorer/showQuery'
-
+import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import { getContextUser } from '../../integration/config/context'
 
 let survey: any = null
 const getUuid = (path: string) => NodeDef.getUuid(SurveyUtils.getNodeDefByPath({ survey, path }))

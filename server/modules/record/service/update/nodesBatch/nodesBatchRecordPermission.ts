@@ -1,7 +1,7 @@
 import type { ArenaRecord, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 
 /**
  * Returns the record with its survey uuid (needed by the Authorizer), taken from the survey when missing.

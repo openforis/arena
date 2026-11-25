@@ -1,32 +1,28 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { ENV } from '@core/processUtils'
-import { uuidv4 } from '@core/uuid'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryApi from '@server/modules/category/api/categoryApi'
 import * as RecordApi from '@server/modules/record/api/recordApi'
-import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
-import { NodesBatchProcessSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
 import { updateNodesBatch } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
-
-import { getContextUser } from '../config/context'
-
+import { NodesBatchProcessSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
+import * as SurveyApi from '@server/modules/survey/api/surveyApi'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { collectRoutes } from '@test/utils/routeUtils'
 import { callHandler, createFakeResponse } from '../../unit/utils/fakeExpress'
-
-import * as SB from '../../utils/surveyBuilder'
+import { createInProcessNodesBatchServiceDeps, TestRecordsUpdateThread } from '../../utils/nodesBatchTestUtils'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-import { createInProcessNodesBatchServiceDeps, TestRecordsUpdateThread } from '../../utils/nodesBatchTestUtils'
-import { collectRoutes } from '@test/utils/routeUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 /**
  * Calls the route handler (the last one of its chain, after the permission middlewares).

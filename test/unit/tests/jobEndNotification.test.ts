@@ -1,6 +1,6 @@
-import { JobRepository, WebSocketServer, type JobRow } from '@openforis/arena-server'
-import type { DbClient } from '@server/db/db'
+import { JobRepository, type JobRow, WebSocketServer } from '@openforis/arena-server'
 
+import type { DbClient } from '@server/db/db'
 import Job from '../../../server/job/job'
 import { startJobEnsuringEndNotification } from '../../../server/job/jobRunner'
 import { createJobThreadListeners } from '../../../server/job/jobThreadExecutor'

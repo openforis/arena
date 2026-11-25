@@ -1,5 +1,4 @@
 import * as JobSerialized from '@common/job/jobSerialized'
-
 import ProgressBar from '@webapp/components/ProgressBar'
 
 const colorByJobStatus: Record<string, 'primary' | 'error' | 'success'> = {

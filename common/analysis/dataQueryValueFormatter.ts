@@ -1,11 +1,10 @@
-import { Numbers, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type { ArenaI18n, ArenaSurvey } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Numbers } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 // Aggregate function results (mean, median, sum, etc.) are capped to this many decimal places
 const MAX_AGGREGATE_VALUE_DECIMAL_DIGITS = 3

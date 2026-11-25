@@ -1,12 +1,12 @@
 import { appModules, systemAdminModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/ModuleSwitch'
-
 import JobsMonitor from '../JobsMonitor'
-import AuthProviderEdit from './AuthProviders/AuthProviderEdit'
-import AuthProvidersList from './AuthProviders/AuthProvidersList'
 import MessageDetails from '../Message/MessageDetails'
 import { MessageList } from '../Message/MessageList'
 import SystemLogs from '../SystemLogs'
+
+import AuthProviderEdit from './AuthProviders/AuthProviderEdit'
+import AuthProvidersList from './AuthProviders/AuthProvidersList'
 
 const SystemAdmin = () => (
   <ModuleSwitch

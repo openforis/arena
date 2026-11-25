@@ -1,8 +1,7 @@
 import { FileFormats } from '@core/fileFormats'
-
 import Job, { type JobParams } from '@server/job/job'
-import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import { generateSchemaSummaryItems } from './schemaSummary'
 

@@ -1,17 +1,15 @@
 import './SurveyDependencyTree.scss'
 
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
-import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
-import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
+import * as Survey from '@core/survey/survey'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 

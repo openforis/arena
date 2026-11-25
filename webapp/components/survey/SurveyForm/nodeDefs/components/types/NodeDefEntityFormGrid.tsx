@@ -1,25 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { Responsive, WidthProvider } from 'react-grid-layout/legacy'
 import classNames from 'classnames'
+import type { LayoutItem } from 'react-grid-layout'
+import { Responsive, WidthProvider } from 'react-grid-layout/legacy'
+import { useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import type { ArenaNodeDefEntityChildPosition, ArenaRecordNode } from '@openforis/arena-core'
+
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
-import * as Node from '@core/record/node'
-
-import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/NodeDefSwitch'
-import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
+import * as Survey from '@core/survey/survey'
 import { useIsMountedRef } from '@webapp/components/hooks'
+import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
+import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/NodeDefSwitch'
+import { useAppDispatch } from '@webapp/store'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { pushDownItemsOverlappingResizedItem } from './gridLayoutPushDown'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaRecordNode, ArenaNodeDefEntityChildPosition } from '@openforis/arena-core'
-import type { LayoutItem } from 'react-grid-layout'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 

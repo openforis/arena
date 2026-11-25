@@ -1,18 +1,16 @@
 import { useParams, useSearchParams } from 'react-router'
 
 import * as User from '@core/user/user'
-
-import { useI18n } from '@webapp/store/system'
-import GuestError from '@webapp/components/guest/GuestError'
-import { ExternalLoginButtons } from '@webapp/components/guest/ExternalLoginButtons'
-import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
-import { LoginActions } from '@webapp/store/login'
-
-import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
-
-import { useResetPassword } from './store/hooks'
 import { Button } from '@webapp/components'
 import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/components/form'
+import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
+import { ExternalLoginButtons } from '@webapp/components/guest/ExternalLoginButtons'
+import GuestError from '@webapp/components/guest/GuestError'
+import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
+import { LoginActions } from '@webapp/store/login'
+import { useI18n } from '@webapp/store/system'
+
+import { useResetPassword } from './store/hooks'
 
 const ResetPassword = () => {
   const i18n = useI18n()

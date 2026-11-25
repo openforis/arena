@@ -1,6 +1,5 @@
 import { ButtonDownload } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
-
 import { useSurveyId } from '@webapp/store/survey'
 
 type HeaderLeftProps = {

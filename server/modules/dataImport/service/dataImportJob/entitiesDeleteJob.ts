@@ -1,9 +1,9 @@
-import type { JobParams } from '@server/job/job'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
-import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as Record from '@core/record/record'
+import type { JobParams } from '@server/job/job'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+
 import DataImportBaseJob from './dataImportBaseJob'
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 

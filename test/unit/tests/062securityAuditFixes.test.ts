@@ -1,10 +1,9 @@
 import { ClusterBus } from '@openforis/arena-server'
 
 import * as Expression from '@core/expressionParser/expression'
+import { validateCycles } from '@core/survey/_surveyValidator/surveyCyclesValidator'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
-import { validateCycles } from '@core/survey/_surveyValidator/surveyCyclesValidator'
-
 import * as JobManager from '@server/job/jobManager'
 
 describe('Survey cycles validation', () => {

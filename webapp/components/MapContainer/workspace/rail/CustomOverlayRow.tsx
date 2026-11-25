@@ -1,11 +1,10 @@
-import type { ReactElement } from 'react'
 import { IconButton } from '@mui/material'
+import type { ReactElement } from 'react'
 
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
-import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 import type { MapCustomOverlay } from '../layers/MapCustomOverlaysContext'
+import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 
 /**
  * Row of an added layer in the Layers tab: visibility, opacity and remove.

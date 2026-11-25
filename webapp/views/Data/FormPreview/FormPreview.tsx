@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import Record from '@webapp/components/survey/Record'
-import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useAppDispatch } from '@webapp/store'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 /**
  * Preview of the draft form (in a temporary preview record) for data entry users: it goes back to the records list when closed.

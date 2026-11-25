@@ -1,10 +1,9 @@
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
-
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useAppDispatch } from '@webapp/store'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 const pValueToItem = (value) => ({ value, label: String(value) })
 

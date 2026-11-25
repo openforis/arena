@@ -1,25 +1,22 @@
-import { Objects, Queue, SystemError, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
+import { type ArenaRecord, type ArenaSurvey, Objects, Queue, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-
-import { db, type DbClient } from '@server/db/db'
-import * as Log from '@server/log/log'
-
-import Thread from '@server/threads/thread'
-import IdleTimeoutCache from '@server/utils/idleTimeoutCache'
-
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import { isUuid } from '@core/uuid'
-
+import { db, type DbClient } from '@server/db/db'
+import * as Log from '@server/log/log'
+import Thread from '@server/threads/thread'
+import IdleTimeoutCache from '@server/utils/idleTimeoutCache'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordManager from '../../../manager/recordManager'
 import * as NodeRepository from '../../../repository/nodeRepository'
-import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 import { type NodesBatchProcessorDeps, processNodesBatch } from '../nodesBatch/nodesBatchProcessor'
 import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
+
+import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 

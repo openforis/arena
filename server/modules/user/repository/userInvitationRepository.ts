@@ -1,9 +1,10 @@
-import type { ArenaUser, ArenaSurvey } from '@openforis/arena-core'
-import { db, DbClient } from '@server/db/db'
+import camelize from 'camelize'
+
+import type { ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import camelize from 'camelize'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 export const tableName = 'user_invitation'

@@ -2,7 +2,7 @@
  * Module-level registry of the running turns and in-flight saves, so logout can stop the answers and wait for
  * their final saves before it resets the panel. The saves are not skipped: the conversations stay stored.
  */
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 
 export type AssistantTurnRegistry = {
   register: (controller: AbortController) => void

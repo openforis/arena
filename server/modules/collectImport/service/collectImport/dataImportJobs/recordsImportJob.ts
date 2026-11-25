@@ -1,30 +1,27 @@
-import type { ArenaUser, ArenaSurvey, ArenaRecordNode, ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaRecord, ArenaRecordNode, ArenaSurvey, ArenaUser } from '@openforis/arena-core'
 import { Authorizer, Queue } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
+import * as A from '@core/arena'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 import * as User from '@core/user/user'
-
 import BatchPersister from '@server/db/batchPersister'
-import * as FileXml from '@server/utils/file/fileXml'
 import Job, { type JobParams } from '@server/job/job'
-import UnauthorizedError from '@server/utils/unauthorizedError'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import * as SurveyManager from '../../../../survey/manager/surveyManager'
-import * as RecordManager from '../../../../record/manager/recordManager'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import * as FileXml from '@server/utils/file/fileXml'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
-
+import * as RecordManager from '../../../../record/manager/recordManager'
+import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
+
 import * as CollectAttributeValueExtractor from './collectAttributeValueExtractor'
 
 const categoryItemProvider = CategoryItemProviderDefault

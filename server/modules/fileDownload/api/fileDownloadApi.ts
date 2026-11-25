@@ -2,13 +2,11 @@ import type { Response as ExpressResponse, Router } from 'express'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { getExtensionByFileFormat } from '@core/fileFormats'
-
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 export const sendTempFileToResponse = ({
   res,

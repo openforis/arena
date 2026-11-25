@@ -1,16 +1,15 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
-import * as A from '@core/arena'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 
+import * as A from '@core/arena'
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
-import * as Expression from '@core/expressionParser/expression'
-
-import ExpressionsProp, { type ExpressionsPropProps } from './ExpressionsProp'
 import { Fieldset } from '@webapp/components/Fieldset'
 import Radiobox from '@webapp/components/form/Radiobox'
 import { TestId } from '@webapp/utils/testId'
-
 import { State } from '../store'
+
+import ExpressionsProp, { type ExpressionsPropProps } from './ExpressionsProp'
 
 const defaultRadioModes = {
   none: 'none',

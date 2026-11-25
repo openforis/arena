@@ -1,5 +1,4 @@
 import { AppInfo } from '@core/app/appInfo'
-
 import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 

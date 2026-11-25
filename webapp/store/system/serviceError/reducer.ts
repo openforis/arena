@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActionTypes } from '../actionTypes'
+
 import * as ServiceErrorActions from './actions'
 import * as ServiceErrorState from './state'
 

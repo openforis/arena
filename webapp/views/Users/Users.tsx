@@ -2,24 +2,22 @@ import { useMemo } from 'react'
 
 import { Authorizer, Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'
-
+import * as Survey from '@core/survey/survey'
 import { appModules, userModules } from '@webapp/app/appModules'
-
 import ModuleSwitch from '@webapp/components/ModuleSwitch'
-import { useUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
-
-import { UsersList } from './UsersList'
-import UsersListSurvey from './UsersListSurvey'
-import UserInvite from './UserInvite'
-import UserEdit from './UserEdit'
-import { UsersAccessRequest } from './UsersAccessRequest'
-import UserPasswordChange from './UserPasswordChange'
-import User2FADevice from './User2FADevice'
+import { useUser } from '@webapp/store/user'
 import UserGroupsEditor from '../UserGroups'
 import UserGroupEdit from '../UserGroups/UserGroupEdit'
+
+import User2FADevice from './User2FADevice'
+import UserEdit from './UserEdit'
+import UserInvite from './UserInvite'
+import UserPasswordChange from './UserPasswordChange'
+import { UsersAccessRequest } from './UsersAccessRequest'
+import { UsersList } from './UsersList'
+import UsersListSurvey from './UsersListSurvey'
 
 const Users = () => {
   const user = useUser()

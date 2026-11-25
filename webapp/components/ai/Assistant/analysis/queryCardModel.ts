@@ -1,8 +1,7 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
-
+import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import { getQueryChartType } from '@webapp/store/dataExplorer/explorerQuery'
 

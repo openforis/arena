@@ -1,36 +1,35 @@
 import { useMemo, useState } from 'react'
 import { Box } from '@mui/material'
-import type { ArenaRecord, ArenaAnyNodeDef } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
+import type { ArenaAnyNodeDef, ArenaRecord } from '@openforis/arena-core'
 
 import {
-  PrintOrientations,
+  type PrintableExportFormat,
   PrintableExportFormats,
+  type PrintableExportScope,
   PrintableExportScopes,
   type PrintOrientation,
-  type PrintableExportFormat,
-  type PrintableExportScope,
+  PrintOrientations,
 } from '@common/record/printableExport'
-
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import { useOnValueChange } from '@webapp/components/hooks'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { RadioButtonGroup } from '@webapp/components/RadioButtonGroup'
-import { useI18n } from '@webapp/store/system'
+import { getRecordPrintableExportUrl } from '@webapp/service/api/data/recordPrintableExportUrl'
 import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
+import { useI18n } from '@webapp/store/system'
 import { useRecord } from '@webapp/store/ui/record'
 import {
   getPageEntity,
   hasUnresolvedMultipleAncestor,
   type PagesUuidMap,
 } from '@webapp/store/ui/record/recordPageEntity'
-import { getRecordPrintableExportUrl } from '@webapp/service/api/data/recordPrintableExportUrl'
-import { useOnValueChange } from '@webapp/components/hooks'
+import { useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 
 type Props = {
   open: boolean

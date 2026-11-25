@@ -1,15 +1,12 @@
-import * as A from '@core/arena'
-
 import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as A from '@core/arena'
 import * as Record from '@core/record/record'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { TreeSelectViewMode } from '@webapp/model'
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
-
 import * as UiState from '../state'
 
 export const stateKey = 'surveyForm'

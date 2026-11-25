@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { Authorizer } from '@openforis/arena-core'
 
+import { parseMapSearchQuery } from '@core/geo/coordinateQuery'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
 import { findNodeDefByName, getCurrentNodeDefs } from '@webapp/ai/tools/common/nodeDefLookup'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
-import { parseMapSearchQuery } from '@core/geo/coordinateQuery'
 
 export const MAP_PROPOSE_LAYER_TOOL_NAME = 'map_proposeLayer'
 

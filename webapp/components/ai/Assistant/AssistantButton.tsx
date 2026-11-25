@@ -8,9 +8,9 @@ import { TestId } from '@webapp/utils/testId'
 
 import { isAssistantShown } from './assistantAreas'
 import { toggleAssistantPanel } from './assistantPanelActions'
-import { useAssistantAreas } from './useAssistantAreas'
 import { getAssistantButtonLabel } from './suggestions/suggestionsModel'
 import { useVisibleSuggestions } from './suggestions/useVisibleSuggestions'
+import { useAssistantAreas } from './useAssistantAreas'
 import { useAssistantPanel } from './useAssistantPanel'
 
 /**

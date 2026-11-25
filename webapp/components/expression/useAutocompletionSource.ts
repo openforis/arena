@@ -1,10 +1,9 @@
 import { useCallback, useMemo } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
-
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import * as Survey from '@core/survey/survey'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import * as ExpressionVariables from './expressionVariables'
 import { getAvailableFunctionExamples } from './functionExamples'

@@ -4,20 +4,18 @@ import React, { useEffect, useMemo } from 'react'
 import classNames from 'classnames'
 
 import { appModules } from '@webapp/app/appModules'
-import { AppReducer, AppState } from '@webapp/store/app'
-import { injectReducers } from '@webapp/store'
-
-import { useAuthCanCleanseRecords, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
-import ModuleSwitch from '@webapp/components/ModuleSwitch'
-
 import { AssistantAreasProvider, AssistantPanelHost } from '@webapp/components/ai/Assistant'
 import { LocalServerConsentHost } from '@webapp/components/ai/LocalServerConsentHost'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { WhatsNewDialog } from '@webapp/components/WhatsNew'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { injectReducers } from '@webapp/store'
+import { AppReducer, AppState } from '@webapp/store/app'
+import { useAuthCanCleanseRecords, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
+import { FileUploadDialog } from './FileUploadDialog'
 import Header from './Header'
 import JobMonitor from './JobMonitor'
-import { FileUploadDialog } from './FileUploadDialog'
 import ServiceErrors from './ServiceErrors'
 import SideBar from './SideBar'
 

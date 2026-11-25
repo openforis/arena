@@ -1,7 +1,6 @@
 import type { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 

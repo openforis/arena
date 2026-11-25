@@ -1,20 +1,16 @@
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
-
-import { getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // collects the messages the thread would post to the main thread, so it can run in-process
 class TestRecordsUpdateThread extends RecordsUpdateThread {

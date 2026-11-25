@@ -1,13 +1,13 @@
-import * as Survey from '@core/survey/survey'
 import type { ArenaUser } from '@openforis/arena-core'
+
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as Survey from '@core/survey/survey'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 // Users are built directly (not via getContextUser()) so each test can give them different
 // "extra" props, read by userProp() (@openforis/arena-core Users.getCombinedExtraProps).

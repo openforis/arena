@@ -1,9 +1,8 @@
 import * as A from '@core/arena'
-
 import { isBlank, isNotBlank, trim } from '@core/stringUtils'
+import { thisVariable } from '../expressionConstants'
 
 import { types } from './types'
-import { thisVariable } from '../expressionConstants'
 
 export interface ExpressionNode {
   type: string

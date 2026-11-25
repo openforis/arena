@@ -1,17 +1,15 @@
+import { Locator, Page } from '@playwright/test'
 import path from 'node:path'
 
-import { Locator, Page } from '@playwright/test'
-
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, generateSurveyName, test } from '../fixtures'
+import { ArenaApi } from '../fixtures/arenaApi'
 import {
   aoiStatusMessages,
   insertAreaOfInterestSurvey,
   pilotAreaLabel,
   pilotAreaName,
 } from '../fixtures/seed/areaOfInterestSurvey'
-import { ArenaApi } from '../fixtures/arenaApi'
 import { RecordForm } from '../helpers/recordForm'
 import { Urls } from '../helpers/urls'
 import {
