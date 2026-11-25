@@ -1,7 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import ExpressionEditor from '@webapp/components/expression/expressionEditor'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ExpressionEditor from '@webapp/components/expression/ExpressionEditor'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import type { ArenaAnyNodeDef, ArenaValidation } from '@openforis/arena-core'
 
 type NodeDefSingleExpressionPropProps = {

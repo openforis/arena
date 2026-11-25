@@ -13,7 +13,7 @@ import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { Dropzone } from '@webapp/components'
-import Checkbox from '@webapp/components/form/checkbox'
+import Checkbox from '@webapp/components/form/Checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'

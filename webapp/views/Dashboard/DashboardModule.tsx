@@ -1,5 +1,5 @@
 import { appModules } from '@webapp/app/appModules'
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 
 import Dashboard from './Dashboard'
 

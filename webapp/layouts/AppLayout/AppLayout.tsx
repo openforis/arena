@@ -9,7 +9,7 @@ import { injectReducers } from '@webapp/store'
 
 import { useAuthCanCleanseRecords, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 
 import { AssistantAreasProvider, AssistantPanelHost } from '@webapp/components/ai/Assistant'
 import { LocalServerConsentHost } from '@webapp/components/ai/LocalServerConsentHost'

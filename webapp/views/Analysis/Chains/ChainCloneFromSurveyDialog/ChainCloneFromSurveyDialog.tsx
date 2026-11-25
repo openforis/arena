@@ -15,7 +15,7 @@ import { ChainActions } from '@webapp/store/ui/chain'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { useAppDispatch } from '@webapp/store'
 
 type ChainItem = {

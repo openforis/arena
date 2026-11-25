@@ -14,8 +14,8 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, NumberFormats } from '@webapp/components/form/Input'
-import Checkbox from '@webapp/components/form/checkbox'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import Checkbox from '@webapp/components/form/Checkbox'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 import { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
 import { State, useNodeDefEditReadOnly } from './store'

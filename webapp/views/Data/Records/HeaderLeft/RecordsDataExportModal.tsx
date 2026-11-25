@@ -1,6 +1,6 @@
 import './RecordsDataExportModal.scss'
 
-import { Modal, ModalBody } from '@webapp/components/modal'
+import { Modal, ModalBody } from '@webapp/components/Modal'
 import DataExport from '../../DataExport'
 
 type RecordsDataExportModalProps = {

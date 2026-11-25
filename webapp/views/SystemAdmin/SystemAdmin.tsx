@@ -1,5 +1,5 @@
 import { appModules, systemAdminModules } from '@webapp/app/appModules'
-import ModuleSwitch from '@webapp/components/moduleSwitch'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 
 import JobsMonitor from '../JobsMonitor'
 import AuthProviderEdit from './AuthProviders/AuthProviderEdit'

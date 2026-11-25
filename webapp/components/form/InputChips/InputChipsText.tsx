@@ -3,12 +3,12 @@ import './InputChips.scss'
 import classNames from 'classnames'
 
 import { ButtonAdd } from '@webapp/components/buttons'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 import { SimpleTextInput } from '../SimpleTextInput'
 
 import { useLocalState, State } from './store'
-import Chip from '../chip'
+import Chip from '../Chip'
 import type { ArenaValidation } from '@openforis/arena-core'
 
 type InputChipsTextProps = {

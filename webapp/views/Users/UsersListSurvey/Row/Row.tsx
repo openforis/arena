@@ -10,7 +10,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/Users/UserEdit/store/actions/useOnInviteRepeat'
 import { Button, ButtonIconEditOrView, ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import ProfilePicture from '@webapp/components/profilePicture'
+import ProfilePicture from '@webapp/components/ProfilePicture'
 import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 type RowProps = {

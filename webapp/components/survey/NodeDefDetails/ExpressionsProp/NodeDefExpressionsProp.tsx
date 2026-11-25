@@ -7,7 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp, { type ExpressionsPropProps } from './ExpressionsProp'
 import { Fieldset } from '@webapp/components/Fieldset'
-import Radiobox from '@webapp/components/form/radiobox'
+import Radiobox from '@webapp/components/form/Radiobox'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from '../store'

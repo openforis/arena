@@ -11,7 +11,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 
 import { Button, ButtonDelete } from '@webapp/components'
-import ErrorBadge from '@webapp/components/errorBadge'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 

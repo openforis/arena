@@ -7,7 +7,7 @@ import * as UserAccessRequest from '@core/user/userAccessRequest'
 
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { ReCaptcha } from '@webapp/components/ReCaptcha'
 import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
 

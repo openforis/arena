@@ -1,6 +1,6 @@
 import { Popup } from 'react-leaflet'
 
-import Markdown from '@webapp/components/markdown'
+import Markdown from '@webapp/components/Markdown'
 import { useI18n } from '@webapp/store/system'
 import { LocationSummaryGenerator } from '@webapp/views/Data/MapView/common/locationSummaryGenerator'
 

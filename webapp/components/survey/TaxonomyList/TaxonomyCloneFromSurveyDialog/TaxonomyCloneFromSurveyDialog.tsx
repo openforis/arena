@@ -15,7 +15,7 @@ import { useSurveyId } from '@webapp/store/survey'
 import { FormItem } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 
 import { getTaxonomyDuplicateCheck } from './taxonomyCloneDuplicateCheck'
 
