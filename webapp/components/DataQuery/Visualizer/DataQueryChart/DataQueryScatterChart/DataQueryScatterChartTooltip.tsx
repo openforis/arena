@@ -9,7 +9,7 @@ import * as Record from '@core/record/record'
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { RecordKeyValuesExtractor } from '@webapp/views/App/views/Data/Records/recordKeyValuesExtractor'
+import { RecordKeyValuesExtractor } from '@webapp/views/Data/Records/recordKeyValuesExtractor'
 
 type FormItemProps = {
   label: string

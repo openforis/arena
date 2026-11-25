@@ -1,6 +1,6 @@
 import { Marker } from 'react-leaflet'
 
-import { useElevation } from '@webapp/views/App/views/Data/MapView/common/useElevation'
+import { useElevation } from '@webapp/views/Data/MapView/common/useElevation'
 
 import { useMapMarker } from './useMapMarker'
 import { MapMarkerPopup } from './MapMarkerPopup'

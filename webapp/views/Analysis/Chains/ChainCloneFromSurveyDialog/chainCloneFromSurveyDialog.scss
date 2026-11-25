@@ -1,0 +1,22 @@
+@use '~@webapp/style/vars' as *;
+
+.chain-clone-from-survey-dialog {
+  &__entity-check-list {
+    .icon {
+      margin-right: 0.5em;
+    }
+  }
+
+  &__entity-icon--found {
+    color: $colorSuccess;
+  }
+
+  &__entity-icon--missing {
+    color: $colorError;
+  }
+
+  &__skip-missing-checkbox-wrapper {
+    display: flex;
+    margin-top: 0.5em;
+  }
+}

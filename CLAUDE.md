@@ -197,7 +197,7 @@ When adding a new node definition type or modifying the survey schema:
 1. Update domain model in `core/survey/nodeDef*` (`nodeDef.ts`, `nodeDefLayout.ts`, ...)
 2. Update database repository in `server/modules/nodeDef/repository/`
 3. Update API endpoints in `server/modules/nodeDef/api/`
-4. Update React components in `webapp/views/App/views/Designer/`
+4. Update React components in `webapp/views/Designer/`
 5. Update Redux slice in `webapp/store/survey/`
 
 ### Working with Database Migrations

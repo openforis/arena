@@ -1,8 +1,8 @@
 import type { ArenaSurvey } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordStep from '@core/record/recordStep'
-import { surveyIncludesCleansingStep } from '@webapp/views/App/views/Dashboard/utils/surveyIncludesCleansingStep'
-import { surveyHasGeoAttributes } from '@webapp/views/App/views/Dashboard/utils/surveyHasGeoAttributes'
+import { surveyIncludesCleansingStep } from '@webapp/views/Dashboard/utils/surveyIncludesCleansingStep'
+import { surveyHasGeoAttributes } from '@webapp/views/Dashboard/utils/surveyHasGeoAttributes'
 
 describe('surveyIncludesCleansingStep', () => {
   it('returns true when an auth group has cleansing step', () => {
