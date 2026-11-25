@@ -896,7 +896,10 @@ export const mergeRecords = (
     return {
       record: recordTargetUpdated,
       nodesCreated: nodesArray.filter((node) => Node.isCreated(node)).length,
-      nodesUpdated: nodesArray.filter((node) => Node.isUpdated(node)).length,
+      // updated values: entities can be updated only in their meta or date modified
+      nodesUpdated: nodesArray.filter(
+        (node) => Node.isUpdated(node) && !NodeDef.isEntity(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
+      ).length,
     }
   })
 
