@@ -3,6 +3,7 @@ export default {
   since: 'Od verzije {{version}}',
   experimental: 'Eksperimentalno',
   dontShowAgain: `Ne prikazuj ponovo`,
+  showChangelog: `Sve izmene i ispravke (dnevnik izmena)`,
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
