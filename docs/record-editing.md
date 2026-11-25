@@ -49,7 +49,7 @@ Message types are in `thread/recordsThreadMessageTypes.js`: `recordInit`, `recor
 `nodeDelete`, `recordReload`, `recordClear`, `surveyClear`, `threadKill`.
 
 The thread passes the app info (`AppInfo.currentAppInfo`: `arena`, web platform, Arena version) to the record
-updates, for the expression functions `appId()`, `appVersion()` and `appPlatform()`. Background jobs (imports,
+updates, for the expression functions `appId()`, `appIdLabel()`, `appVersion()` and `appPlatform()`. Background jobs (imports,
 record merges) don't pass it: arena-core then keeps the values of the expressions using those functions.
 
 ## Opening and closing a record
