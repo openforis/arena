@@ -2,7 +2,7 @@ import './AcceptRequestPanel.scss'
 
 import classNames from 'classnames'
 
-import { Countries } from '@core/Countries'
+import { Countries } from '@core/countries'
 import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'

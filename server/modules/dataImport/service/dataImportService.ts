@@ -9,8 +9,8 @@ import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
-import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
-import DataImportJob from './DataImportJob/DataImportJob'
+import DataImportValidationJob from '@server/modules/dataImport/service/dataImportValidationJob'
+import DataImportJob from './dataImportJob/dataImportJob'
 
 /**
  * Checks that the user can use the specified Collect data import options (the UI offers them only to some users).

@@ -1,4 +1,4 @@
-import ItemsCache from './ItemsCache'
+import ItemsCache from './itemsCache'
 
 const defaultOptions = {
   itemIdleTimeoutSeconds: 15 * 60, // 15 mins

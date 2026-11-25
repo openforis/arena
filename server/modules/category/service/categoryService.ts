@@ -24,10 +24,10 @@ import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenera
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
-import CategoriesExportJob from './CategoriesExportJob'
-import CategoryGeoPackageExportJob from './CategoryGeoPackageExportJob'
+import CategoriesExportJob from './categoriesExportJob'
+import CategoryGeoPackageExportJob from './categoryGeoPackageExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
-import CategoriesBatchImportJob from './CategoriesBatchImportJob'
+import CategoriesBatchImportJob from './categoriesBatchImportJob'
 
 export const importCategory = ({
   user,

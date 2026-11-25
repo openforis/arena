@@ -6,7 +6,7 @@ import { DEFAULT_SRS_INDEX } from '@openforis/arena-core'
 import { uuidv4 } from '@core/uuid'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import SamplingPointDataWhispAnalysisJob from '@server/modules/geo/service/whispSamplingPointData/SamplingPointDataWhispAnalysisJob'
+import SamplingPointDataWhispAnalysisJob from '@server/modules/geo/service/whispSamplingPointData/samplingPointDataWhispAnalysisJob'
 import { WhispColumnsCollector } from '@server/modules/geo/service/whispSamplingPointData/whispResultsUtils'
 
 const csvContent = [

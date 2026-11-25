@@ -7,7 +7,7 @@ import { PointFactory, type ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SamplingPolygon from '@core/survey/SamplingPolygon'
+import * as SamplingPolygon from '@core/survey/samplingPolygon'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { Button, ButtonIconEdit } from '@webapp/components'

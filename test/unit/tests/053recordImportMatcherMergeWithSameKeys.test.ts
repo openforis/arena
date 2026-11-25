@@ -6,7 +6,7 @@ import { RecordImportAction } from '@common/dataImport/recordImportAction'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 
-import { determineRecordAction } from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
+import { determineRecordAction } from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
 
 import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'

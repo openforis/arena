@@ -23,7 +23,7 @@ import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportFlatDataParser from '../manager/categoryImportFlatDataParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
-import { CategoryValidationJob } from './CategoryValidationJob'
+import { CategoryValidationJob } from './categoryValidationJob'
 import * as CategoryService from './categoryService'
 
 const toNumber = (value: unknown) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value)

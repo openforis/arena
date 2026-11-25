@@ -2,9 +2,9 @@ import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
-import FlatDataImportJob from './FlatDataImportJob'
-import DataFilesImportJob from './DataFilesImportJob'
-import EntitiesDeleteJob from './EntitiesDeleteJob'
+import FlatDataImportJob from './flatDataImportJob'
+import DataFilesImportJob from './dataFilesImportJob'
+import EntitiesDeleteJob from './entitiesDeleteJob'
 
 const createInternalJobs = ({
   includeFiles,
