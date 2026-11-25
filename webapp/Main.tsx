@@ -13,7 +13,7 @@ import { BrowserRouter } from 'react-router'
 
 import i18nInstance from '@core/i18n/i18nFactory'
 import Arena from '@webapp/app/Arena'
-import { store } from '@webapp/store'
+import { store } from '@webapp/store/store'
 import { SurveyThemeBridge } from '@webapp/theme/SurveyThemeBridge'
 import { applyThemeMode, getThemePreference, resolveThemeMode } from '@webapp/theme/themeMode'
 
