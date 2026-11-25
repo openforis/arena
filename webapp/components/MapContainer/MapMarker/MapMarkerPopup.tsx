@@ -2,7 +2,7 @@ import { Popup } from 'react-leaflet'
 
 import Markdown from '@webapp/components/markdown'
 import { useI18n } from '@webapp/store/system'
-import { LocationSummaryGenerator } from '@webapp/views/App/views/Data/MapView/common/locationSummaryGenerator'
+import { LocationSummaryGenerator } from '@webapp/views/Data/MapView/common/locationSummaryGenerator'
 
 export const MapMarkerPopup = (props) => {
   const { point, title, elevation } = props

@@ -1,0 +1,31 @@
+@use '~@webapp/style/vars' as *;
+
+.analysis-node-defs {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: start;
+
+  .nodedef-tree-select {
+    border-right: 1px solid $colorOutline;
+  }
+
+  .analysis-node-defs__list {
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    .analysis-node-defs__list-content {
+      overflow-y: auto;
+    }
+  }
+}
+
+.analysis-node-defs-error {
+  height: 2rem;
+  display: flex;
+  flex-direction: row;
+
+  .tooltip-error {
+    position: inherit;
+    margin-right: 16px;
+  }
+}

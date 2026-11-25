@@ -31,7 +31,7 @@ import {
   type ScreenshotTarget,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 import type { LatLngBoundsLiteral } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
-import { useMapLayersPanel } from '@webapp/views/App/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
+import { useMapLayersPanel } from '@webapp/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type { ScreenshotStamp } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
 
 export type ScreenshotDialogState = {
