@@ -5,6 +5,7 @@ export default {
 
   model: 'Model',
   modelOther: 'Drugi (unesite id modela)...',
+  modelChooseFromList: 'Izaberite sa liste modela',
   baseUrl: 'Osnovni URL',
   apiKey: 'API ključ',
   apiKeyPlaceholder: 'Nalijepite API ključ vašeg provajdera',

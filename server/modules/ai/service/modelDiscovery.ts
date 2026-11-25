@@ -119,7 +119,8 @@ const listOpenAi = async ({ apiKey }) => {
 
 const listAnthropic = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.anthropic })
-  const json = await fetchJson('https://api.anthropic.com/v1/models', {
+  // one page of at most 20 models by default: the largest page (1000) holds them all
+  const json = await fetchJson('https://api.anthropic.com/v1/models?limit=1000', {
     headers: {
       Accept: 'application/json',
       'x-api-key': apiKey,

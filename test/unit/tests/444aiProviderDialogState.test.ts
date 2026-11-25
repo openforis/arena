@@ -164,6 +164,9 @@ describe('provider dialog state machine (444)', () => {
         models: [{ id: 'x' }],
       })
       expect(loaded.draft).toMatchObject({ model: 'my-deployment', modelFreeText: true })
+      // "Choose from the list" shows the select again, keeping the typed model
+      const backToList = run(loaded, { type: 'modelSelected', value: 'my-deployment' })
+      expect(backToList.draft).toMatchObject({ model: 'my-deployment', modelFreeText: false })
       const picked = run(loaded, { type: 'modelSelected', value: 'x' })
       expect(picked.draft).toMatchObject({ model: 'x', modelFreeText: false })
       const other = run(picked, { type: 'modelSelected', value: '__other__' })
