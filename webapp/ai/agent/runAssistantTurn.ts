@@ -2,42 +2,40 @@
  * One assistant turn: system prompt, history, tools, then the AI SDK tool loop streamed into the conversation.
  */
 import {
-  ToolChoiceViolationError,
-  streamText,
   type LanguageModel,
   type ModelMessage,
+  streamText,
   type TextStreamPart,
+  ToolChoiceViolationError,
   type ToolSet,
 } from 'ai'
-
-import * as Survey from '@core/survey/survey'
 
 import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
 import type { AiPolicy } from '@common/ai/policy'
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
 import { isWireObject } from '@common/ai/wire'
-
+import * as Survey from '@core/survey/survey'
+import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { getConversationDataClass, isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
-import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
-import { MAP_PROPOSE_LAYER_TOOL_NAME, getProposedMapLayer } from '@webapp/ai/tools/analysis/proposeMapLayer'
-import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
-import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
-import { loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import { CHARS_PER_TOKEN } from '@webapp/ai/engines/localServerProbe'
+import { type ResolvedModel, resolveModel, type ResolveModelParams } from '@webapp/ai/engines/resolveModel'
 import type { AiEngineLimits } from '@webapp/ai/engines/types'
-import { resolveModel, type ResolveModelParams, type ResolvedModel } from '@webapp/ai/engines/resolveModel'
+import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
+import { loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { getAiErrorKey, getAiErrorParams, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import { getProposedMapLayer, MAP_PROPOSE_LAYER_TOOL_NAME } from '@webapp/ai/tools/analysis/proposeMapLayer'
+import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import { getToolResultCap } from '@webapp/ai/tools/common/toolResult'
-import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
+import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
 import { APPLY_NOTE_PREFIX, buildTrimmedHistory, getHistoryBudget, getToolDefinitionChars } from './agentMessages'
-import { buildAssistantSystemPrompt, type AssistantPromptArea } from './assistantSystemPrompt'
+import { type AssistantPromptArea, buildAssistantSystemPrompt } from './assistantSystemPrompt'
 import { resolveAssistantTurnModel } from './turnModel'
 import { createTurnState, type TurnState } from './turnState'
 import { buildTurnUsage, estimateContextTokens, toContextTokens, type TurnUsageInputs } from './turnUsage'

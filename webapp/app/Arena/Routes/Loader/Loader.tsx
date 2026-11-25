@@ -1,4 +1,5 @@
 import './Loader.scss'
+
 import { useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 

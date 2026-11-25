@@ -1,9 +1,7 @@
-import * as A from '@core/arena'
-
-import { useI18n } from '@webapp/store/system'
-import InputChips from '@webapp/components/form/InputChips'
-
 import { getLanguageLabel, languageItemsSortedByEnLabel as appLanguages } from '@core/app/languages'
+import * as A from '@core/arena'
+import InputChips from '@webapp/components/form/InputChips'
+import { useI18n } from '@webapp/store/system'
 
 type LanguagesEditorProps = {
   idInput?: string

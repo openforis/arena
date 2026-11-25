@@ -1,13 +1,13 @@
 import {
+  isTileTemplateUrl,
   MAP_CUSTOM_LAYER_MAX_ZOOM,
   type MapImageFormat,
-  isTileTemplateUrl,
   mapImageFormats,
 } from '@core/map/customLayers/mapCustomLayer'
 import {
-  MAX_CAPABILITIES_LAYERS,
   type MapServiceCapabilities,
   type MapServiceLayer,
+  MAX_CAPABILITIES_LAYERS,
   toMapImageFormat,
 } from '@core/map/customLayers/mapServiceCapabilities'
 import { resolveServiceHref } from '@server/modules/geo/service/mapCapabilities/capabilitiesUrl'

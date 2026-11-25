@@ -1,8 +1,8 @@
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 
 // side effects of a prop change on the node def (shared by the form designer and the AI change sets);
 // each takes the node def with the prop already set

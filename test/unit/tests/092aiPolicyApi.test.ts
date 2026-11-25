@@ -2,7 +2,6 @@ import { ServiceRegistry, ServiceType, SurveyFactory } from '@openforis/arena-co
 import { UnauthorizedError } from '@openforis/arena-server'
 
 import * as AuthGroup from '@core/auth/authGroup'
-
 import { createSurveyAiPolicyRoutes } from '@server/modules/ai/api/surveyAiPolicyApi'
 import { getSurveyAiPolicy, updateSurveyAiPolicy } from '@server/modules/ai/service/surveyAiPolicyService'
 import {
@@ -10,7 +9,6 @@ import {
   requireSurveyViewPermission,
 } from '@server/modules/auth/authApiMiddleware'
 import * as Response from '@server/utils/response'
-
 import { callHandler, createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const surveyUuid = 'survey-1'

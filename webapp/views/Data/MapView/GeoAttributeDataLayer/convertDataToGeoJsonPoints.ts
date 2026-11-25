@@ -1,15 +1,13 @@
 import { latLngBounds } from 'leaflet'
 
-import { PointFactory, Points, type ArenaAnyNodeDef, type ArenaSRSIndex } from '@openforis/arena-core'
+import { type ArenaAnyNodeDef, type ArenaSRSIndex, PointFactory, Points } from '@openforis/arena-core'
 
-import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatter'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as StringUtils from '@core/stringUtils'
+import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import type { GeoAttributePointFeature } from '../common/mapPointTypes'
 
 const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n, survey }) => {

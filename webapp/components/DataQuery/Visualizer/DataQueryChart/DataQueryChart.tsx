@@ -2,18 +2,17 @@ import './DataQueryChart.scss'
 
 import React, { useRef } from 'react'
 
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
+import { ButtonDownload } from '@webapp/components/buttons'
 import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
-
-import { ButtonDownload } from '@webapp/components/buttons'
 import { downloadMultipleSvgsToPng } from '@webapp/utils/chartExportUtils'
 
 import { DataQueryAreaChart } from './DataQueryAreaChart'
 import { DataQueryBarChart } from './DataQueryBarChart'
-import { DataQueryPieChart } from './DataQueryPieChart'
 import { DataQueryLineChart } from './DataQueryLineChart'
+import { DataQueryPieChart } from './DataQueryPieChart'
 import { DataQueryScatterChart } from './DataQueryScatterChart'
-import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 const componentsByType: Record<string, React.ComponentType<any>> = {
   [DataExplorerState.chartTypes.area]: DataQueryAreaChart,

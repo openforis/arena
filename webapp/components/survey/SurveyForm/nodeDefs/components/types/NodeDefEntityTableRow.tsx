@@ -1,17 +1,17 @@
-import { useState, useRef, useImperativeHandle, forwardRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { elementOffset } from '@webapp/utils/domUtils'
+import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
+import { useAppDispatch } from '@webapp/store'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'
-import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
-
+import { elementOffset } from '@webapp/utils/domUtils'
 import NodeDeleteButton from '../NodeDeleteButton'
+
 import NodeDefEntityTableCell from './NodeDefEntityTableCell'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
 
 type NodeDefEntityTableRowProps = {
   edit: boolean

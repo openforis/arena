@@ -7,8 +7,8 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { Spinner } from '@webapp/components/Spinner'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { StatusPill } from '../StatusPill'
+
 import { LocalConsentRevoke } from './LocalConsentRevoke'
 
 /**

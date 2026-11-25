@@ -1,5 +1,4 @@
 import Job, { type JobParams } from '@server/job/job'
-
 import * as TempFileManager from '../manager/tempFileManager'
 
 /**

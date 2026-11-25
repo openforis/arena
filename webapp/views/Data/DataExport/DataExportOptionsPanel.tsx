@@ -3,17 +3,15 @@ import { useMemo } from 'react'
 import { DateFormats, Objects } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
-
 import { ExpansionPanel } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
 import { DateInput } from '@webapp/components/form/DateTimeInput'
-
-import { useI18n } from '@webapp/store/system'
+import { FormItem } from '@webapp/components/form/Input'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
-import { dataImportNonCompatibilityByOption, dataExportOptions as options } from './dataExportOptions'
+import { dataExportOptions as options, dataImportNonCompatibilityByOption } from './dataExportOptions'
 
 const availableFileFormats = [FileFormats.xlsx, FileFormats.csv]
 

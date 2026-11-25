@@ -1,7 +1,7 @@
 import type React from 'react'
+import { Tooltip } from 'react-leaflet'
 
 import { Colors } from '@webapp/utils/colors'
-import { Tooltip } from 'react-leaflet'
 
 const tooltipOpacity = 0.8
 

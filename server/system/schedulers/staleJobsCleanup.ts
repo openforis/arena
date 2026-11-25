@@ -3,9 +3,8 @@ import * as schedule from 'node-schedule'
 import { runWithClusterLock } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
-import * as Log from '@server/log/log'
-
 import { jobStatus } from '@server/job/jobUtils'
+import * as Log from '@server/log/log'
 
 const Logger = Log.getLogger('StaleJobsCleanup')
 

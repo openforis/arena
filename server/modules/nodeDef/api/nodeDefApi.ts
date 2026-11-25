@@ -1,14 +1,13 @@
+import type { Response as ExpressResponse, Router } from 'express'
+
 import type { ArenaNodeDefMap } from '@openforis/arena-core'
-import type { Router, Response as ExpressResponse } from 'express'
+
 import * as A from '@core/arena'
-
-import * as Request from '@server/utils/request'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as ObjectUtils from '@core/objectUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-
 import * as SurveyService from '../../survey/service/surveyService'
 import * as NodeDefService from '../service/nodeDefService'
 

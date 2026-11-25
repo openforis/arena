@@ -1,12 +1,10 @@
+import { expect, Page, TestInfo } from '@playwright/test'
+import AdmZip from 'adm-zip'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import AdmZip from 'adm-zip'
-import { expect, Page, TestInfo } from '@playwright/test'
-
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 import { TestId } from '@webapp/utils/testId'
-
 import { taxa } from '../fixtures/seed/sampleRecordDisplay'
 import {
   category,
@@ -18,6 +16,7 @@ import {
   taxonomy,
   tree,
 } from '../fixtures/seed/sampleSurveyModel'
+
 import { Urls } from './urls'
 
 type AnyObject = Record<string, any>

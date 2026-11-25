@@ -1,8 +1,8 @@
 import type { LanguageModelV4StreamPart } from '@ai-sdk/provider'
 
-import SystemError, { StatusCodes } from '@core/systemError'
 import { createSseParser } from '@common/ai/sseParser'
 import { deserializeStreamPart } from '@common/ai/wire'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 /**
  * Turns the gateway SSE response into a stream of LanguageModelV4 parts; cancelling it cancels the body

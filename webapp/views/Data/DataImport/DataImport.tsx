@@ -1,12 +1,12 @@
 import './DataImport.scss'
 
-import { useI18n } from '@webapp/store/system'
-
 import TabBar from '@webapp/components/TabBar'
+import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import { DataImportFlatDataView } from './DataImportFlatDataView'
-import { CollectDataImportView } from './DataImportCollectView'
+
 import { DataImportArenaView } from './DataImportArenaView'
+import { CollectDataImportView } from './DataImportCollectView'
+import { DataImportFlatDataView } from './DataImportFlatDataView'
 import { DataImportOdkView } from './DataImportOdkView'
 
 const DataImport = () => {

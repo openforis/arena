@@ -1,9 +1,7 @@
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
 import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
-
-import { fromAvailability, type AssistantAreaStatus } from '../assistantAreas'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { type AssistantAreaStatus, fromAvailability } from '../assistantAreas'
 
 type Availability = AiFeatureAvailability | AiEngineFeatureAvailability
 

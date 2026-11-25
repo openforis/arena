@@ -1,5 +1,5 @@
-import * as TaxonomyTests from './_taxonomy/taxonomyTests'
 import * as TaxonomyPublishedTests from './_taxonomy/taxonomyPublishedTests'
+import * as TaxonomyTests from './_taxonomy/taxonomyTests'
 
 describe('Taxonomy test', () => {
   beforeAll(async () => {

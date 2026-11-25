@@ -1,20 +1,17 @@
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import { initTestContext, getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser, initTestContext } from '../config/context'
 
 const getContext = () => {
   const survey = global.applicableSurvey

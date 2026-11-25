@@ -1,10 +1,10 @@
-import * as NodeDef from '@core/survey/nodeDef'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
+import { Query } from '@common/model/query'
+import * as NodeDef from '@core/survey/nodeDef'
 import { useI18n } from '@webapp/store/system'
 
 import { ColumnHeader } from './Column'
-import { Query } from '@common/model/query'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 type RowHeaderProps = {
   codesVisible: boolean

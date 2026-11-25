@@ -1,9 +1,10 @@
 import './ExpressionEditorPopup.scss'
 
-import * as A from '@core/arena'
 import classNames from 'classnames'
 
+import * as A from '@core/arena'
 import { useI18n } from '@webapp/store/system'
+
 import ExpressionNode from './nodes/expressionNode'
 
 type BasicExpressionEditorPopupProps = {

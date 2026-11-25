@@ -1,4 +1,5 @@
 import type { StyleSpecification } from 'maplibre-gl'
+
 import * as StringUtils from '@core/stringUtils'
 
 import { equalEarthMapStyle } from './equalEarthMapStyle'

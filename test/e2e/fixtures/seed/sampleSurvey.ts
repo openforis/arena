@@ -1,6 +1,5 @@
-import path from 'node:path'
-
 import log4js from 'log4js'
+import path from 'node:path'
 
 import type { NodeDefType as ArenaNodeDefType } from '@openforis/arena-core'
 

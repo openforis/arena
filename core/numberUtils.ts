@@ -1,5 +1,6 @@
-import * as A from '@core/arena'
 import { Objects } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 
 import { isBlank } from './stringUtils'
 

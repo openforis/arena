@@ -6,9 +6,8 @@ import {
   toCustomOverlayId,
 } from '@webapp/components/MapContainer/workspace/customLayers/customLayerLeaflet'
 import { useMapCustomLayers } from '@webapp/components/MapContainer/workspace/customLayers/MapCustomLayersContext'
-import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
-
 import { setGridLayerOpacity } from '@webapp/components/MapContainer/workspace/layers/customOverlays'
+import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
 /**
  * Keeps the overlay registry (Layers tab, group "Custom (WMS / WMTS)") in sync with the stored custom overlays.
  * Removing a row in the Layers tab deletes the stored layer.

@@ -1,19 +1,14 @@
 import * as A from '@core/arena'
-
-import { db } from '@server/db/db'
-
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
+import * as Survey from '@core/survey/survey'
+import { db } from '@server/db/db'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-
-import { getContextUser, fetchFullContextSurvey } from '../../config/context'
-
 import * as RecordUtils from '../../../utils/recordUtils'
+import { fetchFullContextSurvey, getContextUser } from '../../config/context'
 
 // ==== helper methods
 const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression({ expression, applyIf })

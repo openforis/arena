@@ -1,12 +1,10 @@
 import * as Survey from '@core/survey/survey'
-
 import { Checkbox } from '@webapp/components/form'
-
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-
-import SamplingPolygonEditor from './SamplingPolygonEditor'
-import { AreasOfInterestEditor } from './AreasOfInterestEditor'
 import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
+
+import { AreasOfInterestEditor } from './AreasOfInterestEditor'
+import SamplingPolygonEditor from './SamplingPolygonEditor'
 
 type SurveyInfoMapProps = {
   areasOfInterest?: any[]

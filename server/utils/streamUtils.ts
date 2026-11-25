@@ -1,4 +1,5 @@
 import type { Readable, Stream } from 'node:stream'
+
 import { SystemError } from '@openforis/arena-core'
 
 const defaultMaxCellsLimit = 1000000

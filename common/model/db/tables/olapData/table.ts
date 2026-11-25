@@ -1,11 +1,10 @@
-import type { ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef, ArenaNodeDefMap } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaNodeDefEntity, ArenaNodeDefMap, ArenaSurvey } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
-
-import TableSurveyRdb from '../tableSurveyRdb'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SQL from '../../sql'
+import TableSurveyRdb from '../tableSurveyRdb'
 
 const tableNamePrefix = 'olap_data'
 

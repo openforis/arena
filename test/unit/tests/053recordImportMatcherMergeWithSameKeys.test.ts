@@ -1,17 +1,13 @@
-import { SurveySecurityProp, type ArenaRecord, type ArenaSurvey } from '@openforis/arena-core'
+import { type ArenaRecord, type ArenaSurvey, SurveySecurityProp } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction } from '@common/dataImport/recordImportAction'
-
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
-
 import { determineRecordAction } from '@server/modules/dataImport/service/dataImportJob/recordImportMatcher'
-
+import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
-
-import { getContextUser } from '../../integration/config/context'
 
 const assocSecurity = (security) => (survey) => {
   const surveyInfo = Survey.getSurveyInfo(survey)

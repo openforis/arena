@@ -1,21 +1,18 @@
 import type { ArenaTaxonomy } from '@openforis/arena-core'
-import * as A from '@core/arena'
 
-import * as Survey from '@core/survey/survey'
-import * as Taxonomy from '@core/survey/taxonomy'
-import * as Taxon from '@core/survey/taxon'
-import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-import * as Validation from '@core/validation/validation'
 import { languageCodesISO639part2 } from '@core/app/languages'
+import * as A from '@core/arena'
+import { FileFormats } from '@core/fileFormats'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { FileFormats } from '@core/fileFormats'
-
+import * as Survey from '@core/survey/survey'
+import * as Taxon from '@core/survey/taxon'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import * as Validation from '@core/validation/validation'
 import Job, { type JobParams } from '@server/job/job'
-
-import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import TaxonomyImportManager from '@server/modules/taxonomy/manager/taxonomyImportManager'
-
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const SPECIES_FILES_PATH = 'species/'

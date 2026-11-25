@@ -3,10 +3,9 @@ import { FileFormats } from '@core/fileFormats'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
+import type { DataExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
 import { getContextUser } from '../config/context'
 
 import {
@@ -15,7 +14,6 @@ import {
   registerUserGroupServiceTest,
   restoreUserGroupService,
 } from './_record/userGroupRecordsTestUtils'
-import type { DataExportOptions } from '@server/modules/surveyRdb/manager/dataExportOptions'
 
 // Data Explorer queries, counts and exports include only the records of the user's group
 // and of the groups its group can read.

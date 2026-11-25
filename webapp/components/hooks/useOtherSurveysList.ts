@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 

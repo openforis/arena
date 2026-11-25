@@ -3,22 +3,21 @@ import './ChainStatisticalAnalysis.scss'
 import { useCallback } from 'react'
 
 import * as Chain from '@common/analysis/chain'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import * as Survey from '@core/survey/survey'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
-import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
-import { useChain } from '@webapp/store/ui/chain'
-
+import * as Survey from '@core/survey/survey'
 import { ButtonGroup } from '@webapp/components/form'
-import WarningBadge from '@webapp/components/WarningBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import { DimensionsSelector } from './DimensionsSelector'
+import WarningBadge from '@webapp/components/WarningBadge'
+import { useSurvey } from '@webapp/store/survey'
+import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
+import { useI18n } from '@webapp/store/system'
+import { useChain } from '@webapp/store/ui/chain'
 import { PValueSelector } from '../PValueSelector'
+
+import { DimensionsSelector } from './DimensionsSelector'
 
 type ChainStatisticalAnalysisPropsProps = {
   updateChain: (...args: any[]) => any

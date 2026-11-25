@@ -2,10 +2,11 @@ import './NodeDefTreeSelect.scss'
 
 import classNames from 'classnames'
 
+import type { NodeDefLabelType } from '@core/survey/nodeDef'
 import { Button } from '@webapp/components/buttons'
 import { TreeView } from '@webapp/components/TreeView'
+
 import { useNodeDefTreeSelect } from './useNodeDefTreeSelect'
-import type { NodeDefLabelType } from '@core/survey/nodeDef'
 
 type NodeDefTreeSelectProps = {
   disableSelection?: boolean

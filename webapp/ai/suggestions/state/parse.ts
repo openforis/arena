@@ -3,9 +3,10 @@
  * kind was stored is read with the kind of the id prefix (`${kind}:${scope}`), once; entries of a kind this version
  * does not know are dropped, so every kind the rest of the code sees has its definition.
  */
-import { isSuggestionKind, type AssistantSuggestion, type SuggestionKind, type SuggestionTarget } from '../types'
+import { type AssistantSuggestion, isSuggestionKind, type SuggestionKind, type SuggestionTarget } from '../types'
+
 import { isPlainObject } from './records'
-import { emptySuggestionState, type DismissedEntry, type InProgressEntry, type SuggestionUserState } from './types'
+import { type DismissedEntry, emptySuggestionState, type InProgressEntry, type SuggestionUserState } from './types'
 
 /**
  * Returns true for a valid target.

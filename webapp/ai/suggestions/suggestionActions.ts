@@ -3,14 +3,13 @@
  * suggestion is then put in progress (or removed) only when a turn was created. Dismiss hides the visible targets.
  */
 import { uuidv4 } from '@core/uuid'
-
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
-import { getSuggestionScopeKey } from './detectors/designTargets'
 import type { SuggestionDefinition, SuggestionDefinitions, SuggestionDescribeContext } from './definitions'
+import { getSuggestionScopeKey } from './detectors/designTargets'
 import { SUGGESTION_DEFINITIONS } from './registry'
-import { suggestionStore, type SuggestionStore } from './suggestionStore'
+import { type SuggestionStore, suggestionStore } from './suggestionStore'
 import type { AssistantSuggestion, SuggestionRequest, SuggestionScope } from './types'
 
 export type { SuggestionDefinitions }

@@ -1,5 +1,4 @@
 import * as Node from '@core/record/node'
-
 import { objectToFormData } from '@webapp/service/api/utils/apiUtils'
 
 export type ScreenshotFileValue = Record<string, string | number>

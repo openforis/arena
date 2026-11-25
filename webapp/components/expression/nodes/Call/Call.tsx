@@ -3,14 +3,13 @@ import './Call.scss'
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
-
 import { ButtonIconEdit } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
-
-import { functions, getComplexFunctionNameByExpression } from './functions'
-import { CallEditorDialog } from './CallEditorDialog'
 import type { ExpressionNodeProps } from '../expressionNode'
+
+import { CallEditorDialog } from './CallEditorDialog'
+import { functions, getComplexFunctionNameByExpression } from './functions'
 
 const extractFunctionLabel = ({ i18n, functionKey, func }) => {
   const { callee, label, labelKey } = func

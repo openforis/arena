@@ -1,20 +1,18 @@
 import type { Router } from 'express'
-import * as User from '@core/user/user'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import * as User from '@core/user/user'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
+import * as FileUtils from '../../../utils/file/fileUtils'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
-import * as FileUtils from '../../../utils/file/fileUtils'
-
-import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
-
-import * as SurveyRdbService from '../service/surveyRdbService'
 import {
   requireDownloadToken,
   requireRecordListViewPermission,
   requireSurveyRdbRefreshPermission,
 } from '../../auth/authApiMiddleware'
+import * as SurveyRdbService from '../service/surveyRdbService'
 
 export const init = (app: Router) => {
   app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res) => {

@@ -1,6 +1,5 @@
 import { SystemLogMessage, SystemLogMessageTypes } from '@common/systemLog/systemLogConstants'
 import { uuidv4 } from '@core/uuid'
-
 import * as Log from '@server/log/log'
 
 import { LogFileStream, startLogFileStream } from './logFileStream'

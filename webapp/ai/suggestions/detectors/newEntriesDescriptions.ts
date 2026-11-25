@@ -2,7 +2,6 @@
  * New entries descriptions suggestion: entries added during a designer visit that have no description in any language.
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { getFilledLanguages, getSurveyLanguages } from '@webapp/ai/tools/design/missingTexts'
 
 import {

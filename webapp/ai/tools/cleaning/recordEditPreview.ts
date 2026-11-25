@@ -5,7 +5,6 @@ import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
 import type { RecordEditBadge } from '@webapp/ai/changeSets/recordEdits/types'
 
 import { getNodeValidationMessages } from './recordNodeDescriber'

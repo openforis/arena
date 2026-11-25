@@ -1,15 +1,13 @@
 import { useCallback } from 'react'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'
-
 import { State } from '../../state'
-import { useAppDispatch } from '@webapp/store'
 
 const sendUpdateIndexesRequest = async ({ dispatch, surveyId, categoryUuid, parentUuid, indexByUuid }) => {
   dispatch(LoaderActions.showLoader())

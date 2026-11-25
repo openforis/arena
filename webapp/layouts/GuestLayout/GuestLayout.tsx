@@ -1,23 +1,22 @@
 import './GuestLayout.scss'
 
+import classNames from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router'
-import classNames from 'classnames'
 
 import * as ProcessUtils from '@core/processUtils'
-
-import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { guestModules } from '@webapp/app/appModules'
-import ResetPassword from '@webapp/views/ResetPassword'
-import ForgotPassword from '@webapp/views/ForgotPassword'
+import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import AccessRequest from '@webapp/views/AccessRequest'
+import ForgotPassword from '@webapp/views/ForgotPassword'
 import Login from '@webapp/views/Login'
+import ResetPassword from '@webapp/views/ResetPassword'
 
-import { GuestToolbar } from './GuestToolbar'
 import { GuestBackground } from './components/GuestBackground'
 import { GuestBrand } from './components/GuestBrand'
 import { GuestFooter } from './components/GuestFooter'
 import { GuestPitch } from './components/GuestPitch'
+import { GuestToolbar } from './GuestToolbar'
 
 const getModules = (allowAccessRequest: boolean) => [
   { component: ResetPassword, path: `${guestModules.resetPassword.path}/*` },

@@ -1,15 +1,14 @@
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 
 import * as A from '@core/arena'
-
 import LoadingBar from '@webapp/components/LoadingBar'
-
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import { ContentRowCells } from './ContentRowCells'
+import type { TableRowsProps, TableSelectionSortProps } from '../tableProps'
+
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
-import type { TableRowsProps, TableSelectionSortProps } from '../tableProps'
+import { ContentRowCells } from './ContentRowCells'
 
 // placeholder rows have no identity: give them positional ids
 const getLoadingRowIds = (rows) => Array.from({ length: rows }, (_item, index) => `loading-row-${index}`)

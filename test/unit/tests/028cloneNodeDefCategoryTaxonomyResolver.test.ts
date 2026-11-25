@@ -1,11 +1,10 @@
 import type { ArenaNodeDefEntity } from '@openforis/arena-core'
-import { uuidv4 } from '@core/uuid'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 import { getContextUser } from '../../integration/config/context'
+import * as SB from '../../utils/surveyBuilder'
 
 const { nodeDefType } = NodeDef
 

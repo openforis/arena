@@ -1,13 +1,12 @@
 import React from 'react'
-import classNames from 'classnames'
 import DialogActions from '@mui/material/DialogActions'
+import classNames from 'classnames'
 
 import { Button } from '@webapp/components/buttons'
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
-
 import { PLAIN_TEXT, type ScreenshotNotice } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 import type { ScreenshotDoneNotice } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotActions'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const PREFIX = 'mapWorkspace.screenshot'
 

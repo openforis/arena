@@ -8,6 +8,7 @@ import {
   type MapCustomLayerScope,
   type MapImageFormat,
 } from '@core/map/customLayers/mapCustomLayer'
+import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 import {
   getSummary,
   isLayerSelectable,
@@ -16,7 +17,6 @@ import {
   type WmsDialogFormAction,
   type WmsDialogFormState,
 } from '@webapp/components/MapContainer/workspace/customLayers/wms/wmsDialogForm'
-import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 

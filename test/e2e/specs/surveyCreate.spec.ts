@@ -1,5 +1,4 @@
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, generateSurveyName, test } from '../fixtures'
 
 test.describe('Survey create', () => {

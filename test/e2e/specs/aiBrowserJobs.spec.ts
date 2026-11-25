@@ -3,7 +3,6 @@ import type { Page } from '@playwright/test'
 import { FileFormats } from '@core/fileFormats'
 import { parseCsvAsync } from '@test/utils/csvUtils'
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { cluster } from '../fixtures/seed/sampleSurveyModel'
 import { Urls } from '../helpers/urls'

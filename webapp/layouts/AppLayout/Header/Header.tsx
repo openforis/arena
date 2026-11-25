@@ -1,36 +1,33 @@
 import './Header.scss'
 
-import classNames from 'classnames'
 import { useCallback, useState } from 'react'
+import classNames from 'classnames'
 import { Link } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
-import { useIsAppSaving } from '@webapp/store/app'
-import { useIsSurveyDirty, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
-import { TestId } from '@webapp/utils/testId'
-
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-
 import { Button, Spinner } from '@webapp/components'
-import ButtonPublishSurvey from '@webapp/components/ButtonPublishSurvey'
 import { AssistantButton } from '@webapp/components/ai/Assistant'
+import ButtonPublishSurvey from '@webapp/components/ButtonPublishSurvey'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/ProfilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
 import { ThemeButtonMenu } from '@webapp/components/ThemeButtonMenu'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { useAppDispatch } from '@webapp/store'
+import { useIsAppSaving } from '@webapp/store/app'
+import { useIsSurveyDirty, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useHasMessageNotifications } from '@webapp/store/ui'
+import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import { PreferredUILanguageButtonMenu } from './PreferredUILanguageButtonMenu'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
 import UserPopupMenu from './UserPopupMenu'
-import { useAppDispatch } from '@webapp/store'
 
 const Header = () => {
   const dispatch = useAppDispatch()

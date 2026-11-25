@@ -1,12 +1,9 @@
-import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
-
+import * as Expression from '@core/expressionParser/expression'
 import { ButtonIconFilter } from '@webapp/components/buttons'
 import ExpressionEditorPopup from '@webapp/components/expression/ExpressionEditorPopup'
 import * as ExpressionParser from '@webapp/components/expression/expressionParser'
-
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-
 import { State } from '../store'
 
 type ButtonFilterProps = {

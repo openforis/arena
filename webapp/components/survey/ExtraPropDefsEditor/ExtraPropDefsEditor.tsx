@@ -1,7 +1,6 @@
 import './ExtraPropDefsEditor.scss'
 
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-
 import { ButtonAdd, Markdown } from '@webapp/components'
 import { useI18n } from '@webapp/store/system'
 

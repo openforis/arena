@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react'
-import type { ReactElement, ReactNode } from 'react'
-import type { Map as LeafletMap } from 'leaflet'
-import { useMap } from 'react-leaflet'
 import { createLeafletContext, LeafletContext } from '@react-leaflet/core'
+import type { Map as LeafletMap } from 'leaflet'
+import type { ReactElement, ReactNode } from 'react'
+import { useMap } from 'react-leaflet'
 
 import { initialMapWorkspaceState, mapWorkspaceReducer } from './mapWorkspaceReducer'
 import type { MapWorkspaceAction, MapWorkspaceState, MapWorkspaceVariant } from './mapWorkspaceTypes'

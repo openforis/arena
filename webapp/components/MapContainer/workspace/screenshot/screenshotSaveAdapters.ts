@@ -1,17 +1,15 @@
 import axios from 'axios'
-import { Dates } from '@openforis/arena-core'
+
 import type { ArenaRecord, ArenaRecordNode } from '@openforis/arena-core'
+import { Dates } from '@openforis/arena-core'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-
-import * as API from '@webapp/service/api'
-
 import { buildNodeFormData } from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
 import type { NodeSaveSubscribe } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
+import * as API from '@webapp/service/api'
 
 const UPLOAD_TIMEOUT_MS = 120000
 

@@ -2,7 +2,7 @@
  * Text generation helpers over any LanguageModel (in practice the gateway model). No client-side retries:
  * the gateway already maps provider failures, and retrying a rate-limited call makes it worse.
  */
-import { generateText, streamText, type LanguageModel, type ModelMessage } from 'ai'
+import { generateText, type LanguageModel, type ModelMessage, streamText } from 'ai'
 
 import type { AiGenerateText } from '@common/ai/llm'
 

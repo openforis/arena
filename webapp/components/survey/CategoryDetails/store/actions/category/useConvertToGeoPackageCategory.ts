@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { useInit } from './useInit'
-import { useAppDispatch } from '@webapp/store'
 
 export const useConvertToGeoPackageCategory = ({ setState }) => {
   const dispatch = useAppDispatch()

@@ -17,7 +17,7 @@ import {
   type ReviewItem,
 } from './changeSetReviewModel'
 import { summarizeSelection } from './changeSetSelectionModel'
-import { createConfirmationFocus, type ConfirmationFocus } from './confirmationFocus'
+import { type ConfirmationFocus, createConfirmationFocus } from './confirmationFocus'
 import type { ChangeSetSelection } from './useChangeSetSelection'
 
 // preview rows and kinds of change shown before "+ N more"

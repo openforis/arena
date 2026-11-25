@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
+import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import { TooltipNew } from '@webapp/components/TooltipNew'
 
 type TableCellFilesProps = {
   item: Record<string, any>

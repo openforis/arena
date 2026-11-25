@@ -1,10 +1,10 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
 import type { CleaningI18n } from './validationRows'

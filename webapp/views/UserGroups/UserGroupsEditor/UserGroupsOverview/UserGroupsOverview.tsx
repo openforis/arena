@@ -6,14 +6,13 @@ import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
-
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
 
 import { UNASSIGNED_GROUP_KEY } from './kanbanConstants'
+import UserGroupColumn from './UserGroupColumn'
+import { useUserGroupsKanbanDnd } from './useUserGroupsKanbanDnd'
 import type { SurveyUserType } from './useUserGroupsOverview'
 import { useUserGroupsOverview } from './useUserGroupsOverview'
-import { useUserGroupsKanbanDnd } from './useUserGroupsKanbanDnd'
-import UserGroupColumn from './UserGroupColumn'
 
 interface ColumnData {
   key: string

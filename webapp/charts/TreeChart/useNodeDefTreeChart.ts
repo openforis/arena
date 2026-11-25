@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef, type MutableRefObject } from 'react'
+import { type MutableRefObject, useCallback, useEffect, useRef } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'

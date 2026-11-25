@@ -1,7 +1,8 @@
-import Job, { type JobParams } from '@server/job/job'
-import * as DbUtils from '@server/db/dbUtils'
-import * as SurveyManager from '../manager/surveyManager'
 import { Schemata } from '@openforis/arena-server'
+
+import * as DbUtils from '@server/db/dbUtils'
+import Job, { type JobParams } from '@server/job/job'
+import * as SurveyManager from '../manager/surveyManager'
 
 export default class SurveyActivityLogClearJob extends Job {
   static readonly type: string = 'SurveyActivityLogClearJob'

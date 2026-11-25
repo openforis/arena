@@ -1,7 +1,6 @@
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SurveyActions } from '@webapp/store/survey'
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as TablesActions from './actions'
 import * as TablesState from './state'

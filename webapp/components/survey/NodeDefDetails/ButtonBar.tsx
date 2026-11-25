@@ -3,15 +3,14 @@ import { useNavigate } from 'react-router'
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
 import { Button, ButtonDelete } from '@webapp/components/buttons'
+import { TreeSelectViewMode } from '@webapp/model'
+import { useAppDispatch } from '@webapp/store'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import { useIsEditingNodeDefInFullScreen, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
-import { TreeSelectViewMode } from '@webapp/model'
-import { useAppDispatch } from '@webapp/store'
 
 type ButtonBarProps = {
   state: Record<string, any>

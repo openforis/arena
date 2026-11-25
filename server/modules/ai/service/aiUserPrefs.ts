@@ -3,9 +3,9 @@
  */
 import type { ArenaUser } from '@openforis/arena-core'
 
-import * as UserUtils from '@core/user/user'
 import { type AiAccessLevel, isCategoryWithinAccessLevel, resolveAiAccessLevel } from '@common/ai/accessLevel'
 import { AiFeatureCategory, isAiCategoryOnByDefault } from '@common/ai/features'
+import * as UserUtils from '@core/user/user'
 
 const PREFS_KEY = 'ai'
 

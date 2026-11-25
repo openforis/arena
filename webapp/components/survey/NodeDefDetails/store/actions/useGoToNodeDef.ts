@@ -2,14 +2,13 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { analysisModules, appModuleUri, designerModules } from '@webapp/app/appModules'
+import { useAppDispatch } from '@webapp/store'
+import { SurveyFormActions, useIsEditingNodeDefInFullScreen } from '@webapp/store/ui/surveyForm'
+import { State } from '../state'
 
 import { useCancelEdits } from './useCancelEdits'
 import { useGetSiblingNodeDefUuid } from './useGetSiblingNodeDefUuid'
-import { SurveyFormActions, useIsEditingNodeDefInFullScreen } from '@webapp/store/ui/surveyForm'
-import { State } from '../state'
-import { useAppDispatch } from '@webapp/store'
 
 export const useGoToNodeDef = ({ setState }) => {
   const dispatch = useAppDispatch()

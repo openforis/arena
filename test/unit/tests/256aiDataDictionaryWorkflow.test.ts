@@ -2,7 +2,6 @@ import { isGatewayFeature } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
 import { buildDataDictionaryPrompt } from '@common/ai/prompts/dataDictionary'
 import SystemError from '@core/systemError'
-
 import { mockAnswerFor } from '@server/modules/ai/service/mockProvider'
 import {
   cleanAiDescription,

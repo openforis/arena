@@ -1,8 +1,8 @@
 /**
  * Activity log summary: compact per user/type aggregates (bounded prompt size) and the summary request.
  */
-import type { AiTextRequest } from '../llm'
 import { AiLimits } from '../limits'
+import type { AiTextRequest } from '../llm'
 import { buildActivityLogSummaryPrompt } from '../prompts/activityLogSummary'
 
 export type AiActivityLogEntry = { userUuid?: string; userName?: string; type?: string; dateCreated?: string }

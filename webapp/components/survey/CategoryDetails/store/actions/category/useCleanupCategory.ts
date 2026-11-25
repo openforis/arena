@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router'
 
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
-
 import { State } from '../../state'
 
 export const useCleanupCategory = ({ setState }) => {

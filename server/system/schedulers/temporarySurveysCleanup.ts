@@ -3,7 +3,6 @@ import * as schedule from 'node-schedule'
 import { runWithClusterLock } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
-
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 const Logger = Log.getLogger('TemporarySurveysCleanup')

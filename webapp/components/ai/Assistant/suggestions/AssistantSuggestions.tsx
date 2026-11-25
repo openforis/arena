@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import * as User from '@core/user/user'
-
 import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { buildSuggestionRequest, dismissSuggestion } from '@webapp/ai/suggestions/suggestionActions'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
@@ -10,9 +9,9 @@ import { useSurvey, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useI18nT, useLang } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
 import { assistantPanelStore } from '../assistantPanelStore'
 import type { AssistantConversationApi } from '../useAssistantConversation'
+
 import { canDoIt, getStartScreenSuggestions, getSuggestionCardText } from './suggestionsModel'
 
 type SuggestionCard = { suggestion: AssistantSuggestion; text: string }

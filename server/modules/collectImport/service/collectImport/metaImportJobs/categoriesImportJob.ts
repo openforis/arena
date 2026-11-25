@@ -1,19 +1,15 @@
 import type { ArenaCategoryItem } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
+import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as ObjectUtils from '@core/objectUtils'
-import * as StringUtils from '@core/stringUtils'
-
-import Job, { type JobParams } from '@server/job/job'
+import * as Survey from '@core/survey/survey'
 import BatchPersister from '@server/db/batchPersister'
-
+import Job, { type JobParams } from '@server/job/job'
 import * as CategoryManager from '../../../../category/manager/categoryManager'
-
 import * as CollectSurvey from '../model/collectSurvey'
 
 /**

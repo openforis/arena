@@ -1,13 +1,12 @@
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import * as Validator from '@core/validation/validator'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-
+import * as Validator from '@core/validation/validator'
 import Job from '@server/job/job'
-import FileZip from '@server/utils/file/fileZip'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import FileZip from '@server/utils/file/fileZip'
 
 import CategoryBatchImportJob from './categoryBatchImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'

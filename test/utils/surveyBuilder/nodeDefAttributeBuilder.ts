@@ -1,9 +1,8 @@
 import * as A from '@core/arena'
-
-import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
-import * as NodeDefValidations from '../../../core/survey/nodeDefValidations'
 import * as NodeDefExpression from '../../../core/survey/nodeDefExpression'
+import * as NodeDefValidations from '../../../core/survey/nodeDefValidations'
+import * as Survey from '../../../core/survey/survey'
 
 import NodeDefBuilder from './nodeDefBuilder'
 

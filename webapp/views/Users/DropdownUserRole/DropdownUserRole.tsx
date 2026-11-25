@@ -1,12 +1,11 @@
-import * as AuthGroup from '@core/auth/authGroup'
 import { Authorizer } from '@openforis/arena-core'
 
-import { TestId } from '@webapp/utils/testId'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyInfo } from '@webapp/store/survey'
-
-import { useUser } from '@webapp/store/user'
+import * as AuthGroup from '@core/auth/authGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 type DropdownUserRoleProps = {
   groupUuid?: any

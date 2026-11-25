@@ -1,7 +1,6 @@
 import React from 'react'
 
 import * as User from '@core/user/user'
-
 import { Button } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'

@@ -1,8 +1,9 @@
 import { MockLanguageModelV4 } from 'ai/test'
 
-import { ENV } from '@core/processUtils'
 import { AiLimits } from '@common/ai/limits'
 import { createSseParser } from '@common/ai/sseParser'
+import { ENV } from '@core/processUtils'
+import { toAiSystemError } from '@server/modules/ai/service/gateway/errorMapping'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import * as ProviderRegistry from '@server/modules/ai/service/providerRegistry'
@@ -13,8 +14,6 @@ import {
   readTextCapped,
 } from '@server/modules/ai/service/responseLimits'
 import { createVercelAiSdkModel } from '@server/modules/ai/service/vercelAiSdkProvider'
-import { toAiSystemError } from '@server/modules/ai/service/gateway/errorMapping'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse, parseSseWrites } from '@test/unit/utils/fakeExpress'
 

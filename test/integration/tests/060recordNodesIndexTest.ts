@@ -1,15 +1,12 @@
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
-
 import RecordsImportJob from '@server/modules/mobile/service/arenaMobileDataImport/jobs/recordsImportJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import { getContextUser } from '../config/context'
-
 import * as RB from '../../utils/recordBuilder'
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 const { integer, text } = NodeDef.nodeDefType
 

@@ -1,11 +1,12 @@
 import './Modal.scss'
 
-import { useCallback, useId, type ReactNode } from 'react'
-import MuiModal from '@mui/material/Modal'
+import { type ReactNode, useCallback, useId } from 'react'
 import Fade from '@mui/material/Fade'
+import MuiModal from '@mui/material/Modal'
 
-import { TestId } from '@webapp/utils/testId'
 import { useI18nT } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
 import { Button } from './buttons'
 
 type ModalCloseProps = {

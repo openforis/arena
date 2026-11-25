@@ -2,9 +2,9 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { State } from '../state'
-import { useAppDispatch } from '@webapp/store'
 
 export const useDeleteTaxonomyIfEmpty = ({ setState }) => {
   const navigate = useNavigate()

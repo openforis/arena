@@ -2,9 +2,9 @@ import {
   isHttpUrl,
   isTileTemplateUrl,
   isValidWmsLayerName,
-  MAP_CUSTOM_LAYERS_MAX,
   MAP_CUSTOM_LAYER_ATTRIBUTION_MAX_LENGTH,
   MAP_CUSTOM_LAYER_NAME_MAX_LENGTH,
+  MAP_CUSTOM_LAYERS_MAX,
   type MapCustomLayer,
   type MapCustomLayerRole,
   type MapCustomLayerScope,
@@ -14,9 +14,9 @@ import {
   URL_FORBIDDEN_PATTERN,
 } from '@core/map/customLayers/mapCustomLayer'
 import {
-  MAX_CAPABILITIES_LAYERS,
   type MapServiceCapabilities,
   type MapServiceLayer,
+  MAX_CAPABILITIES_LAYERS,
 } from '@core/map/customLayers/mapServiceCapabilities'
 
 export type WmsLoadStatus = 'idle' | 'loading' | 'loaded' | 'failed'

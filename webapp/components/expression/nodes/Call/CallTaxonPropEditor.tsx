@@ -3,16 +3,15 @@ import { useCallback, useState } from 'react'
 import { Strings } from '@openforis/arena-core'
 
 import * as Expression from '@core/expressionParser/expression'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as StringUtils from '@core/stringUtils'
-
+import * as Taxonomy from '@core/survey/taxonomy'
 import { Button } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
-
 import Identifier from '../Identifier'
+
 import type { CallEditorProps } from './callEditorProps'
 
 const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdentifierName }) => {

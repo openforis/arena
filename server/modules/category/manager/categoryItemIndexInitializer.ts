@@ -1,9 +1,8 @@
-import { Objects, type ArenaCategoryItem, type ArenaCategory } from '@openforis/arena-core'
+import { type ArenaCategory, type ArenaCategoryItem, Objects } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import { db, DbClient } from '@server/db/db'
 import * as CategoryRepository from '../repository/categoryRepository'
 

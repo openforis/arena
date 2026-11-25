@@ -1,15 +1,14 @@
 import { Fragment } from 'react'
 
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 import { Numbers, Objects } from '@openforis/arena-core'
 
 import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatter'
-
+import { Query } from '@common/model/query'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useColumn } from './store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
-import { Query } from '@common/model/query'
 
 const getColValue = ({ survey, nodeDef, col, row, i18n, isMeasure }) => {
   const value = Object.hasOwn(row, col) ? row[col] : null

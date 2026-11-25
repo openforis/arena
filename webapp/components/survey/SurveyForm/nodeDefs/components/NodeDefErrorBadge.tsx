@@ -1,12 +1,12 @@
 import type React from 'react'
 
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 import { TestId } from '@webapp/utils/testId'
 
-import ErrorBadge from '@webapp/components/ErrorBadge'
-
 import useValidation from './useValidation'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
 
 type NodeDefErrorBadgeProps = {
   children?: React.ReactNode

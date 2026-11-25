@@ -1,4 +1,4 @@
-import { ServiceRegistry, type ArenaUser } from '@openforis/arena-core'
+import { type ArenaUser, ServiceRegistry } from '@openforis/arena-core'
 import type { AuthProvider, AuthProviderInput, AuthProviderService } from '@openforis/arena-server'
 import { ServerServiceType } from '@openforis/arena-server'
 

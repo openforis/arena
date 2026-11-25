@@ -1,10 +1,10 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
-import * as Survey from '@core/survey/survey'
+import { Schemata } from '@common/model/db'
+import * as ProcessUtils from '@core/processUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
 import { db, type DbClient } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -13,13 +13,11 @@ import * as CategoryItemLabelsManager from '@server/modules/category/manager/cat
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-import { Schemata } from '@common/model/db'
-
 import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
-import * as SB from '@test/utils/surveyBuilder'
 import { expectEditPermissionOnly } from '@test/utils/routePermissionTestUtils'
 import { collectRoutes } from '@test/utils/routeUtils'
+import * as SB from '@test/utils/surveyBuilder'
 
 const COLORS = ['Red', 'Green', 'Blue', 'Yellow', 'Black', 'White', 'Grey', 'Orange', 'Pink']
 

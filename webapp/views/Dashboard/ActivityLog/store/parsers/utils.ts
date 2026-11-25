@@ -1,8 +1,7 @@
-import * as A from '@core/arena'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
-import * as Survey from '@core/survey/survey'
+import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 
 // ===== SURVEY
 

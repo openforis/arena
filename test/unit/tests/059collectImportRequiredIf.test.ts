@@ -1,10 +1,10 @@
-import * as Survey from '@core/survey/survey'
 import type { ArenaSurvey } from '@openforis/arena-core'
+
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as Survey from '@core/survey/survey'
 import NodeDefsImportJob from '@server/modules/collectImport/service/collectImport/metaImportJobs/nodeDefsImportJob/nodeDefsImportJob'
-
 import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 

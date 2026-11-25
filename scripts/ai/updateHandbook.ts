@@ -2,10 +2,9 @@
  * yarn ai:docs:update — reads the Arena user manual (the Word files in docs/user-manual) and writes the sections the
  * Help assistant searches to webapp/ai/help/handbook-<lang>.json. Run it and commit the result when the manual changes.
  */
+import AdmZip from 'adm-zip'
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-
-import AdmZip from 'adm-zip'
 
 import { buildHandbook, checkHandbook, HANDBOOK_LANGS } from '../../webapp/ai/help/handbookSplitter.ts'
 

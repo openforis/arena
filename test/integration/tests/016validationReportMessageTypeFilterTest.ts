@@ -1,17 +1,15 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Survey from '@core/survey/survey'
 import {
-  MessageTypeFilterCategories,
   expandMessageTypeFilterCategoriesToKeys,
+  MessageTypeFilterCategories,
 } from '@core/validation/messageTypeFilterCategories'
-
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import { initTestContext, getContextUser } from '../config/context'
-
-import * as SB from '../../utils/surveyBuilder'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RB from '../../utils/recordBuilder'
+import * as SB from '../../utils/surveyBuilder'
+import { getContextUser, initTestContext } from '../config/context'
 
 describe('Validation Report - Message Type Filter', () => {
   let survey

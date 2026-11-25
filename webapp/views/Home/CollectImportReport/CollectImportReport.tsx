@@ -4,16 +4,14 @@ import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
-
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import Table from '@webapp/components/Table'
-
 import { useSurveyId } from '@webapp/store/survey'
 
 import HeaderLeft from './HeaderLeft'
-import RowHeader from './RowHeader'
 import Row from './Row'
+import RowHeader from './RowHeader'
 
 const CollectImportReport = () => {
   const surveyId = useSurveyId()

@@ -1,34 +1,31 @@
 import './ExpressionsProp.scss'
 
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
-import * as A from '@core/arena'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import classNames from 'classnames'
 
-import { Objects, type ArenaValidation } from '@openforis/arena-core'
+import { type ArenaValidation, Objects } from '@openforis/arena-core'
 
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
-import * as Validation from '@core/validation/validation'
+import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as StringUtils from '@core/stringUtils'
-
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as Validation from '@core/validation/validation'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { ButtonNew } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useAppDispatch } from '@webapp/store'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 
-import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
-import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
-import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
-import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
-
-import type { ExpressionEditorSettingsProps } from './expressionPropTypes'
-import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
-
 import ExpressionProp from './ExpressionProp'
-import { useAppDispatch } from '@webapp/store'
+import type { ExpressionEditorSettingsProps } from './expressionPropTypes'
 
 export const ValueType = {
   constant: 'constant',

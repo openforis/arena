@@ -1,5 +1,5 @@
-import { FormItem } from '@webapp/components/form/Input'
 import { ButtonGroup } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
 
 const buttonGroupItems = ['true', 'false'].map((value) => ({
   key: value,

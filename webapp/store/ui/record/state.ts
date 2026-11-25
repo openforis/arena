@@ -1,6 +1,5 @@
 import * as A from '@core/arena'
 import * as Record from '@core/record/record'
-
 import * as UiState from '../state'
 
 export const stateKey = 'record'

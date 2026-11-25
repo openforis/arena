@@ -1,11 +1,9 @@
 import type React from 'react'
 
 import { RecordCycle } from '@core/record/recordCycle'
-
-import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
-
-import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/ButtonGroup'
+import { FormItem } from '@webapp/components/form/Input'
+import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
 
 type CyclesSelectorProps = {
   children?: React.ReactNode

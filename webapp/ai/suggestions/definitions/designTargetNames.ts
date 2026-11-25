@@ -2,7 +2,6 @@
  * Node definitions of a Design suggestion's visible targets, for cards and prompts.
  */
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { findDesignNodeDef, getTargetNodeDefUuid } from '../detectors/designTargets'
 import type { AssistantSuggestion } from '../types'
 

@@ -1,15 +1,13 @@
-import * as Survey from '@core/survey/survey'
 import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
-import SystemError from '@core/systemError'
-import { parseNodeValueInput, type NodeValueInput, type ParsedNodeValue } from '@core/record/nodeValueParser'
 import { areNodeValuesEqual } from '@core/record/nodeValueEquality'
-
-import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
+import { type NodeValueInput, type ParsedNodeValue, parseNodeValueInput } from '@core/record/nodeValueParser'
+import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
 import { RECORD_ATTRIBUTE_UPDATE } from '@webapp/ai/changeSets/recordEdits/types'
+import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 
 import type { CleaningApi } from './cleaningApi'
-import { createRefDataProviders } from './refDataProviders'
 import {
   checkAttributeEditable,
   checkNodeEditable,
@@ -18,6 +16,7 @@ import {
 } from './recordEditPermissions'
 import { computeRecordEditPreview } from './recordEditPreview'
 import { describeNodePath, describeRecordKeys, formatNodeValue, getNodePage } from './recordNodeDescriber'
+import { createRefDataProviders } from './refDataProviders'
 import type { CleaningI18n } from './validationRows'
 
 export type RecordEditInput = { recordUuid: string; nodeUuid: string; value: NodeValueInput }

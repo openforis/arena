@@ -1,15 +1,12 @@
 import * as A from '@core/arena'
-
+import { SurveyActions } from '@webapp/store/survey'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActionTypes } from '@webapp/store/system/actionTypes'
-
-import { SurveyActions } from '@webapp/store/survey'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
-
 import * as RecordActions from './actions'
-import * as RecordState from './state'
 import { mergeNodesOfOpenRecord, mergeValidationsOfOpenRecord } from './recordEventFilter'
+import * as RecordState from './state'
 
 const actionHandlers = {
   // Reset form

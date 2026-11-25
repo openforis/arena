@@ -1,6 +1,5 @@
-import { jobStatus } from './jobUtils'
-
 import type Job from './job'
+import { jobStatus } from './jobUtils'
 
 /**
  * Starts the specified job and ensures that its end is always notified, even when the job terminates

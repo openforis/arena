@@ -1,4 +1,5 @@
 import type { ArenaUser } from '@openforis/arena-core'
+
 import BatchPersister from '@server/db/batchPersister'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 

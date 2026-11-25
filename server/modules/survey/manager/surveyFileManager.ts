@@ -1,14 +1,12 @@
 import type { Readable } from 'node:stream'
+
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 import * as SurveyFile from '@core/survey/surveyFile'
-
 import { db, DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
-
 import { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import { StreamUtils } from '@server/utils/streamUtils'
-
 import * as FileRepository from '../../record/repository/fileRepository'
 import * as FileRepositoryFileSystem from '../../record/repository/fileRepositoryFileSystem'
 import * as FileRepositoryS3Bucket from '../../record/repository/fileRepositoryS3Bucket'

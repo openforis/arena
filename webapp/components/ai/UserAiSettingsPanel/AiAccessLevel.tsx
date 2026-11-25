@@ -6,7 +6,6 @@ import {
   type AiAccessLevel as AccessLevel,
   isCategoryWithinAccessLevel,
 } from '@common/ai/accessLevel'
-
 import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
 import { Fieldset } from '@webapp/components/Fieldset'
 import { useI18n } from '@webapp/store/system'

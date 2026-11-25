@@ -1,5 +1,4 @@
 import Job, { type JobParams } from '@server/job/job'
-
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 

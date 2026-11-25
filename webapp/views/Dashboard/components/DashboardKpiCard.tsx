@@ -7,8 +7,7 @@ import MuiCollapse from '@mui/material/Collapse'
 
 import { useI18n } from '@webapp/store/system'
 import { themeColors, withAlpha } from '@webapp/theme/tokens'
-
-import { getDashboardAccent, type DashboardAccentKind } from '../theme/dashboardAccents'
+import { type DashboardAccentKind, getDashboardAccent } from '../theme/dashboardAccents'
 import { dashboardSurfaces } from '../theme/dashboardSurfaces'
 
 export type DashboardKpiCardProps = {

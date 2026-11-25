@@ -3,26 +3,26 @@
  * pick, history and Apply / Discard of the cards, all saved in the conversation store. The hook only subscribes to its
  * state and passes the scope (user, survey, area) of each render to the actions, so nothing is mirrored in refs.
  */
+import type { RunAssistantTurnParams } from '@webapp/ai/agent/runAssistantTurn'
+import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import { createConversation, withConversationProvider } from '@webapp/ai/conversations/conversationModel'
 import type { ConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import type { Conversation } from '@webapp/ai/conversations/types'
-import type { RunAssistantTurnParams } from '@webapp/ai/agent/runAssistantTurn'
-import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
-import type { SuggestionScope, SettleOutcome } from '@webapp/ai/suggestions/types'
-import type { AiToolContext } from '@webapp/ai/tools/types'
 import { logAiWarning } from '@webapp/ai/log/aiLog'
+import type { SettleOutcome, SuggestionScope } from '@webapp/ai/suggestions/types'
+import type { AiToolContext } from '@webapp/ai/tools/types'
 
 import type { AssistantArea } from './assistantAreas'
 import {
   canShowAfterSave,
   decideLoadedConversation,
   getRetryBase,
+  type LoadedConversationDecision,
   normalizeLoadedConversation,
   withApplyResults,
   withDiscarded,
   withStreamingFailed,
-  type LoadedConversationDecision,
 } from './assistantPanelModel'
 import type { AssistantPanelStore } from './assistantPanelStore'
 import type { AssistantTurnRegistry } from './assistantTurnRegistry'

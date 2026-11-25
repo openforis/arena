@@ -4,34 +4,30 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
-
+import { RecordCycle } from '@core/record/recordCycle'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import { RecordCycle } from '@core/record/recordCycle'
-
-import { appModuleUri, appModules } from '@webapp/app/appModules'
-
-import { contentTypes } from '@webapp/service/api'
-import { useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
-import { useSurveyInfo } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
-
+import { appModules, appModuleUri } from '@webapp/app/appModules'
+import { Button, Dropzone, Fieldset, RadioButtonGroup } from '@webapp/components'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import ButtonGroup from '@webapp/components/form/ButtonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/LanguageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
-import { Checkbox, Dropdown } from '@webapp/components/form'
-import { Button, Dropzone, Fieldset, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
-import { ImportStartButton } from '@webapp/views/Data/DataImport/ImportStartButton'
+import { contentTypes } from '@webapp/service/api'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 import {
   defaultChunkSize,
   FileUploadChunkSizeDropdown,
 } from '@webapp/views/Data/DataImport/FileUploadChunkSizeDropdown'
+import { ImportStartButton } from '@webapp/views/Data/DataImport/ImportStartButton'
+import { SurveyDropdown } from '../SurveyDropdown'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
-import { SurveyDropdown } from '../SurveyDropdown'
 
 const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
   .reverse()

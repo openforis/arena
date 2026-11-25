@@ -2,7 +2,6 @@ import React, { useEffect, useMemo } from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 
 import * as SurveyBranding from '@core/survey/surveyBranding'
-
 import { useSurveyInfo } from '@webapp/store/survey'
 
 import { applyCssVars, buildCssVarMap } from './applyCssVars'

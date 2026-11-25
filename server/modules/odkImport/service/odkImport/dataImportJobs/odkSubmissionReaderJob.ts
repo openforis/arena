@@ -1,6 +1,6 @@
 import Job, { type JobParams } from '@server/job/job'
-import type { OdkImportJobContext } from '../odkImportJobContext'
 import FileZip from '@server/utils/file/fileZip'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 
 const submissionFileName = 'submission.xml'
 

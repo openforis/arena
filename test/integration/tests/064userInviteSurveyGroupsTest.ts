@@ -2,7 +2,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserGroupInvitation from '@core/user/userGroupInvitation'
-
 import { db } from '@server/db/db'
 import * as AuthApi from '@server/modules/auth/api/authApi'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -10,7 +9,6 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 import * as UserInviteService from '@server/modules/user/service/userInviteService'
 import * as UserService from '@server/modules/user/service/userService'
-
 import { getContextUser } from '../config/context'
 
 // Survey users can invite only into the groups of their survey, and can manage the invitation (password reset)

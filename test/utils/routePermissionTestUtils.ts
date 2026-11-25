@@ -4,13 +4,11 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import { uuidv4 } from '@core/uuid'
-
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as Response from '@server/utils/response'
-
 import { callHandler, createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 /**

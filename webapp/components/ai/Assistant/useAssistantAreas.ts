@@ -2,19 +2,17 @@ import { createContext, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
-
 import { AiFeatureCategory } from '@common/ai/features'
-
+import * as Survey from '@core/survey/survey'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useSurveyInfo } from '@webapp/store/survey'
 import * as SurveyStatusState from '@webapp/store/survey/status/state'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { useAnalysisAreaStatus } from './analysis/useAnalysisArea'
+import { type AssistantAreaStatus, getDesignAreaStatus, getHelpAreaStatus, parseAppPath } from './assistantAreas'
 import { useCleaningAreaStatus } from './cleaning/useCleaningArea'
 import { useAssistantFeatureAvailability } from './useAssistantFeatureAvailability'
-import { getDesignAreaStatus, getHelpAreaStatus, parseAppPath, type AssistantAreaStatus } from './assistantAreas'
 
 export type AssistantAreasInfo = { statuses: AssistantAreaStatus[]; module: string | null; subModule: string | null }
 

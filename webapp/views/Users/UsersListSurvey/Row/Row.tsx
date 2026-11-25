@@ -1,16 +1,16 @@
 import * as AuthGroup from '@core/auth/authGroup'
+import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as DateUtils from '@core/dateUtils'
-
-import { TestId } from '@webapp/utils/testId'
-import { useI18n } from '@webapp/store/system'
-import { useAuthCanEditUser, useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
-import { useSurveyInfo } from '@webapp/store/survey'
-import { useOnInviteRepeat } from '@webapp/views/Users/UserEdit/store/actions/useOnInviteRepeat'
 import { Button, ButtonIconEditOrView, ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/ProfilePicture'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditUser, useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
+import { useOnInviteRepeat } from '@webapp/views/Users/UserEdit/store/actions/useOnInviteRepeat'
+
 import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 type RowProps = {

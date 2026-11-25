@@ -2,8 +2,8 @@ import L from 'leaflet'
 import shp from 'shpjs'
 
 import { ZipUtils } from '@webapp/utils/zipUtils'
-
 import { toKmlLayer } from '../../kmlLayer'
+
 import { getUploadedFileKind, type UploadedFileKind } from './uploadedFiles'
 
 type ZipEntry = { async: (type: 'string') => Promise<string> }

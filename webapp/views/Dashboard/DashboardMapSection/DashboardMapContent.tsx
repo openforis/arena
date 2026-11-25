@@ -1,17 +1,17 @@
 import { useCallback, useMemo, useState } from 'react'
+
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import { useOnIntersect } from '@webapp/components/hooks'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
 import { useSurvey } from '@webapp/store/survey'
-import { GeoAttributeDataLayer } from '@webapp/views/Data/MapView/GeoAttributeDataLayer'
-
 import { TestId } from '@webapp/utils/testId'
+import { GeoAttributeDataLayer } from '@webapp/views/Data/MapView/GeoAttributeDataLayer'
 import { DashboardSection } from '../components/DashboardSection'
+
 import { DashboardMapOwnerFilter } from './DashboardMapOwnerFilter'
 import { DashboardPolygonPopup } from './DashboardPolygonPopup'
 import { useDashboardMapOwners } from './useDashboardMapOwners'

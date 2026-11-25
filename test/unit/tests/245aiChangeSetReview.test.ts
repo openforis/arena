@@ -1,20 +1,4 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
-import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
-import type { ChangeOperationDraft, ChangeSetCardState } from '@webapp/ai/changeSets/types'
-import {
-  COMPACT_CARD_MAX_INLINE,
-  buildReviewItems,
-  filterReviewItems,
-  getReviewLabelText,
-  getSelectionState,
-  getValuePreview,
-  groupReviewItems,
-  isCompactCard,
-  toggleSelection,
-  type ReviewItem,
-} from '@webapp/components/ai/Assistant/changeSetReviewModel'
 import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
   buildCategoryLabelsSurvey,
@@ -22,6 +6,21 @@ import {
   categoryLabelOp,
   categoryUuidOf,
 } from '@test/unit/utils/categoryLabelsTestUtils'
+import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
+import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
+import type { ChangeOperationDraft, ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import {
+  buildReviewItems,
+  COMPACT_CARD_MAX_INLINE,
+  filterReviewItems,
+  getReviewLabelText,
+  getSelectionState,
+  getValuePreview,
+  groupReviewItems,
+  isCompactCard,
+  type ReviewItem,
+  toggleSelection,
+} from '@webapp/components/ai/Assistant/changeSetReviewModel'
 
 let survey: any
 

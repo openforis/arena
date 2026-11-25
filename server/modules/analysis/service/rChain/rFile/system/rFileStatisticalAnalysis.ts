@@ -1,6 +1,6 @@
 import * as Chain from '@common/analysis/chain'
-
 import { print, setVar, source } from '../../rFunctions'
+
 import RFileSystem from './rFileSystem'
 
 export default class RFileStatisticalAnalysis extends RFileSystem {

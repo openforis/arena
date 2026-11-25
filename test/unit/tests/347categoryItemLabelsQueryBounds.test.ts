@@ -1,8 +1,8 @@
+import type { DbClient } from '@server/db/db'
 import {
   countItemsMissingLabels,
   fetchItemsMissingLabels,
 } from '@server/modules/category/repository/categoryItemLabelsRepository'
-import type { DbClient } from '@server/db/db'
 
 const pgStatementTimeoutCode = '57014'
 

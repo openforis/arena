@@ -1,17 +1,12 @@
 import { useCallback, useMemo } from 'react'
 import { CircleMarker, GeoJSON } from 'react-leaflet'
 
-import * as Survey from '@core/survey/survey'
-import * as ObjectUtils from '@core/objectUtils'
-
-import { useSurveyInfo } from '@webapp/store/survey'
-
-import { MarkerTooltip, useLayerMarker } from '../common'
-import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
-import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
-import type { FlyToPointFunction } from '../common/useFlyToPoint'
+import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { MarkerTooltip, useLayerMarker } from '../common'
 import type {
   GeoAttributePointFeature,
   GeoAttributePopupRenderer,
@@ -19,6 +14,10 @@ import type {
   RecordEditClickHandler,
   SetMarkerByKey,
 } from '../common/mapPointTypes'
+import type { FlyToPointFunction } from '../common/useFlyToPoint'
+
+import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 
 const markerRadius = 10
 const fillOpacity = 0.5

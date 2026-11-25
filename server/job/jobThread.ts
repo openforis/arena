@@ -1,10 +1,10 @@
-import Thread from '@server/threads/thread'
 import * as Log from '@server/log/log'
+import Thread from '@server/threads/thread'
 
-import { jobThreadMessageTypes, jobToJSON } from './jobUtils'
-import { startJobEnsuringEndNotification } from './jobRunner'
-import * as JobCreator from './jobCreator'
 import type Job from './job'
+import * as JobCreator from './jobCreator'
+import { startJobEnsuringEndNotification } from './jobRunner'
+import { jobThreadMessageTypes, jobToJSON } from './jobUtils'
 
 const logger = Log.getLogger('JobThread')
 

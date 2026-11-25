@@ -1,15 +1,14 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
-
 import {
   CYRILLIC,
   CYRILLIC_LANGUAGES,
-  LANGUAGES,
-  PLURAL_FORMS,
-  PLURAL_SUFFIX,
   enTextOf,
   flatten,
   getResource,
+  LANGUAGES,
   placeholders,
+  PLURAL_FORMS,
+  PLURAL_SUFFIX,
 } from '@test/unit/utils/aiSuggestionsI18n'
 
 describe('aiSuggestions i18n (216)', () => {

@@ -1,24 +1,20 @@
 import './CategoryList.scss'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
+import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components'
+import ErrorBadge from '@webapp/components/ErrorBadge'
 import Table from '@webapp/components/Table'
 import type { TableColumn } from '@webapp/components/Table/tableColumn'
-import ErrorBadge from '@webapp/components/ErrorBadge'
 import WarningBadge from '@webapp/components/WarningBadge'
-
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components'
-
-import TableHeaderLeft from './TableHeaderLeft'
-
 import { State, useActions, useLocalState } from './store'
+import TableHeaderLeft from './TableHeaderLeft'
 
 const getStructure = ({ category }) => (Category.isHierarchical(category) ? 'hierarchical' : 'flat')
 

@@ -1,10 +1,8 @@
 /**
  * Pure helpers of the panel: tool row labels, Retry, Apply / Discard results stored in the conversation.
  */
-import { uuidv4 } from '@core/uuid'
-
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
-
+import { uuidv4 } from '@core/uuid'
 import { mergeOperationResults } from '@webapp/ai/changeSets/operationResults'
 import type { OperationResult } from '@webapp/ai/changeSets/types'
 import type { ApplyNoteMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'

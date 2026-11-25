@@ -1,6 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
-
+import * as Survey from '@core/survey/survey'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 

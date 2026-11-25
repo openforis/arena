@@ -1,8 +1,8 @@
 import { useOnDropdownChange } from './useOnDropdownChange'
 import { useOnInputFieldChange } from './useOnInputFieldChange'
 import { useOnItemAddClick } from './useOnItemAddClick'
-import { useRemoveItem } from './useRemoveItem'
 import { useRejectSelectedItems } from './useRejectSelectedItems'
+import { useRemoveItem } from './useRemoveItem'
 
 export const useActions = ({ onChange, onItemAdd, onItemRemove, setState }) => ({
   onDropdownChange: useOnDropdownChange({ onChange, onItemAdd }),

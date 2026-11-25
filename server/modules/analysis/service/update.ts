@@ -1,17 +1,16 @@
 import type { ArenaChain, ArenaUser } from '@openforis/arena-core'
-import type { DbClient } from '@server/db/db'
 import { DB } from '@openforis/arena-server'
 
-import * as Survey from '@core/survey/survey'
+import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Chain from '@common/analysis/chain'
 import * as ChainValidator from '@common/analysis/chainValidator'
-import * as ActivityLog from '@common/activityLog/activityLog'
 import { TableChain } from '@common/model/db'
-
+import * as Survey from '@core/survey/survey'
+import type { DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
-import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ChainManager from '@server/modules/analysis/manager/chain'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
 

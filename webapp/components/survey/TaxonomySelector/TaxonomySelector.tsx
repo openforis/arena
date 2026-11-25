@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 
-import * as Taxonomy from '@core/survey/taxonomy'
+import type { ArenaValidation } from '@openforis/arena-core'
 
+import * as Taxonomy from '@core/survey/taxonomy'
 import { Dropdown } from '@webapp/components/form'
 import { useTaxonomies, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 type TaxonomySelectorProps = {
   disabled?: boolean

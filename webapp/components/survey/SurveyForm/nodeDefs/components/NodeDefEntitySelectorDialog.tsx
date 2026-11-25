@@ -1,15 +1,14 @@
 import { useCallback, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useSurvey } from '@webapp/store/survey'
-
+import * as Survey from '@core/survey/survey'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
+import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import { FormItem } from '@webapp/components/form/Input'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import { useSurvey } from '@webapp/store/survey'
 
 type NodeDefEntitySelectorDialogProps = {
   confirmButtonLabel: string

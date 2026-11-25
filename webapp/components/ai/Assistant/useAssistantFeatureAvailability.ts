@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 
 import type { AiDataClass } from '@common/ai/features'
-
 import {
   type AiEngineFeatureAvailability,
   getAiEngineFeatureAvailability,

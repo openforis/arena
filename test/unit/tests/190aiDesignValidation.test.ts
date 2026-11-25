@@ -1,10 +1,12 @@
+import { ValidationSeverity } from '@openforis/arena-core'
+
+import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import { ValidationSeverity } from '@openforis/arena-core'
-
-import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
+import { buildAssistantSurvey, createToolContext, fakeT } from '@test/unit/utils/assistantTestUtils'
+import { withValidation } from '@test/unit/utils/surveyValidationTestUtils'
 import { buildAssistantSystemPrompt } from '@webapp/ai/agent/assistantSystemPrompt'
 import { collectNodeDefIssues, collectValidationIssues } from '@webapp/ai/changeSets/validationIssues'
 import { nodeDefGetTool } from '@webapp/ai/tools/design/nodeDefGet'
@@ -14,8 +16,6 @@ import {
   surveyGetValidationTool,
 } from '@webapp/ai/tools/design/surveyGetValidation'
 import { runTool } from '@webapp/ai/tools/registry'
-import { buildAssistantSurvey, createToolContext, fakeT } from '@test/unit/utils/assistantTestUtils'
-import { withValidation } from '@test/unit/utils/surveyValidationTestUtils'
 
 const { keysEmpty, childrenEmpty } = {
   keysEmpty: 'validationErrors:nodeDefEdit.keysEmpty',

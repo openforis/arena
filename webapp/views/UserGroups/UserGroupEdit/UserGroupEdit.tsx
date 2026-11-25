@@ -6,7 +6,6 @@ import { useParams } from 'react-router'
 import * as StringUtils from '@core/stringUtils'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import * as Validation from '@core/validation/validation'
-
 import { ButtonBack, ButtonDelete, ButtonSave } from '@webapp/components'
 import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor/LabelsEditor'

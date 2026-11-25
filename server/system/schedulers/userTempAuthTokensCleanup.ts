@@ -1,10 +1,9 @@
 import * as schedule from 'node-schedule'
 
 import { ServiceRegistry } from '@openforis/arena-core'
+import { runWithClusterLock, ServerServiceType } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
-
-import { ServerServiceType, runWithClusterLock } from '@openforis/arena-server'
 
 const Logger = Log.getLogger('UserTempAuthTokensCleanup')
 

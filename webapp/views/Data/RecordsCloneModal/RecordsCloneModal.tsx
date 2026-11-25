@@ -5,16 +5,15 @@ import { useCallback, useState } from 'react'
 import { Objects } from '@openforis/arena-core'
 
 import { RecordCycle } from '@core/record/recordCycle'
-
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/Modal'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
-import { JobActions } from '@webapp/store/app'
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { useAppDispatch } from '@webapp/store'
+import { JobActions } from '@webapp/store/app'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 const sources = {
   allRecords: 'allRecords',

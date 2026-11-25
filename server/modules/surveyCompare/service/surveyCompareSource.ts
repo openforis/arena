@@ -1,13 +1,12 @@
 import { uuidv4 } from '@core/uuid'
-
+import { db, type DbClient } from '@server/db/db'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import FileZip from '@server/utils/file/fileZip'
-import { db, type DbClient } from '@server/db/db'
 
-import { SurveyCompareSourceSurvey, fetchSurveyFromDb, readSurveyFromFile } from './surveyCompareSurveysReader'
+import { fetchSurveyFromDb, readSurveyFromFile, SurveyCompareSourceSurvey } from './surveyCompareSurveysReader'
 
 /**
  * Reference to the survey compared with the current one: an uploaded survey file (kept in the shared temp storage)

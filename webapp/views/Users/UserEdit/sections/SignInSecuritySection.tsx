@@ -1,5 +1,4 @@
 import { Button } from '@webapp/components'
-
 import { UserPasswordSetForm } from '../../UserPasswordChange/UserPasswordSetForm'
 import { SignInMethodsPanel } from '../SignInMethodsPanel'
 import { UserEditSection, UserEditSectionRow } from '../UserEditSection'

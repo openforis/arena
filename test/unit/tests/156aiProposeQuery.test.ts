@@ -1,16 +1,13 @@
 import { z } from 'zod'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
-
-import { proposeQueryInputSchema, proposeQueryTool, toDataQueryAiResult } from '@webapp/ai/tools/analysis/proposeQuery'
-
+import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
 import { newAnalysisToolContext, runTool } from '@test/unit/utils/aiAnalysisTestUtils'
-
+import { proposeQueryInputSchema, proposeQueryTool, toDataQueryAiResult } from '@webapp/ai/tools/analysis/proposeQuery'
+import { getContextUser } from '../../integration/config/context'
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import { getContextUser } from '../../integration/config/context'
 
 let survey: any = null
 const getUuid = (path: string) => NodeDef.getUuid(SurveyUtils.getNodeDefByPath({ survey, path }))

@@ -2,14 +2,12 @@ import { useCallback } from 'react'
 import axios from 'axios'
 
 import * as Category from '@core/survey/category'
-
+import { useAppDispatch } from '@webapp/store'
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
-
-import { useRefreshCategory } from '../category/useRefreshCategory'
 import { State } from '../../state'
-import { useAppDispatch } from '@webapp/store'
+import { useRefreshCategory } from '../category/useRefreshCategory'
 
 export const useImportCategory = ({ setState }) => {
   const dispatch = useAppDispatch()

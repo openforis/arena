@@ -1,10 +1,9 @@
 import { quote } from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
-
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { setVar, source } from '../../rFunctions'
 
 import RFileSystem from './rFileSystem'
-import { setVar, source } from '../../rFunctions'
 
 const dirNameInit = 'init'
 const fileNamesInit = [

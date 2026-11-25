@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
 
-import { State } from '../state'
 import { Objects } from '@openforis/arena-core'
+
+import { State } from '../state'
 
 const removeDuplicates = ({ items, state }) => {
   const itemsByKey = items.reduce((acc, item) => ({ ...acc, [State.getItemKey(state)(item)]: item }), {})

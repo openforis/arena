@@ -3,24 +3,21 @@ import './dataQuery.scss'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
-
 import { Paginator } from '@webapp/components/Table'
-
+import { useAppDispatch } from '@webapp/store'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
-
 import { RecordEditModal } from '@webapp/views/Data/common/RecordEditModal'
-
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
-import { useDataQuery } from './store'
+
 import ButtonBar from './ButtonBar'
-import Visualizer from './Visualizer'
-import { QuerySidebar } from './QuerySidebar/QuerySidebar'
 import {
   DataQuerySelectedAttributes,
   DataQuerySelectedDimensions,
   DataQuerySelectedMeasures,
 } from './DataQuerySortableItems'
-import { useAppDispatch } from '@webapp/store'
+import { QuerySidebar } from './QuerySidebar/QuerySidebar'
+import { useDataQuery } from './store'
+import Visualizer from './Visualizer'
 
 const DataQuery = () => {
   const dispatch = useAppDispatch()

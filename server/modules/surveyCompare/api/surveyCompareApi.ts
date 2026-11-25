@@ -1,13 +1,12 @@
 import type { Request as ExpressRequest, Response as ExpressResponse, Router } from 'express'
-import SystemError, { StatusCodes } from '@core/systemError'
-import { SurveyCompareMaxFileSizeMB } from '@core/survey/surveyCompare/surveyCompareTypes'
 
+import { SurveyCompareMaxFileSizeMB } from '@core/survey/surveyCompare/surveyCompareTypes'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as JobUtils from '@server/job/jobUtils'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyCompareService from '../service/surveyCompareService'
 import * as SurveyFingerprintService from '../service/surveyFingerprintService'

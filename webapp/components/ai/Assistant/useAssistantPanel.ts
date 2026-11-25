@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 
-import { assistantPanelStore, type AssistantPanelState } from './assistantPanelStore'
+import { type AssistantPanelState, assistantPanelStore } from './assistantPanelStore'
 
 /**
  * Returns the panel state; re-renders on every change.

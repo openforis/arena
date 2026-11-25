@@ -2,8 +2,8 @@
  * Where the gateway sends the data: an organisation server (base URL on AI_ORG_HOSTED_BASE_URLS) or the cloud.
  * Used by the survey AI policy. Local engines (on this device) are classified in the browser.
  */
-import { ENV } from '@core/processUtils'
 import { isAllowlisted, parseUrl, providerTypeUsesBaseUrl } from '@common/ai/allowlist'
+import { ENV } from '@core/processUtils'
 
 export type GatewayHostingClass = 'orgHosted' | 'cloud'
 

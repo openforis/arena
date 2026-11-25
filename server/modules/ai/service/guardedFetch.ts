@@ -11,14 +11,14 @@ import https from 'node:https'
 import { isIP } from 'node:net'
 import { Readable } from 'node:stream'
 
+import { isNonPublicIpAddress } from '@common/ai/ipAddress'
 import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
-import { isNonPublicIpAddress } from '@common/ai/ipAddress'
 
 import {
   areAddressesAllowed,
-  type GuardOptions,
   defaultLookup,
+  type GuardOptions,
   isAllowlisted,
   type LookupFn,
   notAllowed,

@@ -1,12 +1,12 @@
 import * as Survey from '@core/survey/survey'
 
-import { SurveyCompareParams, SurveyCompareResult, SurveyCompareStatus } from './surveyCompareTypes'
-import { buildNodeDefsIndex } from './surveyCompareNodeDefsIndex'
-import { compareNodeDefs, matchNodeDefs } from './surveyCompareNodeDefs'
-import { compareCategories, matchCategories } from './surveyCompareCategories'
-import { compareTaxonomies } from './surveyCompareTaxonomies'
-import { compareSurveyFiles, compareSurveyInfo, surveyInfoChangeId } from './surveyCompareSurveyInfo'
 import { evaluateApplicability } from './surveyCompareApplicability'
+import { compareCategories, matchCategories } from './surveyCompareCategories'
+import { compareNodeDefs, matchNodeDefs } from './surveyCompareNodeDefs'
+import { buildNodeDefsIndex } from './surveyCompareNodeDefsIndex'
+import { compareSurveyFiles, compareSurveyInfo, surveyInfoChangeId } from './surveyCompareSurveyInfo'
+import { compareTaxonomies } from './surveyCompareTaxonomies'
+import { SurveyCompareParams, SurveyCompareResult, SurveyCompareStatus } from './surveyCompareTypes'
 
 const countByStatus = (diffs: { status: string }[]) => ({
   added: diffs.filter((diff) => diff.status === SurveyCompareStatus.added).length,

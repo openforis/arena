@@ -3,10 +3,9 @@
  */
 import type { ArenaUser } from '@openforis/arena-core'
 
-import SystemError, { StatusCodes } from '@core/systemError'
-import * as Survey from '@core/survey/survey'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import {
+  type AiPolicy,
   aiPolicyDataClasses,
   clampAiPolicy,
   findLevelsAboveCeiling,
@@ -14,9 +13,9 @@ import {
   isAiPolicyLevel,
   isDataAboveSchema,
   normalizeAiPolicy,
-  type AiPolicy,
 } from '@common/ai/policy'
-
+import * as Survey from '@core/survey/survey'
+import SystemError, { StatusCodes } from '@core/systemError'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'

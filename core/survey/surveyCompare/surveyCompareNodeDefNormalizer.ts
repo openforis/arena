@@ -1,10 +1,10 @@
-import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { NodeDefsIndex, getNameByUuid } from './surveyCompareNodeDefsIndex'
+import { getNameByUuid, NodeDefsIndex } from './surveyCompareNodeDefsIndex'
 import { normalizeValue } from './surveyCompareValues'
 
 export interface NormalizedNodeDef {

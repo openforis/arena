@@ -1,5 +1,4 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
-
 import * as ActivityLogMessage from '../activityLogMessage'
 
 import i18nMessageParamsFns from './i18nMessageParamsFns'

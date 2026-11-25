@@ -3,8 +3,8 @@
  */
 import type { ArenaNodeDef, ArenaNodeDefExpression, NodeDefType } from '@openforis/arena-core'
 
-import type { RecordAttributeUpdateOperation } from './recordEdits/types'
 import type { CategoryItemLabelSetOperation } from './categoryItemLabels/types'
+import type { RecordAttributeUpdateOperation } from './recordEdits/types'
 
 export type NodeDefBasicProp = 'name' | 'key' | 'multiple' | 'readOnly'
 

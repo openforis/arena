@@ -1,11 +1,9 @@
 import type { Router } from 'express'
 
-import * as Request from '@server/utils/request'
-
-import * as User from '@core/user/user'
 import * as ProcessUtils from '@core/processUtils'
-
+import * as User from '@core/user/user'
 import { requireRecordAnalysisPermission } from '@server/modules/auth/authApiMiddleware'
+import * as Request from '@server/utils/request'
 
 import { sendPoolCommand } from './rStudioPoolClient'
 

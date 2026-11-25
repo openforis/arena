@@ -1,14 +1,13 @@
 import React from 'react'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
-
 import type {
   ScreenshotCaptureMode,
   ScreenshotOptions,
   ScreenshotTarget,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const PREFIX = 'mapWorkspace.screenshot'
 

@@ -1,19 +1,18 @@
 import './AnalysisNodeDef.scss'
+
 import { useCallback } from 'react'
-import { Link } from 'react-router'
 import classNames from 'classnames'
+import { Link } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, NodeDefsActions, useSurveyPreferredLang, useSurveyCycleKey } from '@webapp/store/survey'
-
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useChainEditable } from '@webapp/store/ui/chain'
-import { useI18n } from '@webapp/store/system'
-
 import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/WarningBadge'
 import { useAppDispatch } from '@webapp/store'
+import { NodeDefsActions, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useChainEditable } from '@webapp/store/ui/chain'
 
 type AnalysisNodeDefProps = {
   nodeDefUuid: string

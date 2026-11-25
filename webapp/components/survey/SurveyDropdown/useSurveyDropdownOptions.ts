@@ -2,10 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
-
+import { useOnValueChange } from '@webapp/components/hooks'
 import { SurveyType } from '@webapp/model'
 import * as API from '@webapp/service/api'
-import { useOnValueChange } from '@webapp/components/hooks'
 
 const toOption = (surveyInfo) => {
   if (!surveyInfo) return null

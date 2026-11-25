@@ -1,18 +1,17 @@
-import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/components/hooks'
 import { useCallback, useEffect, useReducer } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-
-import { LoginValidator } from '@webapp/store/login'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { useAsyncGetRequest, useAsyncPutRequest, useOnUpdate } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
+import { LoginValidator } from '@webapp/store/login'
 import { NotificationActions } from '@webapp/store/ui'
 
 import * as actions from './actions'
-import reducer from './reducer'
 import initialState from './initialState'
-import { useAppDispatch } from '@webapp/store'
+import reducer from './reducer'
 
 export const useResetPassword = () => {
   const dispatchRedux = useAppDispatch()

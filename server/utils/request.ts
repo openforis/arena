@@ -1,7 +1,6 @@
 import type { Request as ExpressRequest } from 'express'
 
 import * as A from '@core/arena'
-
 import * as ProcessUtils from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'

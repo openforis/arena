@@ -1,13 +1,10 @@
 import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import type { ExtraPropDefItem } from '@core/survey/extraPropDef'
-
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-
-import * as StringUtils from '@core/stringUtils'
-
 import * as TaxonomyValidator from '../taxonomyValidator'
 
 export default class TaxonCSVParser {

@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, generateSurveyName, test } from '../fixtures'
+import { getWorkerSurveyEditor, insertSurveyEditor } from '../fixtures/testUsers'
 import {
   assistantPanel,
   lastAssistantAnswer,
@@ -13,7 +13,6 @@ import {
 } from '../helpers/assistantPanel'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
-import { getWorkerSurveyEditor, insertSurveyEditor } from '../fixtures/testUsers'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'

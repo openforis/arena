@@ -1,19 +1,18 @@
 import React from 'react'
 
+import type { ArenaNodeDefExpression } from '@openforis/arena-core'
+
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as Expression from '@core/expressionParser/expression'
-
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
-
+import { ButtonIconDelete } from '@webapp/components/buttons'
 import ExpressionEditor from '@webapp/components/expression/ExpressionEditor'
 import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
-import { ButtonIconDelete } from '@webapp/components/buttons'
 import ButtonGroup from '@webapp/components/form/ButtonGroup'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
-import type { ArenaNodeDefExpression } from '@openforis/arena-core'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 import type { ExpressionEditorSettingsProps } from './expressionPropTypes'
 

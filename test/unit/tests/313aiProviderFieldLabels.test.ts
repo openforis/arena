@@ -1,5 +1,5 @@
 import { AI_PROVIDER_FIELD_MAX_CHARS } from '@common/ai/providerLimits'
-import { LANGUAGES, getNamespaceText, placeholders } from '@test/unit/utils/aiSuggestionsI18n'
+import { getNamespaceText, LANGUAGES, placeholders } from '@test/unit/utils/aiSuggestionsI18n'
 
 describe('the field of aiProviderFieldTooLong is shown by its label (313)', () => {
   test.each(LANGUAGES)('%s names every limited field and uses the label in the message', (lang) => {

@@ -1,14 +1,16 @@
 import './dropdown.scss'
 
-import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'
+import ReactSelect, { components, createFilter } from 'react-select'
 
-import { TestId } from '@webapp/utils/testId'
+import type { ArenaValidation } from '@openforis/arena-core'
+
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { TestId } from '@webapp/utils/testId'
 import { LabelWithTooltip } from '../LabelWithTooltip'
+
 import { dropdownTheme } from './dropdownTheme'
 import { useDropdown } from './useDropdown'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 const OptionComponent =
   ({ renderOptionLabel }) =>

@@ -2,11 +2,11 @@ import {
   emptySuggestionState,
   getTrackedOf,
   parseSuggestionState,
+  type SuggestionUserState,
   withAdded,
   withDismissed,
   withKind,
   withProgress,
-  type SuggestionUserState,
 } from '@webapp/ai/suggestions/suggestionState'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 

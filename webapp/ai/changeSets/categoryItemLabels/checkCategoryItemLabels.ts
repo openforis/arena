@@ -3,9 +3,9 @@
  * browser does not hold the items of large categories.
  */
 import * as Survey from '@core/survey/survey'
-
 import type { ChangeSet, ChangeSetIssue } from '../types'
-import { getCategoryItemLabelKey, isCategoryItemLabelOperation, type CategoryItemLabelSetOperation } from './types'
+
+import { type CategoryItemLabelSetOperation, getCategoryItemLabelKey, isCategoryItemLabelOperation } from './types'
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
 type FieldIssue = { field: string; message: string }

@@ -4,28 +4,27 @@
  */
 import type { ArenaCategory, ArenaUser } from '@openforis/arena-core'
 
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Survey from '@core/survey/survey'
-import SystemError, { StatusCodes } from '@core/systemError'
-import { isUuid } from '@core/uuid'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 import {
   CATEGORY_ITEM_LABEL_TEXT_MAX,
   CATEGORY_ITEM_LABELS_UPDATE_MAX,
-  MISSING_LABELS_SERVER_PAGE_DEFAULT,
-  MISSING_LABELS_SERVER_PAGE_MAX,
   type CategoryItemLabelConflict,
   type CategoryItemLabelsUpdateAnswer,
   type CategoryItemLabelUpdate,
+  MISSING_LABELS_SERVER_PAGE_DEFAULT,
+  MISSING_LABELS_SERVER_PAGE_MAX,
   type MissingLabelsCounts,
   type MissingLabelsPage,
 } from '@common/ai/categoryItemLabels'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Survey from '@core/survey/survey'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { isUuid } from '@core/uuid'
 import { db, type DbClient } from '@server/db/db'
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-import * as CategoryItemLabelsRepository from '@server/modules/category/repository/categoryItemLabelsRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as CategoryItemLabelsRepository from '@server/modules/category/repository/categoryItemLabelsRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import { bulkUpdateSurveySchemaTableProp } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 /**

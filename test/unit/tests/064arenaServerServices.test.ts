@@ -1,7 +1,7 @@
 import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 
-import { initArenaServerServices } from '@server/system/arenaServerServices'
 import { SurveyDataMigrationServiceArena } from '@server/modules/survey/service/dataMigration/surveyDataMigrationService'
+import { initArenaServerServices } from '@server/system/arenaServerServices'
 
 describe('arena-server services', () => {
   it('the Arena survey data migration service replaces the arena-server default', () => {

@@ -2,22 +2,19 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Category from '@core/survey/category'
-
-import { useIsCategoriesRoute } from '@webapp/components/hooks'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { Button, ButtonMenu } from '@webapp/components/buttons'
 import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { UploadButton } from '@webapp/components/form'
-
-import { designerModules, appModuleUri } from '@webapp/app/appModules'
+import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
-import { SurveyActions, useSurveyId, useCategoryByName } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { CategoryCloneFromSurveyDialog } from '../CategoryCloneFromSurveyDialog'
-import { useActions, State } from '../store'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useCategoryByName, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { CategoryCloneFromSurveyDialog } from '../CategoryCloneFromSurveyDialog'
+import { State, useActions } from '../store'
 
 type TableHeaderLeftProps = {
   headerProps?: Record<string, any>

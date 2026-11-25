@@ -1,13 +1,11 @@
 import { useCallback } from 'react'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-
 import * as API from '@webapp/service/api'
-
+import { useAppDispatch } from '@webapp/store'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
-import { useAppDispatch } from '@webapp/store'
 
 export const useStartBatchImport = ({ setState }) => {
   const surveyId = useSurveyId()

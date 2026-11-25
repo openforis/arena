@@ -1,5 +1,4 @@
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { waitForJobEnd } from '../helpers/publish'
 import { Urls } from '../helpers/urls'

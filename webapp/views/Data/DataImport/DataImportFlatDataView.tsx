@@ -5,32 +5,28 @@ import { useCallback, useMemo, useState } from 'react'
 import { Objects, UUIDs } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
-
-import { FileUtils } from '@webapp/utils/fileUtils'
-import * as API from '@webapp/service/api'
-import { TestId } from '@webapp/utils/testId'
-
-import { JobActions } from '@webapp/store/app'
-import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
-import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
-import { useUserIsSystemAdmin } from '@webapp/store/user'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import { ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
+import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
+import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
+import { JobActions } from '@webapp/store/app'
+import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
+import { FileUtils } from '@webapp/utils/fileUtils'
+import { TestId } from '@webapp/utils/testId'
 
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
-import { useDataImportFlatDataViewSteps } from './useDataImportFlatDataViewSteps'
 import { ImportStartButton } from './ImportStartButton'
-import { useAppDispatch } from '@webapp/store'
+import { useDataImportFlatDataViewSteps } from './useDataImportFlatDataViewSteps'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',

@@ -1,8 +1,7 @@
 import * as A from '@core/arena'
-
 import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActionTypes } from '../actionTypes'
+
 import * as SystemInfoState from './state'
 
 const actionHandlers = {

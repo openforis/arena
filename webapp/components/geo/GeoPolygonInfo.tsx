@@ -1,16 +1,14 @@
 import './GeoPolygonInfo.scss'
 
 import { useCallback, useMemo } from 'react'
+import type { Feature } from 'geojson'
 
 import { Numbers } from '@openforis/arena-core'
 
-import { NumberConversionUtils } from '@core/numberConversionUtils'
-
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
-import { FormItem } from '../form/Input'
+import { NumberConversionUtils } from '@core/numberConversionUtils'
 import { ButtonIconInfo } from '../buttons'
-import type { Feature } from 'geojson'
+import { FormItem } from '../form/Input'
 
 const { areaUnits, lengthUnits, abbreviationByUnit, metersToUnit, squareMetersToUnit } = NumberConversionUtils
 

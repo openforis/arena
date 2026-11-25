@@ -3,19 +3,17 @@ import { useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-
+import * as Category from '@core/survey/category'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as Survey from '@core/survey/survey'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyState } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
-import { useAppDispatch } from '@webapp/store'
 
 const { categoryCodeAttributeName } = ChainSamplingDesign
 

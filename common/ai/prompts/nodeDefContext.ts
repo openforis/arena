@@ -1,5 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 // getNodeDefChildren is a JS function whose inferred parameter type lacks `nodeDef`.
 type NodeDefChildrenParams = Parameters<typeof Survey.getNodeDefChildren>[0] & { nodeDef: unknown }

@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { ReactElement } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
+import type { ReactElement } from 'react'
 import { useMap, useMapEvents } from 'react-leaflet'
 
+import type { CoordinateNotation } from '@core/geo/coordinateFormat'
+import { formatCoordinates, nextCoordinateNotation } from '@core/geo/coordinateFormat'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
 import { useControlContainerMove } from '../layers/useControlContainerMove'
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import type { MapWorkspaceRecords } from '../mapWorkspaceTypes'
-import { formatCoordinates, nextCoordinateNotation } from '@core/geo/coordinateFormat'
-import type { CoordinateNotation } from '@core/geo/coordinateFormat'
-import { countPointsInBounds, getScaleBar, metersPerPixel } from './mapScale'
+
 import type { LatLngBoundsLiteral } from './mapScale'
+import { countPointsInBounds, getScaleBar, metersPerPixel } from './mapScale'
 
 type LatLng = { lat: number; lng: number }
 type MapViewState = { center: LatLng; zoom: number; bounds: LatLngBoundsLiteral }

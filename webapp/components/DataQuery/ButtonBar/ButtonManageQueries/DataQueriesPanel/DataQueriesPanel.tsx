@@ -5,12 +5,10 @@ import { useMemo } from 'react'
 import { DataQuerySummaries } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
-
-import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
 import PanelRight from '@webapp/components/PanelRight'
 import Table from '@webapp/components/Table'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { DataQueryEditForm } from './DataQueryEditForm'
 import { useDataQueriesPanel } from './useDataQueriesPanel'

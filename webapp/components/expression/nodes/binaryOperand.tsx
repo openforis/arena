@@ -3,8 +3,8 @@ import React, { useCallback, useMemo } from 'react'
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { ButtonGroup } from '@webapp/components/form'
+
 import type { ExpressionNodeComponentProps } from './expressionNode'
 
 const { types } = Expression

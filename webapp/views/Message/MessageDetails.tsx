@@ -7,25 +7,24 @@ import {
   DateFormats,
   MessageNotificationType,
   MessagePropsKey,
+  Messages,
   MessageStatus,
   MessageTargetUserType,
-  Messages,
 } from '@openforis/arena-core'
 
+import * as DateUtils from '@core/dateUtils'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-import * as DateUtils from '@core/dateUtils'
-
 import { Button, ButtonDelete, ButtonSave, Markdown, Switch } from '@webapp/components'
 import { ButtonGroup } from '@webapp/components/form'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 import { useConfirm } from '@webapp/components/hooks'
+import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useAppDispatch } from '@webapp/store'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
-import { DateInput } from '@webapp/components/form/DateTimeInput'
-import { useAppDispatch } from '@webapp/store'
-import ValidationTooltip from '@webapp/components/ValidationTooltip'
 
 const notificationTypeItems = [MessageNotificationType.Email, MessageNotificationType.PushNotification].map(
   (notificationType) => ({

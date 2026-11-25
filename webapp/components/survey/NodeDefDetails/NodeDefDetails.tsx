@@ -1,17 +1,17 @@
 import './NodeDefDetails.scss'
 
-import classNames from 'classnames'
 import { type ElementType, useMemo } from 'react'
+import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
-
-import { TestId } from '@webapp/utils/testId'
-
 import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import TabBar from '@webapp/components/TabBar'
+import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 import AdvancedProps from './AdvancedProps'
 import AnalysisEntitySelector from './AnalysisEntitySelector'
@@ -19,12 +19,8 @@ import BasicProps from './BasicProps'
 import ButtonBar from './ButtonBar'
 import { MobileAppProps } from './MobileAppProps'
 import { PrintProps } from './PrintProps'
-import ValidationsProps from './ValidationsProps'
-
-import { useSurveyCycleKey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
 import { NodeDefEditReadOnlyContext, State, useNodeDefDetails } from './store'
+import ValidationsProps from './ValidationsProps'
 
 type NodeDefDetailsProps = {
   nodeDefUuid?: string

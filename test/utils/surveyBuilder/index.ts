@@ -1,25 +1,22 @@
-import { db } from '../../../server/db/db'
+import type { ArenaUser } from '@openforis/arena-core'
 
 import * as A from '../../../core/arena'
-
-import * as Survey from '../../../core/survey/survey'
-import * as NodeDef from '../../../core/survey/nodeDef'
 import * as Category from '../../../core/survey/category'
+import * as NodeDef from '../../../core/survey/nodeDef'
+import * as Survey from '../../../core/survey/survey'
 import * as Taxonomy from '../../../core/survey/taxonomy'
 import * as User from '../../../core/user/user'
-
-import * as SurveyManager from '../../../server/modules/survey/manager/surveyManager'
+import { db } from '../../../server/db/db'
 import * as NodeDefRepository from '../../../server/modules/nodeDef/repository/nodeDefRepository'
-
+import * as SurveyManager from '../../../server/modules/survey/manager/surveyManager'
 import * as SurveyUtils from '../surveyUtils'
 
-import NodeDefEntityBuilder from './nodeDefEntityBuilder'
-import NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
-import { TaxonomyBuilder } from './taxonomyBuilder'
-import { TaxonBuilder } from './taxonBuilder'
-import { ItemBuilder } from './categoryItemBuilder'
 import { CategoryBuilder } from './categoryBuilder'
-import type { ArenaUser } from '@openforis/arena-core'
+import { ItemBuilder } from './categoryItemBuilder'
+import NodeDefAttributeBuilder from './nodeDefAttributeBuilder'
+import NodeDefEntityBuilder from './nodeDefEntityBuilder'
+import { TaxonBuilder } from './taxonBuilder'
+import { TaxonomyBuilder } from './taxonomyBuilder'
 
 const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)

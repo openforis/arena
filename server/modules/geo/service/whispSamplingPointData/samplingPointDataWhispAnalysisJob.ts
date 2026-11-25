@@ -1,25 +1,24 @@
-import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
 import * as readline from 'node:readline'
 import { Readable } from 'node:stream'
 
-import { Points, type ArenaCategory, type ArenaSRSIndex, type ArenaSurvey } from '@openforis/arena-core'
+import { type ArenaCategory, type ArenaSRSIndex, type ArenaSurvey, Points } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
-import SystemError from '@core/systemError'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
 import Job, { type JobParams } from '@server/job/job'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as CategoryManager from '@server/modules/category/manager/categoryManager'
-
 import { WhishDataProcessor } from '../whishDataProcessor'
-import { WhispColumn, WhispColumnsCollector, WhispFeature, WhispValues, whispExternalIdProp } from './whispResultsUtils'
+
+import type { SamplingPointDataWhispJobContext } from './samplingPointDataWhispJobContext'
+import { WhispColumn, WhispColumnsCollector, whispExternalIdProp, WhispFeature, WhispValues } from './whispResultsUtils'
 
 // max number of features submitted to Whisp in a single analysis request
 const whispBatchSize = 1000

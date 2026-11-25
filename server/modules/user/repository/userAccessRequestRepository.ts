@@ -1,10 +1,9 @@
-import type { Readable } from 'node:stream'
 import camelize from 'camelize'
-
-import { db, type DbClient } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
+import type { Readable } from 'node:stream'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
+import { db, type DbClient } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 export const countUserAccessRequests = (client: DbClient = db): Promise<number> =>
   client.one(

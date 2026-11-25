@@ -5,7 +5,6 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
-
 import * as Log from '@server/log/log'
 
 import Thread from './thread'

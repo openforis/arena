@@ -1,11 +1,9 @@
-import { Readable } from 'stream'
 import ExcelJS from 'exceljs'
+import { Readable } from 'stream'
 
 import { FileFormats } from '@core/fileFormats'
-
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
-
-import { Cell, readHeadersAndRows, toXlsxBuffer, Rows } from '../../utils/flatDataImportTestUtils'
+import { Cell, readHeadersAndRows, Rows, toXlsxBuffer } from '../../utils/flatDataImportTestUtils'
 
 const readXlsx = async (...sheetsRows: Rows[]) =>
   readHeadersAndRows({ stream: Readable.from([await toXlsxBuffer(...sheetsRows)]), fileFormat: FileFormats.xlsx })

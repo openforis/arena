@@ -1,19 +1,18 @@
 import { Navigate } from 'react-router'
 
+import { appModules, appModuleUri, homeModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/ModuleSwitch'
-
-import { appModuleUri, appModules, homeModules } from '@webapp/app/appModules'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
 import CollectImportReport from './CollectImportReport'
 import Landing from './Landing'
-import SurveyList from './SurveyList'
+import { SurveyCompare } from './SurveyCompare'
 import SurveyCreate from './SurveyCreate'
 import SurveyInfo from './SurveyInfo'
-import { SurveyCompare } from './SurveyCompare'
-import TemplateList from './TemplateList'
+import SurveyList from './SurveyList'
 import TemplateCreate from './TemplateCreate'
+import TemplateList from './TemplateList'
 
 const HomeDashboardRedirect = () => <Navigate to={appModuleUri(appModules.dashboard)} replace />
 

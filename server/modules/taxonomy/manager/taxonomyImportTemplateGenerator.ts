@@ -1,9 +1,10 @@
 import type { ArenaTaxonomy } from '@openforis/arena-core'
+
 import { getLanguageISO639part2Label } from '@core/app/languages'
 import { DataImportTemplateTypes } from '@core/dataImport'
+import type { DataImportTemplateType } from '@core/dataImport/dataImportTemplateTypes'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxonomy from '@core/survey/taxonomy'
-import type { DataImportTemplateType } from '@core/dataImport/dataImportTemplateTypes'
 
 const VERNACULAR_LANGUAGE_CODE_SYNONYM = 'lat'
 

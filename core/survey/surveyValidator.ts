@@ -1,7 +1,7 @@
-import * as SurveyInfoValidator from './_surveyValidator/surveyInfoValidator'
-import * as SurveyCyclesValidator from './_surveyValidator/surveyCyclesValidator'
-import * as NodeDefValidator from './_surveyValidator/nodeDefValidator'
 import * as NodeDefExpressionsValidator from './_surveyValidator/nodeDefExpressionsValidator'
+import * as NodeDefValidator from './_surveyValidator/nodeDefValidator'
+import * as SurveyCyclesValidator from './_surveyValidator/surveyCyclesValidator'
+import * as SurveyInfoValidator from './_surveyValidator/surveyInfoValidator'
 
 export const {
   getInvalidLanguageCodes,

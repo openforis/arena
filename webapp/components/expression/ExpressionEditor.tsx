@@ -1,23 +1,23 @@
 import './ExpressionEditor.scss'
 
 import { useCallback, useEffect, useState } from 'react'
-import * as A from '@core/arena'
 
+import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
-import { TestId } from '@webapp/utils/testId'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import AiExplainPanel from '@webapp/components/ai/AiExplainPanel'
+import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { useNodeDefByUuid } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+import { Button } from '../buttons'
 
 import ExpressionEditorPopup from './ExpressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
-import { useNodeDefByUuid } from '@webapp/store/survey'
-import { Button } from '../buttons'
-import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
-import AiExplainPanel from '@webapp/components/ai/AiExplainPanel'
-import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
-import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
-import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
-import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 
 type ExpressionEditorProps = {
   index?: number // used when rendering multiple expression editor elements

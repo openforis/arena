@@ -2,16 +2,27 @@ import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
 import { useCallback, useEffect } from 'react'
-import { connect } from 'react-redux'
 import classNames from 'classnames'
+import { connect } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
+
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
-
+import * as Survey from '@core/survey/survey'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { SurveyState, useSurvey, useIsSurveyDirty } from '@webapp/store/survey'
+import { Split } from '@webapp/components'
+import { ButtonIconClose } from '@webapp/components/buttons'
+import { ButtonGroup } from '@webapp/components/form'
+import { useLocationPathMatcher, useOnUpdate } from '@webapp/components/hooks'
+import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
+import { TreeSelectViewMode } from '@webapp/model'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { useAppDispatch } from '@webapp/store'
+import { SurveyState, useIsSurveyDirty, useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import {
   SurveyFormActions,
   SurveyFormState,
@@ -19,29 +30,16 @@ import {
   useNotAvailableEntityPageUuids,
   useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
-import { RecordActions, RecordState } from '@webapp/store/ui/record'
-import { useI18n } from '@webapp/store/system'
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
-import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import { useOnUpdate, useLocationPathMatcher } from '@webapp/components/hooks'
-
-import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
-
-import { Split } from '@webapp/components'
-import { ButtonIconClose } from '@webapp/components/buttons'
-import { ButtonGroup } from '@webapp/components/form'
-import { TreeSelectViewMode } from '@webapp/model'
-
+import { TestId } from '@webapp/utils/testId'
 import NodeDefDetails from '../NodeDefDetails'
+
+import AddNodeDefPanel from './components/AddNodeDefPanel'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import { RecordCompletionBar } from './components/RecordCompletionBar'
 import { RecordTreeItemStatusSuffix } from './components/RecordTreeItemStatusSuffix'
-import AddNodeDefPanel from './components/AddNodeDefPanel'
-import NodeDefSwitch from './nodeDefs/NodeDefSwitch'
 import FormHeader from './FormHeader'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaRecordNode, ArenaAnyNodeDef } from '@openforis/arena-core'
+import NodeDefSwitch from './nodeDefs/NodeDefSwitch'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
   Survey.getNodeDefChildren({ nodeDef })(survey).some((childDef) =>

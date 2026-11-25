@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { ENV } from '@core/processUtils'
-
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { Button, ButtonSplit } from '@webapp/components/buttons'
 import { MobilePreviewPanel } from '@webapp/components/survey/MobilePreview'

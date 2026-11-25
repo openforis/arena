@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react'
 
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
-import { MeasureTool } from '@webapp/components/MapContainer/workspace/tools/measure/MeasureTool'
 import { measureModeOfTool } from '@webapp/components/MapContainer/workspace/tools/measure/measureModes'
+import { MeasureTool } from '@webapp/components/MapContainer/workspace/tools/measure/MeasureTool'
 
 /**
  * Renders the active map tool; it is inside WorkspaceLeafletProvider, so tools can use the Leaflet map.

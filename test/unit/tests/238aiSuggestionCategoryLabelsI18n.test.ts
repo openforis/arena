@@ -1,11 +1,11 @@
 import {
   CYRILLIC,
   CYRILLIC_LANGUAGES,
-  LANGUAGES,
   enTextOf,
   expectedTexts,
   getNamespaceText,
   getText,
+  LANGUAGES,
   placeholders,
 } from '@test/unit/utils/aiSuggestionsI18n'
 

@@ -2,17 +2,15 @@ import { DataQuerySummaries } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
-
-import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
-
-import { Spinner } from '@webapp/components'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { Spinner } from '@webapp/components'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { Button, ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import { Button, ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 type DataQueryEditFormProps = {
   draft?: boolean

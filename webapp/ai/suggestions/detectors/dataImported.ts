@@ -2,12 +2,12 @@
  * Data imported suggestion: records were imported into the active survey (Analysis area), from a succeeded import job.
  */
 import * as JobSerialized from '@common/job/jobSerialized'
-
-import type { AssistantSuggestion } from '../types'
 import type { SuggestionGeneration } from '../generation'
 import type { SuggestionStore } from '../suggestionStore'
-import type { EventDetector } from './types'
+import type { AssistantSuggestion } from '../types'
+
 import { getSuggestionExpiresAt } from './suggestionExpiry'
+import type { EventDetector } from './types'
 
 // a newer import replaces the previous one
 export const DATA_IMPORTED_SUGGESTION_ID = 'dataImported:latest'

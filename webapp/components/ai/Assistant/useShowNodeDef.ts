@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
-
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { SurveyFormActions, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm'

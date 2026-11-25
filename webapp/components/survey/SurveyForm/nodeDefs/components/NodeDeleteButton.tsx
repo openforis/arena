@@ -1,13 +1,12 @@
 import { useCallback } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { RecordActions } from '@webapp/store/ui/record'
 import { ButtonIconDelete } from '@webapp/components/buttons'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAppDispatch } from '@webapp/store'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { RecordActions } from '@webapp/store/ui/record'
 
 type NodeDeleteButtonProps = {
   nodeDef: any

@@ -1,18 +1,16 @@
 import './NodeDefsSelector.scss'
+
 import { useCallback, useMemo, useState } from 'react'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
 import { ArrayUtils } from '@core/arrayUtils'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import * as Survey from '@core/survey/survey'
 import { ButtonIconFilter } from '@webapp/components/buttons'
-
-import { useI18n } from '@webapp/store/system'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useChains, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'

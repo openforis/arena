@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 
 import * as CategoryItem from '@core/survey/categoryItem'
-
 import { State } from '../../state'
 
 // if itemUuid is specified, the active item is reset only if it's still that item

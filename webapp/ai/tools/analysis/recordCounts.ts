@@ -1,10 +1,9 @@
 import { z } from 'zod'
 
 import * as RecordStep from '@core/record/recordStep'
-
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import { fitListToBudget, getResultBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
-import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'

@@ -1,15 +1,14 @@
 import { useCallback } from 'react'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
-
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { cancelDebouncedAction, debounceAction } from '@webapp/utils/reduxUtils'
-
 import { State } from '../../state'
-import { Objects } from '@openforis/arena-core'
-import { useAppDispatch } from '@webapp/store'
 
 const _putCategoryProp =
   ({ surveyId, categoryUuid, key, value, setState }) =>

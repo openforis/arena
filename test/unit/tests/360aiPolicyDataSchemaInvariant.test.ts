@@ -10,7 +10,6 @@ import {
   normalizeAiPolicy,
 } from '@common/ai/policy'
 import { parseAiPolicyBody } from '@server/modules/ai/service/surveyAiPolicyService'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const pairs = aiPolicyLevels.flatMap((schema) => aiPolicyLevels.map((data) => [schema, data] as const))

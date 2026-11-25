@@ -3,21 +3,17 @@ import './TaxonomyDetails.scss'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
-
 import * as Taxonomy from '@core/survey/taxonomy'
-
+import { ButtonBack } from '@webapp/components/buttons'
+import Table from '@webapp/components/Table/Table'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { ButtonBack } from '@webapp/components/buttons'
-import Table from '@webapp/components/Table/Table'
-
 import Header from './Header'
-import TaxaTableRowHeader from './TaxaTableRowHeader'
-import TaxaTableRow from './TaxaTableRow'
-
 import { State, useLocalState } from './store'
+import TaxaTableRow from './TaxaTableRow'
+import TaxaTableRowHeader from './TaxaTableRowHeader'
 
 type TaxonomyDetailsProps = {
   showClose?: boolean

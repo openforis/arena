@@ -1,5 +1,6 @@
-import Record from './Record'
 import SurveyDefsLoader from '../SurveyDefsLoader/SurveyDefsLoader'
+
+import Record from './Record'
 
 export const RecordNoHeader = (props) => {
   const { recordUuid, pageNodeUuid } = props

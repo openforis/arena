@@ -1,18 +1,16 @@
-import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-
-import * as CategoryApi from '@server/modules/category/api/categoryApi'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as CategoryApi from '@server/modules/category/api/categoryApi'
 import * as CategoryItemLabelsManager from '@server/modules/category/manager/categoryItemLabelsManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
 import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
-import * as SB from '@test/utils/surveyBuilder'
 import { expectEditPermissionOnly } from '@test/utils/routePermissionTestUtils'
 import { collectRoutes } from '@test/utils/routeUtils'
+import * as SB from '@test/utils/surveyBuilder'
 
 /**
  * Returns the uuid of every item of a built category by code path ("1.2").

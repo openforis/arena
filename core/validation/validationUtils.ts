@@ -1,18 +1,18 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as StringUtils from '@core/stringUtils'
-
-import * as Validation from '@core/validation/validation'
-import * as ValidationResult from '@core/validation/validationResult'
-import * as RecordValidation from '@core/record/recordValidation'
 import {
   ArenaI18n,
-  LanguageCode,
-  ValidationSeverity,
   type ArenaSurvey,
   type ArenaValidation,
   type ArenaValidationResult,
+  LanguageCode,
+  ValidationSeverity,
 } from '@openforis/arena-core'
+
+import * as RecordValidation from '@core/record/recordValidation'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 type I18n = ArenaI18n & { language: string }
 

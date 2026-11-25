@@ -1,4 +1,4 @@
-import { themeModes, type ThemeMode } from './tokens'
+import { type ThemeMode, themeModes } from './tokens'
 
 export const themePreferences = {
   ...themeModes,

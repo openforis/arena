@@ -1,14 +1,14 @@
 import {
+  omitServerOnlyPrefsFromLoginBody,
+  stripServerOnlyPrefsFromLoginResponse,
+} from '@server/modules/auth/authResponseMiddleware'
+import {
   omitServerOnlyPrefs,
   omitServerOnlyPrefsFromUser,
   SERVER_ONLY_PREFS_KEYS,
   sqlPrefsParamWithoutServerOnlyKeys,
   sqlPrefsWithoutServerOnlyKeys,
 } from '@server/modules/user/serverOnlyPrefs'
-import {
-  omitServerOnlyPrefsFromLoginBody,
-  stripServerOnlyPrefsFromLoginResponse,
-} from '@server/modules/auth/authResponseMiddleware'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const prefs = {

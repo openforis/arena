@@ -1,12 +1,10 @@
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { TestId } from '@webapp/utils/testId'
-
+import NodeDefAttributeLockToggle from '../NodeDefAttributeLockToggle'
+import type { NodeDefComponentProps, NodeDefFieldLockProps } from '../nodeDefComponentProps'
 import NodeDefErrorBadge from '../NodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
-import NodeDefAttributeLockToggle from '../NodeDefAttributeLockToggle'
-import type { NodeDefComponentProps, NodeDefFieldLockProps } from '../nodeDefComponentProps'
 
 type NodeDefFormItemLabelProps = Omit<NodeDefComponentProps, 'updateNode'> &
   NodeDefFieldLockProps & {

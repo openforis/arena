@@ -4,9 +4,8 @@
  * counted instead of failing the run. A run that cannot go on (cancelled, a guard or an error that will fail every
  * call) keeps the results it already has.
  */
-import { assertHostingAllowed, type AiPolicy } from '@common/ai/policy'
+import { type AiPolicy, assertHostingAllowed } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
-
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from '../engines/featureSwitches'
 import { aborted as createAbortError, OFF_POLICY } from '../engines/resolveModel'
 import { getAiErrorKey, isAiAbortError } from '../runtime/runtimeErrors'

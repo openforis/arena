@@ -1,10 +1,8 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { SurveyDataMigrationServiceArena } from '@server/modules/survey/service/dataMigration/surveyDataMigrationService'
-
 import * as SB from '../../utils/surveyBuilder'
 import { getContextUser } from '../config/context'
 

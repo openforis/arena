@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import type { ArenaApi } from '../fixtures/arenaApi'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
@@ -17,8 +16,8 @@ import {
   isGatewayRequest,
   mapLayerCard,
   queryCard,
-  reopenLastConversation,
   reloadApp,
+  reopenLastConversation,
   setLocalProvider,
 } from '../helpers/aiAnalysis'
 import {

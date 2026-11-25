@@ -6,11 +6,10 @@
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import SystemError, { StatusCodes } from '@core/systemError'
-
-import type { AiGenerateText, AiTextRequest } from '../llm'
 import { AiLimits } from '../limits'
-import { extractTaggedValue, stripCodeFences, withOneRetry } from '../parsing'
+import type { AiGenerateText, AiTextRequest } from '../llm'
 import type { RetryFeedback } from '../parsing'
+import { extractTaggedValue, stripCodeFences, withOneRetry } from '../parsing'
 import { buildExpressionExplainPrompt } from '../prompts/expressionExplain'
 import { buildExpressionGeneratePrompt } from '../prompts/expressionGenerate'
 

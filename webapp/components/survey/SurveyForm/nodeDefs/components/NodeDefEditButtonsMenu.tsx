@@ -1,17 +1,17 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
+import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { NodeDefsActions, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as Survey from '@core/survey/survey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
-
-import { NodeDefEntitySelectorDialog } from './NodeDefEntitySelectorDialog'
-import { NodeDefConversionDialog } from './NodeDefConversionDialog'
 import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+import { NodeDefsActions, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+
+import { NodeDefConversionDialog } from './NodeDefConversionDialog'
+import { NodeDefEntitySelectorDialog } from './NodeDefEntitySelectorDialog'
 
 const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
 

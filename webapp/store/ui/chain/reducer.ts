@@ -1,7 +1,6 @@
 import * as RecordStep from '@core/record/recordStep'
-
-import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { SurveyActions } from '@webapp/store/survey'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { ChainActionTypes } from './actions'

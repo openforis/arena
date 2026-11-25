@@ -1,13 +1,10 @@
 import * as A from '@core/arena'
-
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
 import { TreeSelectViewMode } from '@webapp/model'
+import { NodeDefsActions, SurveyActions } from '@webapp/store/survey'
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
-import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as RecordActions from '../record/actions'
 
 import * as SurveyFormActions from './actions'

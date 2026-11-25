@@ -7,18 +7,19 @@
  * There is no fallback between providers: an unreadable saved key fails with aiApiKeyUnreadable.
  */
 import type { LanguageModelV4 } from '@ai-sdk/provider'
+
 import type { ArenaUser } from '@openforis/arena-core'
 
+import { ARENA_DEFAULT_PROVIDER_ID, isAccountProviderId, isLocalProviderId } from '@common/ai/providerIds'
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { ARENA_DEFAULT_PROVIDER_ID, isAccountProviderId, isLocalProviderId } from '@common/ai/providerIds'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import { decryptStoredKey, findStoredProvider, getProviderPrefs } from './aiProviderPrefs'
 import { getAiPrefs } from './aiUserPrefs'
 import { getProviderHostingClass } from './hostingClass'
-import * as ProviderRegistry from './providerRegistry'
 import type { ProviderConfig } from './providerRegistry'
+import * as ProviderRegistry from './providerRegistry'
 
 export const sources = {
   user: 'user',

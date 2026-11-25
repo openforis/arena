@@ -1,6 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
+import * as Survey from '@core/survey/survey'
 import { isMapLayerDef, type ProposedMapLayer } from '@webapp/ai/tools/analysis/proposeMapLayer'
 
 export type MapLayerCardModel = {

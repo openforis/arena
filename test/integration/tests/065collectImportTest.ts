@@ -1,20 +1,18 @@
 import AdmZip from 'adm-zip'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
 import { getContextUser } from '../config/context'
 
 // a simple Collect survey: a code list (level name to be normalized), a species list (vernacular names and an

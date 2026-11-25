@@ -1,17 +1,15 @@
 import type { MissingLabelsCounts } from '@common/ai/categoryItemLabels'
-
+import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
+import { createDetectorContext, TEST_NOW } from '@test/unit/utils/designSuggestionTestUtils'
 import { type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
-import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   categoryItemTranslationsDetector,
   createCategoryItemTranslationsDetector,
   detectCategoryItemTranslations,
 } from '@webapp/ai/suggestions/detectors/categoryItemTranslations'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import type { SuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import { createGenerationStartNotifier } from '@webapp/components/ai/Assistant/suggestions/useGenerationStartedEvent'
-
-import { buildCategoryLabelsSurvey, categoryUuidOf } from '@test/unit/utils/categoryLabelsTestUtils'
-import { createDetectorContext, TEST_NOW } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
 let counts: MissingLabelsCounts

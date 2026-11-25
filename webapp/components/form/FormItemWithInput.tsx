@@ -1,8 +1,10 @@
-import { useMemo, type ComponentProps } from 'react'
+import { type ComponentProps, useMemo } from 'react'
+
+import type { ArenaValidation } from '@openforis/arena-core'
 
 import { useIsMobile } from '../hooks/useIsMobile'
+
 import { FormItem, Input } from './Input'
-import type { ArenaValidation } from '@openforis/arena-core'
 
 type FormItemWithInputProps = ComponentProps<typeof Input> & {
   label?: string

@@ -2,12 +2,12 @@ import { useCallback } from 'react'
 
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 import * as Survey from '@core/survey/survey'
-
 import * as API from '@webapp/service/api'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { surveyInfoUpdate } from '@webapp/store/survey/surveyInfo/actions'
+
 import { ConfigurationNumericItemEditor } from './ConfigurationNumericItemEditor'
-import { useAppDispatch } from '@webapp/store'
 
 const { dataStorageUnits, dataStorageValueToBytes, dataStorageValueToUnit, dataStorageBytesToUnit } =
   NumberConversionUtils

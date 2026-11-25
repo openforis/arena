@@ -1,15 +1,12 @@
-import SystemError from '@core/systemError'
-import * as Survey from '@core/survey/survey'
 import { Query } from '@common/model/query'
-
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
+import { newAnalysisToolContext, newFakeAnalysisApi, runTool } from '@test/unit/utils/aiAnalysisTestUtils'
 import { proposeQueryTool } from '@webapp/ai/tools/analysis/proposeQuery'
 import { createRunQueryTools, NO_VALUE } from '@webapp/ai/tools/analysis/runQuery'
 import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
-
-import { newAnalysisToolContext, newFakeAnalysisApi, runTool } from '@test/unit/utils/aiAnalysisTestUtils'
-
-import * as DataTest from '../../utils/dataTest'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 let survey: any = null
 

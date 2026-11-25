@@ -2,8 +2,9 @@ import { DBMigrator, runWithClusterLock } from '@openforis/arena-server'
 
 import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
+
 import SurveyDataMigrationJob, { getPendingSurveyDataMigrationSteps } from './surveyDataMigrationJob'
+import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
 
 type SurveyIdAndAppVersion = { id: number; appVersion?: string }
 

@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as WhatsNew from '@core/whatsNew/whatsNew'
-
 import { useSystemConfigAiFeaturesEnabled, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
 

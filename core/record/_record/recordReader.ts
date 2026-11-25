@@ -1,24 +1,23 @@
-import { RecordNodes, Queue, Records, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
+  ArenaNodeDefCode,
   ArenaRecord,
   ArenaRecordNode,
-  ArenaNodeDefCode,
   ArenaRecordNodePointer,
   ArenaSurvey,
   SurveyDependencyType,
 } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Queue, RecordNodes, Records } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-
+import * as ObjectUtils from '@core/objectUtils'
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '../node'
 import { NodeValues } from '../nodeValues'
 
-import { keys } from './recordKeys'
 import { EntityKeysIndexCache } from './entityKeysIndexCache'
+import { keys } from './recordKeys'
 
 type NodeVisitor = (node: ArenaRecordNode) => void
 type NodePredicate = (node: ArenaRecordNode) => boolean

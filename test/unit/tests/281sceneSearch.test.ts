@@ -2,8 +2,8 @@
  * Sentinel-2 search over an injected index reader: pruning, missing parts, de-duplication, period and
  * tile filtering, cancellation.
  */
-import { SCENE_INDEX_COLUMNS } from '@webapp/components/MapContainer/workspace/scenes/sceneRows'
 import { getScenePeriod } from '@webapp/components/MapContainer/workspace/scenes/scenePeriod'
+import { SCENE_INDEX_COLUMNS } from '@webapp/components/MapContainer/workspace/scenes/sceneRows'
 import {
   failSearch,
   finishSearch,

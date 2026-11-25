@@ -1,9 +1,9 @@
 import { useGetUser } from './useGetUser'
+import { useOnInviteRepeat } from './useOnInviteRepeat'
+import { useOnRemove } from './useOnRemove'
+import { useOnSave } from './useOnSave'
 import { useOnUpdate } from './useOnUpdate'
 import { useOnUpdateProfilePicture } from './useOnUpdateProfilePicture'
-import { useOnSave } from './useOnSave'
-import { useOnRemove } from './useOnRemove'
-import { useOnInviteRepeat } from './useOnInviteRepeat'
 
 export const useActions = ({
   userUuid,

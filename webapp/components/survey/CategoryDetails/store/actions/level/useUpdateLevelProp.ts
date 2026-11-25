@@ -3,12 +3,10 @@ import axios from 'axios'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-
+import { useAppDispatch } from '@webapp/store'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { debounceAction } from '@webapp/utils/reduxUtils'
-
 import { State } from '../../state'
-import { useAppDispatch } from '@webapp/store'
 
 const _putProp =
   ({ surveyId, categoryUuid, levelUuid, key, value, setState }) =>

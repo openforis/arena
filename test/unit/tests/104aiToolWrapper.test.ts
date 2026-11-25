@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 import { limitToolResult } from '@webapp/ai/tools/common/toolResult'
 import { runTool, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import type { AiTool } from '@webapp/ai/tools/types'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 
 const makeTool = (execute: AiTool['execute']): AiTool => ({
   name: 'test_tool',

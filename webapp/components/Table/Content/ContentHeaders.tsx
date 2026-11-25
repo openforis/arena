@@ -1,5 +1,6 @@
-import { ContentHeader } from './ContentHeader'
 import type { TableSelectionSortProps } from '../tableProps'
+
+import { ContentHeader } from './ContentHeader'
 
 type ContentHeadersProps = TableSelectionSortProps & {
   columns?: any[]

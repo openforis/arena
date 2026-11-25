@@ -1,10 +1,9 @@
 import type { Router } from 'express'
-import * as SurveyFile from '@core/survey/surveyFile'
 
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-
 import * as AnalysisService from '../service'
 
 export const init = (app: Router) => {

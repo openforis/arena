@@ -1,21 +1,20 @@
-import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { useSelector } from 'react-redux'
 
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { Objects, Surveys } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as Record from '@core/record/record'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
-
 import { TreeSelectViewMode } from '@webapp/model'
 import { SurveyState } from '@webapp/store/survey'
+import { RecordState } from '../record'
 
 import * as SurveyFormState from './state'
-import { RecordState } from '../record'
 
 export const useNodeDefLabelType = () => useSelector(SurveyFormState.getNodeDefLabelType)
 

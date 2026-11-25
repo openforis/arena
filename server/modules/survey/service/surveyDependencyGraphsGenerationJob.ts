@@ -1,7 +1,5 @@
-import Job, { type JobParams } from '@server/job/job'
-
 import * as Survey from '@core/survey/survey'
-
+import Job, { type JobParams } from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 
 /**

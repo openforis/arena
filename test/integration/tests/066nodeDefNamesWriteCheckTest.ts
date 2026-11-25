@@ -1,12 +1,11 @@
-import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import AdmZip from 'adm-zip'
 
+import type { ArenaNodeDefEntity } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
 import { db } from '@server/db/db'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
@@ -14,7 +13,6 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
 import * as SB from '../../utils/surveyBuilder'
 import { getContextUser } from '../config/context'
 

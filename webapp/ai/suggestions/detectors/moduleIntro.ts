@@ -2,8 +2,9 @@
  * Module introduction: the first visit to an introduced module adds its card to Help, unless the user
  * already accepted or dismissed it (seenModules).
  */
-import { isIntroModule, type IntroModule } from '../prompts/moduleIntro'
+import { type IntroModule, isIntroModule } from '../prompts/moduleIntro'
 import type { AssistantSuggestion } from '../types'
+
 import type { EventDetector } from './types'
 
 /**

@@ -1,28 +1,28 @@
-import {
-  RecordValidator,
-  RecordUpdateResult,
-  RecordNodesUpdater as CoreRecordNodesUpdater,
-  RecordNodeValues,
-  ArenaAnyNodeDef,
-} from '@openforis/arena-core'
 import type {
+  ArenaCategoryItemProvider,
   ArenaRecord,
   ArenaRecordNode,
-  ArenaCategoryItemProvider,
   ArenaRecordNodesMap,
   ArenaSurvey,
   ArenaTaxonProvider,
 } from '@openforis/arena-core'
+import {
+  ArenaAnyNodeDef,
+  RecordNodesUpdater as CoreRecordNodesUpdater,
+  RecordNodeValues,
+  RecordUpdateResult,
+  RecordValidator,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as Validation from '@core/validation/validation'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Validation from '@core/validation/validation'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 

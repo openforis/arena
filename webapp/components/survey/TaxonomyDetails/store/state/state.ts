@@ -1,8 +1,7 @@
 import * as A from '@core/arena'
-
+import * as ObjectUtils from '@core/objectUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
-import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
   deleted: 'deleted',

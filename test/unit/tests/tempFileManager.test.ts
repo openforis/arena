@@ -1,15 +1,15 @@
-import {
-  getStorageFunctionOrThrow,
-  chunkWriteFunctionByStorageType,
-  chunkMergeFunctionByStorageType,
-} from '@server/modules/file/manager/tempFileManager'
-import { fileContentStorageTypes } from '@server/modules/file/manager/fileManagerCommon'
-import * as TempFileRepositoryFileSystem from '@server/modules/file/repository/tempFileRepositoryFileSystem'
-import * as TempFileRepositoryS3Bucket from '@server/modules/file/repository/tempFileRepositoryS3Bucket'
-import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
 import { uuidv4 } from '@core/uuid'
+import { fileContentStorageTypes } from '@server/modules/file/manager/fileManagerCommon'
+import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
+import {
+  chunkMergeFunctionByStorageType,
+  chunkWriteFunctionByStorageType,
+  getStorageFunctionOrThrow,
+} from '@server/modules/file/manager/tempFileManager'
+import * as TempFileRepositoryFileSystem from '@server/modules/file/repository/tempFileRepositoryFileSystem'
+import * as TempFileRepositoryS3Bucket from '@server/modules/file/repository/tempFileRepositoryS3Bucket'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 describe('TempFileManager storage routing', () => {
   test('routes to S3 functions when S3 storage is configured, regardless of file size', () => {

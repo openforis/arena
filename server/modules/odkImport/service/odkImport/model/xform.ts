@@ -1,6 +1,5 @@
-import * as StringUtils from '@core/stringUtils'
 import { getLanguageLabel, languageCodes } from '@core/app/languages'
-
+import * as StringUtils from '@core/stringUtils'
 import * as FileXml from '@server/utils/file/fileXml'
 
 /**

@@ -1,7 +1,5 @@
 import { type AiDataClass, getAiFeatureMinDataClass, getMaxAiDataClass } from '@common/ai/features'
-
 import type { AiPolicy } from '@common/ai/policy'
-
 import type { ResolveModelParams } from '@webapp/ai/engines/resolveModel'
 
 type ToolWithClass = { dataClass: AiDataClass }

@@ -4,7 +4,7 @@ import LightModeOutlined from '@mui/icons-material/LightModeOutlined'
 import SettingsBrightnessOutlined from '@mui/icons-material/SettingsBrightnessOutlined'
 
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
-import { themePreferences, type ThemePreference } from '@webapp/theme/themeMode'
+import { type ThemePreference, themePreferences } from '@webapp/theme/themeMode'
 import { useThemeMode } from '@webapp/theme/useThemeMode'
 import { TestId } from '@webapp/utils/testId'
 

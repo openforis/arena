@@ -1,7 +1,5 @@
-import FileZip from '@server/utils/file/fileZip'
-
 import Job, { type JobParams } from '@server/job/job'
-
+import FileZip from '@server/utils/file/fileZip'
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
 /**

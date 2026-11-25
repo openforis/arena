@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
-import { ButtonNew } from '@webapp/components'
 import { appModuleUri, user2FADeviceModules } from '@webapp/app/appModules'
+import { ButtonNew } from '@webapp/components'
 
 const User2FADeviceHeaderLeft = () => {
   const navigate = useNavigate()

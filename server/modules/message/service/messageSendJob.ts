@@ -1,15 +1,14 @@
-import { Messages, MessageNotificationType, MessageStatus } from '@openforis/arena-core'
 import type { ArenaMessage, ArenaUser } from '@openforis/arena-core'
+import { MessageNotificationType, Messages, MessageStatus } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import { parseMarkdown } from '@core/markdownUtils'
-
+import * as User from '@core/user/user'
 import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
-import * as User from '@core/user/user'
-import * as Mailer from '@server/utils/mailer'
 import { initArenaServerServices } from '@server/system/arenaServerServices'
+import * as Mailer from '@server/utils/mailer'
 
 // the methods of the arena-server message service used here
 interface MessageService {

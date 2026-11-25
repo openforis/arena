@@ -1,12 +1,11 @@
 import en from '@core/i18n/resources/en/common'
-
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 import { buildHandbookIndex, getHandbookOutline, searchHandbook, tokenize } from '@webapp/ai/help/handbookSearch'
 import type { Handbook } from '@webapp/ai/help/handbookSplitter'
 import { createHandbookLoader, loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { createDocsSearchTool } from '@webapp/ai/tools/help/docsSearch'
 import { AI_TOOL_NAME_PATTERN, runTool } from '@webapp/ai/tools/registry'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 
 const section = (id: string, title: string, text: string) => ({ id, title, path: [], text })
 

@@ -1,15 +1,14 @@
 import type { Readable } from 'node:stream'
+
+import { type ArenaSurvey, Objects, PointFactory, Points, SystemError } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
-
-import { Objects, PointFactory, Points, SystemError, type ArenaSurvey } from '@openforis/arena-core'
-
-import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
 import * as Srs from '@core/geo/srs'
+import * as StringUtils from '@core/stringUtils'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: string; columnName: string }) => {

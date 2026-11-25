@@ -1,6 +1,6 @@
-import L from 'leaflet'
 import parseGeoraster from 'georaster'
 import GeoRasterLayer from 'georaster-layer-for-leaflet'
+import L from 'leaflet'
 
 import { getScenePixelToColor } from './sceneColors'
 import type { SceneBandMix, SceneResult } from './sceneTypes'

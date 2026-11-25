@@ -1,5 +1,4 @@
 import { uuidv4 } from '@core/uuid'
-
 import type { AiToolArea } from '@webapp/ai/tools/types'
 
 import type { Conversation } from './types'

@@ -1,15 +1,15 @@
-import type { ArenaSurvey, ArenaAnyNodeDef } from '@openforis/arena-core'
-import * as ObjectUtils from '@core/objectUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
+import type { ArenaAnyNodeDef, ArenaSurvey } from '@openforis/arena-core'
 
+import * as ObjectUtils from '@core/objectUtils'
+import * as Category from '@core/survey/category'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
 import { db, type DbClient } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
-import * as DbUtils from '@server/db/dbUtils'
 
 type ExtraPropDefsMap = Record<string, any>
 type ExtraValueRow = Record<string, any>

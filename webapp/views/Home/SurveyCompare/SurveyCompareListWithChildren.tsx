@@ -7,7 +7,6 @@ import {
   SurveyComparePropDiff,
   SurveyCompareStatus,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
-
 import { useI18n } from '@webapp/store/system'
 
 import {

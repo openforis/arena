@@ -1,8 +1,7 @@
 import Job, { type JobParams } from '@server/job/job'
-import type { OdkImportJobContext } from '../odkImportJobContext'
 import * as FileUtils from '@server/utils/file/fileUtils'
-
 import * as XForm from '../model/xform'
+import type { OdkImportJobContext } from '../odkImportJobContext'
 
 /**
  * Reads the uploaded XForm XML file and parses it into the job context: `xform` (the parsed model),

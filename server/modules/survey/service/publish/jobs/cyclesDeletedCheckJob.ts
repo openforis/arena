@@ -1,13 +1,10 @@
 import * as A from '@core/arena'
-
-import Job, { type JobParams } from '@server/job/job'
-
 import * as Survey from '@core/survey/survey'
-
-import * as SurveyManager from '../../../manager/surveyManager'
+import Job, { type JobParams } from '@server/job/job'
 import * as NodeDefManager from '../../../../nodeDef/manager/nodeDefManager'
 import * as RecordManager from '../../../../record/manager/recordManager'
 import * as UserManager from '../../../../user/manager/userManager'
+import * as SurveyManager from '../../../manager/surveyManager'
 
 export default class CyclesDeletedCheckJob extends Job {
   static readonly type: string = 'CyclesDeletedCheckJob'

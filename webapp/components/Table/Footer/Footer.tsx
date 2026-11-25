@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router'
-import { useAppDispatch } from '@webapp/store/hooks'
 
 import { Objects } from '@openforis/arena-core'
 
 import { updateQuery } from '@webapp/components/Table/tableLink'
+import { useAppDispatch } from '@webapp/store/hooks'
+import { useI18n } from '@webapp/store/system'
+import { TablesActions } from '@webapp/store/ui/tables'
 
 import Paginator from './Paginator'
-import { TablesActions } from '@webapp/store/ui/tables'
-import { useI18n } from '@webapp/store/system'
 
 type FooterProps = {
   count: number

@@ -1,8 +1,8 @@
-import test from 'node:test'
 import assert from 'node:assert/strict'
 import path from 'node:path'
+import test from 'node:test'
 
-import { parseConfig, DEFAULT_URL, DEFAULT_COUNT, DEFAULT_JOB_TIMEOUT_MS, type StressTestConfig } from './config.ts'
+import { DEFAULT_COUNT, DEFAULT_JOB_TIMEOUT_MS, DEFAULT_URL, parseConfig, type StressTestConfig } from './config.ts'
 
 const baseEnv = {}
 

@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react'
 
-import { UUIDs, type ArenaUser } from '@openforis/arena-core'
+import { type ArenaUser, UUIDs } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
-
 import { ButtonAdd, ExpansionPanel } from '@webapp/components'
 
 import { UserExtraPropEditor, type UserExtraPropItem } from './UserExtraPropEditor'

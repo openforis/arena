@@ -2,13 +2,11 @@ import './NodeDefEntityTable.scss'
 
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { TestId } from '@webapp/utils/testId'
-
 import { ButtonIconAdd } from '@webapp/components'
-
+import { TestId } from '@webapp/utils/testId'
 import NodeDefErrorBadge from '../NodeDefErrorBadge'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
+
 import NodeDefEntityTableRows from './NodeDefEntityTableRows'
 
 const NodeDefEntityTable = (props) => {

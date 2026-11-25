@@ -1,18 +1,16 @@
 import type { ArenaTaxon, ArenaTaxonomy, ArenaUser } from '@openforis/arena-core'
 
-import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
-
-import BatchPersister from '@server/db/batchPersister'
-
 import * as ObjectUtils from '@core/objectUtils'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
-import * as Validation from '@core/validation/validation'
-
-import * as TaxonomyManager from './taxonomyManager'
-import { TaxonComparator } from './taxonComparator'
+import * as Taxonomy from '@core/survey/taxonomy'
 import SystemError from '@core/systemError'
+import * as Validation from '@core/validation/validation'
+import BatchPersister from '@server/db/batchPersister'
+import type { DbClient } from '@server/db/db'
+
+import { TaxonComparator } from './taxonComparator'
+import * as TaxonomyManager from './taxonomyManager'
 
 const createPredefinedTaxa = (taxonomy: ArenaTaxonomy) => [
   Taxon.newTaxon({

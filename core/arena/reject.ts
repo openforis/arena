@@ -1,5 +1,5 @@
-import { _curry2 } from './internal/_curry2'
 import { filter } from './filter'
+import { _curry2 } from './internal/_curry2'
 
 /**
  * Returns the elements of the array (or entries of the object) that do not satisfy the predicate.

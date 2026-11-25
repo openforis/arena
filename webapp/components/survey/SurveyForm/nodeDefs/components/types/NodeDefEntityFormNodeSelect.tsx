@@ -1,23 +1,19 @@
 import { useCallback } from 'react'
-
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-
-import { FormItem } from '@webapp/components/form/Input'
+import * as NodeDef from '@core/survey/nodeDef'
 import { Button, ButtonDelete } from '@webapp/components/buttons'
+import { FormItem } from '@webapp/components/form/Input'
 import { RecordPageStatusIcon } from '@webapp/components/survey/SurveyForm/components/RecordPageStatusIcon'
-
-import { DialogConfirmActions } from '@webapp/store/ui'
-import { useI18n } from '@webapp/store/system'
+import { useAppDispatch } from '@webapp/store'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
 import { useEntitySubtreeStatus } from '@webapp/store/ui/record'
 import { useNodeKeysLabelValues } from '@webapp/store/ui/surveyForm'
-
 import { TestId } from '@webapp/utils/testId'
-import { useAppDispatch } from '@webapp/store'
 
 const PLACEHOLDER_VALUE = 'placeholder'
 

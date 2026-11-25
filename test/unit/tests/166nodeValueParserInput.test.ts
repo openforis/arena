@@ -1,15 +1,13 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
 import * as NodeRefData from '@core/record/nodeRefData'
-
 import { isNodeDefValueEditable, parseNodeValueInput } from '@core/record/nodeValueParser'
-
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import { buildNodeValueParserSurvey } from '@test/unit/utils/nodeValueParserTestUtils'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SurveyUtils from '../../utils/surveyUtils'
-import { buildNodeValueParserSurvey } from '@test/unit/utils/nodeValueParserTestUtils'
 
 const user = { uuid: 'user-uuid' }
 

@@ -1,11 +1,10 @@
 /**
  * Display rules of the suggestions: which areas count, how cards group, the assistant button label, the card text.
  */
-import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+import { type AiLog, logAiWarning } from '@webapp/ai/log/aiLog'
 import type { SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
 import type { SuggestionDefinitions } from '@webapp/ai/suggestions/suggestionActions'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
-
 import type { AssistantArea, AssistantAreaStatus } from '../assistantAreas'
 
 // setTimeout's largest delay

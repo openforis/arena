@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
-
 import { expect, test } from '../fixtures'
 import { toDisplayValues } from '../fixtures/seed/sampleRecordDisplay'
 import { cluster, plot, sampleRecords, tree } from '../fixtures/seed/sampleSurveyModel'

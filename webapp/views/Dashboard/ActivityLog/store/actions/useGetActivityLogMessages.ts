@@ -1,14 +1,10 @@
 import { useState } from 'react'
 
 import * as A from '@core/arena'
-
 import { useInterval, useRequest } from '@webapp/components/hooks'
-
 import * as API from '@webapp/service/api'
-
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
 import * as ActivityLogMessage from '../activityLogMessage'
 import * as ActivityLogMessageParser from '../parsers'
 

@@ -1,5 +1,5 @@
-import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { SurveyState } from '@webapp/store/survey'
+import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 
 import * as ActionTypes from './actionTypes'
 import { getNodeDefLabelsToShow, prepareNodesToRestore } from './clearNonApplicableValuesConfirmUtils'

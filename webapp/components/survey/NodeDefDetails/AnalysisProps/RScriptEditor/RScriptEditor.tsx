@@ -2,15 +2,15 @@ import './RScriptEditor.scss'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import type { ArenaAnyNodeDef, ArenaCategoryItem } from '@openforis/arena-core'
+
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as CategoryItem from '@core/survey/categoryItem'
-
 import { FormItem } from '@webapp/components/form/Input'
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
-import type { ArenaAnyNodeDef, ArenaCategoryItem } from '@openforis/arena-core'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const codesTextPrefix = '# __CODES__'
 const maxCodesLineLength = 200

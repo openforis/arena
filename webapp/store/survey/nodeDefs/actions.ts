@@ -1,26 +1,20 @@
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
-
-import * as API from '@webapp/service/api'
-
-import { debounceAction } from '@webapp/utils/reduxUtils'
-
-import { TreeSelectViewMode } from '@webapp/model'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-
+import { TreeSelectViewMode } from '@webapp/model'
+import * as API from '@webapp/service/api'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
 import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { NotificationActions } from '@webapp/store/ui/notification'
-
+import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as SurveyActions from '../actions'
-import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
+import * as SurveyState from '../state'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'

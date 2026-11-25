@@ -3,7 +3,6 @@
  * Do it).
  */
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
-
 import type { SuggestionGeneration } from '../generation'
 import type { SuggestionStore } from '../suggestionStore'
 import type { AssistantSuggestion, SuggestionKind } from '../types'

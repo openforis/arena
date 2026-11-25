@@ -2,8 +2,8 @@ import './Paginator.scss'
 
 import { useCallback } from 'react'
 
-import { useI18nT } from '@webapp/store/system'
 import { Button } from '@webapp/components/buttons'
+import { useI18nT } from '@webapp/store/system'
 
 import { ItemsPerPageSelector } from './ItemsPerPageSelector'
 import { PageNumberInput } from './PageNumberInput'

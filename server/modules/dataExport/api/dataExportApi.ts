@@ -1,16 +1,14 @@
 import type { Router } from 'express'
+
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { FileFormats } from '@core/fileFormats'
 import { isUuid } from '@core/uuid'
-
 import * as JobUtils from '@server/job/jobUtils'
-import * as Request from '@server/utils/request'
-
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { sendTempFileToResponse } from '@server/modules/fileDownload/api/fileDownloadApi'
 import { requireRecordsReadableByUserGroup } from '@server/modules/record/api/recordQualifierMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-
+import * as Request from '@server/utils/request'
 import * as DataExportService from '../service/dataExportService'
 
 const checkExportUuid = (exportUuid: string) => {

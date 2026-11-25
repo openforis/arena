@@ -1,7 +1,6 @@
 import { FlatDataExportModel } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-
 import { buildTestSurvey, fileFormats, readRowItems, Rows } from '../../utils/flatDataImportTestUtils'
 
 // the conversion of rows into node values must give the same results for every supported file format

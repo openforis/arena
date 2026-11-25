@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import { getLanguageLabel } from '@core/app/languages'
 import { supportedLanguages } from '@core/i18n/i18nFactory'
-
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
 import { UILanguageStorage } from '@webapp/service/storage/uiLanguage'
 import { TestId } from '@webapp/utils/testId'

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
-
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 

@@ -1,17 +1,15 @@
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
-import { isNodeValueShapeValid } from '@core/record/nodeValueShape'
-import { uuidv4 } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
-
+import * as Node from '@core/record/node'
+import { isNodeValueShapeValid } from '@core/record/nodeValueShape'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import { uuidv4 } from '@core/uuid'
 import { checkBatchEdit } from '@server/modules/record/service/update/nodesBatch/nodesBatchEditCheck'
 import { parseNodesBatchRequest } from '@server/modules/record/service/update/nodesBatch/nodesBatchRequest'
 import { NodesBatchMessageKeys } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
-
-import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import * as SB from '../../utils/surveyBuilder'
 
 const { nodeDefType } = NodeDef
 const nodeDefOf = (type: string) => ({ type })

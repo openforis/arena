@@ -1,7 +1,7 @@
 import { IDBFactory } from 'fake-indexeddb'
 
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
-import { openConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
+import { type ConversationStore, openConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { createOpenConversations, type OpenConversationsStorage } from '@webapp/ai/conversations/openConversations'
 import { createPurgeSurveyAiData } from '@webapp/ai/conversations/purgeSurveyAiData'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'

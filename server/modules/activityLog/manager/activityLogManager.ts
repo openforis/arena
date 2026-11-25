@@ -1,13 +1,11 @@
 import type { ArenaUser } from '@openforis/arena-core'
 
+import * as ActivityLog from '@common/activityLog/activityLog'
 import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-
-import * as ActivityLog from '@common/activityLog/activityLog'
-
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
 const activityTypesCommon = [ActivityLog.type.surveyCreate]
 

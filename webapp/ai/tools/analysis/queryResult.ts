@@ -1,7 +1,7 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import { Query } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
+import { Query } from '@common/model/query'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 export type QueryResultColumn = { name: string; attribute: string; fn?: string }
 

@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
-
 import { useI18n } from '@webapp/store/system'
+
 import { timeRanges } from './utils'
 
 export const useTimeRanges = ({ timeRange }) => {

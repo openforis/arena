@@ -2,21 +2,21 @@
  * Pure helpers on change set operations: target, current value, and applying one operation to a node definition or
  * to a survey copy.
  */
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
-import { onUpdateKey, onUpdateMultiple } from '@core/survey/nodeDefPropUpdaters'
+import * as NodeDef from '@core/survey/nodeDef'
 import { isLockedByPublication } from '@core/survey/nodeDefEditGuards'
+import { onUpdateKey, onUpdateMultiple } from '@core/survey/nodeDefPropUpdaters'
+import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import { getExpressionProp, setExpressionProp } from './expressionProps'
 import { isRecordEditOperation } from './recordEdits/types'
 import {
   isNodeDefRefProp,
-  type NodeDefOperation,
-  type NodeDefOperationDraft,
   type LabelKind,
   type NodeDefBasicProp,
+  type NodeDefOperation,
+  type NodeDefOperationDraft,
   type NodeDefRefProp,
   type NodeDefUpdateProp,
 } from './types'

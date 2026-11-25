@@ -1,18 +1,17 @@
 import type { Readable } from 'node:stream'
 
-import { FlatDataExportModel, Objects, type ArenaAnyNodeDef, type ArenaSurvey } from '@openforis/arena-core'
+import { type ArenaAnyNodeDef, type ArenaSurvey, FlatDataExportModel, Objects } from '@openforis/arena-core'
 
-import SystemError from '@core/systemError'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import {
   type CategoryItemProvider,
+  parseNodeValueProps,
   type TaxonProvider,
   VALUE_PROP_DEFAULT,
-  parseNodeValueProps,
 } from '@core/record/nodeValueParser'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const checkAllHeadersAreValid =

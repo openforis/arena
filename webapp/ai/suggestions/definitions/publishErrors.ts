@@ -2,6 +2,7 @@
  * Card and prompt of the publish errors suggestion (errors before publishing).
  */
 import { buildPublishErrorsPrompt } from '../prompts/designPrompts'
+
 import { getTargetNodeDefNames } from './designTargetNames'
 import type { SuggestionDefinition } from './types'
 

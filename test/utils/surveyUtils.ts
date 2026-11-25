@@ -1,7 +1,5 @@
 import * as Survey from '@core/survey/survey'
-
 import { db } from '@server/db/db'
-
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 
 export const publishSurvey = async (user, surveyId, client = db) => {

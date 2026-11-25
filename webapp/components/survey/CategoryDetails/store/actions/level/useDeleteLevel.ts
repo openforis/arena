@@ -2,15 +2,13 @@ import { useCallback } from 'react'
 import axios from 'axios'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-
-import { NotificationActions, DialogConfirmActions } from '@webapp/store/ui'
-import { SurveyActions, useSurvey } from '@webapp/store/survey'
-
-import { State } from '../../state'
+import * as Survey from '@core/survey/survey'
 import { useAppDispatch } from '@webapp/store'
+import { SurveyActions, useSurvey } from '@webapp/store/survey'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { State } from '../../state'
 
 const _deleteLevel = async ({ surveyId, categoryUuid, level, setState, dispatch }) => {
   const levelUuid = CategoryLevel.getUuid(level)

@@ -1,7 +1,8 @@
 import type { ComponentType, ReactElement } from 'react'
 
-import { WmsDialog } from './customLayers/wms/WmsDialog'
 import { ScreenshotDialog } from '@webapp/components/MapContainer/workspace/screenshot/ScreenshotDialog'
+
+import { WmsDialog } from './customLayers/wms/WmsDialog'
 import { useMapWorkspace } from './MapWorkspaceContext'
 import type { MapDialogKey } from './mapWorkspaceTypes'
 

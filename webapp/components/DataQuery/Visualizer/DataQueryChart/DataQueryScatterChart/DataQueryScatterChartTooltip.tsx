@@ -1,11 +1,10 @@
 import './DataQueryScatterChartTooltip.scss'
 
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { type ReactNode, useCallback, useEffect, useState } from 'react'
 
 import { debounce } from '@core/functionsDefer'
-import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
-
+import * as Survey from '@core/survey/survey'
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'

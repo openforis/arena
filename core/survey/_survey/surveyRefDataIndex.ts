@@ -1,19 +1,19 @@
-import { Objects, SurveyRefDataFactory, Surveys, ArenaAnyNodeDef } from '@openforis/arena-core'
 import type {
-  ArenaRecord,
   ArenaCategoryItem,
-  ArenaRecordNode,
   ArenaNodeDefTaxon,
+  ArenaRecord,
+  ArenaRecordNode,
   ArenaSurvey,
   ArenaTaxon,
 } from '@openforis/arena-core'
+import { ArenaAnyNodeDef, Objects, SurveyRefDataFactory, Surveys } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
-
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
+
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
 type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey

@@ -3,15 +3,14 @@ import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
 import * as SurveyFile from '@core/survey/surveyFile'
-
-import * as API from '@webapp/service/api'
-import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
-import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { NotificationActions } from '@webapp/store/ui'
-import { useConfirmAsync } from '@webapp/components/hooks'
 import { Button, ButtonDelete, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { useConfirmAsync } from '@webapp/components/hooks'
+import * as API from '@webapp/service/api'
 import { useAppDispatch } from '@webapp/store'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
+import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 const isZipFile = (file) => file.name?.toLowerCase().endsWith('.zip')
 

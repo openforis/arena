@@ -5,11 +5,10 @@ import classNames from 'classnames'
 
 import { SystemLogConstants } from '@common/systemLog/systemLogConstants'
 import * as DateUtils from '@core/dateUtils'
-
-import { useI18n } from '@webapp/store/system'
 import { Button } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
+import { useI18n } from '@webapp/store/system'
 import { downloadTextToFile } from '@webapp/utils/domUtils'
 
 import { allLogLevels, filterLines, formatLinesAsText, formatMarkerText, LogLevel, LogMarker } from './systemLogLines'

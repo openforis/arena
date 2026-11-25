@@ -1,8 +1,8 @@
-import type { ArenaChain, ArenaSurvey, ArenaNodeDefEntity, ArenaAnyNodeDef } from '@openforis/arena-core'
+import type { ArenaAnyNodeDef, ArenaChain, ArenaNodeDefEntity, ArenaSurvey } from '@openforis/arena-core'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import * as SurveyNodeDefs from './surveyNodeDefs'
 

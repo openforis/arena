@@ -1,6 +1,6 @@
 import { JobRepository } from '@openforis/arena-server'
-import { db } from '@server/db/db'
 
+import { db } from '@server/db/db'
 import * as JobManager from '../../../server/job/jobManager'
 import { jobStatus } from '../../../server/job/jobUtils'
 

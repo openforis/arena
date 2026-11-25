@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { ResizableBox } from 'react-resizable'
+
+import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
 import ProgressBar from '@webapp/components/ProgressBar'
+import { useAppDispatch } from '@webapp/store'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
-
 import NodeDefSwitch from '../../NodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
-import { useAppDispatch } from '@webapp/store'
-import type { ArenaAnyNodeDef, ArenaRecordNode } from '@openforis/arena-core'
 
 type NodeDefEntityTableCellContentProps = {
   children: ReactNode

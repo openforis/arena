@@ -11,9 +11,13 @@ import { TestId } from '@webapp/utils/testId'
 import { getMgrsTilesForBounds } from './mgrsTiles'
 import { DEFAULT_SCENE_FILTERS, filterScenes, filterScenesByMonth, sortScenes } from './sceneFilters'
 import { getMonthHistogram } from './sceneHistogram'
-import { getScenePanelMessage, getScenePanelStatus } from './scenePanelStatus'
 import type { ScenePanelMessage } from './scenePanelStatus'
+import { getScenePanelMessage, getScenePanelStatus } from './scenePanelStatus'
 import { DEFAULT_SCENE_PERIOD_MONTHS, getScenePeriod } from './scenePeriod'
+import { ScenesBandsControl } from './ScenesBandsControl'
+import { ScenesAreaControl, ScenesPercentSlider, ScenesPeriodControl } from './ScenesFilterControls'
+import { ScenesMonthChart } from './ScenesMonthChart'
+import { ScenesResults } from './ScenesResults'
 import type {
   MgrsTilesResult,
   MonthBucket,
@@ -24,10 +28,6 @@ import type {
   SceneResult,
   SceneSort,
 } from './sceneTypes'
-import { ScenesBandsControl } from './ScenesBandsControl'
-import { ScenesAreaControl, ScenesPercentSlider, ScenesPeriodControl } from './ScenesFilterControls'
-import { ScenesMonthChart } from './ScenesMonthChart'
-import { ScenesResults } from './ScenesResults'
 import { useSceneArea } from './useSceneArea'
 import { useSceneFootprint } from './useSceneFootprint'
 import { useSceneLayers } from './useSceneLayers'

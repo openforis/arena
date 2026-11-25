@@ -1,9 +1,8 @@
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { Dropdown } from '@webapp/components/form'
-
 import { findVariableByName } from '../expressionVariables'
+
 import type { ExpressionNodeProps } from './expressionNode'
 
 const getSelectedVariable = ({ variables, node }) => {

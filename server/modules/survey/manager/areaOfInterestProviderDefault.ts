@@ -3,7 +3,6 @@ import { Surveys } from '@openforis/arena-core'
 
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as Survey from '@core/survey/survey'
-
 import * as Log from '@server/log/log'
 
 import * as SurveyFileManager from './surveyFileManager'

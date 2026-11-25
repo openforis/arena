@@ -1,9 +1,8 @@
+import { checkTextHasLinks } from '@core/markdownValidator'
 import * as User from '@core/user/user'
 import * as UserInvite from '@core/user/userGroupInvitation'
-import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
-
-import { checkTextHasLinks } from '@core/markdownValidator'
+import * as Validator from '@core/validation/validator'
 
 import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidator'
 

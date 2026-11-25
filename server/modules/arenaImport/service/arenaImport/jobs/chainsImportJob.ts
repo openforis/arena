@@ -1,7 +1,6 @@
 import Job, { type JobParams } from '@server/job/job'
-
-import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ChainManager from '@server/modules/analysis/manager'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
 /**

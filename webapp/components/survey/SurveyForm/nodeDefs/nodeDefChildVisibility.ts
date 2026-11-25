@@ -1,6 +1,6 @@
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 type IsChildFilledParams = { record: any; parentNode: any; childDefUuid: string }
 

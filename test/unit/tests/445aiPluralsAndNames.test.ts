@@ -1,8 +1,7 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
-
 import { getDefaultNameKey, getProviderNameText } from '@webapp/ai/providers/providerNames'
-import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 import { fakeT as t } from '../utils/fakeT'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
 const common = namespaceByLanguage('common')
 const errors = namespaceByLanguage('appErrors')

@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import { db, DbClient } from '@server/db/db'
 
 // Reset password expires in 7 days (168 hours)

@@ -1,19 +1,19 @@
 import './HeaderLeft.scss'
+
 import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
 import * as DateUtils from '@core/dateUtils'
+import * as Record from '@core/record/record'
 import * as StringUtils from '@core/stringUtils'
-
-import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { RecordActions, useRecord } from '@webapp/store/ui/record'
-
-import { TestId } from '@webapp/utils/testId'
-
+import * as Survey from '@core/survey/survey'
 import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit, ButtonIconView, ButtonMenu } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
+import { useAppDispatch } from '@webapp/store'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { RecordListActions } from '@webapp/store/ui'
+import { RecordActions, useRecord } from '@webapp/store/ui/record'
 import {
   useAuthCanDeleteRecords,
   useAuthCanEditRecord,
@@ -24,16 +24,14 @@ import {
   useAuthCanUseAnalysis,
   useAuthCanValidateAllRecords,
 } from '@webapp/store/user/hooks'
-import { useI18n } from '@webapp/store/system'
-
+import { TestId } from '@webapp/utils/testId'
 import { RecordsCloneModal } from '../../RecordsCloneModal'
-import { RecordsDataExportModal } from './RecordsDataExportModal'
-import { FormPreviewButton } from './FormPreviewButton'
-import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
-import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 import { RecordKeyValuesExtractor } from '../recordKeyValuesExtractor'
-import { RecordListActions } from '@webapp/store/ui'
-import { useAppDispatch } from '@webapp/store'
+
+import { FormPreviewButton } from './FormPreviewButton'
+import { RecordMergePreviewModal } from './RecordMergePreviewModal'
+import { RecordsDataExportModal } from './RecordsDataExportModal'
+import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 
 const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }) => {
   // sort selected records by date modified; source record will be the newest one

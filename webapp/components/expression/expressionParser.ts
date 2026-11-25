@@ -1,9 +1,8 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import type { ExpressionNode } from '@core/expressionParser/helpers/utils'
-
 import { isNotBlank } from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 export const parseQuery = ({ query, canBeConstant = false }) => {
   const exprQuery = Expression.fromString(query) as ExpressionNode

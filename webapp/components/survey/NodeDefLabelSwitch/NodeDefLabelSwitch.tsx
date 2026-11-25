@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
-
 import { Button } from '@webapp/components/buttons'
 
 export const useNodeDefLabelSwitch = () => {

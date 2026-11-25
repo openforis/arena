@@ -1,12 +1,11 @@
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
+import * as NodeDef from '@core/survey/nodeDef'
+import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { withNodeDef, withSavedNodeDefs, withTexts } from '@test/unit/utils/designSuggestionTestUtils'
 import type { ChangeSet, LabelKind } from '@webapp/ai/changeSets/types'
 import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
 import { surveyListMissingTextsTool } from '@webapp/ai/tools/design/surveyListMissingTexts'
 import { getTools, runTool } from '@webapp/ai/tools/registry'
-import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
-import { withNodeDef, withSavedNodeDefs, withTexts } from '@test/unit/utils/designSuggestionTestUtils'
 
 let survey: any
 

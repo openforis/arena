@@ -1,5 +1,5 @@
-import { Objects, Points } from '@openforis/arena-core'
 import type { ArenaPoint } from '@openforis/arena-core'
+import { Objects, Points } from '@openforis/arena-core'
 
 /**
  * Parses a geometry point value (WKT or JSON format) into a point object.

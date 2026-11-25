@@ -3,11 +3,10 @@
  * for every user of this browser.
  */
 import { logAiWarning } from '@webapp/ai/log/aiLog'
-import { suggestionStore, type SuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
-
+import { type SuggestionStore, suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import { abortAssistantTurns, settleAssistantSaves } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 
-import { getConversationStore, type ConversationStore } from './conversationStore'
+import { type ConversationStore, getConversationStore } from './conversationStore'
 import { browserOpenConversations, type OpenConversations } from './openConversations'
 
 export type PurgeSurveyAiDataDeps = {

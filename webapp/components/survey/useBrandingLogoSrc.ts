@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { AxiosResponse } from 'axios'
 
-import * as SurveyBranding from '@core/survey/surveyBranding'
 import type { BrandingImageDescriptor } from '@core/survey/surveyBranding'
-
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as API from '@webapp/service/api'
 import { getFileNameFromContentDisposition } from '@webapp/utils/contentDispositionUtils'
 

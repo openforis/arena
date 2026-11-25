@@ -1,18 +1,14 @@
-import { PassThrough } from 'node:stream'
-
 import AdmZip from 'adm-zip'
+import { PassThrough } from 'node:stream'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
-
 import { writeSurveyMobilePackage } from '@server/modules/mobile/service/surveyMobilePackageService'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-
-import { getContextUser } from '../config/context'
-
 import * as SB from '../../utils/surveyBuilder'
+import { getContextUser } from '../config/context'
 
 // The Arena Mobile survey package has the same layout of the Arena format export:
 // info.json, survey.json and surveyfiles/<uuid>.bin for the survey files referenced by the survey props.

@@ -1,9 +1,8 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActionTypes } from '../system/actionTypes'
 
-import * as LoginState from './state'
 import * as LoginActions from './actions'
+import * as LoginState from './state'
 
 const actionHandlers = {
   [SystemActionTypes.SYSTEM_RESET]: () => ({}),

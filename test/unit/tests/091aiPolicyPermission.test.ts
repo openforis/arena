@@ -2,9 +2,7 @@ import { SurveyFactory } from '@openforis/arena-core'
 
 import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import * as AuthGroup from '@core/auth/authGroup'
-
 import { createRequireSurveyAiPolicyEditPermission } from '@server/modules/auth/authApiMiddleware'
-
 import { callHandler, createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 const surveyUuid = 'survey-1'

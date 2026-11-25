@@ -1,17 +1,18 @@
 import './UserGroupsList.scss'
 
 import React, { useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router'
 import { GridColDef } from '@mui/x-data-grid'
+import { useNavigate } from 'react-router'
+
 import { ArenaUserGroup } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 import { ButtonIconEdit } from '@webapp/components/buttons'
 import { DataGrid } from '@webapp/components/DataGrid'
 import LoadingBar from '@webapp/components/LoadingBar'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { useUserGroupsList } from './useUserGroupsList'
 

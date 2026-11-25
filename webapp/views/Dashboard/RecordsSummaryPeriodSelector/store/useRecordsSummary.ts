@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
-
 import { useSurveyInfo } from '@webapp/store/survey'
-
 import type { RecordsSummaryContextValue, RecordsSummaryState } from '../../RecordsSummaryContext'
-import { timeRanges } from './utils/timeRanges'
+
 import { useActions } from './actions'
+import { timeRanges } from './utils/timeRanges'
 
 const initialState: RecordsSummaryState = {
   from: '',

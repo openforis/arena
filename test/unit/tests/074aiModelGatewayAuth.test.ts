@@ -1,7 +1,7 @@
 import { AiFeatures, getAiFeature, isGatewayFeature } from '@common/ai/features'
+import SystemError, { StatusCodes } from '@core/systemError'
 import { permissionMiddlewares, requireAiFeaturePermission } from '@server/modules/ai/api/aiMiddleware'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import SystemError, { StatusCodes } from '@core/systemError'
 import * as Response from '@server/utils/response'
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 

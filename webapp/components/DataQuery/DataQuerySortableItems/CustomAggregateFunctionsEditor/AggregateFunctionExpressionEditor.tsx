@@ -1,9 +1,9 @@
-import * as NodeDef from '@core/survey/nodeDef'
-import { ViewDataNodeDef } from '@common/model/db'
-
-import { useSurvey } from '@webapp/store/survey'
-import { ScriptEditor } from '@webapp/components/ScriptEditor'
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
+
+import { ViewDataNodeDef } from '@common/model/db'
+import * as NodeDef from '@core/survey/nodeDef'
+import { ScriptEditor } from '@webapp/components/ScriptEditor'
+import { useSurvey } from '@webapp/store/survey'
 
 type AggregateFunctionExpressionEditorProps = {
   expression: string

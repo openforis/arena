@@ -6,16 +6,14 @@ import { numericFormatter } from 'react-number-format'
 import { Strings } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Node from '@core/record/node'
-
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { Link, Markdown } from '@webapp/components'
 import { Input } from '@webapp/components/form/Input'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
 import NodeDefErrorBadge from '../NodeDefErrorBadge'
 import NodeDeleteButton from '../NodeDeleteButton'
 

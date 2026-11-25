@@ -1,21 +1,18 @@
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
-
-import { listEntitiesTool } from '@webapp/ai/tools/analysis/listEntities'
-import { createFindCategoryItemsTool } from '@webapp/ai/tools/analysis/findCategoryItems'
-
 import {
   newAnalysisToolContext,
   newFakeAnalysisApi,
   runTool,
   userWithoutAccess,
 } from '@test/unit/utils/aiAnalysisTestUtils'
-
-import * as DataTest from '../../utils/dataTest'
+import { createFindCategoryItemsTool } from '@webapp/ai/tools/analysis/findCategoryItems'
+import { listEntitiesTool } from '@webapp/ai/tools/analysis/listEntities'
 import { getContextUser } from '../../integration/config/context'
+import * as DataTest from '../../utils/dataTest'
 
 let survey: any = null
 

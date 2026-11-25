@@ -1,7 +1,7 @@
-import { useAppDispatch } from '@webapp/store/hooks'
-
-import { NotificationActions } from '@webapp/store/ui'
 import { useCallback } from 'react'
+
+import { useAppDispatch } from '@webapp/store/hooks'
+import { NotificationActions } from '@webapp/store/ui'
 
 const useNotification = ({ severity }) => {
   const dispatch = useAppDispatch()

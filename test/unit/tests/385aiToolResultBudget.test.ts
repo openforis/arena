@@ -2,23 +2,22 @@ import fs from 'fs'
 import path from 'path'
 
 import { AiLimits } from '@common/ai/limits'
-
+import { createToolContext } from '@test/unit/utils/assistantTestUtils'
+import { buildAssistantSurvey } from '@test/unit/utils/assistantTestUtils'
+import { listEntitiesTool } from '@webapp/ai/tools/analysis/listEntities'
 import * as analysisToolResults from '@webapp/ai/tools/analysis/toolResults'
 import {
-  TOOL_RESULT_BUDGET_CHARS,
-  TOOL_RESULT_MAX_CHARS,
   fitListToBudget,
   getResultBudget,
   getToolResultCap,
   limitToolResult,
   takeWithinBudget,
+  TOOL_RESULT_BUDGET_CHARS,
+  TOOL_RESULT_MAX_CHARS,
   toolError,
 } from '@webapp/ai/tools/common/toolResult'
 import { runTool } from '@webapp/ai/tools/registry'
-import { listEntitiesTool } from '@webapp/ai/tools/analysis/listEntities'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
-import { createToolContext } from '@test/unit/utils/assistantTestUtils'
-import { buildAssistantSurvey } from '@test/unit/utils/assistantTestUtils'
 
 const size = (value: unknown) => JSON.stringify(value).length
 

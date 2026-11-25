@@ -11,7 +11,6 @@ import {
   isHostingAllowed,
   normalizeAiPolicy,
 } from '@common/ai/policy'
-
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 describe('policy levels', () => {

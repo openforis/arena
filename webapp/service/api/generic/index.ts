@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 import { Objects } from '@openforis/arena-core'
 
 export const fetchVersion = async () => {
