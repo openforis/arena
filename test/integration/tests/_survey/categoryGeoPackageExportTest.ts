@@ -7,7 +7,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
-import CategoryGeoPackageExportJob from '@server/modules/category/service/CategoryGeoPackageExportJob'
+import CategoryGeoPackageExportJob from '@server/modules/category/service/categoryGeoPackageExportJob'
 
 import { getContextSurveyId, getContextUser } from '../../config/context'
 

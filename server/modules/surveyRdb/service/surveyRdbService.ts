@@ -18,7 +18,7 @@ import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 
-import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
+import SurveysRdbRefreshJob from './surveysRdbRefreshJob'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 import type { DataExportOptions, DataMatrixExportOptions } from '../manager/dataExportOptions'
 

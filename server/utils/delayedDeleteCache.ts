@@ -1,4 +1,4 @@
-import ItemsCache from './ItemsCache'
+import ItemsCache from './itemsCache'
 
 const defaultOptions = {
   deleteDelaySeconds: 30, // 30 seconds

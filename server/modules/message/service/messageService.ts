@@ -1,6 +1,6 @@
 import * as JobManager from '@server/job/jobManager'
 
-import MessageSendJob from './MessageSendJob'
+import MessageSendJob from './messageSendJob'
 
 import type { ArenaUser } from '@openforis/arena-core'
 

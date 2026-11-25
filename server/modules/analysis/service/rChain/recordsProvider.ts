@@ -3,7 +3,7 @@ import type { ArenaRecord } from '@openforis/arena-core'
 import type { DbClient } from '@server/db/db'
 import * as Record from '@core/record/record'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import { ItemsCache } from './ItemsCache'
+import { ItemsCache } from './itemsCache'
 
 export class RecordsProvider {
   _recordsCache: ItemsCache<ArenaRecord>

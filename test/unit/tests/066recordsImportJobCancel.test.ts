@@ -1,5 +1,5 @@
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
-import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
+import DataImportBaseJob from '@server/modules/dataImport/service/dataImportJob/dataImportBaseJob'
 import RecordsImportJob from '@server/modules/mobile/service/arenaMobileDataImport/jobs/recordsImportJob'
 
 const recordSummaries = [{ uuid: 'record-1' }, { uuid: 'record-2' }, { uuid: 'record-3' }]

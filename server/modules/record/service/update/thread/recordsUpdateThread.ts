@@ -7,7 +7,7 @@ import { db, type DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
-import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
+import IdleTimeoutCache from '@server/utils/idleTimeoutCache'
 
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'

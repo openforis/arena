@@ -16,7 +16,7 @@ import * as TaxonomyUtils from './taxonomyUtils'
 const taxonomyName = 'species_list'
 let survey = null
 
-beforeAll(async () => {
+export const setUpTaxonomyPublishedTests = async () => {
   const user = getContextUser()
 
   survey = await SB.survey(
@@ -34,13 +34,14 @@ beforeAll(async () => {
       )
     )
     .buildAndStore()
-})
+}
 
-afterAll(async () => {
+export const tearDownTaxonomyPublishedTests = async () => {
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+    survey = null
   }
-})
+}
 
 const _updateTaxonWithNewVernacularNames = (taxonCode, lang, names) =>
   TaxonomyUtils.updateTaxonWithNewVernacularNames(

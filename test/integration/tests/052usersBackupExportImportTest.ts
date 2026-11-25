@@ -10,8 +10,8 @@ import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import FileZip from '@server/utils/file/fileZip'
-import UsersBackupExportJob from '@server/modules/user/service/usersBackup/UsersBackupExportJob'
-import UsersBackupImportJob from '@server/modules/user/service/usersBackup/UsersBackupImportJob'
+import UsersBackupExportJob from '@server/modules/user/service/usersBackup/usersBackupExportJob'
+import UsersBackupImportJob from '@server/modules/user/service/usersBackup/usersBackupImportJob'
 import { UsersBackupService } from '@server/modules/user/service/usersBackup/usersBackupService'
 import {
   UsersBackupFile,

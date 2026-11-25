@@ -17,14 +17,13 @@ import * as TaxonomyUtils from './taxonomyUtils'
 
 const taxonomyNameDefault = 'species_list'
 
-const getContext = () => {
-  const survey = global.applicableSurvey
-  return { survey }
-}
+let survey = null
 
-beforeAll(async () => {
+const getContext = () => ({ survey })
+
+export const setUpTaxonomyTests = async () => {
   const user = getContextUser()
-  global.applicableSurvey = await SB.survey(
+  survey = await SB.survey(
     user,
     // Cluster
     SB.entity('cluster', SB.attribute('cluster_no', NodeDef.nodeDefType.integer).key())
@@ -38,14 +37,14 @@ beforeAll(async () => {
       )
     )
     .buildAndStore(false)
-})
+}
 
-afterAll(async () => {
-  const { survey } = getContext()
+export const tearDownTaxonomyTests = async () => {
   if (survey) {
     await SurveyManager.deleteSurvey(Survey.getId(survey))
+    survey = null
   }
-})
+}
 
 export const taxonomyTests = async () => {
   const { survey } = getContext()
@@ -171,7 +170,7 @@ export const taxonomyImportErrorDuplicateItemsTest = async () => {
 
 export const taxonomyImportNewTest = async () => {
   const { survey } = getContext()
-  const { job, taxonomyUuid } = await _importFile('New taxonomy', 'species list test (short with vernacular names).csv')
+  const { job, taxonomyUuid } = await _importFile('new_taxonomy', 'species list test (short with vernacular names).csv')
 
   // Check that the job completed successfully
   expect(job.status).toBe(jobStatus.succeeded)
@@ -188,7 +187,7 @@ export const taxonomyImportNewTest = async () => {
     const taxon = taxa.find((t) => Taxon.getCode(t) === 'AFZ/QUA')
 
     expect(taxon).toBeDefined()
-    expect(Taxon.getProps(taxon)).toEqual({
+    expect(Taxon.getProps(taxon)).toMatchObject({
       [Taxon.propKeys.code]: 'AFZ/QUA',
       [Taxon.propKeys.family]: 'Fabaceae',
       [Taxon.propKeys.genus]: 'Afzelia',

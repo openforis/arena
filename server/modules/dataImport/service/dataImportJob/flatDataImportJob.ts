@@ -21,7 +21,7 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
-import DataImportBaseJob from './DataImportBaseJob'
+import DataImportBaseJob from './dataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
