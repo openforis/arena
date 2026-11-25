@@ -1,6 +1,8 @@
 import '@fontsource/noto-sans'
 import './utils/polyfill/polyfill'
 import './style/main.scss'
+// the store must be loaded before the app components: import cycles between them resolve only in this order
+import '@webapp/store'
 
 import { createRoot } from 'react-dom/client'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'

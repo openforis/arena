@@ -16,16 +16,18 @@ import * as SurveyActions from '../actions'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
 import * as SurveyState from '../state'
 
-export const nodeDefCreate = 'survey/nodeDef/create'
-export const nodeDefUpdate = 'survey/nodeDef/update'
-export const nodeDefDelete = 'survey/nodeDef/delete'
-export const nodeDefsDelete = 'survey/nodeDefs/delete'
-export const nodeDefSave = 'survey/nodeDef/save'
-export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
+import {
+  dependencyGraphUpdate,
+  nodeDefCreate,
+  nodeDefDelete,
+  nodeDefPropsUpdateCancel,
+  nodeDefSave,
+  nodeDefsUpdate,
+  nodeDefsValidationUpdate,
+  nodeDefUpdate,
+} from './actionTypes'
 
-export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
-export const nodeDefsUpdate = 'survey/nodeDefs/update'
-export const dependencyGraphUpdate = 'survey/dependencyGraph/update'
+export * from './actionTypes'
 
 // ==== PLAIN ACTIONS
 export const updateNodeDef = ({ nodeDef, prevNodeDef = null, dirty = false }) => ({

@@ -1,5 +1,5 @@
 import * as RecordStep from '@core/record/recordStep'
-import { SurveyActions } from '@webapp/store/survey'
+import * as SurveyActionTypes from '@webapp/store/survey/actions/actionTypes'
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
@@ -16,9 +16,9 @@ const reset = () => initialState
 const actionHandlers = {
   [SystemActionTypes.SYSTEM_RESET]: reset,
 
-  [SurveyActions.surveyCreate]: reset,
-  [SurveyActions.surveyUpdate]: reset,
-  [SurveyActions.surveyDelete]: reset,
+  [SurveyActionTypes.surveyCreate]: reset,
+  [SurveyActionTypes.surveyUpdate]: reset,
+  [SurveyActionTypes.surveyDelete]: reset,
 
   [ChainActionTypes.chainReset]: reset,
 

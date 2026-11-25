@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import { SurveyActions } from '@webapp/store/survey'
+import * as SurveyActionTypes from '@webapp/store/survey/actions/actionTypes'
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { exportReducer } from '@webapp/utils/reduxUtils'
@@ -12,9 +12,9 @@ const actionHandlers = {
   // Reset form
   [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
-  [SurveyActions.surveyCreate]: () => ({}),
-  [SurveyActions.surveyUpdate]: () => ({}),
-  [SurveyActions.surveyDelete]: () => ({}),
+  [SurveyActionTypes.surveyCreate]: () => ({}),
+  [SurveyActionTypes.surveyUpdate]: () => ({}),
+  [SurveyActionTypes.surveyDelete]: () => ({}),
   [SurveyFormActions.formReset]: () => ({}),
 
   // Record updates
