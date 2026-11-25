@@ -10,7 +10,7 @@ The videos are not in the repository (to keep it small): they are attached to th
 
 - [`arena-whats-new-2026.mp4`](https://github.com/openforis/arena/releases/download/whats-new-2026/arena-whats-new-2026.mp4): the video (4K, 3840×2160, about 5 minutes), grouped by area: look and feel, survey design,
   maps, data, analysis, users and security, and a short AI scene (AI features have a video of their own).
-- [`arena-ai-v5.mp4`](https://github.com/openforis/arena/releases/download/whats-new-2026/arena-ai-v5.mp4): the AI features video (1920×1080, about 3 minutes).
+- [`arena-ai-features-2026.mp4`](https://github.com/openforis/arena/releases/download/whats-new-2026/arena-ai-features-2026.mp4): the AI features video (1920×1080, about 2.5 minutes).
 - `scenes.json`: the script: for each scene, the narration (`say`, one entry per sentence) and the animated items
   (screenshots, chips, cards, ...). An item with `"at": n` appears when sentence `n` starts (plus `delay` seconds).
   Acronyms are spelled with hyphens (e.g. "A-O-I") so that the voice pronounces them letter by letter.
