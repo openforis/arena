@@ -52,6 +52,13 @@ export const assocProfilePictureSet = A.assoc(keys.profilePictureSet)
 // ====== CHECK
 export const isSystemAdmin = (user: any) => !!user && A.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
 export const isSurveyManager = (user: any) => !!user && A.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
+/**
+ * Returns true if the user is the administrator of at least one survey.
+ * @param {object} user - The user.
+ * @returns {boolean} True if the user has the survey admin role in some survey.
+ */
+export const isSurveyAdminOfSomeSurvey = (user: any): boolean =>
+  !!user && getAuthGroups(user).some((group: any) => AuthGroup.getName(group) === AuthGroup.groupNames.surveyAdmin)
 export const hasAccepted = A.propEq(keys.status, userStatus.ACCEPTED)
 export const isInvited = A.propEq(keys.status, userStatus.INVITED)
 export const isInvitationExpired = A.propEq(keys.invitationExpired, true)

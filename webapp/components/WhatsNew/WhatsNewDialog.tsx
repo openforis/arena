@@ -1,7 +1,11 @@
 import './WhatsNew.scss'
 
 import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router'
 
+import { canViewChangelog } from '@core/auth/changelogAuthorizer'
+import { appModuleUri, helpModules } from '@webapp/app/appModules'
+import { useUser } from '@webapp/store/user'
 import { Button } from '../buttons'
 import { Checkbox } from '../form'
 import { Modal, ModalBody, ModalFooter } from '../Modal'
@@ -17,6 +21,8 @@ import { WhatsNewCarousel } from './WhatsNewCarousel'
  */
 export const WhatsNewDialog = () => {
   const { unseenItems, markItemsAsSeen } = useWhatsNewUnseenItems()
+  const user = useUser()
+  const navigate = useNavigate()
 
   const [closed, setClosed] = useState(false)
   const [dontShowAgain, setDontShowAgain] = useState(false)
@@ -28,6 +34,11 @@ export const WhatsNewDialog = () => {
     }
   }, [dontShowAgain, markItemsAsSeen, unseenItems])
 
+  const onShowChangelog = useCallback(() => {
+    onClose()
+    navigate(appModuleUri(helpModules.changelog))
+  }, [navigate, onClose])
+
   if (closed || unseenItems.length === 0) return null
 
   return (
@@ -36,6 +47,14 @@ export const WhatsNewDialog = () => {
         <WhatsNewCarousel items={unseenItems} />
       </ModalBody>
       <ModalFooter>
+        {canViewChangelog(user) && (
+          <Button
+            className="modal-footer__item whats-new-dialog__changelog-link"
+            label="whatsNew:showChangelog"
+            onClick={onShowChangelog}
+            variant="text"
+          />
+        )}
         <Checkbox checked={dontShowAgain} label="whatsNew:dontShowAgain" onChange={setDontShowAgain} />
         <Button className="modal-footer__item" label="common.close" onClick={onClose} />
       </ModalFooter>
