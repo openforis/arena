@@ -1404,6 +1404,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     or: 'OR',
     group: 'Grupo ()',
     var: 'Variável',
+    ancestorEntities: 'Entidades ancestrais',
     node: 'Nó (atributo ou entidade)',
     const: 'Valor constante',
     call: 'Função',

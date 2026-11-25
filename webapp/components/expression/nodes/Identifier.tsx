@@ -13,7 +13,7 @@ const getSelectedVariable = ({ variables, node }) => {
 
 const defaultVariablesFilterFunction = (variable) => variable.nodeDefType !== NodeDef.nodeDefType.entity
 
-const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
+export const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
   const thisVariable = variables.find((variable) => variable.value === Expression.thisVariable)
 
   const filterVariables = (_vars) =>
