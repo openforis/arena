@@ -17,6 +17,11 @@
   .modal-footer {
     padding-top: 1rem;
   }
+
+  // changelog link on the left, the other footer items on the right
+  .whats-new-dialog__changelog-link {
+    margin-right: auto;
+  }
 }
 
 // shrinkable (not growing) flex column chain down to the description: in a container with a bounded height

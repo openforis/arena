@@ -3,6 +3,7 @@ export default {
   since: 'Seit Version {{version}}',
   experimental: 'Experimentell',
   dontShowAgain: 'Nicht erneut anzeigen',
+  showChangelog: 'Alle Änderungen und Korrekturen (Änderungsprotokoll)',
   slideCounter: '{{current}} von {{total}}',
   noItems: 'Keine neuen Funktionen vorhanden.',
   items: {

@@ -70,7 +70,7 @@ export const init = (app: Router): void => {
     res.json({ version, minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload })
   })
 
-  app.get('/api/changelog', AuthMiddleware.requireAdminPermission, async (_req, res) => {
+  app.get('/api/changelog', AuthMiddleware.requireChangelogViewPermission, async (_req, res) => {
     const content = await FileUtils.readFile('CHANGELOG.md')
     res.json({ content })
   })

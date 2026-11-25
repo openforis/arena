@@ -3,6 +3,8 @@
 The "What's new" dialog is a visual summary of [CHANGELOG.md](../../CHANGELOG.md): a carousel of the most valuable
 features of the latest releases. It is shown automatically to logged-in users when there are items they have not
 dismissed yet, and it is always available in Help > What's new.
+System admins, survey managers and survey admins can also open the whole changelog (Help > Changelog, with all the
+changes and fixes) from the dialog.
 
 ## Adding an item (when updating CHANGELOG.md)
 
