@@ -18,7 +18,7 @@ import { TestId } from '@webapp/utils/testId'
  * First-use dialog of a local provider: says where the requests of this survey will go and what they send (the survey
  * design or record data), and asks to continue, or to choose another provider (the request then fails with
  * aiProviderChooseAnother).
- * Mounted once in AppView; resolveModel opens it through the consent queue.
+ * Mounted once in AppLayout; resolveModel opens it through the consent queue.
  * @returns {React.ReactElement|null} The dialog, or null when nothing is pending.
  */
 export const LocalServerConsentHost = () => {

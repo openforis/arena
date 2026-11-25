@@ -1,4 +1,4 @@
-import { getStorageUsageFillColor } from '@webapp/views/App/views/Dashboard/StorageSummary/StorageUsageMeter'
+import { getStorageUsageFillColor } from '@webapp/views/Dashboard/StorageSummary/StorageUsageMeter'
 import { themeColors } from '@webapp/theme/tokens'
 
 describe('getStorageUsageFillColor', () => {

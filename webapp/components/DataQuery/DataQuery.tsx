@@ -8,7 +8,7 @@ import { Paginator } from '@webapp/components/Table'
 
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
-import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
+import { RecordEditModal } from '@webapp/views/Data/common/RecordEditModal'
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
