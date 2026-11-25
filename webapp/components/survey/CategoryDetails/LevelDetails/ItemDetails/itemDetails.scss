@@ -68,9 +68,14 @@ $borderColor: $colorOutline;
   }
 
   .empty {
-    color: $colorError;
+    color: $colorOnSurfaceVariant;
     font-style: italic;
     font-weight: normal;
+
+    // a missing code is a validation error, a missing label is not
+    &.category__item-code {
+      color: $colorError;
+    }
   }
 
   .category__item-toggle-btn {
