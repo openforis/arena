@@ -2,7 +2,8 @@
 
 .provider-dialog {
   .modal-content {
-    width: 34rem;
+    // wide enough for a model id with its name (claude-haiku-4-5-20251001 — Claude Haiku 4.5)
+    width: 46rem;
     max-width: calc(100vw - 2rem);
   }
 
@@ -99,18 +100,6 @@
   &__grow {
     flex: 1;
     min-width: 0;
-  }
-
-  &__select {
-    width: 100%;
-    min-width: 0;
-    height: 2rem;
-    padding: 0 0.5rem;
-    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
-    border-radius: 4px;
-    background: inherit;
-    color: inherit;
-    font: inherit;
   }
 
   &__result {
