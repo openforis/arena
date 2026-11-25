@@ -24,11 +24,11 @@ import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, Fieldset, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
-import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
+import { ImportStartButton } from '@webapp/views/Data/DataImport/ImportStartButton'
 import {
   defaultChunkSize,
   FileUploadChunkSizeDropdown,
-} from '@webapp/views/App/views/Data/DataImport/FileUploadChunkSizeDropdown'
+} from '@webapp/views/Data/DataImport/FileUploadChunkSizeDropdown'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'

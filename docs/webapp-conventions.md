@@ -5,6 +5,30 @@ How the React code in `webapp/` is written today. The general rules (TypeScript 
 and are not repeated here. A lot of older JavaScript code predates these conventions: follow them in new
 code. The notes below explain the differences you will find in older code.
 
+## Folder structure
+
+```text
+webapp/
+  Main.tsx          entry point: store, theme, router, <Arena />
+  app/              application wiring: Arena/ (root component and routes), modules and their paths
+                    (appModules.ts), web socket, errors middleware
+  layouts/          the frames the screens are rendered in, one per area of the app:
+    AppLayout/      logged-in users: header, side bar, job monitor, service errors
+    GuestLayout/    login, password reset and access request
+    NoHeaderLayout/ full screen pages (e.g. a record opened in a new tab)
+  views/            the screens, one folder per route (Designer, Data, Analysis, Users, Login, ...)
+  components/       components shared by several screens (guest/ for the guest screens)
+  store/            Redux store, one folder per feature area
+  service/          API clients, browser storage
+  ai/, charts/, theme/, style/, utils/, model/, types/
+```
+
+- A layout decides which screens it shows (`AppLayout.tsx` lazy-loads them, `ModuleSwitch` picks one by path);
+  screens don't know which layout hosts them.
+- `views/` stays flat: a screen's subscreens and parts live in its own folder
+  (`views/Data/Records/`, `views/Home/SurveyCompare/`), not in a nested `views/` folder.
+- Code used by a single screen stays in its folder; move it to `components/` when a second screen needs it.
+
 ## Files and folders
 
 - New components are `.tsx`, hooks and helpers are `.ts`.
@@ -14,10 +38,10 @@ code. The notes below explain the differences you will find in older code.
   `index.ts` that re-exports its public parts (`export { SurveyCompare } from './SurveyCompare'`). Small
   single-file components can sit directly in the parent folder (`webapp/components/buttons/ButtonSplit.tsx`).
 - Subcomponents, hooks (`useXxx.ts`) and pure helpers (camelCase `.ts`) stay next to the component that uses
-  them. `webapp/views/App/views/Home/SurveyCompare/` is a typical example. Pure helpers are easy to unit test
+  them. `webapp/views/Home/SurveyCompare/` is a typical example. Pure helpers are easy to unit test
   in `test/unit/tests/` (e.g. `systemLogLines.test.ts`).
 - Prefer named exports (`export const SurveyCompare = ...`), re-exported by name in `index.ts`. Only views
-  loaded with `React.lazy` (`webapp/views/App/AppView.js`) need a default export. Older code (and the
+  loaded with `React.lazy` (`webapp/layouts/AppLayout/AppLayout.tsx`) need a default export. Older code (and the
   dashboard) also uses default exports in other places.
 
 ## Components
@@ -82,7 +106,7 @@ export const JobsHeader = ({ onRefresh, highlighted = false }: Props) => {
   - build conditional classes with `classnames`:
     ``classNames('button-split', `button-split--${variant}`, className)``
 - MUI `sx` is fine in components built from MUI primitives (`Box`, `Card`...), e.g.
-  `webapp/views/App/views/Dashboard/components/DashboardKpiCard.tsx`.
+  `webapp/views/Dashboard/components/DashboardKpiCard.tsx`.
 - Never hard-code colors: use the theme tokens described in CLAUDE.md "Colors and themes".
 
 ## UI texts (i18n)
@@ -129,12 +153,12 @@ export const JobsHeader = ({ onRefresh, highlighted = false }: Props) => {
 New components keep their view state in React:
 
 - Use `useState` in the component. Group related values in one typed object when they change together, e.g.
-  `useState<CompareState>(initialState)` in `webapp/views/App/views/Home/SurveyCompare/SurveyCompare.tsx`.
+  `useState<CompareState>(initialState)` in `webapp/views/Home/SurveyCompare/SurveyCompare.tsx`.
 - When the logic grows, move it to a hook next to the component that returns state and callbacks
-  (`webapp/views/App/views/SystemLogs/useSystemLogStream.ts`,
-  `webapp/views/App/views/JobsMonitor/useJobsMonitor.ts`). Move pure computations to plain `.ts` modules.
+  (`webapp/views/SystemLogs/useSystemLogStream.ts`,
+  `webapp/views/JobsMonitor/useJobsMonitor.ts`). Move pure computations to plain `.ts` modules.
 - To share state with nested subcomponents, use a React context with a `useXxxContext` hook
-  (`webapp/views/App/views/Dashboard/RecordsSummaryContext.tsx`) instead of passing `state`/`setState` down.
+  (`webapp/views/Dashboard/RecordsSummaryContext.tsx`) instead of passing `state`/`setState` down.
 
 **Older `store/` folder pattern.** Components written around 2020 (e.g.
 `webapp/components/survey/CategoryDetails/`) keep their state in a `store/` subfolder:
@@ -158,7 +182,7 @@ the action to its `store/actions/` and register it in `useActions`, as was done 
   Write new functions in TypeScript with typed parameters (e.g. `webapp/service/api/surveyCompare/index.ts`).
   Older components call `axios` directly or use `useAsyncGetRequest`.
 - The axios interceptor in `webapp/app/appErrorsMiddleware.js` catches failed requests, and
-  `webapp/views/App/ServiceErrors` shows them, so you don't need to catch errors just to display them. To
+  `webapp/layouts/AppLayout/ServiceErrors` shows them, so you don't need to catch errors just to display them. To
   handle an error yourself, set `errorHandledLocally: true` in the request config (see `fetchSurveyFile` in
   `webapp/service/api/survey/index.js`).
 - Long operations run as server jobs. The API function returns the job, and
@@ -171,10 +195,10 @@ the action to its `store/actions/` and register it in `useActions`, as was done 
 - Paths are declared as modules in `webapp/app/appModules.js`. Build URLs with `appModuleUri(module)`, e.g.
   `navigate(appModuleUri(userModules.userNew))`.
 - Each area renders its pages with `ModuleSwitch` (`webapp/components/moduleSwitch.js`), e.g.
-  `webapp/views/App/views/SystemAdmin/SystemAdmin.tsx`. `webapp/views/App/AppView.js` lazy-loads the top-level
+  `webapp/views/SystemAdmin/SystemAdmin.tsx`. `webapp/layouts/AppLayout/AppLayout.tsx` lazy-loads the top-level
   areas.
 - A new page needs the module in `appModules.js` and a route in the parent `ModuleSwitch`. If it appears in the
-  side bar, it also needs an entry in `webapp/views/App/SideBar/Modules/utils.js` and a label
+  side bar, it also needs an entry in `webapp/layouts/AppLayout/SideBar/Modules/utils.ts` and a label
   `appModules.<key>` in `core/i18n/resources/<lang>/common.ts`.
 
 ## House components
@@ -194,9 +218,9 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
   handle looks the same.
 - Lists:
   - `DataGrid` (`webapp/components/DataGrid`, based on MUI X) for rows already loaded, e.g.
-    `webapp/views/App/views/JobsMonitor/JobsMonitor.tsx`
+    `webapp/views/JobsMonitor/JobsMonitor.tsx`
   - `Table` (`webapp/components/Table`) loads its pages from `moduleApiUri` and `moduleApiUri/count`, and keeps
-    paging, sorting and search in the URL, e.g. `webapp/views/App/views/Message/MessageList.js`
+    paging, sorting and search in the URL, e.g. `webapp/views/Message/MessageList.tsx`
   - Both have the same look: change it in the table variables of `webapp/style/_vars.scss` (used by
     `webapp/style/table.scss`) and in the `MuiDataGrid` overrides of `webapp/theme/createArenaTheme.ts` together.
   - Both behave the same way. `onRowOpen(item)` opens (views or edits) the item of a row: a click opens it, or a

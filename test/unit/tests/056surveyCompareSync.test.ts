@@ -19,7 +19,7 @@ import {
   expandSelection,
 } from '@core/survey/surveyCompare'
 
-import { getSelectedDeletions } from '@webapp/views/App/views/Home/SurveyCompare/surveyCompareSelection'
+import { getSelectedDeletions } from '@webapp/views/Home/SurveyCompare/surveyCompareSelection'
 
 import * as SB from '../../utils/surveyBuilder'
 import {

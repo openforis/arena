@@ -4,7 +4,7 @@ import {
   applyPolicyChoice,
   getLevelsAbove,
   getPolicyLevelOptions,
-} from '@webapp/views/App/views/Home/SurveyInfo/SurveyAiPolicyEditor/policyLevelOptions'
+} from '@webapp/views/Home/SurveyInfo/SurveyAiPolicyEditor/policyLevelOptions'
 
 const disabledKeys = (options: { key: string; disabled: boolean }[]) =>
   options.filter((o) => o.disabled).map((o) => o.key)

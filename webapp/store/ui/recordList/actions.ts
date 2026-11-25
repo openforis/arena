@@ -3,9 +3,9 @@ import * as API from '@webapp/service/api'
 import { SurveyState } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 
-import { DataExportDownloadButton } from '@webapp/views/App/views/Data/DataExport/DataExportDownloadButton'
-import { DataSummaryExportDownloadButton } from '@webapp/views/App/views/Data/DataExport/DataSummaryExportDownloadButton'
-import { SelectedRecordsExportDownloadButton } from '@webapp/views/App/views/Data/Records/HeaderLeft/SelectedRecordsExportDownloadButton'
+import { DataExportDownloadButton } from '@webapp/views/Data/DataExport/DataExportDownloadButton'
+import { DataSummaryExportDownloadButton } from '@webapp/views/Data/DataExport/DataSummaryExportDownloadButton'
+import { SelectedRecordsExportDownloadButton } from '@webapp/views/Data/Records/HeaderLeft/SelectedRecordsExportDownloadButton'
 
 export const startCSVExport =
   ({ recordUuids, search, options }) =>

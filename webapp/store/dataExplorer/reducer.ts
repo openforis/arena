@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Query } from '@common/model/query'
 import { FileFormats } from '@core/fileFormats'
 
-import { defaultDataExportOptionsSelection } from '@webapp/views/App/views/Data/DataExport/dataExportOptions'
+import { defaultDataExportOptionsSelection } from '@webapp/views/Data/DataExport/dataExportOptions'
 import * as API from '@webapp/service/api'
 
 import { DataExplorerState } from './state'

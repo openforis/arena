@@ -1,4 +1,4 @@
-import { buildRecordCandidates, selectRecordCandidate } from '@webapp/views/App/views/Data/MapView/mapRecordCandidates'
+import { buildRecordCandidates, selectRecordCandidate } from '@webapp/views/Data/MapView/mapRecordCandidates'
 
 const point = (key: string, ancestorsKeys: string[], lng: number, lat: number) => ({
   geometry: { coordinates: [lng, lat] as [number, number] },
