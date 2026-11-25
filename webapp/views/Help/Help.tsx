@@ -1,4 +1,4 @@
-import * as User from '@core/user/user'
+import { canViewChangelog } from '@core/auth/changelogAuthorizer'
 import { appModules, helpModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/ModuleSwitch'
 import { useUser } from '@webapp/store/user'
@@ -25,8 +25,8 @@ const Help = () => {
           component: WhatsNew,
           path: helpModules.whatsNew.path,
         },
-        // Changelog (system admins only)
-        ...(User.isSystemAdmin(user)
+        // Changelog (system admins, survey managers and survey admins)
+        ...(canViewChangelog(user)
           ? [
               {
                 component: Changelog,

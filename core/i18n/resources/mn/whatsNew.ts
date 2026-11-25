@@ -3,6 +3,7 @@ export default {
   since: '{{version}} хувилбараас',
   experimental: 'Туршилтын',
   dontShowAgain: 'Дахин харуулахгүй',
+  showChangelog: 'Бүх өөрчлөлт, засварууд (өөрчлөлтийн бүртгэл)',
   slideCounter: '{{current}} / {{total}}',
   noItems: 'Харуулах шинэ боломж алга.',
   items: {
