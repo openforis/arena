@@ -1414,6 +1414,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     or: 'OU',
     group: 'Groupe ()',
     var: 'Variable',
+    node: 'Nœud (attribut ou entité)',
     const: 'Valeur constante',
     call: 'Fonction',
     operator: 'Opérateur',

@@ -26,6 +26,16 @@ export default {
   editorTextSearchHelp:
     "Busque valores de texto con text_attr.includes('abc'), text_attr.startsWith('abc') o text_attr.endsWith('abc'); agregue .toLowerCase() antes de ellos para ignorar mayúsculas y minúsculas, p. ej. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Devuelve el identificador de la aplicación que modifica el registro: "arena" (Arena) o "am" (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Devuelve el nombre de la aplicación que modifica el registro: "Arena" o "Arena Mobile". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      'Se evalúa al crear el registro y de nuevo cuando se modifica con otra aplicación, plataforma o versión de la aplicación',
+    appPlatform:
+      'Devuelve la plataforma de la aplicación que modifica el registro: "web", "android" o "ios". $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion:
+      'Devuelve la versión de la aplicación que modifica el registro. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp:
       'Devuelve el valor de la $t(extraProp.label) especificada de un elemento de categoría que tiene el código especificado',
     dateTimeDiff: 'Devuelve la diferencia (en minutos) de 2 pares de fecha-hora',
@@ -48,6 +58,10 @@ export default {
     log10: 'Devuelve el logaritmo en base 10 de X',
     max: 'Devuelve el máximo de los argumentos',
     min: 'Devuelve el mínimo de los argumentos',
+    nodeDateCreated:
+      'Devuelve la fecha y hora de creación del nodo especificado (atributo o entidad) como valor de fecha y hora, p. ej. nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Devuelve la fecha y hora de la última modificación del nodo especificado como valor de fecha y hora; para una entidad, la última vez que se modificó la entidad o alguno de sus descendientes, p. ej. nodeDateModified(parent(this))',
     now: 'Devuelve la fecha u hora actual',
     parent: 'Devuelve la entidad padre del nodo especificado',
     pow: 'Devuelve el valor de una base elevada a una potencia',
