@@ -26,6 +26,15 @@ export default {
   editorTextSearchHelp:
     "Pretražujte tekstualne vrijednosti pomoću text_attr.includes('abc'), text_attr.startsWith('abc') ili text_attr.endsWith('abc'); dodajte .toLowerCase() ispred njih da biste zanemarili velika i mala slova, npr. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      'Vraća identifikator aplikacije u kojoj se zapis menja: „arena” (Arena) ili „am” (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      'Vraća naziv aplikacije u kojoj se zapis menja: „Arena” ili „Arena Mobile”. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      'Izračunava se pri kreiranju zapisa i ponovo kada se zapis menja u drugoj aplikaciji, na drugoj platformi ili u drugoj verziji aplikacije',
+    appPlatform:
+      'Vraća platformu aplikacije u kojoj se zapis menja: „web”, „android” ili „ios”. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion: 'Vraća verziju aplikacije u kojoj se zapis menja. $t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp:
       'Vraća vrijednost navedenog svojstva $t(extraProp.label) stavke kategorije koja ima navedenu šifru',
     dateTimeDiff: 'Vraća razliku (u minutima) između 2 para datum-vrijeme',
@@ -47,6 +56,10 @@ export default {
     log10: 'Vraća logaritam od X sa osnovom 10',
     max: 'Vraća maksimum argumenata',
     min: 'Vraća minimum argumenata',
+    nodeDateCreated:
+      'Vraća datum i vreme kreiranja navedenog čvora (atributa ili entiteta) kao vrednost datuma i vremena, npr. nodeDateCreated(parent(this))',
+    nodeDateModified:
+      'Vraća datum i vreme poslednje izmene navedenog čvora kao vrednost datuma i vremena; za entitet, poslednji put kada je izmenjen entitet ili neki od njegovih potomaka, npr. nodeDateModified(parent(this))',
     now: 'Vraća trenutni datum ili vrijeme',
     parent: 'Vraća roditeljski entitet navedenog čvora',
     pow: 'Vraća vrijednost osnove podignute na stepen',

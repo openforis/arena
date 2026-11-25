@@ -1,4 +1,4 @@
-import type { ArenaSurvey, ArenaUser, LanguageCode } from '@openforis/arena-core'
+import type { ArenaAppInfo, ArenaSurvey, ArenaUser, LanguageCode } from '@openforis/arena-core'
 
 import type { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
@@ -19,6 +19,7 @@ type CreateParams = {
   survey: ArenaSurvey
   timezoneOffset?: number | null
   lang?: string | null
+  appInfo?: ArenaAppInfo | null
 }
 
 /**
@@ -29,6 +30,7 @@ type CreateParams = {
  * @param {!object} params.survey - The survey.
  * @param {number} [params.timezoneOffset] - The timezone offset of the client (in minutes).
  * @param {string} [params.lang] - The language used by language-dependent expression functions.
+ * @param {object} [params.appInfo] - The app editing the record (app info expression functions); only for interactive edits.
  * @returns {RecordEvaluationContext} - The context.
  */
 export const createRecordEvaluationContext = ({
@@ -36,10 +38,12 @@ export const createRecordEvaluationContext = ({
   survey,
   timezoneOffset,
   lang,
+  appInfo,
 }: CreateParams): RecordEvaluationContext => ({
   user,
   survey,
   ...RecordProvidersDefault,
   ...(timezoneOffset === null || timezoneOffset === undefined ? {} : { timezoneOffset }),
   ...(lang ? { lang: lang as LanguageCode } : {}),
+  ...(appInfo ? { appInfo } : {}),
 })

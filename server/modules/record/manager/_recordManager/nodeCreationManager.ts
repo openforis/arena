@@ -1,4 +1,5 @@
 import {
+  type ArenaAppInfo,
   type ArenaRecord,
   type ArenaRecordNode,
   type ArenaSurvey,
@@ -102,6 +103,7 @@ export const insertNodesInBatch = async (
  * @param {boolean} [params.system] - Whether the insert is a system activity.
  * @param {number} [params.timezoneOffset] - The client timezone offset.
  * @param {string} [params.lang] - The language used to evaluate the expressions.
+ * @param {object} [params.appInfo] - The app editing the record (interactive edits only).
  * @param {boolean} [params.persistNodes] - Whether to persist the nodes (true by default).
  * @param {boolean} [params.createMultipleEntities] - Whether to create the multiple entities (true by default).
  * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
@@ -117,6 +119,7 @@ export const insertNode = async (
     system,
     timezoneOffset,
     lang,
+    appInfo,
     persistNodes = true,
     createMultipleEntities = true,
     sideEffect = false,
@@ -128,6 +131,7 @@ export const insertNode = async (
     system: boolean
     timezoneOffset?: number
     lang?: string
+    appInfo?: ArenaAppInfo
     persistNodes?: boolean
     createMultipleEntities?: boolean
     sideEffect?: boolean
@@ -156,7 +160,7 @@ export const insertNode = async (
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = await RecordNodesUpdater.addDescendants({
-      ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang }),
+      ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang, appInfo }),
       record: recordUpdated,
       parentNode: node,
       nodeDef,

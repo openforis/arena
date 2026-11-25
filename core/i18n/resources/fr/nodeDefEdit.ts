@@ -26,6 +26,16 @@ export default {
   editorTextSearchHelp:
     "Recherchez des valeurs de texte avec text_attr.includes('abc'), text_attr.startsWith('abc') ou text_attr.endsWith('abc') ; ajoutez .toLowerCase() avant pour ignorer la casse, par ex. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
+    appId:
+      "Renvoie l'identifiant de l'application qui modifie l'enregistrement : « arena » (Arena) ou « am » (Arena Mobile). $t(nodeDefEdit:functionDescriptions.appInfoNote)",
+    appIdLabel:
+      "Renvoie le nom de l'application qui modifie l'enregistrement : « Arena » ou « Arena Mobile ». $t(nodeDefEdit:functionDescriptions.appInfoNote)",
+    appInfoNote:
+      "Évaluée à la création de l'enregistrement, puis à nouveau lorsqu'il est modifié avec une autre application, plateforme ou version de l'application",
+    appPlatform:
+      "Renvoie la plateforme de l'application qui modifie l'enregistrement : « web », « android » ou « ios ». $t(nodeDefEdit:functionDescriptions.appInfoNote)",
+    appVersion:
+      "Renvoie la version de l'application qui modifie l'enregistrement. $t(nodeDefEdit:functionDescriptions.appInfoNote)",
     categoryItemProp:
       "Renvoie la valeur de la $t(extraProp.label) spécifiée d'un élément de catégorie ayant le code spécifié",
     dateTimeDiff: 'Renvoie la différence (en minutes) entre 2 couples date-heure',
@@ -48,6 +58,10 @@ export default {
     log10: 'Renvoie le logarithme en base 10 de X',
     max: 'Renvoie le maximum des arguments',
     min: 'Renvoie le minimum des arguments',
+    nodeDateCreated:
+      "Renvoie la date et l'heure de création du nœud spécifié (attribut ou entité) sous forme de valeur date-heure, par ex. nodeDateCreated(parent(this))",
+    nodeDateModified:
+      "Renvoie la date et l'heure de dernière modification du nœud spécifié sous forme de valeur date-heure ; pour une entité, la dernière fois que l'entité ou l'un de ses descendants a été modifié, par ex. nodeDateModified(parent(this))",
     now: "Renvoie la date ou l'heure actuelle",
     parent: "Renvoie l'entité parente du nœud spécifié",
     pow: "Renvoie la valeur d'une base élevée à une puissance",

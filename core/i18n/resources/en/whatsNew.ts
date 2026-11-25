@@ -7,6 +7,15 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    appInfoAndNodeDateFunctions: {
+      title: 'New expression functions: app info and node dates',
+      description: `New functions for default values, relevance and validation rules:
+
+- **appId()**, **appIdLabel()**, **appPlatform()**, **appVersion()**: the app editing the record (\`arena\` / \`am\`, **Arena** / **Arena Mobile**), its platform (\`web\`, \`android\` or \`ios\`) and its version. They are evaluated when the record is created and again when it is edited with another app, platform or app version: e.g. a **Read only** attribute with default value \`appIdLabel()\` and **Default value evaluated only one time** keeps the app that created the record.
+- **nodeDateCreated(node)**, **nodeDateModified(node)**: creation and last modification date and time of an attribute or entity; for an entity, the last time any value in it changed, e.g. \`nodeDateModified(parent(this))\`.
+
+In the basic expression editor, select them in the **Function** list: the builder of the node date functions lists the attributes reachable from the current node and the ancestor entities.`,
+    },
     googleSignIn: {
       title: 'Sign in with your Google account',
       description: `On the login page, click **Sign in with Google** to sign in with your Google account (Gmail or Google Workspace) instead of typing your password.

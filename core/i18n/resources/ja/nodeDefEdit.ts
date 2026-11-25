@@ -26,6 +26,15 @@ export default {
   editorTextSearchHelp:
     "テキスト値の検索には text_attr.includes('abc')、text_attr.startsWith('abc')、text_attr.endsWith('abc') を使用します。大文字と小文字を区別しない場合は、その前に .toLowerCase() を追加します（例：text_attr.toLowerCase().includes('abc')）",
   functionDescriptions: {
+    appId:
+      '記録を編集しているアプリの識別子を返します：「arena」（Arena）または「am」（Arena Mobile）。$t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appIdLabel:
+      '記録を編集しているアプリの名前を返します：「Arena」または「Arena Mobile」。$t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appInfoNote:
+      '記録の作成時に評価され、別のアプリ、プラットフォーム、またはアプリのバージョンで編集されたときに再評価されます',
+    appPlatform:
+      '記録を編集しているアプリのプラットフォームを返します：「web」、「android」または「ios」。$t(nodeDefEdit:functionDescriptions.appInfoNote)',
+    appVersion: '記録を編集しているアプリのバージョンを返します。$t(nodeDefEdit:functionDescriptions.appInfoNote)',
     categoryItemProp: '指定したコードを持つカテゴリ項目の、指定した$t(extraProp.label)の値を返します',
     dateTimeDiff: '2つの日時の組の差（分単位）を返します',
     distance: '指定した座標間の距離（メートル単位）を返します',
@@ -46,6 +55,10 @@ export default {
     log10: 'Xの常用対数（底10）を返します',
     max: '引数のうち最大の値を返します',
     min: '引数のうち最小の値を返します',
+    nodeDateCreated:
+      '指定したノード（属性または項目）の作成日時を日時値として返します（例：nodeDateCreated(parent(this))）',
+    nodeDateModified:
+      '指定したノードの最終更新日時を日時値として返します。項目の場合は、項目またはその子孫が最後に更新された日時です（例：nodeDateModified(parent(this))）',
     now: '現在の日付または時刻を返します',
     parent: '指定したノードの親項目を返します',
     pow: '底をべき乗した値を返します',

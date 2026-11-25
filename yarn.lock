@@ -3970,9 +3970,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^3.1.3, @openforis/arena-core@npm:^3.1.4":
-  version: 3.1.4
-  resolution: "@openforis/arena-core@npm:3.1.4"
+"@openforis/arena-core@npm:^3.1.3, @openforis/arena-core@npm:^3.2.3":
+  version: 3.2.3
+  resolution: "@openforis/arena-core@npm:3.2.3"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.1.0"
     "@turf/bearing": "npm:^7.4.0"
@@ -3983,12 +3983,12 @@ __metadata:
     bignumber.js: "npm:^11.1.5"
     change-case: "npm:^5.4.4"
     dayjs: "npm:^1.11.23"
+    es-toolkit: "npm:^1.53.2"
     jsep: "npm:^1.6.0"
-    lodash.isequal: "npm:^4.5.0"
     n2words: "npm:^6.3.1"
     proj4: "npm:^2.23.0"
     uuid: "npm:^14.0.3"
-  checksum: 10c0/b5dde61c45f7b827e33111cfe317ca6356c476ba1aeaca2e49d25515eafcade25538cc10d97a0d52423e5228d43c16fedd42431a23a966c961bfd62639936527
+  checksum: 10c0/3cb14c126d9b62fa980d08bfe5af34308ec8405410db637343e8637834aa5c858805986d321d19ffbbd47f286c1881b7c2978fe12268c1bdb3d8c464a2be4f60
   languageName: node
   linkType: hard
 
@@ -9871,7 +9871,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"es-toolkit@npm:^1.39.3":
+"es-toolkit@npm:^1.39.3, es-toolkit@npm:^1.53.2":
   version: 1.53.2
   resolution: "es-toolkit@npm:1.53.2"
   dependenciesMeta:
@@ -15092,7 +15092,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9.18.0"
     "@mui/x-tree-view": "npm:^9.18.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
-    "@openforis/arena-core": "npm:^3.1.4"
+    "@openforis/arena-core": "npm:^3.2.3"
     "@openforis/arena-server": "npm:^3.0.4"
     "@playwright/test": "npm:1.65.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
