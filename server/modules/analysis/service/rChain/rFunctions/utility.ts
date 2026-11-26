@@ -14,11 +14,9 @@ export const tryCatch = ({
   ignoreErrors?: boolean
   errorFnName?: string
 }) => {
-  const tryCatchArguments = [code]
-  if (!ignoreErrors) {
-    tryCatchArguments.push(`error=${errorFnName}`)
-  }
-  return `tryCatch(${tryCatchArguments.join(', ')})`
+  // an ignored error is only printed: without a handler tryCatch rethrows it and arena.R stops
+  const errorHandler = ignoreErrors ? 'function(e) print(e)' : errorFnName
+  return `tryCatch(${code}, error=${errorHandler})`
 }
 
 export const source = (path: RExpression) => `source("${path}")`

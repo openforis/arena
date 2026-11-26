@@ -149,7 +149,8 @@ settings, loaded in R as `arena.chainSummary`. `arena.R` runs, in order:
 
 A failing data or user script doesn't stop `arena.R`: its `source` is wrapped in a `tryCatch` that
 records the error (`saveError` in `system/init/init-handle-errors.R`), and the persist steps (6 and 9)
-then don't run (`checkGlobalErrors`).
+then don't run (`checkGlobalErrors`). Errors in `system/login.R` and `system/statistical-analysis.R`
+are only printed (not recorded), so they don't stop the chain either and `system/close.R` still runs.
 
 ## Authentication of the R scripts
 
