@@ -127,10 +127,7 @@
   }
 
   &__select {
-    padding: 2px 4px;
-    border: 1px solid $colorOutline;
-    border-radius: 4px;
-    background-color: $colorSurface;
+    min-width: 160px;
     font-size: 12px;
   }
 

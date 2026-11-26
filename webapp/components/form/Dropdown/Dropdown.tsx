@@ -1,5 +1,6 @@
 import './dropdown.scss'
 
+import { useMemo } from 'react'
 import classNames from 'classnames'
 import ReactSelect, { components, createFilter } from 'react-select'
 
@@ -33,17 +34,20 @@ const OptionComponent =
     )
   }
 
-const SingleValueComponent = (reactSelectProps) => {
-  const { children: childrenProp, ...otherProps } = reactSelectProps
-  const children = childrenProp && typeof childrenProp === 'string' ? childrenProp.trim() : childrenProp
-  return (
-    <components.SingleValue {...otherProps}>
-      <LabelWithTooltip label={children} />
-    </components.SingleValue>
-  )
-}
+const SingleValueComponent =
+  ({ renderSelectedLabel }) =>
+  (reactSelectProps) => {
+    const { children: childrenProp, data, ...otherProps } = reactSelectProps
+    const children = childrenProp && typeof childrenProp === 'string' ? childrenProp.trim() : childrenProp
+    return (
+      <components.SingleValue data={data} {...otherProps}>
+        {renderSelectedLabel ? renderSelectedLabel({ data }) : <LabelWithTooltip label={children} />}
+      </components.SingleValue>
+    )
+  }
 
 type DropdownProps = {
+  ariaLabel?: string
   className?: string
   clearable?: boolean
   defaultSelection?: any
@@ -65,6 +69,7 @@ type DropdownProps = {
   placeholder?: string
   readOnly?: boolean
   renderOptionLabel?: (...args: any[]) => any
+  renderSelectedLabel?: (...args: any[]) => any // renders the selected item (single selection only)
   searchable?: boolean
   selection?: Record<string, any> | number | string | any[]
   testId?: string
@@ -75,6 +80,7 @@ type DropdownProps = {
 
 const Dropdown = (props: DropdownProps) => {
   const {
+    ariaLabel = undefined,
     className = undefined,
     clearable = true,
     defaultSelection = undefined,
@@ -96,6 +102,7 @@ const Dropdown = (props: DropdownProps) => {
     placeholder = undefined,
     readOnly = false, // unlike disabled, the dropdown is not greyed out but its menu cannot be opened
     renderOptionLabel = null,
+    renderSelectedLabel = null,
     searchable = true,
     selection = undefined,
     testId = null,
@@ -132,6 +139,15 @@ const Dropdown = (props: DropdownProps) => {
     title,
   })
 
+  // stable components: new ones at every render would remount the options and the selected value
+  const selectComponents = useMemo(
+    () => ({
+      Option: OptionComponent({ renderOptionLabel }),
+      SingleValue: SingleValueComponent({ renderSelectedLabel }),
+    }),
+    [renderOptionLabel, renderSelectedLabel]
+  )
+
   return (
     <ValidationTooltip
       className={classNames('dropdown-wrapper dropdown-validation-tooltip', className)}
@@ -141,9 +157,10 @@ const Dropdown = (props: DropdownProps) => {
       position={validationTooltipPosition}
     >
       <ReactSelect
+        aria-label={ariaLabel}
         className="dropdown"
         classNamePrefix="dropdown"
-        components={{ Option: OptionComponent({ renderOptionLabel }), SingleValue: SingleValueComponent }}
+        components={selectComponents}
         defaultValue={defaultValue}
         filterOption={createFilter({ stringify: (option) => option.label })}
         inputId={inputId}
