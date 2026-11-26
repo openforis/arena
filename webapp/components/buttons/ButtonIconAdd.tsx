@@ -6,7 +6,8 @@ export const ButtonIconAdd = (props: ButtonProps) => {
     <Button
       {...props}
       className={className}
-      iconClassName="icon-plus icon-12px"
+      iconName="add"
+      iconSize={14}
       label={label}
       showLabel={showLabel}
       variant={variant}

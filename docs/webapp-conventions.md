@@ -209,6 +209,10 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
 - Buttons (`webapp/components/buttons`): `Button` is MUI-based and its `label` and `title` are i18n keys. The
   folder also has presets (`ButtonSave`, `ButtonDelete`, `ButtonIcon*`...) and menus (`ButtonMenu`,
   `ButtonSplit`).
+- Icons: the app is moving from the IcoMoon font (`<span className="icon icon-xxx icon-12px" />`, `ico.scss`)
+  to Material icons. New code uses `MaterialIcon` (`webapp/components/MaterialIcon`, `name` and `size` in px)
+  or `Button`'s `iconName` / `iconEndName` / `iconSize`; add missing icons to `iconComponents.ts`. A caller's
+  `iconClassName` still wins over a preset's `iconName`.
 - Form inputs (`webapp/components/form`): `Dropdown`, `Checkbox`, `ButtonGroup`, `TextInput`... `FormItem`
   (a label with an optional info tooltip) is in `webapp/components/form/Input`.
 - Dialogs: `Modal` with `ModalBody`/`ModalFooter` (`webapp/components/Modal.tsx`), `ResizableModal`,

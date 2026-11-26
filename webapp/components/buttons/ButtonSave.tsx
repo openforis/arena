@@ -8,7 +8,8 @@ export const ButtonSave = (props: ButtonProps) => {
     <Button
       {...props}
       className={classNames('btn-primary btn-save', props.className)}
-      iconClassName="icon-floppy-disk icon-12px"
+      iconName="save"
+      iconSize={14}
       label={label}
     />
   )

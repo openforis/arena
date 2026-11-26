@@ -8,7 +8,8 @@ export const ButtonNew = (props: ButtonProps) => {
     <Button
       {...props}
       className={classNames('btn-primary btn-new', props.className)}
-      iconClassName="icon-plus icon-12px icon-left"
+      iconName="add"
+      iconSize={14}
       label={label}
     />
   )

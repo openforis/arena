@@ -7,13 +7,5 @@ export const ButtonIconInfo = (props: ButtonProps) => {
 
   const className = classNames('btn-info', classNameProp)
 
-  return (
-    <Button
-      {...otherProps}
-      className={className}
-      iconClassName="icon-info icon-14px"
-      onClick={onClick}
-      variant={variant}
-    />
-  )
+  return <Button {...otherProps} className={className} iconName="info" onClick={onClick} variant={variant} />
 }

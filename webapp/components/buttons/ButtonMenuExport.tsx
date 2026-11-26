@@ -70,7 +70,7 @@ export const ButtonMenuExport = (props: ButtonMenuExportProps) => {
   return (
     <ButtonMenu
       className={classNames('btn-menu-advanced', className)}
-      iconClassName="icon-download2 icon-14px"
+      iconName="download"
       label={label}
       items={items}
       testId={testId}
