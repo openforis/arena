@@ -78,9 +78,11 @@
   padding: 0;
 }
 
-.survey-form__node-def-form-item {
+.form-item.survey-form__node-def-form-item {
+  // .form-item qualifier: the generic .form-item rules (label beside the input) must not win, whatever the CSS bundle order
   grid-template-columns: 1fr;
-  grid-template-rows: 30px 1fr;
+  // the label row grows when the label wraps on more lines
+  grid-template-rows: minmax(30px, auto) 1fr;
   padding: 0;
 
   > :nth-child(1).form-label {
