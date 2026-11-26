@@ -1,5 +1,6 @@
 import React from 'react'
 
+import Dropdown from '@webapp/components/form/Dropdown'
 import type {
   ScreenshotImageAttributeOption,
   ScreenshotPlotCandidate,
@@ -45,35 +46,34 @@ export const ScreenshotAttachFields = ({
   return (
     <>
       <div className="map-screenshot-dialog__attach">
-        <label className="map-screenshot-dialog__field">
-          {i18n.t(`${PREFIX}.plot`)}
-          <select
-            value={plot?.key ?? ''}
-            data-testid={TestId.mapWorkspace.screenshotPlot}
-            onChange={(event) => onPlotChange(event.target.value)}
-          >
-            {candidates.map((candidate) => (
-              <option key={candidate.key} value={candidate.key}>
-                {candidate.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="map-screenshot-dialog__field">
-          {i18n.t(`${PREFIX}.attribute`)}
-          <select
-            value={attribute?.uuid ?? ''}
+        <div className="map-screenshot-dialog__field">
+          <label htmlFor="map-screenshot-plot">{i18n.t(`${PREFIX}.plot`)}</label>
+          <Dropdown
+            idInput="map-screenshot-plot"
+            clearable={false}
+            itemLabel="label"
+            itemValue="key"
+            items={candidates}
+            onChange={(candidate) => onPlotChange(candidate.key)}
+            selection={plot}
+            testId={TestId.mapWorkspace.screenshotPlot}
+          />
+        </div>
+        <div className="map-screenshot-dialog__field">
+          <label htmlFor="map-screenshot-attribute">{i18n.t(`${PREFIX}.attribute`)}</label>
+          <Dropdown
+            idInput="map-screenshot-attribute"
+            clearable={false}
             disabled={attributeOptions.length === 0}
-            data-testid={TestId.mapWorkspace.screenshotAttribute}
-            onChange={(event) => onAttributeChange(event.target.value)}
-          >
-            {attributeOptions.map((option) => (
-              <option key={option.uuid} value={option.uuid}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            itemLabel="label"
+            itemValue="uuid"
+            items={attributeOptions}
+            onChange={(option) => onAttributeChange(option.uuid)}
+            searchable={false}
+            selection={attribute}
+            testId={TestId.mapWorkspace.screenshotAttribute}
+          />
+        </div>
         <label className="map-screenshot-dialog__field map-screenshot-dialog__field--wide">
           {i18n.t(`${PREFIX}.fileName`)}
           <input

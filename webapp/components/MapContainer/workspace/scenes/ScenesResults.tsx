@@ -2,6 +2,7 @@ import React from 'react'
 import Button from '@mui/material/Button'
 import classNames from 'classnames'
 
+import Dropdown from '@webapp/components/form/Dropdown'
 import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
 import { useI18nT, useLang } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -168,6 +169,7 @@ export const ScenesResults = ({
   const countText = monthKey
     ? t('mapWorkspace.scenes.countInMonth', { count, month: formatMonthLabel(monthKey, lang, true) })
     : t('mapWorkspace.scenes.count', { count })
+  const sortItems = SCENE_SORTS.map((option) => ({ value: option, label: t(`mapWorkspace.scenes.sort.${option}`) }))
 
   return (
     <div className={classNames('scenes-panel__results', { 'scenes-panel__results--stale': stale })}>
@@ -175,21 +177,18 @@ export const ScenesResults = ({
         <span className="scenes-panel__count" data-testid={TestId.mapWorkspace.scenesCount}>
           {countText}
         </span>
-        <label className="scenes-panel__sort">
+        <div className="scenes-panel__sort">
           <span>{t('mapWorkspace.scenes.sort.label')}</span>
-          <select
+          <Dropdown
             className="scenes-panel__select"
-            value={sort}
-            onChange={(event) => onSortChange(event.target.value as SceneSort)}
-            data-testid={TestId.mapWorkspace.scenesSort}
-          >
-            {SCENE_SORTS.map((option) => (
-              <option key={option} value={option}>
-                {t(`mapWorkspace.scenes.sort.${option}`)}
-              </option>
-            ))}
-          </select>
-        </label>
+            clearable={false}
+            items={sortItems}
+            onChange={(item) => onSortChange(item.value)}
+            searchable={false}
+            selection={sortItems.find((item) => item.value === sort)}
+            testId={TestId.mapWorkspace.scenesSort}
+          />
+        </div>
       </div>
       <ul className="scenes-panel__rows">
         {scenes.map((scene) => (

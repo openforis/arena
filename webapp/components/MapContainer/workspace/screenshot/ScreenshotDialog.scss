@@ -183,7 +183,6 @@
     font-size: 12px;
     font-weight: 600;
 
-    select,
     input {
       box-sizing: border-box;
       height: 34px;
@@ -193,6 +192,11 @@
       background: $colorSurface;
       color: $colorOnSurface;
       font: inherit;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .dropdown-wrapper {
       font-size: 13px;
       font-weight: 400;
     }
