@@ -106,10 +106,6 @@
 
 .analysis-node-def__type {
   font-size: 0.8rem;
-
-  .app-icon {
-    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the inline AppIcon size
-  }
 }
 
 .analysis-node-def__btn-move {

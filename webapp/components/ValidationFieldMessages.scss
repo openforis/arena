@@ -7,11 +7,6 @@
   .validation-field_message {
     color: $colorOnPrimary;
 
-    .app-icon {
-      padding-right: 0.2em;
-      font-weight: 600;
-    }
-
     &.warning .app-icon {
       color: $colorWarning;
     }

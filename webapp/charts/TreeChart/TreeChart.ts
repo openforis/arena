@@ -6,7 +6,7 @@ import * as d3 from 'd3'
 
 import { type ArenaAnyNodeDef, Objects } from '@openforis/arena-core'
 
-import { appIconMarkup } from '@webapp/components/AppIcon'
+import { appIconMarkup, IconName } from '@webapp/components/AppIcon'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
@@ -72,6 +72,7 @@ export type TreeChartNode = {
 
 export type TreeChartNodeIcon = {
   className: string
+  iconName: IconName | null
   text: string | null
 }
 
@@ -328,13 +329,19 @@ export default class TreeChart {
 
     // node type icon element
     if (this.nodeIconFunction) {
+      const { nodeIconFunction } = this
       nodeGrid
         .append('xhtml:span')
         .attr('class', (d) => {
           const icon = this.nodeIconFunction(d)
           return icon ? `node-icon ${icon.className}` : 'node-icon'
         })
-        .text((d) => this.nodeIconFunction(d)?.text ?? '')
+        .each(function (d) {
+          // an AppIcon (rendered to HTML) or a text icon (e.g. "123")
+          const icon = nodeIconFunction(d)
+          if (icon?.iconName) this.innerHTML = appIconMarkup(icon.iconName)
+          else this.textContent = icon?.text ?? ''
+        })
     }
 
     // node label element

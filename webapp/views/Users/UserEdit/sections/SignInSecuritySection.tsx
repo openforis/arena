@@ -25,7 +25,7 @@ type Props = {
   visibility: SignInSecuritySectionVisibility
 }
 
-const PasswordIcon = () => <AppIcon className="user-edit-section__row-icon" name="key" />
+const PasswordIcon = () => <AppIcon className="user-edit-section__row-icon" name="key" size={20} />
 
 /**
  * Password, linked external login providers and two-factor authentication.
@@ -84,7 +84,7 @@ export const SignInSecuritySection = (props: Props) => {
           {visibility.twoFactorDevices && (
             <UserEditSectionRow
               description="usersView:profile.twoFactorDescription"
-              icon={<AppIcon className="user-edit-section__row-icon" name="shield" />}
+              icon={<AppIcon className="user-edit-section__row-icon" name="shield" size={20} />}
               title="userView.manageTwoFactorDevices.title"
             >
               <Button

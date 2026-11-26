@@ -32,7 +32,6 @@
   }
 
   .app-icon {
-    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the inline AppIcon size
     opacity: 0.6;
   }
 
@@ -41,10 +40,6 @@
     font-weight: 600;
     opacity: 0.6;
     letter-spacing: 0;
-  }
-
-  .icon-text-color {
-    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the inline AppIcon size
   }
 
   .add-to-label {

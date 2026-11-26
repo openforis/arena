@@ -1,17 +1,22 @@
-import { flushSync } from 'react-dom'
-import { createRoot } from 'react-dom/client'
+import { renderToStaticMarkup } from 'react-dom/server'
 
 import { AppIcon } from './AppIcon'
 import { IconName } from './iconComponents'
+
+const markupCache = new Map<string, string>()
+
+// the MUI styles are injected by effects, which don't run here: the basic SVG styles are inline
+const svgStyle = { width: '1em', height: '1em', fill: 'currentColor' }
 
 /**
  * Returns the HTML of an icon, for code that builds HTML outside React (d3 charts, Leaflet markers).
  */
 export const appIconMarkup = (name: IconName, size?: number): string => {
-  const container = document.createElement('div')
-  const root = createRoot(container)
-  flushSync(() => root.render(<AppIcon name={name} size={size} />))
-  const html = container.innerHTML
-  root.unmount()
+  const cacheKey = `${name}-${size ?? ''}`
+  let html = markupCache.get(cacheKey)
+  if (!html) {
+    html = renderToStaticMarkup(<AppIcon name={name} size={size} style={svgStyle} />)
+    markupCache.set(cacheKey, html)
+  }
   return html
 }

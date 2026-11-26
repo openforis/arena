@@ -130,7 +130,7 @@ const NodeDefsSelector = (props: NodeDefsSelectorProps) => {
                 }}
               >
                 <span>{i18n.t(`nodeDefsTypes.${type}`)}</span>
-                {NodeDefUIProps.getIconByType(type)}
+                {NodeDefUIProps.getIconByType(type, 14)}
               </button>
             ))}
           </div>

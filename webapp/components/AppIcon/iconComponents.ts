@@ -20,7 +20,6 @@ import CheckBoxOutlineBlank from '@mui/icons-material/CheckBoxOutlineBlank'
 import Close from '@mui/icons-material/Close'
 import CloseFullscreen from '@mui/icons-material/CloseFullscreen'
 import CloudOutlined from '@mui/icons-material/CloudOutlined'
-import CodeOutlined from '@mui/icons-material/CodeOutlined'
 import CollectionsOutlined from '@mui/icons-material/CollectionsOutlined'
 import ContentCopy from '@mui/icons-material/ContentCopy'
 import ContentPasteOutlined from '@mui/icons-material/ContentPasteOutlined'
@@ -76,6 +75,7 @@ import PictureAsPdfOutlined from '@mui/icons-material/PictureAsPdfOutlined'
 import PieChartOutlineOutlined from '@mui/icons-material/PieChartOutlineOutlined'
 import PlaceOutlined from '@mui/icons-material/PlaceOutlined'
 import PlayArrow from '@mui/icons-material/PlayArrow'
+import PolylineOutlined from '@mui/icons-material/PolylineOutlined'
 import Public from '@mui/icons-material/Public'
 import QrCode2 from '@mui/icons-material/QrCode2'
 import RadioButtonChecked from '@mui/icons-material/RadioButtonChecked'
@@ -131,7 +131,6 @@ export const iconComponents = {
   clipboard: ContentPasteOutlined,
   close: Close,
   cloud: CloudOutlined,
-  code: CodeOutlined,
   collapse: CloseFullscreen,
   copy: ContentCopy,
   database: StorageOutlined,
@@ -154,6 +153,7 @@ export const iconComponents = {
   forum: ForumOutlined,
   fullscreen: Fullscreen,
   fullscreenExit: FullscreenExit,
+  geo: PolylineOutlined,
   globe: Public,
   help: HelpOutlineOutlined,
   home: HomeOutlined,

@@ -1,3 +1,5 @@
+import { cloneElement, isValidElement } from 'react'
+
 import { FormHeaderColor } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -96,7 +98,7 @@ const propsUI = {
 
   [geo]: {
     component: NodeDefGeo,
-    icon: <AppIcon name="code" className="icon-left" />,
+    icon: <AppIcon name="geo" className="icon-left" />,
   },
 
   [taxon]: {
@@ -152,7 +154,18 @@ const getPropByType =
 
 const getProp = (prop, defaultValue = null) => A.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
-export const getIconByType = getPropByType('icon')
+const getIconProp = getPropByType('icon')
+
+// the icons are AppIcon elements (or text, e.g. "123"): a size, when given, is set on the AppIcon ones
+const withSize = (icon, size?: number) =>
+  size && isValidElement(icon) && icon.type === AppIcon
+    ? cloneElement(icon as React.ReactElement<{ size?: number }>, { size })
+    : icon
+
+/**
+ * Returns the icon of the given node definition type, optionally with the given size (px).
+ */
+export const getIconByType = (nodeDefType, size?: number) => withSize(getIconProp(nodeDefType), size)
 
 const getEntityIcon = ({ nodeDef, cycle }) => {
   if (NodeDef.isRoot(nodeDef)) {
@@ -169,30 +182,32 @@ const getEntityIcon = ({ nodeDef, cycle }) => {
   return <AppIcon name="table" className="icon-left" />
 }
 
-export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false }) => (
+export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false, size = undefined }) => (
   <div className="node-def__icon-wrapper">
-    {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
+    {includeKey && NodeDef.isKey(nodeDef) && withSize(keyIcon, size)}
     {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
-    {NodeDef.isEntity(nodeDef) ? getEntityIcon({ nodeDef, cycle }) : getIconByType(NodeDef.getType(nodeDef))}
+    {NodeDef.isEntity(nodeDef)
+      ? withSize(getEntityIcon({ nodeDef, cycle }), size)
+      : getIconByType(NodeDef.getType(nodeDef), size)}
   </div>
 )
 
 /**
- * Extracts the CSS class name and text content of the given icon React element.
+ * Extracts the CSS class name, the AppIcon name and the text content of the given icon React element.
  * Used to render the same node def type icons outside of React (e.g. in a D3 chart).
  * @param {ReactElement} element - Icon element defined in this module.
- * @returns {{className: string, text: string|null}|null} Icon descriptor, or null if no element is given.
+ * @returns {{className: string, iconName: string|null, text: string|null}|null} Icon descriptor, or null if no element is given.
  */
 const getIconDescriptor = (element) => {
   if (!element) return null
-  const { className, children } = element.props
-  return { className, text: typeof children === 'string' ? children : null }
+  const { className, children, name } = element.props
+  return { className, iconName: name ?? null, text: typeof children === 'string' ? children : null }
 }
 
 /**
  * Returns a plain descriptor (CSS class name and optional text content) of the icon
  * representing the type of the given node definition, for use outside of React rendering.
- * @returns {{className: string, text: string|null}|null} Icon descriptor, or null for the root entity.
+ * @returns {{className: string, iconName: string|null, text: string|null}|null} Icon descriptor, or null for the root entity.
  */
 export const getIconDescriptorByNodeDef = ({ nodeDef, cycle }) =>
   NodeDef.isEntity(nodeDef)

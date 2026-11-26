@@ -15,5 +15,5 @@ export const NodeDefInfoIcon = (props: NodeDefInfoIconProps) => {
 
   if (!description) return null
 
-  return <AppIcon name="info" size={14} title={description} />
+  return <AppIcon name="info" size={18} title={description} />
 }

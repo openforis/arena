@@ -185,7 +185,7 @@ export const SignInMethodsPanel = (props: Props) => {
     <div className="sign-in-methods">
       <h3 className="sign-in-methods__title">{i18n.t('usersView:signInMethods.title')}</h3>
       <div className="sign-in-methods__row">
-        <AppIcon className="sign-in-methods__password-icon" name="key" />
+        <AppIcon className="sign-in-methods__password-icon" name="key" size={20} />
         <div className="sign-in-methods__text">
           <span className="sign-in-methods__label">{i18n.t('usersView:signInMethods.password')}</span>
           <span className="sign-in-methods__details">

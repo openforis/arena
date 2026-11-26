@@ -61,10 +61,8 @@
 
         .status-icon {
           display: inline-block;
-          width: 1rem;
           vertical-align: middle;
           margin-right: 0.3rem;
-          text-align: center;
 
           &.app-icon--checkboxChecked {
             color: $colorSuccess;

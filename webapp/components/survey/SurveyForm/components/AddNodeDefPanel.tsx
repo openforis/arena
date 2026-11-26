@@ -47,7 +47,7 @@ const AddNodeDefButtons = (props) => {
             aria-disabled={disabled}
           >
             {i18n.t(`surveyForm:addChildToTypes.${type}`)}
-            {NodeDefUIProps.getIconByType(type)}
+            {NodeDefUIProps.getIconByType(type, 13)}
           </button>
         )
       })}
@@ -65,11 +65,11 @@ const AddNodeDefPanel = (props) => {
     nodeDef && (
       <div className="survey-form__add-node-def-panel">
         <button className="btn btn-s no-border btn-toggle" onClick={() => setFormNodeDefAddChildTo(null)}>
-          <AppIcon name="close" size={14} />
+          <AppIcon name="close" size={13} />
         </button>
 
         <div className="flex-center add-to-label">
-          <AppIcon name="add" size={12} className="icon-left" />
+          <AppIcon name="add" size={13} className="icon-left" />
           {i18n.t('surveyForm:addChildTo', { nodeDefLabel, interpolation: { escapeValue: false } })}
         </div>
 

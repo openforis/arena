@@ -28,5 +28,5 @@ export const AuthProviderIcon = ({ providerId, type, iconKind, iconVersion }: Pr
     const src = getProviderIconUrl(providerId) + versionQuery
     return <img alt="" aria-hidden="true" className="auth-provider-icon" src={src} />
   }
-  return <AppIcon className="auth-provider-icon auth-provider-icon--generic" name="login" />
+  return <AppIcon className="auth-provider-icon--generic" name="login" size={20} />
 }
