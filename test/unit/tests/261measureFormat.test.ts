@@ -8,7 +8,6 @@ import type { MeasureUnit } from '@webapp/components/MapContainer/workspace/tool
 
 /**
  * Fake unit label that makes the unit visible in the expected texts.
- * @param {MeasureUnit} unit - The unit.
  * @returns {string} The unit between angle brackets.
  */
 const unitLabel = (unit: MeasureUnit): string => `<${unit}>`

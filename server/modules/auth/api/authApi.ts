@@ -24,8 +24,6 @@ const sendResponse = (res, user, survey = null, error = null) => res.json({ user
 
 /**
  * Removes the survey from the user prefs and sends the user without survey.
- * @param {!object} res - The response.
- * @param {!object} user - The user.
  * @param {!number} surveyId - ID of the survey to remove from the user prefs.
  * @returns {Promise<void>} - Resolves when the response has been sent.
  */

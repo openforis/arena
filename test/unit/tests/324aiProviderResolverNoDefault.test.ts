@@ -20,7 +20,6 @@ const ownProvider = {
 /**
  * Builds a user with the given default provider.
  * @param {string} defaultProviderId - Id of the default provider.
- * @returns {any} The user.
  */
 const userWithDefault = (defaultProviderId: string): any => ({
   uuid: 'u1',

@@ -7,7 +7,6 @@ import { ToolbarMenu } from './ToolbarMenu'
 
 /**
  * Imagery menu (full bar): the Sentinel-2 scene search.
- * @returns {React.ReactElement} The menu.
  */
 export const ImageryMenu = (): ReactElement => {
   const { dispatch } = useMapWorkspace()

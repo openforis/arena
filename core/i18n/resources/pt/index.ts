@@ -2,6 +2,7 @@ import activityLog from './activityLog'
 import aiSuggestions from './aiSuggestions'
 import appErrors from './appErrors'
 import auth from './auth'
+import authProvidersView from './authProvidersView'
 import common from './common'
 import dataExportView from './dataExportView'
 import dataImportView from './dataImportView'
@@ -27,6 +28,7 @@ export default {
   aiSuggestions,
   appErrors,
   auth,
+  authProvidersView,
   common,
   dataExportView,
   dataImportView,

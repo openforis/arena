@@ -30,7 +30,6 @@ import { getContextUser } from '../config/context'
  * @param {Function} params.init - The init function of the API module.
  * @param {string} params.method - The http method.
  * @param {string} params.path - The route path.
- * @param {object} [params.body] - The request body.
  * @param {object} [params.user] - The user of the request.
  * @returns {Promise<{res: any, next: jest.Mock}>} The fake response and the next callback.
  */

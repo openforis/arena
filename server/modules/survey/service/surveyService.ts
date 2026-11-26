@@ -213,8 +213,6 @@ export const startCreateSurveyJob = ({ user, surveyInfo }: { user: ArenaUser; su
  * Starts the schema summary export job.
  * @param {object} params - Params.
  * @param {object} params.user - Acting user.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {string} params.fileFormat - csv or xlsx.
  * @param {Record<string, string>|null} [params.aiDescriptions] - Validated AI descriptions (null: no AI column).
  * @param {number} [params.aiDescriptionsFailedCount] - Node defs the browser could not describe.
@@ -460,9 +458,6 @@ const isRecordFile = (summary: ArenaSurveyFile): boolean =>
 
 /**
  * Fetches a survey file (map layer, doc image, logo...) with its content; record attachments are not survey files.
- * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.fileUuid - The file uuid.
  * @returns {Promise<{summary: object, contentStream: object}>} The file summary and its content stream.
  * @throws {SystemError} 404 fileNotFound when the file does not exist or is a record attachment.
  */

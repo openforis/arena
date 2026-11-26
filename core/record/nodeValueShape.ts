@@ -22,7 +22,6 @@ const booleanValues = new Set(['true', 'false'])
 
 /**
  * Returns true for a plain object (not null, not an array).
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a plain object.
  */
 const isPlainObject = (value: unknown): value is PlainObject =>
@@ -30,7 +29,6 @@ const isPlainObject = (value: unknown): value is PlainObject =>
 
 /**
  * Returns true for a string of at most `maxChars` characters.
- * @param {unknown} value - The value.
  * @param {number} [maxChars] - The longest accepted string.
  * @returns {boolean} Whether the value is a short enough string.
  */
@@ -39,15 +37,11 @@ const isString = (value: unknown, maxChars: number = maxShortStringChars): value
 
 /**
  * Returns true for a non-empty string of at most 255 characters.
- * @param {unknown} value - The value.
- * @returns {boolean} Whether the value is a non-empty short string.
  */
 const isNonEmptyShortString = (value: unknown): boolean => isString(value) && value.trim().length > 0
 
 /**
  * Returns true for a finite number or a string of a plain decimal number.
- * @param {unknown} value - The value.
- * @returns {boolean} Whether the value is numeric.
  */
 const isNumeric = (value: unknown): boolean => {
   if (typeof value === 'number') return Number.isFinite(value)
@@ -56,8 +50,6 @@ const isNumeric = (value: unknown): boolean => {
 
 /**
  * Returns true for a safe integer or a string of digits.
- * @param {unknown} value - The value.
- * @returns {boolean} Whether the value is an integer.
  */
 const isInteger = (value: unknown): boolean => {
   if (typeof value === 'number') return Number.isSafeInteger(value)
@@ -67,7 +59,6 @@ const isInteger = (value: unknown): boolean => {
 /**
  * Returns true for a valid lower-case uuid string. Upper case is refused: uuids are compared as text, so an upper-case
  * copy would point at no item while looking valid.
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a lower-case uuid.
  */
 const isUuidString = (value: unknown): boolean =>
@@ -75,7 +66,6 @@ const isUuidString = (value: unknown): boolean =>
 
 /**
  * Returns true when a value is an ISO date (YYYY-MM-DD) that exists in the calendar.
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a date.
  */
 const isDate: ShapeCheck = (value) => {
@@ -85,7 +75,6 @@ const isDate: ShapeCheck = (value) => {
 
 /**
  * Returns true when a value is a time (HH:mm, or HH:mm:ss when the attribute includes seconds).
- * @param {unknown} value - The value.
  * @param {object} nodeDef - The time attribute definition.
  * @returns {boolean} Whether the value is a time.
  */
@@ -97,7 +86,6 @@ const isTime: ShapeCheck = (value, nodeDef) => {
 
 /**
  * Checks the props of an object value: only the allowed keys, each one passing its check, the required ones present.
- * @param {unknown} value - The value.
  * @param {object} checkByProp - The check of each allowed prop.
  * @param {string[]} required - The props that must be present.
  * @returns {boolean} Whether the value has the shape.
@@ -112,7 +100,6 @@ const hasProps = (value: unknown, checkByProp: Record<string, ShapeCheck>, requi
 /**
  * Returns a check that also accepts a missing value.
  * @param {Function} check - The check of a present value.
- * @returns {Function} The check.
  */
 const isOptional =
   (check: ShapeCheck): ShapeCheck =>
@@ -121,7 +108,6 @@ const isOptional =
 
 /**
  * Returns true for a code value: a code, an item uuid, or both.
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a code value.
  */
 const isCode: ShapeCheck = (value) =>
@@ -139,7 +125,6 @@ const isCode: ShapeCheck = (value) =>
 
 /**
  * Returns true for a coordinate value: x, y and srs, plus the optional collected fields.
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a coordinate value.
  */
 const isCoordinate: ShapeCheck = (value) =>
@@ -158,7 +143,6 @@ const isCoordinate: ShapeCheck = (value) =>
 
 /**
  * Returns true for a taxon value: the taxon uuid, plus the optional vernacular name and unlisted taxon names.
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a taxon value.
  */
 const isTaxon: ShapeCheck = (value) =>

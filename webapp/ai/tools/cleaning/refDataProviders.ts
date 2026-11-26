@@ -22,7 +22,6 @@ const findExact = (items: any[], getText: (item: any) => string, text: string, i
  * Items and taxa found through the API are kept, so the validation of the preview finds them by uuid.
  * @param {object} params - Parameters.
  * @param {CleaningApi} params.api - Cleaning API.
- * @param {number} params.surveyId - Survey id.
  * @param {AbortSignal} [params.signal] - Aborts the lookups.
  * @returns {{categoryItemProvider: object, taxonProvider: object}} The providers.
  */
@@ -68,7 +67,6 @@ export const createRefDataProviders = ({
     /**
      * Finds an item by its codes, one level at a time (the items API searches by code under a parent).
      * @param {object} params - Parameters.
-     * @param {string} params.categoryUuid - Category uuid.
      * @param {string[]} params.codePaths - Codes, top-down.
      * @returns {Promise<object|null>} The item.
      */
@@ -90,18 +88,12 @@ export const createRefDataProviders = ({
     },
     /**
      * Finds an item by uuid: the survey index, then the items found before.
-     * @param {object} params - Parameters.
-     * @param {object} params.survey - The survey.
-     * @param {string} params.itemUuid - Item uuid.
      * @returns {Promise<object|null>} The item.
      */
     getItemByUuid: ({ survey, itemUuid }: { survey: any; itemUuid: string }) =>
       Promise.resolve(Survey.getCategoryItemByUuid(itemUuid)(survey) ?? itemsByUuid.get(itemUuid) ?? null),
     /**
      * Lists the items under a parent (entity enumeration only; not used by attribute edits).
-     * @param {object} params - Parameters.
-     * @param {string} params.categoryUuid - Category uuid.
-     * @param {string} [params.parentItemUuid] - Parent item uuid.
      * @returns {Promise<object[]>} The items.
      */
     getItems: async ({ categoryUuid, parentItemUuid }: { categoryUuid: string; parentItemUuid?: string | null }) =>
@@ -112,7 +104,6 @@ export const createRefDataProviders = ({
     /**
      * Finds a taxon by its code (exact, case-insensitive).
      * @param {object} params - Parameters.
-     * @param {string} params.taxonomyUuid - Taxonomy uuid.
      * @param {string} params.taxonCode - Code.
      * @returns {Promise<object|null>} The taxon.
      */
@@ -120,9 +111,6 @@ export const createRefDataProviders = ({
       findTaxon(taxonomyUuid, 'code', taxonCode, Taxon.getCode),
     /**
      * Finds a taxon by its scientific name (exact, case-insensitive).
-     * @param {object} params - Parameters.
-     * @param {string} params.taxonomyUuid - Taxonomy uuid.
-     * @param {string} params.scientificName - Scientific name.
      * @returns {Promise<object|null>} The taxon.
      */
     findTaxonByScientificName: async ({
@@ -134,9 +122,6 @@ export const createRefDataProviders = ({
     }) => findTaxon(taxonomyUuid, 'scientificName', scientificName, Taxon.getScientificName),
     /**
      * Finds a taxon by uuid: the survey index, then the taxa found before.
-     * @param {object} params - Parameters.
-     * @param {object} params.survey - The survey.
-     * @param {string} params.taxonUuid - Taxon uuid.
      * @returns {Promise<object|null>} The taxon.
      */
     getTaxonByUuid: ({ survey, taxonUuid }: { survey: any; taxonUuid: string }) =>

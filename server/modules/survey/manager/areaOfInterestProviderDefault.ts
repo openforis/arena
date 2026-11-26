@@ -50,7 +50,6 @@ const fetchAreaOfInterest = async ({
  * Returns the geometry of the specified area of interest, reading it from its survey file.
  *
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {string} params.name - The area of interest name.
  * @returns {Promise<AreaOfInterest|undefined>} - The geometry, or undefined if not defined or not readable.
  */

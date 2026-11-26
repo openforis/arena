@@ -46,7 +46,6 @@ export const getAiCategoryAccessRank = (category: string): number | null =>
  * Returns true when the level covers the category.
  * @param {string} category - Feature category.
  * @param {AiAccessLevel} level - Access level.
- * @returns {boolean} Whether the category is within the level.
  */
 export const isCategoryWithinAccessLevel = (category: string, level: AiAccessLevel): boolean => {
   const rank = getAiCategoryAccessRank(category)
@@ -56,7 +55,6 @@ export const isCategoryWithinAccessLevel = (category: string, level: AiAccessLev
 /**
  * Returns the categories of a rank.
  * @param {number} rank - Rank (1 to 3).
- * @returns {AiFeatureCategory[]} The categories.
  */
 export const getAiCategoriesOfRank = (rank: number): AiFeatureCategory[] =>
   (Object.keys(aiCategoryAccessRanks) as AiFeatureCategory[]).filter(
@@ -68,7 +66,6 @@ export const getAiCategoriesOfRank = (rank: number): AiFeatureCategory[] =>
  * @param {object} params - Parameters.
  * @param {boolean} params.featuresEnabled - The old master switch.
  * @param {object} [params.featureToggles] - Category toggles (only `true` counts).
- * @returns {AiAccessLevel} The level.
  */
 export const deriveAiAccessLevel = ({
   featuresEnabled,
@@ -92,7 +89,6 @@ export const deriveAiAccessLevel = ({
  * @param {unknown} params.accessLevel - Stored level (untrusted).
  * @param {boolean} params.featuresEnabled - The master switch.
  * @param {object} [params.featureToggles] - Category toggles.
- * @returns {AiAccessLevel} The level.
  */
 export const resolveAiAccessLevel = ({
   accessLevel,
@@ -111,7 +107,6 @@ export const resolveAiAccessLevel = ({
  * @param {AiAccessLevel} params.from - Previous level.
  * @param {AiAccessLevel} params.to - New level.
  * @param {object} params.toggles - Category toggles.
- * @returns {object} The new toggles (a new object).
  */
 export const raiseAccessLevelToggles = <T extends Record<string, boolean>>({
   from,

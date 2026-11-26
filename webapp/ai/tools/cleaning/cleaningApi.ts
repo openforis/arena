@@ -47,7 +47,6 @@ export type CleaningApi = {
 
 /**
  * Converts the report filter into the query parameters of the validation report endpoints.
- * @param {ValidationReportFilter} filter - The filter.
  * @returns {object} The query parameters.
  */
 const toReportParams = ({ cycle, recordUuid, attributeDefUuids, messageTypeKeys }: ValidationReportFilter) => ({
@@ -66,7 +65,6 @@ const isRecordUnavailableError = (error: any): boolean => [403, 404].includes(er
 
 /**
  * GETs with the request timeout, turning a timeout into the queryTimeout error.
- * @param {string} url - Request URL.
  * @param {object} config - Axios config (params, signal).
  * @returns {Promise<any>} The axios response.
  */
@@ -78,7 +76,6 @@ const analysisApi = createAnalysisApi({ http: axiosAnalysisHttp })
 export const axiosCleaningApi: CleaningApi = {
   /**
    * Fetches a page of validation report rows.
-   * @param {object} params - Request parameters.
    * @returns {Promise<any>} The rows.
    */
   fetchValidationReportRows: async ({ surveyId, offset, limit, signal, ...filter }) => {
@@ -90,7 +87,6 @@ export const axiosCleaningApi: CleaningApi = {
   },
   /**
    * Counts the validation report rows.
-   * @param {object} params - Request parameters.
    * @returns {Promise<any>} The count.
    */
   countValidationReportRows: async ({ surveyId, signal, ...filter }) => {
@@ -102,7 +98,6 @@ export const axiosCleaningApi: CleaningApi = {
   },
   /**
    * Fetches a record with its nodes, or null when it is not available to the user.
-   * @param {object} params - Request parameters.
    * @returns {Promise<any>} The record or null.
    */
   fetchRecordAndNodes: async ({ surveyId, recordUuid, signal }) => {
@@ -116,7 +111,6 @@ export const axiosCleaningApi: CleaningApi = {
   },
   /**
    * Searches record summaries by key.
-   * @param {object} params - Request parameters.
    * @returns {Promise<any>} The summaries.
    */
   searchRecordsSummary: async ({ surveyId, cycle, search, limit = 20, offset = 0, signal }) => {
@@ -128,7 +122,6 @@ export const axiosCleaningApi: CleaningApi = {
   },
   /**
    * Fetches published category items.
-   * @param {object} params - Request parameters.
    * @returns {Promise<any>} The items.
    */
   fetchCategoryItems: ({ surveyId, categoryUuid, parentUuid, search, signal }) =>
@@ -145,7 +138,6 @@ export const axiosCleaningApi: CleaningApi = {
     }),
   /**
    * Finds published taxa by code or scientific name.
-   * @param {object} params - Request parameters.
    * @returns {Promise<any>} The taxa.
    */
   findTaxa: async ({ surveyId, taxonomyUuid, filterProp, filterValue, signal }) => {

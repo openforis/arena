@@ -1,4 +1,23 @@
 export default {
+  authProvider: {
+    notFound: 'Провайдер входа не найден',
+    readOnly: 'Этот провайдер задан в конфигурации сервера и не может быть изменён здесь',
+    idAlreadyUsed: 'Идентификатор "{{id}}" уже используется другим провайдером',
+    encryptionKeyMissing: 'Не настроен ключ шифрования секретов клиентов (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY)',
+    validation: 'Некоторые поля заполнены неверно',
+    iconInvalid: 'Недопустимый значок: используйте файл PNG или SVG размером до 100 КБ',
+    identityNotFound: 'Привязанная учётная запись не найдена',
+    lastSignInMethod: 'Это последний способ входа: сначала задайте пароль или привяжите другого провайдера',
+    idInvalid: 'Недопустимый идентификатор: используйте строчные буквы, цифры и дефисы (до 64 символов)',
+    typeInvalid: 'Недопустимый тип провайдера',
+    labelInvalid: 'Надпись кнопки обязательна (до 64 символов)',
+    issuerInvalid: 'Недопустимый URL издателя (требуется https)',
+    tenantInvalid: 'Недопустимый тенант',
+    clientIdRequired: 'Требуется ID клиента',
+    scopesMissingOpenid: 'Области доступа должны включать "openid"',
+    emailDomainInvalid: 'Недопустимый домен эл. почты',
+    clientSecretRequired: 'Требуется секрет клиента',
+  },
   mapCustomLayers: {
     urlInvalid: 'Недопустимый URL сервиса',
     urlNotAllowed: 'Можно использовать только публичные адреса http и https',

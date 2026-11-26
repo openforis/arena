@@ -52,7 +52,6 @@ export const buildMockTranslationsInput = ({ lastUserMessage, lastToolOutput }: 
 /**
  * Names the entries the descriptions list returned (the e2e checks the suggestion scope with it).
  * @param {unknown} lastToolOutput - Output of survey_listMissingTexts.
- * @returns {string} The answer.
  */
 export const formatMockDescriptionsAnswer = (lastToolOutput: unknown): string => {
   const names = [...new Set(getPageItems(lastToolOutput).map((item) => item.nodeDefName))].sort((a, b) =>

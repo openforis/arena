@@ -58,7 +58,6 @@ export type ProposeQueryInput = z.infer<typeof proposeQueryInputSchema>
 
 /**
  * Converts the tool input into the shape toQuery expects (lists never null).
- * @param {ProposeQueryInput} input - Tool input.
  * @returns {object} The data-query result.
  */
 export const toDataQueryAiResult = (input: ProposeQueryInput) => {
@@ -87,7 +86,6 @@ export const toDataQueryAiResult = (input: ProposeQueryInput) => {
 
 /**
  * Validates the proposed query and shows it to the user as a card.
- * @param {ProposeQueryInput} input - Tool input.
  * @param {object} ctx - Tool context (with the conversation's analysisQueries).
  * @returns {object} The query id, or the reasons why the proposal is invalid.
  */

@@ -44,7 +44,6 @@ const endlessBody = (chunk: string) => {
 
 /**
  * Returns what a call fails with.
- * @param {PromiseLike<unknown>} call - The call.
  * @returns {Promise<any>} The error.
  */
 const rejectionOf = (call: PromiseLike<unknown>): Promise<any> => Promise.resolve(call).catch((error) => error)

@@ -74,7 +74,6 @@ const capIssues = (issues: ChangeSetIssue[], maxChars: number): ChangeSetIssue[]
 /**
  * Validates the proposed operations and hands the change set to the conversation.
  * @param {object} params - Parameters.
- * @param {AiToolContext} params.ctx - Tool context.
  * @param {ChangeOperationDraft[]} params.drafts - Proposed operations, in order.
  * @param {string} params.summary - The model's summary.
  * @returns {Promise<ProposeResult>} The change set id and the number of operations.

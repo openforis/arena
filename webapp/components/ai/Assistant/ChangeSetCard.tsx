@@ -20,7 +20,6 @@ import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'
  * The card with every change listed (short change sets): the node definition changes, then the category labels
  * grouped by category.
  * @param {object} props - Props.
- * @param {ChangeSetCardState} props.cardState - Card state.
  * @param {ReviewItem[]} props.items - Changes of the card.
  * @param {ChangeSetSelection} props.selection - Selection and actions.
  * @param {boolean} props.busy - An answer is running (Apply waits for it).
@@ -128,7 +127,6 @@ const ChangeSetFullCard = ({
  * Change set card: up to COMPACT_CARD_MAX_INLINE changes listed with checkboxes, Apply selected and Discard; above
  * that, a compact card whose changes are reviewed in a dialog. Both share one selection and one list of changes.
  * @param {object} props - Props.
- * @param {ChangeSetCardState} props.cardState - Card state.
  * @param {boolean} props.busy - An answer is running, or another card is applying (Apply waits for it).
  * @param {Function} props.onApply - Applies the selected operations.
  * @param {Function} props.onDiscard - Discards the card.

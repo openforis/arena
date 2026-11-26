@@ -36,7 +36,6 @@ export const finishSearch = (signal: AbortSignal, key: string, scenes: SceneResu
  *
  * @param {AbortSignal} signal - The search signal.
  * @param {string} key - The search request key.
- * @param {unknown} error - The error.
  * @returns {FinishedSearch | null} The failed search, or null when aborted.
  */
 export const failSearch = (signal: AbortSignal, key: string, error: unknown): FinishedSearch | null =>
@@ -58,17 +57,11 @@ export const getSearchView = (requestKey: string | null, finished: FinishedSearc
 
 /**
  * Tells whether an error comes from a cancelled search.
- *
- * @param {unknown} error - Error.
- * @returns {boolean} True for an AbortError.
  */
 export const isAbortError = (error: unknown): boolean => (error as { name?: unknown } | null)?.name === 'AbortError'
 
 /**
  * Throws an AbortError when the signal is aborted.
- *
- * @param {AbortSignal} [signal] - Signal.
- * @returns {void}
  */
 const throwIfAborted = (signal?: AbortSignal): void => {
   if (signal?.aborted) throw new DOMException('The Sentinel-2 scene search was cancelled.', 'AbortError')
@@ -94,10 +87,7 @@ const readPartRows = async ({ reader, url, tiles, signal }: ReadPartParams): Pro
 /**
  * Turns rows into scenes of the wanted tiles and period (row groups also hold neighbouring tiles).
  *
- * @param {SceneIndexRow[]} rows - Rows.
  * @param {Set<string>} tiles - Wanted tile ids.
- * @param {ScenePeriod} period - Period.
- * @returns {SceneResult[]} Scenes.
  */
 const toScenes = (rows: SceneIndexRow[], tiles: Set<string>, period: ScenePeriod): SceneResult[] => {
   const scenes: SceneResult[] = []

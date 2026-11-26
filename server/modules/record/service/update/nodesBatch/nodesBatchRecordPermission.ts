@@ -5,8 +5,6 @@ import * as Survey from '@core/survey/survey'
 
 /**
  * Returns the record with its survey uuid (needed by the Authorizer), taken from the survey when missing.
- * @param {object} record - The record.
- * @param {object} survey - The survey.
  * @returns {object} The record.
  */
 export const withSurveyUuid = (record: ArenaRecord, survey: ArenaSurvey) =>

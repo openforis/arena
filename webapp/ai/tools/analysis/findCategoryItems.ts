@@ -52,7 +52,6 @@ const toResultItem = (lang: string) => (item: any) => ({
  * Finds the code attributes with items containing the text: a value named in a question tells which attribute holds it.
  * Big categories are left out: their items are not in the survey.
  * @param {object} params - Parameters.
- * @param {any} params.ctx - Tool context.
  * @param {string} params.text - Lower case search text.
  * @param {string} [params.except] - Attribute name to leave out.
  * @returns {object[]} The attributes with their filter columns and matching items.
@@ -79,7 +78,6 @@ const searchCodeAttributes = ({ ctx, text, except }: { ctx: any; text: string; e
 /**
  * Searches every code attribute (no attribute given).
  * @param {object} params - Parameters.
- * @param {any} params.ctx - Tool context.
  * @param {string|null} [params.search] - Search text.
  * @returns {object} The attributes found, with a note when there is none.
  */
@@ -99,15 +97,12 @@ const searchAllAttributes = ({ ctx, search }: { ctx: any; search?: string | null
  * Creates the category_findItems tool.
  * @param {object} params - Parameters.
  * @param {AnalysisApi} params.api - Analysis API (large categories are searched on the server).
- * @returns {AiTool} The tool.
  */
 export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTool<Input, unknown> => {
   /**
    * Gets the items of the attribute's category: from the survey in memory, or searched on the server when big.
    * @param {object} params - Parameters.
-   * @param {any} params.ctx - Tool context.
    * @param {any} params.nodeDef - The code attribute.
-   * @param {any} params.category - Its category.
    * @param {string} params.search - Lower case search text.
    * @returns {Promise<object[] | null>} The items, or null when the level can't be searched.
    */
@@ -123,8 +118,6 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
 
   /**
    * Finds the category items of a code attribute.
-   * @param {Input} input - Tool input.
-   * @param {any} ctx - Tool context.
    * @returns {Promise<object>} The items or an error.
    */
   const execute = async ({ attribute, search }: Input, ctx: any) => {

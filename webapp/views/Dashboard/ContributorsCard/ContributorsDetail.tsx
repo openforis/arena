@@ -10,7 +10,6 @@ const getContributorLabel = (row: UserCountRow): string => row.owner_email || ro
 /**
  * Lists the contributors (email, or name as fallback) with their record count and the active ones.
  *
- * @param {ContributorsDetailProps} props - The component props.
  * @returns {React.ReactElement} The detail.
  */
 export const ContributorsDetail = (props: ContributorsDetailProps) => {

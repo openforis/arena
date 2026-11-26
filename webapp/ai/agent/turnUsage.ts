@@ -20,7 +20,6 @@ export type TurnUsageInputs = {
 
 /**
  * Returns true for a positive finite number.
- * @param {unknown} value - Value.
  * @returns {boolean} True when counted.
  */
 const isCount = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value > 0
@@ -51,7 +50,6 @@ const messageChars = (messages: ModelMessage[]): number => {
 /**
  * Estimates the tokens of a request.
  * @param {object} params - Parameters.
- * @param {string} params.systemPrompt - System prompt.
  * @param {AiTool[]} params.tools - Tools offered.
  * @param {ModelMessage[]} params.messages - History sent (new message included).
  * @returns {number} ceil(characters / 3).
@@ -74,7 +72,6 @@ export const estimateContextTokens = ({
  * @param {number} params.estimatedTokens - Estimate of the request.
  * @param {number} params.droppedCount - Earlier messages left out.
  * @param {AiContextWindow|null} params.contextWindow - Window of the engine, or null.
- * @returns {AssistantMessageUsage} The usage.
  */
 export const buildTurnUsage = ({
   stepTokens,

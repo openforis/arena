@@ -17,7 +17,6 @@ import { useAuthCanEditSurvey, useUser } from '@webapp/store/user'
 
 /**
  * Returns the current generation (null while no survey's defs are loaded).
- * @returns {SuggestionGeneration|null} The generation.
  */
 export const useSuggestionGeneration = (): SuggestionGeneration | null => {
   const [tracker] = useState(createGenerationTracker)

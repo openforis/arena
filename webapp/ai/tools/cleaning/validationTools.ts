@@ -51,7 +51,6 @@ const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
 /**
  * Returns the UUIDs of the named attributes, refusing unknown names.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string[]} [params.attributes] - Attribute names.
  * @returns {string[]} The UUIDs (empty: all attributes).
  */
@@ -69,7 +68,6 @@ const resolveAttributeDefUuids = ({ survey, attributes = [] }: { survey: any; at
 /**
  * Creates validation_summarize.
  * @param {Deps} deps - API and translator.
- * @returns {AiTool} The tool.
  */
 const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summarizeInputSchema>, unknown> => ({
   ...common,
@@ -81,8 +79,6 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
   inputSchema: summarizeInputSchema,
   /**
    * Fetches up to 1,000 report rows and the total, then groups them.
-   * @param {object} input - Tool input.
-   * @param {object} ctx - Tool context.
    * @returns {Promise<object>} The summary.
    */
   execute: async ({ attributes, recordUuid }, ctx) => {
@@ -109,7 +105,6 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
 /**
  * Creates validation_list.
  * @param {Deps} deps - API and translator.
- * @returns {AiTool} The tool.
  */
 const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInputSchema>, unknown> => ({
   ...common,
@@ -121,8 +116,6 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
   inputSchema: listInputSchema,
   /**
    * Fetches one row more than the cap to know whether there are others.
-   * @param {object} input - Tool input.
-   * @param {object} ctx - Tool context.
    * @returns {Promise<object>} The rows, the total and the truncated flag.
    */
   execute: async ({ attributes, categories, recordUuid, offset = 0 }, ctx) => {

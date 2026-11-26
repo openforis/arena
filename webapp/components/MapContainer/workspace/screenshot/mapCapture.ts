@@ -32,7 +32,6 @@ type MaybeLoadingLayer = L.Layer & { isLoading?: () => boolean }
 
 /**
  * Tells whether the map shows a MapLibre (WebGL) layer, which cannot be captured (Equal Earth).
- * @param {L.Map} map - The map.
  * @returns {boolean} True when such a layer is on the map.
  */
 export const hasMaplibreLayer = (map: L.Map): boolean => {
@@ -45,7 +44,6 @@ export const hasMaplibreLayer = (map: L.Map): boolean => {
 
 /**
  * Tells whether the map has no area to capture (e.g. squeezed to 0 px by the side panel on a phone).
- * @param {L.Map} map - The map.
  * @returns {boolean} True when the map container is 0 px wide or high.
  */
 export const isMapHidden = (map: L.Map): boolean => {
@@ -55,7 +53,6 @@ export const isMapHidden = (map: L.Map): boolean => {
 
 /**
  * Tells whether a tile or grid layer (base maps, WMS, COGs) is still loading tiles.
- * @param {L.Map} map - The map.
  * @returns {boolean} True while tiles load.
  */
 const areTilesLoading = (map: L.Map): boolean => {
@@ -69,7 +66,6 @@ const areTilesLoading = (map: L.Map): boolean => {
 /**
  * Waits for a number of milliseconds.
  * @param {number} ms - The time.
- * @returns {Promise<void>} Resolves after the time.
  */
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -78,7 +74,6 @@ const sleep = (ms: number): Promise<void> =>
 
 /**
  * Waits until the tiles of the map are loaded (8 s at most), then for their fade-in.
- * @param {L.Map} map - The map.
  * @returns {Promise<boolean>} True when loaded, false on timeout.
  */
 export const waitForMapTiles = (map: L.Map): Promise<boolean> =>
@@ -94,7 +89,6 @@ export const waitForMapTiles = (map: L.Map): Promise<boolean> =>
 /**
  * Captures the current view of the map at CSS pixel scale; tiles that cannot be fetched become transparent.
  * @param {object} params - The parameters.
- * @param {L.Map} params.map - The map.
  * @param {boolean} params.includeData - Whether markers and measurements are captured.
  * @returns {Promise<MapCaptureResult>} The canvas, the failed images count and the view.
  */
@@ -131,11 +125,8 @@ export const captureMapView = async ({
  * Captures a plot: in the current view when the user is already looking at it, else centred on it (at the current
  * zoom, or the fit-to-plot zoom when zoomed out), then restores the previous view.
  * @param {object} params - The parameters.
- * @param {L.Map} params.map - The map.
  * @param {boolean} params.includeData - Whether markers and measurements are captured.
- * @param {ScreenshotPlotCandidate} params.plot - The plot.
  * @param {number} params.zoom - The fit-to-plot zoom.
- * @returns {Promise<MapCaptureResult>} The capture.
  */
 export const captureMapAtPlot = async ({
   map,
@@ -157,7 +148,6 @@ export const captureMapAtPlot = async ({
   })
   /**
    * Captures the current view and locates the plot in it.
-   * @returns {Promise<MapCaptureResult>} The capture.
    */
   const capturePlot = async (): Promise<MapCaptureResult> => {
     const capture = await captureMapView({ map, includeData })

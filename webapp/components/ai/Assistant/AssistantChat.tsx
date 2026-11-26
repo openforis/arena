@@ -28,7 +28,6 @@ import { useAssistantPanel } from './useAssistantPanel'
 /**
  * Messages and composer of the current conversation; blank until the first message of a new one.
  * @param {object} props - Props.
- * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement} The chat.
  */
@@ -81,7 +80,6 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   /**
    * Remembers whether the user is reading the end of the list.
    * @param {React.UIEvent<HTMLDivElement>} event - Scroll event.
-   * @returns {void} Nothing.
    */
   const onScroll = (event: React.UIEvent<HTMLDivElement>) => {
     stickToBottomRef.current = isNearBottom(event.currentTarget)
@@ -89,7 +87,6 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
 
   /**
    * Sends the typed message.
-   * @returns {void} Nothing.
    */
   const onSend = () => {
     const text = input.trim()
@@ -105,8 +102,6 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
 
   /**
    * Enter sends, Shift+Enter adds a line.
-   * @param {React.KeyboardEvent<HTMLTextAreaElement>} event - Key event.
-   * @returns {void} Nothing.
    */
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key !== 'Enter' || event.shiftKey) return

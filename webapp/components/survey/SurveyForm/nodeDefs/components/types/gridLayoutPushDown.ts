@@ -21,7 +21,6 @@ const compareByPosition = (a: GridLayoutItem, b: GridLayoutItem): number => a.y 
  * @param {object} params - The parameters.
  * @param {GridLayoutItem[]} params.layout - The current layout (with the resized item at its new size).
  * @param {GridLayoutItem} params.resizedItem - The item being resized.
- * @param {GridLayoutItem[]} params.layoutAtResizeStart - The layout at resize start.
  * @returns {GridLayoutItem[]} - The layout with no overlapping items, in the same order as the given one.
  */
 export const pushDownItemsOverlappingResizedItem = <T extends GridLayoutItem>({

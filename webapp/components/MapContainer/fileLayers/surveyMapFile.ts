@@ -12,10 +12,7 @@ export type SurveyFileRef = {
 /**
  * Downloads a survey file.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.fileUuid - The survey file UUID.
- * @param {string} params.fileName - The file name.
- * @returns {Promise<File>} The file.
  */
 export const fetchSurveyFileAsFile = async ({
   surveyId,
@@ -32,10 +29,6 @@ export const fetchSurveyFileAsFile = async ({
 
 /**
  * Creates a map file that downloads a survey file.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {SurveyFileRef} params.surveyFile - The survey file.
- * @returns {MapFile} The map file.
  */
 export const toSurveyMapFile = ({ surveyId, surveyFile }: { surveyId: number; surveyFile: SurveyFileRef }): MapFile => {
   const { fileUuid, fileName, label } = surveyFile

@@ -20,9 +20,7 @@ export type SceneAreaState = {
 /**
  * Holds the chosen search area (map view, selected plot or drawn rectangle) and its bounds.
  *
- * @param {L.Map} map - Map.
  * @param {boolean} active - Whether the panel is visible.
- * @returns {SceneAreaState} Area state.
  */
 export const useSceneArea = (map: L.Map, active: boolean): SceneAreaState => {
   const [areaKey, setAreaKey] = useState<SceneAreaKey>('view')

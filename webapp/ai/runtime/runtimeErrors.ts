@@ -11,8 +11,6 @@ const unwrap = (error: any): any[] => [error, error?.lastError, error?.cause, er
 
 /**
  * Returns the AI error key of an error (SystemError from the gateway model), or null.
- * @param {unknown} error - The error.
- * @returns {string|null} The key.
  */
 export const getAiErrorKey = (error: unknown): string | null => {
   const withKey = unwrap(error).find((candidate) => typeof candidate?.key === 'string' && AI_KEY.test(candidate.key))
@@ -21,8 +19,6 @@ export const getAiErrorKey = (error: unknown): string | null => {
 
 /**
  * Returns the interpolation params of an AI error (the `{{baseUrl}}` of the unreachable server).
- * @param {unknown} error - The error.
- * @returns {Record<string, unknown>|undefined} The params.
  */
 export const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined => {
   const aiKey = getAiErrorKey(error)
@@ -32,7 +28,6 @@ export const getAiErrorParams = (error: unknown): Record<string, unknown> | unde
 /**
  * Returns true for errors caused by a user cancel (to be ignored by the UI): an abort, or the local server's
  * first-use dialog closed without an answer.
- * @param {unknown} error - The error.
  * @returns {boolean} True when cancelled by the user.
  */
 export const isAiAbortError = (error: unknown): boolean =>
@@ -40,10 +35,6 @@ export const isAiAbortError = (error: unknown): boolean =>
 
 /**
  * Returns the translated message for an AI error.
- * @param {object} params - Parameters.
- * @param {unknown} params.error - The error.
- * @param {I18n} params.i18n - i18n instance.
- * @returns {string} The message.
  */
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
   /**

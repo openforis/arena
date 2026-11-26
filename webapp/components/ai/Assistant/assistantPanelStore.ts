@@ -78,8 +78,6 @@ const sameScope = (a: AssistantPanelScope | null, b: AssistantPanelScope | null)
 
 /**
  * Returns the view of a conversation id: its chat, or the home page without one.
- * @param {string|null} conversationId - Conversation id.
- * @returns {AssistantPanelView} The view.
  */
 const viewOf = (conversationId: string | null): AssistantPanelView => (conversationId ? 'chat' : 'home')
 
@@ -87,7 +85,6 @@ const viewOf = (conversationId: string | null): AssistantPanelView => (conversat
  * Creates a panel store.
  * @param {object} [params] - Parameters.
  * @param {OpenConversations} [params.openConversations] - Remembered open conversations (default: localStorage).
- * @returns {AssistantPanelStore} The store.
  */
 export const createAssistantPanelStore = ({
   openConversations = browserOpenConversations,
@@ -97,7 +94,6 @@ export const createAssistantPanelStore = ({
   /**
    * Merges changes into the state and notifies the listeners.
    * @param {Partial<AssistantPanelState>} changes - State changes.
-   * @returns {void}
    */
   const set = (changes: Partial<AssistantPanelState>) => {
     state = { ...state, ...changes }
@@ -106,15 +102,12 @@ export const createAssistantPanelStore = ({
   /**
    * Returns the remembered open conversation of an area.
    * @param {AssistantPanelScope|null} scope - User and survey.
-   * @param {AssistantArea|null} area - Area.
    * @returns {string|null} The conversation id, or null.
    */
   const openIdOf = (scope: AssistantPanelScope | null, area: AssistantArea | null): string | null =>
     scope && area ? openConversations.get({ ...scope, area }) : null
   /**
    * Remembers (or forgets, with null) the conversation of the current area.
-   * @param {string|null} conversationId - Conversation id.
-   * @returns {void}
    */
   const remember = (conversationId: string | null) => {
     if (state.scope && state.area) openConversations.set({ ...state.scope, area: state.area, conversationId })
@@ -129,7 +122,6 @@ export const createAssistantPanelStore = ({
    * Returns the view after selecting an area: the same area keeps a chat (a blank one too), a list goes back.
    * @param {AssistantArea|null} area - Selected area.
    * @param {string|null} conversationId - Conversation shown in that area.
-   * @returns {AssistantPanelView} The view.
    */
   const viewAfterSetArea = (area: AssistantArea | null, conversationId: string | null): AssistantPanelView =>
     area === state.area && state.view === 'chat' ? 'chat' : viewOf(conversationId)

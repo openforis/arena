@@ -27,11 +27,9 @@ type CreateParams = {
  * spread them in the params of the record update and validation functions.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user performing the update.
- * @param {!object} params.survey - The survey.
  * @param {number} [params.timezoneOffset] - The timezone offset of the client (in minutes).
  * @param {string} [params.lang] - The language used by language-dependent expression functions.
  * @param {object} [params.appInfo] - The app editing the record (app info expression functions); only for interactive edits.
- * @returns {RecordEvaluationContext} - The context.
  */
 export const createRecordEvaluationContext = ({
   user,

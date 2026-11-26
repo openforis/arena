@@ -20,8 +20,5 @@ const _assocPath = (pathArray: Array<string | number>, value: any, object: any):
  *
  * @param {*} pathArray - The path (array of keys or indexes).
  * @param {*} value - The value to set.
- * @param {*} object - The object.
- *
- * @returns {object} - The result.
  */
 export const assocPath = _curry3(_assocPath)

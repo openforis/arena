@@ -34,9 +34,6 @@ const fileExifPath = '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-
 
 /**
  * Runs the handlers of a route one after the other, as Express does, until one of them does not call next.
- * @param {Route} route - The route.
- * @param {object} req - The request.
- * @param {object} res - The response.
  * @returns {Promise<{error: any, reachedEnd: boolean}>} The error passed to next, and whether the chain completed.
  */
 const runChain = async (route: Route, req: any, res: any): Promise<{ error: any; reachedEnd: boolean }> => {

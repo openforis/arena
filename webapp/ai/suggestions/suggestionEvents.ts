@@ -23,9 +23,7 @@ export const subscribeSuggestionEvents = (listener: SuggestionEventListener): ((
 
 /**
  * Sends an event to the subscribers; a failing subscriber never breaks the view that notified.
- * @param {SuggestionEvent} event - Event.
  * @param {AiLog} [log] - Reports a failing subscriber.
- * @returns {void}
  */
 export const notifySuggestionEvent = (event: SuggestionEvent, log: AiLog = logAiWarning): void => {
   // a snapshot: a listener added during the loop (e.g. one that re-subscribes) must not be called now

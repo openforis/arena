@@ -9,7 +9,6 @@ type Props = { row: any }
 /**
  * "Ask the assistant" action of a validation report row. The report renders it only when the Cleaning area is
  * available (the status is computed once for the whole report).
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The button.
  */
 export const AskAssistantButton = ({ row }: Props) => {

@@ -15,7 +15,6 @@ const LABEL_PARAM_NAMES = ['name', 'text', 'query']
 
 /**
  * Picks the tool input values a row label can show.
- * @param {unknown} input - Tool input.
  * @returns {Record<string, string>} The label parameters.
  */
 const toLabelParams = (input: unknown): Record<string, string> => {
@@ -31,7 +30,6 @@ const toLabelParams = (input: unknown): Record<string, string> => {
 /**
  * Returns true for the tool calls the chat doesn't list (the conversation title).
  * @param {ConversationToolPart} part - Tool part.
- * @returns {boolean} True when hidden.
  */
 export const isHiddenToolPart = (part: ConversationToolPart): boolean => part.toolName === CONVERSATION_TITLE_TOOL_NAME
 
@@ -39,7 +37,6 @@ export const isHiddenToolPart = (part: ConversationToolPart): boolean => part.to
  * Returns the label of a tool row ("Looked up tree_height"); tools without a label key get the default label.
  * @param {ConversationToolPart} part - Tool part.
  * @param {AiTranslate} t - Translator (returns the key when missing).
- * @returns {string} The label.
  */
 export const getToolRowLabel = (part: ConversationToolPart, t: AiTranslate): string => {
   const key = `aiAssistant.tools.${part.toolName}`
@@ -56,7 +53,6 @@ export const getToolRowLabel = (part: ConversationToolPart, t: AiTranslate): str
 /**
  * Returns the change set a propose tool handed to the conversation (its card goes under the tool row).
  * @param {ConversationToolPart} part - Tool part.
- * @returns {string|null} The change set id.
  */
 export const getProposedChangeSetId = (part: ConversationToolPart): string | null => {
   const changeSetId = (part.output as { changeSetId?: unknown } | undefined)?.changeSetId
@@ -65,7 +61,6 @@ export const getProposedChangeSetId = (part: ConversationToolPart): string | nul
 
 /**
  * Returns what Retry resends: the conversation without the failed pair, and the user message of that pair.
- * @param {Conversation} conversation - Conversation.
  * @returns {{base: Conversation, text: string, displayText?: string}|null} Null when the last answer did not fail.
  */
 export const getRetryBase = (
@@ -92,8 +87,6 @@ export const getRetryBase = (
  * @param {string} params.text - Note.
  * @param {string} params.changeSetId - Card.
  * @param {string} params.now - Date.
- * @param {Function} params.idFactory - Id factory.
- * @returns {ApplyNoteMessage} The message.
  */
 const toNote = ({
   text,
@@ -118,7 +111,6 @@ type NoteParams = { conversation: Conversation; changeSetId: string; now?: strin
 /**
  * Stores the results of an Apply on the card and adds the summary for the model.
  * @param {object} params - Parameters.
- * @param {Conversation} params.conversation - Conversation.
  * @param {string} params.changeSetId - Card.
  * @param {OperationResult[]} params.results - Results of the Apply.
  * @param {string} params.note - Summary for the model (summarizeResults).
@@ -150,7 +142,6 @@ export const withApplyResults = ({
 /**
  * Marks a card discarded and tells the model.
  * @param {object} params - Parameters.
- * @param {Conversation} params.conversation - Conversation.
  * @param {string} params.changeSetId - Card.
  * @param {string} [params.now] - Date (tests).
  * @param {Function} [params.idFactory] - Id factory (tests).

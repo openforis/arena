@@ -20,10 +20,6 @@ const assocScientificName =
 
 /**
  * Replaces the raw Excel cell objects stored in the taxa imported from xlsx files with their plain values.
- * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {object} [client] - The database client.
- * @returns {Promise<void>}
  */
 export const migrateTaxaExcelCellValues = async (
   { surveyId }: { surveyId: number },

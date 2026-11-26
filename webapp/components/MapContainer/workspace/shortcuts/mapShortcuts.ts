@@ -35,7 +35,6 @@ export const isEditableTarget = (target: EventTarget | EditableCandidate | null)
 
 /**
  * Maps a key press to a map workspace action: Escape outside text fields ends the tool or closes the dialog.
- * @param {MapShortcutEvent} event - The key event.
  * @param {boolean} targetIsEditable - Whether the event target is a text field.
  * @returns {MapShortcutAction|null} The action, or null when the key is not a shortcut.
  */

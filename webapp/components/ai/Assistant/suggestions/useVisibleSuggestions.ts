@@ -23,7 +23,6 @@ import {
 
 /**
  * Returns the visible suggestions, all and by area.
- * @returns {{all: AssistantSuggestion[], byArea: SuggestionsByArea}} The suggestions.
  */
 export const useVisibleSuggestions = (): { all: AssistantSuggestion[]; byArea: SuggestionsByArea } => {
   const user = useUser()
@@ -41,7 +40,6 @@ export const useVisibleSuggestions = (): { all: AssistantSuggestion[]; byArea: S
     let timer: ReturnType<typeof setTimeout> | null = null
     /**
      * Re-reads the store; keeps the previous array when nothing changed (no re-render).
-     * @returns {void}
      */
     const refresh = (): void => {
       const next = userUuid ? suggestionStore.getVisible({ userUuid, surveyId, cycle, availableAreas, enabled }) : []

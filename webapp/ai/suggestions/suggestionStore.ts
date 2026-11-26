@@ -87,8 +87,6 @@ const KEY_PREFIX = 'arena.ai.suggestions.'
 
 /**
  * Returns the localStorage key of a user's suggestions.
- * @param {string} userUuid - User UUID.
- * @returns {string} The key.
  */
 export const getSuggestionsKey = (userUuid: string): string => `${KEY_PREFIX}${userUuid}`
 
@@ -122,7 +120,6 @@ export const browserSuggestionStorageAccess: SuggestionStorageAccess = {
  * @param {SuggestionStorageAccess} [params.access] - Storage access (default: the browser's).
  * @param {Function} [params.now] - Clock (expiry).
  * @param {Function} [params.log] - Reports what the storage wrapper recovered from.
- * @returns {SuggestionStore} The store.
  */
 export const createSuggestionStore = ({
   access = browserSuggestionStorageAccess,
@@ -141,7 +138,6 @@ export const createSuggestionStore = ({
   /**
    * Parses a stored value; a corrupt one is reported (it loses the dismissals) and replaced by an empty state.
    * @param {string|null} raw - Stored JSON.
-   * @returns {SuggestionUserState} The state.
    */
   const parse = (raw: string | null): SuggestionUserState =>
     parseSuggestionState(raw, (error) => {
@@ -152,7 +148,6 @@ export const createSuggestionStore = ({
 
   /**
    * Notifies the subscribers.
-   * @returns {void}
    */
   const notify = (): void => {
     // a snapshot: a listener added during the loop (e.g. one that re-subscribes) must not be called now
@@ -162,18 +157,14 @@ export const createSuggestionStore = ({
 
   /**
    * Reads the state of a user.
-   * @param {string} userUuid - User UUID.
-   * @returns {SuggestionUserState} The state.
    */
   const read = (userUuid: string): SuggestionUserState => parse(storage.read(getSuggestionsKey(userUuid)))
 
   /**
    * Re-reads, changes and writes the state of a user; notifies only when it changed. The state is kept within its
    * bounds (expired suggestions go); a full storage gets a smaller state, level by level, and the wrapper logs it.
-   * @param {string} userUuid - User UUID.
    * @param {Function} change - Returns the new state.
    * @param {string|null} [keepBucket] - The bucket being changed: it is never dropped to stay within the bounds.
-   * @returns {void}
    */
   const update = (
     userUuid: string,

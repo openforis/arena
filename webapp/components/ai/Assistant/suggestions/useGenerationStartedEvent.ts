@@ -17,7 +17,6 @@ export type GenerationStartNotifier = { update: (params: { generation: Generatio
  * @param {object} params - Parameters.
  * @param {Function} params.notify - Sends a suggestion event.
  * @param {Function} params.clearRefs - Drops the item refs.
- * @returns {GenerationStartNotifier} The notifier.
  */
 export const createGenerationStartNotifier = ({
   notify,
@@ -46,9 +45,7 @@ export const createGenerationStartNotifier = ({
 /**
  * Sends generationStarted; call it after the effect that feeds the controller, so the event finds the generation.
  * @param {object} params - Parameters.
- * @param {GenerationRef} params.generation - Current generation.
  * @param {boolean} params.active - Setting on, user logged in and Design available.
- * @returns {void}
  */
 export const useGenerationStartedEvent = ({
   generation,

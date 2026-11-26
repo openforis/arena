@@ -45,10 +45,6 @@ export const HELP_BUCKET = 'help'
  */
 export const toBucket = (surveyId: number | null): string => (surveyId === null ? HELP_BUCKET : String(surveyId))
 
-/**
- * Returns an empty state.
- * @returns {SuggestionUserState} The state.
- */
 export const emptySuggestionState = (): SuggestionUserState => ({
   pending: {},
   dismissed: {},

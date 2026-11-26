@@ -37,7 +37,6 @@ const formatCell = (value: unknown): string => {
 /**
  * Builds the scripted answer from the output of query_run.
  * @param {unknown} lastToolOutput - Output of the last tool call.
- * @returns {string} The answer.
  */
 export const formatMockQueryAnswer = (lastToolOutput: unknown): string => {
   const output = lastToolOutput as { queryId?: string; rows?: unknown[][] } | null

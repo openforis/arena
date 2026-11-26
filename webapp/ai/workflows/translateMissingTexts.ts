@@ -32,7 +32,6 @@ const getTexts = (nodeDef: any, kind: LabelKind): Record<string, string> =>
 /**
  * Builds the rows of the texts missing in a language (the rule of the suggestion), in survey hierarchy order.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
  * @param {string} params.lang - Target language.
  * @param {number} [params.maxChars] - Longest source text the task accepts.
  * @param {number} [params.maxItems] - Rows of one run.
@@ -73,7 +72,6 @@ export const buildMissingTextRows = ({
  * @param {number} [params.skippedCount] - Source texts too long to send (counted as failed).
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {AiBatchGuard} params.guard - Check run before each call.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener.
  * @param {Function} [params.translate] - The translation task (tests).
  * @param {number} [params.batchSize] - Items per call.

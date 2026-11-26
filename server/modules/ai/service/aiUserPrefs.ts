@@ -13,7 +13,6 @@ export type AiFeatureToggles = Record<AiFeatureCategory, boolean>
 
 /**
  * Returns the raw `prefs.ai` object of the user.
- * @param {ArenaUser} user - Arena user.
  * @returns {object|null} The persisted AI prefs, or null.
  */
 export const getAiPrefs = (user: ArenaUser): Record<string, any> | null => {
@@ -23,7 +22,6 @@ export const getAiPrefs = (user: ArenaUser): Record<string, any> | null => {
 
 /**
  * Returns the toggles of a user who set none: off, except the categories on by default.
- * @returns {AiFeatureToggles} The toggles.
  */
 export const defaultFeatureToggles = (): AiFeatureToggles =>
   Object.fromEntries(
@@ -46,7 +44,6 @@ export const sanitiseFeatureToggles = (input: unknown): AiFeatureToggles => {
 
 /**
  * Returns the user's access level: the stored one, else the one derived from the old master switch and toggles.
- * @param {ArenaUser} user - Arena user.
  * @returns {AiAccessLevel} The level (0 when nothing is stored).
  */
 export const getAccessLevelForUser = (user: ArenaUser): AiAccessLevel => {
@@ -61,16 +58,13 @@ export const getAccessLevelForUser = (user: ArenaUser): AiAccessLevel => {
 
 /**
  * Returns true when the user has switched AI features on (access level above Off).
- * @param {ArenaUser} user - Arena user.
  * @returns {boolean} The master switch state (default false).
  */
 export const areFeaturesEnabledForUser = (user: ArenaUser): boolean => getAccessLevelForUser(user) > 0
 
 /**
  * Returns true when the access level covers the category and its toggle is on.
- * @param {ArenaUser} user - Arena user.
  * @param {string} category - Feature category.
- * @returns {boolean} Whether the category is enabled.
  */
 export const isCategoryEnabledForUser = (user: ArenaUser, category: string): boolean => {
   const level = getAccessLevelForUser(user)

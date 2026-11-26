@@ -51,7 +51,6 @@ class RotatedImageOverlay extends L.ImageOverlay {
 
 /**
  * Returns the text of a KML description: togeojson gives the HTML ones as an object.
- * @param {KmlFeatureProperties['description']} description - The description.
  * @returns {string} The text (HTML).
  */
 const getDescriptionText = (description: KmlFeatureProperties['description']): string => {
@@ -61,9 +60,6 @@ const getDescriptionText = (description: KmlFeatureProperties['description']): s
 
 /**
  * Binds the popup of a KML place: its name and description (sanitized, the KML comes from the user).
- * @param {KmlFeature} feature - The feature.
- * @param {L.Layer} layer - Its layer.
- * @returns {void}
  */
 const bindPlacePopup = (feature: KmlFeature, layer: L.Layer): void => {
   const { name, description } = feature.properties ?? {}
@@ -73,8 +69,6 @@ const bindPlacePopup = (feature: KmlFeature, layer: L.Layer): void => {
 
 /**
  * Converts the KML styles of a feature (line and polygon colors, widths, opacities) into Leaflet path options.
- * @param {KmlFeature} feature - The feature.
- * @returns {L.PathOptions} The path options.
  */
 const toPathOptions = (feature?: KmlFeature): L.PathOptions => {
   const properties = feature?.properties ?? {}
@@ -89,9 +83,7 @@ const toPathOptions = (feature?: KmlFeature): L.PathOptions => {
 
 /**
  * Creates the marker of a KML point: with the icon of its style, or the default one.
- * @param {KmlFeature} feature - The feature.
  * @param {L.LatLng} latLng - Its position.
- * @returns {L.Marker} The marker.
  */
 const toMarker = (feature: KmlFeature, latLng: L.LatLng): L.Marker => {
   const iconUrl = feature.properties?.icon
@@ -136,7 +128,6 @@ const isGroundOverlay = (feature: KmlFeature): boolean => feature.properties?.['
  * Builds the Leaflet layer of a KML document: places (points, lines, polygons) with their style and popup,
  * and ground overlays.
  * @param {Document} xml - The KML document.
- * @returns {L.FeatureGroup} The layer.
  */
 export const toKmlLayerFromDocument = (xml: Document): L.FeatureGroup => {
   const features = kml(xml).features as KmlFeature[]
@@ -164,7 +155,6 @@ export const toKmlLayerFromDocument = (xml: Document): L.FeatureGroup => {
 /**
  * Builds the Leaflet layer of a KML text.
  * @param {string} text - The KML text.
- * @returns {L.FeatureGroup} The layer.
  * @throws {Error} When the text is not valid XML.
  */
 export const toKmlLayer = (text: string): L.FeatureGroup => {

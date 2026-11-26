@@ -34,7 +34,6 @@ export const toGeoBounds = (bounds: L.LatLngBounds): GeoBounds => ({
 /**
  * Reads the bounds of the map view.
  *
- * @param {L.Map} map - Map.
  * @returns {GeoBounds|null} View bounds, or null before the map has a view.
  */
 export const readViewBounds = (map: L.Map): GeoBounds | null => {
@@ -48,7 +47,6 @@ export const readViewBounds = (map: L.Map): GeoBounds | null => {
 /**
  * Adds a non-interactive outline that Geoman ignores (it must not become editable or measurable).
  *
- * @param {L.Map} map - Map.
  * @param {GeoBounds} bounds - Outline bounds.
  * @param {L.PathOptions} style - Path style.
  * @returns {L.Rectangle} The outline layer (remove it on cleanup).

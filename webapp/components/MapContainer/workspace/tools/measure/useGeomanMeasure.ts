@@ -39,7 +39,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
 
     /**
      * Removes the finished shape from the map.
-     * @returns {void}
      */
     const clearFinished = (): void => {
       if (!finished) return
@@ -51,7 +50,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
     /**
      * Reports the vertices and the rubber-band end of the shape being drawn.
      * @param {object} event - Geoman pm:change event.
-     * @returns {void}
      */
     const onChange: L.PM.ChangeEventHandler = (event) => {
       const vertices = toLatLngPairs(workingLayer?.getLatLngs())
@@ -63,7 +61,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
     /**
      * Follows the new working layer Geoman creates for every drawing.
      * @param {object} event - Geoman pm:drawstart event.
-     * @returns {void}
      */
     const onDrawStart: L.PM.DrawStartEventHandler = (event) => {
       workingLayer?.off('pm:change', onChange)
@@ -74,7 +71,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
     /**
      * Keeps the finished shape on the map with a label and reports it.
      * @param {object} event - Geoman pm:create event.
-     * @returns {void}
      */
     const onCreate: L.PM.CreateEventHandler = (event) => {
       clearFinished()
@@ -99,7 +95,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
     /**
      * Finishes the shape on double-click (not on the bar).
      * @param {Event} event - The captured double-click.
-     * @returns {void}
      */
     const onDoubleClick = (event: Event): void => {
       if (!barRef.current?.contains(event.target as Node)) finishIfComplete()
@@ -107,8 +102,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
 
     /**
      * Finishes the shape on Enter pressed on the map container itself (not on controls or popups inside it).
-     * @param {KeyboardEvent} event - The key event.
-     * @returns {void}
      */
     const onKeyDown = (event: KeyboardEvent): void => {
       // this native listener runs before React's onKeyDown handlers: defaultPrevented only reflects earlier native
@@ -126,7 +119,6 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
 
     /**
      * Stops drawing, removes the listeners and the finished shape, and resets the measure state.
-     * @returns {void}
      */
     return () => {
       releaseDoubleClick()

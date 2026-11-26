@@ -25,7 +25,6 @@ export type SuggestionBatchProgress = AiBatchProgress & { remainingMs?: number; 
 
 /**
  * Returns the batch of a tool row.
- * @param {string} toolName - Tool name.
  * @returns {SuggestionBatchKind|null} The batch; null for a tool of the model.
  */
 export const getSuggestionBatchToolKind = (toolName: string): SuggestionBatchKind | null =>
@@ -38,7 +37,6 @@ export const getSuggestionBatchToolKind = (toolName: string): SuggestionBatchKin
  * request on (one alone is a poor average).
  * @param {AiBatchProgress} progress - Requests done and total.
  * @param {number} elapsedMs - Time since the first request started.
- * @returns {SuggestionBatchProgress} The progress.
  */
 export const withRemainingTime = (progress: AiBatchProgress, elapsedMs: number): SuggestionBatchProgress => {
   const { done, total } = progress

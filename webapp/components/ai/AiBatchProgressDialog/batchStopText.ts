@@ -12,7 +12,6 @@ type I18nLike = { t: (key: string, params?: Record<string, unknown>) => string }
  * Returns the text of the notice of a stopped run.
  * @param {object} params - Parameters.
  * @param {AiBatchStop} params.stop - Where and why the run stopped.
- * @param {I18nLike} params.i18n - i18n instance.
  * @returns {string} The text (not HTML-escaped: it is shown as is).
  */
 export const getBatchStopText = ({ stop, i18n }: { stop: AiBatchStop; i18n: I18nLike }): string => {

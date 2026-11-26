@@ -10,7 +10,6 @@ type StreamSystemLogParams = {
 
 /**
  * Opens the server log stream: last `maxLines` lines first, then the lines appended to the log file.
- * @param {StreamSystemLogParams} params - The parameters.
  * @returns {Function} - Function that closes the stream.
  */
 export const streamSystemLog = ({ maxLines, onMessage, onError, onDone }: StreamSystemLogParams): (() => void) =>

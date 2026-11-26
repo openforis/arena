@@ -8,7 +8,6 @@ import type { CleaningApi } from './cleaningApi'
 /**
  * Returns a key value as text (the tool schema gives strings and numbers).
  * @param {unknown} value - The key value.
- * @returns {string} The text.
  */
 const toKeyText = (value: unknown): string => {
   if (typeof value === 'string') return value
@@ -67,11 +66,7 @@ const collectMatches = async ({
  * Finds the UUID of the record with the given root key values (all keys, exact match).
  * @param {object} params - Parameters.
  * @param {CleaningApi} params.api - Cleaning API.
- * @param {object} params.survey - The survey.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {object} params.keys - Key values by key attribute name.
- * @param {AbortSignal} [params.signal] - Abort signal.
  * @returns {Promise<object>} { recordUuid }; throws an AiToolFailure when no single record has these keys.
  */
 export const findRecordUuidByKeys = async ({

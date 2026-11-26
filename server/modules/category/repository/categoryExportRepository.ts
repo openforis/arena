@@ -65,7 +65,6 @@ const getSelectCumulativeAreaSubquery = ({
  * Generates the query to export the category.
  * Level names, languages and extra prop names are passed as query parameters, column aliases included (quoted).
  * @param {!object} params - The parameters object.
- * @param {!number} [params.surveyId] - The id of the survey.
  * @param {!object} [params.category] - The category to export (with levels).
  * @param {string[]} [params.languages] - Array with the languages in the survey.
  * @param {boolean} [params.draft] - Whether to export draft props.

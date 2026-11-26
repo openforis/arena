@@ -534,7 +534,6 @@ export const updatePassword = ({ userUuid, password }: { userUuid: string; passw
  * (an array, a scalar) are not applied, since they would turn the stored prefs into one for good.
  * mapCustomLayers is written only by the custom layers API: a stale copy sent by the client must not overwrite it.
  * @param user - User with the prefs to merge.
- * @param client - Database client.
  * @returns The user.
  */
 export const updateUserPrefs = (user: ArenaUser, client: DbClient = db) =>
@@ -592,10 +591,6 @@ export const deleteUserPrefsSurvey = (
 
 /**
  * Removes the custom map layers a user added in a survey, whatever their current survey is.
- * @param {object} params - Parameters.
- * @param {string} params.userUuid - The user uuid.
- * @param {number|string} params.surveyId - The survey id.
- * @param {object} [client] - The database client.
  * @returns {Promise<object>} The query result.
  */
 export const deleteUserMapCustomLayersSurvey = (

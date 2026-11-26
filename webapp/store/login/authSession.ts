@@ -31,7 +31,6 @@ export const logoutRequestConfig: AxiosRequestConfig = { errorHandledLocally: tr
 /**
  * Waits.
  * @param {number} ms - Milliseconds.
- * @returns {Promise<void>} Resolves after the time.
  */
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {

@@ -10,7 +10,6 @@ import type { SuggestionDefinition } from './types'
 /**
  * Returns the module of an introduction.
  * @param {AssistantSuggestion} suggestion - Introduction.
- * @returns {IntroModule} The module.
  * @throws {Error} For a module without introduction (a hand-edited storage value): the card is not shown.
  */
 const moduleOf = (suggestion: AssistantSuggestion): IntroModule => {

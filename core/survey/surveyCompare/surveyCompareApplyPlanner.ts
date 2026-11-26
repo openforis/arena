@@ -497,7 +497,6 @@ const planNodeDefs = ({ context, appliedIds, plan }) => {
  * @param {SurveyCompareResult} params.result - The comparison result (computed on the same surveys).
  * @param {string[]} params.selectedIds - Ids of the changes to apply.
  * @param {string[]} [params.usedNodeDefUuids] - Node def uuids already used in the target survey (deleted ones included).
- * @returns {SurveyCompareApplyPlan} - The apply plan.
  */
 export const buildApplyPlan = ({
   result,

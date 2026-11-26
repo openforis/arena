@@ -53,8 +53,6 @@ const _doFetchSurvey = ({
  * Fetches the survey used to run queries on the data views.
  * Concurrent calls with the same parameters share the same (in-progress) fetch.
  * @param {!object} params - The fetch parameters.
- * @param {!number} params.surveyId - The survey id.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {boolean} [params.includeRefData] - Whether to include categories and taxonomies reference data (needed only when exporting data).
  * @param {boolean} [params.draft] - Whether to load draft node defs (needed for custom aggregate functions).
  * @returns {Promise<object>} - The fetched survey.
@@ -99,7 +97,6 @@ const _getRecordOwnerUuidForQuery = ({
  * @param {!object} params - The parameters.
  * @param {object} [params.user] - The user running the query.
  * @param {!object} params.survey - The survey used to run the query.
- * @param {string} [params.cycle] - The survey cycle.
  * @returns {Promise<{own: Array, readable: Array}>} - The access filters (`own` is empty when the user is not restricted).
  */
 const _fetchUserGroupAccessFilters = async ({
@@ -152,10 +149,7 @@ const _pickExportOptions = (options: unknown): Record<string, any> =>
  * @param {!object} params - The query parameters.
  * @param {object} [params.user] - The user running the query.
  * @param {!string} [params.surveyId] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
- * @param {number} [params.offset] - The query offset.
- * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including outliers (used by the scatter chart). Applied only in raw mode.
  * @param {Stream.Writable} [params.outputStream] - The output to be used to stream the data (if specified).
  * @param {object} [params.options] - The export options (only the ones in exportOptionKeys are considered).
@@ -223,7 +217,6 @@ export const fetchViewData = async (params: FetchViewDataParams) => {
  * @param {!object} params - The query parameters.
  * @param {object} [params.user] - The user running the query.
  * @param {!string} [params.surveyId] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query used to filter the records.
  * @returns {Promise<number>} - The count of rows.
  */
@@ -247,9 +240,6 @@ export const countTable = async (params: {
 /**
  * Counts the rows in the data views of the specified entity definitions, only in the records readable by the user.
  * @param {!object} params - The parameters.
- * @param {!object} params.user - The user.
- * @param {!number} params.surveyId - The survey id.
- * @param {!string} params.cycle - The survey cycle.
  * @param {string[]} [params.entityDefUuids] - The entity definition UUIDs (all multiple entities if empty).
  * @returns {Promise<object>} - The count of rows indexed by entity definition UUID.
  */

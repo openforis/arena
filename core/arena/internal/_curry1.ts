@@ -6,7 +6,6 @@ type AnyFn = (...args: any[]) => any
  * Optimized internal one-arity curry function.
  *
  * @private
- * @param {Function} fn - The function to curry.
  * @returns {Function} The curried function.
  */
 export const _curry1 = (fn: AnyFn) =>

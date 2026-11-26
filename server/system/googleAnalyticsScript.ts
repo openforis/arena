@@ -19,9 +19,6 @@ document.head.appendChild(gtagScript)
 
 /**
  * Serves the script loading Google Analytics; empty when GOOGLE_ANALYTICS_ID is not set (analytics disabled).
- * @param {Request} _req - The request.
- * @param {Response} res - The response.
- * @returns {void}
  */
 export const googleAnalyticsScriptHandler = (_req: Request, res: Response): void => {
   const id = ProcessUtils.ENV.googleAnalyticsId?.trim()

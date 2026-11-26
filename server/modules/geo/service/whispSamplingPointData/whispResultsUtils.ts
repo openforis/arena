@@ -108,7 +108,6 @@ export class WhispColumnsCollector {
    *
    * @param {object} params - The parameters.
    * @param {string[]} params.existingColumnNames - Column names already used (sampling point data columns).
-   * @returns {WhispColumn[]} The Whisp columns.
    */
   getColumns({ existingColumnNames }: { existingColumnNames: string[] }): WhispColumn[] {
     const usedColumnNames = new Set(existingColumnNames)
@@ -152,7 +151,6 @@ const collectColumns = (features: WhispFeature[]): WhispColumnsCollector => {
  * @param {object} params - The parameters.
  * @param {WhispFeature[]} params.features - Features returned by Whisp.
  * @param {string[]} params.existingColumnNames - Column names already used (sampling point data columns).
- * @returns {WhispColumn[]} The Whisp columns.
  */
 export const extractWhispColumns = ({
   features,
@@ -183,7 +181,6 @@ export const findNumericColumns = ({
  *
  * @param {Array} array - The array to split.
  * @param {number} size - The max size of every chunk.
- * @returns {Array[]} The chunks.
  */
 export const toChunks = <T>(array: T[], size: number): T[][] => {
   const chunks: T[][] = []

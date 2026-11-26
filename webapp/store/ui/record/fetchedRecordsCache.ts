@@ -15,7 +15,6 @@ const fetchPromisesByUuid = {}
 /**
  * Returns the resolved record for the given uuid, if it has already been fetched (see
  * fetchRecordAndNodesOnce), kept up to date with edited nodes (see mergeNodesIntoFetchedRecordsCache).
- * @param {string} recordUuid - The record uuid.
  * @returns {object} The resolved record, or undefined if it hasn't been fetched yet.
  */
 export const getResolvedRecord = (recordUuid) => resolvedRecordsByUuid[recordUuid]
@@ -24,9 +23,6 @@ export const getResolvedRecord = (recordUuid) => resolvedRecordsByUuid[recordUui
  * Fetches (once, de-duplicating concurrent callers) and caches the full record (with nodes) identified by
  * recordUuid, for contexts where it's not available in the ui/record Redux state (e.g. the Data Explorer
  * inline table editor).
- * @param {object} params - The parameters.
- * @param {string} params.surveyId - The survey id.
- * @param {string} params.recordUuid - The record uuid.
  * @returns {Promise<object>} A promise resolving to the fetched record.
  */
 export const fetchRecordAndNodesOnce = ({ surveyId, recordUuid }) => {
@@ -53,7 +49,6 @@ export const fetchRecordAndNodesOnce = ({ surveyId, recordUuid }) => {
  * before the corresponding Redux nodesUpdate action is dispatched, so that components re-rendered by that
  * dispatch (they all subscribe to the ui/record Redux state) read the already-updated cached record.
  * @param {object} nodes - The updated/created nodes, indexed by uuid.
- * @returns {void}
  */
 export const mergeNodesIntoFetchedRecordsCache = (nodes: ArenaRecordNodesMap) => {
   const nodesByRecordUuid: { [recordUuid: string]: ArenaRecordNodesMap } = {}

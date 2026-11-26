@@ -83,7 +83,6 @@ const validateGenerateInput = ({ expressionType, description }: { expressionType
  * @param {string} params.nodeDefUuid - Target node def.
  * @param {string} params.expressionType - One of AiExpressionType.
  * @param {string} params.description - The user's description.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<AiExpressionResult>} The expression, its explanation and the syntax check result.
  */
 export const generateExpression = async ({

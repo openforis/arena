@@ -15,7 +15,6 @@ const UPLOADED_LAYER_OPACITY = 0.8
 /**
  * Returns a function that reads a file, adds its layers to the map (group "Uploaded files") and zooms to them;
  * unsupported or unreadable files show a message and leave the map as it is.
- * @returns {Function} (file) => Promise<void>.
  */
 export const useUploadMapFile = (): ((file: File) => Promise<void>) => {
   const map = useMap()

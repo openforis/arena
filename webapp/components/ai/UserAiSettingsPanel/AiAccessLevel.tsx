@@ -116,7 +116,6 @@ const ClassCells = ({ accessLevel }: { accessLevel: AccessLevel }) => {
 /**
  * A feature chip: a toggle button and an ⓘ that shows what the feature sends (on hover and on focus).
  * @param {object} props - Props.
- * @param {FeatureCategory} props.category - Category.
  * @param {boolean} props.checked - Toggle state.
  * @param {boolean} props.disabled - True when the level does not cover the category.
  * @param {Function} props.onChange - Called with the new state.
@@ -167,7 +166,6 @@ const FeatureChip = ({
  * @param {object} props - Props.
  * @param {string} props.id - Element id (for aria-controls).
  * @param {AccessLevel} props.accessLevel - Level.
- * @param {FeatureToggles} props.toggles - Toggles.
  * @param {Function} props.onToggleChange - Change handler factory.
  * @returns {React.ReactElement} The chip groups.
  */
@@ -208,7 +206,6 @@ const FeatureChips = ({
 
 /**
  * "What AI can see": the level, what it covers and, under Customize, the single features.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The fieldset.
  */
 export const AiAccessLevel = ({ accessLevel, toggles, onLevelChange, onToggleChange }: Props) => {

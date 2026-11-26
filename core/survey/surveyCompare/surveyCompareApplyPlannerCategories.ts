@@ -165,7 +165,6 @@ const planCategoryRemoval = ({ params, diff, plan }) => {
  * @param {SurveyCompareCategoryDiff[]} params.diffs - Category diffs.
  * @param {Set<string>} params.appliedIds - Ids of the changes to apply.
  * @param {CategoriesApplyPlan} params.plan - The plan to fill.
- * @returns {void}
  */
 export const planCategories = ({
   params,

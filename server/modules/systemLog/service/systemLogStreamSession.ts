@@ -48,7 +48,6 @@ class RemoteInstancesTracker {
 
 /**
  * Streams the log of the current instance and, through the cluster relay, the logs of all the other instances.
- * @param {SystemLogStreamSessionParams} params - The parameters.
  * @returns {Promise<SystemLogStreamSession>} - The started session.
  */
 export const startSystemLogStreamSession = async (

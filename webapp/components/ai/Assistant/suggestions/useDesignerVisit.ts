@@ -11,7 +11,6 @@ import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 /**
  * Tracks the visit and notifies its end.
  * @param {object} params - Parameters.
- * @param {SuggestionGeneration|null} params.generation - Current generation.
  * @param {object|null} params.survey - Survey of the generation (null without one).
  * @param {string|null} params.module - App module.
  * @returns {void} Nothing; the effect notifies.

@@ -6,7 +6,6 @@ import type { AiToolContext } from '@webapp/ai/tools/types'
 
 /**
  * Returns the values every cleaning tool needs.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {object} Survey, its info and id, cycle and survey language.
  */
 export const getCleaningContext = (ctx: AiToolContext) => {
@@ -18,7 +17,6 @@ export const getCleaningContext = (ctx: AiToolContext) => {
 /**
  * Finds the (current, not analysis) attribute definitions with the given names.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string[]} params.names - Attribute names.
  * @returns {{nodeDefs: object[], unknownNames: string[]}} The definitions found and the unknown names.
  */
@@ -36,7 +34,6 @@ export const resolveAttributeDefs = ({ survey, names }: { survey: any; names: st
 /**
  * Describes the unknown attribute names with the real names close to each, for a tool error.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string[]} params.names - The unknown names.
  * @returns {string} E.g. `tree_number (close names: tree_no)`.
  */

@@ -47,7 +47,6 @@ const PLACEHOLDER_PATTERN = /\{([^{}]*)\}/g
 /**
  * Tells whether a value is one of the allowed values.
  * @param {readonly string[]} values - The allowed values.
- * @param {unknown} value - The value.
  * @returns {boolean} True when the value is one of them.
  */
 const isOneOf = <T extends string>(values: readonly T[], value: unknown): value is T =>
@@ -55,7 +54,6 @@ const isOneOf = <T extends string>(values: readonly T[], value: unknown): value 
 
 /**
  * Tells whether a value is a plain object.
- * @param {unknown} value - The value.
  * @returns {boolean} True for non-array objects.
  */
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -63,7 +61,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 /**
  * Tells whether a value is an absolute http(s) URL without credentials.
- * @param {unknown} value - The value.
  * @returns {boolean} True for http and https URLs up to 2048 characters.
  */
 export const isHttpUrl = (value: unknown): boolean => {
@@ -79,7 +76,6 @@ export const isHttpUrl = (value: unknown): boolean => {
 /**
  * Tells whether a value is an XYZ tile URL template: an http(s) URL with {z}, {x} and {y} (or {-y}), and no other
  * placeholder than {s} and {r}.
- * @param {unknown} value - The value.
  * @returns {boolean} True for valid templates.
  */
 export const isTileTemplateUrl = (value: unknown): boolean => {
@@ -96,7 +92,6 @@ export const isTileTemplateUrl = (value: unknown): boolean => {
 
 /**
  * Trims a text and checks its length.
- * @param {unknown} value - The value.
  * @param {number} maxLength - The maximum length after trimming.
  * @returns {string|null} The trimmed text, or null when it is not a string or too long.
  */
@@ -108,7 +103,6 @@ const sanitizeText = (value: unknown, maxLength: number): string | null => {
 
 /**
  * Checks an opacity.
- * @param {unknown} value - The value.
  * @returns {number|null} The opacity, or null when it is not a number between 0.1 and 1.
  */
 const sanitizeOpacity = (value: unknown): number | null =>
@@ -116,7 +110,6 @@ const sanitizeOpacity = (value: unknown): number | null =>
 
 /**
  * Checks an optional maximum zoom level.
- * @param {unknown} value - The value.
  * @returns {number|undefined|null} The zoom level, undefined when absent, null when invalid.
  */
 const sanitizeMaxZoom = (value: unknown): number | undefined | null => {
@@ -151,8 +144,6 @@ const sanitizeWmsProps = (value: Record<string, unknown>): { wmsLayers: string; 
 
 /**
  * Tells whether a URL fits a layer kind.
- * @param {MapCustomLayerKind} kind - The kind.
- * @param {unknown} url - The URL.
  * @returns {boolean} WMS: an http(s) URL without braces; WMTS and XYZ: a tile URL template.
  */
 const isUrlValidForKind = (kind: MapCustomLayerKind, url: unknown): url is string =>
@@ -239,7 +230,6 @@ export const validateMapCustomLayers = (value: unknown): MapCustomLayer[] | null
  * @param {MapCustomLayer[]} params.surveyLayers - The layers shared with everyone in the survey.
  * @param {MapCustomLayer[]} params.userLayers - The layers of the current user.
  * @param {string[]} [params.hiddenLayerIds] - Ids hidden for this session.
- * @returns {MapCustomLayerWithScope[]} The layers with their scope.
  */
 export const mergeMapCustomLayers = ({
   surveyLayers,

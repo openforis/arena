@@ -29,7 +29,6 @@ export const SchemaSummaryExportCloseButton = ({ job, fileFormat }: SchemaSummar
 
   /**
    * Hides the job monitor when the download starts.
-   * @returns {void}
    */
   const onDownload = useCallback(() => dispatch(JobActions.hideJobMonitor()), [dispatch])
 
@@ -58,7 +57,6 @@ export const SchemaSummaryExportCloseButton = ({ job, fileFormat }: SchemaSummar
 
 /**
  * Download button of the schema summary (without AI descriptions; those are generated in the advanced menu).
- * @param {object} props - Props.
  * @returns {ReactElement} The button.
  */
 type SurveySchemaSummaryDownloadButtonProps = {

@@ -12,7 +12,6 @@ import { CustomOverlayRow } from './CustomOverlayRow'
  * Layers tab: the survey data overlays (the Leaflet layers control moved here), then the added layers by group.
  * @param {object} props - Component props.
  * @param {number} props.dataLayersCount - Number of survey data layers.
- * @returns {React.ReactElement} The panel.
  */
 export const LayersPanel = ({ dataLayersCount }: { dataLayersCount: number }): ReactElement => {
   const t = useI18nT()

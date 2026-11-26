@@ -62,7 +62,6 @@ const getItemByUuid = ({
 /**
  * Gets a category item from the survey ref data or, for big categories (not in the ref data), from the database.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.nodeDef - The code node definition.
  * @param {string} params.itemUuid - The category item uuid.
  * @returns {Promise<object|null>} - The category item, or null if not found.

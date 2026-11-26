@@ -31,7 +31,6 @@ type LabelItem = LabelsInput['items'][number]
 /**
  * Converts the model's items to label operations, recording the current texts.
  * @param {LabelItem[]} items - Proposed texts.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {ChangeOperationDraft[]} The drafts, in order.
  */
 const toLabelDrafts = (items: LabelItem[], ctx: AiToolContext): ChangeOperationDraft[] => {

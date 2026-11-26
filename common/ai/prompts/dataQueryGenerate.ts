@@ -129,8 +129,6 @@ const describeAttribute = ({ survey, nodeDef, entityDef, lang, cycle, includeAna
 /**
  * Builds the compact schema description included in the user prompt.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - The survey cycle.
  * @param {string} params.lang - The language used for the labels.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {string} - The schema description.
@@ -168,7 +166,6 @@ export const buildSchemaDescription = ({ survey, cycle, lang, includeAnalysis = 
  * Builds the system + user prompt pair used to generate a Data Explorer query.
  * @param {object} params - The parameters.
  * @param {object} params.survey - The survey (with node defs).
- * @param {string} params.cycle - The survey cycle.
  * @param {string} params.lang - The language used for the labels (and for the explanation).
  * @param {string} params.description - The user's request in natural language.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.

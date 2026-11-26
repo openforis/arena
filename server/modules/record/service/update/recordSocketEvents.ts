@@ -13,7 +13,6 @@ export type RecordSocketEvent = { type: string; content: unknown }
 /**
  * Builds the nodesUpdate event.
  * @param {object} params - The parameters.
- * @param {string} params.recordUuid - The record uuid.
  * @param {object} params.updatedNodes - The updated nodes by uuid.
  * @returns {RecordSocketEvent|null} The event, or null when no node was updated.
  */
@@ -31,7 +30,6 @@ export const buildNodesUpdateEvent = ({
  * @param {object} params - The parameters.
  * @param {object} params.record - The record before the update.
  * @param {object} params.validations - The node validations.
- * @returns {RecordSocketEvent} The event.
  */
 export const buildNodeValidationsUpdateEvent = ({
   record,

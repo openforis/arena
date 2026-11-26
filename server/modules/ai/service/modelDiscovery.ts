@@ -46,7 +46,6 @@ const getListTimeoutMs = () => Math.min(ENV.aiRequestTimeoutMs, LIST_TIMEOUT_MS)
 
 /**
  * Reads a JSON list from an URL. The timeout covers the connection, the headers and the body, and the body is capped.
- * @param {string} url - The URL.
  * @param {object} [options] - Options.
  * @param {object} [options.headers] - Request headers.
  * @param {Function} [options.fetchImpl] - The fetch to use.

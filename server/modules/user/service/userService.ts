@@ -370,7 +370,6 @@ export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
  * role of this survey, because inviting a survey admin grants it.
  * @param {!object} params - The parameters.
  * @param {!object} params.userToInvite - The pending user (with auth groups).
- * @param {!object} params.surveyInfo - The survey info.
  * @returns {Promise<boolean>} - True if the link can be returned to a survey user.
  */
 const _canSurveyUserGetResetPasswordUrl = ({
@@ -395,7 +394,6 @@ const _canSurveyUserGetResetPasswordUrl = ({
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user requesting the link.
  * @param {!string} params.userUuid - UUID of the invited user.
- * @param {!number} params.surveyId - ID of the survey.
  */
 const _checkCanGetSurveyUserResetPasswordUrl = async ({
   user,
@@ -530,7 +528,6 @@ const _canAssignGlobalRoles = ({
  * Checks if user has permission to edit survey-specific role and email.
  * @param {!object} params - Parameters object.
  * @param {!object} params.user - The user performing the update.
- * @param {!number} params.surveyId - The survey ID.
  * @param {!object} params.userToUpdateOld - The user being updated before changes.
  * @param {!object} params.userToUpdate - The user being updated with new values.
  * @param {!Array} params.authGroupsNew - The new auth groups for the user being updated.

@@ -18,8 +18,6 @@ export const getSurveyDBSchema = Schemata.getSchemaSurvey
 
 /**
  * Marks the survey as draft.
- * @param {number|string} surveyId - The survey id.
- * @param {object} [client] - The db client.
  * @returns {Promise<void>} Resolves when the survey is marked.
  * @deprecated - Implement it in survey repository.
  */

@@ -125,17 +125,11 @@ export const insertRecordsInBatch = (
 /**
  * Counts the records of a survey.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {object} [params.nodeDefRoot] - The root node def (needed only with search or qualifier filters).
  * @param {object[]} [params.nodeDefKeys] - The root key node defs (needed only with search or qualifier filters).
  * @param {object[]} [params.summaryDefs] - The summary node defs (needed only with search or qualifier filters).
- * @param {string} [params.search] - The search value.
  * @param {string} [params.ownerUuid] - The records owner UUID.
  * @param {boolean} [params.includeMerged] - Whether to count the merged records.
- * @param {object[]} [params.qualifierNodeDefFilters] - The qualifier node def filters.
- * @param {object[]} [params.readableQualifierNodeDefFilterSets] - The readable qualifier node def filter sets.
- * @param {object} [client] - The database client.
  * @returns {Promise<number>} - The count of records.
  */
 export const countRecordsBySurveyId = async (
@@ -731,11 +725,7 @@ export const updateRecordDateModified = (
 /**
  * Updates the info of a record (e.g. the app that modified it last).
  * @param {!object} params - The parameters.
- * @param {!number} params.surveyId - The survey id.
- * @param {!string} params.recordUuid - The record uuid.
  * @param {!object} params.info - The record info.
- * @param {object} [client] - The database client.
- * @returns {Promise<null>} - The result promise.
  */
 export const updateRecordInfo = (
   { surveyId, recordUuid, info }: { surveyId: number; recordUuid: string; info: object },

@@ -22,8 +22,6 @@ export const MIN_OVERLAY_OPACITY = 0.05
 /**
  * Applies an opacity to a tile or scene layer (both are Leaflet GridLayers).
  * @param {Layer} layer - The grid layer.
- * @param {number} opacity - The opacity.
- * @returns {void}
  */
 export const setGridLayerOpacity = (layer: Layer, opacity: number): void => {
   ;(layer as GridLayer).setOpacity(opacity)

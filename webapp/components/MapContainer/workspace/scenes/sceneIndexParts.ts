@@ -21,7 +21,6 @@ const textDecoder = new TextDecoder()
  * that year in the period. Months already folded into `items.parquet` answer 404 and are skipped by the
  * reader; the emptied `live.parquet` is never listed.
  *
- * @param {ScenePeriod} period - The period.
  * @param {string} [baseUrl] - Index root (tests pass their own).
  * @returns {string[]} File URLs, items before live tails of the same year.
  */

@@ -98,20 +98,15 @@ const maxExcelColumnsLimit = 16384
 /**
  * Executes a select query on an entity definition data view.
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be fetched.
- * @param {number} [params.offset] - The query offset.
- * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including the outliers of the first 2 numeric attributes, so large datasets can be visualized without fetching them entirely.
  * @param {boolean|object} [params.outputStream] - The output to be used to stream the data (if specified).
  * @param {string} [params.fileFormat] - The format of the output file (csv or xlsx).
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 // returns the rows, or the query stream when outputStream is specified
@@ -199,16 +194,10 @@ export const fetchViewData = async (params: FetchViewDataParams, client: DbClien
  * Runs a select query on a data view associated to an entity node definition,
  * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
- * @param {!Query} [params.query] - The query object.
- * @param {number} [params.offset] - The query offset.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
- * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.outputStream] - The output to be used to stream the data (if specified).
  * @param {object} [params.options] - Export options object (e.g. {fileFormat: 'csv'}).
- * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (
@@ -619,11 +608,8 @@ const checkCanExportDataMatrix = ({
  * Fetches the data of a multiple entity pivoted as a matrix, with one column per record.
  * @param {!object} params - The parameters.
  * @param {object} [params.user] - The user: the records of the user groups the user cannot read are excluded.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are included.
  * @param {!object} [params.options] - The entity, row, record key (all when not specified) and value definition UUIDs, the filter expression (as in Data Explorer) and the file format.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<{fields: string[], items: object[]}>} - The output fields and items.
  */
 export const fetchEntityDataMatrix = async (
@@ -736,12 +722,9 @@ export const fetchEntitiesFileUuidsByCycle = async (
 /**
  * Counts the number of rows in the data view related to the specified query object.
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query used to filter the rows.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
- * @param {DbClient} client - The database client.
  * @returns {Promise<number>} - The number of rows.
  */
 export const countTable = (
@@ -774,12 +757,9 @@ export const countTable = (
  * Returns the count of rows in the data views of the specified entity defs, indexed by entity def UUID.
  * If entityDefUuids is not specified, all the entity defs will be considered.
  * @param {!object} params - The parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
- * @param {DbClient} client - The database client.
  * @returns {Promise<object>} - Count of view data table rows indexed by related view data entity def UUID.
  */
 export const fetchTableRowsCountByEntityDefUuid = async (

@@ -53,7 +53,6 @@ export const axiosAnalysisHttp: AnalysisHttp = {
 
 /**
  * Returns true when the error is a request timeout (client or proxy).
- * @param {any} error - The error.
  * @returns {boolean} Whether the request timed out.
  */
 export const isTimeoutError = (error: any): boolean =>
@@ -61,7 +60,6 @@ export const isTimeoutError = (error: any): boolean =>
 
 /**
  * Runs a request, turning a timeout into the queryTimeout error.
- * @param {Function} request - The request.
  * @returns {Promise<any>} The request result.
  */
 export const withTimeoutError = async <T>(request: () => Promise<T>): Promise<T> => {
@@ -76,7 +74,6 @@ export const withTimeoutError = async <T>(request: () => Promise<T>): Promise<T>
 /**
  * Checks the row limit: the server has none, so every query request must carry one.
  * @param {number} limit - The limit (checked at runtime too: JS callers may pass anything).
- * @returns {void}
  */
 const assertLimit = (limit: number): void => {
   if (!Number.isInteger(limit) || limit <= 0) throw new Error(`invalid query limit: ${limit}`)

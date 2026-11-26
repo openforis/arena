@@ -53,7 +53,6 @@ const loadRows = async (part: IndexPart, group: RowGroupInfo, columns: string[])
  * session (see createSceneIndexCache).
  *
  * @param {FetchLike} [fetchImpl] - Fetch function (defaults to the browser fetch).
- * @returns {SceneIndexReader} Reader.
  */
 export const createHyparquetSceneIndexReader = (
   fetchImpl: FetchLike = globalThis.fetch.bind(globalThis)

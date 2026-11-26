@@ -8,10 +8,6 @@ type Middleware = (req: any, res: any, next: (error?: unknown) => void) => unkno
 
 /**
  * Rejects requests when AI is switched off on the deployment (404, as if the routes didn't exist).
- * @param {object} req - Express request.
- * @param {object} res - Express response.
- * @param {(error?: unknown) => void} next - Next middleware.
- * @returns {void}
  */
 export const requireAiFeaturesEnabled: Middleware = (req, res, next) => {
   if (!ENV.aiFeaturesEnabled) {
@@ -32,9 +28,6 @@ export const permissionMiddlewares: Record<string, Middleware> = {
 
 /**
  * Checks the permission the requested gateway feature needs (survey taken from `body.surveyId`).
- * @param {object} req - Express request.
- * @param {object} res - Express response.
- * @param {(error?: unknown) => void} next - Next middleware.
  * @returns {unknown} The permission middleware result.
  */
 export const requireAiFeaturePermission: Middleware = (req, res, next) => {

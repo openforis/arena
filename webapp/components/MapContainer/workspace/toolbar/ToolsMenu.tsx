@@ -7,7 +7,6 @@ import { ToolbarMenu } from './ToolbarMenu'
 
 /**
  * Tools menu (full bar). Starting a tool waits for the menu to close, so the focus is not taken back by the menu button.
- * @returns {React.ReactElement} The menu.
  */
 export const ToolsMenu = (): ReactElement => {
   const { dispatch } = useMapWorkspace()

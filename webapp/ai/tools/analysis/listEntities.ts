@@ -29,7 +29,6 @@ type EntityParams = { survey: any; entityDef: any; cycle: string; lang: string; 
 
 /**
  * Describes an entity for the model: its name, label, parent and Explorer attributes.
- * @param {EntityParams} params - Parameters.
  * @returns {object} The entity item.
  */
 const toEntityItem = ({ survey, entityDef, cycle, lang, includeAnalysis }: EntityParams) => {
@@ -83,8 +82,6 @@ const searchAttributes = ({ entities, search, budget }: { entities: any[]; searc
 
 /**
  * Lists the queryable entities and their attributes, or one entity.
- * @param {Input} input - Tool input.
- * @param {object} ctx - Tool context.
  * @returns {object} The entities.
  */
 const listEntities = (input: Input, ctx: any) => {

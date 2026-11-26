@@ -70,9 +70,7 @@ const _buildQualifierFilters = async (
  * excludes "big" categories), so the returned value can be compared against a record's node value by
  * item uuid rather than relying on the ref data index being loaded.
  * @param {object} params - The function parameters.
- * @param {object} params.user - The current user.
  * @param {object} params.survey - The survey, with node defs loaded.
- * @param {DbClient} [client] - The db client.
  * @returns {Promise<Array<{nodeDef: object, value: *}>>} - An empty array when the user is
  * unrestricted (no group, or group with no matching qualifiers), otherwise the list of qualifier
  * filters to apply.
@@ -90,9 +88,7 @@ export const fetchUserQualifierFilters = async (
  * Determines the qualifier filters of the user's group (records the user can edit) and of the groups
  * whose records the user's group can only read (see UserGroup readableGroupUuids).
  * @param {object} params - The function parameters.
- * @param {object} params.user - The current user.
  * @param {object} params.survey - The survey, with node defs loaded.
- * @param {DbClient} [client] - The db client.
  * @returns {Promise<{own: Array<{nodeDef: *, value: *}>, readable: Array<Array<{nodeDef: *, value: *}>>}>} - `own` is empty when the user is unrestricted (then `readable` is empty too);
  * readable groups without qualifier filters are ignored (they would match every record).
  */

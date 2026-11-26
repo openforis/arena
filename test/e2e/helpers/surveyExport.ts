@@ -59,7 +59,6 @@ export class SurveyExport {
 
 /**
  * Exports the current survey from the dashboard, downloads and extracts the export file.
- * @param {Page} page - The page.
  * @param {TestInfo} testInfo - Test info (the file is saved in the test output folder).
  * @param {object} [options] - Options.
  * @param {boolean} [options.withData] - Whether to include the data (records); for templates only the survey is exported.

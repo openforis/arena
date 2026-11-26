@@ -32,7 +32,6 @@ type MapWorkspaceProps = {
  * @param {MapRailTab[]} props.railTabs - Rail tabs (empty for compact maps).
  * @param {MapWorkspaceRecords} [props.records] - Records on the map (search and records in view).
  * @param {ReactNode} props.mapElement - The react-leaflet map.
- * @returns {React.ReactElement} The workspace.
  */
 export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: MapWorkspaceProps): ReactElement => {
   const t = useI18nT()
@@ -42,7 +41,6 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
   /**
    * Stores the root element and shares it as the portal container.
    * @param {HTMLDivElement|null} element - The root element.
-   * @returns {void}
    */
   const setRoot = useCallback(
     (element: HTMLDivElement | null) => {

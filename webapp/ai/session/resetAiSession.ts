@@ -62,7 +62,6 @@ export const createResetAiSession =
 
 /**
  * Resets the AI state of the session; called on login (a new user may follow an expired session) and on logout.
- * @returns {Promise<void>} Resolves when done.
  */
 export const resetAiSession: () => Promise<void> = createResetAiSession({
   resetAssistant: resetAssistantOnLogout,

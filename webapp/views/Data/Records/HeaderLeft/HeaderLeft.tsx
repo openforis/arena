@@ -49,9 +49,7 @@ const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }
  * @param {boolean} params.canExportRecordsData - Whether the user can export the records data.
  * @param {boolean} params.canExportRecordsSummary - Whether the user can export the records list.
  * @param {string} params.cycle - The current survey cycle.
- * @param {(action: object) => void} params.dispatch - The Redux dispatch function.
  * @param {string[]} params.selectedRecordsUuids - The uuids of the selected records.
- * @param {number} params.surveyId - The current survey id.
  * @param {() => void} params.toggleRecordsDataExportModalOpen - Opens the records data export modal.
  * @returns {Array} - The menu items.
  */

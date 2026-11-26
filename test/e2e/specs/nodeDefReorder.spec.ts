@@ -11,7 +11,6 @@ const boxOf = async (locator: Locator): Promise<Box> => (await locator.boundingB
 
 /**
  * Drags an item of the form grid layout (react-grid-layout) with the mouse.
- * @param {Page} page - The page.
  * @param {object} from - Start point.
  * @param {object} to - End point.
  * @returns {Promise<void>} - Resolves when the item has been dropped.
@@ -34,7 +33,6 @@ const nodeDefWrapper = (page: Page, name: string) => page.getByTestId(TestId.sur
 
 /**
  * Waits for the grid items to stop moving (react-grid-layout animates the items to their new position).
- * @param {Page} page - The page.
  * @returns {Promise<void>} - Resolves when the layout is stable.
  */
 const waitForLayoutStable = async (page: Page) => {
@@ -73,7 +71,6 @@ const moveBelow = (page: Page, name: string, targetName: string) => move(page, n
 
 /**
  * Moves a column of an entity table (native HTML5 drag and drop) next to another one.
- * @param {Page} page - The page.
  * @param {string} name - Name of the node def to move.
  * @param {string} targetName - Name of the node def to move the column next to.
  * @param {'left' | 'right'} side - Side of the target column where to drop the column.

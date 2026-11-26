@@ -10,7 +10,6 @@ import { requireAiFeaturePermission, requireAiFeaturesEnabled } from './aiMiddle
 /**
  * Registers the gateway route.
  * @param {object} app - Express app.
- * @returns {void}
  */
 export const init = (app): void => {
   const deps = createDefaultModelGatewayDeps()

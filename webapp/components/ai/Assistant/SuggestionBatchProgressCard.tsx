@@ -22,8 +22,6 @@ const MINUTE_MS = 60_000
 /**
  * Returns the estimated time left as text.
  * @param {number} remainingMs - Time left.
- * @param {Function} t - Translator.
- * @returns {string} The text.
  */
 const getRemainingText = (remainingMs: number, t: ReturnType<typeof useI18nT>): string =>
   remainingMs < MINUTE_MS
@@ -32,8 +30,6 @@ const getRemainingText = (remainingMs: number, t: ReturnType<typeof useI18nT>): 
 
 /**
  * Returns the line under the bar: the requests done and the time left, or "Preparing…" before the first request.
- * @param {SuggestionBatchProgress|undefined} progress - Progress.
- * @param {Function} t - Translator.
  * @returns {string} The line.
  */
 const getStatusText = (progress: SuggestionBatchProgress | undefined, t: ReturnType<typeof useI18nT>): string => {

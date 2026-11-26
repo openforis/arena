@@ -31,7 +31,6 @@ const isTruthyXPathBoolean = (value: string | null): boolean => value === 'true(
  * @param params.odkType - The bind's `type` attribute (e.g. 'string', 'int', 'select1'), or null.
  * @param params.readonly - The bind's `readonly` attribute, or null.
  * @param params.hasCalculate - Whether the bind has a `calculate` expression.
- * @returns The mapping result.
  */
 export const mapXFormTypeToNodeDefType = ({
   odkType,

@@ -62,7 +62,6 @@ export const useAiBatchRun = () => {
   /**
    * Shows the notice of a stopped run.
    * @param {AiBatchStop} stop - Where and why the run stopped.
-   * @returns {void}
    */
   const notifyStop = useCallback(
     (stop: AiBatchStop) => {
@@ -129,7 +128,6 @@ export const useAiBatchRun = () => {
   /**
    * Stops a running batch (the calls in flight are aborted, the results so far are kept), or closes the dialog of
    * a batch that failed.
-   * @returns {void}
    */
   const close = useCallback(() => {
     const control = controlRef.current

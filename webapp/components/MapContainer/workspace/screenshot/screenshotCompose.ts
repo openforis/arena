@@ -10,7 +10,6 @@ import type { ScreenshotFormat } from '@webapp/components/MapContainer/workspace
  * Draws the scale bar as a "|____|" bracket.
  * @param {CanvasRenderingContext2D} context - The canvas context.
  * @param {object} bar - The bar position (y is the middle of the first strip line).
- * @returns {void}
  */
 const drawScaleBar = (context: CanvasRenderingContext2D, bar: { x: number; y: number; widthPx: number }): void => {
   const { x, y, widthPx } = bar
@@ -28,7 +27,6 @@ const drawScaleBar = (context: CanvasRenderingContext2D, bar: { x: number; y: nu
  * Draws the north arrow: an arrow head and an "N" on a light box.
  * @param {CanvasRenderingContext2D} context - The canvas context.
  * @param {OverlayRect} rect - The box.
- * @returns {void}
  */
 const drawNorthArrow = (context: CanvasRenderingContext2D, rect: OverlayRect): void => {
   const { x, y, width, height } = rect
@@ -56,7 +54,6 @@ const CENTER_MARKER = { radius: 18, haloWidth: 6, haloColor: 'rgba(0, 0, 0, 0.55
  * Draws a ring around the selected plot of a fit-to-plot capture, to tell it from nearby plots.
  * @param {CanvasRenderingContext2D} context - The canvas context.
  * @param {{x: number, y: number}} point - The plot position, in image px.
- * @returns {void}
  */
 const drawPlotMarker = (context: CanvasRenderingContext2D, point: { x: number; y: number }): void => {
   const { radius, haloWidth, haloColor, ringWidth, ringColor } = CENTER_MARKER
@@ -75,8 +72,6 @@ const drawPlotMarker = (context: CanvasRenderingContext2D, point: { x: number; y
 /**
  * Draws a computed overlay layout.
  * @param {CanvasRenderingContext2D} context - The canvas context.
- * @param {OverlayLayout} layout - The layout.
- * @returns {void}
  */
 const drawLayout = (context: CanvasRenderingContext2D, layout: OverlayLayout): void => {
   if (layout.strip) {
@@ -149,7 +144,6 @@ export const composeScreenshot = ({
 
 /**
  * Encodes a canvas in an image format.
- * @param {HTMLCanvasElement} canvas - The canvas.
  * @param {ScreenshotFormat} format - The MIME type and, for JPEG, the quality.
  * @returns {Promise<Blob>} The image.
  */

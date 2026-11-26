@@ -6,7 +6,6 @@ import type { Control } from 'leaflet'
  * On cleanup the DOM goes back where Leaflet put it, or is removed when that place is gone.
  * @param {Control|null|undefined} control - The Leaflet control (null: nothing to move).
  * @param {HTMLElement|null} target - The element that receives the control.
- * @returns {void}
  */
 export const useControlContainerMove = (control: Control | null | undefined, target: HTMLElement | null): void => {
   useLayoutEffect(() => {

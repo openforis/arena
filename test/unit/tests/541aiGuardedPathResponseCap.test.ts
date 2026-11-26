@@ -32,7 +32,6 @@ const KINDS: Kind[] = [
 
 /**
  * Returns what a call fails with, or undefined when it succeeds.
- * @param {PromiseLike<unknown>} call - The call.
  * @returns {Promise<any>} The error.
  */
 const failureOf = (call: PromiseLike<unknown>): Promise<any> =>

@@ -21,8 +21,6 @@ const DescriptionsSchema = z.object({
  * @param {string} params.surveyName - Survey name (context for the model).
  * @param {AiDataDictionaryNodeDef[]} params.nodeDefs - The batch of node defs.
  * @param {string} [params.language] - Language of the descriptions (English when absent).
- * @param {AbortSignal} [params.signal] - Cancellation signal.
- * @returns {Promise<{descriptions: {uuid: string, description: string}[]}>} The descriptions.
  */
 export const generateDataDictionaryDescriptions = async ({
   generateText,

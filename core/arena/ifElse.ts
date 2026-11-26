@@ -6,8 +6,6 @@ import { _curryN } from './internal/_curryN'
  * @param {*} condition - The predicate.
  * @param {*} onTrue - The function applied when the predicate is true.
  * @param {*} onFalse - The function applied when the predicate is false.
- *
- * @returns {Function} - The result.
  */
 export const ifElse = (
   condition: (...args: any[]) => boolean,

@@ -4,9 +4,6 @@ import { buildContextMeter, getContextMeterText } from '@webapp/components/ai/As
 
 /**
  * Translates with the en resources (no i18next in the unit tests).
- * @param {string} key - Key.
- * @param {object} [params] - Params.
- * @returns {string} The text.
  */
 const enT = (key: string, params: Record<string, unknown> = {}): string => {
   const template = key.split('.').reduce<any>((node, part) => node?.[part], en)

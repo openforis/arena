@@ -203,7 +203,6 @@ export const getJobStatus = async ({
  * @param params.authToken - JWT auth token from login.
  * @param params.surveyId - ID of the survey to delete.
  * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns Resolves when the survey has been deleted.
  */
 export const deleteSurvey = async ({
   baseUrl,
@@ -313,7 +312,6 @@ export const createUser = async ({
  * @param params.authToken - JWT auth token of a system admin user.
  * @param params.userUuid - UUID of the user to delete.
  * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns Resolves when the user has been deleted.
  */
 export const deleteUser = async ({
   baseUrl,

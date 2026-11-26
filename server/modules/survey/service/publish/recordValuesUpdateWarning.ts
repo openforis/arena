@@ -143,8 +143,6 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({
  * recalculate values already stored in existing records. Meant to be called up front, before starting
  * the (potentially long) publish job, so the user sees this warning immediately rather than after
  * waiting for a full record check.
- * @param {object} params - Params.
- * @param {number} params.surveyId - Survey id.
  * @returns {Promise<RecordValuesUpdateWarning|null>} the at-risk attribute names, grouped by cause, if
  *   publishing is at risk of updating recorded values, `null` otherwise.
  */

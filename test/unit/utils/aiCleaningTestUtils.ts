@@ -19,7 +19,6 @@ export const fakeI18n = {
 
 /**
  * Sets survey info props on a survey built by the survey builder (info at the top level or under `info`).
- * @param {object} survey - The survey.
  * @param {object} props - Info props to set.
  * @returns {object} The updated survey.
  */
@@ -36,9 +35,7 @@ export const cleaningTestSurvey = async () =>
 /**
  * Builds the test record of DataTest for the survey, with its survey uuid, step and owner.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string} [params.step] - Record step ('1' entry, '2' cleansing, '3' analysis).
- * @param {string} [params.ownerUuid] - Owner uuid.
  * @returns {object} The record.
  */
 export const cleaningTestRecord = ({ survey, step = '1', ownerUuid = 'record-owner' }: any) =>
@@ -47,7 +44,6 @@ export const cleaningTestRecord = ({ survey, step = '1', ownerUuid = 'record-own
 /**
  * Returns a user of the given default group of the survey.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string} params.groupName - Group name (dataEditor, dataCleanser, surveyAdmin…).
  * @param {string} [params.uuid] - User uuid.
  * @returns {object} The user.
@@ -70,7 +66,6 @@ export const newCleaningSurveyUser = ({
 /**
  * Returns a tool context for the cleaning tools; proposed change sets are collected in `changeSets`.
  * @param {object} params - Parameters (any context prop can be overridden).
- * @param {object} params.survey - The survey.
  * @param {object} [params.user] - The user (system admin by default).
  * @returns {object} The context.
  */
@@ -118,9 +113,6 @@ export const newFakeCleaningApi = (overrides: Partial<Record<keyof CleaningApi, 
 
 /**
  * Returns the entity ancestors of a node, root first.
- * @param {object} record - The record.
- * @param {object} node - The node.
- * @returns {object[]} The ancestors.
  */
 const getAncestorsRootFirst = (record: any, node: any): any[] => {
   const ancestors: any[] = []
@@ -135,10 +127,7 @@ const getAncestorsRootFirst = (record: any, node: any): any[] => {
 /**
  * Builds a validation report row for a node, as the server returns it.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
  * @param {object} params.node - The node with the validation.
- * @param {object} params.validation - Its validation.
  * @returns {object} The report row.
  */
 export const newValidationRow = ({ survey, record, node, validation }: any) => {
@@ -172,7 +161,6 @@ export const newValidationRow = ({ survey, record, node, validation }: any) => {
 /**
  * Builds a validation with one error or warning.
  * @param {string} key - Message key.
- * @param {'error'|'warning'} [severity] - Severity.
  * @returns {object} The validation.
  */
 export const newValidation = (key: string, severity: 'error' | 'warning' = 'error') => ({
@@ -184,7 +172,6 @@ export const newValidation = (key: string, severity: 'error' | 'warning' = 'erro
 
 /**
  * Makes a survey built by the survey builder usable by the cleaning tools: id 1, published.
- * @param {object} survey - The survey.
  * @returns {object} The survey.
  */
 export const asCleaningSurvey = (survey: any) => withInfoProps(survey, { id: 1, published: true })
@@ -192,10 +179,7 @@ export const asCleaningSurvey = (survey: any) => withInfoProps(survey, { id: 1, 
 /**
  * Sets the survey uuid, step and owner of a record built by the record builder.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
  * @param {string} [params.step] - Record step.
- * @param {string} [params.ownerUuid] - Owner uuid.
  * @returns {object} The record.
  */
 export const asCleaningRecord = ({ survey, record, step = '1', ownerUuid = 'record-owner' }: any) => ({
@@ -221,9 +205,6 @@ export const surveyIndexProviders = {
 
 /**
  * Validates every node of a record (and applies its dependents), as the server does when it stores it.
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
  * @returns {Promise<object>} The record with its validation.
  */
 export const validateWholeRecord = async ({ survey, record }: any) => {

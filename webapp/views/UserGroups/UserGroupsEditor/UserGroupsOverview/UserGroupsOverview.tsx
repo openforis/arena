@@ -24,8 +24,6 @@ interface ColumnData {
  * Kanban board overview of every survey user's group assignment: one column per user group plus
  * a leading "Unassigned" column, each user shown as a draggable card. Dragging a card into a
  * different column assigns, reassigns or unassigns that user.
- *
- * @returns {React.ReactElement} - The UserGroupsOverview component.
  */
 const UserGroupsOverview = (): React.ReactElement => {
   const canManage = useAuthCanManageUserGroups()

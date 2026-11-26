@@ -191,9 +191,6 @@ const getIconDescriptor = (element) => {
 /**
  * Returns a plain descriptor (CSS class name and optional text content) of the icon
  * representing the type of the given node definition, for use outside of React rendering.
- * @param {object} params - Parameters.
- * @param {object} params.nodeDef - Node definition.
- * @param {string} params.cycle - Survey cycle key.
  * @returns {{className: string, text: string|null}|null} Icon descriptor, or null for the root entity.
  */
 export const getIconDescriptorByNodeDef = ({ nodeDef, cycle }) =>

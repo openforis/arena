@@ -48,7 +48,6 @@ test.describe('AI cleaning assistant (mock model on the stub local server)', () 
 
   /**
    * Opens the validation report on the local server, asks about its only row and waits for the card.
-   * @param {import('@playwright/test').Page} page - The page.
    * @param {ArenaApi} api - The ArenaApi fixture.
    * @returns {Promise<void>} Resolves when the card shows the proposal.
    */

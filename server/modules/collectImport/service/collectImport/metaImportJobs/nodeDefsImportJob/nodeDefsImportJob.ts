@@ -212,7 +212,6 @@ export default class NodeDefsImportJob extends Job {
    * (used to import Collect composite attribute definitions like Range).
    * @param {NodeDef} parentNodeDef - Parent node def definition.
    * @param {!string} parentPath - Parent node path.
-   * @param {!object} collectNodeDef - Collect node definition.
    * @param {!string} type - Node definition type.
    * @param {string} field - Node sub-field.
    * @returns {Promise<object>} - Inserted node definitions.

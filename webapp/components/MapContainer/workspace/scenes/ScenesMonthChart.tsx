@@ -30,7 +30,6 @@ const getBarPercent = (count: number, max: number): number => (max > 0 ? Math.ro
  * @param {MonthBucket[]} props.buckets - Months with their counts.
  * @param {string|null} props.activeMonthKey - Month filtering the list, or null.
  * @param {Function} props.onSelectMonth - Called with a month key, or null for all months.
- * @returns {React.ReactElement} The chart.
  */
 export const ScenesMonthChart = ({
   buckets,

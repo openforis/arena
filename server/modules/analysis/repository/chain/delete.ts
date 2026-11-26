@@ -6,11 +6,7 @@ import * as DB from '../../../../db'
  * Delete processing chain(s) according to query parameters.
  *
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
  * @param {!string} [params.chainUuid] - The chain uuid to delete.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
- * @returns {Promise<object>} - The result promise.
  */
 export const deleteChain = (params: { surveyId: number; chainUuid: string }, client: DbClient = DB.client) => {
   const { surveyId, chainUuid } = params

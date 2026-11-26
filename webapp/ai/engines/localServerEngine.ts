@@ -39,7 +39,6 @@ const thinkCloseMiddleware: LanguageModelMiddleware = {
  * @param {object} params - Parameters.
  * @param {AiLocalServerCapability} params.localServer - Probed local server (URL, chosen model, context).
  * @param {LocalServerFetchImpl} params.fetchImpl - Underlying fetch (the browser's, bound).
- * @returns {AiEngine} The engine.
  */
 export const createLocalServerEngine = ({
   localServer,

@@ -7,7 +7,6 @@ const TITLE_MAX_CHARS = 60
 
 /**
  * Returns the IndexedDB key of a survey id.
- * @param {number|null} surveyId - Survey id.
  * @returns {number} The id, or 0 without survey.
  */
 export const toSurveyKey = (surveyId: number | null): number => surveyId ?? 0
@@ -17,10 +16,8 @@ export const toSurveyKey = (surveyId: number | null): number => surveyId ?? 0
  * @param {object} params - Parameters.
  * @param {string} params.userUuid - Owner.
  * @param {number|null} params.surveyId - Current survey.
- * @param {AiToolArea} params.area - Area.
  * @param {Date} [params.now] - Creation date.
  * @param {Function} [params.idFactory] - Id generator.
- * @returns {Conversation} The conversation.
  */
 export const createConversation = ({
   userUuid,
@@ -50,9 +47,6 @@ export const createConversation = ({
 
 /**
  * Returns the conversation with the provider picked in the chat.
- * @param {object} params - Parameters.
- * @param {Conversation} params.conversation - Conversation.
- * @param {string} params.providerId - Provider id.
  * @returns {Conversation} The conversation (its history order is unchanged: updatedAt is kept).
  */
 export const withConversationProvider = ({
@@ -78,7 +72,6 @@ const TITLE_WRAPPER_CHARS = '"\'`*_«»“”‘’'
 
 /**
  * Removes the wrapping characters and spaces at the start (also `#`) and at the end of a title.
- * @param {string} title - The title.
  * @returns {string} The title without them.
  */
 const stripTitleWrappers = (title: string): string => {
@@ -92,7 +85,6 @@ const stripTitleWrappers = (title: string): string => {
 
 /**
  * Removes the periods at the end of a title.
- * @param {string} title - The title.
  * @returns {string} The title without them.
  */
 const stripFinalPeriods = (title: string): string => {

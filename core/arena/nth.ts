@@ -5,8 +5,6 @@ import { _curry2 } from './internal/_curry2'
  *
  * @param {*} offset - The index (negative values count from the end).
  * @param {*} list - The array or string.
- *
- * @returns {*} - The result.
  */
 export const nth = _curry2((offset: number, list: any): any => {
   if (list === null || list === undefined) return undefined

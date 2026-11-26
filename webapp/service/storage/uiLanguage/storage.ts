@@ -15,9 +15,6 @@ export const getUILanguage = (): string | null => {
 
 /**
  * Stores the UI language chosen in this browser.
- *
- * @param {string} lang - The language code.
- * @returns {void}
  */
 export const setUILanguage = (lang: string): void => {
   try {

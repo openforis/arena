@@ -27,7 +27,6 @@ export type ScreenshotNodeChange = {
  * Builds the value of a file attribute holding the screenshot.
  * @param {object} params - The parameters.
  * @param {string} params.fileUuid - New file uuid.
- * @param {string} params.fileName - File name.
  * @param {number} params.fileSize - File size in bytes.
  * @returns {ScreenshotFileValue} The node value.
  */
@@ -76,7 +75,6 @@ const findSelfOrAncestorOfDef = ({
 /**
  * Finds the entity node that holds the image attribute: the plot itself or one of its descendant single entities.
  * @param {object} params - The parameters.
- * @param {Array<object>} params.nodes - Record nodes.
  * @param {object} params.plotNode - The plot entity node.
  * @param {string} params.attributeParentDefUuid - Definition of the entity holding the attribute.
  * @returns {object|null} The parent node, or null when not found.
@@ -186,12 +184,9 @@ export const buildRowAttributeNode = ({
  * Builds the multipart body of POST /api/survey/:surveyId/record/:recordUuid/node.
  * @param {object} params - The parameters.
  * @param {object} params.node - The node to persist.
- * @param {string} params.cycle - The record cycle.
  * @param {number} params.timezoneOffset - The browser time zone offset (Dates.getTimezoneOffset()).
  * @param {string} params.lang - The UI language.
  * @param {Blob|null} [params.file] - The image (none for a new entity row).
- * @param {string} [params.fileName] - The file name.
- * @returns {FormData} The form data.
  */
 export const buildNodeFormData = ({
   node,

@@ -40,7 +40,6 @@ import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'
  * @param {SelectionState} props.state - State of the group.
  * @param {string} props.label - Accessible label.
  * @param {Function} props.onChange - Toggles the group.
- * @param {string} [props.testId] - Test id.
  * @returns {React.ReactElement} The checkbox.
  */
 const GroupCheckbox = ({
@@ -78,7 +77,6 @@ const GroupCheckbox = ({
  * @param {ReviewItem} props.item - Change.
  * @param {boolean} props.repeated - The change before it is about the same item (its name is not repeated).
  * @param {ReviewColumns} props.columns - Columns of the table.
- * @param {ChangeSetSelection} props.selection - Selection.
  * @param {boolean} props.exists - The node definition of the change exists in the survey.
  * @param {Function} props.onNameClick - Shows the item in the form designer.
  * @returns {React.ReactElement} The row.
@@ -168,16 +166,13 @@ const ReviewRow = ({
  * Returns the number of columns of the table: check, item, change, the optional original and current, proposed,
  * status.
  * @param {ReviewColumns} columns - Columns of the table.
- * @returns {number} The count.
  */
 const getColumnCount = (columns: ReviewColumns): number => 5 + (columns.original ? 1 : 0) + (columns.current ? 1 : 0)
 
 /**
  * The changes of one group: a header row with its checkbox, then one row per change.
  * @param {object} props - Props.
- * @param {ReviewGroup} props.group - Group.
  * @param {ReviewColumns} props.columns - Columns of the table.
- * @param {ChangeSetSelection} props.selection - Selection.
  * @param {Function} props.nodeDefExists - Tells whether a node definition exists in the survey.
  * @param {Function} props.onNameClick - Shows an item in the form designer.
  * @returns {React.ReactElement} The rows.
@@ -239,7 +234,6 @@ const ReviewGroupRows = ({
  * Segmented buttons (group by, filter).
  * @param {object} props - Props.
  * @param {string} props.label - Accessible label of the set.
- * @param {{value: string, label: string}[]} props.options - Options.
  * @param {string} props.value - Pressed option.
  * @param {Function} props.onChange - Called with the clicked option.
  * @returns {React.ReactElement} The buttons.
@@ -273,7 +267,6 @@ const Segmented = <T extends string>({
  * Review dialog of a long change set: the changes grouped by entity or by kind of change, a side list to show one
  * group, search and filters, checkboxes per change, per group and for everything shown, Apply and Discard.
  * @param {object} props - Props.
- * @param {ChangeSetCardState} props.cardState - Card state.
  * @param {ReviewItem[]} props.items - Changes.
  * @param {ChangeSetSelection} props.selection - Selection and actions (shared with the card).
  * @param {boolean} props.busy - An answer is running (Apply waits for it).

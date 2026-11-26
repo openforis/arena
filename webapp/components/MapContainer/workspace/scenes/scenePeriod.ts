@@ -27,7 +27,6 @@ export const normalizePeriodMonths = (months: number): ScenePeriodMonths => {
  *
  * @param {number} year - Full year.
  * @param {number} monthIndex - Month index, 0 is January.
- * @returns {number} Number of days of the month.
  */
 const daysInMonth = (year: number, monthIndex: number): number =>
   new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate()
@@ -37,15 +36,11 @@ const daysInMonth = (year: number, monthIndex: number): number =>
  *
  * @param {number} year - Full year.
  * @param {number} monthIndex - Month index, 0 is January.
- * @returns {string} Month key.
  */
 const toMonthKey = (year: number, monthIndex: number): string => `${year}-${String(monthIndex + 1).padStart(2, '0')}`
 
 /**
  * Returns the absolute month number (year × 12 + month index) of a date in UTC.
- *
- * @param {Date} date - Date.
- * @returns {number} Absolute month number.
  */
 const toAbsoluteMonth = (date: Date): number => date.getUTCFullYear() * MONTHS_PER_YEAR + date.getUTCMonth()
 
@@ -55,7 +50,6 @@ const toAbsoluteMonth = (date: Date): number => date.getUTCFullYear() * MONTHS_P
  *
  * @param {number} months - Requested number of months; normalized to 1, 3 or 6.
  * @param {Date} now - Current time (injected so tests and renders stay pure).
- * @returns {ScenePeriod} The period.
  */
 export const getScenePeriod = (months: number, now: Date): ScenePeriod => {
   const normalized = normalizePeriodMonths(months)
@@ -68,9 +62,6 @@ export const getScenePeriod = (months: number, now: Date): ScenePeriod => {
 
 /**
  * Lists the calendar months (YYYY-MM, UTC) touched by a period, oldest first.
- *
- * @param {ScenePeriod} period - The period.
- * @returns {string[]} Month keys.
  */
 export const getPeriodMonthKeys = (period: ScenePeriod): string[] => {
   const keys: string[] = []
@@ -86,7 +77,6 @@ export const getPeriodMonthKeys = (period: ScenePeriod): string[] => {
  * Tells whether an ISO datetime falls inside a period (both ends included).
  *
  * @param {string} datetime - ISO 8601 datetime.
- * @param {ScenePeriod} period - The period.
  * @returns {boolean} True when inside.
  */
 export const isInPeriod = (datetime: string, period: ScenePeriod): boolean => {
@@ -102,7 +92,6 @@ const dateFormats = new Map<string, Intl.DateTimeFormat>()
  *
  * @param {string} locale - BCP 47 locale (the i18n language).
  * @param {Intl.DateTimeFormatOptions} options - Format options.
- * @returns {Intl.DateTimeFormat} The format.
  */
 const createDateFormat = (locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat => {
   const cacheKey = `${locale}|${JSON.stringify(options)}`
@@ -132,7 +121,6 @@ export const formatSceneDate = (datetime: string, locale: string): string =>
 /**
  * Formats a period as a date range, e.g. "Apr 11 – Oct 11, 2026".
  *
- * @param {ScenePeriod} period - The period.
  * @param {string} locale - BCP 47 locale.
  * @returns {string} Formatted range.
  */

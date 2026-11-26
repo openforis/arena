@@ -5,7 +5,6 @@ import { getCustomLayerLeafletConfig } from '@webapp/components/MapContainer/wor
 
 /**
  * Creates the Leaflet layer of a custom overlay (registered in the overlay registry, so not a react-leaflet child).
- * @param {MapCustomLayer} layer - The layer.
  * @returns {L.TileLayer} A WMS tile layer, or a tile layer for WMTS and XYZ templates.
  */
 export const createCustomLeafletLayer = (layer: MapCustomLayer): L.TileLayer => {
