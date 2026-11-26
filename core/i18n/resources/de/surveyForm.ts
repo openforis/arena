@@ -117,6 +117,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
   },
   nodeDefCoordinate: {
     coordinate: 'Koordinate',
+    latLong: 'Breite, Länge',
     srs: 'SRS',
     x: 'X',
     y: 'Y',
