@@ -123,6 +123,7 @@ export default {
   },
   nodeDefCoordinate: {
     coordinate: 'Координата',
+    latLong: 'Шир., долг.',
     srs: 'СКР',
     x: 'X',
     y: 'Y',

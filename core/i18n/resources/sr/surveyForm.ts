@@ -121,6 +121,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
   },
   nodeDefCoordinate: {
     coordinate: 'Koordinata',
+    latLong: 'Geo. širina, dužina',
     srs: 'SRS',
     x: 'X',
     y: 'Y',

@@ -26,7 +26,8 @@ const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
       return 'code'
     }
     if (NodeDef.isCoordinate(nodeDef)) {
-      return 'coordinate'
+      // the point column shows the WGS84 lat/long of the coordinate
+      return 'lat_long'
     }
   }
   return ColumnNodeDef.extractColumnName({ nodeDef, columnName })
