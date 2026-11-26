@@ -58,8 +58,8 @@
           grid-template-rows: minmax(0, 1fr);
         }
 
-        .survey-form__node-def-form-item {
-          grid-template-rows: 30px minmax(0, 1fr);
+        .form-item.survey-form__node-def-form-item {
+          grid-template-rows: minmax(30px, auto) minmax(0, 1fr);
         }
 
         .survey-form__node-def-form-item-content {
