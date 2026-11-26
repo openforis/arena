@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import { Objects } from '@openforis/arena-core'
 
 import { useI18nT } from '@webapp/store/system'
-import { IconName, MaterialIcon } from '../MaterialIcon'
+import { AppIcon, IconName } from '../AppIcon'
 import { TooltipNew } from '../TooltipNew'
 
 export type ButtonProps = Omit<MuiButtonProps, 'color' | 'title' | 'variant' | 'size'> & {
@@ -67,7 +67,7 @@ const Icon = (props: IconProps) => {
     <>
       {/* an explicit (IcoMoon) iconClassName passed by the caller wins over the default iconName */}
       {iconClassName && <span className={classNames('icon', iconClassName, alignClassName)} />}
-      {!iconClassName && iconName && <MaterialIcon className={alignClassName} name={iconName} size={iconSize} />}
+      {!iconClassName && iconName && <AppIcon className={alignClassName} name={iconName} size={iconSize} />}
       {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
       {icon}
     </>

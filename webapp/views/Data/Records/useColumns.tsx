@@ -8,7 +8,7 @@ import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 import { ButtonIconEditOrView } from '@webapp/components'
-import { AppIcon } from '@webapp/components/AppIcon'
+import { CreatedWithAppIcon } from '@webapp/components/CreatedWithAppIcon'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
 import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
@@ -85,7 +85,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         key: 'created-with',
         header: 'common.createdWith',
         hidden: true,
-        renderItem: ({ item: record }) => <AppIcon appId={Record.getCreatedWithAppId(record)} />,
+        renderItem: ({ item: record }) => <CreatedWithAppIcon appId={Record.getCreatedWithAppId(record)} />,
         width: '8rem',
       },
       {

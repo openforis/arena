@@ -6,7 +6,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import classNames from 'classnames'
 
-import { MaterialIcon } from '../MaterialIcon'
+import { AppIcon } from '../AppIcon'
 
 import { Button, ButtonProps } from './Button'
 
@@ -138,7 +138,7 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
         variant={variant}
         {...otherProps}
       >
-        {showCaret && <MaterialIcon className="button-menu__button-icon" name="dropDown" size={20} />}
+        {showCaret && <AppIcon className="button-menu__button-icon" name="dropDown" size={20} />}
       </Button>
 
       <ButtonMenuPopup

@@ -1,26 +1,29 @@
-import { AppInfo } from '@core/app/appInfo'
-import { useI18n } from '@webapp/store/system'
+import React from 'react'
+import classNames from 'classnames'
 
-const iconNameByAppId = {
-  [AppInfo.arenaAppId]: 'laptop',
-  [AppInfo.arenaMobileId]: 'mobile',
-  [AppInfo.arenaMobile2Id]: 'mobile2',
-}
-const unknownAppIconName = 'question'
+import { iconComponents, IconName } from './iconComponents'
 
-type AppIconProps = {
-  appId?: string
-  alt?: string
-  style?: Record<string, any>
+export type AppIconProps = {
+  className?: string
+  name: IconName
+  /** Size in px; inline so it wins over the MUI button start/end icon size. */
+  size?: number
+  style?: React.CSSProperties
   title?: string
 }
 
+/**
+ * Renders an icon by name (currently a Material icon, SVG); replaces the IcoMoon font icons (`<span className="icon icon-xxx" />`).
+ */
 export const AppIcon = (props: AppIconProps) => {
-  const { appId, alt, style, title: titleProp } = props
-
-  const i18n = useI18n()
-  const iconName = iconNameByAppId[appId] ?? unknownAppIconName
-  const title = titleProp ?? i18n.t('common.createdWithApp', { app: AppInfo.getAppNameById(appId) })
-
-  return <span className={`app-icon icon icon-20px icon-${iconName}`} aria-label={alt} style={style} title={title} />
+  const { className, name, size = 16, style, title } = props
+  const Component = iconComponents[name]
+  return (
+    <Component
+      aria-hidden={title ? undefined : true}
+      className={classNames('app-icon', `app-icon--${name}`, className)}
+      style={{ fontSize: size, ...style }}
+      titleAccess={title}
+    />
+  )
 }

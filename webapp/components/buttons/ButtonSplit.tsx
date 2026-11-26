@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import classNames from 'classnames'
 
-import { MaterialIcon } from '../MaterialIcon'
+import { AppIcon } from '../AppIcon'
 
 import { Button, ButtonProps } from './Button'
 import { ButtonMenuItem, ButtonMenuPopup } from './ButtonMenu'
@@ -58,7 +58,7 @@ export const ButtonSplit = (props: ButtonSplitProps) => {
           title={menuButtonTitle}
           variant={variant}
         >
-          <MaterialIcon className="button-split__menu-button-icon" name="dropDown" size={20} />
+          <AppIcon className="button-split__menu-button-icon" name="dropDown" size={20} />
         </Button>
       </ButtonGroup>
 
