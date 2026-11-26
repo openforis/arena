@@ -74,9 +74,6 @@ const countTerms = (section: HandbookSection): { termCounts: Map<string, number>
   return { termCounts, length }
 }
 
-/**
- * Builds the search index of the handbook.
- */
 export const buildHandbookIndex = (handbook: Handbook): HandbookIndex => {
   const sections = handbook.sections.map((section) => ({ section, ...countTerms(section) }))
   const documentFrequency = new Map<string, number>()

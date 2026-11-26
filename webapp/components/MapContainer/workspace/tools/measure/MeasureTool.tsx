@@ -107,9 +107,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
     [mode]
   )
 
-  /**
-   * Ends the tool.
-   */
   const onDone = useCallback((): void => dispatchWorkspace({ type: 'endTool' }), [dispatchWorkspace])
 
   return createPortal(

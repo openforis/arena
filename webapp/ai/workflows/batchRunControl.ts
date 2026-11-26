@@ -19,9 +19,6 @@ export type BatchRunControl = {
   isAbandoned: () => boolean
 }
 
-/**
- * Creates the control of a run.
- */
 export const createBatchRunControl = (): BatchRunControl => {
   const controller = new AbortController()
   const abandonController = new AbortController()

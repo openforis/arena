@@ -22,14 +22,8 @@ export const isCurrentNodeDef = (nodeDef: any, { includeAnalysis = false }: Node
   !NodeDef.isLayoutElement(nodeDef) &&
   (includeAnalysis || !NodeDef.isAnalysis(nodeDef))
 
-/**
- * Returns the current node definitions of the survey.
- */
 export const getCurrentNodeDefs = (survey: any, options: NodeDefLookupOptions = {}): any[] =>
   Survey.getNodeDefsArray(survey).filter((nodeDef: any) => isCurrentNodeDef(nodeDef, options))
 
-/**
- * Returns the current node definition with the given name, or null.
- */
 export const findNodeDefByName = (survey: any, name: string, options: NodeDefLookupOptions = {}): any =>
   getCurrentNodeDefs(survey, options).find((nodeDef: any) => NodeDef.getName(nodeDef) === name) ?? null

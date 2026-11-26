@@ -61,9 +61,6 @@ export const MapWorkspaceProvider = ({
   return <MapWorkspaceContext.Provider value={value}>{children}</MapWorkspaceContext.Provider>
 }
 
-/**
- * Returns the map workspace context.
- */
 export const useMapWorkspace = (): MapWorkspaceContextValue => {
   const context = useContext(MapWorkspaceContext)
   if (!context) throw new Error('useMapWorkspace must be used inside MapWorkspaceProvider')

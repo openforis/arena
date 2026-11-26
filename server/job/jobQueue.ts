@@ -261,9 +261,6 @@ export class JobQueue {
     }
   }
 
-  /**
-   * Callback when a job ends.
-   */
   onJobEnd(job: { uuid: string }): void {
     const jobInfo = this._jobInfoByUuid[job.uuid]
 
@@ -286,9 +283,6 @@ export class JobQueue {
     this._startNextJob()
   }
 
-  /**
-   * Callback when a job updates its status.
-   */
   onJobUpdate(job: JobSummary): void {
     // runs in main thread; can safely modify internal variables
     const { ended, status, uuid } = job

@@ -217,9 +217,6 @@ export const AssistantProviderChip = (props: Props) => {
     [capabilities, current.providerId, effective, requestDataClass, surveyScoped]
   )
 
-  /**
-   * Closes the popover.
-   */
   const close = useCallback(() => onOpenChange(false), [onOpenChange])
 
   /**

@@ -255,9 +255,6 @@ export const toggleSelection = ({
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
 
-/**
- * Returns the text of a review label.
- */
 export const getReviewLabelText = (label: ReviewLabel, t: Translate): string =>
   'text' in label ? label.text : t(label.key, label.params)
 

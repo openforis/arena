@@ -17,9 +17,6 @@ export const VALIDATION_ERRORS_TARGET_KEY = 'cycle'
 
 type CountValidationReportRows = CleaningApi['countValidationReportRows']
 
-/**
- * Returns the id of the validation errors suggestion of a cycle.
- */
 export const getValidationErrorsSuggestionId = (cycle: string): string => `validationErrors:${cycle}`
 
 /**

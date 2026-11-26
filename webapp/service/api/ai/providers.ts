@@ -88,9 +88,6 @@ export const removeProvider = async (id: string): Promise<{ settings: SettingsBo
   return data
 }
 
-/**
- * Sets the default provider.
- */
 export const setDefaultProvider = async ({
   providerId,
 }: {

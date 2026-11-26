@@ -37,9 +37,6 @@ const capabilitiesStore = createCapabilitiesStore({
  */
 export const getCurrentUserUuid = (): string | null => User.getUuid(UserState.getUser(reduxStore.getState())) ?? null
 
-/**
- * Returns the app capabilities store.
- */
 export const getAiCapabilitiesStore = (): AiCapabilitiesStore => capabilitiesStore
 
 /**

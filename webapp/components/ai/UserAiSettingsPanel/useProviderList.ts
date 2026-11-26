@@ -223,9 +223,6 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
    * Opens the dialog on a new provider.
    */
   const openAdd = useCallback(() => setDialog({ saved: null }), [])
-  /**
-   * Closes the dialog.
-   */
   const closeDialog = useCallback(() => setDialog(null), [])
   /**
    * Closes the dialog after a save. The dialog already refreshed the cache and the capabilities; the key flags come

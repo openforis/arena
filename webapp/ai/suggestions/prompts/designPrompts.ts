@@ -35,9 +35,6 @@ export const buildCategoryItemTranslationsPrompt = ({ lang, langLabel }: { lang:
 export const formatPromptLanguages = (languages: string[]): string =>
   languages.map((lang) => `${lang} (${getLanguageLabel(lang) || lang})`).join(', ')
 
-/**
- * Builds the prompt of the new entries descriptions suggestion.
- */
 export const buildNewEntriesDescriptionsPrompt = ({ languages }: { languages: string[] }): string => {
   const where = languages.length > 0 ? ` (${formatPromptLanguages(languages)})` : ''
   return (

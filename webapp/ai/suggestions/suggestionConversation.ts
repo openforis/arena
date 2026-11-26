@@ -21,9 +21,6 @@ export const withSuggestionScope = (conversation: Conversation, scope: Suggestio
   suggestionScope: scope,
 })
 
-/**
- * Returns the last answer of a conversation.
- */
 const getLastAnswer = (conversation: Conversation): AssistantMessage | null => {
   let last: AssistantMessage | null = null
   for (const message of conversation.messages) {

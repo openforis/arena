@@ -86,9 +86,6 @@ export type SurveyInfoLike = {
   [key: string]: unknown
 }
 
-/**
- * Returns whether value is a valid font size preset.
- */
 export const isValidFontSizePreset = (value: unknown): value is FontSizePreset =>
   typeof value === 'string' && (fontSizePresetValues as readonly string[]).includes(value)
 

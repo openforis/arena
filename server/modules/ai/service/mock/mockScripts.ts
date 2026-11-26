@@ -229,9 +229,6 @@ export const toScriptedStreamParts = (
   return [{ type: 'stream-start', warnings: [] }, ...body, { type: 'finish', finishReason, usage: unknownUsageV4() }]
 }
 
-/**
- * Returns the stream of a step.
- */
 export const toScriptedStream = (
   step: PlayedMockScriptStep,
   prompt: LanguageModelV4Prompt

@@ -101,9 +101,6 @@ export const assocItemsSeen = ({
   return User.assocPrefWhatsNewSeenIds(seenIdsInCatalog)(user)
 }
 
-/**
- * Returns the i18n key of the title of the specified item.
- */
 export const getTitleKey = (item: WhatsNewItem): string => `whatsNew:items.${item.id}.title`
 
 /**

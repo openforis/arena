@@ -37,9 +37,6 @@ const collectGatewayRequests = (page: Page): string[] => {
   return urls
 }
 
-/**
- * Opens the dashboard activity section.
- */
 const openActivitySection = async (page: Page): Promise<void> => {
   await page.goto(Urls.dashboard)
   await page.getByTestId(TestId.dashboard.activityToggle).click()
@@ -63,9 +60,6 @@ const summarize = async (page: Page, { expectConsent }: { expectConsent: boolean
   if (!expectConsent) await expect(page.getByTestId(TestId.ai.consentDialog)).toHaveCount(0)
 }
 
-/**
- * Closes the summary modal.
- */
 const closeSummary = async (page: Page): Promise<void> => {
   await summaryModal(page).locator('.modal-close').click()
   await expect(summaryModal(page)).toHaveCount(0)

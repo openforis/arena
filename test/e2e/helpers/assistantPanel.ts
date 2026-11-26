@@ -18,9 +18,6 @@ export const openAssistantPanel = async (page: Page): Promise<void> => {
   await expect(panel).toBeVisible()
 }
 
-/**
- * Closes the assistant panel.
- */
 export const closeAssistantPanel = async (page: Page): Promise<void> => {
   await assistantPanel(page).getByTestId(TestId.aiAssistant.closeBtn).click()
   await expect(assistantPanel(page)).toBeHidden()

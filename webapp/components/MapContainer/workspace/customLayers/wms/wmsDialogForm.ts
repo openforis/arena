@@ -191,9 +191,6 @@ const toggleLayerName = (state: WmsDialogFormState, name: string): string[] => {
     : [...state.selectedLayerNames, name]
 }
 
-/**
- * Updates the state of the dialog.
- */
 export const wmsDialogFormReducer = (state: WmsDialogFormState, action: WmsDialogFormAction): WmsDialogFormState => {
   switch (action.type) {
     case 'setUrl':

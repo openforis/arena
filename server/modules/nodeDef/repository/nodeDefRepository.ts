@@ -634,9 +634,6 @@ export const fetchVirtualEntities = (
   )
 }
 
-/**
- * Count virtual entities.
- */
 export const countVirtualEntities = (params: { surveyId: number }, client: DbClient = DB) => {
   const { surveyId } = params
   const tableNodeDef = new TableNodeDef(surveyId)

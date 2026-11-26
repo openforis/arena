@@ -298,9 +298,6 @@ export class ArenaApi {
     return Number(jobEnded.result!.surveyId)
   }
 
-  /**
-   * Returns the AI policy of a survey.
-   */
   async getSurveyAiPolicy(surveyId: number): Promise<any> {
     return this.get(`/api/survey/${surveyId}/ai-policy`)
   }

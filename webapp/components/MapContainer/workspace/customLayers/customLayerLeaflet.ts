@@ -37,9 +37,6 @@ export type CustomBaseLayerDef = {
   custom: MapCustomLayerWithScope
 }
 
-/**
- * Builds the Leaflet options of a custom layer.
- */
 const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
   opacity: layer.opacity,
   // Leaflet's attribution control renders HTML; attributions are typed by users or read from capabilities documents

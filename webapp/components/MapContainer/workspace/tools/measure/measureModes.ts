@@ -25,9 +25,6 @@ const UNIT_OPTIONS_BY_MODE: Record<MeasureMode, MeasureUnitOption[]> = {
 export const measureModeOfTool = (tool: MapToolKey | null): MeasureMode | null =>
   tool ? (MODE_BY_TOOL[tool] ?? null) : null
 
-/**
- * Returns the workspace tool of a measure mode.
- */
 export const toolOfMeasureMode = (mode: MeasureMode): MapToolKey => TOOL_BY_MODE[mode]
 
 /**
