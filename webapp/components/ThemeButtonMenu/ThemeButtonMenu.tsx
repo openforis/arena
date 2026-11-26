@@ -1,23 +1,19 @@
-import React, { useCallback, useMemo } from 'react'
-import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined'
-import LightModeOutlined from '@mui/icons-material/LightModeOutlined'
-import SettingsBrightnessOutlined from '@mui/icons-material/SettingsBrightnessOutlined'
+import { useCallback, useMemo } from 'react'
 
+import { IconName } from '@webapp/components/AppIcon'
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
 import { type ThemePreference, themePreferences } from '@webapp/theme/themeMode'
 import { useThemeMode } from '@webapp/theme/useThemeMode'
 import { TestId } from '@webapp/utils/testId'
 
-const iconSx = { mr: 1 }
-
-const iconByPreference: Record<ThemePreference, React.ReactNode> = {
-  light: <LightModeOutlined fontSize="small" sx={iconSx} />,
-  dark: <DarkModeOutlined fontSize="small" sx={iconSx} />,
-  system: <SettingsBrightnessOutlined fontSize="small" sx={iconSx} />,
+const iconByPreference: Record<ThemePreference, IconName> = {
+  light: 'themeLight',
+  dark: 'themeDark',
+  system: 'themeSystem',
 }
 
 /**
- * Header menu to switch between the light, dark and system (OS defined) theme.
+ * Header menu to switch between the light, dark and system (OS defined) theme; its icon shows the current one.
  *
  * @returns {React.ReactElement} The theme switcher button menu.
  */
@@ -28,7 +24,8 @@ export const ThemeButtonMenu = () => {
     () =>
       Object.values(themePreferences).map((key) => ({
         key,
-        icon: iconByPreference[key],
+        iconName: iconByPreference[key],
+        iconSize: 18,
         label: `header.theme.${key}`,
         testId: TestId.header.themeItem(key),
       })),
@@ -39,7 +36,7 @@ export const ThemeButtonMenu = () => {
 
   return (
     <ButtonMenu
-      iconName="contrast"
+      iconName={iconByPreference[preference]}
       iconSize={16}
       items={items}
       onItemClick={onItemClick}

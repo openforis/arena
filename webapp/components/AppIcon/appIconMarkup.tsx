@@ -5,7 +5,7 @@ import { AppIcon } from './AppIcon'
 import { IconName } from './iconComponents'
 
 /**
- * Returns the HTML of an icon, for code that builds HTML outside React (Leaflet markers, d3 charts).
+ * Returns the HTML of an icon, for code that builds HTML outside React (d3 charts, Leaflet markers).
  */
 export const appIconMarkup = (name: IconName, size?: number): string => {
   const container = document.createElement('div')

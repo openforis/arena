@@ -25,8 +25,14 @@
   color: $colorPrimary;
   box-shadow: $shadow1;
 
-  .app-icon {
-    animation: map-view-fly-to-loader-spin 1s linear infinite;
+  // a progress ring, as the MUI circular progress
+  .map-view__fly-to-loader-ring {
+    width: 16px;
+    height: 16px;
+    border: 2px solid $colorPrimary;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: map-view-fly-to-loader-spin 0.8s linear infinite;
   }
 }
 

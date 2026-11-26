@@ -25,7 +25,7 @@ import CodeOutlined from '@mui/icons-material/CodeOutlined'
 import CollectionsOutlined from '@mui/icons-material/CollectionsOutlined'
 import ContentCopy from '@mui/icons-material/ContentCopy'
 import ContentPasteOutlined from '@mui/icons-material/ContentPasteOutlined'
-import Contrast from '@mui/icons-material/Contrast'
+import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined'
 import DeleteOutlined from '@mui/icons-material/DeleteOutlined'
 import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined'
 import DesignServicesOutlined from '@mui/icons-material/DesignServicesOutlined'
@@ -52,6 +52,7 @@ import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown'
 import KeyOutlined from '@mui/icons-material/KeyOutlined'
 import LaptopOutlined from '@mui/icons-material/LaptopOutlined'
 import LayersOutlined from '@mui/icons-material/LayersOutlined'
+import LightModeOutlined from '@mui/icons-material/LightModeOutlined'
 import Link from '@mui/icons-material/Link'
 import LockOpenOutlined from '@mui/icons-material/LockOpenOutlined'
 import LockOutlined from '@mui/icons-material/LockOutlined'
@@ -89,6 +90,7 @@ import ScatterPlotOutlined from '@mui/icons-material/ScatterPlotOutlined'
 import ScheduleOutlined from '@mui/icons-material/ScheduleOutlined'
 import Search from '@mui/icons-material/Search'
 import SentimentDissatisfiedOutlined from '@mui/icons-material/SentimentDissatisfiedOutlined'
+import SettingsBrightnessOutlined from '@mui/icons-material/SettingsBrightnessOutlined'
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined'
 import ShieldOutlined from '@mui/icons-material/ShieldOutlined'
 import ShowChart from '@mui/icons-material/ShowChart'
@@ -101,6 +103,7 @@ import StorageOutlined from '@mui/icons-material/StorageOutlined'
 import TableChartOutlined from '@mui/icons-material/TableChartOutlined'
 import TabletMacOutlined from '@mui/icons-material/TabletMacOutlined'
 import TabOutlined from '@mui/icons-material/TabOutlined'
+import Translate from '@mui/icons-material/Translate'
 import Undo from '@mui/icons-material/Undo'
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined'
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined'
@@ -131,7 +134,6 @@ export const iconComponents = {
   cloud: CloudOutlined,
   code: CodeOutlined,
   collapse: CloseFullscreen,
-  contrast: Contrast,
   copy: ContentCopy,
   database: StorageOutlined,
   delete: DeleteOutlined,
@@ -207,8 +209,12 @@ export const iconComponents = {
   tablet: TabletMacOutlined,
   taxon: SpaOutlined,
   text: NotesOutlined,
+  themeDark: DarkModeOutlined,
+  themeLight: LightModeOutlined,
+  themeSystem: SettingsBrightnessOutlined,
   time: ScheduleOutlined,
   tools: BuildOutlined,
+  translate: Translate,
   tree: AccountTreeOutlined,
   undo: Undo,
   upload: FileUploadOutlined,

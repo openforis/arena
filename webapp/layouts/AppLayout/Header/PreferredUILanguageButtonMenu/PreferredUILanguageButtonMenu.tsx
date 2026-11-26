@@ -46,9 +46,12 @@ export const PreferredUILanguageButtonMenu = () => {
 
   return (
     <ButtonMenu
-      iconName="globe"
+      iconName="translate"
       iconSize={16}
       items={items}
+      // the current language code next to the icon, e.g. "EN"
+      label={i18n.language.toUpperCase()}
+      labelIsI18nKey={false}
       onItemClick={onItemClick}
       selectedItemKey={preferredLanguageCode ?? autoLanguageKey}
       title="userView.preferredUILanguage.label"
