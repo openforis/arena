@@ -23,6 +23,7 @@ const NodeDefEntityTable = (props) => {
 
           {canAddNode && (
             <ButtonIconAdd
+              iconSize={20}
               onClick={() => {
                 const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                 updateNode(nodeDef, entity)

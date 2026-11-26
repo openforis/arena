@@ -20,11 +20,20 @@
   text-align: left;
   font-size: 0.8rem;
 
-  .btn-add {
+  // a filled round button: adding a row is the main action of the table
+  .btn-add.btn {
+    min-width: 0;
+    width: 28px;
+    height: 28px;
     margin-left: 10px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    color: $colorOnPrimary;
+    background-color: $colorPrimary;
 
     &:hover {
-      color: $colorWarning;
+      background-color: shade($colorPrimary, 15%);
     }
   }
 
