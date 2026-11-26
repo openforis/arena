@@ -82,7 +82,6 @@ type ConversationActions = Pick<
 
 /**
  * Binds the controller's actions to the scope and the environment of a render.
- * @param {AssistantConversationController} controller - The controller.
  * @param {AssistantConversationScope} scope - User, survey and area.
  * @param {AssistantConversationEnv} env - The scope plus what a turn reads from the app.
  * @returns {ConversationActions} The actions of the API.
@@ -112,7 +111,6 @@ const bindActions = (
  * Conversation of the current area: a thin adapter over the conversation controller (load, turns, Stop / Retry,
  * history, Apply / Discard, all saved in the store).
  * @param {object} params - Parameters.
- * @param {AssistantArea} params.area - Current area.
  * @param {string|null} params.conversationId - Conversation shown (panel store).
  * @returns {AssistantConversationApi} State and actions.
  */

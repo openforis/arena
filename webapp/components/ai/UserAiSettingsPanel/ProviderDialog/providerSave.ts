@@ -29,7 +29,6 @@ export const buildAccountRequest = ({ spec, draft, saved }: KeyParams): AiProvid
  * Returns true when the model, the endpoint or the key of a saved provider changed.
  * @param {object} params - Parameters.
  * @param {ProviderTypeSpec} params.spec - Type spec.
- * @param {ProviderDraft} params.draft - Draft.
  * @param {SavedProvider} params.saved - Saved provider.
  * @returns {boolean} True when the changes need a test.
  */
@@ -70,7 +69,6 @@ export const canSaveDraft = ({ spec, draft, saved, test }: KeyParams & { test: D
  * @param {object} params - Parameters.
  * @param {LocalProvider[]} params.providers - Stored providers.
  * @param {SavedProvider|null} params.saved - Saved provider (edit), null to add.
- * @param {ProviderDraft} params.draft - Draft.
  * @param {string} params.newId - Id for a new provider (`local:<uuid>`).
  * @returns {{providers: LocalProvider[], provider: LocalProvider}|null} The list and the saved entry; null for an
  * invalid URL.

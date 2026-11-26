@@ -34,7 +34,6 @@ const unusableErrorKeys = new Set([
  * @param {!object} props.result - The result returned by the AI expression API.
  * @param {object} [props.validationError] - The validation error, if any.
  * @param {boolean} props.isValid - Whether the expression is valid.
- * @param {!object} props.i18n - The i18n instance.
  * @returns {React.ReactElement} - The rendered result.
  */
 type ExpressionResultProps = {

@@ -11,7 +11,6 @@ import { createCategoryLabelsApplierDeps } from './categoryItemLabels/categoryLa
 /**
  * Creates the applier dependencies.
  * @param {object} params - Parameters.
- * @param {Function} params.dispatch - Redux dispatch.
  * @param {Function} params.getState - Redux getState.
  * @returns {ApplierDeps} The dependencies.
  */
@@ -47,6 +46,5 @@ export const createApplierDeps = ({
 /**
  * Returns true when Apply may run now (the form designer has no unsaved edit).
  * @param {ApplierDeps} deps - Applier dependencies.
- * @returns {boolean} True when ready.
  */
 export const applierDepsReady = (deps: ApplierDeps): boolean => !deps.isSurveyDirty()

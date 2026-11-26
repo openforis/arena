@@ -21,7 +21,6 @@ import { canDoIt } from './suggestionsModel'
  * @param {object} params - Parameters.
  * @param {AssistantConversationApi} params.api - Conversation state and actions of the chat.
  * @param {AssistantArea} params.area - Area of the chat.
- * @returns {void}
  */
 export const usePendingSuggestionRequest = ({ api, area }: { api: AssistantConversationApi; area: AssistantArea }) => {
   const { pendingRequest } = useAssistantPanel()

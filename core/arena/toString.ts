@@ -17,7 +17,5 @@ const _toString = (value: any): string => {
  * Returns a string representation of the value (strings are double quoted).
  *
  * @param {*} value - The value to convert.
- *
- * @returns {string} - The result.
  */
 export const toString = _curry1(_toString)

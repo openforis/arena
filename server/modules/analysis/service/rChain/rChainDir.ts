@@ -10,7 +10,6 @@ const chainUuidPartLength = 8
  * followed by the first characters of its uuid.
  * @param params - The parameters.
  * @param params.chainLabel - The chain label in the survey default language.
- * @param params.chainUuid - The chain uuid.
  * @returns The folder name.
  */
 export const getChainDirName = ({
@@ -50,9 +49,7 @@ export const isPathInsideDir = ({ dir, filePath }: { dir: string; filePath: stri
  * The folder is deleted and recreated on every script generation, so it must never be outside the output folder.
  * @param params - The parameters.
  * @param params.outputDir - The analysis output folder (ANALYSIS_OUTPUT_DIR).
- * @param params.surveyName - The survey name.
  * @param params.chainLabel - The chain label in the survey default language.
- * @param params.chainUuid - The chain uuid.
  * @returns The folder path.
  */
 export const getChainDirPath = ({

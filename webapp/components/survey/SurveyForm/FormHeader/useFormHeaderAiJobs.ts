@@ -87,7 +87,6 @@ export const useFormHeaderAiJobs = () => {
 
   /**
    * Closes the review modal.
-   * @returns {void}
    */
   const closeTranslationResult = useCallback(() => setTranslationResult(null), [])
 

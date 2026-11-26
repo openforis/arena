@@ -14,10 +14,8 @@ import { TestId } from '@webapp/utils/testId'
  * Uses pagesUuidMap when the page was visited; otherwise falls back to the
  * first instance only for single entities (never for multiples).
  * @param {object} params - Lookup params
- * @param {object} params.record - Record
  * @param {object} params.pagesUuidMap - Page node def UUID → node UUID map
  * @param {string} params.nodeDefUuid - Page entity node def UUID
- * @param {object} params.survey - Survey
  * @returns {object|null} Page entity node or null
  */
 const getPageNode = ({ record, pagesUuidMap, nodeDefUuid, survey }) => {

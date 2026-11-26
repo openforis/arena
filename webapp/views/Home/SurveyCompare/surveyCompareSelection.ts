@@ -56,7 +56,6 @@ const collectDependents = ({ diffs, id, acc }) => {
  * @param {Set<string>} params.selectedIds - Currently selected ids.
  * @param {string} params.id - Id of the change to select or deselect.
  * @param {boolean} params.selected - True to select, false to deselect.
- * @returns {Set<string>} - The updated selection.
  */
 export const updateSelection = ({
   result,
@@ -96,7 +95,6 @@ const getRemovalLabel = ({ change, result }: { change: SurveyCompareChange; resu
  * Returns the selected changes that delete something in this survey (elements only in this survey).
  * @param {object} params - Parameters.
  * @param {SurveyCompareResult} params.result - The comparison result.
- * @param {Set<string>} params.selectedIds - Selected ids.
  * @returns {{id: string, label: string, partial: boolean}[]} - The selected deletions (partial: removal of category items or taxa).
  */
 export const getSelectedDeletions = ({

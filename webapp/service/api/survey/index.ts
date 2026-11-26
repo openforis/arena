@@ -171,10 +171,6 @@ export const startSurveysListExportJob = async ({
 
 /**
  * Fetches the node defs of the schema summary that need an AI description.
- * @param {object} params - Params.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{surveyName: string, nodeDefs: any[]}>} The items.
  */
 export const fetchSchemaSummaryAiItems = async ({
@@ -201,14 +197,11 @@ export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }: { tempFil
 /**
  * Starts the schema summary export with the AI descriptions generated in the browser.
  * @param {object} params - Params.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {string} params.fileFormat - csv or xlsx.
  * @param {Record<string, string>} params.aiDescriptions - AI descriptions by node def uuid. The request checks their
  * shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid), not the request.
  * @param {number} [params.aiDescriptionsFailedCount] - Node defs left without a description.
  * @param {number} [params.aiDescriptionsNotDoneCount] - Node defs a stop kept the run from describing.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{job: object}>} The started job.
  */
 export const startSchemaSummaryExportJob = async ({

@@ -15,7 +15,6 @@ const PREFIX = 'mapWorkspace.screenshot'
  * @param {object} props - The props.
  * @param {string|null} props.url - Object URL of the PNG.
  * @param {boolean} props.loading - Whether a new image is being prepared.
- * @returns {React.ReactElement} The preview.
  */
 export const ScreenshotPreviewBox = ({
   url,
@@ -40,9 +39,6 @@ export const ScreenshotPreviewBox = ({
 
 /**
  * Renders a notice under the preview (tiles left out, Equal Earth, errors).
- * @param {object} props - The props.
- * @param {ScreenshotNotice} props.notice - The notice.
- * @returns {React.ReactElement} The notice line.
  */
 export const ScreenshotNoticeLine = ({ notice }: { notice: ScreenshotNotice }): React.ReactElement => {
   const i18n = useI18n()
@@ -84,7 +80,6 @@ export const ScreenshotDoneLine = ({ done }: { done: ScreenshotDoneNotice }): Re
  * @param {object} props - The props.
  * @param {string} props.fileName - Name of the current image.
  * @param {Function} props.onAnswer - Called with true to replace, false to keep.
- * @returns {React.ReactElement} The prompt.
  */
 export const ScreenshotReplacePrompt = ({
   fileName,
@@ -131,7 +126,6 @@ type ScreenshotDialogFooterProps = {
  * @param {object} params - The parameters.
  * @param {boolean} params.toRecord - Whether the image goes to a record.
  * @param {boolean} params.saving - Whether a save is running.
- * @returns {string} The key.
  */
 const getSubmitLabelKey = ({ toRecord, saving }: { toRecord: boolean; saving: boolean }): string => {
   if (!toRecord) return `${PREFIX}.downloadPng`
@@ -151,7 +145,6 @@ const getSubmitLabelKey = ({ toRecord, saving }: { toRecord: boolean; saving: bo
  * @param {Function} props.onCancel - Closes the dialog.
  * @param {Function} props.onAlsoDownload - Downloads the PNG too.
  * @param {Function} props.onSubmit - Saves or downloads.
- * @returns {React.ReactElement} The footer.
  */
 export const ScreenshotDialogFooter = ({
   done,

@@ -99,8 +99,6 @@ type RanStep = {
 
 /**
  * Returns the JSON of a value with the keys of its objects sorted, so the same input is one key in any key order.
- * @param {unknown} value - The value.
- * @returns {string} The JSON.
  */
 const toSortedJson = (value: unknown): string =>
   JSON.stringify(value, (_key, nested) =>
@@ -168,7 +166,6 @@ export const getLastStepCheck = ({ limits, fixedChars }: { limits: AssistantLimi
 /**
  * Adds a note of Arena as a user message (joined to a last user message: some providers refuse two in a row).
  * @param {ModelMessage[]} messages - Messages of the request.
- * @param {string} note - The note.
  * @returns {ModelMessage[]} The messages with the note.
  */
 const withNote = (messages: ModelMessage[], note: string): ModelMessage[] => {
@@ -221,7 +218,6 @@ export type RunAssistantTurnParams = {
 /**
  * Loads the handbook outline for the Help prompt (null when the handbook can't be loaded: the turn still runs).
  * @param {string} uiLang - Interface language.
- * @returns {Promise<string|null>} The outline.
  */
 const loadOutline = async (uiLang: string): Promise<string | null> => {
   try {
@@ -235,7 +231,6 @@ const loadOutline = async (uiLang: string): Promise<string | null> => {
 /**
  * Message of a thrown value for a tool result: anything can be thrown, not only an Error.
  * @param {unknown} error - The thrown value.
- * @returns {string} Its message.
  */
 export const getThrownMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message
@@ -250,7 +245,6 @@ export const getThrownMessage = (error: unknown): string => {
 
 /**
  * Builds the structured result of a tool that threw outside the wrapper.
- * @param {unknown} error - The error.
  * @returns {object} The `{ error: { code, message } }` result.
  */
 const toolFailedOutput = (error: unknown) => ({
@@ -276,7 +270,6 @@ type TurnStreamPart = TextStreamPart<ToolSet>
  * @param {TurnStreamPart} part - Full-stream part.
  * @param {TurnState} state - Turn state.
  * @param {StreamOutcome} outcome - Abort / error seen so far (updated).
- * @returns {void}
  */
 const handleStreamPart = (part: TurnStreamPart, state: TurnState, outcome: StreamOutcome): void => {
   switch (part.type) {
@@ -317,7 +310,6 @@ const handleStreamPart = (part: TurnStreamPart, state: TurnState, outcome: Strea
  * @param {TurnState} params.state - Turn state.
  * @param {StreamOutcome} params.outcome - Abort / error seen so far (updated).
  * @param {AiTool[]} params.toolList - Tools offered in the turn.
- * @returns {Promise<void>}
  */
 const streamInto = async ({
   result,
@@ -342,7 +334,6 @@ const streamInto = async ({
  * @param {TurnStreamPart} params.part - Stream part.
  * @param {AiTool[]} params.toolList - Tools offered in the turn.
  * @param {TurnState} params.state - Turn state.
- * @returns {void}
  */
 const escalateOnDataResult = ({
   part,
@@ -364,7 +355,6 @@ const escalateOnDataResult = ({
  * A proposed map layer is a card: an answer that is only one ends done.
  * @param {Conversation} after - Conversation at the end of the turn.
  * @param {Conversation} before - Conversation before the turn.
- * @returns {boolean} True for a silent turn.
  */
 const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
   const answer = after.messages.at(-1)
@@ -395,7 +385,6 @@ const isToolCallText = (text: string): boolean => TOOL_CALL_OPEN.test(text.trim(
  * Returns the text of the answer: of the whole turn, or only what follows the last tool call (the last step).
  * @param {Conversation} after - Conversation at the end of the turn.
  * @param {boolean} [lastStepOnly] - True for the text of the last step.
- * @returns {string} The text.
  */
 const getAnswerText = (after: Conversation, lastStepOnly = false): string => {
   const answer = after.messages.at(-1)
@@ -413,7 +402,6 @@ const getAnswerText = (after: Conversation, lastStepOnly = false): string => {
  * @param {StreamOutcome} outcome - Abort / error.
  * @param {AbortSignal} signal - Turn signal.
  * @param {Conversation} before - Conversation before the turn.
- * @returns {void}
  */
 const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSignal, before: Conversation): void => {
   const after = state.get()
@@ -462,7 +450,6 @@ const endedWithoutAnswer = ({
  * Runs one assistant turn. The conversation is reported through onUpdate on every change; the final one is returned.
  * Errors never throw: they end the turn with status "error" (or "stopped" on abort).
  * Without a `model`, the engine is selected for the conversation's data class: its model, limits and hosting class.
- * @param {RunAssistantTurnParams} params - Parameters.
  * @returns {Promise<Conversation>} The conversation after the turn.
  */
 export const runAssistantTurn = async ({

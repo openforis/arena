@@ -5,7 +5,6 @@ import * as SB from '@test/utils/surveyBuilder'
  * Builds the survey of the node value parser tests: a cluster with an attribute of every type,
  * a read-only and an analysis attribute, and the hierarchical codes region > district.
  * @param {object} user - The survey owner.
- * @returns {Promise<object>} The survey.
  */
 export const buildNodeValueParserSurvey = (user: { uuid: string }): Promise<any> =>
   SB.survey(

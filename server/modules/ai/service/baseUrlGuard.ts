@@ -53,7 +53,6 @@ const resolveAddresses = async (hostname: string, lookup: LookupFn): Promise<str
  * @param {object} [options] - Options.
  * @param {string[]} [options.allowlist] - Org-hosted base URLs (default: AI_ORG_HOSTED_BASE_URLS).
  * @param {LookupFn} [options.lookup] - DNS lookup (injectable for tests).
- * @returns {Promise<void>} Resolves when the URL is allowed.
  */
 export const assertBaseUrlAllowed = async (
   baseUrl: string,
@@ -72,9 +71,7 @@ export const assertBaseUrlAllowed = async (
  * Runs {@link assertBaseUrlAllowed} for the providers whose base URL is typed by the user.
  * @param {object} cfg - Provider config.
  * @param {string} cfg.provider - Provider key.
- * @param {string} [cfg.baseUrl] - Base URL.
  * @param {object} [options] - Guard options (see assertBaseUrlAllowed).
- * @returns {Promise<void>} Resolves when allowed (or not applicable).
  */
 export const assertProviderBaseUrlAllowed = async (
   { provider, baseUrl }: { provider: string; baseUrl?: string | null },

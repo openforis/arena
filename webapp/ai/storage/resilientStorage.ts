@@ -23,7 +23,6 @@ const MAX_SHRINK_LEVELS = 3
 /**
  * Returns true for the error of a full storage (the name differs between browsers).
  * @param {unknown} error - Thrown value.
- * @returns {boolean} True for a quota error.
  */
 export const isQuotaExceededError = (error: unknown): boolean => {
   if (typeof error !== 'object' || error === null) return false
@@ -39,7 +38,6 @@ export const isQuotaExceededError = (error: unknown): boolean => {
 
 /**
  * Returns the browser's localStorage, or null when it is not accessible.
- * @returns {ResilientStorageBackend|null} The storage.
  */
 export const getBrowserLocalStorage = (): ResilientStorageBackend | null => {
   try {
@@ -73,8 +71,6 @@ export const createResilientStorage = ({
   /**
    * Marks the storage as unusable for the session.
    * @param {string} reason - What happened.
-   * @param {unknown} [error] - The error.
-   * @returns {void}
    */
   const block = (reason: string, error?: unknown): void => {
     if (!blocked) log(`${reason}: the AI data of this session stays in memory`, error)
@@ -83,9 +79,6 @@ export const createResilientStorage = ({
 
   /**
    * Stores a value, shrinking it while the storage is full.
-   * @param {ResilientStorageBackend} storage - Storage.
-   * @param {string} key - Key.
-   * @param {string} value - Value.
    * @param {Function} [shrink] - Smaller values for a full storage.
    * @returns {string|null} The value that was stored, or null when none fit.
    */

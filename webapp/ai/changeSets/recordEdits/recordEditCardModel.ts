@@ -44,7 +44,6 @@ export const groupOperationsByRecord = (operations: RecordAttributeUpdateOperati
  * Returns the edits that can still be applied: no result yet, or failed.
  * @param {RecordAttributeUpdateOperation[]} operations - The edits.
  * @param {OperationResult[]} [results] - Results so far.
- * @returns {string[]} Their ids.
  */
 export const getSelectableOperationIds = (
   operations: RecordAttributeUpdateOperation[],
@@ -75,8 +74,6 @@ const transientFailureKeys = new Set([
 
 /**
  * Returns the ids of the edits that failed for a transient reason (Retry).
- * @param {OperationResult[]} results - Results.
- * @returns {string[]} The ids.
  */
 export const getRetryOperationIds = (results: OperationResult[] = []): string[] =>
   results
@@ -85,7 +82,6 @@ export const getRetryOperationIds = (results: OperationResult[] = []): string[] 
 
 /**
  * Counts the results by status.
- * @param {OperationResult[]} results - Results.
  * @returns {{applied: number, conflict: number, failed: number}} The counts.
  */
 export const countOperationResults = (results: OperationResult[] = []) => {
@@ -98,9 +94,6 @@ export const countOperationResults = (results: OperationResult[] = []) => {
 
 /**
  * Describes the results of an Apply for the model (the user sees the card).
- * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - The change set.
- * @param {OperationResult[]} params.results - Results.
  * @returns {string} E.g. "Applied 1 of 3 edits. 12, plot[1] / dbh: conflict (…)."
  */
 export const summarizeRecordEditResults = ({

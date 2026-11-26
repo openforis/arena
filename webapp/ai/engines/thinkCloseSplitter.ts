@@ -18,7 +18,6 @@ const GEMMA_TOKEN = /<\|"\|>([\s\S]*?)<\|"\|>|([{,]\s*)([A-Za-z_]\w*)(\s*:)/g
 /**
  * Converts the arguments of a tool call written in the Gemma format (bare keys, <|"|> quotes) to JSON.
  * @param {string} args - The arguments, e.g. `{name:<|"|>tree<|"|>,limit:5}`.
- * @returns {string} The JSON text.
  * @throws {SyntaxError} When the result is not JSON.
  */
 export const gemmaArgsToJson = (args: string): string => {
@@ -68,7 +67,6 @@ const heldLength = (text: string): number => {
  * Sends the text and the tool calls read from the tail.
  * @param {Tail} tail - The tail read.
  * @param {Controller} controller - The stream controller.
- * @returns {void}
  */
 const enqueueTail = ({ calls, text }: Tail, controller: Controller): void => {
   if (text) {
@@ -82,7 +80,6 @@ const enqueueTail = ({ calls, text }: Tail, controller: Controller): void => {
 
 /**
  * Creates the transform of a model stream that moves what follows a `</think>` text out of the reasoning.
- * @returns {TransformStream<Part, Part>} The transform.
  */
 export const createThinkCloseSplitter = (): TransformStream<Part, Part> => {
   // reasoning held back because it may be the start of the marker

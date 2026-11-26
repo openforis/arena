@@ -60,7 +60,6 @@ const hangingModel = () => {
 /**
  * Waits, turn by turn of the event loop, until a condition holds (no fixed delay).
  * @param {Function} condition - What to wait for.
- * @returns {Promise<void>} Resolves when it holds; fails the test if it never does.
  */
 const waitUntil = async (condition: () => boolean): Promise<void> => {
   for (let turn = 0; turn < 1000 && !condition(); turn += 1) {

@@ -43,7 +43,6 @@ export const mgrsTileAt = (lon: number, lat: number): string | null => {
  *
  * @param {number} min - Lower value.
  * @param {number} max - Upper value.
- * @param {number} step - Step.
  * @param {number} origin - Origin of the multiples.
  * @returns {number[]} Multiples within [min, max].
  */

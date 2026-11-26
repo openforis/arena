@@ -75,11 +75,9 @@ export const insertTaxonomy = (
  * }
  * ```.
  * @param {!object} params - The search parameters.
- * @param {!number} [params.surveyId] - The ID of the survey.
  * @param {!string} [params.taxonUuid] - The UUID of the taxon.
  * @param {!object} [params.vernacularNames] - The vernacular names indexed by language code.
  * @param {boolean} [params.backup] - Whether the vernacular names come from a survey backup (props are published).
- * @param {DbClient} [params.client] - The database client.
  * @returns {Array.<function(): Promise<null>>} - The functions running the insert/update queries (not started yet):
  * to be run with DbUtils.runQueries.
  */
@@ -585,9 +583,6 @@ const toSearchValue = (filterValue: string, searchType = searchTypes.equals) => 
 
 /**
  * Fetches the taxa having raw Excel cell objects among their props or extra props.
- * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {object} [client] - The database client.
  * @returns {Promise<Array<{uuid: string, taxonomy_uuid: string, props: object, props_draft: object}>>} The taxa rows.
  */
 export const fetchTaxaWithExcelCellObjects = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
@@ -601,11 +596,7 @@ export const fetchTaxaWithExcelCellObjects = ({ surveyId }: { surveyId: number }
 /**
  * Checks if another taxon of the same taxonomy has the specified scientific name.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.taxonomyUuid - The taxonomy uuid.
  * @param {string} params.taxonUuid - The uuid of the taxon to exclude.
- * @param {string} params.scientificName - The scientific name.
- * @param {object} [client] - The database client.
  * @returns {Promise<boolean>} True if the scientific name is already in use.
  */
 export const existsOtherTaxonWithScientificName = (
@@ -881,11 +872,8 @@ export const updateTaxonAndVernacularNames = (surveyId: number, taxon: ArenaTaxo
 /**
  * Sets both the published and the draft props of a taxon, regardless of its publication status.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.taxonUuid - The taxon uuid.
  * @param {object} params.props - The published props.
  * @param {object} params.propsDraft - The draft props.
- * @param {object} [client] - The database client.
  * @returns {Promise<null>} The query result.
  */
 export const updateTaxonPropsAndPropsDraft = (

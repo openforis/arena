@@ -51,7 +51,6 @@ const validProviders = new Set<string>(Object.values(providers))
 /**
  * Returns true when `provider` is a recognised gateway provider key.
  * @param {string} provider - Provider identifier from config or env.
- * @returns {boolean} True when supported.
  */
 export const isSupported = (provider: string): boolean => validProviders.has(provider)
 
@@ -66,7 +65,6 @@ const noRedirectFetch: FetchLike = (input, init) => fetch(input, { ...init, redi
 /**
  * Throws when a provider that needs an API key has none.
  * @param {string} provider - Provider identifier.
- * @param {string} [apiKey] - The API key.
  */
 const assertApiKey = (provider: string, apiKey?: string): void => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })

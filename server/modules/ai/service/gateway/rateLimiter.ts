@@ -13,7 +13,6 @@ export type RateLimiter = { take: (key: string) => boolean }
  * @param {object} params - Parameters.
  * @param {number} params.limitPerMinute - Max calls per minute (0 or less disables limiting).
  * @param {Function} [params.now] - Clock (tests).
- * @returns {RateLimiter} The limiter.
  */
 export const createRateLimiter = ({
   limitPerMinute,

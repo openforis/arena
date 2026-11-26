@@ -27,9 +27,7 @@ const TRANSLATIONS_CARD = '19 texts are missing in French. Translate them?'
 
 /**
  * Marks the module introductions as seen before the app loads, so only this spec's cards show.
- * @param {Page} page - The page.
  * @param {ArenaApi} api - API of the worker user.
- * @returns {Promise<void>} Resolves when the init script is registered.
  */
 const skipModuleIntros = async (page: Page, api: ArenaApi): Promise<void> => {
   await seedSuggestionState(page, await api.getCurrentUserUuid(), buildSeenIntrosSuggestionState())
@@ -37,8 +35,6 @@ const skipModuleIntros = async (page: Page, api: ArenaApi): Promise<void> => {
 
 /**
  * Adds French to the survey languages in Survey Info and saves.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when the server saved the survey info.
  */
 const addFrench = async (page: Page): Promise<void> => {
   await page.goto(Urls.surveyInfo)
@@ -57,9 +53,7 @@ const addFrench = async (page: Page): Promise<void> => {
 
 /**
  * Navigates inside the app, as a user reaches a page from the sidebar (no reload).
- * @param {Page} page - The page.
  * @param {string} uri - Route to go to.
- * @returns {Promise<void>} Resolves when the route is pushed.
  */
 const navigateInApp = async (page: Page, uri: string): Promise<void> => {
   await page.evaluate((target) => {
@@ -71,7 +65,6 @@ const navigateInApp = async (page: Page, uri: string): Promise<void> => {
 /**
  * Tells whether a suggestion left every part of the stored state of a user: pending, in progress and dismissed targets.
  * Dismissed targets are removed only by a detector run that finds no gap (Do it and settle put them there).
- * @param {Page} page - The page.
  * @param {string} userUuid - User.
  * @param {string} id - Suggestion id.
  * @returns {Promise<boolean>} True when the state exists and holds nothing of the suggestion.

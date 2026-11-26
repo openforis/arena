@@ -405,15 +405,11 @@ export const deleteNode = (
  * when the record has been modified last with another app (or app version) and stores the app info in the record.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user editing the record.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.record - The record.
  * @param {!object} params.appInfo - The app editing the record.
  * @param {number} [params.timezoneOffset] - The client timezone offset.
  * @param {string} [params.lang] - The language used to evaluate the expressions.
  * @param {Function} [params.nodesUpdateListener] - Listener notified with the updated nodes.
  * @param {Function} [params.nodesValidationListener] - Listener notified with the updated validations.
- * @param {object} [client] - The database client.
- * @returns {Promise<object>} - The updated record.
  */
 export const updateAppInfoDependents = (
   {

@@ -6,7 +6,6 @@ import { isNull } from './isNull'
  * It handles objects, arrays, Map, Set, String, Number.
  * It is the inverse of Stringify.
  *
- * @param {string!} string - The string.
  * @returns {*} - The value, a Javascript value.
  */
 export const parse = (string: string | null | undefined): any => {

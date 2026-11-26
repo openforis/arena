@@ -7,7 +7,6 @@ import { assistantPanelStore } from './assistantPanelStore'
 
 /**
  * Closes the panel and gives the focus back to the header button.
- * @returns {void}
  */
 export const closeAssistantPanel = (): void => {
   assistantPanelStore.close()
@@ -16,7 +15,6 @@ export const closeAssistantPanel = (): void => {
 
 /**
  * Toggles the panel; closing it returns the focus to the header button.
- * @returns {void}
  */
 export const toggleAssistantPanel = (): void => {
   if (assistantPanelStore.getState().open) closeAssistantPanel()

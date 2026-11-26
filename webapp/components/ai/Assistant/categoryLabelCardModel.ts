@@ -29,9 +29,6 @@ export type CategoryLabelGroup = { categoryUuid: string; categoryName: string; r
 
 /**
  * Returns the name of a category, or its uuid when it was deleted.
- * @param {object} survey - Survey.
- * @param {string} categoryUuid - Category uuid.
- * @returns {string} The name.
  */
 const getCategoryName = (survey: any, categoryUuid: string): string => {
   const category = Survey.getCategoryByUuid(categoryUuid)(survey)
@@ -40,9 +37,7 @@ const getCategoryName = (survey: any, categoryUuid: string): string => {
 
 /**
  * Converts an operation to a row.
- * @param {CategoryItemLabelSetOperation} op - Operation.
  * @param {OperationResult|null} result - Its result, after Apply.
- * @returns {CategoryLabelRow} The row.
  */
 const toRow = (op: CategoryItemLabelSetOperation, result: OperationResult | null): CategoryLabelRow => {
   const currentText = result?.status === 'conflict' ? ((result.params?.currentText as string | null) ?? null) : null
@@ -62,7 +57,6 @@ const toRow = (op: CategoryItemLabelSetOperation, result: OperationResult | null
 /**
  * Groups the category label operations of a card by category.
  * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
  * @param {object} params.survey - Current survey (category names).
  * @returns {CategoryLabelGroup[]} The groups, in order of first appearance.
  */

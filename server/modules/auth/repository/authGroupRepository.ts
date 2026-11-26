@@ -136,7 +136,6 @@ const untouchedSurveyTolerance = '10 MINUTES'
 
 /**
  * Fetches the surveys never modified since their only user (with expired invitation) was invited.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<Array<{surveyId: number, userUuid: string}>>} - The ids of the surveys with the uuid of their user.
  */
 export const fetchSurveysOfExpiredInvitationUsers = (client: DbClient = db) =>
@@ -174,7 +173,6 @@ export const fetchSurveysOfExpiredInvitationUsers = (client: DbClient = db) =>
 
 /**
  * Fetches the ids of the surveys never modified since their only user (with expired invitation) was invited.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number[]>} - The ids of the surveys.
  */
 export const fetchSurveyIdsOfExpiredInvitationUsers = async (client: DbClient = db) => {

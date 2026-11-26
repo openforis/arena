@@ -6,9 +6,6 @@ export type NodeEditRefusal = 'readOnly' | 'notApplicable'
 /**
  * Finds why the form would not let the user edit a node: the node, or any entity above it, is read-only ("editable if")
  * or not applicable ("applicable if") in its parent. The nearest ancestor is checked first.
- * @param {object} params - The parameters.
- * @param {object} params.record - The record.
- * @param {object} params.node - The node.
  * @returns {NodeEditRefusal|null} The reason of the refusal, or null when the node may be edited.
  */
 export const findNodeEditRefusal = ({ record, node }: { record: any; node: any }): NodeEditRefusal | null => {

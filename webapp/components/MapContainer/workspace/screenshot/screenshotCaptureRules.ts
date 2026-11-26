@@ -21,7 +21,6 @@ const DATA_PANE_CLASSES = ['leaflet-overlay-pane', 'leaflet-marker-pane', 'leafl
  * @param {object} params - The parameters.
  * @param {number|null} [params.mapMaxZoom] - Max zoom of the map (Infinity when no layer sets one).
  * @param {number|null} [params.baseLayerMaxZoom] - Max zoom of the base layer.
- * @returns {number} The zoom.
  */
 export const getFitToPlotZoom = ({
   mapMaxZoom = null,
@@ -155,7 +154,6 @@ export const createImageFailureCounter = (): { placeholderImage: () => string; g
     },
     /**
      * Returns the number of failed images.
-     * @returns {number} The count.
      */
     getCount: (): number => count,
   }

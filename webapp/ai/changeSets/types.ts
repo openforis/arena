@@ -20,7 +20,6 @@ export type NodeDefUpdateProp = NodeDefBasicProp | NodeDefRefProp
 
 /**
  * Tells whether an update property is a category or taxonomy reference.
- * @param {string} prop - Property.
  * @returns {boolean} True for categoryUuid and taxonomyUuid.
  */
 export const isNodeDefRefProp = (prop: string): prop is NodeDefRefProp =>

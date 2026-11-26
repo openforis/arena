@@ -252,7 +252,6 @@ export const validateCategories = async (survey: ArenaSurvey, client: DbClient =
  * Throws a bad request error if the prop value contains invalid names (category name or item extra prop names).
  * @param {!string} key - The key of the category prop.
  * @param {unknown} value - The value of the category prop.
- * @returns {void}
  */
 export const checkCategoryProp = (key: string, value: unknown) => {
   if (key === Category.keysProps.name) {
@@ -266,7 +265,6 @@ export const checkCategoryProp = (key: string, value: unknown) => {
  * Throws a bad request error if the prop value is an invalid level name.
  * @param {!string} key - The key of the level prop.
  * @param {unknown} value - The value of the level prop.
- * @returns {void}
  */
 export const checkLevelProp = (key: string, value: unknown) => {
   if (key === CategoryLevel.keysProps.name) {
@@ -277,7 +275,6 @@ export const checkLevelProp = (key: string, value: unknown) => {
 /**
  * Throws a bad request error if the level (published or draft props) has an invalid name.
  * @param {!object} level - The level to check.
- * @returns {void}
  */
 export const checkLevel = (level: ArenaCategoryLevel) => {
   for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(level)) {
@@ -403,7 +400,6 @@ export const insertCategory = async (
  * @param {!number} params.sourceSurveyId - The id of the survey the category is cloned from.
  * @param {!string} params.sourceCategoryUuid - The uuid of the category to clone.
  * @param {!number} params.targetSurveyId - The id of the survey the category is cloned into.
- * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<Category>} - The cloned and validated category.
  */
 export const cloneCategoryFromSurvey = (
@@ -487,9 +483,7 @@ export const insertItem = (
  * Bulk insert of category items.
  * Items can belong to different categories and validation is not performed.
  * @param {!object} user - The user performing this operation.
- * @param {!number} surveyId - The id of the survey.
  * @param {!any} items - Category items to be inserted.
- * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<*>} - The result promise (void).
  */
 export const insertItems = (user: ArenaUser, surveyId: number, items: ArenaCategoryItem[], client: DbClient = db) =>
@@ -1106,9 +1100,7 @@ export const deleteLevel = (
  * Deletes all levels without items.
  * Category validation is not performed.
  * @param {!object} user - The user performing this operation.
- * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category to filter by.
- * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<Category>} - Category with updated levels.
  */
 export const deleteLevelsEmptyByCategory = (
@@ -1139,10 +1131,8 @@ export const deleteLevelsEmptyByCategory = (
  * Deletes all levels and creates new ones with the specified names.
  * Category validation is not performed.
  * @param {!object} user - The user performing this operation.
- * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category of interest.
  * @param {string[]} levelNamesNew - Array of new level names.
- * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<Category>} - Category with updated levels.
  */
 export const replaceLevels = (

@@ -21,7 +21,6 @@ const isDisabledByFlag = (flags: unknown, feature: string): boolean =>
  * @param {string} feature - Feature key.
  * @param {ArenaUser} user - Acting user (null for system calls: only the env checks apply).
  * @param {GateEnv} [env] - Env values (injectable for tests).
- * @returns {void}
  */
 export const assertFeatureEnabled = (feature: string, user: ArenaUser | null, env: GateEnv = ENV): void => {
   if (!env.aiFeaturesEnabled) {
@@ -43,7 +42,6 @@ export const assertFeatureEnabled = (feature: string, user: ArenaUser | null, en
 /**
  * Returns the keys of the features disabled by AI_FEATURE_FLAGS.
  * @param {GateEnv} [env] - Environment (defaults to ENV).
- * @returns {string[]} Disabled feature keys.
  */
 export const getDisabledFeatureKeys = (env: GateEnv = ENV): string[] =>
   Object.keys(AiFeatures).filter((key) => isDisabledByFlag(env.aiFeatureFlags, key))

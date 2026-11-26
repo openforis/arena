@@ -132,7 +132,6 @@ export const WmsAddAsField = ({ state, dispatch }: SectionProps): React.ReactEle
  * @param {WmsDialogFormState} props.state - The form state.
  * @param {Function} props.dispatch - The form dispatch.
  * @param {MapImageFormat[]} props.formats - The formats the service offers (none for XYZ).
- * @returns {React.ReactElement} The fields.
  */
 export const WmsDisplayFields = ({
   state,

@@ -31,7 +31,6 @@ export const buildRecordCandidates = (activeLayers: ActiveLayer[]): MapRecordCan
  * @param {string} params.id - Candidate id ("<layer key>|<point key>").
  * @param {ActiveLayer[]} params.activeLayers - Layers registered in the Records panel.
  * @param {Function} params.selectPoint - Selects a point by key in the Records panel.
- * @returns {void}
  */
 export const selectRecordCandidate = ({
   id,

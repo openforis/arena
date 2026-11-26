@@ -18,7 +18,6 @@ import { testUser } from './assistantTestUtils'
  * @param {object} [options] - Options.
  * @param {string[]} [options.languages] - Survey languages (default en, fr, es).
  * @param {number} [options.surveyId] - Survey id (default 7).
- * @returns {Promise<object>} The survey.
  */
 export const buildCategoryLabelsSurvey = async ({
   languages = ['en', 'fr', 'es'],
@@ -37,9 +36,7 @@ export const buildCategoryLabelsSurvey = async ({
 
 /**
  * Returns the uuid of a category of the survey.
- * @param {object} survey - Survey.
  * @param {string} name - Category name.
- * @returns {string} The uuid.
  */
 export const categoryUuidOf = (survey: any, name: string): string =>
   Category.getUuid(Survey.getCategoryByName(name)(survey))
@@ -56,7 +53,6 @@ type CategoryLabelParams = {
 /**
  * Builds a category item label operation without id (item uuid `item-<ref>`).
  * @param {CategoryLabelParams} params - Parameters (text defaults to `<ref> (<lang>)`).
- * @returns {object} The draft.
  */
 export const categoryLabelDraft = ({
   categoryUuid,
@@ -79,7 +75,6 @@ export const categoryLabelDraft = ({
 /**
  * Builds a category item label operation.
  * @param {CategoryLabelParams & {id?: string}} params - Parameters (id defaults to c1).
- * @returns {CategoryItemLabelSetOperation} The operation.
  */
 export const categoryLabelOp = ({
   id = 'c1',
@@ -88,9 +83,7 @@ export const categoryLabelOp = ({
 
 /**
  * Builds a change set of survey 7.
- * @param {object[]} operations - Operations.
  * @param {string} [id] - Change set id.
- * @returns {ChangeSet} The change set.
  */
 export const categoryLabelChangeSet = (operations: ChangeSet['operations'], id = 'cs-categories'): ChangeSet => ({
   id,
@@ -156,7 +149,6 @@ export type FakeCategoryItem = {
  * Builds an item of the fake server: uuid `item-<ref>`, level genus (one code) or species (two codes).
  * @param {string} ref - Code path, e.g. "2.14".
  * @param {object} [labels] - Labels (default: `{ en: "Item <ref>" }`).
- * @returns {FakeCategoryItem} The item.
  */
 export const fakeCategoryItem = (ref: string, labels?: Record<string, string>): FakeCategoryItem => {
   const codePath = ref.split('.')
@@ -171,7 +163,6 @@ export const fakeCategoryItem = (ref: string, labels?: Record<string, string>): 
 
 /**
  * Tells whether a text is blank.
- * @param {string} [text] - Text.
  * @returns {boolean} True when empty or only spaces.
  */
 const isBlankText = (text?: string): boolean => (text ?? '').trim() === ''

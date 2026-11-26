@@ -35,7 +35,6 @@ const toQualifier = (qualifierUi: QualifierUi): ArenaUserGroupQualifier => ({
  * @param props0.qualifiers - The qualifiers currently associated with the group.
  * @param props0.onChange - Called with the updated qualifiers array whenever a row is added, edited or removed.
  * @param props0.readOnly - Whether the editor is read-only (add/edit/remove controls are hidden).
- * @returns {React.ReactElement} - The UserGroupQualifiersEditor component.
  */
 export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   const { qualifiers, onChange, readOnly = false } = props

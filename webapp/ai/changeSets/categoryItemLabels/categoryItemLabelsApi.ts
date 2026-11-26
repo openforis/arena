@@ -32,7 +32,6 @@ export type PutCategoryItemLabels = (params: {
 /**
  * Fetches the number of items missing a label, per category and survey language.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
  * @param {AbortSignal} [params.signal] - Aborts the request.
  * @returns {Promise<MissingLabelsCounts>} The counts.
  */
@@ -44,9 +43,6 @@ export const fetchMissingLabelsCounts: FetchMissingLabelsCounts = async ({ surve
 /**
  * Fetches a page of the items of a category whose label is missing in a language.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.categoryUuid - Category uuid.
- * @param {string} params.lang - Language.
  * @param {string|null} params.cursor - nextCursor of the previous page (null: first page).
  * @param {number} params.limit - Page size (at most 200).
  * @param {AbortSignal} [params.signal] - Aborts the request.
@@ -70,7 +66,6 @@ export const fetchMissingLabelsPage: FetchMissingLabelsPage = async ({
 /**
  * Writes category item labels (one transaction; conflicts are reported, not written).
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
  * @param {CategoryItemLabelUpdate[]} params.items - Labels to write.
  * @returns {Promise<CategoryItemLabelsUpdateAnswer>} The answer.
  */

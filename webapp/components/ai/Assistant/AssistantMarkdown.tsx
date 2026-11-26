@@ -17,7 +17,6 @@ import { type AssistantLinkPolicy, renderAssistantMarkdown } from './assistantMa
  * Loads the links of the manual in the interface language once the text refers to the manual (null until then, or
  * when the handbook can't be loaded).
  * @param {string} text - Markdown text.
- * @returns {ManualLinks|null} The manual links.
  */
 const useManualLinks = (text: string): ManualLinks | null => {
   const { language } = useI18n()
@@ -43,7 +42,6 @@ const useManualLinks = (text: string): ManualLinks | null => {
 /**
  * The links that keep their query string: Arena itself and the manual (its Word file and its PDF, not the whole host).
  * @param {ManualLinks|null} links - Manual links, once loaded.
- * @returns {AssistantLinkPolicy} The policy.
  */
 const getLinkPolicy = (links: ManualLinks | null): AssistantLinkPolicy => ({
   trustedOrigins: [globalThis.location.origin],

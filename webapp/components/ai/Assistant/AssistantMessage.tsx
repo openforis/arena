@@ -82,7 +82,6 @@ const ThinkingSection = ({ part, active }: { part: ConversationReasoningPart; ac
 /**
  * One part of an answer: markdown text, the collapsed thinking, or a tool row with the change set card it proposed.
  * @param {object} props - Props.
- * @param {AssistantMessagePart} props.part - Part.
  * @param {ChangeSets} props.changeSets - Cards of the conversation.
  * @param {object} props.queries - Queries of the conversation.
  * @param {boolean} props.streaming - The answer is still streaming.
@@ -208,7 +207,6 @@ const AnswerFooter = ({
  * One message: the user's text, or the answer with its tool rows, change set cards and end status. Apply notes are
  * for the model only.
  * @param {object} props - Props.
- * @param {ConversationMessage} props.message - Message.
  * @param {object} props.changeSets - Cards of the conversation.
  * @param {object} props.queries - Queries of the conversation.
  * @param {boolean} props.isLast - Last message: Retry, and the one announced to screen readers.

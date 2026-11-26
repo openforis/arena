@@ -23,7 +23,6 @@ const IMAGE_INTERPRETATION_KEYS: DisplayOptionKey[] = [
  * @param {object} params - Parameters.
  * @param {object} params.options - Current map options (MapOptions keys to boolean).
  * @param {boolean} params.sampleBasedImageInterpretationEnabled - Whether the survey uses sample-based image interpretation.
- * @returns {DisplayMenuSection[]} The menu sections.
  */
 export const getDisplayMenuSections = ({
   options,
@@ -35,7 +34,6 @@ export const getDisplayMenuSections = ({
   /**
    * Builds the menu item of a display option.
    * @param {DisplayOptionKey} key - The option key.
-   * @returns {DisplayMenuItem} The menu item.
    */
   const toItem = (key: DisplayOptionKey): DisplayMenuItem => ({
     key,

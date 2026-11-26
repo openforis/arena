@@ -16,7 +16,6 @@ import { ToolbarMenu } from './ToolbarMenu'
 
 /**
  * Base map menu: one choice per base layer the user can use, then the custom WMS / WMTS / XYZ base maps.
- * @returns {React.ReactElement} The menu.
  */
 export const BaseMapMenu = (): ReactElement => {
   const user = useUser()

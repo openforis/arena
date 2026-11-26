@@ -35,7 +35,6 @@ export type ProviderDraft = {
 
 /**
  * Returns the URL without spaces and trailing slashes (the server compares endpoints the same way).
- * @param {string|null|undefined} url - URL.
  * @returns {string} The trimmed URL.
  */
 export const trimUrl = (url: string | null | undefined): string => stripTrailingSlashes((url ?? '').trim())
@@ -78,7 +77,6 @@ export const createDraft = ({
  * Returns the name to save.
  * @param {object} params - Parameters.
  * @param {ProviderTypeSpec} params.spec - Type spec.
- * @param {ProviderDraft} params.draft - Draft.
  * @returns {string} The typed name (normalized), else the type's default name.
  */
 export const getDraftName = ({ spec, draft }: { spec: ProviderTypeSpec; draft: ProviderDraft }): string =>
@@ -88,7 +86,6 @@ export const getDraftName = ({ spec, draft }: { spec: ProviderTypeSpec; draft: P
  * Returns the model of the draft.
  * @param {object} params - Parameters.
  * @param {ProviderTypeSpec} params.spec - Type spec.
- * @param {ProviderDraft} params.draft - Draft.
  * @returns {string|null} The trimmed model; null for a type without a model choice.
  */
 export const getDraftModel = ({ spec, draft }: { spec: ProviderTypeSpec; draft: ProviderDraft }): string | null =>
@@ -96,7 +93,6 @@ export const getDraftModel = ({ spec, draft }: { spec: ProviderTypeSpec; draft: 
 
 /**
  * Returns the URL of a local draft as it is stored (http:// added when typed without a scheme).
- * @param {ProviderDraft} draft - Draft.
  * @returns {string|null} The URL, or null when it is not a plain http(s) URL (no credentials, query or fragment).
  */
 export const getLocalDraftUrl = (draft: ProviderDraft): string | null =>
@@ -104,7 +100,6 @@ export const getLocalDraftUrl = (draft: ProviderDraft): string | null =>
 
 /**
  * Returns true when a local address was typed but is not a plain http(s) URL (the dialog then says why).
- * @param {ProviderDraft} draft - Draft.
  * @returns {boolean} True for a typed address that is refused.
  */
 export const isLocalDraftUrlInvalid = (draft: ProviderDraft): boolean =>

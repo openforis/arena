@@ -32,7 +32,6 @@ const fetchEntriesFromApi: FetchEntries = async ({ surveyId, limit, signal }) =>
 /**
  * Streams the summary of the latest activity log entries.
  * @param {object} params - Parameters (surveyId, surveyName, onChunk, signal, model, fetchEntries).
- * @returns {Promise<void>} Resolves when the summary is complete.
  */
 export const summarizeActivityLogWorkflow = async ({
   surveyId,

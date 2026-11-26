@@ -109,9 +109,6 @@ export const initializeSurveyCategoryItemsIndexes = async (
 
 /**
  * Initializes (fixes) the item indexes of every category in a single survey, in one transaction.
- * @param {object} params - The parameters object.
- * @param {number} params.surveyId - The survey id.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<void>} - A promise resolving to void.
  */
 export const initializeCategoryItemIndexesForSurvey = async (

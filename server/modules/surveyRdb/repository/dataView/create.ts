@@ -87,10 +87,8 @@ const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef: ViewDataNodeD
 /**
  * Create a nodeDef data view.
  * @param {object} params - The query parameters.
- * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef to create the data view for.
  * @param {pgPromise.IDatabase} client - The data base client.
- * @returns {Promise<null|*>} - The result promise.
  */
 export const createDataView = (
   { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef },

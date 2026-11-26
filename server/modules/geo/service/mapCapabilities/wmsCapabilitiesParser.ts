@@ -110,7 +110,6 @@ export const collectWmsLayers = (
 
 /**
  * Removes the GetMap parameters Leaflet sets itself (vendor parameters such as "map" stay).
- * @param {string} url - The URL.
  * @returns {string} The URL without those parameters.
  */
 const stripGetMapParams = (url: string): string => {

@@ -1,4 +1,23 @@
 export default {
+  authProvider: {
+    notFound: 'Provajder za prijavu nije pronađen',
+    readOnly: 'Ovaj provajder je definisan u konfiguraciji servera i ne može se ovdje mijenjati',
+    idAlreadyUsed: 'Identifikator "{{id}}" već koristi drugi provajder',
+    encryptionKeyMissing: 'Ključ za šifrovanje tajni klijenata (AUTH_PROVIDER_SECRET_ENCRYPTION_KEY) nije konfigurisan',
+    validation: 'Neka polja nisu važeća',
+    iconInvalid: 'Nevažeća ikona: koristite PNG ili SVG fajl do 100 KB',
+    identityNotFound: 'Povezani nalog nije pronađen',
+    lastSignInMethod: 'Ovo je posljednji način prijave: najprije postavite lozinku ili povežite drugog provajdera',
+    idInvalid: 'Nevažeći identifikator: koristite mala slova, cifre i crtice (najviše 64 znaka)',
+    typeInvalid: 'Nevažeći tip provajdera',
+    labelInvalid: 'Oznaka dugmeta je obavezna (najviše 64 znaka)',
+    issuerInvalid: 'Nevažeći URL izdavaoca (obavezan je https)',
+    tenantInvalid: 'Nevažeći zakupac (tenant)',
+    clientIdRequired: 'ID klijenta je obavezan',
+    scopesMissingOpenid: 'Opsezi moraju uključivati "openid"',
+    emailDomainInvalid: 'Nevažeći e-mail domen',
+    clientSecretRequired: 'Tajna klijenta je obavezna',
+  },
   mapCustomLayers: {
     urlInvalid: 'URL servisa nije važeći',
     urlNotAllowed: 'Mogu se koristiti samo javne http i https adrese',

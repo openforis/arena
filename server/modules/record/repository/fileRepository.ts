@@ -180,9 +180,7 @@ export const fetchCountAndTotalFilesSize = async (
 /**
  * Fetches count and total size of the (not deleted) files of the specified records.
  * @param {!object} params - The parameters.
- * @param {!number} params.surveyId - The survey id.
  * @param {!string[]} params.recordUuids - The uuids of the records.
- * @param {object} [client] - The database client.
  * @returns {Promise<object>} - Count and total size ({count, total}) indexed by record uuid (only records with files).
  */
 export const fetchCountAndTotalFilesSizeByRecordUuids = async (

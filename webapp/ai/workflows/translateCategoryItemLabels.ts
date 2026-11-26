@@ -56,7 +56,6 @@ export type CategoryLabelsTranslationResult = {
  * (the default one first) has it.
  * @param {object} params - Parameters.
  * @param {MissingLabelsItem[]} params.items - Items of the category, as the server lists them.
- * @param {CategoryLabelsCategory} params.category - Category.
  * @param {string} params.lang - Target language.
  * @param {string[]} params.languages - Survey languages, default first.
  * @param {number} [params.maxChars] - Longest text the translation task accepts.
@@ -101,12 +100,10 @@ export const buildCategoryLabelRows = ({
 /**
  * Reads the items missing the label, category by category and page by page, up to maxItems rows.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
  * @param {CategoryLabelsCategory[]} params.categories - Categories of the suggestion.
  * @param {string} params.lang - Target language.
  * @param {string[]} params.languages - Survey languages, default first.
  * @param {FetchMissingLabelsPage} [params.fetchPage] - Page request.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {number} [params.maxItems] - Most rows of one run.
  * @returns {Promise<object>} The rows, and the number of items whose source label is too long.
  */
@@ -159,7 +156,6 @@ export const loadCategoryLabelRows = async ({
  * @param {number} [params.skippedCount] - Items never sent (source too long): they count as failed.
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {AiBatchGuard} params.guard - Check run before each call.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener ({ done, total } calls).
  * @param {Function} [params.translate] - The translation task (tests).
  * @param {number} [params.batchSize] - Items per call.
@@ -207,7 +203,6 @@ export const runTranslateCategoryItemLabels = async ({
  * at Apply, not overwritten.
  * @param {object[]} rows - Translated rows.
  * @param {string} lang - Target language.
- * @returns {ChangeOperationDraft[]} The drafts.
  */
 export const toCategoryLabelDrafts = (
   rows: (CategoryLabelRow & { aiText: string })[],

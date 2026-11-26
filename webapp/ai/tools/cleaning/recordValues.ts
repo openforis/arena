@@ -15,11 +15,8 @@ export const RECORD_VALUES_MAX = 100
 /**
  * Reads the nodes of some attributes of a record, at most `max` nodes.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Cycle key.
  * @param {object} params.record - The record with its nodes.
  * @param {object[]} params.nodeDefs - Attribute definitions, in the order wanted.
- * @param {CleaningI18n} params.i18n - Translator.
  * @param {string|null} [params.parentNodeUuid] - Entity node: only the nodes below it.
  * @param {number} [params.max] - Node cap.
  * @returns {object} The nodes, the total and the truncated flag.

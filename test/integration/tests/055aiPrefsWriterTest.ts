@@ -66,7 +66,6 @@ describe('AI prefs writer (055)', () => {
 
   /**
    * Loads the user as a request sees it: arena-server reads the whole row, the server-only prefs included.
-   * @returns {Promise<any>} The user.
    */
   const loadRequestUser = async (): Promise<any> => {
     const user = await UserManager.fetchUserByUuid(uuid())

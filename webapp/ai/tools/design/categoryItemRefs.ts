@@ -28,13 +28,11 @@ export const CATEGORY_ITEM_REFS_MAX_ENTRIES = 5000
 /**
  * Returns the map key of a ref.
  * @param {RefKey} key - Survey, category and ref.
- * @returns {string} The key.
  */
 const toKey = ({ surveyId, categoryUuid, ref }: RefKey): string => `${surveyId}|${categoryUuid}|${ref}`
 
 /**
  * Creates the refs of one conversation.
- * @returns {CategoryItemRefs} The refs.
  */
 export const createCategoryItemRefs = (): CategoryItemRefs => {
   const entries = new Map<string, CategoryItemRefEntry>()
@@ -62,7 +60,6 @@ export const createCategoryItemRefs = (): CategoryItemRefs => {
 /**
  * Creates a registry of refs by conversation.
  * @param {number} [maxConversations] - Conversations kept.
- * @returns {CategoryItemRefsRegistry} The registry.
  */
 export const createCategoryItemRefsRegistry = (
   maxConversations: number = CATEGORY_ITEM_REFS_MAX_CONVERSATIONS

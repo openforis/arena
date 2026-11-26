@@ -20,7 +20,6 @@ const SECTION_TARGET = /^§ ?(A\d+|\d+(?:\.\d+)*)\.?$/
 
 /**
  * Prepares the links of the manual sections (the first part of each section id).
- * @param {Handbook} handbook - Handbook.
  * @returns {ManualLinks} The manual URLs and the section links by id.
  */
 export const createManualLinks = (handbook: Handbook): ManualLinks => {

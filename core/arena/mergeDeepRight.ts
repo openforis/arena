@@ -6,7 +6,5 @@ import { _mergeDeep } from './internal/_mergeDeep'
  *
  * @param {*} left - The first object.
  * @param {*} right - The object whose properties take precedence.
- *
- * @returns {object} - The result.
  */
 export const mergeDeepRight = _curry2((left: any, right: any): any => _mergeDeep(left, right))

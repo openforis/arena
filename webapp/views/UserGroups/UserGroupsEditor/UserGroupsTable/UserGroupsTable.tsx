@@ -11,8 +11,6 @@ import { useUserGroupsTable } from './useUserGroupsTable'
  * User Groups report table: one row per group-member pair, listing group name, label and
  * qualifiers alongside the member's name, email, survey role and account status. Groups without
  * members are shown with a single, empty-member row so every group stays visible.
- *
- * @returns {React.ReactElement} - The UserGroupsTable component.
  */
 const UserGroupsTable = (): React.ReactElement => {
   const i18n = useI18n()

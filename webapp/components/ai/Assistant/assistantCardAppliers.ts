@@ -22,7 +22,6 @@ type ReduxStore = { dispatch: (action: any) => any; getState: () => any }
 /**
  * Creates the card appliers of the conversation controller.
  * @param {ReduxStore} reduxStore - The app store.
- * @returns {AssistantCardAppliers} The appliers.
  */
 export const createCardAppliers = (reduxStore: ReduxStore): AssistantCardAppliers => ({
   applyOperations: async ({ changeSet, operationIds, onProgress }) => {

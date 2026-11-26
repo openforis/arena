@@ -246,8 +246,6 @@ const _persistNodes = async (
  * Recomputes the "required if" flags (parent nodes meta) of the specified node defs in the whole record (nodes not persisted).
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user performing the update.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.record - The record.
  * @param {!string[]} params.nodeDefUuids - UUIDs of the node defs whose "required if" condition has changed.
  * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
  * @returns {Promise<object>} - The update result (updated record and nodes).
@@ -276,8 +274,6 @@ export const updateRequiredFlags = ({
  * Updates the dependents (default values, applicability, validation...) of the specified nodes.
  * @param {!object} params - The parameters.
  * @param {object} [params.user] - The user performing the update.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.record - The record.
  * @param {!object} params.nodes - The updated nodes, indexed by UUID.
  * @param {number} [params.timezoneOffset] - The client timezone offset.
  * @param {string} [params.lang] - The language used to evaluate the expressions (survey default language if not specified).
@@ -285,7 +281,6 @@ export const updateRequiredFlags = ({
  * @param {boolean} [params.persistNodes] - Whether to persist the updated nodes (true by default).
  * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
  * @param {boolean} [params.clearNonApplicableValues] - Whether to clear the values of the non applicable nodes.
- * @param {object} [tx] - The database transaction.
  * @returns {Promise<object>} - The update result (updated record and nodes).
  */
 export const updateNodesDependents = async (

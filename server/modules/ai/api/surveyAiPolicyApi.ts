@@ -50,7 +50,6 @@ const sendPolicy = async ({
 
 /**
  * Builds the middleware chains of the two routes (tests inject the dependencies).
- * @param {SurveyAiPolicyRouteDeps} [deps] - Dependencies.
  * @returns {{get: Middleware[], put: Middleware[]}} The chains.
  */
 export const createSurveyAiPolicyRoutes = (deps: SurveyAiPolicyRouteDeps = createDefaultDeps()) => {
@@ -72,7 +71,6 @@ export const createSurveyAiPolicyRoutes = (deps: SurveyAiPolicyRouteDeps = creat
 /**
  * Registers the survey AI policy routes.
  * @param {object} app - Express router.
- * @returns {void}
  */
 export const init = (app: any): void => {
   const routes = createSurveyAiPolicyRoutes()

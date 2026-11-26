@@ -32,7 +32,6 @@ const fakeFetcher = (results: FetchResult[]): { fetcher: SafeHttpFetcher; reques
 /**
  * Runs a request and returns the key of the error it fails with.
  * @param {Promise<unknown>} promise - The request.
- * @returns {Promise<string>} The error key.
  */
 const errorKeyOf = async (promise: Promise<unknown>): Promise<string> => {
   try {

@@ -68,10 +68,7 @@ const describeDesignIssues = (names: string[]): string | null => {
  * Builds the system prompt of the Design area.
  * @param {object} params - Parameters.
  * @param {string} params.uiLang - The user's interface language (answer language).
- * @param {string} params.surveyName - Survey name.
  * @param {string} params.surveyLabel - Survey label in the preferred language.
- * @param {string[]} params.languages - Survey languages.
- * @param {string|null} params.cycle - Current cycle key.
  * @param {string|null} params.viewDescription - Where the user is (see describeView).
  * @param {string[]} [params.nodeDefNamesWithIssues] - Names of the node definitions with design errors or warnings.
  * @returns {string} The system prompt.

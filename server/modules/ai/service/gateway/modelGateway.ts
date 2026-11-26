@@ -75,7 +75,6 @@ export const createDefaultModelGatewayDeps = (): ModelGatewayDeps => ({
 /**
  * Creates the abort controller of one call, aborted by the timeout or by the client going away.
  * @param {object} params - Parameters.
- * @param {object} params.res - Express response.
  * @param {number} params.timeoutMs - Timeout.
  * @returns {object} Signal, state and dispose function.
  */
@@ -106,7 +105,6 @@ const createCallControl = ({ res, timeoutMs }: { res: any; timeoutMs: number }) 
 
 /**
  * Creates a function that records telemetry for the call only the first time it is called.
- * @param {ModelGatewayDeps} deps - Dependencies.
  * @param {TelemetryContext} ctx - Telemetry context.
  * @returns {(outcome: object) => void} The recorder.
  */
@@ -122,9 +120,6 @@ const createTelemetryRecorder = (deps: ModelGatewayDeps, ctx: TelemetryContext) 
 
 /**
  * Answers with a JSON error unless the response was already started or closed.
- * @param {object} res - Express response.
- * @param {SystemError} error - The error.
- * @returns {void}
  */
 const sendJsonError = (res: any, error: SystemError) => {
   if (!isSseClosed(res) && !res.headersSent) Response.sendErr(res, error)
@@ -133,9 +128,7 @@ const sendJsonError = (res: any, error: SystemError) => {
 /**
  * Validates the request, applies the gates and resolves the model (nothing reaches the provider yet).
  * @param {object} params - Parameters.
- * @param {object} params.req - Express request.
  * @param {ArenaUser} params.user - Logged-in user.
- * @param {ModelGatewayDeps} params.deps - Dependencies.
  * @returns {Promise<object>} Request, sanitized call, model and telemetry context.
  */
 const prepareCall = async ({ req, user, deps }: { req: any; user: ArenaUser; deps: ModelGatewayDeps }) => {
@@ -173,7 +166,6 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: ArenaUser; dep
 /**
  * Sends the error event to the client unless the response is already closed.
  * @param {object} params - Parameters.
- * @param {any} params.res - The response.
  * @param {Function} params.writeEvent - The SSE event writer.
  * @param {unknown} params.error - The error to send.
  * @param {ReturnType<typeof createCallControl>['state']} params.state - The state of the call.
@@ -194,7 +186,6 @@ const sendErrorIfOpen = ({
 
 /**
  * Copies the provider stream to the SSE response; stream errors are sent as keys only.
- * @param {object} params - Parameters.
  * @returns {Promise<object>} The outcome (usage or error).
  */
 const pumpStream = async ({
@@ -264,8 +255,6 @@ type RunParams = {
 
 /**
  * Runs a non-streaming call and answers with the wire result.
- * @param {RunParams} params - Parameters.
- * @returns {Promise<void>} Resolves when answered.
  */
 const runGenerate = async ({ model, call, res, control, record, offeredTools }: RunParams): Promise<void> => {
   const result = await model.doGenerate({ ...call, abortSignal: control.signal })
@@ -277,8 +266,6 @@ const runGenerate = async ({ model, call, res, control, record, offeredTools }: 
 
 /**
  * Runs a streaming call; mid-stream errors are logged in full, the client only gets the mapped key.
- * @param {RunParams} params - Parameters.
- * @returns {Promise<void>} Resolves when the stream is closed.
  */
 const runStream = async ({
   model,
@@ -302,10 +289,7 @@ const runStream = async ({
  * Handles one gateway request; always answers by itself (JSON, SSE stream or JSON error).
  * @param {object} params - Parameters.
  * @param {object} params.req - Express request (body: AiGatewayRequest).
- * @param {object} params.res - Express response.
  * @param {ArenaUser} params.user - Logged-in user (permission already checked by the route middleware).
- * @param {ModelGatewayDeps} params.deps - Dependencies.
- * @returns {Promise<void>} Resolves when the response is complete.
  */
 export const handleModelRequest = async ({
   req,

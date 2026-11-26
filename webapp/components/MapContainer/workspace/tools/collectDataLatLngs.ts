@@ -7,7 +7,6 @@ type LayerOptions = { interactive?: boolean; pane?: string }
 
 /**
  * Collects the points of the data shown on the map: marker positions and the corners of lines and polygons.
- * @param {L.Map} map - The map.
  * @returns {LatLngLiteral[]} The points (may contain duplicates).
  */
 export const collectDataLatLngs = (map: L.Map): LatLngLiteral[] => {

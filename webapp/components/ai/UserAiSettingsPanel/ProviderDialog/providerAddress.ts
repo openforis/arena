@@ -24,7 +24,6 @@ export const shouldShowLocalUrlHint = ({ spec, baseUrl, allowlist }: AddressPara
 /**
  * Returns true when an Organisation server URL is typed but not on the allowlist.
  * @param {AddressParams} params - Type spec, typed base URL and the org-hosted base URLs.
- * @returns {boolean} True when the URL is refused.
  */
 export const isOrgServerUrlRefused = ({ spec, baseUrl, allowlist }: AddressParams): boolean =>
   spec.value === 'orgServer' && !!baseUrl.trim() && !isOrgHostedUrl(baseUrl, allowlist)
@@ -32,7 +31,6 @@ export const isOrgServerUrlRefused = ({ spec, baseUrl, allowlist }: AddressParam
 /**
  * Returns true when the account draft has a base URL the server may call (or needs none).
  * @param {AddressParams} params - Type spec, typed base URL and the org-hosted base URLs.
- * @returns {boolean} True when usable.
  */
 export const isAccountBaseUrlUsable = (params: AddressParams): boolean =>
   !params.spec.requiresBaseUrl ||

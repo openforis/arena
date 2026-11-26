@@ -16,7 +16,6 @@ export const POLICY_REASONS: AiUnavailableReason[] = ['policyForbids']
 
 /**
  * Returns true when the reason comes from the survey AI policy (only a policy change fixes it).
- * @param {AiUnavailableReason} reason - Reason.
  * @returns {boolean} True for policy reasons.
  */
 export const isPolicyReason = (reason: AiUnavailableReason): boolean => POLICY_REASONS.includes(reason)
@@ -41,8 +40,6 @@ export const getEffectiveProviderId = ({
 
 /**
  * Returns a selection with one reason.
- * @param {AiUnavailableReason} reason - Reason.
- * @returns {AiEngineSelection} The selection.
  */
 const unavailable = (reason: AiUnavailableReason): AiEngineSelection => ({ unavailable: [reason] })
 

@@ -15,7 +15,6 @@ export const chunkLines = (lines: string[], size: number = linesPerMessage): str
 
 /**
  * Keeps the most recent lines whose total size does not exceed maxBytes.
- * @param {string[]} lines - The lines.
  * @param {number} maxBytes - Maximum total size (in bytes).
  * @returns {{lines: string[], skipped: boolean}} - The kept lines and whether some lines were dropped.
  */
@@ -50,7 +49,6 @@ export type LogFileStream = { stop: () => void }
 
 /**
  * Sends the last lines of a log file and then the lines appended to it.
- * @param {LogFileStreamParams} params - The parameters.
  * @returns {Promise<LogFileStream>} - The started stream.
  */
 export const startLogFileStream = async (params: LogFileStreamParams): Promise<LogFileStream> => {

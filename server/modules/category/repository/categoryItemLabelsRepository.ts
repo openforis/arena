@@ -58,7 +58,6 @@ const itemCode = (alias: string): string => `COALESCE(${combinedProps(alias)} ->
 
 /**
  * Runs a read query in a transaction that cancels it after the timeout.
- * @param {object} client - Database client.
  * @param {Function} query - The query, given the transaction.
  * @returns {Promise<T>} The result of the query.
  * @throws {SystemError} categoryItemLabelsTooLarge (503) when the query was cancelled by the timeout.
@@ -80,9 +79,7 @@ const runBounded = async <T>(client: DbClient, query: (t: DbClient) => Promise<T
 /**
  * Counts the items missing a label, per category and language.
  * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
  * @param {string[]} params.langs - Survey languages.
- * @param {object} [client] - Database client.
  * @returns {Promise<MissingLabelsCounts>} Counts by category uuid, then language (only counts above 0).
  */
 export const countItemsMissingLabels = async (
@@ -113,10 +110,6 @@ export const countItemsMissingLabels = async (
 
 /**
  * Tells whether a category exists in the survey.
- * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.categoryUuid - Category uuid.
- * @param {object} [client] - Database client.
  * @returns {Promise<boolean>} True when it exists.
  */
 export const categoryExists = (
@@ -141,13 +134,10 @@ type MissingLabelsRow = {
  * Fetches the items of a category missing a label, in level, then code path order, after the cursor item. The cursor
  * is searched among all items (a filled one keeps its place); an unknown cursor restarts from the first item.
  * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.categoryUuid - Category uuid.
  * @param {string} params.lang - Missing language.
  * @param {string[]} params.langs - Survey languages.
  * @param {string|null} params.cursor - Uuid of the last item already listed.
  * @param {number} params.limit - Most items returned.
- * @param {object} [client] - Database client.
  * @returns {Promise<{total: number, items: MissingLabelsItem[]}>} The total of missing items and the items.
  */
 export const fetchItemsMissingLabels = async (
@@ -242,9 +232,6 @@ export type ItemLabelsRow = {
 
 /**
  * Fetches the combined labels of items and locks their rows until the end of the transaction.
- * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string[]} params.itemUuids - Item uuids.
  * @param {object} client - Database client (a transaction).
  * @returns {Promise<ItemLabelsRow[]>} The rows of the existing items.
  */

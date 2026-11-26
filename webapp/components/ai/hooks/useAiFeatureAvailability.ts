@@ -37,7 +37,6 @@ export type AiFeaturePolicyState = {
  * @param {string} feature - Feature key (common/ai/features).
  * @param {object} [options] - Options.
  * @param {AiDataClass} [options.dataClass] - Data class of the request (default: the feature's lowest).
- * @returns {AiFeaturePolicyState} The state.
  */
 export const useAiFeaturePolicy = (
   feature: string,
@@ -77,7 +76,6 @@ export const useAiFeaturePolicy = (
  * @param {object} [options] - Options.
  * @param {AiDataClass} [options.dataClass] - Data class of the request (default: the feature's lowest; the assistant passes its conversation's).
  * @param {string} [options.providerId] - The conversation's provider (default: the user's default provider).
- * @returns {AiEngineFeatureAvailability} The availability.
  */
 export const useAiFeatureAvailability = (
   feature: string,

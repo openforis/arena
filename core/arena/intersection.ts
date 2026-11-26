@@ -4,11 +4,6 @@ import { uniq } from './uniq'
 
 /**
  * Returns the (unique) elements that are in both lists.
- *
- * @param {*} list1 - The first array.
- * @param {*} list2 - The second array.
- *
- * @returns {Array} - The result.
  */
 export const intersection = _curry2((list1: any[], list2: any[]): any[] => {
   const lookupList = list1.length > list2.length ? list1 : list2

@@ -23,7 +23,6 @@ const ENTRY = { itemUuid: 'item-2.14', levelName: 'species', labels: { en: 'Pinu
 
 /**
  * Runs a turn where the model calls one tool, which gets the turn's context.
- * @param {Conversation} conversation - Conversation.
  * @param {Function} withCtx - Called with the tool context.
  * @returns {Promise<Conversation>} The conversation after the turn.
  */

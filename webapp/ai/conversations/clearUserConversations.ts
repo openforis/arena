@@ -9,11 +9,8 @@ import type { OpenConversations } from './openConversations'
 /**
  * Deletes the user's conversations and forgets their open conversations and suggestions.
  * @param {object} params - Parameters.
- * @param {object} params.conversationStore - Conversation store.
  * @param {object} params.openConversations - Remembered open conversations.
  * @param {object} [params.suggestions] - Suggestion store (its in-progress entries point to these conversations).
- * @param {string} params.userUuid - User UUID.
- * @returns {Promise<void>} Resolves when done.
  */
 export const clearUserConversations = async ({
   conversationStore,

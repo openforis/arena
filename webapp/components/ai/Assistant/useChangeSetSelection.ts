@@ -33,7 +33,6 @@ export type ChangeSetSelection = {
  * Selection, Apply and Discard of a change set, shared by its card and its review dialog. Every pending operation
  * without conflict starts selected, except the expression and property changes of a compact card.
  * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
  * @param {boolean} params.compact - The card is compact: its changes are reviewed in the dialog.
  * @param {object} params.survey - Current survey (conflicts).
  * @param {Function} params.onApply - Applies the selected operations.

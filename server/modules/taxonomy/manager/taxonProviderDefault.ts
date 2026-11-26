@@ -43,9 +43,7 @@ const getTaxonByUuid = ({
 /**
  * Gets a taxon from the survey ref data or, for big taxonomies (not in the ref data), from the database.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.nodeDef - The taxon node definition.
- * @param {string} params.taxonUuid - The taxon uuid.
  * @returns {Promise<import('@openforis/arena-core').ArenaTaxon|null>} - The taxon, or null if not found.
  */
 const getOrFetchTaxon = ({

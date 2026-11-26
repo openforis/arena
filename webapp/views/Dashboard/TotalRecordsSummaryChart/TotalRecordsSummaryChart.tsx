@@ -28,7 +28,6 @@ const AXIS_STROKE = themeColors.onPrimaryContainer
 /**
  * Line/area trend of records added over the selected period.
  *
- * @param {TotalRecordsSummaryChartProps} props - The component props.
  * @returns {React.ReactElement} The chart or empty state.
  */
 const TotalRecordsSummaryChart = (props: TotalRecordsSummaryChartProps) => {

@@ -40,7 +40,6 @@ export const toMapImageFormat = (mimeType: string): MapImageFormat | null => {
 
 /**
  * Lists the supported image formats among the MIME types offered by a service.
- * @param {string[]} mimeTypes - The MIME types.
  * @returns {MapImageFormat[]} The formats, PNG first, without duplicates.
  */
 export const toMapImageFormats = (mimeTypes: string[]): MapImageFormat[] => {

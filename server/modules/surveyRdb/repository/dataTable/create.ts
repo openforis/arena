@@ -8,11 +8,8 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
  * Create a nodeDef data table.
  *
  * @param {object} params - The query parameters.
- * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef to create the data table for.
  * @param {pgPromise.IDatabase} client - The data base client.
- *
- * @returns {Promise<null|*>} - The result promise.
  */
 export const createDataTable = (
   { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef },
@@ -55,10 +52,8 @@ const _getIndexedColumnNames = (nodeDef: ArenaAnyNodeDef) => {
  * Create the indexes of a nodeDef data table.
  * It should be invoked after the table has been populated, to speed up the bulk insert.
  * @param {object} params - The query parameters.
- * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef of the data table.
  * @param {pgPromise.IDatabase} client - The data base client.
- * @returns {Promise<void>} - The result promise.
  */
 export const createDataTableIndexes = async (
   { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaAnyNodeDef },

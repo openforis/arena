@@ -34,19 +34,13 @@ const capabilitiesStore = createCapabilitiesStore({
 
 /**
  * Returns the UUID of the logged-in user, or null.
- * @returns {string|null} The UUID.
  */
 export const getCurrentUserUuid = (): string | null => User.getUuid(UserState.getUser(reduxStore.getState())) ?? null
 
-/**
- * Returns the app capabilities store.
- * @returns {AiCapabilitiesStore} The store.
- */
 export const getAiCapabilitiesStore = (): AiCapabilitiesStore => capabilitiesStore
 
 /**
  * Loads the capabilities once per session (probes the local server when it is enabled).
- * @returns {Promise<AiCapabilities>} The capabilities.
  */
 export const loadAiCapabilities = (): Promise<AiCapabilities> =>
   capabilitiesStore.load({ userUuid: getCurrentUserUuid() })
@@ -55,7 +49,6 @@ export const loadAiCapabilities = (): Promise<AiCapabilities> =>
  * Reloads the AI settings and probes the local server again (after a settings change, or Retry).
  * @param {object} [options] - Options.
  * @param {boolean} [options.probe] - False to keep the stored probes (only the settings are read again).
- * @returns {Promise<AiCapabilities>} The capabilities.
  */
 export const refreshAiCapabilities = ({ probe = true }: { probe?: boolean } = {}): Promise<AiCapabilities> =>
   capabilitiesStore.refresh({ userUuid: getCurrentUserUuid(), probe })
@@ -65,7 +58,6 @@ export const refreshAiCapabilities = ({ probe = true }: { probe?: boolean } = {}
  * @param {object} params - Parameters.
  * @param {string} params.baseUrl - Server URL.
  * @param {string|null} params.modelId - Chosen model.
- * @returns {Promise<LocalServerProbeResult>} The probe result.
  */
 export const testLocalServer = ({
   baseUrl,
@@ -77,7 +69,6 @@ export const testLocalServer = ({
 
 /**
  * Tells the subscribers that something they derive from the capabilities changed (e.g. a consent decision).
- * @returns {void}
  */
 export const notifyAiCapabilities = (): void => capabilitiesStore.notify()
 
@@ -90,14 +81,12 @@ export const subscribeAiCapabilities = (listener: () => void): (() => void) => c
 
 /**
  * Returns the current capabilities (same object until something changes), never another user's.
- * @returns {AiCapabilities} The capabilities.
  */
 export const getAiCapabilitiesSnapshot = (): AiCapabilities =>
   getCapabilitiesSnapshotForUser(capabilitiesStore, getCurrentUserUuid())
 
 /**
  * Drops the capabilities of the previous user (login, logout).
- * @returns {void}
  */
 export const resetAiCapabilities = (): void => capabilitiesStore.reset()
 

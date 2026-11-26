@@ -14,8 +14,6 @@ export type PasswordInputProps = Omit<SimpleTextInputProps, 'type' | 'endAdornme
 
 /**
  * Returns the data-* attributes of the props.
- * @param {PasswordInputProps} props - The props.
- * @returns {Record<string, string>} The attributes with a value.
  */
 const getDataAttributes = (props: PasswordInputProps): Record<string, string> =>
   Object.fromEntries(

@@ -162,7 +162,6 @@ export const insertNodeDefs = (
 /**
  * Throws an error if the custom aggregate functions being saved are not valid (e.g. not allowed SQL in the expression).
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {string} params.nodeDefUuid - The UUID of the node definition being updated.
  * @param {object} params.propsAdvanced - The advanced props being saved.
  * @returns {Promise<void>} - The validation promise.
@@ -307,13 +306,7 @@ export const convertNodeDef = (
  * get their categoryUuid/taxonomyUuid prop rewritten accordingly.
  * @param {object} params - The params.
  * @param {object} params.user - The user performing the clone.
- * @param {string} params.sourceSurveyId - The source survey id.
- * @param {object} params.sourceSurvey - The source survey.
- * @param {string} params.targetSurveyId - The target survey id.
- * @param {object} params.targetSurvey - The target survey.
  * @param {Array.<object>} params.clonedNodeDefs - The node defs cloned from the source survey.
- * @param {object} [client] - The db client.
- * @returns {Promise<object>} - { clonedNodeDefs, categoriesCloned, taxonomiesCloned }.
  */
 export const resolveAndCloneNodeDefsCategoriesAndTaxonomies = async (
   {
@@ -532,7 +525,6 @@ export const fetchNodeDefsUpdatedAndValidated = async (
  * the explicit `.filter(...)` below is the sole guard that excludes it from the reindexing.
  * @param {object} params - Parameters.
  * @param {object} params.survey - The survey object (pre-deletion snapshot).
- * @param {number} params.surveyId - The survey identifier.
  * @param {object} params.nodeDefDeleted - The analysis node def that was just deleted.
  * @param {object} client - The database client / transaction.
  * @returns {Promise<object>} UUID-indexed map of the reindexed node defs (may be empty if no reindexing was needed).

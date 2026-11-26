@@ -12,7 +12,6 @@ import type { AssistantConversationApi } from './useAssistantConversation'
 /**
  * Footer of the composer: the provider that answers, what is sent, the context used, then Send or Stop (children).
  * @param {object} props - Props.
- * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @param {ContextMeter|null} props.contextMeter - Meter of the shown conversation (computed once by the chat).
  * @param {React.ReactNode} [props.children] - Send or Stop button, on the right.

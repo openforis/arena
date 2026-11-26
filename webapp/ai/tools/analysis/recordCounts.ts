@@ -38,7 +38,6 @@ const parseIsoDay = (value: string): number => {
 
 /**
  * Checks the requested range.
- * @param {CountOverTimeInput} input - Tool input.
  * @returns {void} Nothing; throws a failure when the range is invalid.
  */
 const checkRange = ({ from, to, groupBy }: CountOverTimeInput): void => {
@@ -73,7 +72,6 @@ const sumByMonth = (days: PeriodCount[]): PeriodCount[] => {
 
 /**
  * Turns an expected request failure into a failure the model can act on.
- * @param {any} error - The error.
  * @returns {Error} The error to throw.
  */
 const toCountFailure = (error: any) => toRequestFailure(error, 'The count took too long. Try a shorter date range.')
@@ -99,7 +97,6 @@ export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<an
     /**
      * Counts the records by step.
      * @param {EmptyInput} _input - Tool input (none).
-     * @param {object} ctx - Tool context.
      * @returns {Promise<object>} The counts, or an error result.
      */
     execute: async (_input, ctx) => {
@@ -121,8 +118,6 @@ export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<an
     inputSchema: countOverTimeInputSchema,
     /**
      * Counts the records created per day or month.
-     * @param {CountOverTimeInput} input - Tool input.
-     * @param {object} ctx - Tool context.
      * @returns {Promise<object>} The counts, or an error result.
      */
     execute: async (input, ctx) => {

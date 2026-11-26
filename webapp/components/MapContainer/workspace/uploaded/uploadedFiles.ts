@@ -12,7 +12,6 @@ const KIND_BY_EXTENSION: Record<string, UploadedFileKind> = {
 
 /**
  * Tells how an uploaded file is read from its extension.
- * @param {string} fileName - The file name.
  * @returns {UploadedFileKind|null} The kind, or null for unsupported files.
  */
 export const getUploadedFileKind = (fileName: string): UploadedFileKind | null => {

@@ -13,7 +13,6 @@ export const TEST_NOW = new Date('2026-10-11T10:00:00.000Z')
 
 /**
  * Replaces a node definition of the survey with a changed copy.
- * @param {object} survey - Survey.
  * @param {string} name - Node definition name.
  * @param {Function} change - Returns the changed node definition.
  * @returns {object} The updated survey.
@@ -23,7 +22,6 @@ export const withNodeDef = (survey: any, name: string, change: (nodeDef: any) =>
 
 /**
  * Marks every node definition as saved (the test survey builder leaves them all temporary).
- * @param {object} survey - Survey.
  * @returns {object} The updated survey.
  */
 export const withSavedNodeDefs = (survey: any): any =>
@@ -34,7 +32,6 @@ export const withSavedNodeDefs = (survey: any): any =>
 
 /**
  * Replaces the labels or descriptions of a node definition.
- * @param {object} survey - Survey.
  * @param {string} name - Node definition name.
  * @param {LabelKind} kind - Labels or descriptions.
  * @param {object} texts - The new texts by language (the whole map).
@@ -47,7 +44,6 @@ export const withTexts = (survey: any, name: string, kind: LabelKind, texts: Rec
 
 /**
  * Sets the survey languages (the test surveys keep the survey info at the top level).
- * @param {object} survey - Survey.
  * @param {string[]} languages - Languages, default first.
  * @returns {object} The updated survey.
  */
@@ -73,12 +69,10 @@ export const createAddRecorder = (): { store: SuggestionStore; added: AssistantS
 /**
  * Creates a detector context on a draft generation of survey 7 (cycle 0) of an editor.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
  * @param {SuggestionStore} [params.store] - Store (default: a recorder).
  * @param {boolean} [params.draft] - Whether the defs are the draft (default true).
  * @param {boolean} [params.canEditSurvey] - Whether the user can edit (default true).
  * @param {boolean} [params.noGeneration] - True for a context without generation.
- * @returns {DetectorContext} The context.
  */
 export const createDetectorContext = ({
   survey,
@@ -113,10 +107,7 @@ export const createDetectorContext = ({
 
 /**
  * Builds a Design suggestion of survey 7, as the store returns it (visible targets only).
- * @param {SuggestionKind} kind - Kind.
  * @param {string} scopeKey - Id part after the kind.
- * @param {string[]} targetKeys - Target keys.
- * @returns {AssistantSuggestion} The suggestion.
  */
 export const buildSuggestion = (kind: SuggestionKind, scopeKey: string, targetKeys: string[]): AssistantSuggestion => ({
   id: `${kind}:${scopeKey}`,
@@ -131,9 +122,7 @@ export const buildSuggestion = (kind: SuggestionKind, scopeKey: string, targetKe
 
 /**
  * Creates the context of a card or prompt.
- * @param {object|null} survey - Survey.
  * @param {string} [lang] - Interface language (default en).
- * @returns {SuggestionDescribeContext} The context.
  */
 export const describeContext = (survey: any, lang = 'en'): SuggestionDescribeContext => ({ survey, t: fakeT, lang })
 
@@ -141,7 +130,6 @@ export const describeContext = (survey: any, lang = 'en'): SuggestionDescribeCon
  * Builds survey 7 (en) with categories and a taxonomy: cluster > cluster_id (integer, key), country (code, category
  * countries), region (code, no category), species (taxon, no taxonomy), tree_species (taxon, taxonomy trees),
  * calc_code (code, analysis, no category). Categories land_use (class) and countries (country, region); taxonomy trees.
- * @returns {Promise<object>} The survey.
  */
 export const buildRefSurvey = async (): Promise<any> => {
   const { code, integer, taxon } = NodeDef.nodeDefType

@@ -68,7 +68,6 @@ export const parseSseWrites = (res: { writes: string[] }) =>
 
 /**
  * Minimal Express request double.
- * @param {object} body - Request body.
  * @returns {object} The fake request.
  */
 export const createFakeRequest = (body: unknown) => {
@@ -81,10 +80,6 @@ export const createFakeRequest = (body: unknown) => {
 
 /**
  * Calls a route handler or middleware as Express 5 does: an error it throws (a rejected promise) goes to next.
- * @param {Function} handler - The handler.
- * @param {object} req - The request.
- * @param {object} res - The response.
- * @param {Function} next - The next function.
  * @returns {Promise<void>} Settles when the handler does.
  */
 export const callHandler = async (

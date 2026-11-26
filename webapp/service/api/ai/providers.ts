@@ -31,7 +31,6 @@ type SettingsBody = Record<string, any>
 /**
  * Returns the URL of one provider (ids contain ':', which is encoded).
  * @param {string} id - Provider id.
- * @returns {string} The URL.
  */
 const providerUrl = (id: string): string => `/api/ai/providers/${encodeURIComponent(id)}`
 
@@ -48,7 +47,6 @@ export const testProvider = async (input: AiProviderRequest): Promise<AiProvider
 /**
  * Lists the models of a draft or a saved provider.
  * @param {AiProviderRequest} input - Draft or saved provider.
- * @returns {Promise<AiProviderModelsResponse>} The models.
  */
 export const fetchProviderModels = async (input: AiProviderRequest): Promise<AiProviderModelsResponse> => {
   const { data } = await axios.post('/api/ai/providers/models', input, localErrors)
@@ -84,19 +82,12 @@ export const updateProvider = async (
 /**
  * Removes an account provider (a removed default becomes Arena default on the server).
  * @param {string} id - Provider id.
- * @returns {Promise<{settings: object}>} The settings.
  */
 export const removeProvider = async (id: string): Promise<{ settings: SettingsBody }> => {
   const { data } = await axios.delete(providerUrl(id))
   return data
 }
 
-/**
- * Sets the default provider.
- * @param {object} params - Parameters.
- * @param {string} params.providerId - Provider id.
- * @returns {Promise<{settings: object}>} The settings.
- */
 export const setDefaultProvider = async ({
   providerId,
 }: {

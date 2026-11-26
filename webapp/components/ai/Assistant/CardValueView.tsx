@@ -6,8 +6,6 @@ import type { CardValue } from './changeSetCardModel'
 
 /**
  * A value of a change set row (text, boolean or expression list).
- * @param {object} props - Props.
- * @param {CardValue} props.value - Value.
  * @returns {React.ReactElement} The value.
  */
 export const CardValueView = ({ value }: { value: CardValue }) => {

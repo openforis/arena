@@ -137,7 +137,6 @@ const _getAncestorUuidSelect = ({
 /**
  * It builds the node select query.
  * @param {!object} params - The parameters.
- * @param {!number} [params.surveyId] - The survey ID.
  * @param {boolean} [params.includeRefData] - If true, category item and taxon item associated to the node value will be fetched.
  * @param {boolean} [params.includeRecordUuid] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
  * @param {boolean} [params.includeSurveyUuid] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
@@ -268,10 +267,8 @@ export const countNodesWithMissingFile = (
 /**
  * Counts the file attribute nodes whose file is missing, for each of the specified records.
  * @param {!object} params - The parameters.
- * @param {!number} params.surveyId - The survey id.
  * @param {!string[]} params.nodeDefFileUuids - The uuids of the file attribute definitions.
  * @param {!string[]} params.recordUuids - The uuids of the records.
- * @param {object} [client] - The database client.
  * @returns {Promise<object>} - Counts indexed by record uuid (only records with missing files).
  */
 export const countNodesWithMissingFileByRecordUuids = async (
@@ -303,9 +300,7 @@ export const countNodesWithMissingFileByRecordUuids = async (
  * Must be called BEFORE the node delete, since ON DELETE CASCADE silently removes descendant
  * rows with no RETURNING visibility.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey ID.
  * @param {Array<string>} params.nodeDefUuids - Node def UUIDs being purged wholesale.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<Array<{fileUuid: string, recordUuid: string}>>} - The matching file-attribute nodes.
  */
 export const fetchFileValueNodesByNodeDefUuids = (
@@ -565,9 +560,7 @@ export const deleteNode = (surveyId: number, nodeUuid: string, client: DbClient 
  * not tracking individual affected nodes, so this intentionally skips RETURNING: on a large survey
  * this delete can match millions of rows, and pulling them all back (with their JSONB value/meta
  * payloads) into memory at once is enough on its own to exhaust a job worker's heap.
- * @param {number} surveyId - The survey ID.
  * @param {Array<string>} nodeDefUuids - Node def UUIDs being purged wholesale.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<number>} - The number of nodes deleted.
  */
 export const deleteNodesByNodeDefUuids = (surveyId: number, nodeDefUuids: string[], client: DbClient = db) =>
@@ -595,8 +588,6 @@ export const deleteNodesByUuids = (surveyId: number, nodeUuids: string[], client
 /**
  * Rewrites the node table of the specified survey reclaiming the space of dead rows (it locks the table while running).
  * It cannot be run inside a transaction.
- * @param {!object} params - The parameters.
- * @param {!number} params.surveyId - The survey ID.
  * @param {DbClient} [client] - The database client (not a transaction).
  * @returns {Promise<null>} - The query result.
  */

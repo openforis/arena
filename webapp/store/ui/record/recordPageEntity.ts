@@ -92,10 +92,7 @@ export const getPageEntity = ({ survey, record, pagesUuidMap, pageNodeDefUuid }:
 /**
  * True when a multiple ancestor lacks a pagesUuidMap entry (scope cannot be resolved).
  *
- * @param pageNodeDef - Page node def
- * @param survey - Survey
  * @param pagesUuidMap - Active page entity map
- * @returns True when a multiple ancestor is unresolved
  */
 export const hasUnresolvedMultipleAncestor = (
   pageNodeDef: ArenaAnyNodeDef,

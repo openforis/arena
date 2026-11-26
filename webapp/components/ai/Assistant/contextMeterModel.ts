@@ -31,7 +31,6 @@ const COMPACT: Intl.NumberFormatOptions = { notation: 'compact', maximumFraction
 /**
  * Returns the usage of the latest answer that has one.
  * @param {ConversationMessage[]} messages - Conversation messages.
- * @returns {AssistantMessageUsage|null} The usage, or null.
  */
 export const getLatestUsage = (messages: ConversationMessage[]): AssistantMessageUsage | null => {
   for (const message of [...messages].reverse()) {
@@ -53,7 +52,6 @@ export const getContextMeterLevel = (ratio: number | null): ContextMeterLevel =>
 
 /**
  * Formats a token count in compact notation.
- * @param {number} tokens - Tokens.
  * @param {string} lang - UI language.
  * @returns {string} For example 12.4K in English.
  */
@@ -101,9 +99,6 @@ export const buildContextMeter = ({
 
 /**
  * Returns the text of the meter.
- * @param {object} params - Parameters.
- * @param {ContextMeter} params.meter - Meter.
- * @param {Function} params.t - Translation function.
  * @returns {string} For example "≈ 6K / 8.2K tokens (assumed)".
  */
 export const getContextMeterText = ({ meter, t }: { meter: ContextMeter; t: Translate }): string => {
@@ -117,7 +112,6 @@ export const getContextMeterText = ({ meter, t }: { meter: ContextMeter; t: Tran
 
 /**
  * Returns the short text shown next to the ring in the composer footer.
- * @param {ContextMeter} meter - Meter.
  * @returns {string} For example "≈ 6K / 8.2K" (the full text with "tokens" is in the ring's tooltip).
  */
 export const getContextMeterShortText = (meter: ContextMeter): string => {

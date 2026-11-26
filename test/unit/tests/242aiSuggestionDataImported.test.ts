@@ -33,7 +33,6 @@ const job = (overrides: Record<string, unknown> = {}) => ({
 /**
  * Returns the event of a succeeded job.
  * @param {object} jobSerialized - The job.
- * @returns {SuggestionEvent} The event.
  */
 const succeeded = (jobSerialized: object): SuggestionEvent => ({ type: 'jobSucceeded', job: jobSerialized })
 
@@ -82,7 +81,6 @@ const setup = ({
   /**
    * Moves the clock.
    * @param {Date} date - New date.
-   * @returns {void}
    */
   const setClock = (date: Date) => {
     clock = date

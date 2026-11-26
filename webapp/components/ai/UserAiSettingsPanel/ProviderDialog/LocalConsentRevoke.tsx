@@ -17,7 +17,6 @@ type Props = {
 /**
  * Where the user takes back the permission to send requests to the saved local server: the first-use dialog stores it
  * per survey, and this removes it for every survey, so the next request asks again. Nothing is shown without one.
- * @param {Props} props - Props.
  * @returns {React.ReactElement|null} The line, or null when there is no permission to revoke.
  */
 export const LocalConsentRevoke = ({ baseUrl }: Props) => {

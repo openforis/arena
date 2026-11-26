@@ -121,7 +121,6 @@ export const AssistantSuggestions = ({
   /**
    * Opens the suggestion's area in a new conversation; the chat of that area claims and sends the request.
    * @param {AssistantSuggestion} suggestion - Visible suggestion.
-   * @returns {void}
    */
   const onDoIt = (suggestion: AssistantSuggestion): void => {
     const request = buildSuggestionRequest({ suggestion, userUuid, surveyId, cycle, describeContext })

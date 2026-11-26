@@ -10,7 +10,6 @@ type Route = CollectedRoute
  * @param {Route[]} routes - Registered routes.
  * @param {string} method - HTTP method, lower case.
  * @param {string} path - Route path.
- * @returns {Route} The route.
  */
 const findRoute = (routes: Route[], method: string, path: string): Route => {
   const route = routes.find((candidate) => candidate.method === method && candidate.path === path)
@@ -20,9 +19,7 @@ const findRoute = (routes: Route[], method: string, path: string): Route => {
 
 /**
  * Returns the position of a handler in a route chain, failing the test when it is missing.
- * @param {Route} route - The route.
  * @param {Function} handler - The handler to look for.
- * @returns {number} Its index.
  */
 const indexOfHandler = (route: Route, handler: unknown): number => {
   const index = route.handlers.indexOf(handler)

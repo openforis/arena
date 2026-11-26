@@ -7,8 +7,6 @@ import { UserActions, useUser } from '@webapp/store/user'
 
 /**
  * Returns all the "What's new" items visible to the current user.
- *
- * @returns {WhatsNew.WhatsNewItem[]} - The visible items.
  */
 export const useWhatsNewVisibleItems = (): WhatsNew.WhatsNewItem[] => {
   const user = useUser()

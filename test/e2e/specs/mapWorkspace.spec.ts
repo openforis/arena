@@ -31,8 +31,6 @@ const PREVIEW_TIMEOUT = 30_000
 
 /**
  * Waits for the screenshot preview image and for the main button to be enabled.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when the PNG is ready.
  */
 const waitForScreenshotPreview = async (page: Page): Promise<void> => {
   await expect(page.getByTestId(ids.screenshotPreview)).toBeVisible({ timeout: PREVIEW_TIMEOUT })
@@ -59,9 +57,7 @@ const openMap = async (page: Page): Promise<void> => {
 
 /**
  * Starts a tool from the Tools menu (the full bar has no quick buttons for the tools).
- * @param {Page} page - The page.
  * @param {string} itemKey - The menu item: measureDistance, measureArea.
- * @returns {Promise<void>} Resolves when the item is clicked.
  */
 const startFromToolsMenu = async (page: Page, itemKey: string): Promise<void> => {
   await page.getByTestId(ids.menuButton('tools')).click()
@@ -79,15 +75,12 @@ const ONE_PIXEL_PNG_DATA_URL = `data:image/png;base64,${ONE_PIXEL_PNG.toString('
 
 /**
  * Locates the rows of the custom overlays in the Layers panel.
- * @param {Page} page - The page.
- * @returns {Locator} The rows.
  */
 const customOverlayRows = (page: Page): Locator =>
   page.getByTestId(ids.railPanel('layers')).locator(`[data-testid^="${ids.overlayRow('custom-')}"]`)
 
 /**
  * Waits for the response of a custom layers request.
- * @param {Page} page - The page.
  * @param {string} method - The HTTP method.
  * @param {string} path - A part of the URL.
  * @returns {Promise<Response>} The response.
@@ -108,7 +101,6 @@ const DISTANCE_TOTAL = /^\d+(\.\d+)? (m|km)$/
 /**
  * Returns a page point at an offset from the centre of the Leaflet map (south-west of the centre: away from the
  * measure bar at the top and the zoom buttons at the bottom right; the data layers are off when the map opens).
- * @param {Page} page - The page.
  * @param {number} dx - Horizontal offset in pixels.
  * @param {number} dy - Vertical offset in pixels.
  * @returns {Promise<{x: number, y: number}>} The point in page coordinates.
@@ -132,7 +124,6 @@ const boxOf = async (locator: Locator): Promise<{ x: number; y: number; width: n
 
 /**
  * Returns the permanent label of the finished measurement on the map.
- * @param {Page} page - The page.
  * @returns {Locator} The Leaflet tooltip.
  */
 const measureLabel = (page: Page): Locator => page.locator('.leaflet-tooltip-pane .leaflet-tooltip')

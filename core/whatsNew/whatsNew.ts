@@ -29,11 +29,9 @@ const isVisibleToAudienceByAudience: Record<WhatsNewAudience, (user: any) => boo
  * Returns the "What's new" items visible to the specified user.
  *
  * @param {object} params - The parameters.
- * @param {object} params.user - The user.
  * @param {boolean} [params.experimentalFeatures=false] - Whether experimental features are enabled.
  * @param {boolean} [params.aiFeaturesEnabled=false] - Whether AI features are enabled on the server.
  * @param {WhatsNewItem[]} [params.items] - The items to filter (defaults to the whole catalog).
- * @returns {WhatsNewItem[]} - The visible items.
  */
 export const getVisibleItems = ({
   user,
@@ -57,7 +55,6 @@ export const getVisibleItems = ({
  * Returns the "What's new" items visible to the specified user and not dismissed yet by the user.
  *
  * @param {object} params - The parameters.
- * @param {object} params.user - The user.
  * @param {boolean} [params.experimentalFeatures=false] - Whether experimental features are enabled.
  * @param {boolean} [params.aiFeaturesEnabled=false] - Whether AI features are enabled on the server.
  * @param {WhatsNewItem[]} [params.items] - The items to filter (defaults to the whole catalog).
@@ -85,7 +82,6 @@ export const getUnseenItems = ({
  * Ids no longer in the catalog are removed, to keep the prefs small.
  *
  * @param {object} params - The parameters.
- * @param {object} params.user - The user.
  * @param {WhatsNewItem[]} params.itemsSeen - The items to mark as seen.
  * @param {WhatsNewItem[]} [params.items] - The whole catalog.
  * @returns {object} - The updated user.
@@ -105,18 +101,9 @@ export const assocItemsSeen = ({
   return User.assocPrefWhatsNewSeenIds(seenIdsInCatalog)(user)
 }
 
-/**
- * Returns the i18n key of the title of the specified item.
- *
- * @param {WhatsNewItem} item - The item.
- * @returns {string} - The i18n key.
- */
 export const getTitleKey = (item: WhatsNewItem): string => `whatsNew:items.${item.id}.title`
 
 /**
  * Returns the i18n key of the description (markdown) of the specified item.
- *
- * @param {WhatsNewItem} item - The item.
- * @returns {string} - The i18n key.
  */
 export const getDescriptionKey = (item: WhatsNewItem): string => `whatsNew:items.${item.id}.description`

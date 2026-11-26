@@ -19,7 +19,6 @@ export type DrawAreaState = {
 /**
  * Lets the user draw the search rectangle with Geoman and keeps it as a dotted outline.
  *
- * @param {L.Map} map - Map.
  * @param {boolean} active - Whether the drawn area is the search area of the visible panel.
  * @returns {DrawAreaState} Drawn bounds, drawing flag and actions.
  */
@@ -44,7 +43,6 @@ export const useDrawArea = (map: L.Map, active: boolean): DrawAreaState => {
      * Replaces Geoman's rectangle with the panel's own outline.
      *
      * @param {GeomanCreateEvent} event - Geoman pm:create event.
-     * @returns {void}
      */
     const onCreate = (event: GeomanCreateEvent): void => {
       if (event.shape !== 'Rectangle') return
@@ -55,8 +53,6 @@ export const useDrawArea = (map: L.Map, active: boolean): DrawAreaState => {
     }
     /**
      * Ends the drawing state when Geoman stops drawing (finished or replaced by another draw mode).
-     *
-     * @returns {void}
      */
     const onDrawEnd = (): void => setDrawing(false)
 

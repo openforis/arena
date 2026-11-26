@@ -35,7 +35,6 @@ export const ensureGeoman = (map: L.Map): L.PM.PMMap => {
  * @param {L.Map} map - The Leaflet map.
  * @param {GeomanShape} shape - 'Line' or 'Polygon'.
  * @param {MeasureDrawOptions} options - The draw options.
- * @returns {void}
  */
 export const startMeasureDraw = (map: L.Map, shape: GeomanShape, options: MeasureDrawOptions): void => {
   ensureGeoman(map).enableDraw(shape, options)
@@ -44,7 +43,6 @@ export const startMeasureDraw = (map: L.Map, shape: GeomanShape, options: Measur
 /**
  * Stops drawing and drops the shape being drawn.
  * @param {L.Map} map - The Leaflet map.
- * @returns {void}
  */
 export const stopMeasureDraw = (map: L.Map): void => {
   map.pm?.disableDraw()
@@ -54,7 +52,6 @@ export const stopMeasureDraw = (map: L.Map): void => {
  * Finishes the shape being drawn.
  * @param {L.Map} map - The Leaflet map.
  * @param {GeomanShape} shape - The shape being drawn.
- * @returns {void}
  */
 export const finishMeasureDraw = (map: L.Map, shape: GeomanShape): void => {
   // same private call as Geoman's own Enter handler (Keyboard._handleEnterKey); checked against 2.20.2
@@ -66,7 +63,6 @@ export const finishMeasureDraw = (map: L.Map, shape: GeomanShape): void => {
  * Keeps mouse events on an element inside the map container away from Leaflet: no vertex, no map drag,
  * no rubber-band move while the pointer is on the element.
  * @param {HTMLElement} element - The element (the measure bar).
- * @returns {void}
  */
 export const isolateFromMap = (element: HTMLElement): void => {
   L.DomEvent.disableClickPropagation(element)

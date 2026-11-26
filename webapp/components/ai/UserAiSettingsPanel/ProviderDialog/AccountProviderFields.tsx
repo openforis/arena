@@ -33,7 +33,6 @@ type BaseUrlFieldProps = {
 
 /**
  * Base URL, with the allowlist of an Organisation server and the hint for an address on this computer or network.
- * @param {BaseUrlFieldProps} props - Props.
  * @returns {React.ReactElement} The field.
  */
 const BaseUrlField = (props: BaseUrlFieldProps) => {
@@ -95,7 +94,6 @@ type ApiKeyFieldProps = {
 
 /**
  * API key, with the kept, removed, cleared, unreadable and encryption-missing hints.
- * @param {ApiKeyFieldProps} props - Props.
  * @returns {React.ReactElement} The field.
  */
 const ApiKeyField = (props: ApiKeyFieldProps) => {
@@ -175,7 +173,6 @@ type ModelFieldProps = {
 
 /**
  * Model: a select of the listed models (with "Other"), else a text input.
- * @param {ModelFieldProps} props - Props.
  * @returns {React.ReactElement} The field.
  */
 const ModelField = (props: ModelFieldProps) => {
@@ -241,7 +238,6 @@ type TestRowProps = {
 
 /**
  * Test and its result.
- * @param {TestRowProps} props - Props.
  * @returns {React.ReactElement} The row.
  */
 const TestRow = ({ result, testing, canTest, onTest }: TestRowProps) => (
@@ -292,7 +288,6 @@ type Props = {
 
 /**
  * Step 2 for an account provider: base URL where the type needs it, API key, model, Test.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The fields.
  */
 export const AccountProviderFields = ({

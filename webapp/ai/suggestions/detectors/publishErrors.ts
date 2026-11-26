@@ -15,7 +15,6 @@ const keepKey = (key: string): string => key
 /**
  * Tells whether the stored validation of a node definition has errors (at any field, children included).
  * @param {object} survey - Survey with the node definitions validation.
- * @param {object} nodeDef - Node definition.
  * @returns {boolean} True when publishing would fail on it.
  */
 export const hasPublishErrors = (survey: any, nodeDef: any): boolean =>
@@ -23,9 +22,6 @@ export const hasPublishErrors = (survey: any, nodeDef: any): boolean =>
 
 /**
  * Adds the saved entries with errors when the user clicks Publish.
- * @param {SuggestionEvent} event - The event.
- * @param {DetectorContext} ctx - Detector context.
- * @returns {void}
  */
 export const handlePublishErrors = (event: SuggestionEvent, ctx: DetectorContext): void => {
   if (event.type !== 'publishClicked') return

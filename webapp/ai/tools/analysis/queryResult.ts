@@ -8,7 +8,6 @@ export type QueryResultColumn = { name: string; attribute: string; fn?: string }
 /**
  * Returns the view columns of an attribute (codes with their label, taxa with their scientific name).
  * @param {object} nodeDef - The attribute definition.
- * @returns {QueryResultColumn[]} The columns.
  */
 const getAttributeColumns = (nodeDef: any): QueryResultColumn[] =>
   ColumnNodeDef.getColumnNames(nodeDef).map((name: string) => ({ name, attribute: NodeDef.getName(nodeDef) }))
@@ -33,10 +32,6 @@ const getMeasureColumns = ({ query, getDef }: { query: any; getDef: (uuid: strin
 
 /**
  * Returns the columns of the result of a query, as the Explorer shows them.
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.query - The query.
- * @returns {QueryResultColumn[]} The columns.
  */
 export const getQueryResultColumns = ({ survey, query }: { survey: any; query: any }): QueryResultColumn[] => {
   const getDef = (uuid: string) => Survey.getNodeDefByUuid(uuid)(survey)

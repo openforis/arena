@@ -37,7 +37,6 @@ export const useCleaningAreaStatus = (): AssistantAreaStatus => {
 
 /**
  * Whether the Explorer is in edit mode (one of the views where the Cleaning area is selected).
- * @returns {boolean} The edit mode.
  */
 export const useExplorerEditMode = (): boolean => useSelector(DataExplorerState.isEditMode)
 

@@ -57,7 +57,6 @@ export const isRecordEditOperation = <T extends { type: string }>(
 
 /**
  * Returns true when every operation of the change set is a record edit (rendered by the record-edit card).
- * @param {ChangeSet} changeSet - The change set.
  * @returns {boolean} Whether it is a record-edit change set.
  */
 export const isRecordEditChangeSet = (changeSet: ChangeSet): boolean =>

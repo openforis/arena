@@ -64,7 +64,6 @@ export const cleanAiDescription = (
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {AiBatchGuard} params.guard - Check run before each call.
  * @param {string} [params.language] - Language of the descriptions (English when absent).
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener ({ done, total } calls).
  * @param {Function} [params.describe] - The data dictionary task (tests).
  * @param {number} [params.batchSize] - Node defs per call.
@@ -129,9 +128,6 @@ export const runDataDictionaryDescriptions = async ({
 /**
  * Generates the AI descriptions of the schema summary export with the model of the data dictionary feature.
  * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @param {Function} [params.onProgress] - Progress listener.
  * @param {FetchAiItems} [params.fetchAiItems] - Fetches the node defs to describe (tests).
  * @returns {Promise<DataDictionaryResult>} Descriptions by uuid, and the node defs left without one.

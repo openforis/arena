@@ -148,7 +148,6 @@ export const findDescendantOrSelf =
  * Finds the parent node of the specified node def, starting from the specified parent node and traversing
  * the single entities, if any, down to the correct parent node.
  * @param params - The parameters.
- * @param params.survey - The survey.
  * @param params.parentNode - The node to start from.
  * @param params.nodeDefUuid - The UUID of the node def whose parent node is searched.
  * @returns Function returning the parent node in the specified record.
@@ -188,7 +187,6 @@ export const getNodeParentInDescendantSingleEntities =
 
 /**
  * Returns true if a node and all its ancestors are applicable.
- * @param node - The node.
  * @returns Function returning true if the node is applicable in the specified record.
  */
 // not delegated to Records.isNodeApplicable: a missing node is considered applicable here
@@ -206,9 +204,7 @@ export const isNodeApplicable =
 // ==== dependency
 /**
  * Returns the dependent node pointers (each one in the format { nodeCtx, nodeDef }).
- * @param survey - The survey.
  * @param node - The node whose dependents are searched.
- * @param dependencyType - The dependency type.
  * @param includeSelf - True to include the node itself, if it depends on itself.
  * @param filterFn - Optional filter for the node pointers.
  * @returns Function returning the dependent node pointers in the specified record.

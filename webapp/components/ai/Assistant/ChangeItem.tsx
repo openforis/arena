@@ -35,9 +35,6 @@ export const ChangeItemName = ({ name, exists, onClick }: { name: string; exists
 
 /**
  * Result of an Apply on a change ("Applied", "Conflict"…), with its message as the tooltip.
- * @param {object} props - Props.
- * @param {OperationResult} props.result - Result.
- * @param {string} [props.testId] - Test id.
  * @returns {React.ReactElement} The status.
  */
 export const ChangeItemStatus = ({ result, testId }: { result: OperationResult; testId?: string }) => {
@@ -71,8 +68,6 @@ export const ChangeItemConflict = ({ conflict }: { conflict: OperationConflict }
 
 /**
  * A language code, next to a text in that language.
- * @param {object} props - Props.
- * @param {string} props.lang - Language code.
  * @returns {React.ReactElement} The tag.
  */
 export const LangTag = ({ lang }: { lang: string }) => <code className="ai-change-item__lang">{lang}</code>

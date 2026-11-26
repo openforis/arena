@@ -15,7 +15,6 @@ type Props = {
 
 /**
  * Why an AI feature cannot run here, with what would fix it (the mockups' "not available" panel).
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The panel.
  */
 export const AiNotAvailable = (props: Props) => {

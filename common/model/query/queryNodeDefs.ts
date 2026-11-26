@@ -15,7 +15,6 @@ type QueryNodeDef = ArenaAnyNodeDef
 
 /**
  * Returns true if the given node def can be used as a dimension in an aggregate query.
- * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the node def can be used as a dimension.
  */
 const isDimensionEligible = (nodeDef: QueryNodeDef): boolean =>
@@ -24,7 +23,6 @@ const isDimensionEligible = (nodeDef: QueryNodeDef): boolean =>
 /**
  * Returns true if the given node def can be used as a measure in an aggregate query
  * (the entity frequency measure excluded).
- * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the node def can be used as a measure.
  */
 const isMeasureEligible = (nodeDef: QueryNodeDef): boolean =>
@@ -33,7 +31,6 @@ const isMeasureEligible = (nodeDef: QueryNodeDef): boolean =>
 /**
  * Returns true if the given node def is an entity that can be selected as the main entity of a query
  * (the root entity or a multiple entity).
- * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the entity can be queried.
  */
 const isQueryableEntity = (nodeDef: QueryNodeDef): boolean =>
@@ -43,9 +40,6 @@ const isInCycle = (cycle: string | null) => (nodeDef: QueryNodeDef) => !cycle ||
 
 /**
  * Returns the entities that can be selected as the main entity of a query, in hierarchical order.
- * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {string} [params.cycle] - The survey cycle.
  * @returns {object[]} - The queryable entity defs.
  */
 const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: ArenaSurvey; cycle?: string | null }) => {
@@ -69,9 +63,6 @@ const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: ArenaSurvey;
 /**
  * Returns the attribute defs that are descendants of the given entity def, including the ones inside single entities.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.entityDef - The entity def.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @param {boolean} [params.includeMultiple] - Whether to include multiple attributes.
  * @returns {object[]} - The attribute defs.
@@ -90,9 +81,6 @@ const getAttributeDefsInSingleEntities = ({ survey, entityDef, cycle, includeAna
  * Returns the attribute defs visible from the given entity def: the ones in the entity itself (and in its
  * descendant single entities) and the ones in the ancestor multiple entities.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.entityDef - The entity def.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @param {boolean} [params.includeMultiple] - Whether to include multiple attributes.
  * @returns {object[]} - The attribute defs.
@@ -120,9 +108,7 @@ const getAttributeDefsInEntityAndAncestors = ({ survey, entityDef, cycle, includ
 /**
  * Returns the attribute defs that can be selected in a raw mode query for the given entity.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.entityDef - The query entity def.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {object[]} - The attribute defs.
  */
@@ -132,9 +118,7 @@ const getRawAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis 
 /**
  * Returns the attribute defs that can be used as dimensions in an aggregate query for the given entity.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.entityDef - The query entity def.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {object[]} - The attribute defs.
  */
@@ -147,9 +131,7 @@ const getDimensionAttributeDefs = ({ survey, entityDef, cycle = null, includeAna
  * Returns the attribute defs that can be used as measures in an aggregate query for the given entity
  * (the entity frequency measure excluded).
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {object} params.entityDef - The query entity def.
- * @param {string} [params.cycle] - The survey cycle.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {object[]} - The attribute defs.
  */

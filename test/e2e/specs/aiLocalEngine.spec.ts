@@ -15,10 +15,8 @@ if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: 
 /**
  * Writes the stub server as the only local provider before any page script runs (on every navigation of this page),
  * and makes it the default provider.
- * @param {Page} page - The page.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {LocalModelServerStub} stub - The stub server.
- * @returns {Promise<void>} Resolves when registered and saved.
  */
 const seedLocalProvider = async (page: Page, api: ArenaApi, stub: LocalModelServerStub): Promise<void> => {
   const userUuid = await api.getCurrentUserUuid()
@@ -29,7 +27,6 @@ const seedLocalProvider = async (page: Page, api: ArenaApi, stub: LocalModelServ
 
 /**
  * Records the URLs of the requests to the gateway endpoint.
- * @param {Page} page - The page.
  * @returns {string[]} The URLs (filled while the test runs).
  */
 const collectGatewayRequests = (page: Page): string[] => {
@@ -40,11 +37,6 @@ const collectGatewayRequests = (page: Page): string[] => {
   return urls
 }
 
-/**
- * Opens the dashboard activity section.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when open.
- */
 const openActivitySection = async (page: Page): Promise<void> => {
   await page.goto(Urls.dashboard)
   await page.getByTestId(TestId.dashboard.activityToggle).click()
@@ -55,10 +47,8 @@ const summaryModal = (page: Page) => page.locator('.ai-activity-log-summary-moda
 
 /**
  * Clicks Summarize and, when the first-use dialog appears, accepts it.
- * @param {Page} page - The page.
  * @param {object} [options] - Options.
  * @param {boolean} [options.expectConsent] - Whether the dialog must appear (true) or must not (false).
- * @returns {Promise<void>} Resolves when the modal is open.
  */
 const summarize = async (page: Page, { expectConsent }: { expectConsent: boolean }): Promise<void> => {
   await page.locator('.btn-ai-summary').click()
@@ -70,11 +60,6 @@ const summarize = async (page: Page, { expectConsent }: { expectConsent: boolean
   if (!expectConsent) await expect(page.getByTestId(TestId.ai.consentDialog)).toHaveCount(0)
 }
 
-/**
- * Closes the summary modal.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when closed.
- */
 const closeSummary = async (page: Page): Promise<void> => {
   await summaryModal(page).locator('.modal-close').click()
   await expect(summaryModal(page)).toHaveCount(0)

@@ -143,7 +143,6 @@ export const getToolDefinitionChars = (tools: AiTool[]): number =>
  * Returns the characters left for the history of a turn.
  * @param {object} params - Parameters.
  * @param {number} params.maxPromptChars - Prompt limit of the engine.
- * @param {string} params.systemPrompt - System prompt.
  * @param {AiTool[]} params.tools - Tools offered (their schemas count toward the limit).
  * @returns {number} The budget, at least 0.
  */

@@ -22,7 +22,6 @@ const FIT_BOUNDS_OPTIONS: L.FitBoundsOptions = { padding: [32, 32], maxZoom: 16 
 
 /**
  * Shows KML, KMZ, zipped Shapefile or GeoJSON files on the map and zooms to them; files that cannot be read show an error.
- * @param {Props} props - The props.
  * @returns {null} Nothing: the layers are added to the Leaflet map.
  */
 export const MapFileLayers = (props: Props): null => {

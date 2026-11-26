@@ -19,7 +19,6 @@ import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 /**
  * Returns the given name, or the first "name_N" (N = 2, 3, ...) not used by any of the given query summaries.
  * @param {object} params - The parameters.
- * @param {string} params.name - The name.
  * @param {object[]} params.dataQuerySummaries - The existing query summaries.
  * @returns {string} - The unique name.
  */

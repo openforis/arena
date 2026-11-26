@@ -22,9 +22,6 @@ const keepDismissedIn = (targets: DismissedTargets, gap: Set<string>): Dismissed
 
 /**
  * Prunes the dismissed and in-progress entries of a kind in a bucket to the targets still in the gap.
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
- * @param {SuggestionKind} kind - Kind.
  * @param {AssistantSuggestion[]} suggestions - The kind's new suggestions (the gap).
  * @returns {SuggestionUserState} The pruned state.
  */
@@ -51,12 +48,8 @@ const pruneKind = (
 
 /**
  * Replaces every pending suggestion of a kind in a bucket (state detectors); an empty list resolves the kind.
- * @param {SuggestionUserState} state - State.
  * @param {object} params - Parameters.
- * @param {string} params.bucket - Bucket.
- * @param {SuggestionKind} params.kind - Kind.
  * @param {AssistantSuggestion[]} params.suggestions - The kind's suggestions now.
- * @returns {SuggestionUserState} The new state.
  */
 export const withKind = (
   state: SuggestionUserState,
@@ -69,12 +62,9 @@ export const withKind = (
 
 /**
  * Removes targets that are no longer in the gap (resolvers): from pending, in progress and dismissed.
- * @param {SuggestionUserState} state - State.
  * @param {object} params - Parameters.
- * @param {string} params.bucket - Bucket.
  * @param {string} params.id - Suggestion id.
  * @param {string[]} params.targetKeys - Resolved target keys.
- * @returns {SuggestionUserState} The new state.
  */
 export const withoutTargets = (
   state: SuggestionUserState,
@@ -98,8 +88,6 @@ export const withoutTargets = (
 /**
  * Lists the suggestions the state holds something of in a bucket (pending, dismissed or in progress), so a resolver
  * also reaches the dismissed targets of a suggestion that is no longer pending.
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
  * @returns {TrackedSuggestion[]} The suggestions, with the keys of all their targets.
  */
 export const getTrackedOf = (state: SuggestionUserState, bucket: string): TrackedSuggestion[] => {
@@ -131,9 +119,6 @@ export const getTrackedOf = (state: SuggestionUserState, bucket: string): Tracke
 
 /**
  * Removes everything stored for a bucket (a deleted survey): pending, dismissed and in-progress entries.
- * @param {SuggestionUserState} state - State.
- * @param {string} bucket - Bucket.
- * @returns {SuggestionUserState} The new state.
  */
 export const withoutBucket = (state: SuggestionUserState, bucket: string): SuggestionUserState => ({
   ...state,

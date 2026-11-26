@@ -60,7 +60,6 @@ const fakeClient = (row: unknown = null) => {
 /**
  * Creates a fake repository whose methods return the given values.
  * @param {Partial<MapCustomLayersRepositoryType>} overrides - The methods.
- * @returns {MapCustomLayersRepositoryType} The repository.
  */
 const fakeRepository = (overrides: Partial<MapCustomLayersRepositoryType>): MapCustomLayersRepositoryType => ({
   ...MapCustomLayersRepository,
@@ -70,7 +69,6 @@ const fakeRepository = (overrides: Partial<MapCustomLayersRepositoryType>): MapC
 /**
  * Runs a request and returns the key of the error it fails with.
  * @param {Promise<unknown>} promise - The request.
- * @returns {Promise<string>} The error key.
  */
 const errorKeyOf = async (promise: Promise<unknown>): Promise<string> => {
   try {

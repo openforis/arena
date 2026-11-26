@@ -18,8 +18,6 @@ export const CYRILLIC = /[Ѐ-ӿ]/
 
 /**
  * Returns a namespace (common, appErrors, userAiSettings...) in every language.
- * @param {string} namespace - Namespace.
- * @returns {Record<string, any>} The namespace by language.
  */
 export const namespaceByLanguage = (namespace: string): Record<string, any> =>
   Object.fromEntries(LANGUAGES.map((lang) => [lang, RESOURCES[lang][namespace]]))
@@ -27,7 +25,6 @@ export const namespaceByLanguage = (namespace: string): Record<string, any> =>
 /**
  * Returns the plural forms the texts of a language must have: the ones ordinary counts reach (what i18next picks),
  * plus "other". Intl also lists "many" for the languages that use it only for millions, which no text needs.
- * @param {string} lang - Language.
  * @returns {string[]} The forms, in the order Intl lists them.
  */
 export const pluralFormsOf = (lang: string): string[] => {
@@ -39,7 +36,6 @@ export const pluralFormsOf = (lang: string): string[] => {
 
 /**
  * Returns every plural category of a language (what Intl lists), including the ones only a very large count reaches.
- * @param {string} lang - Language.
  * @returns {string[]} The categories, sorted.
  */
 export const pluralCategoriesOf = (lang: string): string[] =>
@@ -47,7 +43,6 @@ export const pluralCategoriesOf = (lang: string): string[] =>
 
 /**
  * Tells whether a language is written in the Cyrillic script (its texts must then contain Cyrillic letters).
- * @param {string} lang - Language.
  * @returns {boolean} True for Cyrillic.
  */
 // Intl maximizes sr to Cyrl, but the Serbian of the app is written in Latin script
@@ -58,8 +53,6 @@ export const CYRILLIC_LANGUAGES: string[] = LANGUAGES.filter(usesCyrillic)
 
 /**
  * Resolves a dotted path in an object.
- * @param {object} obj - The object.
- * @param {string} path - The path.
  * @returns {any} The value, or undefined.
  */
 export const getPath = (obj: unknown, path: string): any =>
@@ -67,8 +60,6 @@ export const getPath = (obj: unknown, path: string): any =>
 
 /**
  * Resolves an i18n key such as 'appErrors:record.lockTimeout' (no namespace: common) in a language.
- * @param {string} lang - Language.
- * @param {string} key - The key.
  * @returns {any} The text, or undefined.
  */
 export const resolveKey = (lang: string, key: string): any => {
@@ -95,13 +86,11 @@ export const flattenTexts = (obj: unknown, prefix = ''): Record<string, string> 
 /**
  * Returns the dotted paths of the string leaves, sorted.
  * @param {object} obj - Resource.
- * @returns {string[]} The paths.
  */
 export const leafPaths = (obj: unknown): string[] => Object.keys(flattenTexts(obj)).sort((a, b) => a.localeCompare(b))
 
 /**
  * Returns the sorted {{placeholder}} names of a text.
- * @param {string} text - Text.
  * @returns {string[]} The names.
  */
 export const placeholdersOf = (text: string): string[] =>
@@ -117,7 +106,6 @@ export const baseKeyOf = (path: string): string => path.replace(PLURAL_SUFFIX, '
 /**
  * Returns the sorted base keys of flattened texts (plural forms together).
  * @param {Record<string, string>} flat - Texts by path.
- * @returns {string[]} The base keys.
  */
 export const baseKeysOf = (flat: Record<string, string>): string[] =>
   [...new Set(Object.keys(flat).map(baseKeyOf))].sort((a, b) => a.localeCompare(b))
@@ -125,7 +113,6 @@ export const baseKeysOf = (flat: Record<string, string>): string[] =>
 /**
  * Returns the general form of a text: the "other" form of a plural, else the text itself.
  * @param {Record<string, string>} flat - Texts by path.
- * @param {string} baseKey - Base key.
  * @returns {string} The text ('' when missing).
  */
 export const generalForm = (flat: Record<string, string>, baseKey: string): string =>
@@ -134,7 +121,6 @@ export const generalForm = (flat: Record<string, string>, baseKey: string): stri
 /**
  * Lists the plural texts whose forms differ from the plural categories of the language (i18next shows the raw key for a
  * category without a text).
- * @param {string} lang - Language.
  * @param {Record<string, string>} flat - Texts of the language by path.
  * @returns {{ baseKey: string, forms: string[] }[]} The plural texts with the wrong forms (empty: all right).
  */
@@ -171,7 +157,6 @@ const groupByBaseKey = (texts: Record<string, string>): Map<string, string[]> =>
  * Compares a group of texts of a language with the same group in English, by base key (a language has the plural
  * forms of its own language): the keys that are missing or extra, and the keys with a text whose placeholders differ
  * from the English ones.
- * @param {string} lang - Language.
  * @param {string} group - Dotted path of the group in the resources, with its namespace first (e.g. "common.aiBatch").
  * @returns {{ missing: string[], extra: string[], placeholders: string[] }} The differences (all empty: same keys and
  *   placeholders).

@@ -383,7 +383,6 @@ function generateModel() {
 
 /**
  * Builds the gateway dependencies around a model.
- * @param {MockLanguageModelV4} model - The model.
  * @param {object} [overrides] - Dependencies to replace.
  * @returns {object} The dependencies and what they recorded.
  */
@@ -404,7 +403,6 @@ function createDeps(model: any, overrides: Record<string, unknown> = {}) {
 
 /**
  * Runs one gateway request.
- * @param {object} body - Request body.
  * @param {object} deps - Gateway dependencies.
  * @returns {Promise<object>} The fake response.
  */
