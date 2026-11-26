@@ -22,7 +22,7 @@ export const AppIcon = (props: AppIconProps) => {
     <Component
       aria-hidden={title ? undefined : true}
       className={classNames('app-icon', `app-icon--${name}`, className)}
-      style={{ fontSize: size, ...style }}
+      style={{ fontSize: size, verticalAlign: 'middle', ...style }}
       titleAccess={title}
     />
   )
