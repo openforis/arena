@@ -235,10 +235,9 @@ export class RecordForm {
    */
   async selectEntity(keyLabel: string, keyValue: string): Promise<void> {
     const label = `${keyLabel}: ${keyValue}`
-    const select = this.page.getByTestId(TestId.entities.form.nodeSelect)
-    if (!((await select.textContent()) ?? '').includes(label)) {
-      await select.locator('[role="combobox"]').click()
-      await this.page.getByRole('option', { name: label }).click()
+    const dropdown = getDropdown(this.page, TestId.entities.form.nodeSelect)
+    if (!((await dropdown.textContent()) ?? '').includes(label)) {
+      await selectDropdownItem({ page: this.page, dropdown, label })
     }
   }
 }

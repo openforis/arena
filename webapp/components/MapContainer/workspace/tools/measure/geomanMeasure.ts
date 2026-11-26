@@ -62,10 +62,12 @@ export const finishMeasureDraw = (map: L.Map, shape: GeomanShape): void => {
 /**
  * Keeps mouse events on an element inside the map container away from Leaflet: no vertex, no map drag,
  * no rubber-band move while the pointer is on the element.
- * @param {HTMLElement} element - The element (the measure bar).
+ * @param {HTMLElement} element - The element (the container of the measure bar).
  */
 export const isolateFromMap = (element: HTMLElement): void => {
   L.DomEvent.disableClickPropagation(element)
   L.DomEvent.disableScrollPropagation(element)
-  L.DomEvent.on(element, 'mousemove', L.DomEvent.stopPropagation)
+  // Leaflet ignores clicks by looking for the element among the target ancestors: a dropdown option removed by React
+  // while handling the click has none, so the click must not reach the map at all
+  L.DomEvent.on(element, 'click mousemove', L.DomEvent.stopPropagation)
 }
