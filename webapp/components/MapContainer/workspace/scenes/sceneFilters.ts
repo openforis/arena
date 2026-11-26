@@ -10,9 +10,7 @@ type SceneComparator = (sceneA: SceneResult, sceneB: SceneResult) => number
  * Tells whether a scene passes the cloud and coverage limits. Unknown values only pass at the widest
  * setting (max cloud 100, min coverage 0), so a scene is never shown as "clear" without data.
  *
- * @param {SceneResult} scene - Scene.
  * @param {SceneFilters} filters - Limits.
- * @returns {boolean} True when the scene passes.
  */
 export const passesSceneFilters = (scene: SceneResult, filters: SceneFilters): boolean => {
   const cloudOk = scene.cloud === null ? filters.maxCloud >= 100 : scene.cloud <= filters.maxCloud
@@ -23,7 +21,6 @@ export const passesSceneFilters = (scene: SceneResult, filters: SceneFilters): b
 /**
  * Keeps the scenes that pass the limits.
  *
- * @param {SceneResult[]} scenes - Scenes.
  * @param {SceneFilters} filters - Limits.
  * @returns {SceneResult[]} Passing scenes.
  */
@@ -33,7 +30,6 @@ export const filterScenes = (scenes: SceneResult[], filters: SceneFilters): Scen
 /**
  * Keeps the scenes of one month (UTC), or all of them when no month is chosen.
  *
- * @param {SceneResult[]} scenes - Scenes.
  * @param {string|null} monthKey - Month key YYYY-MM, or null for all months.
  * @returns {SceneResult[]} Scenes of the month (the same array when monthKey is null).
  */
@@ -43,8 +39,6 @@ export const filterScenesByMonth = (scenes: SceneResult[], monthKey: string | nu
 /**
  * Compares two strings.
  *
- * @param {string} valueA - First value.
- * @param {string} valueB - Second value.
  * @returns {number} Negative, zero or positive.
  */
 const compareStrings = (valueA: string, valueB: string): number => {
@@ -56,8 +50,6 @@ const compareStrings = (valueA: string, valueB: string): number => {
 /**
  * Compares two nullable numbers ascending, nulls last.
  *
- * @param {number|null} valueA - First value.
- * @param {number|null} valueB - Second value.
  * @returns {number} Negative, zero or positive.
  */
 const compareNullableAscending = (valueA: number | null, valueB: number | null): number => {
@@ -70,7 +62,6 @@ const compareNullableAscending = (valueA: number | null, valueB: number | null):
 /**
  * Negates a nullable number (to sort descending with compareNullableAscending).
  *
- * @param {number|null} value - Value.
  * @returns {number|null} Negated value or null.
  */
 const negate = (value: number | null): number | null => (value === null ? null : -value)

@@ -15,7 +15,6 @@ const levelIcons: Record<SentDataLevel, string> = {
 /**
  * Chip of the composer footer: the level of content the conversation sends (questions, survey design, record data).
  * @param {object} props - Props.
- * @param {AssistantArea} props.area - Current area.
  * @param {Conversation|null} props.conversation - Open conversation (null before the first message).
  * @returns {React.ReactElement} The chip.
  */

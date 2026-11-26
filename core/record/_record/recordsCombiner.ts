@@ -92,7 +92,6 @@ const _areAttributeValuesEqual = ({
  * attributes with the same value (only their date modified changes) and read-only attributes, whose value
  * was already calculated in the source record (e.g. by Arena Mobile) and is kept as it is.
  * @param params - The parameters.
- * @param params.survey - The survey.
  * @param params.attrDef - The attribute definition.
  * @param params.recordTarget - The record being updated.
  * @param params.entityTarget - The parent entity of the target attribute.

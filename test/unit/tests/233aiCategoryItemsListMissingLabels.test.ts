@@ -30,7 +30,6 @@ beforeAll(async () => {
  * Builds items 1..count (genus level), labelled in en only.
  * @param {number} count - Number of items.
  * @param {object} [labels] - Labels of every item (default: `{ en: "Item <ref>" }`).
- * @returns {FakeCategoryItem[]} The items.
  */
 const genusItems = (count: number, labels?: Record<string, string>): FakeCategoryItem[] =>
   Array.from({ length: count }, (_, index) => fakeCategoryItem(String(index + 1), labels))

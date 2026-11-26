@@ -134,11 +134,6 @@ const _updateChain = (
 
 // ====== PERSIST
 /**
- * @param root0
- * @param root0.user
- * @param root0.surveyId
- * @param root0.chain
- * @param client
  * @deprecated
  */
 export const persistChain = async (
@@ -199,8 +194,6 @@ export const deleteChain = (
  * Returns undefined when the nodeDef cannot be found in the target.
  * @param {object} params - Parameters.
  * @param {string} params.uuid - NodeDef UUID in the source survey.
- * @param {object} params.sourceSurvey - Source survey object.
- * @param {object} params.targetSurvey - Target survey object.
  * @returns {string|undefined} Corresponding UUID in the target survey, or undefined.
  */
 const _remapNodeDefUuid = ({
@@ -333,7 +326,6 @@ const _getNodeDefsToClone = ({
 /**
  * Makes cloned area based estimates refer to the cloned attributes instead of the ones in the source survey.
  * @param {object} params - Parameters.
- * @param {Array<object>} params.sourceNodeDefs - The source node defs.
  * @param {Array<object>} params.clonedNodeDefs - The cloned node defs, in the same order as the source ones.
  * @returns {Array<object>} The cloned node defs with the references updated.
  */

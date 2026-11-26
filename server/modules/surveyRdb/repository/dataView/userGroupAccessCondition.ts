@@ -42,7 +42,6 @@ const buildQualifierFiltersCondition = ({
  * and of the groups whose records it can read, using the qualifier columns of the root entity data view
  * (same filters used for the records list, see RecordRepository.fetchRecordsSummaryBySurveyId).
  * @param params - The parameters.
- * @param params.survey - The survey.
  * @param params.accessFilters - The user group access filters (see SurveyManager.fetchUserGroupAccessFilters).
  * @param params.recordUuidColumn - The record UUID column of the queried data view (qualified if the view is aliased).
  * @returns The condition and its parameters, or null when the user is not restricted.

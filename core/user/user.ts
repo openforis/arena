@@ -54,7 +54,6 @@ export const isSystemAdmin = (user: any) => !!user && A.any(AuthGroup.isSystemAd
 export const isSurveyManager = (user: any) => !!user && A.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
 /**
  * Returns true if the user is the administrator of at least one survey.
- * @param {object} user - The user.
  * @returns {boolean} True if the user has the survey admin role in some survey.
  */
 export const isSurveyAdminOfSomeSurvey = (user: any): boolean =>

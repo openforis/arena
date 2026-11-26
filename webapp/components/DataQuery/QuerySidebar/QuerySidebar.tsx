@@ -27,7 +27,6 @@ type Props = {
 
 /**
  * Left panel: query mode (raw / aggregate) on top of the entity and variables selector.
- * @param {Props} props - The component props.
  * @returns {React.ReactElement} - The sidebar element.
  */
 export const QuerySidebar = (props: Props) => {

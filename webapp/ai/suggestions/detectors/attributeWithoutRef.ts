@@ -13,7 +13,6 @@ import type { DetectorContext, StateDetector } from './types'
 
 /**
  * Returns the reference a code or taxon attribute lacks.
- * @param {object} nodeDef - Node definition.
  * @returns {NodeDefRefProp|null} categoryUuid or taxonomyUuid; null when nothing is missing.
  */
 export const getMissingRefProp = (nodeDef: any): NodeDefRefProp | null => {
@@ -24,7 +23,6 @@ export const getMissingRefProp = (nodeDef: any): NodeDefRefProp | null => {
 
 /**
  * Returns the saved, eligible attributes without their category or taxonomy that may get one.
- * @param {object} survey - Survey.
  * @returns {object[]} The node definitions, in hierarchy order.
  */
 export const findAttributesWithoutRef = (survey: any): any[] =>
@@ -36,7 +34,6 @@ export const findAttributesWithoutRef = (survey: any): any[] =>
 
 /**
  * Detects the attributes without a category or taxonomy.
- * @param {DetectorContext} ctx - Detector context.
  * @returns {AssistantSuggestion[]} One suggestion, or none.
  */
 export const detectAttributeWithoutRef = (ctx: DetectorContext): AssistantSuggestion[] => {

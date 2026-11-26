@@ -21,7 +21,6 @@ export type SuggestionKind = keyof typeof SUGGESTION_GROWTH_STEPS
 
 /**
  * Tells whether a value is one of the kinds (stored data may hold one that this version does not know).
- * @param {unknown} value - Value.
  * @returns {boolean} True for a kind.
  */
 export const isSuggestionKind = (value: unknown): value is SuggestionKind =>

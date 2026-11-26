@@ -37,7 +37,6 @@ export const ARENA_DEFAULT_NAME = 'Arena default'
 /**
  * Returns the value when it is a hosting class.
  * @param {unknown} value - Raw value (from the server).
- * @returns {AiHostingClass|null} The hosting class, or null.
  */
 const toHostingClass = (value: unknown): AiHostingClass | null =>
   (aiHostingClasses as readonly unknown[]).includes(value) ? (value as AiHostingClass) : null
@@ -48,7 +47,6 @@ const toHostingClass = (value: unknown): AiHostingClass | null =>
  * @param {boolean} provider.hasApiKey - A key is stored.
  * @param {boolean} provider.apiKeyReadable - The stored key can be decrypted.
  * @param {boolean|null} provider.lastTestOk - Result of the last test, null when never tested.
- * @returns {AiProviderStatus} The status.
  */
 export const getAccountProviderStatus = ({
   hasApiKey,
@@ -63,7 +61,6 @@ export const getAccountProviderStatus = ({
 /**
  * Returns the status of a local provider from its probe.
  * @param {AiLocalServerCapability|null} capability - Probe-based capability (null: not probed).
- * @returns {AiProviderStatus} The status.
  */
 export const getLocalProviderStatus = (capability: AiLocalServerCapability | null): AiProviderStatus => {
   if ((capability?.reachable ?? null) === null) return 'notTested'
@@ -74,7 +71,6 @@ export const getLocalProviderStatus = (capability: AiLocalServerCapability | nul
 /**
  * Returns the entry of an account provider.
  * @param {AiPublicProvider} provider - Public entry.
- * @returns {AiProviderEntry} The entry.
  */
 const toAccountEntry = (provider: AiPublicProvider): AiProviderEntry => ({
   id: provider.id,
@@ -91,7 +87,6 @@ const toAccountEntry = (provider: AiPublicProvider): AiProviderEntry => ({
  * Returns the entry of a local provider.
  * @param {LocalProvider} provider - Stored provider.
  * @param {AiLocalServerCapability|null} capability - Its capability (null: not probed).
- * @returns {AiProviderEntry} The entry.
  */
 const toLocalEntry = (provider: LocalProvider, capability: AiLocalServerCapability | null): AiProviderEntry => ({
   id: provider.id,
@@ -130,8 +125,6 @@ export const getArenaDefaultEntry = (adminDefault: AiAdminDefault | null): AiPro
  * @param {AiPublicProvider[]} params.accountProviders - Account providers from the settings.
  * @param {LocalProvider[]} params.localProviders - Local providers of this browser.
  * @param {object} params.local - Capability of each local provider, by id.
- * @param {AiAdminDefault|null} params.adminDefault - Admin default.
- * @returns {AiProviderEntry[]} The entries.
  */
 export const buildProviderEntries = ({
   accountProviders,

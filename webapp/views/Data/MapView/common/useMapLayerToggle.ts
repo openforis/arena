@@ -7,7 +7,6 @@ import { useMapEvents } from 'react-leaflet'
  * @param {string} [params.layerKey] - When set, overlays whose name includes it match (instead of the exact name).
  * @param {() => void} [params.onAdd] - Called when the overlay is checked.
  * @param {() => void} [params.onRemove] - Called when the overlay is unchecked.
- * @returns {void}
  */
 export const useMapLayerToggle = ({
   layerName,

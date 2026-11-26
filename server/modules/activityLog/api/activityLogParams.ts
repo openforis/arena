@@ -13,7 +13,6 @@ const invalid = (name: string) => new SystemError(INVALID_PARAMS_KEY, { name }, 
 
 /**
  * Parses an optional non-negative integer (digits only).
- * @param {unknown} value - Raw value.
  * @param {string} name - Parameter name.
  * @returns {?number} The number, or null when missing.
  */

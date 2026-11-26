@@ -14,8 +14,6 @@ import type { DetectorContext, EventDetector, SuggestionEvent, TargetResolver } 
 
 /**
  * Tells whether a node definition is a multiple entity with no key among its direct children (validateKeyAttributes).
- * @param {object} survey - Survey.
- * @param {object} nodeDef - Node definition.
  * @returns {boolean} True when it needs a key.
  */
 export const isEntityWithoutKey = (survey: any, nodeDef: any): boolean => {
@@ -28,9 +26,6 @@ export const isEntityWithoutKey = (survey: any, nodeDef: any): boolean => {
 
 /**
  * Adds the new multiple entities without a key.
- * @param {SuggestionEvent} event - The event.
- * @param {DetectorContext} ctx - Detector context.
- * @returns {void}
  */
 export const handleEntityWithoutKey = (event: SuggestionEvent, ctx: DetectorContext): void => {
   if (event.type !== 'designerLeft') return

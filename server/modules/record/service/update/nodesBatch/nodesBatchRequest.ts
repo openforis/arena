@@ -9,14 +9,12 @@ import { NodesBatchEdit, NodesBatchMessageKeys, NodesBatchRecordEdit, NodesBatch
  * Builds the 400 error of an invalid request.
  * @param {string} reason - What is wrong.
  * @param {object} [params] - Extra params.
- * @returns {SystemError} The error.
  */
 const invalidRequest = (reason: string, params: Record<string, unknown> = {}): SystemError =>
   new SystemError(NodesBatchMessageKeys.invalidRequest, { reason, ...params }, StatusCodes.BAD_REQUEST)
 
 /**
  * Returns true for a valid uuid (a malformed one would make the database query fail and roll the record back).
- * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a usable id.
  */
 const isId = (value: unknown): value is string => typeof value === 'string' && isUuid(value)
@@ -24,7 +22,6 @@ const isId = (value: unknown): value is string => typeof value === 'string' && i
 /**
  * Validates one edit (ids and size of the new value) and fills the missing from/to with null.
  * @param {unknown} edit - The edit from the body.
- * @returns {NodesBatchEdit} The edit.
  */
 const parseEdit = (edit: unknown): NodesBatchEdit => {
   if (!edit || typeof edit !== 'object') throw invalidRequest('edit')
@@ -39,8 +36,6 @@ const parseEdit = (edit: unknown): NodesBatchEdit => {
 
 /**
  * Checks the request limits: no node twice, at most 50 records.
- * @param {NodesBatchEdit[]} edits - The edits.
- * @returns {void}
  */
 const checkEditsSet = (edits: NodesBatchEdit[]): void => {
   const nodeUuids = new Set(edits.map((edit) => edit.nodeUuid))
@@ -55,7 +50,6 @@ const checkEditsSet = (edits: NodesBatchEdit[]): void => {
  * Validates the body of POST /records/nodes/update.
  * @param {unknown} body - The request body: { cycle, edits: [{ recordUuid, nodeUuid, from, to }] }.
  * @param {string[]} [cycleKeys] - The survey cycle keys; when given, the cycle must be one of them (it becomes a cache key).
- * @returns {NodesBatchRequest} The request.
  */
 export const parseNodesBatchRequest = (body: unknown, cycleKeys?: string[]): NodesBatchRequest => {
   const { cycle, edits } = (body ?? {}) as Record<string, unknown>
@@ -72,7 +66,6 @@ export const parseNodesBatchRequest = (body: unknown, cycleKeys?: string[]): Nod
 
 /**
  * Groups the edits by record, in request order, keeping each edit's index in the request.
- * @param {NodesBatchEdit[]} edits - The edits.
  * @returns {Map<string, NodesBatchRecordEdit[]>} The edits by record uuid.
  */
 export const groupEditsByRecord = (edits: NodesBatchEdit[]): Map<string, NodesBatchRecordEdit[]> => {

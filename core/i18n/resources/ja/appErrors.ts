@@ -1,4 +1,24 @@
 export default {
+  authProvider: {
+    notFound: 'ログインプロバイダーが見つかりません',
+    readOnly: 'このプロバイダーはサーバー設定で定義されているため、ここでは変更できません',
+    idAlreadyUsed: '識別子「{{id}}」は別のプロバイダーですでに使用されています',
+    encryptionKeyMissing:
+      'クライアントシークレットの暗号化キー（AUTH_PROVIDER_SECRET_ENCRYPTION_KEY）が設定されていません',
+    validation: '一部の項目が無効です',
+    iconInvalid: '無効なアイコンです：100 KBまでのPNGまたはSVGファイルを使用してください',
+    identityNotFound: '連携アカウントが見つかりません',
+    lastSignInMethod: 'これは最後のサインイン方法です：先にパスワードを設定するか、別のプロバイダーを連携してください',
+    idInvalid: '無効な識別子です：小文字の英字、数字、ハイフンを使用してください（64文字以内）',
+    typeInvalid: '無効なプロバイダーの種類です',
+    labelInvalid: 'ボタンのラベルは必須です（64文字以内）',
+    issuerInvalid: '無効な発行者（Issuer）URLです（httpsが必要です）',
+    tenantInvalid: '無効なテナントです',
+    clientIdRequired: 'クライアントIDは必須です',
+    scopesMissingOpenid: 'スコープには「openid」を含める必要があります',
+    emailDomainInvalid: '無効なメールドメインです',
+    clientSecretRequired: 'クライアントシークレットは必須です',
+  },
   mapCustomLayers: {
     urlInvalid: 'サービス URL が無効です',
     urlNotAllowed: '使用できるのは公開された http および https アドレスのみです',

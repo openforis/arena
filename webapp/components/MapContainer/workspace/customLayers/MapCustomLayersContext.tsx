@@ -49,7 +49,6 @@ const MapCustomLayersContext = createContext<MapCustomLayersContextValue>({
 
 /**
  * Returns the stored-layers key of a scope.
- * @param {MapCustomLayerScope} scope - The scope.
  * @returns {string} surveyLayers or userLayers.
  */
 const storedKeyOf = (scope: MapCustomLayerScope): keyof StoredLayers =>
@@ -101,9 +100,6 @@ const useStoredMapCustomLayers = () => {
 
 /**
  * Provides the custom WMS / WMTS / XYZ layers of the current survey to the map (base maps) and the workspace (overlays).
- * @param {object} props - Props.
- * @param {React.ReactNode} props.children - The children.
- * @returns {React.ReactElement} The provider.
  */
 export const MapCustomLayersProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const canEditSurveyLayers = Boolean(useAuthCanEditSurvey())

@@ -11,12 +11,6 @@ export const transformCallback = (row: { [column: string]: unknown } | null) => 
 
 /**
  * Count the processing chains by the given survey id.
- *
- * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
- * @param {BaseProtocol} [client=db] - The database client.
- *
- * @returns {Promise<number>} - The result promise.
  */
 export const countChains = (params: { surveyId: number }, client: DbClient = DB.client) => {
   const { surveyId } = params
@@ -28,13 +22,9 @@ export const countChains = (params: { surveyId: number }, client: DbClient = DB.
  * Fetches all processing chains by the given survey id.
  *
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
  * @param {number} [params.offset=0] - The select query offset.
  * @param {number} [params.limit=null] - The select query limit.
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
- * @param {BaseProtocol} [client=db] - The database client.
- *
- * @returns {Promise<object[]>} - The result promise.
  */
 export const fetchChains = (
   params: { surveyId: number; offset?: number; limit?: number | null; includeScript?: boolean },
@@ -58,12 +48,8 @@ export const fetchChains = (
  * Fetches a single processing chain by the given survey id and chainUuid.
  *
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
  * @param {boolean} params.includeScript - Whether to include script columns.
- * @param {BaseProtocol} [client=db] - The database client.
- *
- * @returns {Promise<Chain|null>} - The result promise.
  */
 export const fetchChain = (
   params: { surveyId: number; chainUuid: string; includeScript?: boolean },

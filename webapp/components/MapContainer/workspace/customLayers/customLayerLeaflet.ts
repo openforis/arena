@@ -37,11 +37,6 @@ export type CustomBaseLayerDef = {
   custom: MapCustomLayerWithScope
 }
 
-/**
- * Builds the Leaflet options of a custom layer.
- * @param {MapCustomLayer} layer - The layer.
- * @returns {CustomLayerTileOptions} The options.
- */
 const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
   opacity: layer.opacity,
   // Leaflet's attribution control renders HTML; attributions are typed by users or read from capabilities documents
@@ -53,7 +48,6 @@ const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
 
 /**
  * Tells how to create the Leaflet layer of a custom layer.
- * @param {MapCustomLayer} layer - The layer.
  * @returns {CustomLayerLeafletConfig} WMS: the GetMap endpoint and its parameters; WMTS and XYZ: the tile template.
  */
 export const getCustomLayerLeafletConfig = (layer: MapCustomLayer): CustomLayerLeafletConfig => {
@@ -76,7 +70,6 @@ export const getCustomLayerLeafletConfig = (layer: MapCustomLayer): CustomLayerL
 /**
  * Builds the base layer definition of a custom base map.
  * @param {MapCustomLayerWithScope} layer - The layer (role baseMap).
- * @returns {CustomBaseLayerDef} The definition.
  */
 export const toCustomBaseLayerDef = (layer: MapCustomLayerWithScope): CustomBaseLayerDef => {
   const key = `${CUSTOM_BASE_LAYER_KEY_PREFIX}${layer.id}`

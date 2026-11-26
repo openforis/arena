@@ -14,7 +14,6 @@ const uriPrefix = '/survey/:surveyId/geo/map/'
 /**
  * Wraps an async route handler and answers every error with sendErr. systemErrorMiddleware only handles SystemErrors;
  * the other errors (unexpected failures) would reach the default handler and be answered as an HTML page, not as JSON.
- * @param {Handler} handler - The handler.
  * @returns {Function} The Express handler.
  */
 const handle =
@@ -29,7 +28,6 @@ const handle =
 
 /**
  * Reads the survey id and the user uuid of a request.
- * @param {ExpressRequest} req - The request.
  * @returns {{surveyId: number, userUuid: string}} The ids.
  */
 const getSurveyAndUser = (req: ExpressRequest): { surveyId: number; userUuid: string } => {
@@ -41,9 +39,7 @@ const getSurveyAndUser = (req: ExpressRequest): { surveyId: number; userUuid: st
  * Registers the routes adding and removing the layers of one scope.
  * @param {object} params - Parameters.
  * @param {Router} params.app - The router.
- * @param {MapCustomLayerScope} params.scope - The scope.
  * @param {RequestHandler} params.permission - The middleware checking who may change that scope.
- * @returns {void}
  */
 const initScopeRoutes = ({
   app,
@@ -82,7 +78,6 @@ const initScopeRoutes = ({
 /**
  * Registers the custom map layer routes: the capabilities proxy and the layer storage.
  * @param {Router} app - The API router.
- * @returns {void}
  */
 export const init = (app: Router): void => {
   app.get(

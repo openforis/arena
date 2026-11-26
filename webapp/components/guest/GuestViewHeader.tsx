@@ -16,7 +16,6 @@ type Props = {
 /**
  * Header of a guest view: optional "back to login" link and icon, title and description.
  *
- * @param {Props} props - The props.
  * @returns {React.ReactElement} The header element.
  */
 export const GuestViewHeader = (props: Props) => {

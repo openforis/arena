@@ -42,7 +42,6 @@ export type ProviderChipView =
  * @param {object} params - Parameters.
  * @param {AiCapabilities} params.capabilities - Capabilities (provider list and default).
  * @param {string|null} [params.providerId] - Provider stored with the conversation.
- * @returns {ConversationProvider} The provider.
  */
 export const getConversationProvider = ({
   capabilities,
@@ -61,7 +60,6 @@ export const getConversationProvider = ({
 
 /**
  * Returns true when the chip can open the "Answer with" popover (at least one provider is set up).
- * @param {AiCapabilities} capabilities - Capabilities.
  * @returns {boolean} True when the switcher can be opened.
  */
 export const canOpenProviderChooser = (capabilities: AiCapabilities): boolean =>
@@ -92,7 +90,6 @@ export const shouldShowProviderRemoved = ({
  * @param {AiPolicy} params.effective - Effective policy of the conversation.
  * @param {AiDataClass} params.dataClass - Data class of the conversation.
  * @param {boolean} params.surveyScoped - The conversation belongs to a survey.
- * @returns {string|null} The i18n key, or null.
  */
 const getChoiceBlockKey = ({
   entry,
@@ -152,7 +149,6 @@ export const buildProviderChoices = ({
 /**
  * Returns true when at least one row of the "Answer with" popover can be picked under the policy.
  * @param {object} params - Parameters (those of buildProviderChoices, without the selected provider).
- * @param {AiCapabilities} params.capabilities - Capabilities.
  * @param {AiPolicy|null} params.effective - Effective policy (null while loading: nothing can be picked).
  * @param {AiDataClass} params.dataClass - Data class of the conversation.
  * @param {boolean} params.surveyScoped - The conversation belongs to a survey.
@@ -180,10 +176,8 @@ export const hasPickableProvider = ({
 /**
  * Returns what the chip shows.
  * @param {object} params - Parameters.
- * @param {AiCapabilities} params.capabilities - Capabilities.
  * @param {ConversationProvider} params.current - Provider of the conversation.
  * @param {AiFeatureAvailabilityStatus} params.status - Availability of the area's feature with that provider.
- * @returns {ProviderChipView} The view.
  */
 export const getProviderChipView = ({
   capabilities,
@@ -204,8 +198,6 @@ export const getProviderChipView = ({
  * Returns the chip text: the provider name, then the model.
  * @param {object} params - Parameters.
  * @param {AiProviderEntry} params.entry - Provider.
- * @param {TFunction} params.t - Translation function.
- * @returns {string} The text.
  */
 export const getProviderChipLabel = ({ entry, t }: { entry: AiProviderEntry; t: TFunction }): string => {
   const name = getProviderDisplayName({ entry, t })
@@ -217,8 +209,6 @@ export const getProviderChipLabel = ({ entry, t }: { entry: AiProviderEntry; t: 
  * that too (the red tone is never the only sign).
  * @param {object} params - Parameters.
  * @param {ProviderChipView} params.view - What the chip shows.
- * @param {TFunction} params.t - Translation function.
- * @returns {string} The text.
  */
 export const getProviderChipFullLabel = ({ view, t }: { view: ProviderChipView; t: TFunction }): string => {
   if (view.kind === 'none') return t('aiAssistant.providerChip.none')

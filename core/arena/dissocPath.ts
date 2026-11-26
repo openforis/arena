@@ -22,8 +22,5 @@ const _dissocPath = (pathArray: Array<string | number>, object: any): any => {
  * Returns a clone of the object without the value at the given path.
  *
  * @param {*} pathArray - The path (array of keys or indexes).
- * @param {*} object - The object.
- *
- * @returns {object} - The result.
  */
 export const dissocPath = _curry2(_dissocPath)

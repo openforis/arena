@@ -30,7 +30,6 @@ export type CreateSceneLayerParams = {
 /**
  * Creates the overlay pane of the scene layers once per map (raster panes never catch pointer events).
  *
- * @param {L.Map} map - Map.
  * @param {string} paneName - SCENE_OVERLAY_PANE.
  * @returns {string} The pane name.
  */

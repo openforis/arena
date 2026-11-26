@@ -19,7 +19,6 @@ export const initialReasonsState: ReasonsState = { keyboardFocus: false, dismiss
 
 /**
  * Returns the next state.
- * @param {ReasonsState} state - Current state.
  * @param {ReasonsEvent} event - What happened.
  * @returns {ReasonsState} The next state.
  */
@@ -38,7 +37,6 @@ export const reduceReasons = (state: ReasonsState, event: ReasonsEvent): Reasons
 
 /**
  * Tells whether the reasons are open below the control.
- * @param {ReasonsState} state - Current state.
  * @returns {boolean} True when they show.
  */
 export const isReasonsPopupOpen = ({ keyboardFocus, dismissed }: ReasonsState): boolean => keyboardFocus && !dismissed

@@ -126,7 +126,6 @@ const handleTag = (state: DocxState, content: string): void => {
  * Reads the paragraphs and table rows of a Word document, in document order.
  * shortcut: footnotes (word/footnotes.xml) and text boxes are not read, add them if the manual starts using them for content.
  * @param {string} xml - Content of word/document.xml.
- * @returns {HandbookBlock[]} The blocks.
  */
 export const readDocxBlocks = (xml: string): HandbookBlock[] => {
   const state: DocxState = { blocks: [], paragraph: null, inText: false, tableDepth: 0, row: [], cell: [] }
@@ -235,7 +234,6 @@ export const splitHandbook = (blocks: HandbookBlock[], maxChars: number = SECTIO
  * @param {object} params - Parameters.
  * @param {string} params.xml - Content of word/document.xml of the manual in that language.
  * @param {string} params.lang - Language of the manual (one of HANDBOOK_LANGS).
- * @returns {Handbook} The handbook.
  */
 export const buildHandbook = ({ xml, lang }: { xml: string; lang: string }): Handbook => ({
   source: `https://github.com/openforis/arena/raw/master/docs/user-manual/arena-user-manual-${lang}.docx`,
@@ -246,7 +244,6 @@ export const buildHandbook = ({ xml, lang }: { xml: string; lang: string }): Han
 
 /**
  * Checks that the handbook looks complete.
- * @param {Handbook} handbook - Handbook.
  * @param {number} [minIds] - Minimum number of distinct section ids.
  * @returns {string|null} The problem, or null when it looks complete.
  */

@@ -46,7 +46,6 @@ export const getPolicyLevelOptions = ({
  * Returns the policy after the user chose a level. The record data cannot be more permissive than the survey design:
  * lowering the design below the data lowers the data with it.
  * @param {object} params - Parameters.
- * @param {AiPolicy} params.policy - Current policy.
  * @param {keyof AiPolicy} params.dataClass - The class the user changed.
  * @param {AiPolicyLevel} params.level - The chosen level.
  * @returns {{policy: AiPolicy, dataLowered: boolean}} The new policy, and whether the data level was lowered besides the choice.
@@ -68,8 +67,6 @@ export const applyPolicyChoice = ({
  * Returns the message of a failed save: the server error key when there is one.
  * @param {object} params - Parameters.
  * @param {any} params.error - Axios error (or any error).
- * @param {Function} params.t - Translation function.
- * @returns {string} The message.
  */
 export const getPolicySaveErrorMessage = ({
   error,

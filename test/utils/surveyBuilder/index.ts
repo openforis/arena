@@ -131,7 +131,6 @@ class SurveyBuilder {
   /**
    * Builds the survey and saves it as draft or publish it.
    * @param {boolean} [publish] - Whether to publish the survey.
-   * @param {pgPromise.IDatabase} [client] - The database client.
    * @returns {Promise<Survey>} - The newly created survey object.
    */
   async buildAndStore(publish = true, client = db) {

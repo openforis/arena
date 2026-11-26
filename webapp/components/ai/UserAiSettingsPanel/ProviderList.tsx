@@ -28,7 +28,6 @@ type RowProps = {
 
 /**
  * ⋯ menu of a row (an empty cell keeps the columns aligned when there is no action).
- * @param {RowProps} props - Props.
  * @returns {React.ReactElement} The menu.
  */
 const RowMenu = ({ row, t, busy, onAction }: RowProps) => {
@@ -59,7 +58,6 @@ const RowMenu = ({ row, t, busy, onAction }: RowProps) => {
 
 /**
  * One provider: monogram, name, model and where tag, Default marker, status pill and ⋯ menu.
- * @param {RowProps} props - Props.
  * @returns {React.ReactElement} The row.
  */
 const ProviderRowView = ({ row, t, busy, onAction }: RowProps) => {
@@ -100,7 +98,6 @@ type Props = {
 /**
  * Providers block of the panel: "Add provider", one row per provider (Arena default last), the
  * footer hint, and the add / edit dialog.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The block.
  */
 export const ProviderList = ({ settings, reloadSettings }: Props) => {

@@ -31,8 +31,6 @@ const usedToday = (field: 'calls' | 'chars'): string =>
 /**
  * Adds one call to the usage of a user, unless it would go over a limit (one atomic statement, so concurrent calls
  * of any server replica cannot exceed the limits).
- * @param {ChargeAiUsageParams} params - Parameters.
- * @param {object} [client] - Database client.
  * @returns {Promise<AiUsage|null>} The usage after the call, or null when a limit would be exceeded.
  */
 export const chargeAiUsage = async (

@@ -23,7 +23,6 @@ const actionColumn = <R,>(field: string, renderButton: (row: R) => ReactNode): G
  * only the columns of the given actions.
  *
  * @param actions - The row actions.
- * @returns The columns.
  */
 export const rowActionColumns = <R,>({
   getDownloadUrl,

@@ -35,7 +35,6 @@ type ClassEditorProps = {
 /**
  * Segmented control of one data class, with the explanation of the chosen level and the notes on the levels that
  * cannot be chosen (instance ceiling; for record data, also the survey design level).
- * @param {ClassEditorProps} props - Props.
  * @returns {React.ReactElement} The control.
  */
 const PolicyClassEditor = (props: ClassEditorProps) => {

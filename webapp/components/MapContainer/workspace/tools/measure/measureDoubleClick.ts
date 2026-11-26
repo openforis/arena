@@ -14,7 +14,6 @@ export const interceptDoubleClick = (
   /**
    * Stops the double-click in the capture phase and reports it.
    * @param {Event} event - The double-click event.
-   * @returns {void}
    */
   const listener = (event: Event): void => {
     // immediate: also skips Leaflet's listener when the container itself is the target

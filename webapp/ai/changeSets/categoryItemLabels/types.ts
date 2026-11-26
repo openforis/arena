@@ -33,10 +33,6 @@ export const isCategoryItemLabelOperation = <T extends { type: string }>(
 
 /**
  * Returns the key of a label (two operations with the same key write the same label).
- * @param {object} params - Parameters.
- * @param {string} params.itemUuid - Item uuid.
- * @param {string} params.lang - Language.
- * @returns {string} The key.
  */
 export const getCategoryItemLabelKey = ({ itemUuid, lang }: { itemUuid: string; lang: string }): string =>
   `${itemUuid.toLowerCase()}|${lang}`

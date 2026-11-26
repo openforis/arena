@@ -9,7 +9,6 @@ import type { SuggestionDefinition } from './types'
 
 /**
  * Returns the name of a language in the interface language ("French", "francés").
- * @param {string} lang - Language code.
  * @param {string} uiLang - Interface language.
  * @returns {string} The name; the English name or the code when the engine has none.
  */

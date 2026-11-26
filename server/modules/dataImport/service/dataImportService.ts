@@ -15,7 +15,6 @@ import DataImportJob from './dataImportJob/dataImportJob'
  * Checks that the user can use the specified Collect data import options (the UI offers them only to some users).
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user starting the import.
- * @param {!number} params.surveyId - The id of the survey.
  * @param {boolean} [params.deleteAllRecords] - Whether all the records of the cycle will be deleted before the import.
  * @returns {Promise<void>} - Resolves if the options are allowed.
  * @throws {UnauthorizedError} If the user cannot use the options.
@@ -40,7 +39,6 @@ const checkCollectDataImportOptions = async ({
  * Starts the import of the records of a Collect backup file.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user starting the import.
- * @param {!number} params.surveyId - The id of the survey.
  * @param {!string} params.filePath - The path of the Collect backup file.
  * @param {boolean} [params.deleteAllRecords] - Whether all the records of the cycle will be deleted before the import.
  * @param {string} [params.cycle] - The cycle to import the records into.
@@ -83,7 +81,6 @@ export const startCollectDataImportJob = async ({
  * @param {!object} params.user - The user starting the import.
  * @param {boolean} [params.includeFiles] - Whether files are imported too.
  * @param {boolean} [params.deleteExistingEntities] - Whether the existing entities will be deleted.
- * @returns {void}
  * @throws {UnauthorizedError} If the user cannot use the options.
  */
 export const checkFlatDataImportOptions = ({

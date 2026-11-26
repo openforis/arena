@@ -16,7 +16,6 @@ const variables = [
 /**
  * Tells whether an env value is unset or empty.
  * @param {string | undefined} raw - Raw env value.
- * @returns {boolean} True when blank.
  */
 const isBlank = (raw: string | undefined): boolean => raw === undefined || raw === null || raw.trim() === ''
 
@@ -33,7 +32,6 @@ const toLevel = (raw: string): AiPolicyLevel | undefined => {
 /**
  * Parses one ceiling (unset → cloud, invalid → off).
  * @param {string | undefined} raw - Raw env value.
- * @returns {AiPolicyLevel} The ceiling level.
  */
 const parseCeiling = (raw: string | undefined): AiPolicyLevel => {
   if (isBlank(raw)) return DEFAULT_CEILING
@@ -43,7 +41,6 @@ const parseCeiling = (raw: string | undefined): AiPolicyLevel => {
 /**
  * Returns the instance ceilings (unset → cloud, invalid → off).
  * @param {AiPolicyCeilingEnv} [env] - Environment (defaults to ENV).
- * @returns {AiPolicy} The ceilings.
  */
 export const getAiPolicyCeilings = (env: AiPolicyCeilingEnv = ENV): AiPolicy => ({
   schema: parseCeiling(env.aiPolicyMaxSchema),

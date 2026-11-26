@@ -23,7 +23,6 @@ const stripTrailingSlashes = (value: string): string => {
 /**
  * Returns the public origin for URLs that outlive the request (QR codes, emails).
  * Prefers ARENA_PUBLIC_URL when configured; otherwise uses the request Host.
- * @param {object} req - Express request.
  * @returns {string} Origin without a trailing slash.
  */
 export const getPublicServerUrl = (req: ExpressRequest) => {
@@ -82,7 +81,6 @@ const integerStringRegex = /^-?\d+$/
 
 /**
  * Returns the value of an optional integer param.
- * @param {object} req - The HTTP request.
  * @param {string} param - The param name.
  * @returns {number|null} The param value as an integer, or null when the param is not specified.
  * @throws {SystemError} With status 400 when the param is specified but it is not an integer.
@@ -100,7 +98,6 @@ export const getIntegerParam = (req: ExpressRequest, param) => {
 
 /**
  * Returns the "key" param of a prop update request, failing when that prop cannot be updated through the request.
- * @param {object} req - The request.
  * @param {string[]} updatablePropKeys - The keys of the props that can be updated.
  * @returns {string} - The prop key.
  */

@@ -17,11 +17,8 @@ import { db, DbClient } from '@server/db/db'
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  * ```.
- * @param {!object} survey - The survey object.
- * @param {!string} cycle - The survey cycle.
  * @param {!object} nodeDefEntity - The entity definition.
  * @param {!Array} nodeDefKeys - The key attribute defs.
- * @param {!object} client - The DB client.
  * @returns {Promise<Array>} The list of items.
  */
 export const fetchRecordsWithDuplicateEntities = async (

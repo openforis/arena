@@ -5,7 +5,6 @@ import * as Survey from '@core/survey/survey'
 /**
  * Checks whether any survey auth group can act on the cleansing record step.
  *
- * @param {unknown} surveyInfo - The survey info.
  * @returns {boolean} True if at least one auth group includes the cleansing step.
  */
 export const surveyIncludesCleansingStep = (surveyInfo: unknown): boolean => {

@@ -50,7 +50,6 @@ const getKey = (): Buffer => {
 /**
  * Throws unless the AAD is a non-empty string.
  * @param {unknown} aad - Additional authenticated data.
- * @returns {void}
  */
 function assertAad(aad: unknown): asserts aad is string {
   if (typeof aad !== 'string' || aad.length === 0) {
@@ -60,7 +59,6 @@ function assertAad(aad: unknown): asserts aad is string {
 
 /**
  * Splits an envelope into its version and payload.
- * @param {unknown} envelope - The envelope.
  * @returns {{version: string, payload: Buffer}} The parts.
  * @throws {Error} When the envelope is malformed.
  */
@@ -74,7 +72,6 @@ const parseEnvelope = (envelope: unknown): { version: string; payload: Buffer } 
 
 /**
  * Returns true when the envelope was written without AAD (an old `v1` envelope).
- * @param {unknown} envelope - The envelope.
  * @returns {boolean} Whether it is a legacy envelope.
  */
 export const isLegacyEnvelope = (envelope: unknown): boolean =>
@@ -83,7 +80,6 @@ export const isLegacyEnvelope = (envelope: unknown): boolean =>
 /**
  * Returns the payload of an old `v1` envelope in one canonical form, so that two spellings of the same envelope compare
  * equal (base64 decoding ignores whitespace and accepts the URL alphabet and missing padding).
- * @param {unknown} envelope - The envelope.
  * @returns {string|null} The canonical payload, or null when the envelope is not a `v1` one.
  */
 export const getLegacyEnvelopeId = (envelope: unknown): string | null =>

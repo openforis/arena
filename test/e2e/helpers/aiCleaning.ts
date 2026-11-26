@@ -15,7 +15,6 @@ export const fixedValue = '25'
 /**
  * Returns the first sample record with tree_dec_2 = 5 in its first tree (tree_dec_1 = 10.5):
  * the validation "tree_dec_2 > 10" fails on that node only.
- * @returns {SampleRecord} The record.
  */
 export const buildInvalidTreeRecord = (): SampleRecord => {
   const [record] = sampleRecords
@@ -25,7 +24,6 @@ export const buildInvalidTreeRecord = (): SampleRecord => {
 
 /**
  * Returns the rows of the validation report.
- * @param {Page} page - The page.
  * @returns {import('@playwright/test').Locator} The rows.
  */
 export const reportRows = (page: Page) =>
@@ -34,9 +32,7 @@ export const reportRows = (page: Page) =>
 /**
  * Opens the validation report and waits until it has the expected number of rows
  * (record validations are updated asynchronously, so the report is reloaded until then).
- * @param {Page} page - The page.
  * @param {number} count - Expected number of rows.
- * @returns {Promise<void>} Resolves when the report has that many rows.
  */
 export const expectReportRowCount = async (page: Page, count: number): Promise<void> => {
   await expect
@@ -58,7 +54,6 @@ export const expectReportRowCount = async (page: Page, count: number): Promise<v
  * @param {Page} page - The page (already on an app URL).
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {{ baseUrl: string, modelId: string }} stub - The stub server.
- * @returns {Promise<void>} Resolves after the reload.
  */
 export const useLocalServer = async (
   page: Page,
@@ -72,7 +67,6 @@ export const useLocalServer = async (
 /**
  * Clicks "Ask the assistant" on the first report row, checks the pre-filled message and sends it.
  * @param {Page} page - The page (on the validation report).
- * @returns {Promise<void>} Resolves when the message is sent.
  */
 export const askAssistantAboutFirstRow = async (page: Page): Promise<void> => {
   await reportRows(page).first().getByTestId(TestId.validationReport.askAssistantBtn).click()
@@ -87,16 +81,13 @@ export const askAssistantAboutFirstRow = async (page: Page): Promise<void> => {
 
 /**
  * Returns the record-edit card of the conversation (the last one).
- * @param {Page} page - The page.
  * @returns {import('@playwright/test').Locator} The card.
  */
 export const recordEditCard = (page: Page) => page.getByTestId(TestId.aiCleaning.card).last()
 
 /**
  * Applies the selected edits of the card and waits for the result of the first edit.
- * @param {Page} page - The page.
  * @param {string} status - Expected result status (applied, conflict, failed).
- * @returns {Promise<void>} Resolves when the result is shown.
  */
 export const applyCardAndCheckStatus = async (page: Page, status: string): Promise<void> => {
   const card = recordEditCard(page)

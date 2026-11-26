@@ -67,7 +67,6 @@ const DEFAULT_OPACITY_PERCENT_BY_ROLE: Record<MapCustomLayerRole, number> = { ov
  * Creates the initial state of the dialog.
  * @param {object} params - Parameters.
  * @param {boolean} params.canEditSurvey - Whether the user can share layers with everyone in the survey.
- * @returns {WmsDialogFormState} The state.
  */
 export const createWmsDialogFormState = ({ canEditSurvey }: { canEditSurvey: boolean }): WmsDialogFormState => ({
   url: '',
@@ -106,7 +105,6 @@ export const getUrlLoadMode = (url: string): WmsUrlLoadMode => {
  * accepts, and for WMTS a non-empty identifier (a refused or empty name would make the whole batch fail).
  * @param {object} params - Parameters.
  * @param {MapServiceCapabilities} params.capabilities - The service.
- * @param {MapServiceLayer} params.layer - The layer.
  * @returns {boolean} True when the layer can be added.
  */
 export const isLayerSelectable = ({
@@ -120,8 +118,6 @@ export const isLayerSelectable = ({
 
 /**
  * Returns the layers of the service that are selected, in service order.
- * @param {WmsDialogFormState} state - The state.
- * @returns {MapServiceLayer[]} The selected layers.
  */
 export const getSelectedLayers = (state: WmsDialogFormState): MapServiceLayer[] => {
   const selected = new Set(state.selectedLayerNames)
@@ -130,7 +126,6 @@ export const getSelectedLayers = (state: WmsDialogFormState): MapServiceLayer[] 
 
 /**
  * Lists the image formats the user can choose.
- * @param {WmsDialogFormState} state - The state.
  * @returns {MapImageFormat[]} WMS: the service formats; WMTS: the formats with a tile template for the selected layers
  * (all layers when none is selected); XYZ: none (the template decides).
  */
@@ -158,7 +153,6 @@ const templateHostname = (url: string): string => {
 
 /**
  * Fills the fields the user has not edited from the current source and selection.
- * @param {WmsDialogFormState} state - The state.
  * @returns {WmsDialogFormState} The state with name, attribution and format kept consistent.
  */
 const withAutoFields = (state: WmsDialogFormState): WmsDialogFormState => {
@@ -175,7 +169,6 @@ const withAutoFields = (state: WmsDialogFormState): WmsDialogFormState => {
 
 /**
  * Selects the only usable layer of a service, so a one-layer service needs no extra click.
- * @param {MapServiceCapabilities} capabilities - The capabilities.
  * @returns {string[]} The preselected layer names.
  */
 const preselectLayers = (capabilities: MapServiceCapabilities): string[] => {
@@ -185,7 +178,6 @@ const preselectLayers = (capabilities: MapServiceCapabilities): string[] => {
 
 /**
  * Toggles a layer; layers that are not selectable cannot be selected, and no more than the maximum can be.
- * @param {WmsDialogFormState} state - The state.
  * @param {string} name - The layer name.
  * @returns {string[]} The new selection.
  */
@@ -199,12 +191,6 @@ const toggleLayerName = (state: WmsDialogFormState, name: string): string[] => {
     : [...state.selectedLayerNames, name]
 }
 
-/**
- * Updates the state of the dialog.
- * @param {WmsDialogFormState} state - The state.
- * @param {WmsDialogFormAction} action - The action.
- * @returns {WmsDialogFormState} The new state.
- */
 export const wmsDialogFormReducer = (state: WmsDialogFormState, action: WmsDialogFormAction): WmsDialogFormState => {
   switch (action.type) {
     case 'setUrl':
@@ -268,7 +254,6 @@ export const wmsDialogFormReducer = (state: WmsDialogFormState, action: WmsDialo
 
 /**
  * Describes what was loaded ("WMS 1.3.0 · 4 layers · Web Mercator supported").
- * @param {WmsDialogFormState} state - The state.
  * @returns {WmsSummaryPart[]} The parts, empty before loading.
  */
 export const getSummary = (state: WmsDialogFormState): WmsSummaryPart[] => {
@@ -288,7 +273,6 @@ export const getSummary = (state: WmsDialogFormState): WmsSummaryPart[] => {
 
 /**
  * Counts the layers the submit button adds.
- * @param {WmsDialogFormState} state - The state.
  * @returns {number} 1 for XYZ, else the number of selected layers.
  */
 const countLayersToAdd = (state: WmsDialogFormState): number =>
@@ -296,7 +280,6 @@ const countLayersToAdd = (state: WmsDialogFormState): number =>
 
 /**
  * Builds the label of the submit button ("Add 2 overlays").
- * @param {WmsDialogFormState} state - The state.
  * @returns {WmsFormMessage} The i18n key and its count.
  */
 export const getSubmitLabel = (state: WmsDialogFormState): WmsFormMessage => ({
@@ -306,14 +289,12 @@ export const getSubmitLabel = (state: WmsDialogFormState): WmsFormMessage => ({
 
 /**
  * Tells whether one display name is used (one layer), so the name field is enabled and required.
- * @param {WmsDialogFormState} state - The state.
  * @returns {boolean} True when exactly one layer is added.
  */
 export const isSingleLayer = (state: WmsDialogFormState): boolean => countLayersToAdd(state) === 1
 
 /**
  * Tells whether the dialog can be submitted.
- * @param {WmsDialogFormState} state - The state.
  * @returns {boolean} True when something is loaded and selected, and the single layer has a name.
  */
 export const canSubmit = (state: WmsDialogFormState): boolean => {
@@ -324,7 +305,6 @@ export const canSubmit = (state: WmsDialogFormState): boolean => {
 
 /**
  * Cuts a text to the stored maximum length (service titles can be longer than the server accepts).
- * @param {string} text - The text.
  * @param {number} maxLength - The maximum length.
  * @returns {string} The trimmed, cut text.
  */
@@ -346,10 +326,8 @@ const pickWmtsTemplate = (layer: MapServiceLayer, format: MapImageFormat): { url
 /**
  * Builds the layer stored for one selected service layer.
  * @param {object} params - Parameters.
- * @param {WmsDialogFormState} params.state - The state.
  * @param {MapServiceLayer} params.layer - The service layer.
  * @param {MapCustomLayer} params.common - The properties shared by every added layer.
- * @returns {MapCustomLayer} The layer.
  */
 const buildServiceLayer = ({
   state,
@@ -378,7 +356,6 @@ const buildServiceLayer = ({
 /**
  * Builds the layers to store from the dialog.
  * @param {object} params - Parameters.
- * @param {WmsDialogFormState} params.state - The state.
  * @param {Function} params.newId - Creates a layer id (uuid).
  * @returns {MapCustomLayer[]} One layer for XYZ, one per selected service layer otherwise.
  */
@@ -409,7 +386,6 @@ export const buildMapCustomLayers = ({
  * Reads the message of a failed API call: the server's appErrors key when there is one.
  * @param {unknown} error - The axios error.
  * @param {string} fallbackKey - The key used otherwise.
- * @returns {WmsFormMessage} The message.
  */
 export const toErrorMessage = (error: unknown, fallbackKey: string): WmsFormMessage => {
   const data = (error as { response?: { data?: { key?: unknown; params?: Record<string, unknown> } } })?.response?.data
@@ -435,7 +411,6 @@ export const isInsecureTileUrl = ({
 
 /**
  * Returns the URL the loaded source adds, to check its protocol.
- * @param {WmsDialogFormState} state - The state.
  * @returns {string|null} The typed template for XYZ; the GetMap URL for WMS; the first selected layer's tile template
  * (else the first layer's) for WMTS; null before loading.
  */

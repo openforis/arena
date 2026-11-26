@@ -33,7 +33,6 @@ const isMergeable = (part: LanguageModelV4StreamPart): part is DeltaPart =>
  * @param {object} [options] - Options.
  * @param {number} [options.intervalMs] - Longest wait of a delta.
  * @param {Timers} [options.timers] - Timer functions (tests give their own).
- * @returns {TransformStream<LanguageModelV4StreamPart, LanguageModelV4StreamPart>} The transform.
  */
 export const createDeltaCoalescer = ({
   intervalMs = COALESCE_INTERVAL_MS,
@@ -51,7 +50,6 @@ export const createDeltaCoalescer = ({
   /**
    * Sends the delta that is waiting, if any.
    * @param {TransformStreamDefaultController} controller - The stream controller.
-   * @returns {void}
    */
   const flush = (controller: TransformStreamDefaultController<LanguageModelV4StreamPart>) => {
     if (timer !== null) timers.clearTimer(timer)

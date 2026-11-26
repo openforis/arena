@@ -4,7 +4,6 @@ import { isNull } from './isNull'
 /**
  * Checks if the given value is its type's empty value.
  *
- * @param {*} value - The input value.
  *
  * @returns {boolean} - True if the input object is its type's empty value, false otherwise.
  */

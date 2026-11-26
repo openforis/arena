@@ -22,7 +22,6 @@ export type NodesBatchReplyRegistry = {
  * @param {number} [options.timeoutMs] - How long to wait for a reply (60 s by default).
  * @param {Function} [options.setTimer] - Timer scheduler (setTimeout).
  * @param {Function} [options.clearTimer] - Timer cancel (clearTimeout).
- * @returns {NodesBatchReplyRegistry} The registry.
  */
 export const createNodesBatchReplyRegistry = ({
   timeoutMs = NodesBatchLimits.replyTimeoutMs,
@@ -37,9 +36,7 @@ export const createNodesBatchReplyRegistry = ({
 
   /**
    * Waits for the reply of a request; resolves null on timeout (the entry is then dropped).
-   * @param {string} requestId - The request id.
    * @param {number} [waitMs] - How long to wait for this request (never more than the registry timeout, which is the default).
-   * @returns {Promise<NodesBatchEditResult[]|null>} The results, or null.
    */
   const waitFor = (requestId: string, waitMs: number = timeoutMs): Promise<NodesBatchEditResult[] | null> =>
     new Promise((resolve) => {
@@ -59,9 +56,6 @@ export const createNodesBatchReplyRegistry = ({
 
   /**
    * Resolves a pending request with the thread reply.
-   * @param {object} reply - The reply.
-   * @param {string} reply.requestId - The request id.
-   * @param {NodesBatchEditResult[]} reply.results - The results.
    * @returns {boolean} False when nobody waits for it (unknown or timed out).
    */
   const resolveReply = ({ requestId, results }: { requestId: string; results: NodesBatchEditResult[] }): boolean => {

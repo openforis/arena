@@ -34,7 +34,6 @@ const unknownQuery = (queryId: string) =>
 
 /**
  * Turns an expected request failure into a failure the model can act on.
- * @param {any} error - The error.
  * @returns {Error} The error to throw.
  */
 const toQueryFailure = (error: any) =>
@@ -42,7 +41,6 @@ const toQueryFailure = (error: any) =>
 
 /**
  * Returns the request parameters of a stored query.
- * @param {object} ctx - Tool context.
  * @param {object} entry - Stored query.
  * @returns {object} Survey id, cycle, query and signal.
  */
@@ -55,7 +53,6 @@ const getRequestParams = (ctx: any, entry: any) => {
  * Fetches at most max rows (asking one more to know whether there are others) and the total.
  * @param {object} params - Parameters.
  * @param {AnalysisApi} params.api - Analysis API.
- * @param {object} params.requestParams - Request parameters.
  * @param {number} params.max - Row cap.
  * @returns {Promise<object>} Rows, total and truncated flag.
  */
@@ -73,7 +70,6 @@ const fetchCappedRows = async ({ api, requestParams, max }: { api: AnalysisApi; 
  * @param {number} params.total - Rows of the query.
  * @param {boolean} params.sorted - Whether the query has a sort.
  * @param {boolean} params.hasTotals - Whether the result has the totals.
- * @returns {string} The note.
  */
 const getTruncationNote = ({
   shown,
@@ -98,7 +94,6 @@ const getTruncationNote = ({
  * Fetches the measures of an aggregate query over all its rows (the same query without dimensions).
  * @param {object} params - Parameters.
  * @param {AnalysisApi} params.api - Analysis API.
- * @param {object} params.requestParams - Request parameters.
  * @param {QueryResultColumn[]} params.columns - Result columns.
  * @returns {Promise<object|null>} The totals by measure column, or null when the query has no rows.
  */
@@ -154,9 +149,7 @@ const isUngrouped = (entry: { mode: string; query: any }) =>
  * Runs an aggregate query without dimensions. Its figures are the "totals": a row count of 1 would be read as one.
  * @param {object} params - Parameters.
  * @param {AnalysisApi} params.api - Analysis API.
- * @param {object} params.ctx - Tool context.
  * @param {any} params.entry - Proposed query.
- * @returns {Promise<object>} The result.
  */
 const runUngrouped = async ({ api, ctx, entry }: { api: AnalysisApi; ctx: any; entry: any }) => {
   const columns = getQueryResultColumns({ survey: ctx.survey, query: entry.query })
@@ -199,8 +192,6 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
       'dimensions has no groups to count: it returns its figures in "totals".',
     /**
      * Counts a proposed query.
-     * @param {Input} input - Tool input.
-     * @param {object} ctx - Tool context.
      * @returns {Promise<object>} The result, or an error result.
      */
     execute: async ({ queryId }, ctx) => {
@@ -226,8 +217,6 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
       'figures from "totals", never by adding rows, and cite the query id.',
     /**
      * Runs a proposed query, capped.
-     * @param {Input} input - Tool input.
-     * @param {object} ctx - Tool context.
      * @returns {Promise<object>} The result, or an error result.
      */
     execute: async ({ queryId }, ctx) => {

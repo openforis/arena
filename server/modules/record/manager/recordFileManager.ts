@@ -13,9 +13,6 @@ const contentDeleteFunctionByStorageType = {
 
 /**
  * Deletes all files associated with the given record UUIDs (record-level operation).
- * @param surveyId
- * @param recordUuids
- * @param client
  */
 export const deleteFilesByRecordUuids = async (surveyId: number, recordUuids: string[], client: DbClient = db) => {
   const storageType = getFileContentStorageType()
@@ -34,10 +31,7 @@ export const deleteFilesByRecordUuids = async (surveyId: number, recordUuids: st
  * Only meant to be used for preview records: soft-deleted files are never purged, so
  * preview records must have their replaced/removed files deleted immediately instead.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey ID.
  * @param {Array<{fileUuid: string, recordUuid: string}>} params.files - The files to delete.
- * @param {pgPromise.IDatabase} [client] - The database client.
- * @returns {Promise<void>} - The result promise.
  */
 export const deleteFiles = async (
   { surveyId, files }: { surveyId: number; files: { fileUuid: string; recordUuid?: string | null }[] },
@@ -51,11 +45,8 @@ export const deleteFiles = async (
 /**
  * Hard-deletes a single file (storage content + DB row). Convenience wrapper around deleteFiles.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey ID.
  * @param {string} params.fileUuid - The UUID of the file to delete.
  * @param {string} params.recordUuid - The UUID of the record the file belongs to.
- * @param {pgPromise.IDatabase} [client] - The database client.
- * @returns {Promise<void>} - The result promise.
  */
 export const deleteFileByUuid = (
   { surveyId, fileUuid, recordUuid }: { surveyId: number; fileUuid: string; recordUuid: string },
@@ -72,10 +63,7 @@ export const deleteFileByUuid = (
  * Must be called BEFORE the corresponding node delete, since descendant node rows are removed
  * silently by the DB's ON DELETE CASCADE and can no longer be queried afterwards.
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey ID.
  * @param {Array<string>} params.nodeDefUuids - Node def UUIDs being purged wholesale.
- * @param {pgPromise.IDatabase} [client] - The database client.
- * @returns {Promise<void>} - The result promise.
  */
 export const deleteFilesByNodeDefUuids = async (
   { surveyId, nodeDefUuids }: { surveyId: number; nodeDefUuids: string[] },

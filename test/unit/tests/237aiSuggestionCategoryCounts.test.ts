@@ -31,7 +31,6 @@ const createSetKindRecorder = () => {
 /**
  * Creates a detector context with a controllable signal and clock.
  * @param {object} params - Parameters (see createDetectorContext), plus the generation's controller and the time.
- * @returns {DetectorContext} The context.
  */
 const contextWith = ({
   controller = new AbortController(),

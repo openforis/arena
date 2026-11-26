@@ -43,8 +43,6 @@ const pad2 = (value: number): string => String(value).padStart(2, '0')
 
 /**
  * Returns the notation that follows the given one (Lat, Lon → DMS → UTM → Lat, Lon).
- * @param {CoordinateNotation} notation - Current notation.
- * @returns {CoordinateNotation} The next notation.
  */
 export const nextCoordinateNotation = (notation: CoordinateNotation): CoordinateNotation =>
   COORDINATE_NOTATIONS[(COORDINATE_NOTATIONS.indexOf(notation) + 1) % COORDINATE_NOTATIONS.length]
@@ -205,7 +203,6 @@ const formatDecimal = (value: number): string => (Math.abs(value) < 5e-6 ? 0 : v
  * Formats a point in the given notation.
  * @param {number} lat - Latitude in degrees.
  * @param {number} lng - Longitude in degrees.
- * @param {CoordinateNotation} notation - The notation.
  * @returns {string} The formatted point; "—" when UTM is not defined for the point.
  */
 export const formatCoordinates = (lat: number, lng: number, notation: CoordinateNotation): string => {

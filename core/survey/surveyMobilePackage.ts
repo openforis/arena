@@ -37,7 +37,6 @@ const getAreaOfInterestFileSummaries = (surveyInfo: any): MobilePackageFileSumma
 /**
  * Returns the survey files to include in the Arena Mobile survey package (the ones referenced by the survey info).
  *
- * @param {object} surveyInfo - The survey info.
  * @returns {MobilePackageFileSummary[]} - Summaries of the files to include.
  */
 const getFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] => [

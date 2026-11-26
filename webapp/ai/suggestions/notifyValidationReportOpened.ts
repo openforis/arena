@@ -11,7 +11,6 @@ import { notifySuggestionEvent } from './suggestionEvents'
  * @param {string|null} params.cycle - The open cycle.
  * @param {boolean} params.askAssistantAvailable - True when the Cleaning area is available.
  * @param {Function} [params.notify] - Sends an event (the suggestion events by default).
- * @returns {void}
  */
 export const notifyValidationReportOpened = ({
   cycle,

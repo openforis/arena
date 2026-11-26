@@ -7,7 +7,6 @@ export type FailureNotice = { key: string; params: { message: string } }
 /**
  * Runs the action; when it rejects, notifies the failure with the given key and the error message.
  * @param {object} params - Parameters.
- * @param {Function} params.action - The action.
  * @param {Function} params.notifyError - Shows an error notification.
  * @param {string} params.key - i18n key of the notification (takes the `message` param).
  * @returns {Promise<boolean>} True when the action succeeded.

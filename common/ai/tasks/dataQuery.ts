@@ -56,7 +56,6 @@ const aggregateFunctions: string[] = Object.values(Query.DEFAULT_AGGREGATE_FUNCT
  * @param {object} node - The expression node.
  * @param {Function} visitor - Function called with (node, parent).
  * @param {object} [parent] - The parent node.
- * @returns {void}
  */
 const visitExpression = (node, visitor, parent = null) => {
   if (!node || typeof node !== 'object') return
@@ -200,11 +199,9 @@ const getCodeComparison = (node: any, defsByColumn: Map<string, any>) => {
  * such a filter runs and finds nothing.
  * @param {object} params - The parameters.
  * @param {object} params.expr - The parsed filter.
- * @param {object} params.survey - The survey.
  * @param {string} params.lang - The label language.
  * @param {object[]} params.codeDefs - The code and taxon attributes the filter can use.
  * @param {string[]} params.errors - Errors array to populate.
- * @returns {void}
  */
 const checkFilterCodes = ({ expr, survey, lang, codeDefs, errors }) => {
   const defsByColumn = new Map<string, any>(codeDefs.map((nodeDef) => [NodeDef.getName(nodeDef), nodeDef]))
@@ -235,8 +232,6 @@ const checkFilterCodes = ({ expr, survey, lang, codeDefs, errors }) => {
 /**
  * Converts the (already parsed) model answer into a Data Explorer query, validating every node def reference.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - The survey cycle.
  * @param {string} params.lang - The language used for the sort criteria labels.
  * @param {object} params.aiResult - The model answer (validated by the Zod schema).
  * @param {boolean} [params.includeAnalysis] - Whether analysis attributes can be used.
@@ -407,7 +402,6 @@ const assertLangLength = (lang: string): void => {
 /**
  * Returns the given language when the survey supports it, otherwise the survey default language.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {string} [params.lang] - Requested language.
  * @returns {string} The language to use.
  */
@@ -423,11 +417,9 @@ export const getEffectiveQueryLang = ({ survey, lang }: { survey: any; lang?: st
  * @param {object} params - Parameters.
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {object} params.survey - Survey with its node defs.
- * @param {string} params.cycle - Survey cycle key.
  * @param {string} params.lang - Language for labels and the explanation.
  * @param {string} params.description - The user's request.
  * @param {boolean} params.includeAnalysis - Whether analysis attributes can be used (user can analyze records).
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{query: object, explanation: string}>} The query and its explanation.
  */
 export const generateDataQuery = async ({
@@ -511,9 +503,7 @@ export const normalizeQueryName = ({ name, label }: { name?: string | null; labe
  * @param {object} params - Parameters.
  * @param {AiGenerateText} params.generateText - Text generator.
  * @param {object} params.survey - Survey with its node defs.
- * @param {object} params.query - The query.
  * @param {string} params.lang - Language of the label and description.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{name: string, label: string, description: string}>} The suggestions.
  */
 export const summarizeDataQuery = async ({

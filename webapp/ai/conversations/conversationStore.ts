@@ -51,7 +51,6 @@ const INDEXES: [name: string, keyPath: string | string[]][] = [
  * the upgrade, so a version bump must find what an older version left.
  * @param {IDBDatabase} db - Database being upgraded.
  * @param {IDBTransaction} transaction - The version change transaction.
- * @returns {void}
  */
 export const ensureConversationsSchema = (db: IDBDatabase, transaction: IDBTransaction): void => {
   const store = db.objectStoreNames.contains(STORE)
@@ -66,14 +65,11 @@ export const ensureConversationsSchema = (db: IDBDatabase, transaction: IDBTrans
  * Opens the database. A newer build in another tab may have upgraded it past this build's version: that tab's version is
  * then used as it is (the store only needs what both builds share).
  * @param {IDBFactory} indexedDB - IndexedDB factory.
- * @returns {Promise<IDBDatabase>} The database.
  */
 const openDatabase = (indexedDB: IDBFactory): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
     /**
      * Opens the database at a version (any version when omitted).
-     * @param {number} [version] - Version.
-     * @returns {void}
      */
     const open = (version?: number): void => {
       const request =
@@ -94,7 +90,6 @@ const openDatabase = (indexedDB: IDBFactory): Promise<IDBDatabase> =>
 /**
  * Returns the ids of the conversations of a survey, whoever owns them (a key cursor: no conversation is loaded).
  * @param {IDBIndex} index - The userSurvey index (its keys are [userUuid, surveyKey]).
- * @param {number} surveyKey - Survey key.
  * @returns {Promise<string[]>} The conversation ids.
  */
 const getPrimaryKeysOfSurvey = (index: IDBIndex, surveyKey: number): Promise<string[]> =>
@@ -151,7 +146,6 @@ const createIndexedDbStore = (
   /**
    * Runs work on the open connection; if it was closed in the meantime, once more on a new one.
    * @param {Function} work - Work on the database.
-   * @returns {Promise<T>} The result.
    */
   const withDb = async <T>(work: (db: IDBDatabase) => Promise<T>): Promise<T> => {
     try {
@@ -242,7 +236,6 @@ const createIndexedDbStore = (
  * Creates the in-memory store (same behaviour as IndexedDB, lost on reload).
  * @param {object} params - Parameters.
  * @param {number} params.keep - Conversations kept per user and survey.
- * @returns {ConversationStore} The store.
  */
 export const createMemoryConversationStore = ({ keep }: { keep: number }): ConversationStore => {
   const byId = new Map<string, Conversation>()
@@ -284,7 +277,6 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
  * @param {IDBFactory|null} params.indexedDB - IndexedDB factory (null: memory store).
  * @param {number} [params.keep] - Conversations kept per user and survey.
  * @param {AiLog} [params.log] - Reports why the memory store is used.
- * @returns {Promise<ConversationStore>} The store.
  */
 export const openConversationStore = async ({
   indexedDB,
@@ -311,7 +303,6 @@ let appStorePromise: Promise<ConversationStore> | null = null
 
 /**
  * Returns the app's conversation store (opened once).
- * @returns {Promise<ConversationStore>} The store.
  */
 export const getConversationStore = (): Promise<ConversationStore> => {
   appStorePromise ??= openConversationStore({ indexedDB: globalThis.indexedDB ?? null })

@@ -39,7 +39,6 @@ export const categoryItemLabelsInvalid = (reason: string): SystemError =>
  * Throws the invalid request error when a check fails.
  * @param {boolean} valid - Check result.
  * @param {string} reason - Reason reported when it fails.
- * @returns {void}
  */
 export const requireValid = (valid: boolean, reason: string): void => {
   if (!valid) throw categoryItemLabelsInvalid(reason)
@@ -47,8 +46,6 @@ export const requireValid = (valid: boolean, reason: string): void => {
 
 /**
  * Returns the languages of the draft survey info.
- * @param {number} surveyId - Survey id.
- * @param {object} client - Database client.
  * @returns {Promise<string[]>} The languages, default first.
  */
 export const fetchSurveyLanguages = async (surveyId: number, client: DbClient): Promise<string[]> => {
@@ -70,7 +67,6 @@ const parseCursor = (cursor: unknown): string | null => {
 /**
  * Parses the limit parameter.
  * @param {unknown} limit - Raw value (a query string value or a number).
- * @returns {number} The limit.
  */
 const parseLimit = (limit: unknown): number => {
   if (limit === undefined || limit === null || limit === '') return MISSING_LABELS_SERVER_PAGE_DEFAULT
@@ -81,9 +77,6 @@ const parseLimit = (limit: unknown): number => {
 
 /**
  * Counts the items missing a label, per category and language (nothing with fewer than two languages).
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {object} [client] - Database client.
  * @returns {Promise<MissingLabelsCounts>} Counts by category uuid, then language.
  */
 export const countItemsMissingLabels = async (
@@ -98,13 +91,9 @@ export const countItemsMissingLabels = async (
 /**
  * Fetches one page of the items of a category whose label is missing in a language.
  * @param {object} params - Parameters (raw request values).
- * @param {number} params.surveyId - Survey id.
- * @param {string} params.categoryUuid - Category uuid.
  * @param {string} params.lang - Missing language (a survey language).
  * @param {string} [params.cursor] - nextCursor of the previous page.
  * @param {number|string} [params.limit] - Page size (1–200, default 50).
- * @param {object} [client] - Database client.
- * @returns {Promise<MissingLabelsPage>} The page.
  */
 export const fetchItemsMissingLabels = async (
   {
@@ -137,7 +126,6 @@ export const fetchItemsMissingLabels = async (
  * Parses one update of the request.
  * @param {unknown} raw - Raw update.
  * @param {string[]} langs - Survey languages.
- * @returns {CategoryItemLabelUpdate} The update.
  */
 const parseUpdate = (raw: unknown, langs: string[]): CategoryItemLabelUpdate => {
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw categoryItemLabelsInvalid('item')
@@ -187,7 +175,6 @@ const normalizeLabel = (text: string | null | undefined): string | null =>
 
 /**
  * Returns the conflict of an update, if any.
- * @param {CategoryItemLabelUpdate} update - Update.
  * @param {ItemLabelsRow|undefined} row - Locked row of the item (undefined: deleted).
  * @returns {CategoryItemLabelConflict|null} The conflict, null when the label can be written.
  */
@@ -224,10 +211,6 @@ const newLabelsActivity = (row: CategoryItemLabelsRepository.ItemLabelsRow, labe
 
 /**
  * Writes the updates that do not conflict, in request order.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - Survey id.
- * @param {CategoryItemLabelUpdate[]} params.updates - Updates.
- * @param {object} tx - Transaction.
  * @returns {Promise<object>} The answer without categories, the activities and the touched category uuids.
  */
 const writeUpdates = async (
@@ -267,10 +250,7 @@ const writeUpdates = async (
 /**
  * Writes category item labels in one language each, if they are still what the proposal saw (compare and set).
  * @param {object} params - Parameters.
- * @param {object} params.user - User.
- * @param {number} params.surveyId - Survey id.
  * @param {unknown} params.items - Raw request items (CategoryItemLabelUpdate[]).
- * @param {object} [client] - Database client.
  * @returns {Promise<CategoryItemLabelsUpdateAnswer>} Written labels, conflicts and the touched categories.
  */
 export const updateItemsLabels = (

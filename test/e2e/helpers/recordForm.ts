@@ -54,7 +54,6 @@ export class RecordForm {
    * @param {AttributeDef} def - The attribute definition.
    * @param {AttributeValue} value - The value to enter.
    * @param {Locator} [parent] - Container of the attribute (e.g. an entity table row).
-   * @returns {Promise<void>} - Resolves when the value has been persisted.
    */
   async enter(def: AttributeDef, value: AttributeValue, parent?: Locator): Promise<void> {
     if (def.key) await this.unlockKeyAttribute(def, parent)
@@ -197,7 +196,6 @@ export class RecordForm {
    * @param {string} name - Node def name.
    * @param {string} message - Expected message.
    * @param {Locator} [parent] - Container of the attribute (e.g. an entity table row).
-   * @returns {Promise<void>} - Resolves when the check completes.
    */
   async expectError(name: string, message: string, parent?: Locator): Promise<void> {
     await this.errorBadge(name, parent).hover()
@@ -234,7 +232,6 @@ export class RecordForm {
    * Selects the entity to edit in a multiple entity form page, by its key.
    * @param {string} keyLabel - Label of the key attribute.
    * @param {string} keyValue - Value of the key attribute.
-   * @returns {Promise<void>} - Resolves when the entity has been selected.
    */
   async selectEntity(keyLabel: string, keyValue: string): Promise<void> {
     const label = `${keyLabel}: ${keyValue}`

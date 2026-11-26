@@ -14,8 +14,6 @@ export const OVERVIEW_MAX_NODE_DEFS = 300
  * Builds the survey overview: name, languages, cycles and the node definitions depth-first. A survey too large for
  * one result lists its entities, each with its number of attributes; an entity name lists the children of that entity.
  * @param {object} params - Parameters.
- * @param {object} params.survey - Survey.
- * @param {string|null} params.cycle - Current cycle.
  * @param {string} params.lang - Label language.
  * @param {string|null} [params.entity] - Entity whose children are listed (default: the whole survey).
  * @param {number} [params.maxNodeDefs] - Cap on the listed node definitions.

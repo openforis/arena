@@ -11,7 +11,6 @@ type Props = {
 
 /**
  * Menu with the options affecting how the query data is displayed (names, codes, totals).
- * @param {Props} props - The component props.
  * @returns {React.ReactElement} - The view options menu button.
  */
 export const ButtonViewOptions = (props: Props) => {

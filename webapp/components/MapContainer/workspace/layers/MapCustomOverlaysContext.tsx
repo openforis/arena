@@ -23,7 +23,6 @@ const MapCustomOverlaysContext = createContext<MapCustomOverlaysContextValue | n
  * Keeps the layers that are not survey data (uploaded files, WMS layers, Sentinel-2 scenes) and syncs them with the map.
  * @param {object} props - Component props.
  * @param {ReactNode} props.children - Workspace content.
- * @returns {React.ReactElement} The provider.
  */
 export const MapCustomOverlaysProvider = ({ children }: { children: ReactNode }): ReactElement => {
   const { map } = useMapWorkspace()
@@ -54,7 +53,6 @@ export const MapCustomOverlaysProvider = ({ children }: { children: ReactNode })
   /**
    * Adds an overlay, replacing the one with the same id.
    * @param {MapCustomOverlayInput} input - The overlay.
-   * @returns {void}
    */
   const addOverlay = useCallback((input: MapCustomOverlayInput) => {
     const overlay: MapCustomOverlay = { ...input, visible: input.visible ?? true, opacity: clampOpacity(input.opacity) }
@@ -69,8 +67,6 @@ export const MapCustomOverlaysProvider = ({ children }: { children: ReactNode })
   /**
    * Changes the visibility, opacity or name of an overlay (undefined values are ignored).
    * @param {string} id - The overlay id.
-   * @param {object} changes - The changes.
-   * @returns {void}
    */
   const updateOverlay = useCallback(
     (id: string, changes: { visible?: boolean; opacity?: number; name?: string }) =>
@@ -92,7 +88,6 @@ export const MapCustomOverlaysProvider = ({ children }: { children: ReactNode })
   /**
    * Removes an overlay from the map and the list.
    * @param {string} id - The overlay id.
-   * @returns {void}
    */
   const removeOverlay = useCallback((id: string) => {
     const overlay = overlaysRef.current.find((item) => item.id === id)

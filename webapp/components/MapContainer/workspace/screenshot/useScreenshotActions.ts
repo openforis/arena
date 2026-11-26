@@ -20,13 +20,11 @@ export type ScreenshotDoneNotice = { key: string; params: Record<string, string>
 /**
  * Reacts to the save outcome: the "saved" (or "still being updated") notice in the dialog, or an inline error.
  * @param {object} params - The parameters.
- * @param {ScreenshotSaveOutcome} params.outcome - The outcome.
  * @param {string} params.plotLabel - Label of the plot.
  * @param {string} params.attributeLabel - Label of the image attribute.
  * @param {Function} params.setDone - Shows the done notice (the footer then only offers Close).
  * @param {Function} params.setActionError - Shows an inline error.
  * @param {Function} params.translateServerKey - Turns a server error key into its text (other details are kept).
- * @returns {void}
  */
 const handleSaveOutcome = ({
   outcome,

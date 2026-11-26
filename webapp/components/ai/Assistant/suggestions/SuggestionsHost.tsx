@@ -27,7 +27,6 @@ import { useSuggestionGeneration } from './useSuggestionGeneration'
  * Settles, for a user, the in-progress entries whose conversation ended in a tab that is gone.
  * @param {string} userUuid - User.
  * @param {Function} isCancelled - True once the user changed.
- * @returns {Promise<void>} Resolves when done.
  */
 const reconcileUser = async (userUuid: string, isCancelled: () => boolean): Promise<void> => {
   // nothing in progress: the conversation store stays closed
@@ -42,7 +41,6 @@ const reconcileUser = async (userUuid: string, isCancelled: () => boolean): Prom
  * @param {object} props - Props.
  * @param {AssistantAreaStatus[]} props.statuses - Area statuses.
  * @param {string|null} props.module - App module.
- * @returns {null} Nothing.
  */
 export const SuggestionsHost = ({ statuses, module }: { statuses: AssistantAreaStatus[]; module: string | null }) => {
   const [controller] = useState(() => createSuggestionHostController({ store: suggestionStore }))

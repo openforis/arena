@@ -35,7 +35,6 @@ export const ToolbarMenu = ({ menuKey, labelKey, iconClassName, children }: Tool
   /**
    * Closes the menu and optionally runs a callback once it has closed.
    * @param {Function} [callback] - Runs after the menu is closed.
-   * @returns {void}
    */
   const close = useCallback((callback?: () => void) => {
     setAfterClose(callback ? () => callback : null) // wrapped: a state setter would call the function
@@ -44,7 +43,6 @@ export const ToolbarMenu = ({ menuKey, labelKey, iconClassName, children }: Tool
 
   /**
    * Runs the pending callback after MUI gives the focus back to the menu button, so a focused input or dialog keeps it.
-   * @returns {void}
    */
   const onExited = useCallback(() => {
     setAfterClose(null)

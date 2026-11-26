@@ -16,10 +16,8 @@ const input = (page: Page, testId: string) => page.locator(`input[data-testid="$
  * Fills the specified category editor field and waits for the change to be saved
  * (changes are saved with a debounce: editing another field of the same item or closing the editor
  * before the change is saved would lose it).
- * @param {Page} page - The page.
  * @param {string} testId - Input field test id.
  * @param {string} value - Value to fill.
- * @returns {Promise<void>} - Resolves when the change has been saved.
  */
 const fillAndWait = async (page: Page, testId: string, value: string): Promise<void> => {
   await Promise.all([
@@ -30,10 +28,8 @@ const fillAndWait = async (page: Page, testId: string, value: string): Promise<v
 
 /**
  * Adds the specified items (and their descendants) to the category being edited.
- * @param {Page} page - The page.
  * @param {SampleCategoryItem[]} items - Items to add.
  * @param {number} levelIdx - Index of the level of the items.
- * @returns {Promise<void>} - Resolves when all the items have been added.
  */
 const addItems = async (page: Page, items: SampleCategoryItem[], levelIdx = 0): Promise<void> => {
   for (const [itemIdx, item] of items.entries()) {

@@ -29,7 +29,6 @@ export type LocalServerProbeResult = {
 /**
  * Returns the local engine limits for a context size.
  * @param {number|null} contextTokens - Context size, or null when unknown (8,192 is used).
- * @returns {AiEngineLimits} The limits.
  */
 export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimits => {
   const maxPromptTokens = Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * PROMPT_SHARE)
@@ -49,7 +48,6 @@ export const getLocalServerContextWindow = (contextTokens: number | null): AiCon
 /**
  * Returns the object entries of the `data` array of a response body.
  * @param {unknown} json - Response body.
- * @returns {Record<string, unknown>[]} The entries.
  */
 const dataEntries = (json: unknown): Record<string, unknown>[] => {
   const data = (json as { data?: unknown } | null)?.data
@@ -70,8 +68,6 @@ export const parseLocalServerModelIds = (json: unknown): string[] => {
 
 /**
  * Returns the value when it is a positive integer.
- * @param {unknown} value - The value.
- * @returns {number|null} The value, or null.
  */
 const positiveInteger = (value: unknown): number | null =>
   typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null
@@ -79,7 +75,6 @@ const positiveInteger = (value: unknown): number | null =>
 /**
  * Returns the context size of a model from LM Studio's GET /api/v0/models.
  * @param {unknown} json - Response body.
- * @param {string} modelId - Model id.
  * @returns {number|null} loaded_context_length, else max_context_length, else null.
  */
 export const parseLmStudioContextTokens = (json: unknown, modelId: string): number | null => {
@@ -91,7 +86,6 @@ export const parseLmStudioContextTokens = (json: unknown, modelId: string): numb
 /**
  * Returns the ids of the embedding models of an LM Studio models response.
  * @param {unknown} lmStudioJson - Response body.
- * @returns {Set<string>} The ids.
  */
 const embeddingModelIds = (lmStudioJson: unknown): Set<string> =>
   new Set(
@@ -102,7 +96,6 @@ const embeddingModelIds = (lmStudioJson: unknown): Set<string> =>
 
 /**
  * Reads a JSON body, never throwing.
- * @param {Response} response - The response.
  * @returns {Promise<unknown>} The body, or null when invalid.
  */
 const readJson = async (response: Response): Promise<unknown> => {
@@ -117,7 +110,6 @@ const readJson = async (response: Response): Promise<unknown> => {
  * Fetches LM Studio's model details (best effort: other servers do not have this endpoint).
  * @param {FetchFunction} localFetch - The local server fetch.
  * @param {string} baseUrl - Server base URL.
- * @param {AbortSignal} signal - Abort signal.
  * @returns {Promise<unknown>} The body, or null.
  */
 const fetchLmStudioModels = async (localFetch: FetchFunction, baseUrl: string, signal: AbortSignal) => {

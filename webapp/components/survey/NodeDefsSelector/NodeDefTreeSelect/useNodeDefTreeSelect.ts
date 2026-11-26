@@ -108,7 +108,6 @@ export const useNodeDefTreeSelect = (props) => {
    * Updates expanded keys. When a node is newly expanded, also expands all of
    * its expandable descendants so one click opens the whole subtree.
    * @param {string[]} itemIds - Expanded item keys from the tree view
-   * @returns {void}
    */
   const onExpandedItemKeysChange = useCallback(
     (itemIds) => {

@@ -37,7 +37,6 @@ const getReachableAttributeGroups = ({ variables, nodeDefCurrent }) => {
 /**
  * Returns the ancestor entity defs of the specified node def, from the parent one to the root.
  * @param {!object} params - The parameters.
- * @param {!object} params.survey - The survey.
  * @param {!object} params.nodeDefCurrent - The node def the expression belongs to.
  * @returns {Array} - The ancestor entity defs.
  */

@@ -62,7 +62,6 @@ const checkRootKeysSpecified = ({
  * @param {!object} params.context - The import job context.
  * @param {!object} params.record - The record (with nodes) to update.
  * @param {!string} params.keyValues - The record key values (formatted), used in the error message.
- * @returns {void}
  */
 const checkCanUpdateRecord = ({
   context,
@@ -114,7 +113,6 @@ const getRecordSummaryKey = ({
  * NodeValues.getFastEqualityKeyWithoutRecordContext: callers should fall back to a full scan in that case,
  * matching the pre-existing behavior exactly (see fetchOrCreateRecord below).
  * @param {!object} params - The function parameters.
- * @param {!object} params.survey - The survey object.
  * @param {!Array<object>} params.rootKeyDefs - The root entity key node defs.
  * @param {!Array<object>} params.recordsSummary - The records summary list to index.
  * @returns {Map<string, Array<object>>|null} - The index, or null if it cannot be built safely.

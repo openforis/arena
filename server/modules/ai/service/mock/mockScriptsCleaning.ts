@@ -34,7 +34,6 @@ export const proposeRowFixInput = ({
 /**
  * Builds the scripted answer from the output of records_proposeEdits.
  * @param {unknown} lastToolOutput - Output of the last tool call.
- * @returns {string} The answer.
  */
 export const formatMockProposalAnswer = (lastToolOutput: unknown): string => {
   const output = lastToolOutput as { proposed?: unknown } | null
@@ -45,7 +44,6 @@ export const formatMockProposalAnswer = (lastToolOutput: unknown): string => {
 /**
  * Builds the scripted answer from the output of validation_summarize (validation errors suggestion, e2e).
  * @param {unknown} lastToolOutput - Output of the last tool call.
- * @returns {string} The answer.
  */
 export const formatMockValidationSummaryAnswer = (lastToolOutput: unknown): string => {
   const output = lastToolOutput as { total?: unknown; groups?: { path?: string }[] } | null

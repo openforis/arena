@@ -4,9 +4,6 @@ import { _curry2 } from './internal/_curry2'
  * Retrieves the value at the given path (undefined if any step is missing).
  *
  * @param {*} pathArray - The path (array of keys or indexes).
- * @param {*} object - The object.
- *
- * @returns {*} - The result.
  */
 export const path = _curry2((pathArray: Array<string | number>, object: any): any => {
   let value = object

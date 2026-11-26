@@ -51,7 +51,6 @@ const extractPolygons = (geoJson: unknown): Position[][][] | null => {
 /**
  * Extracts the area of interest from a GeoJSON object (Polygon or MultiPolygon geometry, Feature or FeatureCollection).
  *
- * @param {unknown} geoJson - The GeoJSON object.
  * @returns {AreaOfInterest|null} - A Polygon (single polygon) or MultiPolygon geometry, or null if no valid polygon is found.
  */
 export const parseAreaOfInterest = (geoJson: unknown): ArenaAreaOfInterest | null => {
@@ -80,7 +79,6 @@ export const parseAreaOfInterestJson = (text: string): ArenaAreaOfInterest | nul
 /**
  * Returns the number of polygons and vertices of an area of interest.
  *
- * @param {AreaOfInterest} areaOfInterest - The area of interest.
  * @returns {{polygons: number, vertices: number}} - Number of polygons and vertices.
  */
 export const getAreaOfInterestSummary = (

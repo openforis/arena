@@ -146,7 +146,6 @@ export const createRecordFromSamplingPointDataItem = async ({
  * Fetches, for each of the given record UUIDs, the UUIDs of the files already stored on the
  * server for it. Used by mobile clients to skip re-uploading file content that hasn't changed.
  * @param {object} params - The function parameters.
- * @param {number} params.surveyId - The survey ID.
  * @param {Array<string>} params.recordUuids - The record UUIDs to fetch files for.
  * @returns {Promise<{[recordUuid: string]: Array<string>}>} File UUIDs grouped by record UUID.
  */

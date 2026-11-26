@@ -13,7 +13,6 @@ if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: 
 
 /**
  * Waits for a gateway call of the feature (the batch runs in the browser, through POST /api/ai/model).
- * @param {Page} page - Page.
  * @param {string} feature - Feature key.
  * @returns {Promise<object>} The request.
  */
@@ -24,7 +23,6 @@ const waitForGatewayCall = (page: Page, feature: string) =>
 
 /**
  * Opens the Form Designer's advanced menu.
- * @param {Page} page - Page.
  * @returns {Promise<void>} Resolves when the menu is open.
  */
 const openAdvancedMenu = async (page: Page) => {

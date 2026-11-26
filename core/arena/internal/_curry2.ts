@@ -16,7 +16,6 @@ const _applyTwoArgs = ({ fn, f2, a, b }: { fn: AnyFn; f2: AnyFn; a: unknown; b: 
  * Optimized internal two-arity curry function.
  *
  * @private
- * @param {Function} fn - The function to curry.
  * @returns {Function} The curried function.
  */
 export const _curry2 = (fn: AnyFn) =>

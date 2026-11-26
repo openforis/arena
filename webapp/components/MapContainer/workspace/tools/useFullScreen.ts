@@ -5,7 +5,6 @@ export type FullScreenState = { isFullScreen: boolean; toggle: () => void }
 
 /**
  * Leaves full screen, if the page is in full screen (e.g. before opening a modal that lives outside the map).
- * @returns {void}
  */
 export const exitFullScreen = (): void => {
   if (document.fullscreenElement) {
@@ -24,7 +23,6 @@ export const useFullScreen = (ref: RefObject<HTMLElement | null>): FullScreenSta
   useEffect(() => {
     /**
      * Updates the state when the full screen element changes.
-     * @returns {void}
      */
     const onChange = (): void =>
       setIsFullScreen(document.fullscreenElement !== null && document.fullscreenElement === ref.current)
@@ -34,7 +32,6 @@ export const useFullScreen = (ref: RefObject<HTMLElement | null>): FullScreenSta
 
   /**
    * Enters or leaves full screen.
-   * @returns {void}
    */
   const toggle = useCallback(() => {
     if (document.fullscreenElement) {

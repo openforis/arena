@@ -66,7 +66,6 @@ type InstanceParseState = { level: LogLevel | null; timestamp: string }
 /**
  * Creates a parser assigning a unique id, a level and a timestamp to every line.
  * Lines without prefix (e.g. stack traces) inherit level and timestamp of the previous line of the same instance.
- * @returns {LogLinesParser} - The parser.
  */
 export const createLogLinesParser = (): LogLinesParser => {
   let nextId = 0
@@ -161,10 +160,8 @@ export const mergeLines = (lines: LogLine[], newLines: LogLine[]): LogLine[] => 
 
 /**
  * Merges new lines keeping only the most recent ones.
- * @param {LogLine[]} lines - Current lines.
  * @param {LogLine[]} newLines - Lines to append.
  * @param {number} maxLines - Maximum number of lines to keep.
- * @returns {LogLine[]} - The resulting lines.
  */
 export const appendLines = (lines: LogLine[], newLines: LogLine[], maxLines: number): LogLine[] => {
   const result = mergeLines(lines, newLines)
@@ -191,7 +188,6 @@ const isFilterEmpty = ({ text, levels, excludedInstanceIds = [], hideHttpRequest
  * Filters the lines by instance, text (case insensitive), level and type (HTTP requests).
  * Markers and lines without a level are kept, unless their instance is excluded.
  * @param {LogLine[]} lines - Lines to filter.
- * @param {LogLinesFilter} filter - The filter.
  * @returns {LogLine[]} - The filtered lines.
  */
 export const filterLines = (lines: LogLine[], filter: LogLinesFilter): LogLine[] => {
@@ -216,7 +212,6 @@ export const formatMarkerText = (markerLabel: string): string => `— ${markerLa
  * @param {object} options - The options.
  * @param {Function} options.formatMarker - Returns the text of a marker line.
  * @param {boolean} [options.includeInstanceId] - When true, every line is prefixed by its instance id.
- * @returns {string} - The text.
  */
 export const formatLinesAsText = (
   lines: LogLine[],

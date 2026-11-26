@@ -15,8 +15,6 @@ import { useAssistantPanel } from './useAssistantPanel'
 
 /**
  * Returns true for Ctrl/Cmd + . .
- * @param {KeyboardEvent} event - Key event.
- * @returns {boolean} True for the shortcut.
  */
 const isToggleShortcut = (event: KeyboardEvent): boolean => (event.ctrlKey || event.metaKey) && event.key === '.'
 
@@ -36,8 +34,6 @@ export const AssistantButton = () => {
     if (!shown) return undefined
     /**
      * Toggles the panel on the shortcut.
-     * @param {KeyboardEvent} event - Key event.
-     * @returns {void} Nothing.
      */
     const onKeyDown = (event: KeyboardEvent) => {
       if (!isToggleShortcut(event)) return

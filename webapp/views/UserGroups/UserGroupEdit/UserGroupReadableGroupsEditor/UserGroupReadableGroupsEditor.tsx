@@ -28,7 +28,6 @@ const toItem = (group: ArenaUserGroup): GroupItem => ({
  * @param props0.readableGroupUuids - Uuids of the currently selected groups.
  * @param props0.onChange - Called with the uuids of the selected groups.
  * @param props0.readOnly - Whether the selection cannot be changed.
- * @returns {React.ReactElement} - The UserGroupReadableGroupsEditor component.
  */
 export const UserGroupReadableGroupsEditor = ({
   otherGroups,

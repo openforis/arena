@@ -22,7 +22,6 @@ export type PolicyEnforcerDeps = {
  * @param {object} params - Parameters.
  * @param {number|null} params.surveyId - Survey of the call (null for the Help chat and admin calls).
  * @param {PolicyEnforcerDeps} deps - Policy and ceilings readers.
- * @returns {Promise<AiPolicy>} The effective policy.
  */
 export const getEffectivePolicyFor = async (
   { surveyId }: { surveyId: number | null },

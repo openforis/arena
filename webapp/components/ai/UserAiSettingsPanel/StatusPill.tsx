@@ -11,7 +11,6 @@ type Props = {
 
 /**
  * Status pill of the AI settings panel (engine status, Test results).
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The pill.
  */
 export const StatusPill = ({ tone, text, testId }: Props) => (

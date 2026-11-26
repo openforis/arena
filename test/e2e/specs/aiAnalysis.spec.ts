@@ -35,7 +35,6 @@ if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: 
 
 /**
  * Opens the Map Layers panel (when closed) and gives the Cluster coordinate checkbox.
- * @param {Page} page - The page.
  * @returns {Promise<Locator>} The checkbox.
  */
 const openLayersPanelCheckbox = async (page: Page) => {
@@ -190,9 +189,7 @@ test.describe('AI analysis assistant (mock provider)', () => {
 
     /**
      * Runs the scripted "run the average" turn on the local provider until its query card shows.
-     * @param {Page} page - The page.
      * @param {ArenaApi} api - The ArenaApi fixture.
-     * @returns {Promise<void>} Resolves when the query card shows.
      */
     const runAverageLocally = async (page: Page, api: ArenaApi): Promise<void> => {
       await page.goto(Urls.dataExplorer)

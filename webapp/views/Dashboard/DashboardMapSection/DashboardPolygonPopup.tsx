@@ -31,7 +31,6 @@ type DashboardPolygonPopupProps = {
 /**
  * Popup of a dashboard map polygon: record keys, attribute, record editor link and Whisp actions.
  *
- * @param {DashboardPolygonPopupProps} props - The component props.
  * @returns {React.ReactElement} The popup.
  */
 export const DashboardPolygonPopup = (props: DashboardPolygonPopupProps) => {

@@ -28,7 +28,6 @@ export const expectedAverages = ['30.5', '31.5', '32.5']
 
 /**
  * Collects the JSON bodies of the browser requests whose URL matches.
- * @param {Page} page - The page.
  * @param {(request: Request) => boolean} filter - Request filter.
  * @returns {object[]} The live list of bodies.
  */
@@ -51,14 +50,12 @@ export const E2E_LOCAL_PROVIDER_ID = 'local:e2e'
  * Makes the stub server the only local provider of this browser and the default provider, or removes it and makes
  * Arena default the default again. The page must be on an app URL; reload it afterwards with `reloadApp` (the
  * capabilities are read when the app loads).
- * @param {Page} page - The page.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {object} params - Parameters.
  * @param {boolean} params.enabled - Add (true) or remove (false) the local provider.
  * @param {string} params.baseUrl - Stub base URL.
  * @param {string} params.modelId - Stub model id.
  * @param {string} [params.name] - Provider name.
- * @returns {Promise<void>} Resolves when saved.
  */
 export const setLocalProvider = async (
   page: Page,
@@ -80,8 +77,6 @@ export const setLocalProvider = async (
  * Reloads the app and waits until it has booted (the AI settings are loaded). Refresh tokens rotate, so a navigation
  * that aborts the boot's refresh logs the user out: use this after `setLocalProvider` and for any other reload in the
  * AI specs, never a bare `page.reload()` or a second `goto`.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when the app has booted.
  */
 export const reloadApp = async (page: Page): Promise<void> => {
   await Promise.all([
@@ -96,8 +91,6 @@ export const reloadApp = async (page: Page): Promise<void> => {
 /**
  * Opens the assistant on the Analysis area and sends a message.
  * @param {Page} page - The page (on the Explorer).
- * @param {string} message - The message.
- * @returns {Promise<void>} Resolves when the message is sent.
  */
 export const askAnalysis = async (page: Page, message: string): Promise<void> => {
   await openAssistantPanel(page)
@@ -107,8 +100,6 @@ export const askAnalysis = async (page: Page, message: string): Promise<void> =>
 
 /**
  * Accepts the first-use consent (shown once per user and survey), then waits for the end of the turn.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when the turn has ended.
  */
 export const acceptConsentAndWait = async (page: Page): Promise<void> => {
   await expect(page.getByTestId(TestId.ai.consentDialog)).toBeVisible()
@@ -119,8 +110,6 @@ export const acceptConsentAndWait = async (page: Page): Promise<void> => {
 /**
  * Reopens the most recent conversation of the current area (after a reload) from the home page (back from the
  * conversation when one is already open).
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when the conversation is shown.
  */
 export const reopenLastConversation = async (page: Page): Promise<void> => {
   const panel = assistantPanel(page)
@@ -135,15 +124,12 @@ export const reopenLastConversation = async (page: Page): Promise<void> => {
 
 /**
  * Returns the query card of the given query.
- * @param {Page} page - The page.
- * @param {string} queryId - Query id.
  * @returns {import('@playwright/test').Locator} The card.
  */
 export const queryCard = (page: Page, queryId: string) => page.getByTestId(TestId.aiQueryCard.root(queryId))
 
 /**
  * Returns the map layer card (the only one of the conversation).
- * @param {Page} page - The page.
  * @returns {import('@playwright/test').Locator} The card.
  */
 export const mapLayerCard = (page: Page) =>
@@ -151,8 +137,6 @@ export const mapLayerCard = (page: Page) =>
 
 /**
  * Checks that the Explorer table shows the expected averages.
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves when visible.
  */
 export const expectAveragesInTable = async (page: Page): Promise<void> => {
   const rows = page.locator('.data-query__container .table__rows')

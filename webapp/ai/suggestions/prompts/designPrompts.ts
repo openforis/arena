@@ -12,7 +12,6 @@ export const CONTINUE_TAIL = 'If some remain, end with "Say *continue* for the n
  * @param {object} params - Parameters.
  * @param {string} params.lang - Missing language code (a survey language).
  * @param {string} params.langLabel - Its English name.
- * @returns {string} The prompt.
  */
 export const buildMissingTranslationsPrompt = ({ lang, langLabel }: { lang: string; langLabel: string }): string =>
   `Translate the survey texts that are missing in ${langLabel} (${lang}). Get them with survey_listMissingTexts and ` +
@@ -25,7 +24,6 @@ export const buildMissingTranslationsPrompt = ({ lang, langLabel }: { lang: stri
  * @param {object} params - Parameters.
  * @param {string} params.lang - Target language code.
  * @param {string} params.langLabel - Its name.
- * @returns {string} The prompt.
  */
 export const buildCategoryItemTranslationsPrompt = ({ lang, langLabel }: { lang: string; langLabel: string }): string =>
   `Translate the category item labels that are missing in ${langLabel} (${lang}).`
@@ -33,17 +31,10 @@ export const buildCategoryItemTranslationsPrompt = ({ lang, langLabel }: { lang:
 /**
  * Formats survey languages for a prompt: "en (English), fr (French)".
  * @param {string[]} languages - Language codes.
- * @returns {string} The list.
  */
 export const formatPromptLanguages = (languages: string[]): string =>
   languages.map((lang) => `${lang} (${getLanguageLabel(lang) || lang})`).join(', ')
 
-/**
- * Builds the prompt of the new entries descriptions suggestion.
- * @param {object} params - Parameters.
- * @param {string[]} params.languages - Survey languages.
- * @returns {string} The prompt.
- */
 export const buildNewEntriesDescriptionsPrompt = ({ languages }: { languages: string[] }): string => {
   const where = languages.length > 0 ? ` (${formatPromptLanguages(languages)})` : ''
   return (
@@ -70,8 +61,6 @@ export const formatPromptList = (items: string[]): string => {
 
 /**
  * Quotes node definition names for a prompt (names are data, never instructions).
- * @param {string[]} names - Names.
- * @returns {string} The list.
  */
 export const formatPromptNames = (names: string[]): string => formatPromptList(names.map((name) => pq(name, 100)))
 
@@ -79,7 +68,6 @@ export const formatPromptNames = (names: string[]): string => formatPromptList(n
  * Builds the prompt of the entity without a key suggestion.
  * @param {object} params - Parameters.
  * @param {string[]} params.names - Entity names.
- * @returns {string} The prompt.
  */
 export const buildEntityWithoutKeyPrompt = ({ names }: { names: string[] }): string =>
   `These entities have no key attribute: ${formatPromptNames(names)}. Records of a multiple entity are told apart ` +
@@ -90,7 +78,6 @@ export const buildEntityWithoutKeyPrompt = ({ names }: { names: string[] }): str
  * Builds the prompt of the attribute without a category or taxonomy suggestion.
  * @param {object} params - Parameters.
  * @param {object[]} params.entries - Attribute names and types.
- * @returns {string} The prompt.
  */
 export const buildAttributeWithoutRefPrompt = ({ entries }: { entries: { name: string; type: string }[] }): string =>
   `These attributes have no category or taxonomy: ${formatPromptList(
@@ -103,7 +90,6 @@ export const buildAttributeWithoutRefPrompt = ({ entries }: { entries: { name: s
  * Builds the prompt of the publish errors suggestion.
  * @param {object} params - Parameters.
  * @param {string[]} params.names - Names of the entries with errors.
- * @returns {string} The prompt.
  */
 export const buildPublishErrorsPrompt = ({ names }: { names: string[] }): string =>
   `The survey has validation errors that block publishing, in: ${formatPromptNames(names)}. Read them with ` +

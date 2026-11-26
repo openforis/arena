@@ -26,7 +26,6 @@ const isNoData = (value: number | undefined): boolean => value === undefined || 
 /**
  * Rounds and clamps a value to a byte; non-finite values become 0.
  *
- * @param {number} value - Value.
  * @returns {number} Byte 0–255.
  */
 const toByte = (value: number): number => (Number.isFinite(value) ? Math.min(255, Math.max(0, Math.round(value))) : 0)
@@ -34,7 +33,6 @@ const toByte = (value: number): number => (Number.isFinite(value) ? Math.min(255
 /**
  * Formats a byte as two hex digits.
  *
- * @param {number} byte - Byte.
  * @returns {string} Hex digits.
  */
 const toHex = (byte: number): string => byte.toString(16).padStart(2, '0')
@@ -56,7 +54,6 @@ export const tciPixelToColor: PixelToColor = (values) => {
  *
  * @param {number} dn - Digital number (uint16).
  * @param {number} max - Reflectance shown as 255.
- * @returns {number} Byte.
  */
 export const reflectanceToByte = (dn: number, max: number): number =>
   toByte(((dn * SCENE_REFLECTANCE_SCALE + SCENE_REFLECTANCE_OFFSET) / max) * 255)
@@ -78,7 +75,6 @@ export const createReflectancePixelToColor =
 /**
  * Returns the colour function of a band mix.
  *
- * @param {SceneBandMix} bandMix - Band mix.
  * @returns {PixelToColor} Colour function.
  */
 export const getScenePixelToColor = (bandMix: SceneBandMix): PixelToColor =>

@@ -42,12 +42,10 @@ const toSurveyIdNumber = (surveyId: number | string | null): number | null => {
  * @param {object} raw - Values from the stores.
  * @param {string|null} raw.userUuid - Logged-in user.
  * @param {number|string|null} raw.surveyId - Active survey (a numeric string is accepted).
- * @param {string|null} raw.cycle - Current cycle.
  * @param {boolean} raw.fetched - The defs are fetched.
  * @param {boolean} raw.draft - The fetched defs are the draft.
  * @param {boolean} raw.canEditSurvey - The user can edit the survey.
  * @param {number} raw.loadCount - Defs load count.
- * @returns {SuggestionGenerationInput|null} The input.
  */
 export const toGenerationInput = ({
   userUuid,
@@ -81,7 +79,6 @@ export const createGenerationTracker = (): GenerationTracker => {
 
   /**
    * Ends the current generation.
-   * @returns {void}
    */
   const end = (): void => {
     current?.controller.abort()

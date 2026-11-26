@@ -20,7 +20,6 @@ export const AI_TOOL_NAME_PATTERN = /^[a-zA-Z]\w{0,63}$/
  * class must be allowed for the engine's hosting class; nothing when the class or the policy is unknown).
  * @param {object} params - Parameters.
  * @param {AiToolArea} params.area - Assistant area.
- * @param {AiToolContext} params.ctx - Tool context.
  * @param {AiPolicy|null} params.effective - Effective policy (survey, or ceilings without a survey).
  * @param {string|null} params.hostingClass - Hosting class of the engine.
  * @param {AiTool[]} [params.tools] - Candidate tools (default: all tools).
@@ -55,7 +54,6 @@ const isAbortError = (error: unknown): boolean => (error as { name?: string })?.
  * the survey does not work on the survey of the start of the turn. Another survey is refused: the turn's policy and
  * engine were resolved for the first one, and the abort of the turn comes after React commits.
  * @param {AiToolContext} ctx - Turn context.
- * @returns {AiToolContext} The context of the call.
  */
 const toCallContext = (ctx: AiToolContext): AiToolContext => {
   if (!ctx.getSurvey) return ctx
@@ -73,8 +71,6 @@ const toCallContext = (ctx: AiToolContext): AiToolContext => {
 
 /**
  * Turns the text a model sent in place of a list into the list: a JSON array, or names separated by commas.
- * @param {string} text - The text.
- * @returns {unknown[]} The list.
  */
 const toList = (text: string): unknown[] => {
   try {
@@ -111,7 +107,6 @@ const mergedKey = /^(\w+)[^\w[]*(\[.*\]),(\w+)$/s
 
 /**
  * Drops the double quotes at the start and end of the text (without a regex: /"+$/ backtracks on many quotes).
- * @param {string} text - Text.
  * @returns {string} The text without the surrounding quotes.
  */
 const trimQuotes = (text: string): string => {
@@ -149,7 +144,6 @@ const withKeysRepaired = (input: unknown): unknown => {
 
 /**
  * Validates the input of a tool; small models often send a list as a string, which is read as the list.
- * @param {AiTool} tool - The tool.
  * @param {unknown} given - Raw input from the model.
  * @returns {object} The zod result.
  */
@@ -166,11 +160,8 @@ const parseInput = (tool: AiTool, given: unknown) => {
 /**
  * Runs a tool safely: checks the input, turns errors into structured results the model can recover from, limits the
  * result size and honours the abort signal (an abort is re-thrown, so the turn stops).
- * @param {AiTool} tool - The tool.
  * @param {unknown} input - Raw input from the model.
- * @param {AiToolContext} ctx - Tool context.
  * @param {number} [maxResultChars] - Cap of the result JSON (default: the wrapper limit).
- * @returns {Promise<unknown>} The result or `{ error: { code, message, … } }`.
  */
 export const runTool = async (
   tool: AiTool,
@@ -194,8 +185,6 @@ export const runTool = async (
 
 /**
  * Returns the JSON schema of a tool input, without the `$schema` key (some providers reject it).
- * @param {AiTool} tool - The tool.
- * @returns {object} The JSON schema.
  */
 const toToolJsonSchema = (tool: AiTool): Record<string, unknown> => {
   const schema = { ...(z.toJSONSchema(tool.inputSchema) as Record<string, unknown>) }
@@ -206,10 +195,7 @@ const toToolJsonSchema = (tool: AiTool): Record<string, unknown> => {
 /**
  * Converts tools for streamText. The SDK gets a plain JSON schema (no SDK-side validation): runTool validates, so an
  * invalid input reaches the model as `invalidInput` with the zod message.
- * @param {AiTool[]} tools - The tools.
- * @param {AiToolContext} ctx - Tool context.
  * @param {number} [maxResultChars] - Cap of each result JSON (default: the wrapper limit).
- * @returns {ToolSet} The AI SDK tool set.
  */
 export const toAiSdkTools = (
   tools: AiTool[],
@@ -230,7 +216,6 @@ export const toAiSdkTools = (
 
 /**
  * Returns the WebMCP descriptor of a tool. readOnlyHint is true for every tool: propose tools don't write either.
- * @param {AiTool} tool - The tool.
  * @returns {object} `{ name, description, inputSchema, annotations }`.
  */
 export const toWebMcpDescriptor = (tool: AiTool) => ({

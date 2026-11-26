@@ -5,8 +5,6 @@ const typeOf = (value: any): string => Object.prototype.toString.call(value)
  * Primitives are compared like `Object.is` (NaN equals NaN, +0 does not equal -0).
  *
  * @private
- * @param {*} a - The first value.
- * @param {*} b - The second value.
  * @returns {boolean} - True if the values are deeply equal.
  */
 export const _equals = (a: any, b: any): boolean => {

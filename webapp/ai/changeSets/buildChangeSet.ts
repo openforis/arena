@@ -11,7 +11,6 @@ import type { ChangeOperation, ChangeOperationDraft, ChangeSet } from './types'
  * @param {string} params.summary - The model's summary, shown on the card.
  * @param {Function} [params.now] - Clock.
  * @param {Function} [params.idFactory] - Id generator.
- * @returns {ChangeSet} The change set.
  */
 export const buildChangeSet = ({
   drafts,

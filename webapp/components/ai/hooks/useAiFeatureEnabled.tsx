@@ -47,7 +47,6 @@ export const invalidateAiSettingsCache = () => settingsCache.invalidate()
 /**
  * Drops the cached AI settings and the fetch in flight without fetching again (login, logout): the next
  * consumer fetches the settings of the then logged-in user.
- * @returns {void}
  */
 export const resetAiSettingsCache = () => settingsCache.reset()
 

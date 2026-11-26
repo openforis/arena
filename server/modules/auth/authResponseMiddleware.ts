@@ -22,10 +22,7 @@ export const omitServerOnlyPrefsFromLoginBody = (body: unknown): unknown => {
 
 /**
  * Express middleware (register it before the routes of arena-server): wraps `res.json` of the login routes.
- * @param {Request} req - Request.
- * @param {Response} res - Response.
  * @param {NextFunction} next - Next handler.
- * @returns {void}
  */
 export const stripServerOnlyPrefsFromLoginResponse = (req: Request, res: Response, next: NextFunction): void => {
   if (LOGIN_PATH_PATTERN.test(req.path)) {

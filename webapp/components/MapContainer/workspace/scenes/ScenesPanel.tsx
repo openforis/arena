@@ -60,7 +60,6 @@ const getActiveMonthKey = (monthKey: string | null, buckets: MonthBucket[]): str
  *
  * @param {ScenePanelStatusKind} status - Panel status.
  * @param {number} count - Rows to show.
- * @returns {boolean} True when the list is shown.
  */
 const isListShown = (status: ScenePanelStatusKind, count: number): boolean =>
   status === 'results' || (status === 'searching' && count > 0)
@@ -70,7 +69,6 @@ const isListShown = (status: ScenePanelStatusKind, count: number): boolean =>
  *
  * @param {string|null} currentId - Selected scene id.
  * @param {string} sceneId - Clicked scene id.
- * @returns {string|null} New selected id.
  */
 const toggleSelectedId = (currentId: string | null, sceneId: string): string | null =>
   currentId === sceneId ? null : sceneId
@@ -84,7 +82,6 @@ type ScenesMessageProps = { message: ScenePanelMessage; showRetry: boolean; onRe
  * @param {ScenePanelMessage} props.message - Message key and params.
  * @param {boolean} props.showRetry - Whether to show Retry.
  * @param {Function} props.onRetry - Retries the search.
- * @returns {React.ReactElement} The message.
  */
 const ScenesMessage = ({ message, showRetry, onRetry }: ScenesMessageProps): React.ReactElement => {
   const t = useI18nT()
@@ -102,8 +99,6 @@ const ScenesMessage = ({ message, showRetry, onRetry }: ScenesMessageProps): Rea
 
 /**
  * The Sentinel-2 rail panel: area, period and filters, the month chart, the scenes and their layer actions.
- *
- * @returns {React.ReactElement} The panel.
  */
 export const ScenesPanel = (): React.ReactElement => {
   const map = useMap()

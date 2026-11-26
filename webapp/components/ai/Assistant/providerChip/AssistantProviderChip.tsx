@@ -48,7 +48,6 @@ type Props = {
  * @param {ProviderChoice} props.choice - Row.
  * @param {Function} props.onChoose - Called with the provider id.
  * @param {object} props.itemProps - Ref and tabIndex of the roving focus.
- * @param {TFunction} props.t - Translation function.
  * @returns {React.ReactElement} The row.
  */
 const ProviderChoiceRow = ({
@@ -106,7 +105,6 @@ const ProviderChoiceRow = ({
  * @param {ProviderChoice[]} props.choices - Rows.
  * @param {Function} props.onChoose - Called with the provider id and whether to make it the default.
  * @param {Function} props.onManage - Opens the provider settings.
- * @param {TFunction} props.t - Translation function.
  * @returns {React.ReactElement} The content.
  */
 const ProviderChooser = ({
@@ -181,7 +179,6 @@ const ProviderChooser = ({
 
 /**
  * Provider chip of the composer: the provider of the conversation, and the "Answer with" popover to pick another one.
- * @param {Props} props - Props.
  * @returns {React.ReactElement|null} The chip, or null while the area's feature is off or loading.
  */
 export const AssistantProviderChip = (props: Props) => {
@@ -220,17 +217,12 @@ export const AssistantProviderChip = (props: Props) => {
     [capabilities, current.providerId, effective, requestDataClass, surveyScoped]
   )
 
-  /**
-   * Closes the popover.
-   * @returns {void} Nothing.
-   */
   const close = useCallback(() => onOpenChange(false), [onOpenChange])
 
   /**
    * Picks a provider for the conversation, and saves it as the default when asked.
    * @param {string} id - Provider id.
    * @param {boolean} makeDefault - Also make it the user's default provider.
-   * @returns {Promise<void>} Resolves when done.
    */
   const choose = useCallback(
     async (id: string, makeDefault: boolean) => {
@@ -253,7 +245,6 @@ export const AssistantProviderChip = (props: Props) => {
 
   /**
    * Opens the provider settings.
-   * @returns {void} Nothing.
    */
   const manage = useCallback(() => {
     close()

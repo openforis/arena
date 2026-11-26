@@ -20,7 +20,6 @@ const indexBySourceUuid = <T extends { sourceUuid?: string }>(diffs: T[]): Recor
 /**
  * Compares a source survey (e.g. uploaded from another environment) with a target survey (the one to update).
  * Category items and taxa must be passed separately (they are not part of the survey object).
- * @param {SurveyCompareParams} params - The parameters.
  * @returns {SurveyCompareResult} - The comparison result.
  */
 export const compareSurveys = ({

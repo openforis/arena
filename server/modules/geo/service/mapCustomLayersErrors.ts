@@ -44,7 +44,6 @@ export const newMapCustomLayersError = (
 
 /**
  * Tells whether an error is a custom map layer error, optionally of one of the given names.
- * @param {unknown} error - The error.
  * @param {MapCustomLayersErrorName[]} [names] - The accepted names; any name when omitted.
  * @returns {boolean} True when the error matches.
  */

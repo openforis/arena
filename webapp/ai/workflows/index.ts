@@ -23,8 +23,6 @@ const loadExpression = () => import('./expression')
 
 /**
  * Generates an expression (see workflows/expression).
- * @param {object} params - Workflow parameters.
- * @returns {Promise<AiExpressionResult>} The result.
  */
 const generateExpression = async (
   params: Parameters<ExpressionWorkflows['generateExpressionWorkflow']>[0]
@@ -60,7 +58,6 @@ const loadTranslation = () => import('./translation')
 
 /**
  * Translates labels (see workflows/translation).
- * @param {object} params - Workflow parameters.
  * @returns {Promise<object>} The translations.
  */
 const translateLabels = async (
@@ -94,7 +91,6 @@ type DataDictionaryModule = Awaited<ReturnType<typeof loadDataDictionary>>
 /**
  * Generates the AI descriptions of the schema summary export (see workflows/dataDictionary).
  * @param {object} params - Workflow parameters (surveyId, cycle, signal, onProgress).
- * @returns {Promise<object>} { aiDescriptions, failedCount }.
  */
 const generateDataDictionary = async (params: Parameters<DataDictionaryModule['generateDataDictionaryWorkflow']>[0]) =>
   (await loadDataDictionary()).generateDataDictionaryWorkflow(params)
@@ -132,7 +128,6 @@ type DataQueryModule = Awaited<ReturnType<typeof loadDataQuery>>
 
 /**
  * Generates a Data Explorer query (see workflows/dataQuery).
- * @param {object} params - Workflow parameters.
  * @returns {Promise<object>} The query and its explanation.
  */
 const generateDataQuery = async (params: Parameters<DataQueryModule['generateDataQueryWorkflow']>[0]) =>
@@ -140,7 +135,6 @@ const generateDataQuery = async (params: Parameters<DataQueryModule['generateDat
 
 /**
  * Suggests a name, a label and a description for a query (see workflows/dataQuery).
- * @param {object} params - Workflow parameters.
  * @returns {Promise<object>} The suggestions.
  */
 const summarizeDataQuery = async (params: Parameters<DataQueryModule['summarizeDataQueryWorkflow']>[0]) =>

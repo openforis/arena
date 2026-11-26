@@ -37,9 +37,7 @@ const LAST_SHRINK_LEVEL = 3
 
 /**
  * Applies a change to every entry of a record; returns the same record when nothing changed.
- * @param {Record<string, T>} record - Record.
  * @param {Function} change - Returns the new value of an entry, the same value when unchanged, or null to drop it.
- * @returns {Record<string, T>} The record.
  */
 const mapEntries = <T>(record: Record<string, T>, change: (value: T, key: string) => T | null): Record<string, T> => {
   let changed = false
@@ -60,7 +58,6 @@ const mapEntries = <T>(record: Record<string, T>, change: (value: T, key: string
  * @param {number} max - Survey buckets to keep.
  * @param {string|null} keepBucket - A bucket that is never dropped.
  * @param {Record<string, number>|undefined} touchedAt - When each bucket was last written.
- * @returns {Record<string, T>} The record.
  */
 const capBuckets = <T>(
   record: Record<string, T>,
@@ -89,7 +86,6 @@ const capTargets = <T extends { targets: { key: string }[] }>(entry: T, max: num
 /**
  * Keeps the latest dismissed targets that are no longer pending (they are recorded in order). A dismissed target that
  * is still pending is never cut: it would show again.
- * @param {DismissedEntry} entry - Entry.
  * @param {number} max - Targets to keep, besides those still pending.
  * @param {Set<string>} stillPending - Keys of the targets the suggestion still has.
  * @returns {DismissedEntry} The entry (the same one when within the cap).
@@ -105,7 +101,6 @@ const capDismissed = (entry: DismissedEntry, max: number, stillPending: Set<stri
  * Returns the keys of the targets a bucket has pending for a suggestion id.
  * @param {AssistantSuggestion[]|undefined} suggestions - Pending suggestions of the bucket.
  * @param {string} id - Suggestion id.
- * @returns {Set<string>} The keys.
  */
 const pendingKeysOf = (suggestions: AssistantSuggestion[] | undefined, id: string): Set<string> =>
   new Set(suggestions?.find((item) => item.id === id)?.targets.map((target) => target.key))
@@ -113,7 +108,6 @@ const pendingKeysOf = (suggestions: AssistantSuggestion[] | undefined, id: strin
 /**
  * Removes the pending suggestions that expired (a re-detected one then starts afresh, with a new expiry).
  * @param {AssistantSuggestion[]} suggestions - Suggestions of a bucket.
- * @param {Date} now - Now.
  * @returns {AssistantSuggestion[]|null} The same list when none expired, the rest, or null when none is left.
  */
 const withoutExpired = (suggestions: AssistantSuggestion[], now: Date): AssistantSuggestion[] | null => {
@@ -124,7 +118,6 @@ const withoutExpired = (suggestions: AssistantSuggestion[], now: Date): Assistan
 
 /**
  * Caps the targets of the suggestions of a bucket.
- * @param {AssistantSuggestion[]} suggestions - Suggestions.
  * @param {number} max - Targets per suggestion.
  * @returns {AssistantSuggestion[]} The suggestions (the same list when within the cap).
  */
@@ -151,11 +144,8 @@ const pruneTouchedAt = (
 
 /**
  * Applies limits to a state (the same object when it already fits).
- * @param {SuggestionUserState} state - State.
  * @param {Date} now - Now (expiry).
- * @param {Limits} limits - Limits.
  * @param {string|null} keepBucket - The bucket in use.
- * @returns {SuggestionUserState} The state.
  */
 const applyLimits = (
   state: SuggestionUserState,
@@ -204,8 +194,6 @@ const applyLimits = (
 
 /**
  * Returns the state as it is kept between writes: expired suggestions removed and the caps applied.
- * @param {SuggestionUserState} state - State.
- * @param {Date} now - Now.
  * @param {object} [options] - Options.
  * @param {string|null} [options.keepBucket] - The bucket being written, which is never dropped.
  * @returns {SuggestionUserState} The state (the same object when it already fits).
@@ -219,9 +207,7 @@ export const normalizeSuggestionState = (
 /**
  * Returns a smaller state for a full storage: level 1 tightens the caps, level 2 also forgets the dismissed targets (those of the survey in use stay),
  * level 3 keeps only what is running (in progress) and the modules seen.
- * @param {SuggestionUserState} state - State.
  * @param {number} level - Shrink level, from 1.
- * @param {Date} now - Now.
  * @param {object} [options] - Options.
  * @param {string|null} [options.keepBucket] - The bucket being written, which is never dropped.
  * @returns {SuggestionUserState|null} The state; null past the last level (nothing left to cut).
@@ -251,9 +237,7 @@ export const shrinkSuggestionState = (
 /**
  * Records that a bucket was just written, at hour precision: a write that keeps the time of the last hour leaves the
  * state as it is, so an update that changes nothing stays a no-op.
- * @param {SuggestionUserState} state - State.
  * @param {string|null} bucket - The bucket written (null: none).
- * @param {Date} now - Now.
  * @returns {SuggestionUserState} The state (the same object when the time is recent enough).
  */
 export const withBucketTouched = (

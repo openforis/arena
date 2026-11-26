@@ -134,7 +134,6 @@ export default class DataImportBaseJob extends Job {
 
   /**
    * Updates the record modified date using the max modified date of the nodes.
-   * @param {!object} record - The record object.
    * @returns {object} - The modified record.
    */
   prepareRecordSummaryToStore(record) {

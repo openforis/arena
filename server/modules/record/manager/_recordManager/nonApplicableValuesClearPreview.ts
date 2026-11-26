@@ -52,8 +52,6 @@ const _prepareNodeToPersist = ({ record, node }: { record: ArenaRecord; node: Ar
  * The record is not modified.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user performing the update.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.record - The record.
  * @param {!object} params.node - The node to insert or update.
  * @param {number} [params.timezoneOffset] - The timezone offset of the client.
  * @param {string} [params.lang] - The language used to evaluate expressions.
@@ -77,8 +75,6 @@ export const findNodeDefUuidsToClearOnNodePersist = async (
  * The record is not modified.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user performing the update.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.record - The record.
  * @param {!string} params.nodeUuid - The uuid of the node to delete.
  * @param {number} [params.timezoneOffset] - The timezone offset of the client.
  * @param {string} [params.lang] - The language used to evaluate expressions.

@@ -63,7 +63,6 @@ const dispatchPayload = <C>(payload: string, { onChunk, onDone, onError }: SseHa
  * has been terminated by a payload (e.g. `[DONE]` or an error event).
  * @param {string} buffer - Accumulated decoded text since the last drain.
  * @param {object} handlers - User-supplied callbacks.
- * @returns {{ remainder: string, terminated: boolean }} Drain result.
  */
 const drainFrames = <C>(buffer: string, handlers: SseHandlers<C>): { remainder: string; terminated: boolean } => {
   let remainder = buffer
@@ -92,7 +91,6 @@ const drainFrames = <C>(buffer: string, handlers: SseHandlers<C>): { remainder: 
  * @param {object} handlers - Same shape as `streamSse`'s handlers.
  * @param {{ cancelled: boolean }} state - Shared cancellation flag.
  * @param {Function} cancel - Cancel callback (invoked on terminal frame).
- * @returns {Promise<void>} Resolves when the loop ends.
  */
 const pumpResponse = async <C>(
   response: Response,

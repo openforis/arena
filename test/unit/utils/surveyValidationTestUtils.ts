@@ -10,7 +10,6 @@ import { getDefByName } from './assistantTestUtils'
 /**
  * Stores node definition validations in the survey, by node definition name (the survey keeps them by uuid, as the
  * designer gets them from the server).
- * @param {object} survey - Survey.
  * @param {Record<string, object>} validationsByName - Validation of each node definition name.
  * @returns {object} The updated survey.
  */

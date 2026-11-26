@@ -32,7 +32,6 @@ let savedCompatible: any
 /**
  * Builds a user with the AI prefs.
  * @param {object} ai - AI prefs to merge.
- * @returns {any} The user.
  */
 const userWith = (ai: Record<string, unknown>): any => ({
   uuid: USER_UUID,

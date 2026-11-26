@@ -45,9 +45,7 @@ export const isProviderChoiceError = (errorKey: string | null | undefined): bool
 /**
  * Returns the actions offered for the reasons, once each, in the reasons' order.
  * @param {object} params - Parameters.
- * @param {AiUnavailableReason[]} params.reasons - Reasons.
  * @param {boolean} params.canChangePolicy - The user may edit this survey's AI policy (and the request has a survey).
- * @returns {AiUnavailableAction[]} The actions.
  */
 export const getAiUnavailableActions = ({
   reasons,
@@ -65,7 +63,6 @@ export const getAiUnavailableActions = ({
 /**
  * Returns the buttons to show with an AI error, or null when the error is not an engine error.
  * @param {unknown} error - The error (as thrown by resolveModel or the local server fetch), or a `{ key }` object.
- * @returns {AiEngineErrorView|null} The view.
  */
 export const getAiEngineErrorView = (error: unknown): AiEngineErrorView | null => {
   const key = getAiErrorKey(error)

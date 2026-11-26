@@ -13,7 +13,6 @@ const MEASURE_DISTANCE_SVG = [
 /**
  * Turns an SVG document into an image URL.
  * @param {string} svg - The SVG markup.
- * @returns {string} The data URI.
  */
 const toSvgDataUri = (svg: string): string => `data:image/svg+xml,${encodeURIComponent(svg)}`
 

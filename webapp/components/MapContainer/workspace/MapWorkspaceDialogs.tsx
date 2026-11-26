@@ -11,7 +11,6 @@ const dialogComponents: Partial<Record<MapDialogKey, ComponentType>> = { wms: Wm
 
 /**
  * Renders the open workspace dialog, if any.
- * @returns {React.ReactElement|null} The dialog.
  */
 export const MapWorkspaceDialogs = (): ReactElement | null => {
   const { dialog } = useMapWorkspace()

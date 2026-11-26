@@ -19,10 +19,8 @@ export type ApiKeyFieldState = {
 /**
  * Returns the state of the API key field.
  * @param {object} params - Parameters.
- * @param {ProviderDraft} params.draft - Draft.
  * @param {SavedProvider|null} params.saved - Saved provider (edit), null to add.
  * @param {boolean} params.keyCleared - The saved key no longer applies (the address changed).
- * @returns {ApiKeyFieldState} The state.
  */
 export const getApiKeyFieldState = ({
   draft,

@@ -123,8 +123,6 @@ const toMessageParams = (params: unknown): Record<string, unknown> | undefined =
 
 /**
  * Maps an error to the message key and params of the failed edits.
- * @param {unknown} error - The error.
- * @returns {{messageKey: string, params?: object}} The message.
  */
 const toFailureMessage = (
   error: { key?: unknown; params?: unknown } | null | undefined
@@ -144,9 +142,7 @@ const toFailureMessage = (
  * Persists one checked edit; throws when the new value duplicates a record key or a unique attribute of another record.
  * @param {object} params - The parameters.
  * @param {BatchState} params.state - The batch state.
- * @param {object} params.record - The current record.
  * @param {object} params.node - The node to update.
- * @param {NodesBatchRecordEdit} params.edit - The edit.
  * @param {object} params.t - The transaction.
  * @returns {Promise<object>} The updated record.
  */
@@ -195,8 +191,6 @@ const persistEdit = async ({
  * is a failure (never a conflict), so an edit can't be used to probe or touch the nodes of other records.
  * @param {object} params - The parameters.
  * @param {BatchState} params.state - The batch state.
- * @param {object} params.record - The current record.
- * @param {NodesBatchRecordEdit} params.edit - The edit.
  * @param {NodesBatchEditResult} params.result - The result given by the check.
  * @param {object} params.t - The transaction.
  * @returns {Promise<NodesBatchEditResult>} The result to keep.
@@ -233,7 +227,6 @@ const isPastDeadline = (state: BatchState): boolean => state.deps.now() > state.
 /**
  * Aborts the transaction when the caller stopped waiting: it reported the edits as timed out, so none may commit.
  * @param {BatchState} state - The batch state.
- * @returns {void}
  * @throws {SystemError} applyTimeout when the deadline has passed.
  */
 const assertBeforeDeadline = (state: BatchState): void => {
@@ -243,7 +236,6 @@ const assertBeforeDeadline = (state: BatchState): void => {
 /**
  * Returns true when the record matches the user group qualifiers (optionally with a pending node value).
  * @param {BatchState} state - The batch state.
- * @param {object} record - The record.
  * @param {object|null} pendingNode - The node with its new value, or null.
  * @returns {boolean} Whether the record matches.
  */
@@ -261,7 +253,6 @@ const matchesQualifiers = (state: BatchState, record: ArenaRecord, pendingNode: 
 /**
  * Checks, with the record as it is under the lock, that the user may edit it (step, ownership, group qualifiers).
  * @param {BatchState} state - The batch state.
- * @param {object} record - The record.
  * @returns {boolean} Whether the user may edit the record.
  */
 const isRecordEditAllowed = (state: BatchState, record: ArenaRecord): boolean =>
@@ -291,8 +282,6 @@ const withFreshStepAndOwner = async (
  * Checks and persists one edit.
  * @param {object} params - The parameters.
  * @param {BatchState} params.state - The batch state.
- * @param {object} params.record - The current record.
- * @param {NodesBatchRecordEdit} params.edit - The edit.
  * @param {object} params.t - The transaction.
  * @returns {Promise<object>} The record after the edit (the same record when the edit is refused).
  */
@@ -344,7 +333,6 @@ const applyEdit = async ({
  * Checks and persists the edits of the record, inside the record lock.
  * @param {BatchState} state - The batch state.
  * @param {object} t - The transaction.
- * @returns {Promise<NodesBatchEditResult[]>} The results.
  */
 const applyEditsInLock = async (state: BatchState, t: DbClient): Promise<NodesBatchEditResult[]> => {
   const { msg, deps, survey, refusedResults, appliedEdits } = state
@@ -377,8 +365,6 @@ const applyEditsInLock = async (state: BatchState, t: DbClient): Promise<NodesBa
  * Builds the results of a record whose transaction rolled back: refused edits keep their result, the others fail
  * (with the error when it hit them all, e.g. a timeout; as rolled back when another edit raised it).
  * @param {BatchState} state - The batch state.
- * @param {unknown} error - The error.
- * @returns {NodesBatchEditResult[]} The results.
  */
 const rolledBackResults = (state: BatchState, error: unknown): NodesBatchEditResult[] => {
   const { messageKey, params } = toFailureMessage(error)
@@ -396,7 +382,6 @@ const rolledBackResults = (state: BatchState, error: unknown): NodesBatchEditRes
 /**
  * Drops the cached record after a rollback (its in-memory copy may hold the rolled back values).
  * @param {BatchState} state - The batch state.
- * @returns {Promise<void>} Resolved when done.
  */
 const clearCachedRecordSafely = async (state: BatchState): Promise<void> => {
   try {
@@ -408,7 +393,6 @@ const clearCachedRecordSafely = async (state: BatchState): Promise<void> => {
 
 /**
  * Sorts results by edit index.
- * @param {NodesBatchEditResult[]} results - The results.
  * @returns {NodesBatchEditResult[]} The sorted results.
  */
 const sortByIndex = (results: NodesBatchEditResult[]): NodesBatchEditResult[] =>

@@ -49,9 +49,6 @@ export const isNotBlank = (value: unknown): value is string => isString(value) &
  */
 export const normalizeName = A.pipe(leftTrim, A.toLower, A.replace(/[^a-z0-9]/g, '_'), A.slice(0, 40))
 
-/**
- * Capitalize the first letter of a string.
- */
 export const capitalizeFirstLetter = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1)
 
 /**

@@ -16,7 +16,6 @@ export type SceneIndexCacheDeps<P extends CachedPart> = {
  * part (null) stays cached. Pure: file access is injected.
  *
  * @param {SceneIndexCacheDeps} deps - Part opener, row loader and optional row-group cap.
- * @returns {SceneIndexReader} Reader.
  */
 export const createSceneIndexCache = <P extends CachedPart>({
   openPart,
@@ -30,7 +29,6 @@ export const createSceneIndexCache = <P extends CachedPart>({
    * Drops a part and all its cached row groups, so a retry never pairs stale rows with a fresh footer.
    *
    * @param {string} url - Part URL.
-   * @returns {void}
    */
   const evictPart = (url: string): void => {
     parts.delete(url)
@@ -78,7 +76,6 @@ export const createSceneIndexCache = <P extends CachedPart>({
    *
    * @param {string} key - Cache key.
    * @param {Promise<SceneIndexRow[]>} rows - Rows promise.
-   * @returns {void}
    */
   const rememberRows = (key: string, rows: Promise<SceneIndexRow[]>): void => {
     rowGroups.set(key, rows)

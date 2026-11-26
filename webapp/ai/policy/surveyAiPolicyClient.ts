@@ -25,10 +25,8 @@ registerAppSurveyAiPolicyCache(cache)
 
 /**
  * Returns the survey AI policy (cached for 30 s).
- * @param {number} surveyId - Survey id.
  * @param {object} [options] - Options.
  * @param {boolean} [options.fresh] - Read it from the server now, whatever the cache holds.
- * @returns {Promise<SurveyAiPolicyClientState>} The policy state.
  */
 export const fetchSurveyAiPolicy = (
   surveyId: number,
@@ -37,7 +35,6 @@ export const fetchSurveyAiPolicy = (
 
 /**
  * Saves the survey AI policy; every consumer sees the new value right away.
- * @param {number} surveyId - Survey id.
  * @param {AiPolicy} policy - New policy.
  * @returns {Promise<SurveyAiPolicyClientState>} The saved policy state.
  */
@@ -46,7 +43,6 @@ export const updateSurveyAiPolicy = (surveyId: number, policy: AiPolicy): Promis
 
 /**
  * Drops the cached policy of a survey and fetches it again.
- * @param {number} surveyId - Survey id.
  * @returns {Promise<SurveyAiPolicyClientState>} The fresh policy state (rejects when the fetch fails).
  */
 export const invalidateSurveyAiPolicy = (surveyId: number): Promise<SurveyAiPolicyClientState> =>
@@ -54,7 +50,6 @@ export const invalidateSurveyAiPolicy = (surveyId: number): Promise<SurveyAiPoli
 
 /**
  * Returns the last known policy state without fetching.
- * @param {number} surveyId - Survey id.
  * @returns {SurveyAiPolicyClientState|null} The state, or null when never loaded.
  */
 export const peekSurveyAiPolicy = (surveyId: number): SurveyAiPolicyClientState | null => cache.peek(surveyId)

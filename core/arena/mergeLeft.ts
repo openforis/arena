@@ -5,7 +5,5 @@ import { _curry2 } from './internal/_curry2'
  *
  * @param {*} left - The object whose properties take precedence.
  * @param {*} right - The other object.
- *
- * @returns {object} - The result.
  */
 export const mergeLeft = _curry2((left: any, right: any): any => ({ ...right, ...left }))

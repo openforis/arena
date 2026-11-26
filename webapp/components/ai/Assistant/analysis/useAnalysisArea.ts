@@ -29,7 +29,6 @@ export const useAnalysisAreaStatus = (): AssistantAreaStatus => {
 
 /**
  * Tells whether the conversation contains record data that no allowed engine may receive any more.
- * @param {object|null} conversation - The current conversation.
  * @param {AiFeatureKey} feature - Gateway feature of the area shown (its data policy decides).
  * @param {string} [providerId] - The shown conversation's provider (default: the user's default).
  * @returns {boolean} True to show the notice and disable the composer.

@@ -44,7 +44,6 @@ const hasKeyboardFocus = (target: EventTarget): boolean => {
 /**
  * Wraps a disabled AI entry point with the reason it is blocked: the AI policy (with a link to the tab for survey
  * administrators), or no engine (the reasons, each with an action). Renders the children unchanged otherwise.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The children, with the tooltip when blocked.
  */
 export const AiPolicyBlockedTooltip = (props: Props) => {

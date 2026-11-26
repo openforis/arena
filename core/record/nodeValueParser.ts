@@ -50,7 +50,6 @@ const booleanTrueValues = new Set(['true', 'yes', '1'])
 /**
  * Generates the accepted date formats for a separator.
  * @param {string} sep - The separator between day, month and year.
- * @returns {string[]} The date formats.
  */
 const generateAllowedDateFormats = (sep: string): string[] => [
   `DD${sep}MM${sep}YYYY`,
@@ -81,7 +80,6 @@ const singlePropValueConverter = ({ value }: { value: Record<string, any> }): an
  * @param {object} params - The parameters.
  * @param {object} params.value - The value props.
  * @param {string[]} params.headers - The headers, for the error message.
- * @returns {number} The number.
  */
 const numericValueConverter = ({ value, headers }: { value: Record<string, any>; headers: string[] }): number => {
   const val = singlePropValueConverter({ value })
@@ -130,9 +128,6 @@ const extractDateOrTime = ({
 
 /**
  * Finds the uuid of a vernacular name of a taxon, written as "Name" or "Name (lang)" (the whole text when it is neither).
- * @param {object} params - The parameters.
- * @param {object} params.taxon - The taxon.
- * @param {string} params.vernacularName - The vernacular name.
  * @returns {string|null} The vernacular name uuid, or null.
  */
 const extractVernacularNameUuid = ({ taxon, vernacularName }: { taxon: any; vernacularName: string }) => {
@@ -153,10 +148,8 @@ const extractVernacularNameUuid = ({ taxon, vernacularName }: { taxon: any; vern
 /**
  * Finds a first-level category item by code: the survey index, else the provider (big categories).
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {CategoryItemProvider} params.categoryItemProvider - The item provider.
  * @param {object} params.nodeDef - The code attribute definition.
- * @param {string} params.code - The code.
  * @returns {Promise<object|null>} The item, or null.
  */
 const findCategoryItem = async ({
@@ -182,10 +175,7 @@ const findCategoryItem = async ({
 /**
  * Finds a taxon by code: the survey index, else the provider (big taxonomies).
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {TaxonProvider} params.taxonProvider - The taxon provider.
  * @param {object} params.nodeDef - The taxon attribute definition.
- * @param {string} params.taxonCode - The taxon code.
  * @returns {Promise<object|null>} The taxon, or null.
  */
 export const findTaxonByCode = async ({
@@ -245,7 +235,6 @@ export const extractTimeValue = ({
 
 /**
  * Extracts a boolean value.
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {ParsedNodeValue} 'true' or 'false'.
  */
 const extractBoolean: Extractor = ({ value, headers }) => {
@@ -258,7 +247,6 @@ const extractBoolean: Extractor = ({ value, headers }) => {
 
 /**
  * Extracts a code value; hierarchical codes keep the code only (the item depends on the parent item).
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {Promise<ParsedNodeValue>} The code value and the category item as ref data.
  */
 const extractCode: Extractor = async ({ survey, categoryItemProvider, nodeDef, value }) => {
@@ -281,7 +269,6 @@ const extractCode: Extractor = async ({ survey, categoryItemProvider, nodeDef, v
 
 /**
  * Extracts a coordinate value (srs without the "EPSG:" prefix, plus the additional fields).
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {ParsedNodeValue} The coordinate value.
  */
 const extractCoordinate: Extractor = ({ nodeDef, value }) => {
@@ -299,7 +286,6 @@ const extractCoordinate: Extractor = ({ nodeDef, value }) => {
 
 /**
  * Extracts a date value.
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {ParsedNodeValue} The ISO date.
  */
 const extractDate: Extractor = ({ value, headers }) => ({
@@ -315,7 +301,6 @@ const extractDate: Extractor = ({ value, headers }) => ({
 
 /**
  * Extracts a file value (a new file uuid when none is given).
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {ParsedNodeValue} The file value.
  */
 const extractFile: Extractor = ({ value, headers }) => {
@@ -332,14 +317,12 @@ const extractFile: Extractor = ({ value, headers }) => {
 
 /**
  * Extracts a numeric value.
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {ParsedNodeValue} The number.
  */
 const extractNumber: Extractor = (params) => ({ value: numericValueConverter(params), refData: null })
 
 /**
  * Extracts a taxon value by code (unlisted taxa keep the scientific and vernacular names).
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {Promise<ParsedNodeValue>} The taxon value and the taxon as ref data.
  */
 const extractTaxon: Extractor = async ({ survey, taxonProvider, nodeDef, value, headers }) => {
@@ -372,7 +355,6 @@ const extractTaxon: Extractor = async ({ survey, taxonProvider, nodeDef, value, 
 
 /**
  * Extracts a text value.
- * @param {ExtractorParams} params - The extractor parameters.
  * @returns {ParsedNodeValue} The string, or null.
  */
 const extractText: Extractor = ({ value }) => {
@@ -449,16 +431,12 @@ type InputParser = (params: InputParserParams) => Promise<ParsedNodeValue>
 
 /**
  * Returns true when the value of the attribute can be set by hand (not an entity, read-only or analysis attribute).
- * @param {object} nodeDef - The node definition.
- * @returns {boolean} Whether the value is editable.
  */
 export const isNodeDefValueEditable = (nodeDef: any): boolean =>
   Boolean(nodeDef) && NodeDef.isAttribute(nodeDef) && !NodeDef.isReadOnly(nodeDef) && !NodeDef.isAnalysis(nodeDef)
 
 /**
  * Returns true when the input means "no value".
- * @param {NodeValueInput} input - The input.
- * @returns {boolean} Whether the input is empty.
  */
 const isEmptyInput = (input: NodeValueInput): boolean =>
   input === null || input === undefined || (typeof input === 'string' && input.trim() === '')
@@ -466,14 +444,11 @@ const isEmptyInput = (input: NodeValueInput): boolean =>
 /**
  * Returns the headers used in the import error messages: the attribute name.
  * @param {object} nodeDef - The attribute definition.
- * @returns {string[]} The headers.
  */
 const headersOf = (nodeDef: any): string[] => [NodeDef.getName(nodeDef)]
 
 /**
  * Converts an input to text: objects as JSON, so that "[object Object]" never shows up.
- * @param {NodeValueInput} input - The input.
- * @returns {string} The text.
  */
 const inputToText = (input: NodeValueInput): string => {
   if (input === null) return 'null'
@@ -482,15 +457,12 @@ const inputToText = (input: NodeValueInput): string => {
 
 /**
  * Converts a scalar to text; any other value (object, array, missing) becomes an empty string.
- * @param {unknown} value - The value.
- * @returns {string} The text.
  */
 const scalarToText = (value: unknown): string =>
   typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
 
 /**
  * Parses a single-prop value (number, boolean, date, time) with layer 1.
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseSinglePropInput: InputParser = (params) =>
@@ -504,7 +476,6 @@ const decimalPattern = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/
 
 /**
  * Parses a decimal: layer 1, plus a plain decimal notation and finite check (no hex, Infinity, etc.).
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseDecimalInput: InputParser = async (params) => {
@@ -520,7 +491,6 @@ const parseDecimalInput: InputParser = async (params) => {
 
 /**
  * Parses an integer: a decimal that must be a whole number.
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseIntegerInput: InputParser = async (params) => {
@@ -536,7 +506,6 @@ const parseIntegerInput: InputParser = async (params) => {
 
 /**
  * Parses a text value (kept as is); objects are refused so that "[object Object]" is never stored.
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseTextInput: InputParser = async ({ nodeDef, input }) => {
@@ -568,7 +537,6 @@ const toCoordinateParts = (input: NodeValueInput): { x: unknown; y: unknown; srs
 
 /**
  * Returns the SRS code of a coordinate: the given one without the "EPSG:" prefix, or the only SRS of the survey.
- * @param {object} survey - The survey.
  * @param {unknown} srs - The given SRS, if any.
  * @returns {string|null} The SRS code, or null when it isn't one of the survey.
  */
@@ -583,7 +551,6 @@ const resolveSrsCode = (survey: any, srs: unknown): string | null => {
 
 /**
  * Parses a coordinate.
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input, currentValue }) => {
@@ -615,7 +582,6 @@ const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input, curre
 
 /**
  * Returns the code of a code attribute: its value, its ref data item, or the survey item.
- * @param {object} survey - The survey.
  * @param {object} node - The code attribute.
  * @returns {string|null} The code, or null when the attribute has no value.
  */
@@ -629,8 +595,6 @@ const getCodeAttributeCode = (survey: any, node: any): string | null => {
 /**
  * Returns the codes of the ancestor code attributes (top-down), [] for a first-level code,
  * or null when they can't be determined (no record, or an ancestor without a value).
- * @param {InputParserParams} params - The parser parameters.
- * @returns {string[]|null} The ancestor codes.
  */
 const getAncestorCodes = ({ survey, nodeDef, record, parentNode }: InputParserParams): string[] | null => {
   if (!NodeDef.getParentCodeDefUuid(nodeDef)) return []
@@ -643,7 +607,6 @@ const getAncestorCodes = ({ survey, nodeDef, record, parentNode }: InputParserPa
 
 /**
  * Parses a code: the survey index (under the parent item for hierarchical codes), else the provider by code path.
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value and the category item as ref data.
  */
 const parseCodeInput: InputParser = async (params) => {
@@ -673,7 +636,6 @@ const parseCodeInput: InputParser = async (params) => {
 
 /**
  * Parses a taxon: by code (index, then provider), then by scientific name (provider). Unlisted taxa are refused.
- * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value and the taxon as ref data.
  */
 const parseTaxonInput: InputParser = async ({ survey, nodeDef, input, taxonProvider }) => {

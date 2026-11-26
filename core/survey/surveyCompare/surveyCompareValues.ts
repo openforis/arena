@@ -52,8 +52,6 @@ export function normalizeValue(value: any, key?: string): any {
 
 /**
  * Compares two already normalized values.
- * @param {any} valueA - First value.
- * @param {any} valueB - Second value.
  * @returns {boolean} - True if the values are equal.
  */
 export const areNormalizedValuesEqual = (valueA: any, valueB: any): boolean =>

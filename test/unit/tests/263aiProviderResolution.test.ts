@@ -34,7 +34,6 @@ const chatBody = (override: Record<string, unknown> = {}) => ({
 /**
  * Builds a user with the given AI prefs on top of an enabled chat setup.
  * @param {Record<string, unknown>} ai - AI prefs to add.
- * @returns {any} The user.
  */
 const userWith = (ai: Record<string, unknown>): any => ({
   uuid: 'u1',
@@ -149,7 +148,6 @@ describe('provider resolution by id (263)', () => {
 
   /**
    * Runs the gateway handler with a resolver and returns the response and the policy checks.
-   * @param {unknown} body - Request body.
    * @param {any} user - Caller.
    * @param {any} resolveModel - Model resolver dependency.
    * @returns {Promise<{res: any, checks: any[]}>} The response and the checks.

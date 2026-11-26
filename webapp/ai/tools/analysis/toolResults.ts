@@ -9,7 +9,6 @@ import type { AiToolContext } from '@webapp/ai/tools/types'
  * Returns what a tool throws for a failed request: the expected failures become a failure the model can act on, a
  * timeout (queryTimeout, with the given hint) or a forbidden request (noPermission); other errors are returned as
  * they are (and the registry reports them as toolFailed).
- * @param {any} error - The error.
  * @param {string} timeoutHint - What the model can do after a timeout.
  * @returns {Error} The error to throw.
  */
@@ -26,7 +25,6 @@ export const toRequestFailure = (error: any, timeoutHint: string): Error => {
 
 /**
  * Returns the values every analysis tool needs.
- * @param {AiToolContext} ctx - Tool context.
  * @returns {object} Survey, survey id and info, cycle, query language and whether analysis attributes are included.
  */
 export const getAnalysisContext = (ctx: AiToolContext) => {

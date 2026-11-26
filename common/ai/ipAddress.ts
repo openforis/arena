@@ -24,7 +24,6 @@ const IPV6_GROUP = /^[0-9a-f]{1,4}$/i
 
 /**
  * Parses a dotted-quad IPv4 address (the form the URL parser produces).
- * @param {string} host - Host.
  * @returns {number[]|null} The 4 octets, or null.
  */
 export const parseIpv4 = (host: string): number[] | null => {
@@ -56,7 +55,6 @@ const replaceDottedTail = (host: string): string | null => {
 /**
  * Parses an IPv6 address in hexadecimal groups, with at most one "::" and an optional dotted IPv4 tail (the URL parser's
  * form, without brackets).
- * @param {string} host - Host.
  * @returns {number[]|null} The 8 groups, or null.
  */
 export const parseIpv6 = (host: string): number[] | null => {

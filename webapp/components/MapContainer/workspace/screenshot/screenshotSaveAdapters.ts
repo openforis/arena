@@ -39,8 +39,6 @@ export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({
 /**
  * Creates the function fetching a record with its nodes. The request error is handled locally (it is shown in the
  * dialog): the global error notification would be hidden behind the full screen map.
- * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
  * @returns {Function} The record fetcher.
  */
 export const createRecordFetcher =
@@ -51,8 +49,6 @@ export const createRecordFetcher =
 /**
  * Creates the function checking the record out: the node requests associate this browser socket with the record, and
  * only the checkout dissociates it (the record editor does the same on exit).
- * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
  * @returns {Function} The checkout function.
  */
 export const createRecordCheckOut =
@@ -66,7 +62,6 @@ export const createRecordCheckOut =
 /**
  * Creates the function deleting a node (the empty entity row left by a failed save).
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.lang - The UI language.
  * @param {string} params.fallbackCycle - Cycle used when the record has none.
  * @returns {Function} The node deleter.
@@ -89,7 +84,6 @@ export const createNodeDeleter =
  * Creates the function posting a node, with its file if any, to the node endpoint (the socket id header is added by the
  * axios interceptor of appWebSocket).
  * @param {object} params - The parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.lang - The UI language.
  * @param {string} params.fallbackCycle - Cycle used when the record has none.
  * @returns {Function} The poster.

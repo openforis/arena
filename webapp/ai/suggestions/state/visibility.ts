@@ -10,8 +10,6 @@ import { HELP_BUCKET, type SuggestionUserState, toBucket, type VisibilityParams 
 
 /**
  * Returns true when a dismissed counted target grew by at least its kind's step.
- * @param {SuggestionKind} kind - Kind.
- * @param {SuggestionTarget} target - Current target.
  * @param {number|true} seen - Value recorded at the dismissal.
  * @returns {boolean} True when it shows again.
  */
@@ -22,9 +20,6 @@ const hasGrown = (kind: SuggestionKind, target: SuggestionTarget, seen: number |
 
 /**
  * Returns the visible targets of a suggestion: not in progress, and not dismissed (or a counted gap that grew).
- * @param {SuggestionUserState} state - State.
- * @param {AssistantSuggestion} suggestion - Suggestion.
- * @returns {SuggestionTarget[]} The visible targets.
  */
 export const getVisibleTargets = (state: SuggestionUserState, suggestion: AssistantSuggestion): SuggestionTarget[] => {
   const bucket = toBucket(suggestion.surveyId)
@@ -40,9 +35,7 @@ export const getVisibleTargets = (state: SuggestionUserState, suggestion: Assist
 
 /**
  * Returns true when a suggestion may show now (area, expiry, cycle).
- * @param {AssistantSuggestion} suggestion - Suggestion.
  * @param {VisibilityParams} params - Visibility parameters.
- * @returns {boolean} True when shown.
  */
 const isShown = (suggestion: AssistantSuggestion, { cycle, availableAreas, now }: VisibilityParams): boolean =>
   availableAreas.includes(suggestion.area) &&
@@ -51,7 +44,6 @@ const isShown = (suggestion: AssistantSuggestion, { cycle, availableAreas, now }
 
 /**
  * Returns the visible suggestions of a survey plus Help, each with its visible targets only.
- * @param {SuggestionUserState} state - State.
  * @param {VisibilityParams} params - Visibility parameters.
  * @returns {AssistantSuggestion[]} The visible suggestions.
  */

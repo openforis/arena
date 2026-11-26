@@ -15,7 +15,6 @@ import { CYRILLIC, CYRILLIC_LANGUAGES, getText, LANGUAGES, placeholders } from '
 /**
  * Returns a describe context in a UI language.
  * @param {string} lang - UI language.
- * @returns {SuggestionDescribeContext} The context.
  */
 const describeCtx = (lang: string): SuggestionDescribeContext => ({
   survey: null,

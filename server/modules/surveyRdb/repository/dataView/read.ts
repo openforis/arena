@@ -245,14 +245,12 @@ const _dbTransformCallbackSelect =
  * Adds the conditions filtering the records (cycle, record UUIDs, steps, owner and user group) to the query.
  * The record filters are applied also without a cycle (e.g. when exporting the data of all cycles).
  * @param {!object} params - The parameters.
- * @param {!SqlSelectBuilder} params.queryBuilder - The query builder.
  * @param {!ViewDataNodeDef} params.viewDataNodeDef - The queried data view.
  * @param {string} [params.cycle] - The survey cycle (all cycles if not specified).
  * @param {!object} params.query - The Query object (with the record UUID filters).
  * @param {Array} [params.recordSteps] - The record steps (all steps if empty).
  * @param {string} [params.recordOwnerUuid] - The record owner UUID (all owners if empty).
  * @param {object} [params.userGroupAccessFilters] - The user group access filters (see SurveyManager.fetchUserGroupAccessFilters).
- * @returns {void}
  */
 const _prepareRecordsWhereConditions = ({
   queryBuilder,
@@ -500,19 +498,14 @@ const _createViewDataQuery = (params: ViewDataQueryParams) => {
 /**
  * Runs a select query on a data view associated to an entity node definition.
  * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
  * @param {boolean} [params.columnNodeDefs] - Whether to select only columnNodes.
  * @param {boolean} [params.includeFileAttributeDefs] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
- * @param {number} [params.offset] - The query offset.
- * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including the outliers of the first 2 numeric attributes. Ignored when no limit is specified.
  * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = (params: ViewDataQueryParams, client: DbClient = db) => {
@@ -542,14 +535,11 @@ export const countViewData = async (params: ViewDataQueryParams, client: DbClien
 /**
  * Counts the rows of a data table or view in the specified cycle.
  * @param {!object} params - The parameters.
- * @param {!number} params.surveyId - The survey id.
- * @param {!string} params.cycle - The survey cycle.
  * @param {!string} params.tableName - The name of the data table or view.
  * @param {object} [params.filter] - The filter expression.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
  * @param {object} [params.survey] - The survey (required only with userGroupAccessFilters).
  * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
 export const countDataTableRows = async (

@@ -8,7 +8,6 @@ const SUPPORTED_SERVICES = new Set(['WMS', 'WMTS'])
 /**
  * Parses a URL without throwing.
  * @param {string} text - The URL, absolute or relative to baseUrl.
- * @param {string} [baseUrl] - The base URL.
  * @returns {URL|null} The URL, or null when it cannot be parsed.
  */
 const tryParseUrl = (text: string, baseUrl?: string): URL | null => {
@@ -38,7 +37,6 @@ export const parseServiceUrl = (value: unknown): URL => {
 
 /**
  * Finds a query parameter by name, ignoring its case (OGC parameter names are case-insensitive).
- * @param {URL} url - The URL.
  * @param {string} name - The lower-case parameter name.
  * @returns {string|null} The value, or null when absent.
  */

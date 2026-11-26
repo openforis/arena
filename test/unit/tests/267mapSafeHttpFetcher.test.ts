@@ -18,9 +18,7 @@ const publicAddress = { address: '93.184.215.14', family: 4 }
 
 /**
  * Builds a fake response.
- * @param {string} body - The body.
  * @param {string} [contentType] - The Content-Type header.
- * @returns {HttpResponse} The response.
  */
 const xmlResponse = (body: string, contentType = 'application/xml'): HttpResponse => ({
   status: 200,
@@ -54,7 +52,6 @@ const newFakes = ({
 
 /**
  * Waits for a promise expected to reject with a SystemError.
- * @param {Promise} promise - The promise.
  * @returns {Promise<SystemError>} The rejection reason.
  */
 const rejectionOf = async (promise: Promise<unknown>): Promise<SystemError> => {

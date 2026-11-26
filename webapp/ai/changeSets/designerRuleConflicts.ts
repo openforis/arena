@@ -47,11 +47,8 @@ const toConflict = (id: string, { key, params }: KeyedMessage): OperationConflic
 /**
  * Returns the operations the rules are checked on: those to check, plus (unless `onlySelected`) the creates that are
  * not in the survey yet, in proposal order. Creates already in the survey were applied.
- * @param {ChangeSet} changeSet - Change set.
- * @param {object} survey - Current survey.
  * @param {string[]} [operationIds] - Operations to check (default: all).
  * @param {boolean} [onlySelected] - Leave out the creates that are not selected (they will not be applied).
- * @returns {NodeDefOperation[]} The operations.
  */
 const selectOperations = (
   changeSet: ChangeSet,
@@ -72,8 +69,6 @@ const selectOperations = (
  * a published attribute, multiple, key, parent of a new item, languages), checking them in order as they would be
  * applied. Synchronous, so a card can use it to show itself as stale.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
- * @param {object} params.survey - Current survey.
  * @param {string[]} [params.operationIds] - Operations to report and check (default: all).
  * @returns {OperationConflict[]} One conflict per operation that breaks a rule: reason = the i18n key of the issue
  * (`aiAssistant.issues.*`), params = its interpolation values.
@@ -105,8 +100,6 @@ export const findStructuralConflicts = ({
  * expression, a missing category, a duplicate name...) once the operations are applied. Asynchronous: Apply runs it
  * after the structural check, on the operations it is about to save.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
- * @param {object} params.survey - Current survey.
  * @param {string[]} params.operationIds - Operations about to be applied.
  * @returns {Promise<OperationConflict[]>} The conflicts: every operation on an invalid node definition, reason
  * `aiAssistant.issues.nodeDefInvalid`, params `{ name, count, issues: [{ key, params }] }`.
