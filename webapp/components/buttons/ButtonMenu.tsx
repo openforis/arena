@@ -138,7 +138,7 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
         variant={variant}
         {...otherProps}
       >
-        {showCaret && <AppIcon name="dropDown" size={20} />}
+        {showCaret && <AppIcon name="dropDown" />}
       </Button>
 
       <ButtonMenuPopup

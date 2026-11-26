@@ -1,6 +1,5 @@
 import Add from '@mui/icons-material/Add'
 import ArrowBack from '@mui/icons-material/ArrowBack'
-import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
 import ArrowForward from '@mui/icons-material/ArrowForward'
 import Close from '@mui/icons-material/Close'
 import DeleteOutlined from '@mui/icons-material/DeleteOutlined'
@@ -9,6 +8,7 @@ import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
 import FormatListBulleted from '@mui/icons-material/FormatListBulleted'
 import InfoOutlined from '@mui/icons-material/InfoOutlined'
+import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown'
 import LockOpenOutlined from '@mui/icons-material/LockOpenOutlined'
 import LockOutlined from '@mui/icons-material/LockOutlined'
 import MailOutlined from '@mui/icons-material/MailOutlined'
@@ -28,7 +28,8 @@ export const iconComponents = {
   close: Close,
   delete: DeleteOutlined,
   download: FileDownloadOutlined,
-  dropDown: ArrowDropDown,
+  // chevron: MUI / Material convention for buttons opening a menu
+  dropDown: KeyboardArrowDown,
   edit: EditOutlined,
   filter: FilterAltOutlined,
   info: InfoOutlined,

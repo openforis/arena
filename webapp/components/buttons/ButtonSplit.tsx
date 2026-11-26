@@ -58,7 +58,7 @@ export const ButtonSplit = (props: ButtonSplitProps) => {
           title={menuButtonTitle}
           variant={variant}
         >
-          <AppIcon name="dropDown" size={20} />
+          <AppIcon name="dropDown" />
         </Button>
       </ButtonGroup>
 
