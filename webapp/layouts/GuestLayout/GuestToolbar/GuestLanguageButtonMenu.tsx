@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { getLanguageLabel } from '@core/app/languages'
+import { getLanguageEndonym } from '@core/app/languages'
 import { supportedLanguages } from '@core/i18n/i18nFactory'
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
 import { UILanguageStorage } from '@webapp/service/storage/uiLanguage'
@@ -19,7 +19,7 @@ export const GuestLanguageButtonMenu = () => {
     () =>
       supportedLanguages.map((langCode) => ({
         key: langCode,
-        label: getLanguageLabel(langCode),
+        label: getLanguageEndonym(langCode),
         labelIsI18nKey: false,
         testId: TestId.guest.languageItem(langCode),
       })),
@@ -39,7 +39,7 @@ export const GuestLanguageButtonMenu = () => {
       iconName="translate"
       iconSize={16}
       items={items}
-      label={getLanguageLabel(i18n.language)}
+      label={getLanguageEndonym(i18n.language)}
       labelIsI18nKey={false}
       onItemClick={onItemClick}
       selectedItemKey={i18n.language}

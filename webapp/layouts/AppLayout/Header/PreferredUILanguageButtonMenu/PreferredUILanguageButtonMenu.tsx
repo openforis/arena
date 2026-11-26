@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { getLanguageLabel } from '@core/app/languages'
+import { getLanguageEndonym, getLanguageLabel } from '@core/app/languages'
 import { supportedLanguages } from '@core/i18n/i18nFactory'
 import * as User from '@core/user/user'
 import { ButtonMenu } from '@webapp/components'
@@ -38,7 +38,7 @@ export const PreferredUILanguageButtonMenu = () => {
       },
       ...supportedLanguages.map((langCode) => ({
         key: langCode,
-        label: getLanguageLabel(langCode),
+        label: getLanguageEndonym(langCode),
         labelIsI18nKey: false,
       })),
     ]
@@ -46,6 +46,8 @@ export const PreferredUILanguageButtonMenu = () => {
 
   return (
     <ButtonMenu
+      // the label is only the language code: the accessible name is the title
+      aria-label={i18n.t('userView.preferredUILanguage.label')}
       iconName="translate"
       iconSize={16}
       items={items}
