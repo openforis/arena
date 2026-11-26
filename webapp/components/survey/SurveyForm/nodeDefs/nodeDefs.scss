@@ -183,7 +183,8 @@
       height: 100%;
       font-weight: 400;
 
-      > *:first-child {
+      // the cell content: the icon keeps its own size
+      > *:first-child:not(.app-icon) {
         width: 100%;
         height: 100%;
         display: flex;
