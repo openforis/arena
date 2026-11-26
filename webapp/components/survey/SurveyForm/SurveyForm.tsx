@@ -13,6 +13,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { Split } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { ButtonIconClose } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { useLocationPathMatcher, useOnUpdate } from '@webapp/components/hooks'
@@ -224,7 +225,7 @@ const SurveyForm = (props: SurveyFormProps) => {
 
       {preview && (
         <div className="survey-form__preview-label">
-          <span className="icon icon-eye icon-12px" />
+          <AppIcon name="view" size={14} />
           {i18n.t('common.preview')}
           <ButtonIconClose
             label="surveyForm:formEntryActions.closePreview"

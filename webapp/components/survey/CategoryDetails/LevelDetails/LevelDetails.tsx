@@ -92,7 +92,8 @@ const LevelDetails = (props: LevelDetailsProps) => {
             testId={TestId.categoryDetails.levelAddItemBtn(levelIndex)}
             className="btn-add-item"
             onClick={() => Actions.createItem({ category, level, parentItemUuid: CategoryItem.getUuid(parentItem) })}
-            iconClassName="icon-plus icon-12px"
+            iconName="add"
+            iconSize={14}
             label="common.add"
             primary
             size="small"

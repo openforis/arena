@@ -429,7 +429,7 @@ test.describe('AI assistant (mock provider)', () => {
     const footer = panel.getByTestId(TestId.aiAssistant.composerFooter)
     const chip = footer.getByTestId(TestId.aiAssistant.providerChip)
     await expect(chip).toHaveAttribute('title', /^Arena default/)
-    await expect(chip.locator('.icon-cloud')).toBeVisible()
+    await expect(chip.locator('.app-icon--cloud')).toBeVisible()
     await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute('data-level', 'schema')
     await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute(
       'aria-label',
@@ -500,7 +500,7 @@ test.describe('AI assistant context meter (stub local server)', () => {
     const chip = footer.getByTestId(TestId.aiAssistant.providerChip)
     await expect(footer.getByTestId(TestId.aiAssistant.contextMeter)).toBeVisible()
     // the chip shows where the provider runs as an icon; the name is only in the tooltip
-    await expect(chip.locator('.icon-laptop')).toBeVisible()
+    await expect(chip.locator('.app-icon--laptop')).toBeVisible()
     await expect(chip).toHaveAttribute('title', new RegExp(`^${LONG_LOCAL_NAME} · ${stub!.modelId}`))
     await expect(chip).not.toContainText(LONG_LOCAL_NAME)
     await expect

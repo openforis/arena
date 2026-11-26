@@ -11,7 +11,7 @@ import { ToolbarMenu } from './ToolbarMenu'
 export const ImageryMenu = (): ReactElement => {
   const { dispatch } = useMapWorkspace()
   return (
-    <ToolbarMenu menuKey="imagery" labelKey="mapWorkspace.menus.imagery" iconClassName="icon-images">
+    <ToolbarMenu menuKey="imagery" labelKey="mapWorkspace.menus.imagery" iconName="images">
       {(close) => [
         <MenuActionItem
           key="searchScenes"

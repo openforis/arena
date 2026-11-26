@@ -41,7 +41,7 @@ const ResetPassword = () => {
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       <GuestViewHeader
         description={`guest:resetPasswordView.description.${viewKey}`}
-        icon={hasAlreadyAccepted ? 'icon-key' : 'icon-user-plus'}
+        icon={hasAlreadyAccepted ? 'key' : 'userAdd'}
         title={`guest:resetPasswordView.title.${viewKey}`}
       />
       <GuestError error={error} />

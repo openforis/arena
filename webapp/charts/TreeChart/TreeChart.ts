@@ -6,6 +6,7 @@ import * as d3 from 'd3'
 
 import { type ArenaAnyNodeDef, Objects } from '@openforis/arena-core'
 
+import { appIconMarkup } from '@webapp/components/AppIcon'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
@@ -356,8 +357,7 @@ export default class TreeChart {
           event.stopPropagation()
           this.toggleNode(d)
         })
-        .append('xhtml:span')
-        .attr('class', 'icon icon-tree icon-12px')
+        .html(appIconMarkup('tree', 14))
     }
 
     // UPDATE

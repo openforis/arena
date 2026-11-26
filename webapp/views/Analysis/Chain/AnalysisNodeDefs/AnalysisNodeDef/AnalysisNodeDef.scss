@@ -99,7 +99,7 @@
 }
 
 .analysis-node-def__area-based {
-  .icon {
+  .app-icon {
     padding-left: 2rem;
   }
 }
@@ -107,8 +107,8 @@
 .analysis-node-def__type {
   font-size: 0.8rem;
 
-  .icon {
-    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
+  .app-icon {
+    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the inline AppIcon size
   }
 }
 

@@ -39,7 +39,8 @@ export const ThemeButtonMenu = () => {
 
   return (
     <ButtonMenu
-      iconClassName="icon-contrast icon-16px"
+      iconName="contrast"
+      iconSize={16}
       items={items}
       onItemClick={onItemClick}
       selectedItemKey={preference}

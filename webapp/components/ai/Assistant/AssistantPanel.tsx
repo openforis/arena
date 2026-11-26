@@ -106,7 +106,8 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
       items={[
         {
           key: 'aiSettings',
-          iconClassName: 'icon-cog icon-12px',
+          iconName: 'settings',
+          iconSize: 14,
           label: 'aiAssistant.menu.aiSettings',
           // own profile: the AI settings panel (as the not-available actions do)
           onClick: () => void navigate(appModuleUri(userModules.user)),
@@ -115,7 +116,8 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
         {
           key: 'deleteAll',
           className: 'ai-assistant-panel__menu-danger',
-          iconClassName: 'icon-bin2 icon-12px',
+          iconName: 'delete',
+          iconSize: 14,
           label: 'aiAssistant.menu.deleteAll',
           // onCancel is required by useConfirm's inferred (untyped) parameter
           onClick: () =>

@@ -7,7 +7,7 @@ export const scenesRailTab: MapRailTab = {
   key: 'scenes',
   labelKey: 'mapWorkspace.scenes.tab',
   titleKey: 'mapWorkspace.scenes.title',
-  iconClassName: 'icon-earth',
+  iconName: 'globe',
   width: 340,
   content: <ScenesPanel />,
 }

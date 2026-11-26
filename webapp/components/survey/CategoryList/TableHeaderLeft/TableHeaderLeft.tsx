@@ -111,7 +111,8 @@ const TableHeaderLeft = (props: TableHeaderLeftProps) => {
       <span className="category-list__add-category-btn-group" style={{ display: 'inline-flex' }}>
         <Button
           className="btn-add-category"
-          iconClassName="icon-plus icon-16px icon-left"
+          iconName="add"
+          iconSize={16}
           label="categoryEdit.createCategory.menuLabel"
           onClick={createSimpleCategory}
           size="small"
@@ -146,7 +147,7 @@ const TableHeaderLeft = (props: TableHeaderLeftProps) => {
       </span>
 
       <Button
-        iconClassName="icon-copy"
+        iconName="copy"
         label="categoryList.cloneFromAnotherSurvey.title"
         onClick={openCloneFromSurveyDialog}
         size="small"

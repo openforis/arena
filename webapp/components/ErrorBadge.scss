@@ -14,7 +14,7 @@
   background-color: transparent;
   color: $colorError;
 
-  .icon-warning {
+  .app-icon--warning {
     font-weight: bold;
     color: $colorError;
   }
@@ -23,7 +23,7 @@
     background-color: transparent;
     color: $colorWarning;
 
-    .icon-warning {
+    .app-icon--warning {
       color: $colorWarning;
     }
   }

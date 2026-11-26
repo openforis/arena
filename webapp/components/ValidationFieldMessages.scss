@@ -7,16 +7,16 @@
   .validation-field_message {
     color: $colorOnPrimary;
 
-    .icon {
+    .app-icon {
       padding-right: 0.2em;
       font-weight: 600;
     }
 
-    &.warning .icon {
+    &.warning .app-icon {
       color: $colorWarning;
     }
 
-    &.error .icon {
+    &.error .app-icon {
       color: $colorError;
     }
   }

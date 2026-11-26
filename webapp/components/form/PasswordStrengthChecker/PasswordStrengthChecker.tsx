@@ -2,6 +2,7 @@ import './PasswordStrengthChecker.scss'
 
 import classNames from 'classnames'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 
 const checks = [
@@ -47,7 +48,7 @@ export const PasswordStrengthChecker = ({ password = '' }: Props) => {
       <ul className="password-strength-checker__checks" aria-label={title}>
         {results.map(({ key, passed }) => (
           <li key={key} className={classNames({ passed })}>
-            <span className={classNames('icon icon-10px', passed ? 'icon-checkmark' : 'icon-radio-unchecked')} />
+            <AppIcon name={passed ? 'check' : 'radioUnchecked'} size={12} />
             {t(`guest:resetPasswordView.passwordStrengthChecks.${key}`)}
           </li>
         ))}

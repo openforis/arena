@@ -4,12 +4,14 @@ import { useMap } from 'react-leaflet'
 
 import { Numbers } from '@openforis/arena-core'
 
+import { appIconMarkup } from '@webapp/components/AppIcon'
+
 import type { MapPointMarker, RecordEditClickHandler, SetMarkerByKey } from './mapPointTypes'
 
 // shown at the destination until the popup of the point opens
 const flyToLoaderIcon = L.divIcon({
   className: 'map-view__fly-to-loader',
-  html: '<span class="icon icon-16px icon-spinner"></span>',
+  html: appIconMarkup('spinner'),
   iconSize: [28, 28],
 })
 // the loader is removed anyway if no popup opens (e.g. layer hidden during the flight)

@@ -1,4 +1,5 @@
 import type { Conversation } from '@webapp/ai/conversations/types'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -6,10 +7,10 @@ import { TestId } from '@webapp/utils/testId'
 import type { AssistantArea } from './assistantAreas'
 import { getSentDataLevel, type SentDataLevel } from './sentDataLevel'
 
-const levelIcons: Record<SentDataLevel, string> = {
-  questions: 'icon-bubble',
-  schema: 'icon-tree',
-  data: 'icon-database',
+const levelIcons: Record<SentDataLevel, IconName> = {
+  questions: 'chat',
+  schema: 'tree',
+  data: 'database',
 }
 
 /**
@@ -38,7 +39,7 @@ export const AssistantSentDataChip = ({
         data-testid={TestId.aiAssistant.sentDataChip}
         type="button"
       >
-        <span aria-hidden="true" className={`icon ${levelIcons[level]} icon-12px`} />
+        <AppIcon name={levelIcons[level]} size={14} />
         <span aria-hidden="true" className="ai-assistant-panel__sent-data-text">
           {label}
         </span>

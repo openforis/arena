@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { ENV } from '@core/processUtils'
-import { Button, ButtonSplit } from '@webapp/components/buttons'
+import { Button, ButtonProps, ButtonSplit } from '@webapp/components/buttons'
 import { MobilePreviewPanel } from '@webapp/components/survey/MobilePreview'
 import { useAppDispatch } from '@webapp/store'
 import { useIsSurveyDirty } from '@webapp/store/survey'
@@ -17,9 +17,10 @@ const FormEditActions = () => {
 
   const openDesktopPreview = () => dispatch(RecordActions.createRecord({ preview: true }))
 
-  const previewButtonProps = {
+  const previewButtonProps: ButtonProps = {
     disabled: surveyIsDirty,
-    iconClassName: 'icon-eye icon-12px',
+    iconName: 'view',
+    iconSize: 14,
     label: 'surveyForm:formEditActions.preview',
     onClick: openDesktopPreview,
     size: 'small' as const,
@@ -37,13 +38,15 @@ const FormEditActions = () => {
             {
               key: 'desktop',
               disabled: surveyIsDirty,
-              iconClassName: 'icon-display icon-12px',
+              iconName: 'desktop',
+              iconSize: 14,
               label: 'surveyForm:formEditActions.previewDesktop',
               onClick: openDesktopPreview,
             },
             {
               key: 'mobile',
-              iconClassName: 'icon-mobile icon-12px',
+              iconName: 'mobile',
+              iconSize: 14,
               label: 'surveyForm:formEditActions.previewMobile',
               onClick: () => setMobilePreviewOpen(true),
             },

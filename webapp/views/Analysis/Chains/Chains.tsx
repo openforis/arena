@@ -6,6 +6,7 @@ import * as Chain from '@common/analysis/chain'
 import * as DateUtils from '@core/dateUtils'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ButtonIconEdit } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import Table from '@webapp/components/Table'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
@@ -46,7 +47,7 @@ const ChainsView = () => {
         {
           key: 'samplingDesign',
           header: 'chainView.samplingDesign',
-          renderItem: ({ item }) => Chain.hasSamplingDesign(item) && <span className="icon icon-checkmark" />,
+          renderItem: ({ item }) => Chain.hasSamplingDesign(item) && <AppIcon name="check" />,
           width: '10rem',
         },
         {

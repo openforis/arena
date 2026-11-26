@@ -3,6 +3,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import { Button, ButtonIconEditOrView, ButtonInvite } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/ProfilePicture'
 import { useSurveyInfo } from '@webapp/store/survey'
@@ -60,11 +61,12 @@ const Row = (props: RowProps) => {
         {invitedDateFormatted}
       </div>
       <div className="accepted-cell">
-        {User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}
+        {User.hasAccepted(userListItem) && <AppIcon name="userCheck" size={16} />}
         {User.isInvited(userListItem) && User.isInvitationExpired(userListItem) && (
           <Button
             className="icon-invitation-expired"
-            iconClassName="icon-crying icon-16px"
+            iconName="sad"
+            iconSize={16}
             label="usersView:invitationExpiredClickToSendAgainTheInvitation"
             onClick={handleResendInvitation}
             showLabel={false}
@@ -88,7 +90,7 @@ const Row = (props: RowProps) => {
       </div>
       <div>
         <Button
-          iconClassName="icon-cog"
+          iconName="settings"
           title="usersView:editSurveyUserExtraPropsForUser"
           titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
           onClick={() => onEditSurveyUserExtraProps(userListItem)}

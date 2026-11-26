@@ -1,7 +1,5 @@
 import './NodeDefTreeSelect.scss'
 
-import classNames from 'classnames'
-
 import type { NodeDefLabelType } from '@core/survey/nodeDef'
 import { Button } from '@webapp/components/buttons'
 import { TreeView } from '@webapp/components/TreeView'
@@ -72,10 +70,8 @@ const NodeDefTreeSelect = (props: NodeDefTreeSelectProps) => {
         <div className="display-flex">
           <Button
             className="btn-toggle btn-expand"
-            iconClassName={classNames('icon icon-12px', {
-              'icon-shrink2': expanded,
-              'icon-enlarge2': !expanded,
-            })}
+            iconName={expanded ? 'collapse' : 'expand'}
+            iconSize={14}
             onClick={toggleExpanded}
             size="small"
             title={expanded ? 'common.collapse' : 'common.expand'}

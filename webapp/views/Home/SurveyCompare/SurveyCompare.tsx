@@ -373,7 +373,8 @@ export const SurveyCompare = () => {
       <div className="survey-compare__header">
         {result && (
           <Button
-            iconClassName="icon-upload2 icon-12px"
+            iconName="upload"
+            iconSize={14}
             label="surveyCompareView:selectNewSource"
             title="surveyCompareView:selectNewSourceInfo"
             onClick={onReset}
@@ -382,7 +383,8 @@ export const SurveyCompare = () => {
         )}
         {sourceRef && (
           <Button
-            iconClassName="icon-loop2 icon-12px"
+            iconName="refresh"
+            iconSize={14}
             label="surveyCompareView:refreshComparison"
             title="surveyCompareView:refreshComparisonInfo"
             onClick={() => startCompare({ sourceRef, manualMatches })}

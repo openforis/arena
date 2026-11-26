@@ -1,6 +1,7 @@
 import { ListItemIcon, ListItemText, ListSubheader, MenuItem } from '@mui/material'
 import type { ReactElement } from 'react'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -63,10 +64,7 @@ export const MenuCheckItem = ({
       data-testid={TestId.mapWorkspace.menuItem(itemKey)}
     >
       <ListItemIcon>
-        <span
-          className={`icon icon-14px ${checked ? 'icon-checkbox-checked' : 'icon-checkbox-unchecked'}`}
-          aria-hidden="true"
-        />
+        <AppIcon name={checked ? 'checkboxChecked' : 'checkboxUnchecked'} />
       </ListItemIcon>
       <ListItemText>{t(labelKey)}</ListItemText>
     </MenuItem>
@@ -97,10 +95,7 @@ export const MenuRadioItem = ({ itemKey, label, checked, onSelect }: MenuRadioIt
     data-testid={TestId.mapWorkspace.menuItem(itemKey)}
   >
     <ListItemIcon>
-      <span
-        className={`icon icon-14px ${checked ? 'icon-radio-checked' : 'icon-radio-unchecked'}`}
-        aria-hidden="true"
-      />
+      <AppIcon name={checked ? 'radioChecked' : 'radioUnchecked'} />
     </ListItemIcon>
     <ListItemText>{label}</ListItemText>
   </MenuItem>

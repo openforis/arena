@@ -22,7 +22,7 @@ export const DisplayMenu = (): ReactElement => {
   })
 
   return (
-    <ToolbarMenu menuKey="display" labelKey="mapWorkspace.menus.display" iconClassName="icon-eye">
+    <ToolbarMenu menuKey="display" labelKey="mapWorkspace.menus.display" iconName="view">
       {() =>
         sections.flatMap(({ headerKey, items }) => {
           const nodes: ReactNode[] = headerKey ? [<MenuSectionHeader key={headerKey} labelKey={headerKey} />] : []

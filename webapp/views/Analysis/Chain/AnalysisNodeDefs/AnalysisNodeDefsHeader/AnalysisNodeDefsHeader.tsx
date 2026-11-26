@@ -35,14 +35,14 @@ const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDe
         )}
         <div className="analysis-node-defs-header__buttons">
           <Button
-            iconClassName="icon-plus"
+            iconName="add"
             iconEnd={NodeDefUIProps.getIconByType(NodeDef.nodeDefType.decimal)}
             label="common:chain.addQuantitative"
             onClick={() => createNodeDef(NodeDef.nodeDefType.decimal)}
             disabled={!editable}
           />
           <Button
-            iconClassName="icon-plus"
+            iconName="add"
             iconEnd={NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
             label="common:chain.addCategorical"
             onClick={() => createNodeDef(NodeDef.nodeDefType.code)}

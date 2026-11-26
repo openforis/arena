@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import ProfilePicture from '@webapp/components/ProfilePicture'
 import { useAppDispatch } from '@webapp/store'
 import { LoginActions } from '@webapp/store/login'
@@ -23,17 +24,17 @@ const Separator = () => <div className="user-popup-menu__sep" />
 
 type PopupMenuButtonProps = {
   onClick: (...args: any[]) => any
-  iconClassName: string
+  iconName: IconName
   label: string
   testId?: string
 }
 
 const PopupMenuButton = (props: PopupMenuButtonProps) => {
   const i18n = useI18n()
-  const { onClick, iconClassName, label, testId } = props
+  const { onClick, iconName, label, testId } = props
   return (
     <button data-testid={testId} type="button" className="btn-s btn-transparent" onClick={onClick}>
-      <span className={`icon ${iconClassName} icon-12px icon-left`} />
+      <AppIcon className="icon-left" name={iconName} size={14} />
       {i18n.t(label)}
     </button>
   )
@@ -86,7 +87,7 @@ const UserPopupMenu = (props: UserPopupMenuProps) => {
               to={appModuleUri(userModules.user)}
               onClick={onClose}
             >
-              <span className="icon icon-user icon-12px icon-left" />
+              <AppIcon name="user" size={14} className="icon-left" />
               {i18n.t('header.myProfile')}
             </Link>
           </div>
@@ -101,7 +102,7 @@ const UserPopupMenu = (props: UserPopupMenuProps) => {
         onClick={onClose}
         className="btn-s btn-transparent"
       >
-        <span className="icon icon-paragraph-justify icon-12px icon-left" />
+        <AppIcon name="text" size={14} className="icon-left" />
         {i18n.t('appModules.surveys')}
       </Link>
 
@@ -112,7 +113,7 @@ const UserPopupMenu = (props: UserPopupMenuProps) => {
           onClick={onNewSurveyClick}
           className="btn-s btn-transparent"
         >
-          <span className="icon icon-plus icon-12px icon-left" />
+          <AppIcon name="add" size={14} className="icon-left" />
           {i18n.t('surveyCreate:newSurvey')}
         </Link>
       )}
@@ -127,7 +128,7 @@ const UserPopupMenu = (props: UserPopupMenuProps) => {
               onClick={onClose}
               className="btn-s btn-transparent"
             >
-              <span className="icon icon-paragraph-justify icon-12px icon-left" />
+              <AppIcon name="text" size={14} className="icon-left" />
               {i18n.t('appModules.templates')}
             </Link>
           )}
@@ -138,7 +139,7 @@ const UserPopupMenu = (props: UserPopupMenuProps) => {
               onClick={onClose}
               className="btn-s btn-transparent"
             >
-              <span className="icon icon-plus icon-12px icon-left" />
+              <AppIcon name="add" size={14} className="icon-left" />
               {i18n.t('surveyCreate:newTemplate')}
             </Link>
           )}
@@ -147,16 +148,12 @@ const UserPopupMenu = (props: UserPopupMenuProps) => {
 
       <Separator />
 
-      <PopupMenuButton
-        iconClassName="icon-qrcode"
-        label="header.qrCodeLoginDialog.title"
-        onClick={onQrCodeLoginDialogOpen}
-      />
+      <PopupMenuButton iconName="qrCode" label="header.qrCodeLoginDialog.title" onClick={onQrCodeLoginDialogOpen} />
       <Separator />
 
       <PopupMenuButton
         testId={TestId.header.userLogoutBtn}
-        iconClassName="icon-switch"
+        iconName="logout"
         label="sidebar.logout"
         onClick={() => {
           onClose()

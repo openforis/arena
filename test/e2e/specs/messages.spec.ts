@@ -53,7 +53,7 @@ test.describe('Messages', () => {
 
     // the notification is loaded when the app starts
     await page.reload()
-    await page.locator('.app-header__user-controls button:has(.icon-bell)').click()
+    await page.locator('.app-header__user-controls button:has(.app-icon--notifications)').click()
     await expect(page.locator('.panel-right').getByText(subject)).toBeVisible()
     const notificationBody = page.locator('.message-notification__body')
     await expect(notificationBody).toContainText(`Dear ${testUser.name},`)

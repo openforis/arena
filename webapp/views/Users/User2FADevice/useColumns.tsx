@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import * as DateUtils from '@core/dateUtils'
 import { User2FADevice } from '@core/user2FADevice'
 import { ButtonIconEdit } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useUser } from '@webapp/store/user'
 
@@ -23,7 +24,7 @@ export const useUser2FADeviceColumns = ({ onRowOpen }) => {
       {
         key: 'enabled',
         header: 'user2FADevice:enabled',
-        renderItem: ({ item }) => User2FADevice.isEnabled(item) && <span className="icon icon-checkmark" />,
+        renderItem: ({ item }) => User2FADevice.isEnabled(item) && <AppIcon name="check" />,
         width: '7rem',
       },
       {

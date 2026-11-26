@@ -36,7 +36,8 @@ export const GuestLanguageButtonMenu = () => {
 
   return (
     <ButtonMenu
-      iconClassName="icon-earth icon-16px"
+      iconName="globe"
+      iconSize={16}
       items={items}
       label={getLanguageLabel(i18n.language)}
       labelIsI18nKey={false}

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Button } from '@webapp/components/buttons'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import { TreeSelectViewMode } from '@webapp/model'
@@ -54,18 +55,20 @@ const FormHeader = (props: FormHeaderProps) => {
       <div className="survey-form-header__label-container">
         <Button
           disabled={surveyIsDirty}
-          iconClassName="icon-stack icon-12px"
+          iconName="layers"
+          iconSize={14}
           onClick={() => dispatch(SurveyFormActions.toggleFormPageNavigation())}
           size="small"
           title={`surveyForm:${showPageNavigation ? 'hide' : 'show'}Pages`}
           variant="text"
         >
-          <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
+          <AppIcon name={showPageNavigation ? 'collapse' : 'expand'} size={14} />
         </Button>
 
         {edit && canEditDef && treeViewMode === TreeSelectViewMode.onlyPages && (
           <Button
-            iconClassName="icon-plus icon-12px"
+            iconName="add"
+            iconSize={14}
             label="surveyForm:subPage"
             onClick={() => {
               const propsNodeDef = {

@@ -13,7 +13,7 @@ export const useDialogConfirm = () => {
   const params = useSelector(DialogConfirmState.getParams)
   const okButtonLabel = useSelector(DialogConfirmState.getOkButtonLabel)
   const okButtonClass = useSelector(DialogConfirmState.getOkButtonClass)
-  const okButtonIconClass = useSelector(DialogConfirmState.getOkButtonIconClass)
+  const okButtonIcon = useSelector(DialogConfirmState.getOkButtonIcon)
   const checkboxLabel = useSelector(DialogConfirmState.getCheckboxLabel)
   const checkboxChecked = useSelector(DialogConfirmState.isCheckboxChecked)
   const okButtonLabelChecked = useSelector(DialogConfirmState.getOkButtonLabelChecked)
@@ -57,7 +57,7 @@ export const useDialogConfirm = () => {
     params,
     okButtonLabel,
     okButtonClass,
-    okButtonIconClass,
+    okButtonIcon,
     checkboxLabel,
     checkboxChecked,
     okButtonLabelChecked,

@@ -1,6 +1,7 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { AppIcon } from '@webapp/components/AppIcon'
 
 type NodeDefInfoIconProps = {
   lang: string
@@ -14,5 +15,5 @@ export const NodeDefInfoIcon = (props: NodeDefInfoIconProps) => {
 
   if (!description) return null
 
-  return <span className="icon icon-info icon-12px" title={description} />
+  return <AppIcon name="info" size={14} title={description} />
 }

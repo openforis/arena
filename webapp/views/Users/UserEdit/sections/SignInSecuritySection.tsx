@@ -1,4 +1,5 @@
 import { Button } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { UserPasswordSetForm } from '../../UserPasswordChange/UserPasswordSetForm'
 import { SignInMethodsPanel } from '../SignInMethodsPanel'
 import { UserEditSection, UserEditSectionRow } from '../UserEditSection'
@@ -24,7 +25,7 @@ type Props = {
   visibility: SignInSecuritySectionVisibility
 }
 
-const PasswordIcon = () => <span aria-hidden="true" className="icon icon-key user-edit-section__row-icon" />
+const PasswordIcon = () => <AppIcon className="user-edit-section__row-icon" name="key" />
 
 /**
  * Password, linked external login providers and two-factor authentication.
@@ -83,7 +84,7 @@ export const SignInSecuritySection = (props: Props) => {
           {visibility.twoFactorDevices && (
             <UserEditSectionRow
               description="usersView:profile.twoFactorDescription"
-              icon={<span aria-hidden="true" className="icon icon-shield user-edit-section__row-icon" />}
+              icon={<AppIcon className="user-edit-section__row-icon" name="shield" />}
               title="userView.manageTwoFactorDevices.title"
             >
               <Button

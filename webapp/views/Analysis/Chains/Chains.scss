@@ -2,7 +2,7 @@
 
 .chains {
   .column-draft {
-    .icon {
+    .app-icon {
       color: $colorOnSurfaceVariant;
     }
   }
@@ -11,17 +11,17 @@
     display: flex;
     justify-content: center;
 
-    .icon {
+    .app-icon {
       padding: 5px;
       color: $colorOnPrimary;
       border-radius: 100%;
     }
 
-    &.success .icon {
+    &.success .app-icon {
       background-color: $colorSuccess;
     }
 
-    &.error .icon {
+    &.error .app-icon {
       color: $colorError;
     }
   }

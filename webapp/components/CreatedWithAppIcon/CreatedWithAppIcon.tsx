@@ -1,12 +1,13 @@
 import { AppInfo } from '@core/app/appInfo'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 
-const iconNameByAppId = {
+const iconNameByAppId: Record<string, IconName> = {
   [AppInfo.arenaAppId]: 'laptop',
-  [AppInfo.arenaMobileId]: 'mobile',
-  [AppInfo.arenaMobile2Id]: 'mobile2',
+  [AppInfo.arenaMobileId]: 'mobileOld',
+  [AppInfo.arenaMobile2Id]: 'mobile',
 }
-const unknownAppIconName = 'question'
+const unknownAppIconName: IconName = 'help'
 
 type CreatedWithAppIconProps = {
   appId?: string
@@ -23,11 +24,6 @@ export const CreatedWithAppIcon = (props: CreatedWithAppIconProps) => {
   const title = titleProp ?? i18n.t('common.createdWithApp', { app: AppInfo.getAppNameById(appId) })
 
   return (
-    <span
-      className={`created-with-app-icon icon icon-20px icon-${iconName}`}
-      aria-label={alt}
-      style={style}
-      title={title}
-    />
+    <AppIcon aria-label={alt} className="created-with-app-icon" name={iconName} size={20} style={style} title={title} />
   )
 }

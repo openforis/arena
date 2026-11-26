@@ -6,7 +6,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import classNames from 'classnames'
 
-import { AppIcon } from '../AppIcon'
+import { AppIcon, IconName } from '../AppIcon'
 
 import { Button, ButtonProps } from './Button'
 
@@ -20,7 +20,8 @@ export type ButtonMenuItem = {
   content?: React.ReactNode
   disabled?: boolean
   icon?: React.ReactNode
-  iconClassName?: string
+  iconName?: IconName
+  iconSize?: number
   label?: string
   labelIsI18nKey?: boolean
   labelParams?: Record<string, unknown>
@@ -91,7 +92,8 @@ export const ButtonMenuPopup = (props: ButtonMenuPopupProps) => {
             <Button
               className={classNames(item.className)}
               icon={item.icon}
-              iconClassName={item.iconClassName}
+              iconName={item.iconName}
+              iconSize={item.iconSize}
               label={item.label}
               labelIsI18nKey={item.labelIsI18nKey}
               labelParams={item.labelParams}

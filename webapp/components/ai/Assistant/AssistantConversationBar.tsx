@@ -18,7 +18,8 @@ export const AssistantConversationBar = ({ title, busy }: { title: string | null
     <div className="ai-assistant-panel__bar" data-testid={TestId.aiAssistant.conversationBar}>
       <Button
         disabled={busy}
-        iconClassName="icon-arrow-left2 icon-12px"
+        iconName="arrowBack"
+        iconSize={14}
         label="aiAssistant.back"
         onClick={assistantPanelStore.showHome}
         showLabel={false}

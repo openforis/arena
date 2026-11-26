@@ -126,7 +126,8 @@ const NodeDefEntityFormNodeSelect = (props) => {
             updateNode(nodeDef, entity)
             onChange(Node.getUuid(entity))
           }}
-          iconClassName="icon-plus icon-10px icon-left"
+          iconName="add"
+          iconSize={12}
           label="surveyForm:nodeDefEntityForm.addNewEntity"
           labelParams={{ name: nodeDefName }}
         />

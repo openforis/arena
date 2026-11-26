@@ -33,7 +33,7 @@ export const AddDataMenu = (): ReactElement => {
           if (file) void uploadMapFile(file)
         }}
       />
-      <ToolbarMenu menuKey="addData" labelKey="mapWorkspace.menus.addData" iconClassName="icon-upload2">
+      <ToolbarMenu menuKey="addData" labelKey="mapWorkspace.menus.addData" iconName="upload">
         {(close) => [
           <MenuActionItem
             key="uploadFile"

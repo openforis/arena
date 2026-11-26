@@ -461,7 +461,8 @@ const NodeDefsTranslationModal = ({
         <Button label="common.cancel" onClick={onClose} variant="outlined" />
         <Button
           disabled={isSaving}
-          iconClassName="icon-checkmark icon-14px"
+          iconName="check"
+          iconSize={16}
           label="surveyForm:nodeDefsTranslation.apply"
           onClick={() => void onApply()}
           variant="contained"

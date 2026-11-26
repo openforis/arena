@@ -54,7 +54,8 @@ export const MapLayerCard = ({ proposed }: { proposed: ProposedMapLayer }) => {
         <div className="ai-query-card__buttons">
           <Button
             className="btn-s"
-            iconClassName="icon-map icon-12px"
+            iconName="map"
+            iconSize={14}
             label="aiAnalysis.mapLayerCard.showOnMap"
             onClick={() => void navigate(appModuleUri(dataModules.map), { state: { aiMapLayer: { uuid, search } } })}
             testId={TestId.aiMapLayerCard.showOnMap(key)}

@@ -8,6 +8,7 @@ import { Authorizer } from '@openforis/arena-core'
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import Table from '@webapp/components/Table'
@@ -80,7 +81,7 @@ const Surveys = (props: SurveysProps) => {
       {
         key: 'active',
         renderItem: ({ active }) => (
-          <span className={`icon icon-14px icon-action icon-radio-${active ? 'checked2' : 'unchecked'}`} />
+          <AppIcon className="icon-action" name={active ? 'radioChecked' : 'radioUnchecked'} />
         ),
         width: '30px',
       },

@@ -3,6 +3,7 @@ import './ExpansionPanel.scss'
 import React, { useEffect, useMemo, useRef } from 'react'
 import classNames from 'classnames'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 
 const closeClassName = 'close'
@@ -57,7 +58,7 @@ const ExpansionPanel = (props: ExpansionPanelProps) => {
       {showHeader && (
         <button type="button" className="expansion-panel__header" onClick={toggleCloseState}>
           <span className="btn-toggle">
-            <span className="icon icon-play3 icon-10px" />
+            <AppIcon name="play" size={12} />
           </span>
           {t(buttonLabel, buttonLabelParams)}
         </button>

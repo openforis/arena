@@ -26,7 +26,8 @@ export const AssistantSuggestionList = ({
     <div className="ai-assistant-panel__history" data-testid={TestId.aiAssistant.suggestionList}>
       <div className="ai-assistant-panel__bar">
         <Button
-          iconClassName="icon-arrow-left2 icon-12px"
+          iconName="arrowBack"
+          iconSize={14}
           label="aiAssistant.back"
           onClick={assistantPanelStore.showHome}
           showLabel={false}

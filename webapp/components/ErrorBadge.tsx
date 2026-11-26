@@ -6,6 +6,7 @@ import type React from 'react'
 import type { ArenaValidation } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 
 import ValidationTooltip from './ValidationTooltip'
@@ -54,7 +55,7 @@ const ErrorBadge = (props: ErrorBadgeProps) => {
       <div className="badge__content">
         {children}
 
-        {showIcon && <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`} />}
+        {showIcon && <AppIcon className={showLabel ? 'icon-left' : undefined} name="warning" size={14} />}
 
         {showLabel && <span>{i18n.t(labelKey)}</span>}
       </div>

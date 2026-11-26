@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
@@ -64,11 +65,11 @@ const AddNodeDefPanel = (props) => {
     nodeDef && (
       <div className="survey-form__add-node-def-panel">
         <button className="btn btn-s no-border btn-toggle" onClick={() => setFormNodeDefAddChildTo(null)}>
-          <span className="icon icon-cross icon-12px" />
+          <AppIcon name="close" size={14} />
         </button>
 
         <div className="flex-center add-to-label">
-          <span className="icon icon-plus icon-10px icon-left" />
+          <AppIcon name="add" size={12} className="icon-left" />
           {i18n.t('surveyForm:addChildTo', { nodeDefLabel, interpolation: { escapeValue: false } })}
         </div>
 

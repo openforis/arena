@@ -63,7 +63,8 @@ export const DashboardPolygonPopup = (props: DashboardPolygonPopupProps) => {
           <Button
             component={RouterLink}
             to={recordEditUrl}
-            iconClassName="icon-pencil2 icon-12px"
+            iconName="edit"
+            iconSize={14}
             label="mapView.editRecord"
             size="small"
             variant="outlined"

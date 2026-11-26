@@ -85,15 +85,15 @@
           margin-right: 0.3rem;
           text-align: center;
 
-          &.icon-checkbox-checked {
+          &.app-icon--checkboxChecked {
             color: $colorSuccess;
           }
 
-          &.icon-cross {
+          &.app-icon--close {
             color: $colorError;
           }
 
-          &.icon-spinner {
+          &.app-icon--spinner {
             animation: app-job-monitor-inner-job-spinner-spin 1s linear infinite;
 
             @media (prefers-reduced-motion: reduce) {

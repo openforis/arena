@@ -34,7 +34,7 @@ export const useMapRailTabs = ({
       {
         key: 'layers',
         labelKey: 'mapWorkspace.rail.tabs.layers',
-        iconClassName: 'icon-stack',
+        iconName: 'layers',
         content: <LayersPanel dataLayersCount={dataLayersCount} />,
       },
       ...extraRailTabs,
@@ -42,7 +42,7 @@ export const useMapRailTabs = ({
       {
         key: 'legend',
         labelKey: 'mapWorkspace.rail.tabs.legend',
-        iconClassName: 'icon-info',
+        iconName: 'info',
         content: <LegendPanel />,
       },
     ]

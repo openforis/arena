@@ -80,7 +80,8 @@ export const QueryCard = ({ entry }: Props) => {
       <div className="ai-query-card__buttons">
         <Button
           className="btn-s"
-          iconClassName="icon-table2 icon-12px"
+          iconName="table"
+          iconSize={14}
           label="aiAnalysis.queryCard.openInExplorer"
           onClick={() => show(DataExplorerState.displayTypes.table)}
           testId={TestId.aiQueryCard.openInExplorer(queryId)}
@@ -89,7 +90,8 @@ export const QueryCard = ({ entry }: Props) => {
         {model.chartType && (
           <Button
             className="btn-s"
-            iconClassName="icon-stats-bars icon-12px"
+            iconName="barChart"
+            iconSize={14}
             label="aiAnalysis.queryCard.showAsChart"
             onClick={() => show(DataExplorerState.displayTypes.chart, model.chartType)}
             testId={TestId.aiQueryCard.showAsChart(queryId)}

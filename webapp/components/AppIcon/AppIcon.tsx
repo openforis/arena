@@ -1,26 +1,27 @@
-import React from 'react'
+import './AppIcon.scss'
+
+import { SvgIconProps } from '@mui/material'
 import classNames from 'classnames'
 
 import { iconComponents, IconName } from './iconComponents'
 
-export type AppIconProps = {
-  className?: string
+export type AppIconProps = Omit<SvgIconProps, 'fontSize' | 'titleAccess'> & {
   name: IconName
   /** Size in px; inline so it wins over the MUI button start/end icon size. */
   size?: number
-  style?: React.CSSProperties
   title?: string
 }
 
 /**
- * Renders an icon by name (currently a Material icon, SVG); replaces the IcoMoon font icons (`<span className="icon icon-xxx" />`).
+ * Renders an icon by name (currently a Material icon, SVG).
  */
 export const AppIcon = (props: AppIconProps) => {
-  const { className, name, size = 16, style, title } = props
+  const { className, name, size = 16, style, title, ...otherProps } = props
   const Component = iconComponents[name]
   return (
     <Component
       aria-hidden={title ? undefined : true}
+      {...otherProps}
       className={classNames('app-icon', `app-icon--${name}`, className)}
       style={{ fontSize: size, verticalAlign: 'middle', ...style }}
       titleAccess={title}

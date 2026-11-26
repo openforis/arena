@@ -53,7 +53,8 @@ const ImportSummary = (props: ImportSummaryProps) => {
         <Button
           className="modal-footer__item btn-import"
           onClick={() => Actions.importCategory({ state })}
-          iconClassName="icon-upload2 icon-12px"
+          iconName="upload"
+          iconSize={14}
           label="common.import"
         />
         <FormItem className="total-items" label="common.totalItems">

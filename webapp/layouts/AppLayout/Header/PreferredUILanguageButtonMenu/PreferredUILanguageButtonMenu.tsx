@@ -46,7 +46,8 @@ export const PreferredUILanguageButtonMenu = () => {
 
   return (
     <ButtonMenu
-      iconClassName="icon-earth icon-16px"
+      iconName="globe"
+      iconSize={16}
       items={items}
       onItemClick={onItemClick}
       selectedItemKey={preferredLanguageCode ?? autoLanguageKey}

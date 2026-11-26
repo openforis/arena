@@ -99,7 +99,7 @@
     align-self: start;
   }
 
-  .icon-info {
+  .app-icon--info {
     padding-left: 6px;
     cursor: pointer;
   }
@@ -153,7 +153,7 @@
     display: flex;
     align-items: center;
 
-    > .icon:not(:first-child) {
+    > .app-icon:not(:first-child) {
       margin-left: 6px;
     }
   }
@@ -189,7 +189,7 @@
         display: flex;
       }
 
-      .icon-warning {
+      .app-icon--warning {
         position: absolute;
         left: -0.5rem;
       }

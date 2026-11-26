@@ -93,7 +93,8 @@ const NodeDefGeo = (props: NodeDefComponentProps) => {
     <Button
       className="map-trigger-btn btn-transparent"
       disabled={edit}
-      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
+      iconName="map"
+      iconSize={insideTable ? 16 : 24}
       onClick={toggleShowMap}
       title="surveyForm:nodeDefCoordinate.showOnMap"
       variant="text"

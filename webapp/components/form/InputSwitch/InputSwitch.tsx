@@ -2,6 +2,8 @@ import './InputSwitch.scss'
 
 import ReactSwitch from 'react-switch'
 
+import { AppIcon } from '@webapp/components/AppIcon'
+
 type InputSwitchProps = {
   checked: boolean
   disabled?: boolean
@@ -22,12 +24,12 @@ const InputSwitch = (props: InputSwitchProps) => {
       offColor="#d1d1dd"
       checkedIcon={
         <div className="input-switch__icon">
-          <span className="icon icon-checkmark icon-10px" />
+          <AppIcon name="check" size={12} />
         </div>
       }
       uncheckedIcon={
         <div className="input-switch__icon">
-          <span className="icon icon-cross icon-8px" />
+          <AppIcon name="close" size={10} />
         </div>
       }
     />

@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { NumberFormats } from '@webapp/components/form/Input'
 
 import NodeDefBoolean from './components/types/NodeDefBoolean'
@@ -29,49 +30,49 @@ export const headerColorRgbCodesByColor = {
   [FormHeaderColor.yellow]: '#fffdaf',
 }
 
-const singleEntityIcon = <span className="icon icon-file-empty icon-left" />
+const singleEntityIcon = <AppIcon name="file" className="icon-left" />
 const multipleAttributeIcon = <span title="Multiple">M</span>
-const keyIcon = <span className="icon icon-key icon-left" />
+const keyIcon = <AppIcon name="key" className="icon-left" />
 
 const propsUI = {
   [integer]: {
-    icon: <span className="icon icon-left node_def__icon">123</span>,
+    icon: <span className="icon-left node_def__icon">123</span>,
     numberFormat: NumberFormats.integer(),
     defaultValue: '',
   },
 
   [decimal]: {
-    icon: <span className="icon icon-left node_def__icon">1.23</span>,
+    icon: <span className="icon-left node_def__icon">1.23</span>,
     numberFormat: NumberFormats.decimal(),
     defaultValue: '',
   },
 
   [text]: {
-    icon: <span className="icon icon-left node_def__icon">ABC</span>,
+    icon: <span className="icon-left node_def__icon">ABC</span>,
     defaultValue: '',
   },
 
   [date]: {
     component: NodeDefDate,
-    icon: <span className="icon icon-calendar icon-left" />,
+    icon: <AppIcon name="calendar" className="icon-left" />,
     defaultValue: '',
   },
 
   [time]: {
     component: NodeDefTime,
-    icon: <span className="icon icon-clock icon-left" />,
+    icon: <AppIcon name="time" className="icon-left" />,
     defaultValue: '',
   },
 
   [boolean]: {
     component: NodeDefBoolean,
-    icon: <span className="icon icon-checkbox-checked icon-left" />,
+    icon: <AppIcon name="checkboxChecked" className="icon-left" />,
     defaultValue: '',
   },
 
   [code]: {
     component: NodeDefCode,
-    icon: <span className="icon icon-list icon-left" />,
+    icon: <AppIcon name="list" className="icon-left" />,
     defaultValue: '',
     defaultProps: (cycle) => ({
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.dropdown),
@@ -80,7 +81,7 @@ const propsUI = {
 
   [coordinate]: {
     component: NodeDefCoordinate,
-    icon: <span className="icon icon-location2 icon-left" />,
+    icon: <AppIcon name="place" className="icon-left" />,
     defaultValue: { x: '', y: '', srs: '' },
     formFieldsFn: (nodeDef) => [
       { field: valuePropsCoordinate.x, labelKey: 'surveyForm:nodeDefCoordinate.x' },
@@ -95,12 +96,12 @@ const propsUI = {
 
   [geo]: {
     component: NodeDefGeo,
-    icon: <span className="icon icon-codepen icon-left" />,
+    icon: <AppIcon name="code" className="icon-left" />,
   },
 
   [taxon]: {
     component: NodeDefTaxon,
-    icon: <span className="icon icon-leaf icon-left" />,
+    icon: <AppIcon name="taxon" className="icon-left" />,
     defaultValue: {
       taxonUuid: null,
       vernacularNameUuid: null,
@@ -122,13 +123,13 @@ const propsUI = {
 
   [file]: {
     component: NodeDefFile,
-    icon: <span className="icon icon-file-picture icon-left" />,
+    icon: <AppIcon name="fileImage" className="icon-left" />,
     validations: true,
   },
 
   [entity]: {
     component: NodeDefEntitySwitch,
-    icon: <span className="icon icon-table2 icon-left" />,
+    icon: <AppIcon name="table" className="icon-left" />,
     defaultProps: (cycle) => ({
       [NodeDef.propKeys.multiple]: true,
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
@@ -137,7 +138,7 @@ const propsUI = {
 
   [formHeader]: {
     component: NodeDefFormHeader,
-    icon: <span className="icon icon-minus icon-left" />,
+    icon: <AppIcon name="remove" className="icon-left" />,
     defaultProps: () => ({
       [NodeDef.propKeys.headerColor]: FormHeaderColor.blue,
     }),
@@ -162,10 +163,10 @@ const getEntityIcon = ({ nodeDef, cycle }) => {
   }
   // multiple entity with form layout
   if (NodeDefLayout.isRenderForm(cycle)(nodeDef)) {
-    return <span className="icon icon-files-empty icon-left" />
+    return <AppIcon name="files" className="icon-left" />
   }
   // multiple entity with table layout
-  return <span className="icon icon-table2 icon-left" />
+  return <AppIcon name="table" className="icon-left" />
 }
 
 export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false }) => (
