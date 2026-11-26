@@ -117,6 +117,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
   },
   nodeDefCoordinate: {
     coordinate: 'Координат',
+    latLong: 'Өргөрөг, Уртраг',
     srs: 'SRS',
     x: 'X',
     y: 'Y',

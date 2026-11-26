@@ -113,6 +113,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
   },
   nodeDefCoordinate: {
     coordinate: '座標',
+    latLong: '緯度, 経度',
     srs: 'SRS',
     x: 'X',
     y: 'Y',
