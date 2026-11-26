@@ -1,25 +1,5 @@
 @use '~@webapp/style/vars' as *;
 
-@keyframes app-job-monitor-inner-job-spinner-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-// reduced motion: fade the spinner instead of rotating it
-@keyframes app-job-monitor-inner-job-spinner-fade {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 .app-job-monitor {
   .modal-body {
     padding-top: 0;
@@ -82,6 +62,7 @@
         .status-icon {
           display: inline-block;
           width: 1rem;
+          vertical-align: middle;
           margin-right: 0.3rem;
           text-align: center;
 
@@ -91,14 +72,6 @@
 
           &.app-icon--close {
             color: $colorError;
-          }
-
-          &.app-icon--spinner {
-            animation: app-job-monitor-inner-job-spinner-spin 1s linear infinite;
-
-            @media (prefers-reduced-motion: reduce) {
-              animation-name: app-job-monitor-inner-job-spinner-fade;
-            }
           }
         }
       }

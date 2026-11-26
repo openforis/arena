@@ -8,7 +8,6 @@ import ArrowForward from '@mui/icons-material/ArrowForward'
 import ArrowUpward from '@mui/icons-material/ArrowUpward'
 import ArticleOutlined from '@mui/icons-material/ArticleOutlined'
 import AutoFixHighOutlined from '@mui/icons-material/AutoFixHighOutlined'
-import Autorenew from '@mui/icons-material/Autorenew'
 import BarChartOutlined from '@mui/icons-material/BarChartOutlined'
 import Block from '@mui/icons-material/Block'
 import BuildOutlined from '@mui/icons-material/BuildOutlined'
@@ -202,7 +201,6 @@ export const iconComponents = {
   shield: ShieldOutlined,
   sortAsc: North,
   sortDesc: South,
-  spinner: Autorenew,
   sum: Functions,
   tab: TabOutlined,
   table: TableChartOutlined,
