@@ -19,7 +19,7 @@ export const AssistantConversationBar = ({ title, busy }: { title: string | null
       <Button
         disabled={busy}
         iconName="arrowBack"
-        iconSize={14}
+        iconSize={18}
         label="aiAssistant.back"
         onClick={assistantPanelStore.showHome}
         showLabel={false}

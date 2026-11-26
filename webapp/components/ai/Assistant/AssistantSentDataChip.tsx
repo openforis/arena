@@ -39,7 +39,7 @@ export const AssistantSentDataChip = ({
         data-testid={TestId.aiAssistant.sentDataChip}
         type="button"
       >
-        <AppIcon name={levelIcons[level]} size={14} />
+        <AppIcon name={levelIcons[level]} size={16} />
         <span aria-hidden="true" className="ai-assistant-panel__sent-data-text">
           {label}
         </span>

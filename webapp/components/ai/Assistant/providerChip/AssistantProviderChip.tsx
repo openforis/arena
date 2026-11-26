@@ -288,7 +288,7 @@ export const AssistantProviderChip = (props: Props) => {
         title={fullLabel}
         type="button"
       >
-        <AppIcon className="ai-provider-chip__icon" name={hostingIcon} />
+        <AppIcon className="ai-provider-chip__icon" name={hostingIcon} size={18} />
         <span aria-hidden="true" className="ai-provider-chip__caret">
           ▾
         </span>

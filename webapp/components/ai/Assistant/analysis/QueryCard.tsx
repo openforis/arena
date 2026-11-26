@@ -81,7 +81,7 @@ export const QueryCard = ({ entry }: Props) => {
         <Button
           className="btn-s"
           iconName="table"
-          iconSize={14}
+          iconSize={18}
           label="aiAnalysis.queryCard.openInExplorer"
           onClick={() => show(DataExplorerState.displayTypes.table)}
           testId={TestId.aiQueryCard.openInExplorer(queryId)}
@@ -91,7 +91,7 @@ export const QueryCard = ({ entry }: Props) => {
           <Button
             className="btn-s"
             iconName="barChart"
-            iconSize={14}
+            iconSize={18}
             label="aiAnalysis.queryCard.showAsChart"
             onClick={() => show(DataExplorerState.displayTypes.chart, model.chartType)}
             testId={TestId.aiQueryCard.showAsChart(queryId)}

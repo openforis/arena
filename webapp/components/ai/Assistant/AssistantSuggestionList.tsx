@@ -27,7 +27,7 @@ export const AssistantSuggestionList = ({
       <div className="ai-assistant-panel__bar">
         <Button
           iconName="arrowBack"
-          iconSize={14}
+          iconSize={18}
           label="aiAssistant.back"
           onClick={assistantPanelStore.showHome}
           showLabel={false}

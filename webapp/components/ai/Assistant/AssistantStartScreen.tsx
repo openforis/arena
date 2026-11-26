@@ -69,7 +69,7 @@ export const AssistantStartScreen = ({
                     title={item.title || t('aiAssistant.newConversationTitle')}
                     type="button"
                   >
-                    <AppIcon name="chat" size={14} />
+                    <AppIcon name="chat" size={16} />
                     <span className="ai-assistant-panel__history-title">
                       {item.title || t('aiAssistant.newConversationTitle')}
                     </span>
@@ -102,7 +102,7 @@ export const AssistantStartScreen = ({
           className="ai-assistant-panel__home-new"
           disabled={api.busy}
           iconName="add"
-          iconSize={14}
+          iconSize={18}
           label="aiAssistant.menu.newConversation"
           onClick={api.newConversation}
           primary

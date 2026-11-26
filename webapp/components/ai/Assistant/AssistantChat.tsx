@@ -166,7 +166,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
               className="ai-assistant-panel__send"
               disabled={!input.trim() || applying}
               iconName="arrowUp"
-              iconSize={16}
+              iconSize={20}
               label="aiAssistant.send"
               onClick={onSend}
               primary
