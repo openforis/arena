@@ -22,9 +22,7 @@ export type QueryCardModel = {
  * Builds what the query card shows.
  * @param {object} params - Parameters.
  * @param {AnalysisQueryEntry} params.entry - Stored query.
- * @param {object} params.survey - The survey.
  * @param {string} params.lang - Label language.
- * @returns {QueryCardModel} The card model.
  */
 export const buildQueryCardModel = ({
   entry,

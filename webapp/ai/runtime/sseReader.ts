@@ -8,7 +8,6 @@ import SystemError, { StatusCodes } from '@core/systemError'
  * Turns the gateway SSE response into a stream of LanguageModelV4 parts; cancelling it cancels the body
  * (which aborts the request).
  * @param {Response} response - Gateway response (status 200, text/event-stream).
- * @returns {ReadableStream<LanguageModelV4StreamPart>} The parts.
  * @throws {SystemError} aiProviderUnavailable when the response has no body, or the stream ends without `[DONE]`.
  */
 export const readSseParts = (response: Response): ReadableStream<LanguageModelV4StreamPart> => {

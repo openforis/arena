@@ -11,8 +11,6 @@ const BEHAVIOUR_OPERATION_TYPES = new Set(['expression.set', 'nodeDef.update'])
 
 /**
  * Returns the changes that alter how the survey behaves: expressions, and properties such as key and category.
- * @param {ChangeSet} changeSet - Change set.
- * @returns {string[]} Operation ids.
  */
 export const getBehaviourOperationIds = (changeSet: ChangeSet): string[] =>
   changeSet.operations.filter((op) => BEHAVIOUR_OPERATION_TYPES.has(op.type)).map((op) => op.id)
@@ -20,7 +18,6 @@ export const getBehaviourOperationIds = (changeSet: ChangeSet): string[] =>
 /**
  * Returns the operations that start unselected.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
  * @param {boolean} params.compact - The change set is reviewed in the dialog (not every change is listed on the card).
  * @returns {string[]} Operation ids: the behaviour changes of a compact card, none otherwise.
  */
@@ -36,7 +33,6 @@ export const getInitialDeselectedIds = ({
  * Toggles an operation in the list of the unselected ones.
  * @param {string[]} deselected - Unselected operations.
  * @param {string} id - Operation.
- * @returns {string[]} The new list.
  */
 export const toggleDeselected = (deselected: string[], id: string): string[] =>
   deselected.includes(id) ? deselected.filter((item) => item !== id) : [...deselected, id]

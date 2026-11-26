@@ -14,10 +14,8 @@ export type MapLayerCardModel = {
  * Builds what the map layer card shows.
  * @param {object} params - Parameters.
  * @param {ProposedMapLayer} params.proposed - The proposed layer.
- * @param {object} params.survey - The survey.
  * @param {string} params.lang - Label language.
  * @param {boolean} params.canUseMap - Whether the user can open the map.
- * @returns {MapLayerCardModel} The card model.
  */
 export const getMapLayerCardModel = ({
   proposed,

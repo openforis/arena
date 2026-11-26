@@ -8,7 +8,6 @@ export type ScreenshotSizeCheck =
 /**
  * Returns the max file size to apply: the attribute's own, or the default when it is missing or not valid.
  * @param {number|null} [maxFileSizeMb] - Max file size of the attribute, in MB.
- * @returns {number} The max file size in MB.
  */
 export const getEffectiveMaxFileSizeMb = (maxFileSizeMb?: number | null): number =>
   typeof maxFileSizeMb === 'number' && Number.isFinite(maxFileSizeMb) && maxFileSizeMb > 0

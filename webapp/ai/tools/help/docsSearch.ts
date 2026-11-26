@@ -14,7 +14,6 @@ type DocsSearchInput = z.infer<typeof inputSchema>
  * Creates the docs_search tool (the index loader is injectable for tests).
  * @param {object} deps - Dependencies.
  * @param {Function} deps.loadIndex - Returns the handbook index of an interface language.
- * @returns {AiTool} The tool.
  */
 export const createDocsSearchTool = ({
   loadIndex,

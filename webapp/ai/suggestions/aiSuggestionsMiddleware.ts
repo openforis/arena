@@ -24,7 +24,6 @@ const DEFERRED_EVENTS = new Set<SuggestionEvent['type']>(['surveyInfoSaved'])
 /**
  * Returns the events of a job update: only a succeeded job is one.
  * @param {any} job - Serialized job (null when the monitor is reset).
- * @returns {SuggestionEvent[]} The events.
  */
 const getJobEvents = (job: any): SuggestionEvent[] => {
   if (!job || !JobSerialized.isSucceeded(job)) return []
@@ -35,7 +34,6 @@ const getJobEvents = (job: any): SuggestionEvent[] => {
 
 /**
  * Returns the suggestion events of an action.
- * @param {any} action - Redux action.
  * @returns {SuggestionEvent[]} The events (none for most actions).
  */
 const getEvents = (action: any): SuggestionEvent[] => {
@@ -57,7 +55,6 @@ const getEvents = (action: any): SuggestionEvent[] => {
 /**
  * Creates the middleware.
  * @param {Notify} notify - Receives the events (notifySuggestionEvent already isolates a failing subscriber).
- * @returns {Middleware} The middleware.
  */
 export const createAiSuggestionsMiddleware =
   (notify: Notify): Middleware =>

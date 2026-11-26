@@ -137,8 +137,6 @@ const extractKeyOrSummaryValue = ({
 /**
  * Extracts the values of the root key attributes of a record.
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.record - The record.
  * @param {object} [params.categoryItemsByCodeDefUuid] - Category items by code attribute definition UUID.
  * @param {string} [params.lang] - The language of the labels.
  * @returns {Array} The key values.

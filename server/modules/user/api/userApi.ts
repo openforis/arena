@@ -119,7 +119,6 @@ export const init = (app: Router) => {
 
   /**
    * Returns the UUID of the survey in the path, if the user can view it.
-   * @param {!object} req - The request.
    * @returns {Promise<string|null>} - The survey UUID or null.
    */
   const _fetchPathSurveyUuidViewable = async (req) => {

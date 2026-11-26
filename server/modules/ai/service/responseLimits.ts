@@ -27,7 +27,6 @@ export const getProviderResponseLimits = (
 
 /**
  * Wraps a response so that reading its body fails once more than `maxBytes` came through (the upstream is cancelled).
- * @param {Response} response - The response.
  * @param {number} maxBytes - Cap of the body, in bytes.
  * @returns {Response} The response itself when it has no body, else one with a capped body.
  * @throws {SystemError} aiProviderResponseTooLarge (502) when the declared length is over the cap.
@@ -65,7 +64,6 @@ export const createResponseLimitedFetch =
 
 /**
  * Reads the text of a body up to a cap (for an error body to be logged), then stops the upstream.
- * @param {Response} response - The response.
  * @param {number} maxBytes - Most bytes to read.
  * @returns {Promise<string>} The text read (empty when there is no body).
  */

@@ -14,7 +14,6 @@ const toCount = (value) => {
 
 /**
  * Reads token counts from any usage shape: v4 provider (nested `total`), AI SDK result (flat) or legacy.
- * @param {object} [usage] - Usage object.
  * @returns {{tokensIn: number, tokensOut: number}} Token counts (0 when unknown).
  */
 export const normalizeUsage = (usage) => ({
@@ -33,7 +32,6 @@ const describeContext = (ctx) =>
  * @param {number} outcome.latencyMs - Duration.
  * @param {object} [outcome.usage] - Usage, any shape (see normalizeUsage).
  * @param {Error} [outcome.error] - Error, when the call failed or was aborted.
- * @returns {void}
  */
 export const record = (
   ctx,

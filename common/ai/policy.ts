@@ -38,7 +38,6 @@ export const isAiPolicyLevel = (value: unknown): value is AiPolicyLevel =>
 
 /**
  * Returns the position of a level (off = 0 … cloud = 3).
- * @param {string|null|undefined} level - The level.
  * @returns {number} The index, or -1 when the level is unknown.
  */
 export const getPolicyLevelIndex = (level: string | null | undefined): number =>
@@ -64,15 +63,12 @@ const stricterLevel = (a: unknown, b: unknown): AiPolicyLevel => {
 
 /**
  * Returns true when record data is more permissive than the survey design (a policy the editor and the server refuse).
- * @param {AiPolicy} policy - The policy.
- * @returns {boolean} True when `data` is above `schema`.
  */
 export const isDataAboveSchema = (policy: AiPolicy): boolean =>
   getPolicyLevelIndex(policy?.data) > getPolicyLevelIndex(policy?.schema)
 
 /**
  * Lowers the data level to the schema level when it is above it (the invariant `data` <= `schema`).
- * @param {AiPolicy} policy - The policy.
  * @returns {AiPolicy} The clamped policy (a new object).
  */
 export const clampDataToSchema = (policy: AiPolicy): AiPolicy => ({
@@ -110,8 +106,6 @@ export const normalizeAiPolicy = (raw: unknown): AiPolicy => {
  * with record data not above the survey design.
  * @param {object} params - Parameters.
  * @param {AiPolicy} params.policy - Survey policy (normalized).
- * @param {AiPolicy} params.ceilings - Instance ceilings.
- * @returns {AiPolicy} The effective policy.
  */
 export const getEffectiveAiPolicy = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy }): AiPolicy =>
   clampDataToSchema({
@@ -121,9 +115,6 @@ export const getEffectiveAiPolicy = ({ policy, ceilings }: { policy: AiPolicy; c
 
 /**
  * Clamps a policy to the ceilings (used when a policy comes from another instance, e.g. survey import).
- * @param {object} params - Parameters.
- * @param {AiPolicy} params.policy - The policy.
- * @param {AiPolicy} params.ceilings - Instance ceilings.
  * @returns {AiPolicy} The clamped policy.
  */
 export const clampAiPolicy = (params: { policy: AiPolicy; ceilings: AiPolicy }): AiPolicy =>
@@ -146,7 +137,6 @@ export const isHostingAllowed = ({ effective, dataClass, hostingClass }: Hosting
 /**
  * Throws `aiPolicyRefused` (403) when the hosting class is not allowed for the data class.
  * @param {HostingCheck} check - Effective policy, data class and hosting class.
- * @returns {void}
  */
 export const assertHostingAllowed = (check: HostingCheck): void => {
   if (isHostingAllowed(check)) return
@@ -163,7 +153,6 @@ export const assertHostingAllowed = (check: HostingCheck): void => {
  * Returns the data classes whose level is above the ceiling.
  * @param {object} params - Parameters.
  * @param {AiPolicy} params.policy - Requested policy.
- * @param {AiPolicy} params.ceilings - Instance ceilings.
  * @returns {AiDataClass[]} The classes above their ceiling (empty when none).
  */
 export const findLevelsAboveCeiling = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy }): AiDataClass[] =>
@@ -174,8 +163,6 @@ export const findLevelsAboveCeiling = ({ policy, ceilings }: { policy: AiPolicy;
 /**
  * Returns true when the user can change the survey AI policy (system admin or survey administrator).
  * Delegates to canManageUserGroups today; a separate name lets the AI policy rule change on its own.
- * @param {ArenaUser} user - The user.
- * @param {ArenaSurvey} surveyInfo - The survey info.
  * @returns {boolean} True when allowed.
  */
 export const canEditSurveyAiPolicy = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>

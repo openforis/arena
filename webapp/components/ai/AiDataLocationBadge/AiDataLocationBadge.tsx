@@ -24,7 +24,6 @@ type Props = {
 
 /**
  * Shows where an AI feature's data is processed (cloud provider, organisation server, this device).
- * @param {Props} props - Props.
  * @returns {React.ReactElement|null} The badge, or null when no provider is configured.
  */
 export const AiDataLocationBadge = (props: Props) => {

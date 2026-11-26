@@ -19,7 +19,6 @@ export type CleaningRowContext = {
  * @param {object} params - Parameters.
  * @param {string} params.question - The translated question.
  * @param {CleaningRowContext} params.context - The row.
- * @returns {string} The draft.
  */
 export const buildRowContextDraft = ({
   question,

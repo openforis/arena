@@ -42,7 +42,6 @@ export const keepFile = async ({ filePath }: { filePath: string }): Promise<stri
  * @param {object} params - The parameters.
  * @param {string} params.fileId - The id of the kept file.
  * @param {Function} fn - Function receiving the local file path.
- * @returns {Promise<any>} - The result of the function.
  */
 export const withKeptFilePath = async <T>(
   { fileId }: { fileId: string },
@@ -73,7 +72,6 @@ export const keepJson = async (data: unknown): Promise<string> => {
  * Reads an object kept with keepJson.
  * @param {object} params - The parameters.
  * @param {string} params.fileId - The id of the kept file.
- * @returns {Promise<unknown>} - The kept object.
  */
 export const readKeptJson = async <T = unknown>({ fileId }: { fileId: string }): Promise<T> =>
   withKeptFilePath({ fileId }, async (filePath) => JSON.parse(await FileUtils.readFile(filePath)))
@@ -92,8 +90,6 @@ const readSurveyFileFromZip = async ({ filePath, fileUuid }): Promise<Buffer | n
  * Reads the source survey of a comparison and runs a function with it.
  * @param {SurveyCompareSourceRef} sourceRef - Reference to the source survey.
  * @param {Function} fn - Function receiving the source survey.
- * @param {any} [client] - Database client.
- * @returns {Promise<any>} - The result of the function.
  */
 export const withSource = async <T>(
   sourceRef: SurveyCompareSourceRef,

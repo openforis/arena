@@ -21,7 +21,6 @@ type Props = {
 /**
  * Buttons under an engine error (local server down, model not loaded, no engine): Retry and Open the AI settings.
  * Renders nothing for other errors.
- * @param {Props} props - Props.
  * @returns {React.ReactElement|null} The buttons.
  */
 export const AiEngineErrorActions = (props: Props) => {

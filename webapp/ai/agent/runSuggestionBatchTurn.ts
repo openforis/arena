@@ -32,11 +32,8 @@ const KEYS = 'aiAssistant.missingTextsBatch'
  * Proposes the texts on one card under the tool row.
  * @param {object} params - Parameters.
  * @param {TurnState} params.state - Turn state.
- * @param {AiToolContext} params.ctx - Tool context.
  * @param {string} params.toolCallId - Tool row.
- * @param {ChangeOperationDraft[]} params.drafts - Drafts.
  * @param {string} params.summary - Summary of the card.
- * @returns {Promise<void>} Resolves when the card is added.
  */
 const proposeTexts = async ({
   state,
@@ -69,7 +66,6 @@ const proposeTexts = async ({
  * @param {TurnState} state - Turn state.
  * @param {AiBatchStop} [stop] - Why the run ended early.
  * @param {AbortSignal} signal - Turn signal.
- * @returns {void}
  */
 const finishBatch = (state: TurnState, stop: AiBatchStop | undefined, signal: AbortSignal): void => {
   if (signal.aborted || stop?.cause === 'cancelled') state.finish('stopped')
@@ -83,9 +79,7 @@ const finishBatch = (state: TurnState, stop: AiBatchStop | undefined, signal: Ab
  * @param {object} params - Parameters.
  * @param {TurnState} params.state - Turn state.
  * @param {string} params.toolCallId - Tool row (failed, when it was started).
- * @param {unknown} params.error - Error.
  * @param {AbortSignal} params.signal - Turn signal.
- * @returns {void}
  */
 const failBatch = ({
   state,

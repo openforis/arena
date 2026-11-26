@@ -12,7 +12,6 @@ import type { SuggestionStore } from './suggestionStore'
  * @param {Function} load - Loader.
  * @param {string} id - Conversation id.
  * @param {AiLog} log - Reports the store error.
- * @returns {Promise<Conversation|null>} The conversation.
  */
 const loadSafely = async (
   load: (id: string) => Promise<Conversation | null>,
@@ -36,7 +35,6 @@ const loadSafely = async (
  * @param {Function} [params.getHeldLockNames] - Names of the Web Locks held now: a conversation whose turn lock is
  * held runs in another tab and is left alone.
  * @param {AiLog} [params.log] - Reports what could not be read.
- * @returns {Promise<void>} Resolves when done.
  */
 export const reconcileInProgress = async ({
   store,

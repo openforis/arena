@@ -54,8 +54,6 @@ const readingWithoutData = `Reading results:
 /**
  * Builds the system prompt of the Analysis area.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {string} params.cycle - Current cycle key.
  * @param {string} params.lang - Survey language used for the labels.
  * @param {string} params.uiLang - Language of the user's interface (answer language).
  * @param {string|null} [params.viewDescription] - Current view, as the assistant describes it.

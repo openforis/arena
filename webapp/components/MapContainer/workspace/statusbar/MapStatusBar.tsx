@@ -19,8 +19,6 @@ type MapViewState = { center: LatLng; zoom: number; bounds: LatLngBoundsLiteral 
 
 /**
  * Reads the centre, zoom and bounds of the map.
- * @param {LeafletMap} map - The map.
- * @returns {MapViewState} The view.
  */
 const readView = (map: LeafletMap): MapViewState => {
   const { lat, lng } = map.getCenter()
@@ -35,7 +33,6 @@ const readView = (map: LeafletMap): MapViewState => {
 /**
  * Formats a zoom level with at most one decimal.
  * @param {number} zoom - The zoom level.
- * @returns {string} The text.
  */
 const formatZoom = (zoom: number): string => String(Math.round(zoom * 10) / 10)
 
@@ -61,7 +58,6 @@ export const MapStatusBar = ({ records }: { records?: MapWorkspaceRecords }): Re
     if (!attributionTarget) return undefined
     /**
      * Copies the attribution text into the title.
-     * @returns {void}
      */
     const syncTitle = (): void => {
       attributionTarget.setAttribute('title', attributionTarget.textContent ?? '')

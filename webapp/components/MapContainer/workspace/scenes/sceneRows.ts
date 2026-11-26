@@ -16,7 +16,6 @@ export const SCENE_INDEX_COLUMNS = [
  *
  * @param {SceneIndexRow} row - Decoded row.
  * @param {string[]} columns - Columns to keep.
- * @returns {SceneIndexRow} Compact row.
  */
 export const compactSceneRow = (row: SceneIndexRow, columns: string[]): SceneIndexRow => {
   const compact: SceneIndexRow = {}
@@ -33,7 +32,6 @@ export const compactSceneRow = (row: SceneIndexRow, columns: string[]): SceneInd
 /**
  * Returns a finite number clamped to 0–100, or null when the value is not a finite number.
  *
- * @param {unknown} value - Raw value.
  * @returns {number|null} Percentage or null.
  */
 const toPercent = (value: unknown): number | null => {
@@ -44,7 +42,6 @@ const toPercent = (value: unknown): number | null => {
 /**
  * Parses `eo:cloud_cover`.
  *
- * @param {unknown} value - Raw value.
  * @returns {number|null} Cloud cover 0–100, or null when unknown.
  */
 export const parseCloudCover = (value: unknown): number | null => toPercent(value)
@@ -64,7 +61,6 @@ export const parseCoverage = (nodata: unknown): number | null => {
  * Converts a Date, ISO string or epoch milliseconds into a valid Date.
  *
  * @param {unknown} value - Raw datetime.
- * @returns {Date|null} Valid date or null.
  */
 const toValidDate = (value: unknown): Date | null => {
   let date: Date | null = null
@@ -76,7 +72,6 @@ const toValidDate = (value: unknown): Date | null => {
 /**
  * Tells whether a value is a non-empty string.
  *
- * @param {unknown} value - Value.
  * @returns {boolean} True for a non-empty string.
  */
 const isFilledString = (value: unknown): value is string => typeof value === 'string' && value !== ''

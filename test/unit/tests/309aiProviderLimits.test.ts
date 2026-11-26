@@ -25,7 +25,6 @@ const storedProvider = (n: number): any => ({
 /**
  * Builds the stored AI prefs with the number of providers.
  * @param {number} count - Number of providers.
- * @returns {object} The AI prefs.
  */
 const aiPrefsWith = (count: number): any => ({
   accessLevel: 1,

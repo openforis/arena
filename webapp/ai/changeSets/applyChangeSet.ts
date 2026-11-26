@@ -140,7 +140,6 @@ const persistGroup = async (group: Group, changeSet: ChangeSet, deps: ApplierDep
  * Applies the operations of one node definition, unless an earlier failure or stop skips them.
  * @param {object} params - Parameters.
  * @param {Group} params.group - Operations of the node definition.
- * @param {ChangeSet} params.changeSet - Change set.
  * @param {ApplierDeps} params.deps - Store access and save actions.
  * @param {Map} params.results - Results by operation.
  * @param {Set<string>} params.appliedCreates - Node definitions created so far.
@@ -205,7 +204,6 @@ const applyGroups = async (
  * Applies the selected operations: refused while the designer has an unsaved edit, conflicts re-checked against
  * the latest survey, then one save per node definition, in proposal order, then one request for the category labels.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
  * @param {string[]} params.operationIds - Selected operations.
  * @param {ApplierDeps} params.deps - Store access and the designer's save actions.
  * @param {Function} [params.onProgress] - Operations done and total, after each save.

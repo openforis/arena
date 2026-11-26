@@ -35,7 +35,6 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
 
 /**
  * Returns the badge of a group.
- * @param {FeatureGroup} group - Group.
  * @returns {DataBadgeKind} Its data class, or none.
  */
 export const getDataBadgeKind = (group: FeatureGroup): DataBadgeKind => group.dataClass ?? 'none'

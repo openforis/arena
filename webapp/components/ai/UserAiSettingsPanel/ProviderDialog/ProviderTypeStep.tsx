@@ -25,7 +25,6 @@ type Props = {
 
 /**
  * Step 1 of "Add provider": the provider types in two groups; a click opens step 2.
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The step.
  */
 export const ProviderTypeStep = ({ groups, onChoose }: Props) => {

@@ -67,8 +67,6 @@ const ApplyConfirmation = ({
   /**
    * Escape cancels the confirmation, not the assistant panel behind it; on the buttons, which hold the focus (the
    * confirmation itself is not focusable).
-   * @param {React.KeyboardEvent} event - Key event.
-   * @returns {void} Nothing.
    */
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key !== 'Escape') return
@@ -116,7 +114,6 @@ const ApplyConfirmation = ({
  * opens the review dialog. Apply all applies the selection (the changes of expressions and properties start
  * unselected); until the dialog was opened it asks to confirm, with the selection counted by kind.
  * @param {object} props - Props.
- * @param {ChangeSetCardState} props.cardState - Card state.
  * @param {ReviewItem[]} props.items - Changes of the card.
  * @param {ChangeSetSelection} props.selection - Selection and actions.
  * @param {boolean} props.busy - An answer is running (Apply waits for it).

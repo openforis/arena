@@ -34,7 +34,6 @@ const isPlainHttp = (url: string): boolean => {
  * @param {string} params.baseUrl - Tested URL.
  * @param {string[]} params.allowlist - Org-hosted base URLs.
  * @param {string} params.pageProtocol - Protocol of the Arena page (`window.location.protocol`).
- * @returns {LocalServerTestView} The view.
  */
 export const getLocalServerTestView = ({
   probe,

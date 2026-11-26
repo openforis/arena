@@ -47,7 +47,6 @@ const SectionToggle = (props: SectionToggleProps) => {
 /**
  * Titled container grouping related dashboard content; collapsible when `onToggle` is given.
  *
- * @param {DashboardSectionProps} props - The component props.
  * @returns {React.ReactElement} The section.
  */
 export const DashboardSection = (props: DashboardSectionProps) => {

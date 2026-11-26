@@ -9,7 +9,6 @@ import * as Survey from '@core/survey/survey'
 /**
  * Converts a Collect XPath expression into a valid JS expression.
  * @param {object} params - Parameters object.
- * @param {!Survey} [params.survey] - The survey.
  * @param {!NodeDef} [params.nodeDefCurrent] - The current node definition being evaluated.
  * @param {!string} [params.expression] - The expression to convert.
  * @param {boolean} [params.advancedExpressionEditor] - The generated expression will be ready for the 'advanced' expression editor.

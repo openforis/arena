@@ -25,7 +25,6 @@ export const SETTLE_TIMEOUT_MS = 10_000
  * @param {Set<Promise<unknown>>} pending - The tracked promises (it changes while waiting).
  * @param {number} timeoutMs - Longest wait.
  * @param {AiLog} log - Called when the time is up.
- * @returns {Promise<void>} Resolves when none is pending or when the time is up; never rejects.
  */
 const settleWithin = async (pending: Set<Promise<unknown>>, timeoutMs: number, log: AiLog): Promise<void> => {
   if (pending.size === 0) return
@@ -51,7 +50,6 @@ const settleWithin = async (pending: Set<Promise<unknown>>, timeoutMs: number, l
  * @param {object} [options] - Options.
  * @param {number} [options.settleTimeoutMs] - Longest wait of `settle`.
  * @param {AiLog} [options.log] - Receives the warning when `settle` times out.
- * @returns {AssistantTurnRegistry} The registry.
  */
 export const createAssistantTurnRegistry = ({
   settleTimeoutMs = SETTLE_TIMEOUT_MS,
@@ -92,12 +90,10 @@ export const assistantTurnRegistry = createAssistantTurnRegistry()
 
 /**
  * Aborts every running assistant turn for a reset (logout): their last state is saved but they no longer update the UI.
- * @returns {void}
  */
 export const abortAssistantTurns = (): void => assistantTurnRegistry.abortAll()
 
 /**
  * Waits for the tracked turns and saves (an aborted turn ends with a final save), but not longer than the timeout.
- * @returns {Promise<void>} Resolves when none is pending or the time is up.
  */
 export const settleAssistantSaves = (): Promise<void> => assistantTurnRegistry.settle()

@@ -19,8 +19,6 @@ const reportRows = (page: Page) =>
 
 /**
  * Reads the validation report messages as [path, message] pairs (sorted).
- * @param {Page} page - The page.
- * @returns {Promise<Message[]>} - The messages.
  */
 const readMessages = async (page: Page): Promise<Message[]> => {
   const messageCells = page.getByTestId(TestId.validationReport.cellMessages)
@@ -35,9 +33,7 @@ const readMessages = async (page: Page): Promise<Message[]> => {
 /**
  * Opens the validation report and waits for it to contain exactly the specified messages
  * (record validation is updated asynchronously, so the report is polled).
- * @param {Page} page - The page.
  * @param {Message[]} expected - Expected messages.
- * @returns {Promise<void>} - Resolves when the report contains the expected messages.
  */
 const expectReportMessages = async (page: Page, expected: Message[]): Promise<void> => {
   await expect

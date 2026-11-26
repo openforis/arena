@@ -19,7 +19,6 @@ type Props = {
 
 /**
  * Overlay showing a survey file (preloaded map layer, area of interest), downloaded when the overlay is checked.
- * @param {Props} props - The props.
  * @returns {React.ReactElement} The overlay.
  */
 export const SurveyFileLayer = (props: Props) => {

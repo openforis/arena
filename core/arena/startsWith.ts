@@ -6,8 +6,6 @@ import { _curry2 } from './internal/_curry2'
  *
  * @param {*} prefix - The prefix (string or array).
  * @param {*} list - The string or array to check.
- *
- * @returns {boolean} - The result.
  */
 export const startsWith = _curry2((prefix: any, list: any): boolean =>
   typeof list === 'string' && typeof prefix === 'string'

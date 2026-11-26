@@ -31,7 +31,6 @@ import * as TaxonomyValidator from '../taxonomyValidator'
  * or invalid names (taxonomy name or extra prop names).
  * @param {!string} key - The key of the taxonomy prop.
  * @param {unknown} value - The value of the taxonomy prop.
- * @returns {void}
  */
 export const checkTaxonomyProp = (key: string, value: unknown) => {
   if (key === Taxonomy.keysProps.vernacularLanguageCodes) {
@@ -52,7 +51,6 @@ export const checkTaxonomyProp = (key: string, value: unknown) => {
 /**
  * Throws a bad request error if the taxonomy has invalid vernacular language codes or extra prop names.
  * @param {!object} taxonomy - The taxonomy to check.
- * @returns {void}
  */
 export const checkTaxonomy = (taxonomy: ArenaTaxonomy) => {
   for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(taxonomy)) {
@@ -146,7 +144,6 @@ export const insertTaxa = ({
  * @param {!number} params.sourceSurveyId - The id of the survey the taxonomy is cloned from.
  * @param {!string} params.sourceTaxonomyUuid - The uuid of the taxonomy to clone.
  * @param {!number} params.targetSurveyId - The id of the survey the taxonomy is cloned into.
- * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<Taxonomy>} - The cloned taxonomy.
  */
 export const cloneTaxonomyFromSurvey = (

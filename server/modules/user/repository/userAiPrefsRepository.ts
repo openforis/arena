@@ -21,7 +21,6 @@ export type AiPrefsUpdate = (
 /**
  * Reads the stored AI prefs of a user.
  * @param {object} params - Parameters.
- * @param {string} params.userUuid - User uuid.
  * @param {boolean} [params.forUpdate] - Lock the user row until the end of the transaction (`FOR UPDATE`).
  * @param {object} [client] - Database client (a transaction when `forUpdate` is true).
  * @returns {Promise<object|null>} The AI prefs, or null when the user has none.
@@ -38,7 +37,6 @@ export const readAiPrefs = (
 
 /**
  * Reads the stored AI prefs of every user that has some.
- * @param {object} [client] - Database client.
  * @returns {Promise<Array<{userUuid: string, aiPrefs: object}>>} The AI prefs and their user.
  */
 export const readAllAiPrefs = (client: Queryable = db): Promise<{ userUuid: string; aiPrefs: StoredAiPrefs }[]> =>
@@ -47,10 +45,7 @@ export const readAllAiPrefs = (client: Queryable = db): Promise<{ userUuid: stri
 /**
  * Replaces the stored AI prefs of a user, atomically: no other pref is read or written.
  * @param {object} params - Parameters.
- * @param {string} params.userUuid - User uuid.
  * @param {object} params.aiPrefs - AI prefs to store.
- * @param {object} [client] - Database client.
- * @returns {Promise<void>} Resolves when stored.
  */
 export const writeAiPrefs = async (
   { userUuid, aiPrefs }: { userUuid: string; aiPrefs: StoredAiPrefs },
@@ -70,7 +65,6 @@ export const writeAiPrefs = async (
  * @param {object} params - Parameters.
  * @param {string} params.userUuid - The user whose own records are left out.
  * @param {string[]} params.envelopes - Envelopes to look for.
- * @param {object} [client] - Database client.
  * @returns {Promise<string[]>} The envelopes found in the record of another user.
  */
 export const findEnvelopesOfOtherUsers = async (
@@ -95,10 +89,8 @@ export const findEnvelopesOfOtherUsers = async (
  * Changes the AI prefs of a user from their latest stored value: reads them with the row locked, applies the change
  * and stores the result in one transaction. The change must not wait for the network: the row stays locked meanwhile.
  * @param {object} params - Parameters.
- * @param {string} params.userUuid - User uuid.
  * @param {Function} params.update - Receives the stored AI prefs (null when none) and returns the ones to store, or
  *   null to keep the stored ones (nothing is written then).
- * @param {object} [client] - Database client.
  * @returns {Promise<object|null>} The AI prefs as stored after the update (null when the user has none).
  */
 export const updateAiPrefs = (

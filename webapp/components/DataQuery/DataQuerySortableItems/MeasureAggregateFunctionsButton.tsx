@@ -17,7 +17,6 @@ type Props = {
 
 /**
  * Menu to pick the aggregate functions (default and custom ones) of a measure; it also opens the custom functions editor.
- * @param {Props} props - The component props.
  * @returns {React.ReactElement|null} - The menu button, or null for the entity count measure (not editable).
  */
 export const MeasureAggregateFunctionsButton = (props: Props) => {

@@ -78,7 +78,6 @@ const validateGlossary = (glossary: AiTranslationGlossaryEntry[]): void => {
  * @param {string[]} params.targetLangs - Target language codes.
  * @param {AiTranslationItem[]} params.items - Items to translate.
  * @param {AiTranslationGlossaryEntry[]} [params.glossary] - Existing translations to reuse.
- * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<AiTranslationResult>} The translations by item id.
  */
 export const translateItems = async ({

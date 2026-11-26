@@ -118,7 +118,6 @@ const _checkSurveyProps = (props: Partial<ArenaSurveyProps>) => {
  * @param {boolean} [params.createRootEntityDef] - Whether to create the root entity definition.
  * @param {boolean} [params.system] - Whether the creation comes from a real user or it's a system activity (survey import).
  * @param {boolean} [params.updateUserPrefs] - Whether to update the user preferred survey after the creation.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<Survey>} - The newly created survey object.
  */
 export const insertSurvey = async (
@@ -277,7 +276,6 @@ export const {
 
 /**
  * Fetches the id and app version of every survey.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
  */
 export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
@@ -285,8 +283,6 @@ export const fetchSurveyIdsAndAppVersions = (client: DbClient = db) =>
 
 /**
  * Returns true if the per-survey data migration of the given survey hasn't completed yet.
- * @param {!number} surveyId - The survey ID.
- * @param {DbClient} [client] - The database client.
  * @returns {Promise<boolean>} - False if the survey doesn't exist.
  */
 export const isSurveyDataMigrationPendingById = async (surveyId: number, client: DbClient = db) => {
@@ -297,8 +293,6 @@ export const isSurveyDataMigrationPendingById = async (surveyId: number, client:
 /**
  * Throws a service-unavailable SystemError if the given survey's per-survey data migration hasn't
  * completed yet, i.e. its stored app version is older than the latest survey data migration version.
- * @param {object} surveyInfo - The survey info object.
- * @returns {void}
  */
 const assertSurveyDataMigrated = (surveyInfo: ArenaSurvey) => {
   const surveyId = Survey.getId(surveyInfo)
@@ -569,10 +563,8 @@ const _fetchSurveysWithCounts = async ({
 /**
  * Fetches the info of the surveys visible to the specified user.
  * @param {object} params - The parameters.
- * @param {import('@openforis/arena-core').ArenaUser} params.user - The user.
  * @param {boolean} [params.draft] - Whether to fetch the draft props.
  * @param {boolean} [params.template] - Whether to fetch templates instead of surveys.
- * @param {number} [params.offset] - The offset.
  * @param {number} [params.limit] - The max number of surveys to fetch.
  * @param {string} [params.lang] - The language used to sort by label.
  * @param {string} [params.search] - The text to search.
@@ -803,10 +795,7 @@ export const unpublishSurveyProps = (surveyId: number, client: DbClient = db) =>
 /**
  * Updates the app version associated to the specified survey.
  * @param {object} params - The update parameters.
- * @param {number} params.surveyId - The survey id.
  * @param {string} params.version - The app version to associate to the survey.
- * @param {DbClient} [client] - The database client.
- * @returns {Promise<null>} - The result promise.
  */
 export const updateSurveyAppVersion = (
   { surveyId, version }: { surveyId: number; version: string },

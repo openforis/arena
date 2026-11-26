@@ -23,7 +23,6 @@ export type AnalysisQueryStore = {
  * @param {object} [params.queries] - Queries already in the conversation, by id.
  * @param {Function} [params.onChange] - Called with all the queries after each addition (to save the conversation).
  * @param {Function} [params.now] - Clock (ISO string).
- * @returns {AnalysisQueryStore} The store.
  */
 export const createAnalysisQueryStore = ({
   queries = {},

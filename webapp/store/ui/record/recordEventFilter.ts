@@ -67,7 +67,6 @@ export const mergeValidationsOfOpenRecord = (
  * Tells whether a socket event belongs to the open record (events without record uuid are accepted).
  * @param {object} params - The parameters.
  * @param {string} [params.recordUuid] - The record uuid carried by the event.
- * @param {string|null} [params.openRecordUuid] - The open record uuid.
  * @returns {boolean} True when the event can be applied to the open record.
  */
 export const isEventOfOpenRecord = ({

@@ -9,9 +9,6 @@ const VIEW_BOUNDS_DEBOUNCE_MS = 800
 
 /**
  * Returns the bounds of the map view, updated 800 ms after the view stops moving.
- *
- * @param {L.Map} map - Map.
- * @returns {GeoBounds|null} View bounds.
  */
 export const useMapViewBounds = (map: L.Map): GeoBounds | null => {
   const [bounds, setBounds] = useState<GeoBounds | null>(() => readViewBounds(map))
@@ -20,8 +17,6 @@ export const useMapViewBounds = (map: L.Map): GeoBounds | null => {
     let timer: ReturnType<typeof setTimeout> | null = null
     /**
      * Restarts the debounce timer.
-     *
-     * @returns {void}
      */
     const onMoveEnd = (): void => {
       if (timer) clearTimeout(timer)

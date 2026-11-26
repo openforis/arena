@@ -10,8 +10,6 @@ import { CleaningI18n, getRowMessages, getRowRecordKeys } from './validationRows
 /**
  * Returns true when the user can edit the record of a report row (same check as the report's row icon).
  * @param {object} params - Parameters.
- * @param {object} params.surveyInfo - Survey info.
- * @param {object} params.user - The user.
  * @param {object} params.row - The report row.
  * @returns {boolean} Whether the record is editable.
  */
@@ -27,10 +25,7 @@ const canEditRowRecord = ({ surveyInfo, user, row }: { surveyInfo: any; user: an
 /**
  * Converts validation report rows into the items returned to the model.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {object[]} params.rows - Report rows.
- * @param {object} params.user - The user.
- * @param {CleaningI18n} params.i18n - Translator.
  * @param {string} params.lang - Survey language.
  * @returns {object[]} The items.
  */

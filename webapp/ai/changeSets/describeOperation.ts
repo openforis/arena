@@ -21,7 +21,6 @@ const findName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
 /**
  * Returns the name of a category of the survey.
  * @param {string} uuid - Category uuid.
- * @param {object} survey - Survey.
  * @returns {string} The name (the uuid when the category is gone).
  */
 const findCategoryName = (uuid: string, survey: any): string => {
@@ -31,10 +30,6 @@ const findCategoryName = (uuid: string, survey: any): string => {
 
 /**
  * Describes what an operation changes, e.g. "`tree_height` label (fr)" or "new text `notes`".
- * @param {ChangeOperation} op - Operation.
- * @param {object} context - Context.
- * @param {ChangeSet} context.changeSet - Its change set.
- * @param {object} context.survey - Survey.
  * @returns {string} The description.
  */
 export const describeOperation = (
@@ -54,8 +49,6 @@ export const describeOperation = (
 /**
  * Summarizes the results of an Apply for the model.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - Change set.
- * @param {OperationResult[]} params.results - Results.
  * @param {object} params.survey - Survey after the Apply.
  * @returns {string} E.g. "Applied 3 of 4 operations; `tree_height` label (fr): conflict (valueChanged)."
  */

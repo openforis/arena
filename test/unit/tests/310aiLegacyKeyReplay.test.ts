@@ -13,7 +13,6 @@ const ATTACKER_ENDPOINT = 'https://attacker.example/v1'
 /**
  * Builds a stored account provider.
  * @param {object} fields - Fields to override.
- * @returns {object} The provider.
  */
 const storedProvider = (fields: Record<string, unknown>): any => ({
   id: 'acct:legacy',

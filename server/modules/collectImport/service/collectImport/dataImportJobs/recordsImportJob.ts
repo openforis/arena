@@ -442,8 +442,6 @@ export default class RecordsImportJob extends Job {
 
   /**
    * Evaluates all record entities children applicability and stores the updated nodes.
-   * @param {!Survey} survey - The survey object.
-   * @param {!Record} record - The record object.
    * @param {!User} user - The user performing the import (used to evaluate user-dependent expressions).
    * @returns {Promise<null>} - The updated record (promise).
    */

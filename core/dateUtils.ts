@@ -112,9 +112,6 @@ export const isValidTime = (hour: unknown = '', minutes: unknown = '', seconds: 
   return Number(seconds) >= 0 && Number(seconds) < 60
 }
 
-/**
- * Check if a date string is valid for the given format.
- */
 export const isValidDateInFormat = (dateStr: string, format: string): boolean => {
   const parsed = parse(dateStr, format as any)
   return isValidDateObject(parsed)

@@ -35,7 +35,6 @@ const KEY_BY_STATUS: Record<number, string> = {
 /**
  * Error key used when the error body has no AI key (e.g. proxy pages, auth middleware errors).
  * @param {number} status - HTTP status.
- * @returns {string} The error key.
  */
 const getErrorKeyForHttpStatus = (status: number): string => KEY_BY_STATUS[status] ?? 'aiProviderUnavailable'
 
@@ -91,7 +90,6 @@ const toHttpError = async (response: Response): Promise<SystemError> => {
  * @param {number} [params.surveyId] - Survey (required for survey-scoped features).
  * @param {string} params.providerId - Provider the server calls (`acct:…` or `arena-default`).
  * @param {FetchLike} params.fetchImpl - Authorized fetch.
- * @returns {LanguageModelV4} The model.
  */
 export const createGatewayModel = ({
   feature,

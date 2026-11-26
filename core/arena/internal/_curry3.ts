@@ -52,7 +52,6 @@ const _applyThreeArgs = ({ fn, f3, a, b, c }: { fn: AnyFn; f3: AnyFn; a: unknown
  * Optimized internal three-arity curry function.
  *
  * @private
- * @param {Function} fn - The function to curry.
  * @returns {Function} The curried function.
  */
 export const _curry3 = (fn: AnyFn) =>

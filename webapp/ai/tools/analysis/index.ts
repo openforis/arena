@@ -12,7 +12,6 @@ import { createRunQueryTools } from './runQuery'
  * Creates the tools of the analysis area.
  * @param {object} params - Parameters.
  * @param {AnalysisApi} params.api - Analysis API.
- * @returns {AiTool[]} The tools.
  */
 export const createAnalysisTools = ({ api }: { api: AnalysisApi }): AiTool<any, unknown>[] => [
   listEntitiesTool,

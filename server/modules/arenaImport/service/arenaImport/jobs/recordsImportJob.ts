@@ -16,7 +16,6 @@ const NODES_INSERT_BATCH_SIZE = 10000
 /**
  * Updates the record modified date using the max modified date of the nodes.
  *
- * @param {!object} record - The record object.
  * @returns {object} - The modified record.
  */
 const prepareRecordSummaryToStore = (record: ArenaRecord) => {

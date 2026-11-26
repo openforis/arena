@@ -14,7 +14,6 @@ import type {
  * Builds the action Geoman's pm:change produces.
  * @param {LatLngPair[]} vertices - The vertices of the working layer.
  * @param {LatLngPair[]} latLngs - The event lat/lngs (vertices plus the cursor when it moved).
- * @returns {MeasureAction} The change action.
  */
 const change = (vertices: LatLngPair[], latLngs: LatLngPair[] = vertices): MeasureAction => ({
   type: 'change',

@@ -73,8 +73,6 @@ const prependPreamble = (rest: { role: ChatMessage['role']; text: string }[], pr
 
 /**
  * Converts the AI SDK prompt into chat messages; system content is prepended to the first user message.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
- * @returns {ChatMessage[]} The chat messages.
  */
 export const vercelAiSdkMessagesFromPrompt = (prompt: LanguageModelV4Prompt): ChatMessage[] => {
   if (!Array.isArray(prompt)) return []
@@ -273,7 +271,6 @@ const createPartsStream = ({
  * @param {FetchImpl} [cfg.fetchImpl] - Fetch implementation (tests).
  * @param {VercelAiSdkLimits} [cfg.limits] - Caps on one frame and on an error body (default: AiLimits.provider*, raised by
  *   AI_MAX_OUTPUT_TOKENS). The cap on the whole answer is on the fetch (see providerRegistry).
- * @returns {LanguageModelV4} The model.
  */
 export const createVercelAiSdkModel = ({
   baseUrl,

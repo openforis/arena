@@ -8,7 +8,6 @@ import { isRecordEditOperation, type RecordAttributeUpdateOperation, type Record
  * Converts a result of the endpoint into the result of an operation.
  * @param {string} id - Operation id.
  * @param {RecordEditResult} [result] - Endpoint result.
- * @returns {OperationResult} The operation result.
  */
 const toOperationResult = (id: string, result?: RecordEditResult): OperationResult => {
   if (!result) return { id, status: 'failed', message: 'appErrors:generic', params: { text: 'no result' } }
@@ -20,7 +19,6 @@ const toOperationResult = (id: string, result?: RecordEditResult): OperationResu
  * Returns the failed result of a request error: the server's message key, or a network error.
  * @param {string} id - Operation id.
  * @param {unknown} error - The axios error.
- * @returns {OperationResult} The result.
  */
 export const toChunkErrorResult = (id: string, error: any): OperationResult => {
   const data = error?.response?.data
@@ -63,7 +61,6 @@ const applyChunk = async ({
 /**
  * Applies the selected edits of a record-edit change set.
  * @param {object} params - Parameters.
- * @param {ChangeSet} params.changeSet - The change set.
  * @param {string[]} params.operationIds - Selected edits.
  * @param {string} params.cycle - Current survey cycle (used when the edits carry none).
  * @param {number} params.timezoneOffset - Browser timezone offset.

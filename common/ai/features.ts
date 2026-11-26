@@ -194,7 +194,6 @@ export const getAiFeature = (key: string): AiFeatureDef | null =>
 /**
  * Returns true when the browser may call the model for the given feature through the gateway.
  * @param {string} key - Feature key.
- * @returns {boolean} Whether the feature is a gateway feature.
  */
 export const isGatewayFeature = (key: string): boolean => getAiFeature(key)?.gateway === true
 
@@ -231,14 +230,11 @@ export const isAiDataClass = (value: unknown): value is AiDataClass =>
 
 /**
  * Returns the level of a data class (schema 0, data 1).
- * @param {AiDataClass} dataClass - The data class.
- * @returns {number} The level.
  */
 export const getAiDataClassLevel = (dataClass: AiDataClass): number => dataClassLevels[dataClass]
 
 /**
  * Returns the highest of the given data classes.
- * @param {...AiDataClass} dataClasses - Data classes.
  * @returns {AiDataClass} The highest class, schema when none is given.
  */
 export const getMaxAiDataClass = (...dataClasses: AiDataClass[]): AiDataClass =>

@@ -23,7 +23,6 @@ const PLAIN_TEXT = { interpolation: { escapeValue: false } }
 /**
  * Adds scene layers (overlay or base map) to the overlay registry, so the Layers tab lists them.
  *
- * @param {L.Map} map - Map.
  * @returns {SceneLayersState} Pending ids and the add action.
  */
 export const useSceneLayers = (map: L.Map): SceneLayersState => {
@@ -90,7 +89,6 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
    * Starts loading a scene layer; failures are reported by the loader.
    *
    * @param {AddSceneLayerParams} params - Scene, band mix and base map flag.
-   * @returns {void}
    */
   const addSceneLayer = useCallback(
     (params: AddSceneLayerParams): void => {

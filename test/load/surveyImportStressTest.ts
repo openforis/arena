@@ -124,7 +124,6 @@ export const pollJobUntilTerminal = async ({
  * @param params.index - Index of this request within the run (for reporting).
  * @param params.jobTimeoutMs - Max time to wait for the job to finish.
  * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns A result entry.
  */
 export const runSingleImport = async ({
   baseUrl,
@@ -204,7 +203,6 @@ export const runSingleImport = async ({
  * @param params.index - Index of this request within the run (for reporting).
  * @param params.jobTimeoutMs - Max time to wait for the job to finish.
  * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns A result entry.
  */
 export const runSingleUserImport = async ({
   baseUrl,
@@ -334,7 +332,6 @@ export const cleanupUsers = async ({
 
 /**
  * CLI entry point: parses config, runs the concurrent import burst, reports, and cleans up.
- * @returns Resolves when the run is complete; sets process.exitCode on failure.
  */
 export const main = async (): Promise<void> => {
   let config: ParseConfigResult

@@ -26,7 +26,6 @@ beforeAll(async () => {
 /**
  * Builds the card state of three label operations: species 1, land_use 3, species 1.2.
  * @param {object} [extra] - Results or discarded flag.
- * @returns {ChangeSetCardState} The card state.
  */
 const cardOf = (extra: Partial<ChangeSetCardState> = {}): ChangeSetCardState => ({
   changeSet: categoryLabelChangeSet([

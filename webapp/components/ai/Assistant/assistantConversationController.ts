@@ -151,7 +151,6 @@ type Selection = { scope: AssistantConversationScope; conversationId: string | n
  * Returns the conversation of the state when it is the selected one (a stale one, or one still loading, is not shown).
  * @param {AssistantConversationState} state - Controller state.
  * @param {string|null} conversationId - Conversation selected in the panel.
- * @returns {Conversation|null} The shown conversation.
  */
 export const selectShownConversation = (
   state: AssistantConversationState,
@@ -161,8 +160,6 @@ export const selectShownConversation = (
 
 /**
  * Returns the key of a scope (history and the provider pick belong to it).
- * @param {AssistantConversationScope} scope - Scope.
- * @returns {string} The key.
  */
 const toScopeKey = ({ userUuid, surveyId, area }: AssistantConversationScope): string =>
   `${userUuid}|${surveyId}|${area}`
@@ -185,7 +182,6 @@ const requestFrame = (callback: () => void): (() => void) => {
  * Creates the conversation of a first message. A Cleaning conversation has record content from its first turn, so
  * it starts as `data`: the engine is selected for `data` already for that turn.
  * @param {AssistantConversationScope} scope - User, survey and area.
- * @returns {Conversation} The new conversation.
  */
 const createNewConversation = ({ userUuid, surveyId, area }: AssistantConversationScope): Conversation => {
   const created = createConversation({ userUuid, surveyId, area })
@@ -197,7 +193,6 @@ const createNewConversation = ({ userUuid, surveyId, area }: AssistantConversati
 /**
  * Creates the controller of the panel's conversation.
  * @param {AssistantConversationDeps} deps - The store, the panel, the registry and the app services.
- * @returns {AssistantConversationController} The controller.
  */
 export const createAssistantConversationController = (
   deps: AssistantConversationDeps
@@ -220,7 +215,6 @@ export const createAssistantConversationController = (
   /**
    * Merges changes into the state and notifies the listeners.
    * @param {Partial<AssistantConversationState>} changes - State changes.
-   * @returns {void}
    */
   const set = (changes: Partial<AssistantConversationState>) => {
     state = { ...state, ...changes }
@@ -304,7 +298,6 @@ export const createAssistantConversationController = (
 
   /**
    * Loads the selected conversation, unless it is the one in memory.
-   * @returns {void}
    */
   const loadSelection = () => {
     loadToken += 1
@@ -621,7 +614,6 @@ export const createAssistantConversationController = (
   /**
    * Reads a conversation by id: the one in memory, or the stored one of the user of the panel.
    * @param {string} id - Conversation id.
-   * @returns {Promise<Conversation|null>} The conversation.
    */
   const readConversation = async (id: string): Promise<Conversation | null> => {
     if (state.conversation?.id === id) return newerThanStored(state.conversation)
@@ -634,7 +626,6 @@ export const createAssistantConversationController = (
    * Runs an Apply or Discard of a card unless another one runs (also blocks new turns meanwhile). It is tracked, so
    * logout waits for the results to be saved.
    * @param {Function} action - Receives the conversation id and the registry generation.
-   * @returns {Promise<void>} Resolves when done.
    */
   const runCardAction = async (action: (id: string, generation: number) => Promise<void>) => {
     const id = getShown()?.id

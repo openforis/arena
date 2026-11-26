@@ -21,15 +21,12 @@ export type LocalProvider = {
 
 /**
  * Returns the localStorage key of the user's local providers.
- * @param {string} userUuid - User UUID.
- * @returns {string} The key.
  */
 export const getLocalProvidersKey = (userUuid: string): string => `arena.ai.localProviders.${userUuid}`
 
 /**
  * Returns the base URL to store: trimmed, without trailing slashes, http(s) only, without credentials, query or
  * fragment, at most 2048 chars.
- * @param {unknown} value - Raw value.
  * @returns {string|null} The URL, or null when it is not a plain http(s) URL.
  */
 export const normalizeLocalProviderBaseUrl = (value: unknown): string | null => {
@@ -43,7 +40,6 @@ export const normalizeLocalProviderBaseUrl = (value: unknown): string | null => 
  * Returns the provider when the stored entry is valid. An entry whose address is text but not a plain http(s) URL is
  * kept, flagged addressInvalid; an entry without an address text is dropped.
  * @param {unknown} input - Raw entry.
- * @returns {LocalProvider|null} The provider, or null.
  */
 const normalizeLocalProvider = (input: unknown): LocalProvider | null => {
   if (!input || typeof input !== 'object') return null
@@ -64,7 +60,6 @@ const normalizeLocalProvider = (input: unknown): LocalProvider | null => {
 /**
  * Keeps the valid entries of a stored list; the first entry of an id wins.
  * @param {unknown} input - Raw list.
- * @returns {LocalProvider[]} The providers.
  */
 export const normalizeLocalProviders = (input: unknown): LocalProvider[] => {
   if (!Array.isArray(input)) return []
@@ -81,10 +76,6 @@ export const normalizeLocalProviders = (input: unknown): LocalProvider[] => {
 
 /**
  * Reads the user's local providers; unavailable storage or corrupt JSON give an empty list.
- * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
- * @returns {LocalProvider[]} The providers.
  */
 export const loadLocalProviders = ({
   storage,
@@ -104,10 +95,6 @@ export const loadLocalProviders = ({
 
 /**
  * Stores the user's local providers (normalized before saving).
- * @param {object} params - Parameters.
- * @param {StorageLike|null} params.storage - Storage.
- * @param {string|null} params.userUuid - User UUID.
- * @param {LocalProvider[]} params.providers - Providers.
  * @returns {boolean} False when the storage is unavailable or full.
  */
 export const saveLocalProviders = ({

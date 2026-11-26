@@ -49,7 +49,6 @@ export const getProviderWhereKey = (entry: Pick<AiProviderEntry, 'kind' | 'hosti
 
 /**
  * Returns the status pill of a provider status.
- * @param {AiProviderStatus} status - Status.
  * @returns {ProviderStatusPill} The tone and the i18n key.
  */
 export const getProviderStatusPill = (status: AiProviderStatus): ProviderStatusPill =>
@@ -58,7 +57,6 @@ export const getProviderStatusPill = (status: AiProviderStatus): ProviderStatusP
 /**
  * Returns the type the monogram shows (Arena default has its own mark, whatever the admin provider is).
  * @param {Pick<AiProviderEntry, 'kind'|'type'>} entry - Provider entry.
- * @returns {string} The monogram type.
  */
 export const getProviderMonogramType = (entry: Pick<AiProviderEntry, 'kind' | 'type'>): string =>
   entry.kind === 'arenaDefault' ? ARENA_DEFAULT_MONOGRAM : entry.type
@@ -68,8 +66,6 @@ export const getProviderMonogramType = (entry: Pick<AiProviderEntry, 'kind' | 't
  * are the user's names).
  * @param {object} params - Parameters.
  * @param {Pick<AiProviderEntry, 'kind'|'name'|'type'>} params.entry - Provider entry.
- * @param {TFunction} params.t - Translation function.
- * @returns {string} The name.
  */
 export const getProviderDisplayName = ({
   entry,
@@ -106,8 +102,6 @@ export const getProviderMenuActions = ({
  * Returns the rows of the list, in the order of the capabilities (account, local, Arena default last).
  * @param {object} params - Parameters.
  * @param {AiProviderEntry[]} params.providers - Provider entries.
- * @param {string} params.defaultProviderId - Default provider id.
- * @returns {ProviderRow[]} The rows.
  */
 export const buildProviderRows = ({
   providers,
@@ -132,7 +126,6 @@ export const buildProviderRows = ({
  * Returns true when the default has no row: a local provider saved in another browser.
  * @param {object} params - Parameters.
  * @param {AiProviderEntry[]} params.providers - Provider entries (empty before the capabilities are loaded).
- * @param {string} params.defaultProviderId - Default provider id.
  * @returns {boolean} True when the default is missing here.
  */
 export const isDefaultProviderMissing = ({
@@ -148,8 +141,6 @@ export const isDefaultProviderMissing = ({
  * @param {object} params - Parameters.
  * @param {AiSettings} params.settings - GET /api/ai/settings response.
  * @param {AiProviderEntry[]} params.providers - Provider entries.
- * @param {string} params.defaultProviderId - Default provider id.
- * @returns {ProviderDialogContext} The context.
  */
 export const getProviderDialogContext = ({
   settings,
@@ -173,7 +164,6 @@ export const getProviderDialogContext = ({
  * @param {object} params - Parameters.
  * @param {LocalProvider[]} params.providers - Stored local providers.
  * @param {string} params.id - Removed provider id.
- * @param {string} params.defaultProviderId - Default provider id.
  * @returns {{providers: LocalProvider[], resetDefault: boolean}} The new list and the reset flag.
  */
 export const buildLocalProviderRemoval = ({

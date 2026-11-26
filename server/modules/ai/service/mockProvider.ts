@@ -66,8 +66,6 @@ const CANNED_ANSWERS: [RegExp, CannedAnswer][] = [
 
 /**
  * Returns the canned answer for the feature the prompt belongs to.
- * @param {LanguageModelV4Prompt} prompt - The prompt.
- * @returns {string} The answer.
  */
 export const mockAnswerFor = (prompt: LanguageModelV4Prompt): string => {
   const text = promptText(prompt)
@@ -99,7 +97,6 @@ const streamOf = (text: string): ReadableStream<LanguageModelV4StreamPart> => {
  * Creates the mock model.
  * @param {object} [options] - Options.
  * @param {string} [options.text] - Fixed answer (default: the assistant scripts, then the per-feature canned answers).
- * @returns {LanguageModelV4} The model.
  */
 export const createMockModel = ({ text }: { text?: string } = {}): LanguageModelV4 => ({
   specificationVersion: 'v4',

@@ -21,11 +21,9 @@ type SummaryGroup = {
 /**
  * Groups validation report rows by attribute path, message category and severity.
  * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
  * @param {object[]} params.rows - The rows analysed (at most 1,000).
  * @param {number} params.total - Number of rows of the whole report.
  * @param {CleaningI18n} params.i18n - Translator (for the example messages).
- * @param {string} params.cycle - Cycle key.
  * @returns {object} The summary.
  */
 export const summarizeValidationRows = ({

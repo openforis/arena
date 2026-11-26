@@ -44,8 +44,6 @@ const isViewMode = (value: unknown): value is ViewModeType =>
  * DataGrids scroll their rows with the header and pagination footer staying fixed in place, and
  * the assignments Kanban board scrolls each column independently - instead of growing the whole
  * page.
- *
- * @returns {React.ReactElement} - The UserGroupsEditor component.
  */
 const UserGroupsEditor = (): React.ReactElement => {
   const navigate = useNavigate()

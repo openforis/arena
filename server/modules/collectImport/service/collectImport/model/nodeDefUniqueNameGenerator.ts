@@ -6,7 +6,6 @@ const namePrefixIfNotStartingWithLetter = 'n_'
 
 /**
  * Truncates the name so that, with the suffix appended, it fits the maximum name length.
- * @param {string} name - The name.
  * @param {string} [suffix] - The suffix to append.
  * @returns {string} - The name with the suffix, at most nameMaxLength characters long.
  */
@@ -14,7 +13,6 @@ const fitName = (name: string, suffix = ''): string => name.slice(0, nameMaxLeng
 
 /**
  * Prefixes the name when it doesn't start with a letter (e.g. ODK names like "_7" or form titles like "2024 survey").
- * @param {string} name - The name.
  * @returns {string} - A name starting with a letter.
  */
 export const ensureStartsWithLetter = (name: string): string =>

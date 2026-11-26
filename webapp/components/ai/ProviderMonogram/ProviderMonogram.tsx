@@ -9,7 +9,6 @@ type Props = {
 
 /**
  * Coloured two-letter mark of a provider type (decorative: the name is always shown beside it).
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The mark.
  */
 export const ProviderMonogram = ({ type, small = false }: Props) => {

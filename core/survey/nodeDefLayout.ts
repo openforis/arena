@@ -197,7 +197,6 @@ export const isIncludedInPreviousCycleLink: CyclePredicate = (cycle) => NodeDefs
  * Returns the uuids of the layout children items.
  * If the render type is form, they will be ordered from top to bottom according to the grid layout props (y and x),
  * otherwise they will be in the order they are defined in the 'layoutChildren' prop.
- * @param cycle - The survey cycle key.
  * @returns Function returning the child item uuids, ordered from top to bottom.
  */
 export const getLayoutChildrenUuids =

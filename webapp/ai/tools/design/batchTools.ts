@@ -29,9 +29,6 @@ const langSchema = z.string().min(2).max(10).describe('The survey language to tr
 
 /**
  * Returns the language when it is a survey language, or fails for the model.
- * @param {object} survey - Survey.
- * @param {string} lang - Language code.
- * @returns {string} The language.
  */
 const requireSurveyLanguage = (survey: any, lang: string): string => {
   const languages = getSurveyLanguages(survey)
@@ -45,7 +42,6 @@ const requireSurveyLanguage = (survey: any, lang: string): string => {
  * @param {SuggestionBatchKind} params.kind - Batch.
  * @param {string} params.lang - Language (translations; '' otherwise).
  * @param {string[]} params.targetKeys - Uuids of the categories or node definitions (none: all).
- * @param {AiToolContext} params.ctx - Tool context.
  * @param {Function} [params.resolveBatch] - Resolves the model of a feature (tests).
  * @param {AssistantBatchDeps} [params.deps] - Test dependencies.
  * @returns {Promise<object>} The card (changeSetId) and the counts, for the model.
@@ -113,7 +109,6 @@ export const runBatchTool = async ({
  * @param {string} params.description - For the model.
  * @param {z.ZodType} params.inputSchema - Input.
  * @param {Function} params.toBatch - Language and targets of the input.
- * @returns {AiTool} The tool.
  */
 const createBatchTool = <I>({
   kind,

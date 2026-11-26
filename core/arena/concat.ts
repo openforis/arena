@@ -5,7 +5,5 @@ import { _curry2 } from './internal/_curry2'
  *
  * @param {*} a - The first array or string.
  * @param {*} b - The second array or string.
- *
- * @returns {*} - The result.
  */
 export const concat = _curry2((a: any, b: any): any => a.concat(b))

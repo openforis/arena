@@ -3,8 +3,6 @@
  *
  * @private
  * @param {number} length - The arity of the function.
- * @param {Function} fn - The function to curry.
- * @returns {Function} The curried function.
  */
 export const _curryN = (length: number, fn: (...args: any[]) => any): ((...args: any[]) => any) => {
   const curried =

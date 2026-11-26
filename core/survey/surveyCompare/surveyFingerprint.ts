@@ -92,7 +92,6 @@ const normalizeTaxonomies = ({ survey, taxaByTaxonomyUuid, strict }) =>
  * @param {object} params - The parameters.
  * @param {any} params.survey - The survey (node defs, categories and taxonomies).
  * @param {CategoryItemsByCategoryUuid} params.itemsByCategoryUuid - Category items by category uuid.
- * @param {TaxaByTaxonomyUuid} params.taxaByTaxonomyUuid - Taxa by taxonomy uuid.
  * @param {SurveyFingerprintType} params.type - Fingerprint variant.
  * @returns {string} - The canonical representation (JSON).
  */

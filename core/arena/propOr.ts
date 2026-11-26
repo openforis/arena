@@ -6,7 +6,6 @@ import { prop } from './prop'
  * Returns a function that when supplied an object returns the indicated
  * property of that object if it exists (and is not `null`, `undefined` or `NaN`), otherwise the default value.
  *
- * @param {*} defaultValue - The default value.
  * @param {!string|number} property - The property name or array index.
  * @param {!object} object - The object to query.
  *

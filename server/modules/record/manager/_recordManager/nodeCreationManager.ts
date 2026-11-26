@@ -97,8 +97,6 @@ export const insertNodesInBatch = async (
  * Inserts a node and updates its dependents.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user performing the insert.
- * @param {!object} params.survey - The survey.
- * @param {!object} params.record - The record.
  * @param {!object} params.node - The node to insert.
  * @param {boolean} [params.system] - Whether the insert is a system activity.
  * @param {number} [params.timezoneOffset] - The client timezone offset.

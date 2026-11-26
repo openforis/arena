@@ -57,8 +57,6 @@ export const isCompactCard = (count: number): boolean => count > COMPACT_CARD_MA
  * @param {ChangeOperation|undefined} op - Operation of the row.
  * @param {string} nodeDefUuid - Node definition of the row.
  * @param {ChangeOperation[]} operations - Operations of the change set (parents of new items).
- * @param {object} survey - Survey.
- * @returns {string} The entity uuid.
  */
 const getEntityUuid = (
   op: ChangeOperation | undefined,
@@ -79,8 +77,6 @@ const getEntityUuid = (
 /**
  * Returns the review items of a card: node definition changes, then category labels, in proposal order.
  * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
- * @param {object} params.survey - Current survey.
  * @param {string} params.lang - Survey preferred language (label of a new node definition).
  * @returns {ReviewItem[]} One item per operation.
  */
@@ -132,7 +128,6 @@ export const buildReviewItems = ({
 
 /**
  * Returns the group of an item.
- * @param {ReviewItem} item - Item.
  * @param {ReviewGroupBy} groupBy - Grouping.
  * @returns {{key: string, label: ReviewLabel}} The group key and label.
  */
@@ -148,7 +143,6 @@ const getItemGroup = (item: ReviewItem, groupBy: ReviewGroupBy): { key: string; 
 
 /**
  * Groups items by entity or by kind of change.
- * @param {ReviewItem[]} items - Items.
  * @param {ReviewGroupBy} groupBy - Grouping.
  * @returns {ReviewGroup[]} The groups, in order of first appearance.
  */
@@ -165,8 +159,6 @@ export const groupReviewItems = (items: ReviewItem[], groupBy: ReviewGroupBy): R
 
 /**
  * Returns the searchable texts of a value.
- * @param {CardValue|null} value - Value.
- * @returns {string[]} Its texts.
  */
 const valueTexts = (value: CardValue | null): string[] => {
   if (value?.kind === 'text') return value.text ? [value.text] : []
@@ -176,7 +168,6 @@ const valueTexts = (value: CardValue | null): string[] => {
 
 /**
  * Tells whether an item matches a search text (name, level, group, original text and values).
- * @param {ReviewItem} item - Item.
  * @param {string} search - Lower case search text.
  * @returns {boolean} True when one of its texts contains it.
  */
@@ -192,7 +183,6 @@ const matchesSearch = (item: ReviewItem, search: string): boolean =>
 
 /**
  * Filters items by selection, conflicts and a search text.
- * @param {ReviewItem[]} items - Items.
  * @param {object} params - Parameters.
  * @param {ReviewFilter} params.filter - All, selected or conflicts.
  * @param {string} params.search - Search text (case insensitive; blank: no search).
@@ -265,19 +255,11 @@ export const toggleSelection = ({
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
 
-/**
- * Returns the text of a review label.
- * @param {ReviewLabel} label - Label.
- * @param {Function} t - Translation function.
- * @returns {string} The text.
- */
 export const getReviewLabelText = (label: ReviewLabel, t: Translate): string =>
   'text' in label ? label.text : t(label.key, label.params)
 
 /**
  * Returns a value on one line (the preview rows of the compact card).
- * @param {CardValue} value - Value.
- * @param {Function} t - Translation function.
  * @returns {string} The text; "(empty)" for a blank value.
  */
 export const getValuePreview = (value: CardValue, t: Translate): string => {
@@ -289,9 +271,7 @@ export const getValuePreview = (value: CardValue, t: Translate): string => {
 /**
  * Returns the text of the card's status line: the results of an Apply by status, or that the card was discarded.
  * @param {object} params - Parameters.
- * @param {ReviewItem[]} params.items - Items.
  * @param {boolean} params.discarded - The card was discarded.
- * @param {Function} params.t - Translation function.
  * @returns {string} The text; empty while nothing happened.
  */
 export const getStatusLineText = ({

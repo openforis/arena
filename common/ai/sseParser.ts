@@ -31,7 +31,6 @@ const parseJson = (payload: string): { ok: boolean; value?: unknown } => {
  * @param {Function} params.onEvent - Called with each JSON payload; errors it throws propagate to the caller.
  * @param {Function} [params.onDone] - Called once, on `[DONE]` (argument true) or at `end()` (false).
  * @param {SseLimits} [params.limits] - Cap on one frame; `push` throws aiProviderResponseTooLarge (502) when exceeded.
- * @returns {SseParser} The parser.
  */
 export const createSseParser = ({
   onEvent,
@@ -144,6 +143,5 @@ export const unknownUsageV4 = (): LanguageModelV4Usage => ({
 
 /**
  * Finish reason of a normally completed answer.
- * @returns {LanguageModelV4FinishReason} The `stop` finish reason.
  */
 export const stopFinishReason = (): LanguageModelV4FinishReason => ({ unified: 'stop', raw: undefined })

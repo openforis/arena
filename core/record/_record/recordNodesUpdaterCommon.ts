@@ -110,11 +110,9 @@ const _populateRefDataForBigNodes = async ({
 /**
  * Updates the dependents of the updated nodes, then validates all the updated nodes.
  * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
- * @param {!object} params.record - The record.
  * @param {!object} params.nodes - The updated nodes, indexed by UUID.
  * @param {object} [params.passiveNodes] - Updated nodes not triggering the dependents update, indexed by UUID.
  * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
- * @returns {Promise<RecordUpdateResult>} - The update result.
  */
 export const afterNodesUpdate = async ({
   record,

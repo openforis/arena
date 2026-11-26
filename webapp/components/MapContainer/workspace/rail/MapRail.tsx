@@ -16,9 +16,6 @@ const KEY_STEPS: Record<string, number> = { ArrowDown: 1, ArrowUp: -1 }
 /**
  * Left rail: vertical tabs and their panels. Every panel stays mounted (hidden when not selected), so the
  * Leaflet layers control moved into the Layers tab is never destroyed.
- * @param {object} props - Component props.
- * @param {MapRailTab[]} props.tabs - The tabs.
- * @returns {React.ReactElement} The rail.
  */
 export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
   const t = useI18nT()
@@ -34,8 +31,6 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
 
   /**
    * Moves the focus between the tabs with the arrow keys.
-   * @param {KeyboardEvent<HTMLDivElement>} event - The key event.
-   * @returns {void}
    */
   const onTabsKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     const step = KEY_STEPS[event.key]

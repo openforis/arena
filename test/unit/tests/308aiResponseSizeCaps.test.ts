@@ -24,7 +24,6 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
    * Answers with the status and a body that never ends (until the client closes the connection).
    * @param {number} status - Status of the answer.
    * @param {Record<string, string>} [headers] - More headers.
-   * @returns {void}
    */
   const answerForever = (status: number, headers: Record<string, string> = {}) => {
     server.handler = (_request, response) => {
@@ -39,7 +38,6 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
    * Answers with the status and the body.
    * @param {number} status - Status of the answer.
    * @param {string} body - Body of the answer.
-   * @returns {void}
    */
   const answer = (status: number, body: string) => {
     server.handler = (_request, response) => {

@@ -44,9 +44,7 @@ const determineAncestorMultipleEntityDefUuid = ({
 /**
  * Counts the updated values: the updated attributes (entities can be updated only in their meta or date modified).
  * @param {!object} params - The parameters.
- * @param {!object} params.survey - The survey.
  * @param {!Array} params.nodes - The updated nodes.
- * @returns {number} - The number of updated values.
  */
 const countUpdatedValues = ({ survey, nodes }: { survey: ArenaSurvey; nodes: ArenaRecordNode[] }): number =>
   nodes.filter((node) => !NodeDef.isEntity(Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))).length

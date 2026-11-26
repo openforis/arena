@@ -14,7 +14,6 @@ import { type AssistantArea, parseAppPath } from './assistantAreas'
 /**
  * Reads the current view (module and selected item) for the view_getCurrent tool.
  * @param {Function} getState - Redux getState.
- * @returns {AiCurrentView} The view.
  */
 const getCurrentView = (getState: () => any): AiCurrentView => {
   const { module, subModule } = parseAppPath(window.location.pathname)
@@ -25,7 +24,6 @@ const getCurrentView = (getState: () => any): AiCurrentView => {
 
 /**
  * Returns a factory of the tool context of a turn (read from the store when the turn starts).
- * @returns {Function} (area) => AiToolContext.
  */
 export const useAssistantToolContext = (): ((area: AssistantArea) => AiToolContext) => {
   const store = useStore()

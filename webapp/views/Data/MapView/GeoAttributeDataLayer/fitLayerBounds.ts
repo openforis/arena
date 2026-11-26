@@ -2,7 +2,6 @@ import type { Map as LeafletMap } from 'leaflet'
 
 /**
  * Zooms the map to the points of a layer.
- * @param {LeafletMap} map - The map.
  * @param {Array} points - GeoJSON points (coordinates are [lng, lat]).
  * @returns {boolean} False (the map is left alone) when there are no points.
  */

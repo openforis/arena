@@ -47,7 +47,6 @@ const checkChange = (
 /**
  * Returns the conflicts of a change set with the survey: a value that changed, a missing node definition, list or
  * parent, and an operation that the form designer's rules no longer allow (published since the proposal, for example).
- * @param {ChangeSet} changeSet - Change set.
  * @param {object} survey - Current draft survey.
  * @param {object} [options] - Options.
  * @param {string[]} [options.operationIds] - Check only these operations (default: all).

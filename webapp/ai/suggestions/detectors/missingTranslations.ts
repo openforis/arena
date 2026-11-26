@@ -16,7 +16,6 @@ import type { DetectorContext, StateDetector } from './types'
 
 /**
  * Groups the missing texts by language, in survey hierarchy order.
- * @param {object} survey - Survey.
  * @returns {Map<string, string[]>} Target keys (`<uuid>:<kind>`) per missing language.
  */
 export const collectMissingTextKeys = (survey: any): Map<string, string[]> => {
@@ -37,7 +36,6 @@ export const collectMissingTextKeys = (survey: any): Map<string, string[]> => {
 
 /**
  * Detects the missing translations: one suggestion per language.
- * @param {DetectorContext} ctx - Detector context.
  * @returns {AssistantSuggestion[]} The suggestions (empty: nothing missing, or detectors must not run).
  */
 export const detectMissingTranslations = (ctx: DetectorContext): AssistantSuggestion[] => {

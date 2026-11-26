@@ -88,7 +88,6 @@ const toToolMessage = (message: OpenAiMessage, toolNames: Map<string, string>): 
 /**
  * Converts OpenAI chat messages back to the prompt the mock model reads.
  * @param {OpenAiMessage[]} messages - Request messages.
- * @returns {LanguageModelV4Prompt} The prompt.
  */
 export const toMockPrompt = (messages: OpenAiMessage[]): LanguageModelV4Prompt => {
   const toolNames = new Map<string, string>()

@@ -16,7 +16,6 @@ export type AiBatchModel = { generateText: AiGenerateText; guard: AiBatchGuard }
  * Resolves the model of a batch and creates its guard.
  * @param {object} params - Parameters.
  * @param {AiFeatureKey} params.feature - Feature key (translation, dataDictionary).
- * @param {number} params.surveyId - Survey id.
  * @param {string} [params.providerId] - Provider picked in the chat (the default when absent or removed).
  * @param {AbortSignal} [params.signal] - Cancellation signal (closes a pending consent dialog).
  * @returns {Promise<AiBatchModel>} The text generator and the guard.

@@ -33,11 +33,8 @@ type FormatParams = {
 /**
  * Formats a node value (falling back to its string conversion).
  * @param params - The parameters.
- * @param params.survey - The survey.
  * @param params.cycle - The survey cycle (used only when showing code labels).
- * @param params.nodeDef - The node definition.
  * @param params.value - The value to format.
- * @param params.node - The node.
  * @param params.showLabel - True to show the label of codes and taxa.
  * @param params.lang - The language of the labels.
  * @returns The formatted value.

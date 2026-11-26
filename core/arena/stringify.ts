@@ -5,8 +5,6 @@ import { isNull } from './isNull'
  * It handles objects, arrays, Map, Set, String, Number.
  *
  * @param {*} object - The value, object, to stringify.
- * @param _replacer
- * @param space
  * @returns {*} - The stringified object.
  */
 export const stringify = (

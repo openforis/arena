@@ -50,7 +50,6 @@ const scenesOf = (resources: Messages): Record<string, string> => {
 /**
  * Lists the placeholders of a text, sorted.
  *
- * @param {string} text - Text.
  * @returns {string[]} Placeholder names.
  */
 const placeholders = (text: string): string[] =>

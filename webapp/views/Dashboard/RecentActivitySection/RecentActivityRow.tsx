@@ -18,7 +18,6 @@ const buildRowClassName = (message: Record<string, unknown>): string => {
 /**
  * Compact activity log row: timestamp, user and message.
  *
- * @param {RecentActivityRowProps} props - The component props.
  * @returns {React.ReactElement} The row.
  */
 export const RecentActivityRow = (props: RecentActivityRowProps) => {

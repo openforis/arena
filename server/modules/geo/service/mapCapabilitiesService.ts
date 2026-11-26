@@ -41,7 +41,6 @@ export const parseCapabilitiesXml = ({
 /**
  * Creates the service that reads WMS / WMTS capabilities for the "Add WMS / WMTS / XYZ" dialog.
  * @param {SafeHttpFetcher} fetcher - The SSRF-safe fetcher.
- * @returns {MapCapabilitiesService} The service.
  */
 export const createMapCapabilitiesService = ({ fetchText }: SafeHttpFetcher): MapCapabilitiesService => {
   /**

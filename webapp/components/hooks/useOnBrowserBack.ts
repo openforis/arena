@@ -7,7 +7,6 @@ import { useLocation, useNavigate } from 'react-router'
  * @param {!object} params - The parameters.
  * @param {!Function} [params.onBack] - Callback to be called when back button is pressed. It should return true when navigate(-1) is called by the callback itself, false otherwise.
  * @param {boolean} [params.active] - True if onBack callback should be called on browser back button press and confirm message on page refresh should be shown.
- * @returns {undefined}
  */
 export const useOnBrowserBack = (params) => {
   const { active = false, onBack } = params

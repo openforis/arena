@@ -14,8 +14,6 @@ export type NodeDefLookupOptions = {
 /**
  * Returns true for the node definitions a tool may name: not deleted, virtual or a layout element, and not an
  * analysis one unless asked.
- * @param {object} nodeDef - Node definition.
- * @param {NodeDefLookupOptions} [options] - Options.
  * @returns {boolean} True when the tool may name it.
  */
 export const isCurrentNodeDef = (nodeDef: any, { includeAnalysis = false }: NodeDefLookupOptions = {}): boolean =>
@@ -24,21 +22,8 @@ export const isCurrentNodeDef = (nodeDef: any, { includeAnalysis = false }: Node
   !NodeDef.isLayoutElement(nodeDef) &&
   (includeAnalysis || !NodeDef.isAnalysis(nodeDef))
 
-/**
- * Returns the current node definitions of the survey.
- * @param {object} survey - Survey.
- * @param {NodeDefLookupOptions} [options] - Options.
- * @returns {object[]} The node definitions.
- */
 export const getCurrentNodeDefs = (survey: any, options: NodeDefLookupOptions = {}): any[] =>
   Survey.getNodeDefsArray(survey).filter((nodeDef: any) => isCurrentNodeDef(nodeDef, options))
 
-/**
- * Returns the current node definition with the given name, or null.
- * @param {object} survey - Survey.
- * @param {string} name - Name.
- * @param {NodeDefLookupOptions} [options] - Options.
- * @returns {object|null} The node definition.
- */
 export const findNodeDefByName = (survey: any, name: string, options: NodeDefLookupOptions = {}): any =>
   getCurrentNodeDefs(survey, options).find((nodeDef: any) => NodeDef.getName(nodeDef) === name) ?? null

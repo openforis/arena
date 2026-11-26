@@ -14,7 +14,6 @@ type ScenesBandsControlProps = { bandMix: SceneBandMix; onChange: (bandMix: Scen
  * @param {object} props - Props.
  * @param {SceneBandMix} props.bandMix - Selected band mix.
  * @param {Function} props.onChange - Called with the new band mix.
- * @returns {React.ReactElement} The control.
  */
 export const ScenesBandsControl = ({ bandMix, onChange }: ScenesBandsControlProps): React.ReactElement => {
   const t = useI18nT()

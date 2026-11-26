@@ -20,7 +20,6 @@ const ZOOM_TO_DATA_MAX_ZOOM = 16
  * no Tools menu).
  * @param {object} props - Component props.
  * @param {FullScreenState} props.fullScreen - Full screen state of the workspace.
- * @returns {React.ReactElement} The buttons.
  */
 export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState }): ReactElement => {
   const map = useMap()
@@ -29,7 +28,6 @@ export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState })
 
   /**
    * Zooms the map to the data, or warns when there is none.
-   * @returns {void}
    */
   const zoomToData = useCallback(() => {
     const bounds = computeBounds(collectDataLatLngs(map))

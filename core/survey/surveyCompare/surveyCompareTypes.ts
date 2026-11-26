@@ -203,7 +203,6 @@ const getRemovalChanges = (diffs: { removal?: SurveyCompareChange }[]): SurveyCo
 /**
  * Returns all the changes of a comparison result (sub-changes like removals of category items included).
  * @param {SurveyCompareResult} result - The comparison result.
- * @returns {SurveyCompareChange[]} - The changes.
  */
 export const getAllChanges = (result: SurveyCompareResult): SurveyCompareChange[] => [
   ...result.surveyInfo,

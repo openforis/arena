@@ -14,8 +14,6 @@ import type { DetectorContext, EventDetector, SuggestionEvent, TargetResolver } 
 
 /**
  * Tells whether a node definition has a description in some survey language.
- * @param {object} nodeDef - Node definition.
- * @param {string[]} languages - Survey languages.
  * @returns {boolean} True when it has one.
  */
 export const hasDescription = (nodeDef: any, languages: string[]): boolean =>
@@ -23,9 +21,6 @@ export const hasDescription = (nodeDef: any, languages: string[]): boolean =>
 
 /**
  * Adds the new entries without a description; successive visits add to the same suggestion (store merge).
- * @param {SuggestionEvent} event - The event.
- * @param {DetectorContext} ctx - Detector context.
- * @returns {void}
  */
 export const handleNewEntriesDescriptions = (event: SuggestionEvent, ctx: DetectorContext): void => {
   if (event.type !== 'designerLeft') return

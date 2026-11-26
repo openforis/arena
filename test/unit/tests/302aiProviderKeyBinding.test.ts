@@ -24,7 +24,6 @@ const sealedFor = (userUuid: string, provider: { id: string; type: string; baseU
 /**
  * Builds a stored account provider.
  * @param {object} fields - Fields to override.
- * @returns {object} The provider.
  */
 const storedProvider = (fields: Record<string, unknown>): any => ({
   id: 'acct:p1',
@@ -42,7 +41,6 @@ const storedProvider = (fields: Record<string, unknown>): any => ({
  * Builds a user with the providers.
  * @param {string} uuid - User uuid.
  * @param {object[]} providers - Stored providers.
- * @returns {any} The user.
  */
 const userWith = (uuid: string, providers: any[]): any => ({
   uuid,

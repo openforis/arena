@@ -182,7 +182,6 @@ const DialogFooter = ({
  * Add / edit provider dialog: step 1 picks the type (add only), step 2 connects; "Add provider" / "Save" needs a
  * passing test of the current values (a name-only edit needs none). Errors stay in the dialog. With typed values a
  * click on the backdrop or Escape does not close it (Cancel and the close button do).
- * @param {Props} props - Props.
  * @returns {React.ReactElement} The dialog.
  */
 export const ProviderDialog = ({ saved, context, onClose, onSaved }: Props) => {

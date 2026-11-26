@@ -16,8 +16,6 @@ const succeededJob = {
 
 /**
  * Dispatches an action through a middleware.
- * @param {Middleware} middleware - The middleware.
- * @param {unknown} action - The action.
  * @param {Function} next - The next dispatch.
  * @returns {unknown} What the middleware returned.
  */

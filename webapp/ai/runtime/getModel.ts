@@ -30,7 +30,6 @@ const authorizedFetch = createAuthorizedFetch({
  * @param {number} [params.surveyId] - Survey (required for survey-scoped features).
  * @param {AiDataClass} [params.dataClass] - Data class of the request (default: the feature's).
  * @param {string} params.providerId - Provider the server calls.
- * @returns {LanguageModelV4} The model.
  */
 export const getGatewayModel = ({
   feature,

@@ -319,7 +319,6 @@ const formatByKey = ({ t, key, value, indent }): FormattedLine[] | null => {
 /**
  * Formats a value of a survey comparison as a list of labelled lines.
  * @param {object} params - Parameters.
- * @param {Translate} params.t - Translation function.
  * @param {string} [params.singleLang] - The only language of the survey (if any): its code is not shown in labels.
  * @param {string} [params.key] - Key of the property the value belongs to.
  * @param {any} params.value - The value to format.

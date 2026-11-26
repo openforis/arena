@@ -6,7 +6,6 @@ import type { ScreenshotImageAttributeOption } from '@webapp/components/MapConta
 
 /**
  * Creates a filter for the attributes that can hold a screenshot: image file attributes allowing it, editable, in the cycle.
- * @param {string} cycle - The survey cycle key.
  * @returns {Function} A predicate taking a node definition.
  */
 export const isImageAttributeDefForScreenshot =
@@ -22,7 +21,6 @@ export const isImageAttributeDefForScreenshot =
 /**
  * Keeps the attributes that can hold a screenshot.
  * @param {Array<object>} defs - Node definitions.
- * @param {string} cycle - The survey cycle key.
  * @returns {Array<object>} The image file attributes that can be edited in the cycle.
  */
 export const filterImageAttributeDefs = (defs: any[], cycle: string): any[] =>
@@ -33,7 +31,6 @@ export const filterImageAttributeDefs = (defs: any[], cycle: string): any[] =>
  * @param {Array<object>} defs - Image attribute definitions.
  * @param {string} lang - Survey language for the labels.
  * @param {object|null} [rowEntityDef] - The multiple entity holding the attributes (a new row gets the image).
- * @returns {Array<ScreenshotImageAttributeOption>} The options.
  */
 export const toImageAttributeOptions = (
   defs: any[],
@@ -55,9 +52,7 @@ export const toImageAttributeOptions = (
  * Finds the image attributes of a plot entity: its own, those of its single entity descendants, and those directly
  * inside its multiple child entities (saved in a new row).
  * @param {object} params - The parameters.
- * @param {object} params.survey - The survey.
  * @param {string} params.entityDefUuid - Uuid of the plot entity definition.
- * @param {string} params.cycle - The survey cycle key.
  * @param {string} params.lang - Survey language for the labels.
  * @returns {Array<ScreenshotImageAttributeOption>} The options, in form order (rows last).
  */

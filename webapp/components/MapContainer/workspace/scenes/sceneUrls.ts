@@ -38,7 +38,6 @@ export const getSceneDirectoryUrl = (thumbnailUrl: string | null): string | null
  * Returns the COG URLs to read for a scene and band mix.
  *
  * @param {string|null} thumbnailUrl - Thumbnail URL from the index.
- * @param {SceneBandMix} bandMix - Band mix.
  * @returns {string[]|null} One URL per band file, or null when the scene has no usable URL.
  */
 export const getSceneCogUrls = (thumbnailUrl: string | null, bandMix: SceneBandMix): string[] | null => {

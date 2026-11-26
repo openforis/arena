@@ -20,7 +20,6 @@ const withAuth = (init: RequestInit, token: string | null): RequestInit => {
  * @param {FetchLike} deps.fetchImpl - Underlying fetch.
  * @param {Function} deps.getAuthToken - Returns the current token (or null).
  * @param {Function} deps.refreshAuthToken - Refreshes the token (sharing a refresh already in flight); resolves to the new token or null.
- * @returns {FetchLike} The authorized fetch.
  */
 export const createAuthorizedFetch = ({
   fetchImpl,

@@ -14,7 +14,6 @@ type DashboardMapOwnerFilterProps = {
 /**
  * Dropdown narrowing the map features to the records of a single owner.
  *
- * @param {DashboardMapOwnerFilterProps} props - The component props.
  * @returns {React.ReactElement} The filter, or null when there is no owner to filter by.
  */
 export const DashboardMapOwnerFilter = (props: DashboardMapOwnerFilterProps) => {

@@ -21,7 +21,6 @@ const chatCall = (providerId?: string) => ({
  * Checks that a response carries neither the key, nor a ciphertext, nor a stored provider.
  * @param {unknown} response - Parsed response body.
  * @param {string} secret - The plain key.
- * @returns {void}
  */
 const expectNoKey = (response: unknown, secret: string): void => {
   const json = JSON.stringify(response)

@@ -6,9 +6,6 @@ type NodeDefChildrenParams = Parameters<typeof Survey.getNodeDefChildren>[0] & {
 
 /**
  * Returns the node defs sharing the parent of the given one (the fields an expression can reference by name).
- * @param {object} params - Parameters.
- * @param {object} params.survey - The survey.
- * @param {object} params.nodeDef - The node def.
  * @returns {object[]} The sibling node defs (empty for the root).
  */
 export const getSiblingNodeDefs = ({ survey, nodeDef }: { survey: any; nodeDef: any }): any[] => {

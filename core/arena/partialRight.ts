@@ -3,8 +3,6 @@
  *
  * @param {*} fn - The function to partially apply.
  * @param {*} args - The trailing arguments.
- *
- * @returns {Function} - The result.
  */
 export const partialRight =
   (fn: (...args: any[]) => any, args: any[]) =>

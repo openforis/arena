@@ -149,7 +149,6 @@ const _checkCanInviteToGroup = ({
  * @param {!object} params - The parameters.
  * @param {!object} params.userToInvite - The user to check (with auth groups).
  * @param {!string} params.surveyUuid - UUID of the survey.
- * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<boolean>} - True if the user is involved only in the specified survey.
  */
 export const isUserInvolvedOnlyInSurvey = async (
@@ -197,13 +196,11 @@ const _repeatInvitation = async (
  * Invites a user who has not accepted an invitation yet (pending user), or sends again the invitation to this survey.
  * @param {!object} params - The parameters.
  * @param {!object} params.user - The user sending the invitation.
- * @param {!object} params.survey - The survey.
  * @param {!object} params.group - The group to add the user to.
  * @param {!object} params.userToInvite - The pending user.
  * @param {!string} params.email - Email of the pending user.
  * @param {boolean} params.repeatInvitation - Whether to send again the invitation to this survey.
  * @param {!object} params.emailParams - Parameters of the invitation email.
- * @param {!object} params.i18n - The i18n object.
  * @param {pgPromise.IDatabase} t - The database transaction.
  */
 const _invitePendingUser = async (

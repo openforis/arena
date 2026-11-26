@@ -42,7 +42,6 @@ const ACCOUNT: AiProviderEntry = {
 /**
  * Returns capabilities with one ready account provider as the default and the given instance prompt cap.
  * @param {number|null} maxPromptChars - Instance prompt cap.
- * @returns {AiCapabilities} The capabilities.
  */
 const capabilitiesWithCap = (maxPromptChars: number | null): AiCapabilities => ({
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [], maxPromptChars },

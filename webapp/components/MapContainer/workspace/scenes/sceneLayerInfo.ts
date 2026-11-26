@@ -7,10 +7,7 @@ const PLOT_HALF_SIZE_DEGREES = 0.01
 /**
  * Builds the overlay registry id of a scene layer.
  *
- * @param {string} sceneId - Scene id.
- * @param {SceneBandMix} bandMix - Band mix.
  * @param {boolean} asBase - True when used as base map.
- * @returns {string} Overlay id.
  */
 export const getSceneOverlayId = (sceneId: string, bandMix: SceneBandMix, asBase: boolean): string =>
   `${asBase ? BASE_PREFIX : LAYER_PREFIX}${bandMix}:${sceneId}`
@@ -19,7 +16,6 @@ export const getSceneOverlayId = (sceneId: string, bandMix: SceneBandMix, asBase
  * Tells whether an overlay id is a scene used as base map.
  *
  * @param {string} id - Overlay id.
- * @returns {boolean} True for a base scene.
  */
 export const isBaseSceneOverlayId = (id: string): boolean => id.startsWith(BASE_PREFIX)
 
@@ -27,7 +23,6 @@ export const isBaseSceneOverlayId = (id: string): boolean => id.startsWith(BASE_
  * Returns the attribution required by the Copernicus licence (kept in English, it is the licence wording).
  *
  * @param {string} datetime - Scene ISO datetime.
- * @returns {string} Attribution.
  */
 export const getSceneAttribution = (datetime: string): string =>
   `Contains modified Copernicus Sentinel data ${datetime.slice(0, 4)}`
@@ -52,7 +47,6 @@ export const boundsAroundPoint = (lat: number, lng: number, halfSizeDegrees = PL
  *
  * @param {Array<{id: string}>} overlays - Registered overlays.
  * @param {(id: string) => void} removeOverlay - Registry remove function.
- * @returns {void}
  */
 export const removeBaseSceneOverlays = (overlays: Array<{ id: string }>, removeOverlay: (id: string) => void): void => {
   for (const overlay of overlays) {

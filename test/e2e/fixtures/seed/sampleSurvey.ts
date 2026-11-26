@@ -35,7 +35,6 @@ log4js.getLogger('arena').level = 'error'
 /**
  * Runs the specified function silencing console.log (the survey schema migrations print the executed SQL).
  * @param {Function} fn - Function to run.
- * @returns {Promise<any>} - The result of the function.
  */
 const withConsoleLogSilenced = async <T>(fn: () => Promise<T>): Promise<T> => {
   const { log } = console
@@ -125,7 +124,6 @@ const createSamplingPointDataBuilder = () =>
 /**
  * Inserts the sample survey (cluster -> plot -> tree, with a category and a taxonomy) directly in the DB,
  * owned by the specified user and set as its current survey, optionally with some records.
- * @param {SampleSurveyOptions} options - Options.
  * @returns {Promise<number>} - The id of the survey inserted.
  */
 export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<number> => {
