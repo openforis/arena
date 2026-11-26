@@ -240,6 +240,7 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
         />
         <AssistantMenu api={api} />
         <ButtonIconClose
+          className="close-btn ai-assistant-panel__close"
           iconSize={20}
           label="aiAssistant.close"
           onClick={closeAssistantPanel}
