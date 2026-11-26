@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "license": "MIT",
   "engines": {
     "node": "^24.11.1"
@@ -289,6 +289,6 @@
   },
   "packageManager": "yarn@4.19.0",
   "arenaMobileWebPreview": {
-    "version": "v2.11.2"
+    "version": "v3.0.1"
   }
 }
