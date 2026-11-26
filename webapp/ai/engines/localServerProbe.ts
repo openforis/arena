@@ -29,7 +29,6 @@ export type LocalServerProbeResult = {
 /**
  * Returns the local engine limits for a context size.
  * @param {number|null} contextTokens - Context size, or null when unknown (8,192 is used).
- * @returns {AiEngineLimits} The limits.
  */
 export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimits => {
   const maxPromptTokens = Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * PROMPT_SHARE)
@@ -49,7 +48,6 @@ export const getLocalServerContextWindow = (contextTokens: number | null): AiCon
 /**
  * Returns the object entries of the `data` array of a response body.
  * @param {unknown} json - Response body.
- * @returns {Record<string, unknown>[]} The entries.
  */
 const dataEntries = (json: unknown): Record<string, unknown>[] => {
   const data = (json as { data?: unknown } | null)?.data
@@ -70,7 +68,6 @@ export const parseLocalServerModelIds = (json: unknown): string[] => {
 
 /**
  * Returns the value when it is a positive integer.
- * @returns {number|null} The value, or null.
  */
 const positiveInteger = (value: unknown): number | null =>
   typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null
@@ -89,7 +86,6 @@ export const parseLmStudioContextTokens = (json: unknown, modelId: string): numb
 /**
  * Returns the ids of the embedding models of an LM Studio models response.
  * @param {unknown} lmStudioJson - Response body.
- * @returns {Set<string>} The ids.
  */
 const embeddingModelIds = (lmStudioJson: unknown): Set<string> =>
   new Set(

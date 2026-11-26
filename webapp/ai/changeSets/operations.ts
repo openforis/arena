@@ -27,7 +27,6 @@ type AnyOperation = NodeDefOperation | NodeDefOperationDraft
 
 /**
  * Returns the uuid of the node definition the operation works on.
- * @returns {string} The uuid.
  */
 export const getOperationNodeDefUuid = (op: AnyOperation): string =>
   op.type === 'nodeDef.create' ? NodeDef.getUuid(op.nodeDef) : op.nodeDefUuid
@@ -104,7 +103,6 @@ export const getLabelValue = (nodeDef: any, kind: LabelKind, lang: string): stri
 /**
  * Returns the current value of what an update operation changes (compared with its `from`).
  * @param {ChangeOperation} op - A non-create operation.
- * @returns {unknown} The current value.
  */
 export const getOperationCurrentValue = (nodeDef: any, op: AnyOperation): unknown => {
   if (isRecordEditOperation(op)) return null
@@ -130,7 +128,6 @@ const applyUpdate = (nodeDef: any, op: { prop: string; to: unknown }, survey: an
 /**
  * Applies a non-create operation to a node definition.
  * @param {object} survey - Survey the node definition belongs to (the layout side effect of `multiple` reads it).
- * @returns {object} The updated node definition.
  */
 export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation, survey: any): any => {
   if (isRecordEditOperation(op)) return nodeDef
@@ -142,7 +139,6 @@ export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation, survey: 
 
 /**
  * Applies an operation to a survey (a new survey object; the dependency graph is not rebuilt).
- * @returns {object} The updated survey.
  */
 export const applyOperationToSurvey = (survey: any, op: AnyOperation): any => {
   if (isRecordEditOperation(op)) return survey

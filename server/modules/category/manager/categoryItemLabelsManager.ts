@@ -67,7 +67,6 @@ const parseCursor = (cursor: unknown): string | null => {
 /**
  * Parses the limit parameter.
  * @param {unknown} limit - Raw value (a query string value or a number).
- * @returns {number} The limit.
  */
 const parseLimit = (limit: unknown): number => {
   if (limit === undefined || limit === null || limit === '') return MISSING_LABELS_SERVER_PAGE_DEFAULT
@@ -95,7 +94,6 @@ export const countItemsMissingLabels = async (
  * @param {string} params.lang - Missing language (a survey language).
  * @param {string} [params.cursor] - nextCursor of the previous page.
  * @param {number|string} [params.limit] - Page size (1–200, default 50).
- * @returns {Promise<MissingLabelsPage>} The page.
  */
 export const fetchItemsMissingLabels = async (
   {
@@ -128,7 +126,6 @@ export const fetchItemsMissingLabels = async (
  * Parses one update of the request.
  * @param {unknown} raw - Raw update.
  * @param {string[]} langs - Survey languages.
- * @returns {CategoryItemLabelUpdate} The update.
  */
 const parseUpdate = (raw: unknown, langs: string[]): CategoryItemLabelUpdate => {
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) throw categoryItemLabelsInvalid('item')

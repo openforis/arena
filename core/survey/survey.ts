@@ -446,7 +446,6 @@ const _resolveClonedNodeDefsRefs = <T>({
  * @param params.sourceSurvey - The survey the node defs have been cloned from.
  * @param params.targetSurvey - The survey the node defs have been cloned into.
  * @param params.clonedNodeDefs - The cloned node defs (subtree).
- * @returns The updated cloned node defs and the uuids of the categories and taxonomies to clone.
  */
 export const resolveClonedNodeDefsCategoriesAndTaxonomies = ({
   sourceSurvey,

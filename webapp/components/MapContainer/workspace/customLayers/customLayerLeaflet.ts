@@ -39,7 +39,6 @@ export type CustomBaseLayerDef = {
 
 /**
  * Builds the Leaflet options of a custom layer.
- * @returns {CustomLayerTileOptions} The options.
  */
 const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
   opacity: layer.opacity,
@@ -74,7 +73,6 @@ export const getCustomLayerLeafletConfig = (layer: MapCustomLayer): CustomLayerL
 /**
  * Builds the base layer definition of a custom base map.
  * @param {MapCustomLayerWithScope} layer - The layer (role baseMap).
- * @returns {CustomBaseLayerDef} The definition.
  */
 export const toCustomBaseLayerDef = (layer: MapCustomLayerWithScope): CustomBaseLayerDef => {
   const key = `${CUSTOM_BASE_LAYER_KEY_PREFIX}${layer.id}`

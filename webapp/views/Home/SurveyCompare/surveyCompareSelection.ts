@@ -56,7 +56,6 @@ const collectDependents = ({ diffs, id, acc }) => {
  * @param {Set<string>} params.selectedIds - Currently selected ids.
  * @param {string} params.id - Id of the change to select or deselect.
  * @param {boolean} params.selected - True to select, false to deselect.
- * @returns {Set<string>} - The updated selection.
  */
 export const updateSelection = ({
   result,

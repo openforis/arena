@@ -23,7 +23,6 @@ const getUserLabel = (user: Record<string, unknown>): string => `${User.getName(
  * @param props0 - The component props.
  * @param props0.groupUuid - Uuid of the group whose members are being managed.
  * @param props0.canEdit - Whether add/remove controls are shown.
- * @returns {React.ReactElement} - The UserGroupMembersEditor component.
  */
 export const UserGroupMembersEditor = (props: Props): React.ReactElement => {
   const { groupUuid, canEdit = false } = props

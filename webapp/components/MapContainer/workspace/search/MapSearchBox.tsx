@@ -74,7 +74,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   /**
    * Gets the text of a result.
-   * @returns {string} The label.
    */
   const getLabel = (result: MapSearchResult): string => {
     switch (result.type) {
@@ -202,7 +201,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
   /**
    * Builds the DOM id of a result option.
    * @param {number} index - Index of the result.
-   * @returns {string} The id.
    */
   const optionId = (index: number): string => `${listId}-option-${index}`
 

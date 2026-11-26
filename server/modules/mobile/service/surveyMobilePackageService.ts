@@ -52,7 +52,6 @@ const appendSurveyFile = async ({
  * @param {object} params.user - The user downloading the survey.
  * @param {object} params.survey - The survey, as returned by the mobile survey endpoint.
  * @param {Writable} params.outputStream - Stream the zip is written to (e.g. the HTTP response).
- * @returns {Promise<void>} - Resolves when the zip has been completely written.
  */
 export const writeSurveyMobilePackage = async ({
   user,

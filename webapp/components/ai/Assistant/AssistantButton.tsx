@@ -15,7 +15,6 @@ import { useAssistantPanel } from './useAssistantPanel'
 
 /**
  * Returns true for Ctrl/Cmd + . .
- * @returns {boolean} True for the shortcut.
  */
 const isToggleShortcut = (event: KeyboardEvent): boolean => (event.ctrlKey || event.metaKey) && event.key === '.'
 

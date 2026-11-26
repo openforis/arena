@@ -131,7 +131,6 @@ export const buildTranslationItems = ({
  * @param {Function} params.translate - The translation task.
  * @param {number} params.batchSize - Items per call.
  * @param {number} params.maxTargetLangs - Target languages per call.
- * @returns {AiBatchCall[]} The calls.
  */
 export const buildTranslationCalls = ({
   items,

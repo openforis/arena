@@ -30,7 +30,6 @@ type ScreenshotAttachFieldsProps = {
  * @param {ScreenshotImageAttributeOption|null} props.attribute - The selected attribute.
  * @param {Function} props.onAttributeChange - Selects an attribute by uuid.
  * @param {Function} props.onFileNameChange - Changes the file name.
- * @returns {React.ReactElement} The fields.
  */
 export const ScreenshotAttachFields = ({
   candidates,

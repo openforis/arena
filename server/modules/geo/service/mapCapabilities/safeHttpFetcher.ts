@@ -273,7 +273,6 @@ const readResponse = (response: HttpResponse): FetchedText => {
  * @param {HttpGet} [deps.httpGet] - The HTTP client.
  * @param {number} [deps.timeoutMs] - The time limit of a request.
  * @param {number} [deps.maxBytes] - The size limit of a response.
- * @returns {SafeHttpFetcher} The fetcher.
  */
 export const createSafeHttpFetcher = ({
   dnsLookup = defaultDnsLookup,

@@ -63,7 +63,6 @@ export type MeasureBarProps = {
  * @param {Function} props.onModeChange - Called with the selected mode.
  * @param {Function} props.onUnitChange - Called with the selected unit.
  * @param {Function} props.onDone - Called by Done.
- * @returns {React.ReactElement} The bar.
  */
 export const MeasureBar = (props: MeasureBarProps): ReactElement => {
   const { barRef, mode, unit, unitOptions, total, perimeter, showHint, onModeChange, onUnitChange, onDone } = props

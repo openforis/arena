@@ -62,7 +62,6 @@ const resolveReferences = ({ index, props }: { index: NodeDefsIndex; props: Reco
  * @param {object} params - The parameters.
  * @param {NodeDefsIndex} params.index - Node defs index of the survey the node def belongs to.
  * @param {any} params.nodeDef - The node def to normalize.
- * @returns {NormalizedNodeDef} - The normalized node def.
  */
 export const normalizeNodeDef = ({ index, nodeDef }: { index: NodeDefsIndex; nodeDef: any }): NormalizedNodeDef => {
   const { [NodeDefLayout.keys.layout]: layout = {}, ...props } = NodeDef.getProps(nodeDef)

@@ -33,7 +33,6 @@ const hasUsableSavedKey = (params: KeyParams): boolean =>
 /**
  * Returns true when the draft cannot be tested until a key is typed.
  * @param {KeyParams} params - Spec, draft and saved provider.
- * @returns {boolean} True when a key is missing.
  */
 export const isApiKeyMissing = (params: KeyParams): boolean => {
   const { spec, draft, saved } = params
@@ -66,7 +65,6 @@ export const canRemoveKey = (params: KeyParams): boolean => {
 /**
  * Returns the `apiKey` field of a request: the typed key, an empty string to remove the saved key, else nothing (the
  * server keeps the saved key).
- * @returns {{apiKey?: string}} The field.
  */
 export const getApiKeyRequestField = (draft: ProviderDraft): { apiKey?: string } => {
   if (isApiKeyTyped(draft)) return { apiKey: draft.apiKey.trim() }

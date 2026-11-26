@@ -36,7 +36,6 @@ export const normalizeTaxonomy = (taxonomy: any) =>
 
 /**
  * Key identifying a vernacular name in a taxon (language and name).
- * @returns {string} - The key.
  */
 export const vernacularNameKey = (vernacularName: any): string =>
   `${TaxonVernacularName.getLang(vernacularName)}|${TaxonVernacularName.getName(vernacularName)}`

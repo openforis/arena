@@ -22,7 +22,6 @@ const compareByIdOrName = (nodeDefA: any, nodeDefB: any): number => {
 
 /**
  * Indexes the comparable node defs of a survey (hierarchy and name paths).
- * @returns {NodeDefsIndex} - The node defs index.
  */
 export const buildNodeDefsIndex = (survey: any): NodeDefsIndex => {
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(isComparable)

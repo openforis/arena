@@ -51,7 +51,6 @@ const validProviders = new Set<string>(Object.values(providers))
 /**
  * Returns true when `provider` is a recognised gateway provider key.
  * @param {string} provider - Provider identifier from config or env.
- * @returns {boolean} True when supported.
  */
 export const isSupported = (provider: string): boolean => validProviders.has(provider)
 

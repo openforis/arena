@@ -126,7 +126,6 @@ const noEngine = (selection: { unavailable: string[] }, dataClass: AiDataClass) 
  * Returns the selected engine, or throws aiNoEngineAvailable with the reason.
  * @param {AiDataClass} dataClass - Data class of the request.
  * @param {AiEngineErrorInfo|null} [probeError] - Why the last probe of the request's local provider failed.
- * @returns {AiSelectedEngine} The engine.
  */
 const assertSelected = (
   selection: AiEngineSelection,
@@ -176,7 +175,6 @@ const selectForTurn = ({
 /**
  * Returns the probe-based capability of the selected local provider.
  * @param {AiSelectedEngine} engine - The selected local engine.
- * @returns {AiLocalServerCapability} The capability.
  */
 const getLocalCapability = (context: Context, engine: AiSelectedEngine): AiLocalServerCapability => {
   const capability = engine.providerId ? context.capabilities.local[engine.providerId] : undefined
@@ -237,7 +235,6 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
   /**
    * Asks the user to confirm the local provider; only Continue goes on (no other provider is tried).
    * @param {AiSelectedEngine} engine - The selected local engine.
-   * @returns {Promise<void>} Resolves on Continue.
    * @throws {SystemError} aiProviderChooseAnother for "Choose another provider", aiLocalServerConsentCancelled otherwise.
    */
   const askConsent = async (

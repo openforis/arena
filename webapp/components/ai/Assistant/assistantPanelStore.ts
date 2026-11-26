@@ -78,7 +78,6 @@ const sameScope = (a: AssistantPanelScope | null, b: AssistantPanelScope | null)
 
 /**
  * Returns the view of a conversation id: its chat, or the home page without one.
- * @returns {AssistantPanelView} The view.
  */
 const viewOf = (conversationId: string | null): AssistantPanelView => (conversationId ? 'chat' : 'home')
 
@@ -86,7 +85,6 @@ const viewOf = (conversationId: string | null): AssistantPanelView => (conversat
  * Creates a panel store.
  * @param {object} [params] - Parameters.
  * @param {OpenConversations} [params.openConversations] - Remembered open conversations (default: localStorage).
- * @returns {AssistantPanelStore} The store.
  */
 export const createAssistantPanelStore = ({
   openConversations = browserOpenConversations,
@@ -124,7 +122,6 @@ export const createAssistantPanelStore = ({
    * Returns the view after selecting an area: the same area keeps a chat (a blank one too), a list goes back.
    * @param {AssistantArea|null} area - Selected area.
    * @param {string|null} conversationId - Conversation shown in that area.
-   * @returns {AssistantPanelView} The view.
    */
   const viewAfterSetArea = (area: AssistantArea | null, conversationId: string | null): AssistantPanelView =>
     area === state.area && state.view === 'chat' ? 'chat' : viewOf(conversationId)

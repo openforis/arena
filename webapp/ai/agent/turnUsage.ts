@@ -72,7 +72,6 @@ export const estimateContextTokens = ({
  * @param {number} params.estimatedTokens - Estimate of the request.
  * @param {number} params.droppedCount - Earlier messages left out.
  * @param {AiContextWindow|null} params.contextWindow - Window of the engine, or null.
- * @returns {AssistantMessageUsage} The usage.
  */
 export const buildTurnUsage = ({
   stepTokens,

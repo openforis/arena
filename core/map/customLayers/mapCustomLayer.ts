@@ -230,7 +230,6 @@ export const validateMapCustomLayers = (value: unknown): MapCustomLayer[] | null
  * @param {MapCustomLayer[]} params.surveyLayers - The layers shared with everyone in the survey.
  * @param {MapCustomLayer[]} params.userLayers - The layers of the current user.
  * @param {string[]} [params.hiddenLayerIds] - Ids hidden for this session.
- * @returns {MapCustomLayerWithScope[]} The layers with their scope.
  */
 export const mergeMapCustomLayers = ({
   surveyLayers,

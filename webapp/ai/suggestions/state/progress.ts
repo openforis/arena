@@ -12,7 +12,6 @@ import { getVisibleTargets } from './visibility'
 /**
  * Returns the state with the in-progress entry of a suggestion replaced (null or no target removes it).
  * @param {string} id - Suggestion id.
- * @returns {SuggestionUserState} The new state.
  */
 export const setInProgress = (
   state: SuggestionUserState,
@@ -58,7 +57,6 @@ export const withProgress = (
  * count), failed shows them again.
  * @param {object} params - Parameters.
  * @param {string} params.conversationId - Conversation.
- * @returns {SuggestionUserState} The new state.
  */
 export const withSettled = (
   state: SuggestionUserState,

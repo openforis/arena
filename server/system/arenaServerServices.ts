@@ -5,7 +5,6 @@ import { SurveyDataMigrationServiceArena } from '@server/modules/survey/service/
 
 /**
  * Registers the Arena implementations of arena-server services, replacing the arena-server defaults.
- * @returns {ServiceRegistry} - The service registry.
  */
 export const registerArenaServerServices = (serviceRegistry: ServiceRegistry): ServiceRegistry =>
   serviceRegistry.registerService(ServerServiceType.surveyDataMigration, SurveyDataMigrationServiceArena)
@@ -13,6 +12,5 @@ export const registerArenaServerServices = (serviceRegistry: ServiceRegistry): S
 /**
  * Initializes the arena-server services (ArenaServer.initServices registers the arena-server defaults again)
  * and registers the Arena implementations.
- * @returns {ServiceRegistry} - The service registry.
  */
 export const initArenaServerServices = (): ServiceRegistry => registerArenaServerServices(ArenaServer.initServices())

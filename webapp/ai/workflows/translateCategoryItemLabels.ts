@@ -203,7 +203,6 @@ export const runTranslateCategoryItemLabels = async ({
  * at Apply, not overwritten.
  * @param {object[]} rows - Translated rows.
  * @param {string} lang - Target language.
- * @returns {ChangeOperationDraft[]} The drafts.
  */
 export const toCategoryLabelDrafts = (
   rows: (CategoryLabelRow & { aiText: string })[],

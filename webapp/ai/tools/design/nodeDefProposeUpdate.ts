@@ -89,7 +89,6 @@ const checkValueType = ({ prop, value }: UpdateChange): void => {
 /**
  * Converts a category or taxonomy change: checks the node definition type and resolves the name.
  * @param {UpdateChange} change - The change (prop categoryName or taxonomyName, string value).
- * @returns {ChangeOperationDraft} The draft.
  */
 const toRefDraft = (survey: any, nodeDef: any, change: UpdateChange): ChangeOperationDraft => {
   const target = refTargets[change.prop as RefInputProp]

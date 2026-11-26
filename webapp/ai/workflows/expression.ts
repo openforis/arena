@@ -41,7 +41,6 @@ export const generateExpressionWorkflow = async ({
 /**
  * Streams the explanation of an expression.
  * @param {object} params - Parameters (survey, surveyId, nodeDefUuid, expression, onChunk, signal, model).
- * @returns {Promise<void>} Resolves when the explanation is complete.
  */
 export const explainExpressionWorkflow = async ({
   survey,

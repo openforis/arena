@@ -40,7 +40,6 @@ const setAll = (
 
 /**
  * Converts an operation to its server update.
- * @returns {CategoryItemLabelUpdate} The update.
  */
 const toUpdate = ({ itemUuid, lang, text, expectedText }: CategoryItemLabelSetOperation): CategoryItemLabelUpdate => ({
   itemUuid,
@@ -120,7 +119,6 @@ const applyChunk = async ({
  * @param {Map<string, OperationResult>} params.results - Results (updated).
  * @param {number} [params.chunkSize] - Labels per request (the server limit).
  * @param {Function} [params.onChunkDone] - Labels of each request sent.
- * @returns {Promise<void>} Resolves when every operation has a result.
  */
 export const applyCategoryItemLabels = async ({
   changeSet,

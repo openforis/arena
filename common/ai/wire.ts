@@ -193,7 +193,6 @@ export const serializeGenerateResult = (
 /**
  * Converts a wire result back to a generate result (browser side).
  * @param {unknown} json - Parsed wire result.
- * @returns {LanguageModelV4GenerateResult} The generate result.
  * @throws {SystemError} aiProviderUnavailable when the payload is not an object.
  */
 export const deserializeGenerateResult = (json: unknown): LanguageModelV4GenerateResult => {

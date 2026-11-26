@@ -27,7 +27,6 @@ registerAppSurveyAiPolicyCache(cache)
  * Returns the survey AI policy (cached for 30 s).
  * @param {object} [options] - Options.
  * @param {boolean} [options.fresh] - Read it from the server now, whatever the cache holds.
- * @returns {Promise<SurveyAiPolicyClientState>} The policy state.
  */
 export const fetchSurveyAiPolicy = (
   surveyId: number,

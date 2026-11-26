@@ -37,7 +37,6 @@ const bindPropertiesPopup = (feature: { properties?: Record<string, unknown> | n
 /**
  * Builds a layer from GeoJSON data.
  * @param {GeoJsonInput} data - The GeoJSON data.
- * @returns {L.GeoJSON} The layer.
  */
 const toGeoJsonLayer = (data: GeoJsonInput): L.GeoJSON => L.geoJSON(data, { onEachFeature: bindPropertiesPopup })
 
@@ -92,7 +91,6 @@ export const readFileLayerGroup = async (file: File): Promise<L.FeatureGroup> =>
 /**
  * Returns the details of an error thrown while reading a file, to show to the user.
  * @param {unknown} error - The error (an Error from the parsers or the download; other values shown as JSON).
- * @returns {string} The details.
  */
 export const getReadErrorDetails = (error: unknown): string =>
   error instanceof Error ? error.message : JSON.stringify(error)

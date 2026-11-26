@@ -21,14 +21,12 @@ export type AssistantAreaStatus = {
 
 /**
  * Returns a hidden status.
- * @returns {AssistantAreaStatus} The status.
  */
 const hidden = (area: AssistantArea): AssistantAreaStatus => ({ area, status: 'hidden', reasonKeys: [] })
 
 /**
  * Returns an unavailable status.
  * @param {string[]} reasonKeys - Reason i18n keys.
- * @returns {AssistantAreaStatus} The status.
  */
 const unavailable = (area: AssistantArea, reasonKeys: string[]): AssistantAreaStatus => ({
   area,
@@ -57,7 +55,6 @@ const isProviderLevelProblem = (availability: AiEngineFeatureAvailability): bool
  * Maps the availability of a feature (B) to an area status.
  * @param {AiFeatureAvailability|AiEngineFeatureAvailability} availability - Feature availability.
  * @param {boolean} [canSwitchProvider] - A provider row can be picked in the chat (hasPickableProvider).
- * @returns {AssistantAreaStatus} The status.
  */
 export const fromAvailability = (
   area: AssistantArea,
@@ -91,7 +88,6 @@ export const fromAvailability = (
  * @param {boolean} params.categoryEnabled - The user's "chat" AI category is on.
  * @param {AiFeatureAvailability} params.availability - Availability of the chatbot feature (B).
  * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
- * @returns {AssistantAreaStatus} The status.
  */
 export const getHelpAreaStatus = ({
   categoryEnabled,
@@ -142,7 +138,6 @@ export const getDesignAreaStatus = ({
 /**
  * Returns the areas with a tab (not hidden), in tab order.
  * @param {AssistantAreaStatus[]} statuses - Area statuses.
- * @returns {AssistantArea[]} The areas.
  */
 export const getTabAreas = (statuses: AssistantAreaStatus[]): AssistantArea[] =>
   statuses.filter((status) => status.status !== 'hidden').map((status) => status.area)
@@ -157,7 +152,6 @@ export const isTabBarShown = (tabAreas: AssistantArea[]): boolean => tabAreas.le
 /**
  * Returns true when the panel button is shown (at least one area not hidden).
  * @param {AssistantAreaStatus[]} statuses - Area statuses.
- * @returns {boolean} True when shown.
  */
 export const isAssistantShown = (statuses: AssistantAreaStatus[]): boolean =>
   statuses.some((status) => status.status !== 'hidden')

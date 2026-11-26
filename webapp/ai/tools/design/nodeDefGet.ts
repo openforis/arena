@@ -31,7 +31,6 @@ const getExpressionsView = (nodeDef: any) => {
 /**
  * Returns the names of the design children of an entity.
  * @param {object} nodeDef - Entity definition.
- * @returns {string[]} The child names.
  */
 const getChildNames = (survey: any, nodeDef: any): string[] =>
   getCurrentNodeDefs(survey)

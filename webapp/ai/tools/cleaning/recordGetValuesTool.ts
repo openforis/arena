@@ -50,7 +50,6 @@ const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
  * @param {object} deps - Dependencies.
  * @param {CleaningApi} deps.api - Cleaning API.
  * @param {Function} deps.getI18n - Returns the translator.
- * @returns {AiTool} The tool.
  */
 export const createRecordGetValuesTool = ({
   api,

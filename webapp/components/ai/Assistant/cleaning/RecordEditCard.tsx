@@ -38,7 +38,6 @@ type EditRowProps = {
 /**
  * Returns the translated text of an edit result.
  * @param {Function} t - Translation function (unescaped: the message is translated twice).
- * @returns {string} The text.
  */
 const getResultText = (t: (key: string, params?: any) => string, result: OperationResult): string => {
   if (result.status !== 'failed') return t(`aiCleaning.result.${result.status}`)

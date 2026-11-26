@@ -38,7 +38,6 @@ const LAST_SHRINK_LEVEL = 3
 /**
  * Applies a change to every entry of a record; returns the same record when nothing changed.
  * @param {Function} change - Returns the new value of an entry, the same value when unchanged, or null to drop it.
- * @returns {Record<string, T>} The record.
  */
 const mapEntries = <T>(record: Record<string, T>, change: (value: T, key: string) => T | null): Record<string, T> => {
   let changed = false
@@ -59,7 +58,6 @@ const mapEntries = <T>(record: Record<string, T>, change: (value: T, key: string
  * @param {number} max - Survey buckets to keep.
  * @param {string|null} keepBucket - A bucket that is never dropped.
  * @param {Record<string, number>|undefined} touchedAt - When each bucket was last written.
- * @returns {Record<string, T>} The record.
  */
 const capBuckets = <T>(
   record: Record<string, T>,
@@ -103,7 +101,6 @@ const capDismissed = (entry: DismissedEntry, max: number, stillPending: Set<stri
  * Returns the keys of the targets a bucket has pending for a suggestion id.
  * @param {AssistantSuggestion[]|undefined} suggestions - Pending suggestions of the bucket.
  * @param {string} id - Suggestion id.
- * @returns {Set<string>} The keys.
  */
 const pendingKeysOf = (suggestions: AssistantSuggestion[] | undefined, id: string): Set<string> =>
   new Set(suggestions?.find((item) => item.id === id)?.targets.map((target) => target.key))
@@ -149,7 +146,6 @@ const pruneTouchedAt = (
  * Applies limits to a state (the same object when it already fits).
  * @param {Date} now - Now (expiry).
  * @param {string|null} keepBucket - The bucket in use.
- * @returns {SuggestionUserState} The state.
  */
 const applyLimits = (
   state: SuggestionUserState,

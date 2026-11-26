@@ -67,7 +67,6 @@ const DEFAULT_OPACITY_PERCENT_BY_ROLE: Record<MapCustomLayerRole, number> = { ov
  * Creates the initial state of the dialog.
  * @param {object} params - Parameters.
  * @param {boolean} params.canEditSurvey - Whether the user can share layers with everyone in the survey.
- * @returns {WmsDialogFormState} The state.
  */
 export const createWmsDialogFormState = ({ canEditSurvey }: { canEditSurvey: boolean }): WmsDialogFormState => ({
   url: '',
@@ -119,7 +118,6 @@ export const isLayerSelectable = ({
 
 /**
  * Returns the layers of the service that are selected, in service order.
- * @returns {MapServiceLayer[]} The selected layers.
  */
 export const getSelectedLayers = (state: WmsDialogFormState): MapServiceLayer[] => {
   const selected = new Set(state.selectedLayerNames)
@@ -195,7 +193,6 @@ const toggleLayerName = (state: WmsDialogFormState, name: string): string[] => {
 
 /**
  * Updates the state of the dialog.
- * @returns {WmsDialogFormState} The new state.
  */
 export const wmsDialogFormReducer = (state: WmsDialogFormState, action: WmsDialogFormAction): WmsDialogFormState => {
   switch (action.type) {
@@ -334,7 +331,6 @@ const pickWmtsTemplate = (layer: MapServiceLayer, format: MapImageFormat): { url
  * @param {object} params - Parameters.
  * @param {MapServiceLayer} params.layer - The service layer.
  * @param {MapCustomLayer} params.common - The properties shared by every added layer.
- * @returns {MapCustomLayer} The layer.
  */
 const buildServiceLayer = ({
   state,
@@ -393,7 +389,6 @@ export const buildMapCustomLayers = ({
  * Reads the message of a failed API call: the server's appErrors key when there is one.
  * @param {unknown} error - The axios error.
  * @param {string} fallbackKey - The key used otherwise.
- * @returns {WmsFormMessage} The message.
  */
 export const toErrorMessage = (error: unknown, fallbackKey: string): WmsFormMessage => {
   const data = (error as { response?: { data?: { key?: unknown; params?: Record<string, unknown> } } })?.response?.data

@@ -93,7 +93,6 @@ const withoutId = (request: AiProviderRequest): AiProviderRequest => {
 /**
  * Returns the state, the derived view and the actions of the add / edit provider dialog.
  * @param {Params} params - Saved provider (edit) or null (add), context and the callback after a save.
- * @returns {ProviderDialogApi} The dialog API.
  */
 export const useProviderDialog = ({ saved, context, onSaved }: Params): ProviderDialogApi => {
   const t = useI18nT()

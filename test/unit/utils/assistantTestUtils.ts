@@ -23,7 +23,6 @@ export const fakeT = (key: string, params?: Record<string, unknown>): string =>
  * @param {object} [options] - Options.
  * @param {string[]} [options.languages] - Survey languages (default en).
  * @param {number} [options.surveyId] - Survey id (default 7).
- * @returns {Promise<object>} The survey.
  */
 export const buildAssistantSurvey = async ({
   languages = ['en'],
@@ -98,7 +97,6 @@ export const finish = (unified: string) => ({ type: 'finish', finishReason: { un
 
 /**
  * Builds a model stream that answers with the given text.
- * @returns {ReadableStream} The stream.
  */
 export const textStream = (text: string): any =>
   convertArrayToReadableStream([
@@ -112,7 +110,6 @@ export const textStream = (text: string): any =>
 /**
  * Builds a model stream that calls a tool.
  * @param {unknown} [input] - Tool input (default: the tool name as summary).
- * @returns {ReadableStream} The stream.
  */
 export const toolCallStream = (toolCallId: string, toolName: string, input?: unknown): any =>
   convertArrayToReadableStream([
@@ -124,7 +121,6 @@ export const toolCallStream = (toolCallId: string, toolName: string, input?: unk
 /**
  * Creates a mock model that returns one stream per call, in order (the last one repeats).
  * @param {...Function} streams - Stream factories.
- * @returns {MockLanguageModelV4} The model.
  */
 export const scriptedModel = (...streams: (() => any)[]): MockLanguageModelV4 => {
   let call = 0
@@ -138,7 +134,6 @@ export const scriptedModel = (...streams: (() => any)[]): MockLanguageModelV4 =>
  * @param {string} name - Tool name.
  * @param {Function} execute - Execute function.
  * @param {Function} [requires] - Requires function (default: always available).
- * @returns {AiTool} The tool.
  */
 export const makeTool = (
   name: string,

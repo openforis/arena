@@ -104,7 +104,6 @@ const findLabelSource = (op: LabelSetOperation, changeSet: ChangeSet, survey: an
 
 /**
  * Converts a basic value to a card value.
- * @returns {CardValue} The card value.
  */
 const toBasicValue = (value: string | boolean | null): CardValue =>
   typeof value === 'boolean' ? { kind: 'boolean', value } : { kind: 'text', text: value }
@@ -113,7 +112,6 @@ const toBasicValue = (value: string | boolean | null): CardValue =>
  * Converts an update value to a card value: categories and taxonomies by name.
  * @param {object} op - Update operation.
  * @param {string|boolean|null} value - Its from or to value.
- * @returns {CardValue} The card value.
  */
 const toUpdateValue = (
   survey: any,
@@ -127,7 +125,6 @@ const toUpdateValue = (
 /**
  * Converts expressions to a card value.
  * @param {object[]} expressions - Node definition expressions.
- * @returns {CardValue} The card value.
  */
 const toExpressionsValue = (expressions: any[]): CardValue => ({
   kind: 'expressions',
@@ -268,7 +265,6 @@ export const buildCardRows = ({
 
 /**
  * Returns the operations that can still be applied (not applied yet, card not discarded).
- * @returns {string[]} Operation ids.
  */
 export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] => {
   if (cardState.discarded) return []
@@ -297,7 +293,6 @@ export const getOperationConflicts = ({
 
 /**
  * Returns the nearest page node definition containing a node definition.
- * @returns {object} The page node definition.
  */
 const findPageNodeDef = (nodeDef: any, survey: any, cycle: string): any => {
   let current = NodeDef.isEntity(nodeDef) ? nodeDef : Survey.getNodeDefParent(nodeDef)(survey)

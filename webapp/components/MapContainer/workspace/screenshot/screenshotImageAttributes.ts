@@ -31,7 +31,6 @@ export const filterImageAttributeDefs = (defs: any[], cycle: string): any[] =>
  * @param {Array<object>} defs - Image attribute definitions.
  * @param {string} lang - Survey language for the labels.
  * @param {object|null} [rowEntityDef] - The multiple entity holding the attributes (a new row gets the image).
- * @returns {Array<ScreenshotImageAttributeOption>} The options.
  */
 export const toImageAttributeOptions = (
   defs: any[],

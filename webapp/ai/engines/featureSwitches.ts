@@ -19,7 +19,6 @@ export type AiFeatureSwitches = {
  * Returns whether the access level covers the category, its switch is on and the server leaves it enabled.
  * @param {AiFeatureSwitches|null|undefined} settings - AI settings (null: not loaded, nothing is enabled).
  * @param {string|null} category - Feature category.
- * @returns {boolean} True when the category is enabled.
  */
 export const isAiCategoryEnabledInSettings = (
   settings: AiFeatureSwitches | null | undefined,
@@ -42,7 +41,6 @@ export const isAiCategoryEnabledInSettings = (
  * Returns whether a feature is enabled by the settings (its category is, and the server did not disable it).
  * @param {AiFeatureSwitches|null|undefined} settings - AI settings (null: not loaded).
  * @param {string} feature - Feature key.
- * @returns {boolean} True when enabled.
  */
 export const isAiFeatureEnabledInSettings = (
   settings: AiFeatureSwitches | null | undefined,

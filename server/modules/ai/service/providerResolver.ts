@@ -57,7 +57,6 @@ const adminDefaultConfig = (): ProviderConfig | null =>
  * @param {object} params - Parameters.
  * @param {string} params.providerId - `acct:` id.
  * @param {boolean} params.decrypt - Decrypt the key (false for descriptions).
- * @returns {ResolvedProviderConfig} The resolved config.
  */
 const resolveAccountConfig = ({
   user,

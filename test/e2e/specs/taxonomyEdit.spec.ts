@@ -14,7 +14,6 @@ const resourcePath = (fileName: string) => path.resolve(__dirname, '..', 'resour
  * Fills the specified taxonomy editor field and waits for the change to be saved.
  * @param {string} selector - Field selector.
  * @param {string} value - Value to fill.
- * @returns {Promise<void>} - Resolves when the change has been saved.
  */
 const fillAndWait = async (page: Page, selector: string, value: string): Promise<void> => {
   await Promise.all([

@@ -19,7 +19,6 @@ type MapViewState = { center: LatLng; zoom: number; bounds: LatLngBoundsLiteral 
 
 /**
  * Reads the centre, zoom and bounds of the map.
- * @returns {MapViewState} The view.
  */
 const readView = (map: LeafletMap): MapViewState => {
   const { lat, lng } = map.getCenter()
@@ -34,7 +33,6 @@ const readView = (map: LeafletMap): MapViewState => {
 /**
  * Formats a zoom level with at most one decimal.
  * @param {number} zoom - The zoom level.
- * @returns {string} The text.
  */
 const formatZoom = (zoom: number): string => String(Math.round(zoom * 10) / 10)
 

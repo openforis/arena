@@ -16,7 +16,6 @@ export type MapLayerCardModel = {
  * @param {ProposedMapLayer} params.proposed - The proposed layer.
  * @param {string} params.lang - Label language.
  * @param {boolean} params.canUseMap - Whether the user can open the map.
- * @returns {MapLayerCardModel} The card model.
  */
 export const getMapLayerCardModel = ({
   proposed,

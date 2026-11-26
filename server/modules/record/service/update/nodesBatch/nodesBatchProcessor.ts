@@ -123,7 +123,6 @@ const toMessageParams = (params: unknown): Record<string, unknown> | undefined =
 
 /**
  * Maps an error to the message key and params of the failed edits.
- * @returns {{messageKey: string, params?: object}} The message.
  */
 const toFailureMessage = (
   error: { key?: unknown; params?: unknown } | null | undefined
@@ -334,7 +333,6 @@ const applyEdit = async ({
  * Checks and persists the edits of the record, inside the record lock.
  * @param {BatchState} state - The batch state.
  * @param {object} t - The transaction.
- * @returns {Promise<NodesBatchEditResult[]>} The results.
  */
 const applyEditsInLock = async (state: BatchState, t: DbClient): Promise<NodesBatchEditResult[]> => {
   const { msg, deps, survey, refusedResults, appliedEdits } = state
@@ -367,7 +365,6 @@ const applyEditsInLock = async (state: BatchState, t: DbClient): Promise<NodesBa
  * Builds the results of a record whose transaction rolled back: refused edits keep their result, the others fail
  * (with the error when it hit them all, e.g. a timeout; as rolled back when another edit raised it).
  * @param {BatchState} state - The batch state.
- * @returns {NodesBatchEditResult[]} The results.
  */
 const rolledBackResults = (state: BatchState, error: unknown): NodesBatchEditResult[] => {
   const { messageKey, params } = toFailureMessage(error)
@@ -385,7 +382,6 @@ const rolledBackResults = (state: BatchState, error: unknown): NodesBatchEditRes
 /**
  * Drops the cached record after a rollback (its in-memory copy may hold the rolled back values).
  * @param {BatchState} state - The batch state.
- * @returns {Promise<void>} Resolved when done.
  */
 const clearCachedRecordSafely = async (state: BatchState): Promise<void> => {
   try {

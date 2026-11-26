@@ -45,7 +45,6 @@ export const createProviderRateLimit = ({
   /**
    * Creates the function that counts a call of the user as finished; it counts it once, however often it is called.
    * @param {string} userUuid - User.
-   * @returns {() => void} The release function.
    */
   const createRelease = (userUuid: string): (() => void) => {
     let released = false

@@ -162,7 +162,6 @@ const fillRestTemplate = ({ template, values }: { template: string; values: Map<
  * @param {XmlElement} params.layer - The Layer element.
  * @param {Map<string, string>} params.values - Placeholder values (matrix set, style, dimensions, zoom/row/col).
  * @param {string} params.requestUrl - The capabilities request URL.
- * @returns {Partial<Record<MapImageFormat, string>>} The templates.
  */
 const buildRestTemplates = ({
   layer,
@@ -195,7 +194,6 @@ const buildRestTemplates = ({
  * @param {string} params.matrixSetId - The tile matrix set identifier.
  * @param {string} params.prefix - The TileMatrix identifier prefix.
  * @param {Map<string, string>} params.dimensions - The dimension values.
- * @returns {Partial<Record<MapImageFormat, string>>} The templates.
  */
 const buildKvpTemplates = ({
   layer,

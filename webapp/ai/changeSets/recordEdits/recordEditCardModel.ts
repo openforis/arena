@@ -44,7 +44,6 @@ export const groupOperationsByRecord = (operations: RecordAttributeUpdateOperati
  * Returns the edits that can still be applied: no result yet, or failed.
  * @param {RecordAttributeUpdateOperation[]} operations - The edits.
  * @param {OperationResult[]} [results] - Results so far.
- * @returns {string[]} Their ids.
  */
 export const getSelectableOperationIds = (
   operations: RecordAttributeUpdateOperation[],
@@ -75,7 +74,6 @@ const transientFailureKeys = new Set([
 
 /**
  * Returns the ids of the edits that failed for a transient reason (Retry).
- * @returns {string[]} The ids.
  */
 export const getRetryOperationIds = (results: OperationResult[] = []): string[] =>
   results

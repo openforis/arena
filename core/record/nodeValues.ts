@@ -299,7 +299,6 @@ const getFastEqualityKeyInRecordContext = ({
  * produce the same key, regardless of their content (no separator character to collide on, unlike a plain join
  * or a doubled-separator escape - which is still ambiguous for values that are themselves runs of the separator
  * straddling a part boundary, e.g. ["\u0001\u0001", "X"] vs ["\u0001", "\u0001X"]).
- * @returns The composite key.
  */
 const buildCompositeKey = (keyParts: string[]): string =>
   keyParts.map((keyPart) => `${keyPart.length}:${keyPart}`).join('')

@@ -13,7 +13,6 @@ import { CYRILLIC, LANGUAGES, RESOURCES, usesCyrillic } from '../utils/i18nParit
 /**
  * Returns a describe context in a UI language.
  * @param {string} lang - UI language.
- * @returns {SuggestionDescribeContext} The context.
  */
 const describeCtx = (lang: string): SuggestionDescribeContext => ({
   survey: null,
@@ -31,7 +30,6 @@ const suggestionOf = (count: number) =>
 
 /**
  * Returns the {{placeholders}} of a text, sorted.
- * @returns {string[]} The placeholders.
  */
 const placeholders = (text: string): string[] => (text.match(/{{\s*[\w.]+\s*}}/g) ?? []).sort()
 

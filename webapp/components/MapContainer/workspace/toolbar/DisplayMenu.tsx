@@ -11,7 +11,6 @@ import { ToolbarMenu } from './ToolbarMenu'
 
 /**
  * Display menu: map options (markers, labels, UTM grid, image interpretation aids); it stays open while toggling.
- * @returns {React.ReactElement} The menu.
  */
 export const DisplayMenu = (): ReactElement => {
   const surveyInfo = useSurveyInfo()

@@ -19,7 +19,6 @@ type CountValidationReportRows = CleaningApi['countValidationReportRows']
 
 /**
  * Returns the id of the validation errors suggestion of a cycle.
- * @returns {string} The id.
  */
 export const getValidationErrorsSuggestionId = (cycle: string): string => `validationErrors:${cycle}`
 
@@ -28,7 +27,6 @@ export const getValidationErrorsSuggestionId = (cycle: string): string => `valid
  * @param {object} params - Parameters.
  * @param {number} params.count - Number of report rows.
  * @param {Date} params.createdAt - Creation date.
- * @returns {AssistantSuggestion} The suggestion.
  */
 export const buildValidationErrorsSuggestion = ({
   surveyId,
@@ -97,7 +95,6 @@ const countCycleMessages = async ({
  * @param {object} deps - Dependencies.
  * @param {CountValidationReportRows} deps.countRows - Counts the validation report rows (Arena's server).
  * @param {AiLog} [deps.log] - Reports a failed count.
- * @returns {EventDetector} The detector.
  */
 export const createValidationErrorsDetector = ({
   countRows,

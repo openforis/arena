@@ -16,7 +16,6 @@ const DESIGNER_MODULE = 'designer'
 /**
  * Returns a snapshot of the eligible node defs.
  * @param {object} survey - Survey (defs of the generation).
- * @returns {DesignerVisit} The visit.
  */
 const startVisit = (generation: SuggestionGeneration, survey: any): DesignerVisit => ({
   generationId: generation.id,
@@ -27,7 +26,6 @@ const startVisit = (generation: SuggestionGeneration, survey: any): DesignerVisi
 
 /**
  * Returns the saved eligible node defs that are not in the snapshot.
- * @returns {string[]} Their uuids.
  */
 const newSavedUuids = (visit: DesignerVisit, survey: any): string[] => {
   const seen = new Set(visit.snapshot)

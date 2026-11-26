@@ -37,7 +37,6 @@ const STATUSES_WITH_MESSAGE = new Set<ScenePanelStatusKind>([
  * Derives what the panel shows from the area, the tiles and the search state.
  *
  * @param {ScenePanelStatusInput} input - Panel state.
- * @returns {ScenePanelStatusKind} Status.
  */
 export const getScenePanelStatus = (input: ScenePanelStatusInput): ScenePanelStatusKind => {
   if (input.areaKey === 'draw' && input.drawing) return 'drawing'

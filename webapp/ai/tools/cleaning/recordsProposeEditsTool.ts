@@ -77,7 +77,6 @@ const invalidProposal = (
  * @param {object} deps - Dependencies.
  * @param {CleaningApi} deps.api - Cleaning API.
  * @param {Function} deps.getI18n - Returns the translator.
- * @returns {AiTool} The tool.
  */
 export const createRecordsProposeEditsTool = ({
   api,

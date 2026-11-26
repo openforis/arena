@@ -76,7 +76,6 @@ const countTerms = (section: HandbookSection): { termCounts: Map<string, number>
 
 /**
  * Builds the search index of the handbook.
- * @returns {HandbookIndex} The index.
  */
 export const buildHandbookIndex = (handbook: Handbook): HandbookIndex => {
   const sections = handbook.sections.map((section) => ({ section, ...countTerms(section) }))
@@ -92,7 +91,6 @@ export const buildHandbookIndex = (handbook: Handbook): HandbookIndex => {
  * Computes the BM25 score of a section for the query terms.
  * @param {IndexedSection} indexed - Section.
  * @param {string[]} terms - Query terms.
- * @returns {number} The score.
  */
 const scoreSection = (index: HandbookIndex, indexed: IndexedSection, terms: string[]): number => {
   const count = index.sections.length
@@ -143,7 +141,6 @@ const PART_SUFFIX = / \(\d+\/\d+\)$/
  * Returns the outline of the handbook ("<id> <title>" per line, parts merged). When it is too long, the deepest
  * levels are dropped.
  * @param {number} [maxChars] - Maximum length.
- * @returns {string} The outline.
  */
 export const getHandbookOutline = (handbook: Handbook, maxChars: number = AiLimits.handbookOutlineMaxChars): string => {
   const entries: { depth: number; line: string }[] = []

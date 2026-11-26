@@ -104,7 +104,6 @@ const sendRecordEdits = async (
  * Sends the edits of a record; a failure to send fails only the edits of this record. The returned promise never
  * rejects, so it can wait for the others without an unhandled rejection.
  * @param {NodesBatchRecordEdit[]} edits - The edits to apply.
- * @returns {Promise<NodesBatchEditResult[]>} The results.
  */
 const sendRecordEditsSafely = async (
   context: RequestContext,
@@ -164,7 +163,6 @@ const runNodesBatch = async (
  * Waits for a batch, but not for ever: past the request deadline plus a grace time the caller gets a timeout error
  * (the work still running in the background stops by itself, as the deadline has passed).
  * @param {Promise<NodesBatchEditResult[]>} batch - The batch run.
- * @returns {Promise<NodesBatchEditResult[]>} The results of the batch.
  * @throws {SystemError} aiApplyTimeout (504) when the batch did not end in time.
  */
 const runUntilHung = async (batch: Promise<NodesBatchEditResult[]>): Promise<NodesBatchEditResult[]> => {

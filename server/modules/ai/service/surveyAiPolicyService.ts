@@ -70,7 +70,6 @@ const isSamePolicy = (a: AiPolicy, b: AiPolicy): boolean => a.schema === b.schem
 /**
  * Validates a policy sent by the client: both classes with a valid level, and record data not more permissive than
  * the survey design (`aiPolicyDataAboveSchema`).
- * @returns {AiPolicy} The policy.
  */
 export const parseAiPolicyBody = (body: unknown): AiPolicy => {
   const valid =
@@ -88,7 +87,6 @@ export const parseAiPolicyBody = (body: unknown): AiPolicy => {
 /**
  * Returns the survey AI policy, the instance ceilings and the effective policy.
  * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
- * @returns {Promise<SurveyAiPolicyState>} The policy state.
  */
 export const getSurveyAiPolicy = async (
   surveyId: number,
@@ -130,7 +128,6 @@ const assertChangesWithinCeilings = ({
  * @param {ArenaUser} params.user - Acting user (permission checked by the route).
  * @param {unknown} params.policy - Requested policy (request body).
  * @param {SurveyAiPolicyDeps} [deps] - Dependencies (tests).
- * @returns {Promise<SurveyAiPolicyState>} The new policy state.
  */
 export const updateSurveyAiPolicy = async (
   { user, surveyId, policy }: { user: ArenaUser; surveyId: number; policy: unknown },

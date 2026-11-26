@@ -31,7 +31,6 @@ const PREVIEW_TIMEOUT = 30_000
 
 /**
  * Waits for the screenshot preview image and for the main button to be enabled.
- * @returns {Promise<void>} Resolves when the PNG is ready.
  */
 const waitForScreenshotPreview = async (page: Page): Promise<void> => {
   await expect(page.getByTestId(ids.screenshotPreview)).toBeVisible({ timeout: PREVIEW_TIMEOUT })
@@ -59,7 +58,6 @@ const openMap = async (page: Page): Promise<void> => {
 /**
  * Starts a tool from the Tools menu (the full bar has no quick buttons for the tools).
  * @param {string} itemKey - The menu item: measureDistance, measureArea.
- * @returns {Promise<void>} Resolves when the item is clicked.
  */
 const startFromToolsMenu = async (page: Page, itemKey: string): Promise<void> => {
   await page.getByTestId(ids.menuButton('tools')).click()
@@ -77,7 +75,6 @@ const ONE_PIXEL_PNG_DATA_URL = `data:image/png;base64,${ONE_PIXEL_PNG.toString('
 
 /**
  * Locates the rows of the custom overlays in the Layers panel.
- * @returns {Locator} The rows.
  */
 const customOverlayRows = (page: Page): Locator =>
   page.getByTestId(ids.railPanel('layers')).locator(`[data-testid^="${ids.overlayRow('custom-')}"]`)

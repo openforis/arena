@@ -39,7 +39,6 @@ const userMessages = (page: Page) => assistantPanel(page).getByTestId(TestId.aiA
  * @param {object} params - Parameters.
  * @param {string} params.baseURL - Arena base URL.
  * @param {TestUser} params.user - The worker user.
- * @returns {Promise<void>} Resolves when logged in again (no page loaded yet).
  */
 const logOutAndBackIn = async (page: Page, { baseURL, user }: { baseURL: string; user: TestUser }): Promise<void> => {
   await page.getByTestId(TestId.header.userBtn).click()
@@ -61,7 +60,6 @@ const compact = (tokens: number): string =>
 /**
  * Navigates inside the app, as a user reaches a page from the sidebar (no reload: a running answer goes on).
  * @param {string} uri - Route to go to.
- * @returns {Promise<void>} Resolves when the route is pushed.
  */
 const navigateInApp = async (page: Page, uri: string): Promise<void> => {
   await page.evaluate((target) => {

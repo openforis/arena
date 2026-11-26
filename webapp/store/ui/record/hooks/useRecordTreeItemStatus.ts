@@ -95,7 +95,6 @@ const pageHasOwnCompletableAttributes = (pageNodeDefUuid: string, state: unknown
  * Returns own-page completion percent for a page entity, or null when unavailable.
  *
  * @param params - Page scope and Redux state
- * @returns Completion percent, or null
  */
 const getPageCompletionPercent = ({
   pageNodeDefUuid,

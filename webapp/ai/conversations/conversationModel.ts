@@ -18,7 +18,6 @@ export const toSurveyKey = (surveyId: number | null): number => surveyId ?? 0
  * @param {number|null} params.surveyId - Current survey.
  * @param {Date} [params.now] - Creation date.
  * @param {Function} [params.idFactory] - Id generator.
- * @returns {Conversation} The conversation.
  */
 export const createConversation = ({
   userUuid,

@@ -35,7 +35,6 @@ const importCardText = 'Imported 2 records. Get a quick overview?'
 
 /**
  * Returns the first sample record with INVALID_TREES invalid trees (distinct keys, no species).
- * @returns {SampleRecord} The record.
  */
 const buildRecordWithManyErrors = (): SampleRecord => {
   const [record] = sampleRecords
@@ -51,7 +50,6 @@ const buildRecordWithManyErrors = (): SampleRecord => {
 /**
  * Navigates inside the app, as a user reaches a page from the sidebar (no reload).
  * @param {string} uri - Route to go to.
- * @returns {Promise<void>} Resolves when the route is pushed.
  */
 const navigateInApp = async (page: Page, uri: string): Promise<void> => {
   await page.evaluate((target) => {
@@ -62,7 +60,6 @@ const navigateInApp = async (page: Page, uri: string): Promise<void> => {
 
 /**
  * Counts the chat requests the stub local server received.
- * @returns {number} The count.
  */
 const countChatRequests = (stub: LocalModelServerStub): number =>
   stub.requests.filter((request) => request.path === '/v1/chat/completions').length
@@ -70,7 +67,6 @@ const countChatRequests = (stub: LocalModelServerStub): number =>
 /**
  * Opens the panel on an area and waits until the area is available (its home page shows only then).
  * @param {string} label - Area tab label.
- * @returns {Promise<void>} Resolves when the area is usable.
  */
 const openArea = async (page: Page, label: string): Promise<void> => {
   await openAssistantPanel(page)
@@ -106,7 +102,6 @@ const readStoredSuggestion = async (
 /**
  * Waits until the store holds a suggestion as pending and not in progress (an absent state keeps waiting).
  * @param {string} id - Suggestion id.
- * @returns {Promise<void>} Resolves when the suggestion is pending.
  */
 const expectStoredPending = async (page: Page, userUuid: string, surveyId: number, id: string): Promise<void> => {
   await expect

@@ -8,7 +8,6 @@ import SystemError, { StatusCodes } from '@core/systemError'
 /**
  * Builds the 400 error of an invalid body.
  * @param {string} reason - What is wrong (logged with the error, not shown).
- * @returns {SystemError} The error.
  */
 const invalid = (reason: string): SystemError =>
   new SystemError('aiDescriptionsInvalid', { reason }, StatusCodes.BAD_REQUEST)
@@ -46,7 +45,6 @@ export const parseAiDescriptions = ({ raw, knownUuids = null }: { raw: unknown; 
 /**
  * Validates the number of node defs the browser could not describe.
  * @param {unknown} raw - The aiDescriptionsFailedCount of the request (missing: 0).
- * @returns {number} The count.
  * @throws {SystemError} aiDescriptionsInvalid (400) when not a whole number between 0 and the cap.
  */
 export const parseAiDescriptionsFailedCount = (raw: unknown): number => {

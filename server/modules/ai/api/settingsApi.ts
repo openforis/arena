@@ -62,7 +62,6 @@ const providerCallGuards = [...guards, limitProviderCalls]
 /**
  * Returns the body of a request as an object: anything else (nothing, a list, a scalar) is an empty one.
  * @param {unknown} body - The parsed body.
- * @returns {Record<string, unknown>} The body.
  */
 const toBodyObject = (body: unknown): Record<string, unknown> =>
   body !== null && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {}

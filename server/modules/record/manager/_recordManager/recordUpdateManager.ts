@@ -410,7 +410,6 @@ export const deleteNode = (
  * @param {string} [params.lang] - The language used to evaluate the expressions.
  * @param {Function} [params.nodesUpdateListener] - Listener notified with the updated nodes.
  * @param {Function} [params.nodesValidationListener] - Listener notified with the updated validations.
- * @returns {Promise<object>} - The updated record.
  */
 export const updateAppInfoDependents = (
   {

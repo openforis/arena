@@ -33,7 +33,6 @@ const isMergeable = (part: LanguageModelV4StreamPart): part is DeltaPart =>
  * @param {object} [options] - Options.
  * @param {number} [options.intervalMs] - Longest wait of a delta.
  * @param {Timers} [options.timers] - Timer functions (tests give their own).
- * @returns {TransformStream<LanguageModelV4StreamPart, LanguageModelV4StreamPart>} The transform.
  */
 export const createDeltaCoalescer = ({
   intervalMs = COALESCE_INTERVAL_MS,

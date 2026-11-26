@@ -20,7 +20,6 @@ type Props = {
  * @param props0.user - The survey user to render.
  * @param props0.draggable - Whether the card can be dragged; false renders a static, non-interactive card.
  * @param props0.pending - Whether a group change for this user is currently being saved; renders a dimmed, non-interactive card regardless of `draggable`, so it can't be dragged again until the change settles.
- * @returns {React.ReactElement} - The UserCard component.
  */
 const UserCard = (props: Props): React.ReactElement => {
   const { user, draggable, pending = false } = props

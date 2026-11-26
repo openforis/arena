@@ -123,7 +123,6 @@ export class JobQueue {
    * Returns the summary of the specified job: the active job summary (if running), the last summary received from the
    * job thread or, if the job has not started yet, a summary created from the job info.
    * The job info itself is never returned: it contains the job params (e.g. the user who started the job).
-   * @returns The job summary.
    */
   private _getJobSummary(jobInfo: JobInfo): JobSummary {
     const { uuid: jobUuid, params } = jobInfo

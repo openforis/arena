@@ -16,7 +16,6 @@ const screenshotPath = (name: string, type: ImageType = 'png'): string =>
 
 /**
  * Waits for the map tiles to be loaded (from the internet: missing ones are left out), only if saving the screenshots.
- * @returns {Promise<void>} Resolves when the tiles are loaded or after the timeout.
  */
 export const waitForMapTiles = async (page: Page): Promise<void> => {
   if (!screenshotsDir) return
@@ -38,7 +37,6 @@ export const waitForMapTiles = async (page: Page): Promise<void> => {
  * @param {Locator} locator - The element.
  * @param {string} name - The file name, without extension.
  * @param {ImageType} [type] - The image type: jpeg for photo-like content (e.g. satellite imagery), much smaller.
- * @returns {Promise<void>} Resolves when the screenshot is saved.
  */
 export const saveScreenshot = async (locator: Locator, name: string, type: ImageType = 'png'): Promise<void> => {
   if (screenshotsDir) await locator.screenshot({ path: screenshotPath(name, type), style })
@@ -54,7 +52,6 @@ export const saveScreenshot = async (locator: Locator, name: string, type: Image
  * @param {number} [params.marginRight] - Extra margin on the right of the elements, in pixels.
  * @param {number} [params.maxHeight] - Maximum height, in pixels (the bottom is cut).
  * @param {ImageType} [params.type] - The image type: jpeg for photo-like content (e.g. satellite imagery), much smaller.
- * @returns {Promise<void>} Resolves when the screenshot is saved.
  */
 export const saveAreaScreenshot = async ({
   page,

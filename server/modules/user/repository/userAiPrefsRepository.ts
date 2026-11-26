@@ -46,7 +46,6 @@ export const readAllAiPrefs = (client: Queryable = db): Promise<{ userUuid: stri
  * Replaces the stored AI prefs of a user, atomically: no other pref is read or written.
  * @param {object} params - Parameters.
  * @param {object} params.aiPrefs - AI prefs to store.
- * @returns {Promise<void>} Resolves when stored.
  */
 export const writeAiPrefs = async (
   { userUuid, aiPrefs }: { userUuid: string; aiPrefs: StoredAiPrefs },

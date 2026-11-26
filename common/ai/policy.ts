@@ -63,7 +63,6 @@ const stricterLevel = (a: unknown, b: unknown): AiPolicyLevel => {
 
 /**
  * Returns true when record data is more permissive than the survey design (a policy the editor and the server refuse).
- * @returns {boolean} True when `data` is above `schema`.
  */
 export const isDataAboveSchema = (policy: AiPolicy): boolean =>
   getPolicyLevelIndex(policy?.data) > getPolicyLevelIndex(policy?.schema)
@@ -107,7 +106,6 @@ export const normalizeAiPolicy = (raw: unknown): AiPolicy => {
  * with record data not above the survey design.
  * @param {object} params - Parameters.
  * @param {AiPolicy} params.policy - Survey policy (normalized).
- * @returns {AiPolicy} The effective policy.
  */
 export const getEffectiveAiPolicy = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy }): AiPolicy =>
   clampDataToSchema({

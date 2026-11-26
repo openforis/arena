@@ -7,7 +7,6 @@
  * Fake `t`: the key, followed by the params as JSON when there are any.
  * @param {string} key - Translation key.
  * @param {object} [params] - Params of the text.
- * @returns {string} The key and the params, e.g. `common:x{"count":2}`.
  */
 export const fakeT = (key: string, params?: object): string => `${key}${params ? JSON.stringify(params) : ''}`
 

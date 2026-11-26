@@ -43,7 +43,6 @@ const pad2 = (value: number): string => String(value).padStart(2, '0')
 
 /**
  * Returns the notation that follows the given one (Lat, Lon → DMS → UTM → Lat, Lon).
- * @returns {CoordinateNotation} The next notation.
  */
 export const nextCoordinateNotation = (notation: CoordinateNotation): CoordinateNotation =>
   COORDINATE_NOTATIONS[(COORDINATE_NOTATIONS.indexOf(notation) + 1) % COORDINATE_NOTATIONS.length]

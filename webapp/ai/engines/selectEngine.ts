@@ -40,7 +40,6 @@ export const getEffectiveProviderId = ({
 
 /**
  * Returns a selection with one reason.
- * @returns {AiEngineSelection} The selection.
  */
 const unavailable = (reason: AiUnavailableReason): AiEngineSelection => ({ unavailable: [reason] })
 

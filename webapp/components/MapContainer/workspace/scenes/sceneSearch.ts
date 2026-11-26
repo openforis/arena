@@ -57,8 +57,6 @@ export const getSearchView = (requestKey: string | null, finished: FinishedSearc
 
 /**
  * Tells whether an error comes from a cancelled search.
- *
- * @returns {boolean} True for an AbortError.
  */
 export const isAbortError = (error: unknown): boolean => (error as { name?: unknown } | null)?.name === 'AbortError'
 
@@ -90,7 +88,6 @@ const readPartRows = async ({ reader, url, tiles, signal }: ReadPartParams): Pro
  * Turns rows into scenes of the wanted tiles and period (row groups also hold neighbouring tiles).
  *
  * @param {Set<string>} tiles - Wanted tile ids.
- * @returns {SceneResult[]} Scenes.
  */
 const toScenes = (rows: SceneIndexRow[], tiles: Set<string>, period: ScenePeriod): SceneResult[] => {
   const scenes: SceneResult[] = []

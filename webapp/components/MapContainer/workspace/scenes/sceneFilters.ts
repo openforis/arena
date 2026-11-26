@@ -11,7 +11,6 @@ type SceneComparator = (sceneA: SceneResult, sceneB: SceneResult) => number
  * setting (max cloud 100, min coverage 0), so a scene is never shown as "clear" without data.
  *
  * @param {SceneFilters} filters - Limits.
- * @returns {boolean} True when the scene passes.
  */
 export const passesSceneFilters = (scene: SceneResult, filters: SceneFilters): boolean => {
   const cloudOk = scene.cloud === null ? filters.maxCloud >= 100 : scene.cloud <= filters.maxCloud

@@ -166,7 +166,6 @@ const ReviewRow = ({
  * Returns the number of columns of the table: check, item, change, the optional original and current, proposed,
  * status.
  * @param {ReviewColumns} columns - Columns of the table.
- * @returns {number} The count.
  */
 const getColumnCount = (columns: ReviewColumns): number => 5 + (columns.original ? 1 : 0) + (columns.current ? 1 : 0)
 

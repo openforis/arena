@@ -92,7 +92,6 @@ const useWmsDialogForm = () => {
  * "Add a WMS / WMTS service" dialog: loads the layers of a service (or takes an XYZ template), and stores the chosen
  * layers as overlays or base maps, for everyone in the survey or only for the current user.
  * Registered as the `wms` dialog of the workspace: it takes no props and closes itself.
- * @returns {React.ReactElement} The dialog.
  */
 export const WmsDialog = (): React.ReactElement => {
   const t = useI18nT()

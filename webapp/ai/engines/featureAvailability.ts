@@ -42,7 +42,6 @@ const ACTIONS: Record<AiUnavailableReason, AiUnavailableAction[]> = {
 
 /**
  * Returns the i18n key (common namespace) of a reason.
- * @returns {string} The key.
  */
 export const getAiUnavailableReasonKey = (reason: AiUnavailableReason): string => `aiEngine.unavailable.${reason}`
 
@@ -54,7 +53,6 @@ export const getAiUnavailableReasonActions = (reason: AiUnavailableReason): AiUn
 
 /**
  * Returns where the data goes with the engine (the props of AiDataLocationBadge).
- * @returns {AiDataLocation} The location.
  */
 export const toDataLocation = (engine: AiSelectedEngine): AiDataLocation =>
   engine.id === 'gateway'
@@ -78,7 +76,6 @@ export const toDataLocation = (engine: AiSelectedEngine): AiDataLocation =>
  * @param {object} params - Parameters.
  * @param {string[]} [params.reasonKeys] - i18n keys of the texts.
  * @param {boolean} params.surveyScoped - The request belongs to a survey.
- * @returns {AiEngineFeatureAvailability} The availability.
  */
 const notAvailable = ({
   status,
@@ -107,7 +104,6 @@ const notAvailable = ({
  * @param {AiDataClass} params.dataClass - Data class of the request.
  * @param {boolean} params.surveyScoped - The request belongs to a survey (false: checked against the instance ceilings).
  * @param {string|null} [params.providerId] - The conversation's provider (default: the user's default).
- * @returns {AiEngineFeatureAvailability} The availability.
  */
 export const getAiEngineFeatureAvailability = ({
   enabled,

@@ -123,7 +123,6 @@ export const createInitialState = ({
  * Returns the draft with a key edit: any edit (also removing it or keeping it) bumps the counter, so a test of an
  * older key never matches.
  * @param {Partial<ProviderDraft>} patch - The key fields.
- * @returns {ProviderDraft} The draft.
  */
 const withKeyEdit = (draft: ProviderDraft, patch: Partial<ProviderDraft>): ProviderDraft => ({
   ...draft,
@@ -143,7 +142,6 @@ const withModelsAnswer = (state: ProviderDialogState, requestId: number, patch: 
 /**
  * Returns the state after the model list arrived: the draft keeps its model (or takes the first listed one).
  * @param {AiModel[]} list - Listed models.
- * @returns {ProviderDialogState} The new state.
  */
 const withModelsLoaded = (state: ProviderDialogState, list: AiModel[]): ProviderDialogState => {
   const models = { ...state.models, list, fetching: false, error: null }
@@ -154,7 +152,6 @@ const withModelsLoaded = (state: ProviderDialogState, list: AiModel[]): Provider
 /**
  * Returns the state after a local test: the address as stored, the model the server lists, and the result.
  * @param {object} action - The `localTested` action.
- * @returns {ProviderDialogState} The new state.
  */
 const withLocalTested = (
   state: ProviderDialogState,
@@ -167,7 +164,6 @@ const withLocalTested = (
 
 /**
  * Returns the draft after a field edit, or null when the action is not one.
- * @returns {ProviderDraft|null} The new draft.
  */
 const reduceDraftEdit = (draft: ProviderDraft, action: ProviderDialogAction): ProviderDraft | null => {
   switch (action.type) {
@@ -194,7 +190,6 @@ const reduceDraftEdit = (draft: ProviderDraft, action: ProviderDialogAction): Pr
 
 /**
  * Returns the state after the test or save progress, or null when the action is not one.
- * @returns {ProviderDialogState|null} The new state.
  */
 const reduceProgress = (state: ProviderDialogState, action: ProviderDialogAction): ProviderDialogState | null => {
   switch (action.type) {
@@ -278,7 +273,6 @@ export type ProviderDialogView = {
  * @param {object} params - Parameters.
  * @param {SavedProvider|null} params.saved - Saved provider (edit), null to add.
  * @param {string[]} params.allowlist - Org-hosted base URLs.
- * @returns {ProviderDialogView} The view.
  */
 export const getProviderDialogView = ({
   state,

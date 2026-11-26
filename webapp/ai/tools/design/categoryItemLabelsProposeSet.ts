@@ -41,7 +41,6 @@ type CategoryLabelItem = CategoryLabelsInput['items'][number]
 /**
  * Converts one proposed item to an operation draft.
  * @param {CategoryLabelItem} item - Proposed label.
- * @returns {ChangeOperationDraft} The draft.
  */
 const toDraft = (
   { categoryName, ref, lang, text }: CategoryLabelItem,

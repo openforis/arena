@@ -21,7 +21,6 @@ export type BatchRunControl = {
 
 /**
  * Creates the control of a run.
- * @returns {BatchRunControl} The control.
  */
 export const createBatchRunControl = (): BatchRunControl => {
   const controller = new AbortController()
@@ -62,7 +61,6 @@ export type BatchOutcome<T> =
  * @param {BatchSettled} params.settled - The result of the run, or its error.
  * @param {BatchRunControl} params.control - Control of the run.
  * @param {Function} params.getStop - Returns the stop reported in a result, if any.
- * @returns {BatchOutcome} The outcome.
  */
 export const settleBatchRun = <T>({
   settled,

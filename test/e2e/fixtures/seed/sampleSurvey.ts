@@ -35,7 +35,6 @@ log4js.getLogger('arena').level = 'error'
 /**
  * Runs the specified function silencing console.log (the survey schema migrations print the executed SQL).
  * @param {Function} fn - Function to run.
- * @returns {Promise<any>} - The result of the function.
  */
 const withConsoleLogSilenced = async <T>(fn: () => Promise<T>): Promise<T> => {
   const { log } = console

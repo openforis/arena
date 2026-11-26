@@ -19,7 +19,6 @@ const publicAddress = { address: '93.184.215.14', family: 4 }
 /**
  * Builds a fake response.
  * @param {string} [contentType] - The Content-Type header.
- * @returns {HttpResponse} The response.
  */
 const xmlResponse = (body: string, contentType = 'application/xml'): HttpResponse => ({
   status: 200,

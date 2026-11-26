@@ -99,7 +99,6 @@ type RanStep = {
 
 /**
  * Returns the JSON of a value with the keys of its objects sorted, so the same input is one key in any key order.
- * @returns {string} The JSON.
  */
 const toSortedJson = (value: unknown): string =>
   JSON.stringify(value, (_key, nested) =>
@@ -219,7 +218,6 @@ export type RunAssistantTurnParams = {
 /**
  * Loads the handbook outline for the Help prompt (null when the handbook can't be loaded: the turn still runs).
  * @param {string} uiLang - Interface language.
- * @returns {Promise<string|null>} The outline.
  */
 const loadOutline = async (uiLang: string): Promise<string | null> => {
   try {
@@ -233,7 +231,6 @@ const loadOutline = async (uiLang: string): Promise<string | null> => {
 /**
  * Message of a thrown value for a tool result: anything can be thrown, not only an Error.
  * @param {unknown} error - The thrown value.
- * @returns {string} Its message.
  */
 export const getThrownMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message
@@ -358,7 +355,6 @@ const escalateOnDataResult = ({
  * A proposed map layer is a card: an answer that is only one ends done.
  * @param {Conversation} after - Conversation at the end of the turn.
  * @param {Conversation} before - Conversation before the turn.
- * @returns {boolean} True for a silent turn.
  */
 const isSilentTurn = (after: Conversation, before: Conversation): boolean => {
   const answer = after.messages.at(-1)
@@ -389,7 +385,6 @@ const isToolCallText = (text: string): boolean => TOOL_CALL_OPEN.test(text.trim(
  * Returns the text of the answer: of the whole turn, or only what follows the last tool call (the last step).
  * @param {Conversation} after - Conversation at the end of the turn.
  * @param {boolean} [lastStepOnly] - True for the text of the last step.
- * @returns {string} The text.
  */
 const getAnswerText = (after: Conversation, lastStepOnly = false): string => {
   const answer = after.messages.at(-1)

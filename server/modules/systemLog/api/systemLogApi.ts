@@ -32,7 +32,6 @@ const parseMaxLines = (value: unknown): number => {
  * (like `tail -f`), until the client disconnects.
  * @param {object} params - The parameters.
  * @param {number} params.maxLines - Number of lines sent initially for every instance.
- * @returns {Promise<void>} - Resolved once the stream is started.
  */
 const streamLogFiles = async ({ res, maxLines }): Promise<void> => {
   openSseStream(res)

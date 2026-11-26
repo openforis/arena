@@ -50,7 +50,6 @@ const pruneKind = (
  * Replaces every pending suggestion of a kind in a bucket (state detectors); an empty list resolves the kind.
  * @param {object} params - Parameters.
  * @param {AssistantSuggestion[]} params.suggestions - The kind's suggestions now.
- * @returns {SuggestionUserState} The new state.
  */
 export const withKind = (
   state: SuggestionUserState,
@@ -66,7 +65,6 @@ export const withKind = (
  * @param {object} params - Parameters.
  * @param {string} params.id - Suggestion id.
  * @param {string[]} params.targetKeys - Resolved target keys.
- * @returns {SuggestionUserState} The new state.
  */
 export const withoutTargets = (
   state: SuggestionUserState,
@@ -121,7 +119,6 @@ export const getTrackedOf = (state: SuggestionUserState, bucket: string): Tracke
 
 /**
  * Removes everything stored for a bucket (a deleted survey): pending, dismissed and in-progress entries.
- * @returns {SuggestionUserState} The new state.
  */
 export const withoutBucket = (state: SuggestionUserState, bucket: string): SuggestionUserState => ({
   ...state,

@@ -70,7 +70,6 @@ const setup = ({
 
 /**
  * Returns the event of a report opened in a cycle.
- * @returns {SuggestionEvent} The event.
  */
 const opened = (cycle = '0'): SuggestionEvent => ({ type: 'validationReportOpened', cycle })
 

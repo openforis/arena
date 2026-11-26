@@ -43,7 +43,6 @@ type SceneRowProps = {
  * @param {ReadonlySet<string>} props.pendingIds - Overlay ids being loaded.
  * @param {Function} props.onSelect - Selects or deselects the row.
  * @param {Function} props.onAddLayer - Adds the scene as overlay or base map.
- * @returns {React.ReactElement} The row.
  */
 const SceneRow = ({
   scene,
@@ -69,7 +68,6 @@ const SceneRow = ({
    * Formats a percentage or the unknown mark.
    *
    * @param {number|null} value - Percentage.
-   * @returns {string} Text.
    */
   const formatPercent = (value: number | null): string =>
     value === null
@@ -154,7 +152,6 @@ type ScenesResultsProps = Omit<SceneRowProps, 'scene' | 'selected'> & {
  * @param {string|null} props.selectedId - Selected scene id.
  * @param {boolean} props.stale - Whether a newer search is running.
  * @param {Function} props.onSortChange - Called with the new sort.
- * @returns {React.ReactElement} The results.
  */
 export const ScenesResults = ({
   scenes,

@@ -25,7 +25,6 @@ const startPublish = async (page: Page) => {
 
 /**
  * Publishes the current survey and checks that the publish job completes successfully.
- * @returns {Promise<void>} - Resolves when the survey has been published.
  */
 export const publishSurvey = async (page: Page): Promise<void> => {
   await startPublish(page)
@@ -39,7 +38,6 @@ export const publishSurvey = async (page: Page): Promise<void> => {
 /**
  * Tries to publish the current survey and checks that the publish job fails with the specified errors.
  * @param {string[]} errors - Expected error messages.
- * @returns {Promise<void>} - Resolves when the errors have been checked and the job dialog closed.
  */
 export const publishSurveyWithErrors = async (page: Page, errors: string[]): Promise<void> => {
   await startPublish(page)

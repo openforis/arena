@@ -72,7 +72,6 @@ export const buildInstanceCapability = (settings: AiSettingsSnapshot | null): Ai
  * @param {LocalProvider} params.provider - Local provider.
  * @param {LocalServerProbeResult|null} params.probe - Last probe (null: not probed, or the probe failed).
  * @param {string[]} params.allowlist - Org-hosted base URLs.
- * @returns {AiLocalServerCapability} The capability.
  */
 export const buildLocalProviderCapability = ({
   provider,
@@ -102,7 +101,6 @@ type CapabilityInputs = {
 /**
  * Builds the capabilities from the loaded settings, local providers and probes.
  * @param {CapabilityInputs} inputs - Loaded data.
- * @returns {AiCapabilities} The capabilities.
  */
 const buildCapabilities = ({ settings, localProviders, probes }: CapabilityInputs): AiCapabilities => {
   const instance = buildInstanceCapability(settings)
@@ -129,7 +127,6 @@ const buildCapabilities = ({ settings, localProviders, probes }: CapabilityInput
 
 /**
  * Returns the capabilities before anything is loaded (nothing available).
- * @returns {AiCapabilities} The capabilities.
  */
 export const emptyCapabilities = (): AiCapabilities =>
   buildCapabilities({ settings: null, localProviders: [], probes: [] })
@@ -176,7 +173,6 @@ export const isCapabilitiesLoadedForUser = (store: AiCapabilitiesStore, currentU
 /**
  * Creates a capabilities store.
  * @param {CapabilitiesStoreDeps} deps - Settings, local providers and probe readers.
- * @returns {AiCapabilitiesStore} The store.
  */
 export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabilitiesStore => {
   let capabilities = emptyCapabilities()
@@ -236,7 +232,6 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * Returns the result of the newer run of the same user (running, or already stored); after a reset or a user
    * change, empty capabilities.
    * @param {string|null} userUuid - UUID of the user whose run is waited for.
-   * @returns {Promise<AiCapabilities>} The capabilities.
    */
   const newerRun = (userUuid: string | null): Promise<AiCapabilities> => {
     if (inflight?.userUuid === userUuid) return inflight.promise
@@ -255,7 +250,6 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   /**
    * Returns the stored probe of a provider of the same user, at the same address and model, or null.
    * @param {LocalProvider} provider - Local provider.
-   * @returns {LocalServerProbeResult|null} The stored probe, or null.
    */
   const storedProbe = (provider: LocalProvider, userUuid: string | null): LocalServerProbeResult | null => {
     const stored = loadedFor === userUuid ? capabilities.local[provider.id] : undefined
@@ -307,7 +301,6 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * @param {object} params - Parameters.
    * @param {boolean} params.force - Read the settings again instead of using the cache.
    * @param {boolean} params.probe - Probe every server again, instead of reusing the stored probes.
-   * @returns {Promise<AiCapabilities>} The capabilities.
    */
   const run = (params: { userUuid: string | null; force: boolean; probe: boolean }): Promise<AiCapabilities> => {
     const entry = { promise: null as unknown as Promise<AiCapabilities>, ...params }

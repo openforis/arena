@@ -42,7 +42,6 @@ export type ProviderChipView =
  * @param {object} params - Parameters.
  * @param {AiCapabilities} params.capabilities - Capabilities (provider list and default).
  * @param {string|null} [params.providerId] - Provider stored with the conversation.
- * @returns {ConversationProvider} The provider.
  */
 export const getConversationProvider = ({
   capabilities,
@@ -91,7 +90,6 @@ export const shouldShowProviderRemoved = ({
  * @param {AiPolicy} params.effective - Effective policy of the conversation.
  * @param {AiDataClass} params.dataClass - Data class of the conversation.
  * @param {boolean} params.surveyScoped - The conversation belongs to a survey.
- * @returns {string|null} The i18n key, or null.
  */
 const getChoiceBlockKey = ({
   entry,
@@ -180,7 +178,6 @@ export const hasPickableProvider = ({
  * @param {object} params - Parameters.
  * @param {ConversationProvider} params.current - Provider of the conversation.
  * @param {AiFeatureAvailabilityStatus} params.status - Availability of the area's feature with that provider.
- * @returns {ProviderChipView} The view.
  */
 export const getProviderChipView = ({
   capabilities,
@@ -201,7 +198,6 @@ export const getProviderChipView = ({
  * Returns the chip text: the provider name, then the model.
  * @param {object} params - Parameters.
  * @param {AiProviderEntry} params.entry - Provider.
- * @returns {string} The text.
  */
 export const getProviderChipLabel = ({ entry, t }: { entry: AiProviderEntry; t: TFunction }): string => {
   const name = getProviderDisplayName({ entry, t })
@@ -213,7 +209,6 @@ export const getProviderChipLabel = ({ entry, t }: { entry: AiProviderEntry; t: 
  * that too (the red tone is never the only sign).
  * @param {object} params - Parameters.
  * @param {ProviderChipView} params.view - What the chip shows.
- * @returns {string} The text.
  */
 export const getProviderChipFullLabel = ({ view, t }: { view: ProviderChipView; t: TFunction }): string => {
   if (view.kind === 'none') return t('aiAssistant.providerChip.none')

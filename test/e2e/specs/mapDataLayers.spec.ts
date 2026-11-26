@@ -27,7 +27,6 @@ const popup = (page: Page): Locator => page.locator('.leaflet-popup')
 /**
  * Opens the popup of a point from the Records tab of the rail (the map flies to the point and opens its popup).
  * @param {string} label - The label of the point in the list (its keys).
- * @returns {Promise<void>} Resolves when the popup is open.
  */
 const openPointFromRecordsTab = async (page: Page, label: string): Promise<void> => {
   await page.getByTestId(ids.railTab('records')).click()

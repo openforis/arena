@@ -31,7 +31,6 @@ const COMPACT: Intl.NumberFormatOptions = { notation: 'compact', maximumFraction
 /**
  * Returns the usage of the latest answer that has one.
  * @param {ConversationMessage[]} messages - Conversation messages.
- * @returns {AssistantMessageUsage|null} The usage, or null.
  */
 export const getLatestUsage = (messages: ConversationMessage[]): AssistantMessageUsage | null => {
   for (const message of [...messages].reverse()) {

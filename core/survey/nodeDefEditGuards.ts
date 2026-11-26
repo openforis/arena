@@ -64,7 +64,6 @@ export const isMultipleEditDisabled = ({
 
 /**
  * Tells whether the maximum number of key attributes of the parent entity is reached.
- * @returns {boolean} True when reached.
  */
 export const isMaxKeysCountReached = ({ survey, nodeDef }: { survey: any; nodeDef: any }): boolean => {
   if (!nodeDef) return false

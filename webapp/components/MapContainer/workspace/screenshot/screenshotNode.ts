@@ -187,7 +187,6 @@ export const buildRowAttributeNode = ({
  * @param {number} params.timezoneOffset - The browser time zone offset (Dates.getTimezoneOffset()).
  * @param {string} params.lang - The UI language.
  * @param {Blob|null} [params.file] - The image (none for a new entity row).
- * @returns {FormData} The form data.
  */
 export const buildNodeFormData = ({
   node,

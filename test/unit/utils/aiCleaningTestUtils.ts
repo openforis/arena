@@ -113,7 +113,6 @@ export const newFakeCleaningApi = (overrides: Partial<Record<keyof CleaningApi, 
 
 /**
  * Returns the entity ancestors of a node, root first.
- * @returns {object[]} The ancestors.
  */
 const getAncestorsRootFirst = (record: any, node: any): any[] => {
   const ancestors: any[] = []

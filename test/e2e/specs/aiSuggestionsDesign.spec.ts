@@ -28,7 +28,6 @@ const TRANSLATIONS_CARD = '19 texts are missing in French. Translate them?'
 /**
  * Marks the module introductions as seen before the app loads, so only this spec's cards show.
  * @param {ArenaApi} api - API of the worker user.
- * @returns {Promise<void>} Resolves when the init script is registered.
  */
 const skipModuleIntros = async (page: Page, api: ArenaApi): Promise<void> => {
   await seedSuggestionState(page, await api.getCurrentUserUuid(), buildSeenIntrosSuggestionState())
@@ -36,7 +35,6 @@ const skipModuleIntros = async (page: Page, api: ArenaApi): Promise<void> => {
 
 /**
  * Adds French to the survey languages in Survey Info and saves.
- * @returns {Promise<void>} Resolves when the server saved the survey info.
  */
 const addFrench = async (page: Page): Promise<void> => {
   await page.goto(Urls.surveyInfo)
@@ -56,7 +54,6 @@ const addFrench = async (page: Page): Promise<void> => {
 /**
  * Navigates inside the app, as a user reaches a page from the sidebar (no reload).
  * @param {string} uri - Route to go to.
- * @returns {Promise<void>} Resolves when the route is pushed.
  */
 const navigateInApp = async (page: Page, uri: string): Promise<void> => {
   await page.evaluate((target) => {

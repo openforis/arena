@@ -29,7 +29,6 @@ export const TOOL_RESULT_BUDGET_CHARS = TOOL_RESULT_MAX_CHARS - TOOL_RESULT_RESE
 /**
  * Returns what a tool may fill of its result in the current turn (follows the cap of the turn).
  * @param {object} [ctx] - Tool context (the registry sets resultCapChars on every call).
- * @returns {number} The budget.
  */
 export const getResultBudget = (ctx?: { resultCapChars?: number }): number =>
   ctx?.resultCapChars ? ctx.resultCapChars - TOOL_RESULT_RESERVE_CHARS : TOOL_RESULT_BUDGET_CHARS

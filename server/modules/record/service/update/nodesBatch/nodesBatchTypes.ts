@@ -94,7 +94,6 @@ export const failedResult = (
  * Builds a failed result for each edit.
  * @param {string} messageKey - The i18n key of the reason.
  * @param {object} [params] - The message params.
- * @returns {NodesBatchEditResult[]} The results.
  */
 export const failedResults = (
   edits: { index: number }[],

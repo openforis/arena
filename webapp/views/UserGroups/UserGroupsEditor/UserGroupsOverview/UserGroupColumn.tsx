@@ -30,7 +30,6 @@ type Props = {
  * @param props0.draggable - Whether the cards in this column can be dragged.
  * @param props0.pendingUserUuids - Uuids of users with a group change currently in flight; their cards render as non-draggable until it settles.
  * @param props0.containerRef - Callback ref registering this column's drop-target list element with the drag-and-drop hook.
- * @returns {React.ReactElement} - The UserGroupColumn component.
  */
 const UserGroupColumn = (props: Props): React.ReactElement => {
   const { group, groupKey, members, draggable, pendingUserUuids, containerRef } = props

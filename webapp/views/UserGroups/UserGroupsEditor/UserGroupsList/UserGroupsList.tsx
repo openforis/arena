@@ -24,8 +24,6 @@ type AppModule = Parameters<typeof appModuleUri>[0]
 
 /**
  * User Groups list table, listing the user groups defined in the current survey.
- *
- * @returns {React.ReactElement} - The UserGroupsList component.
  */
 const UserGroupsList = (): React.ReactElement => {
   const i18n = useI18n()

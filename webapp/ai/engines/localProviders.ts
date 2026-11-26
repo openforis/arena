@@ -21,7 +21,6 @@ export type LocalProvider = {
 
 /**
  * Returns the localStorage key of the user's local providers.
- * @returns {string} The key.
  */
 export const getLocalProvidersKey = (userUuid: string): string => `arena.ai.localProviders.${userUuid}`
 
@@ -41,7 +40,6 @@ export const normalizeLocalProviderBaseUrl = (value: unknown): string | null => 
  * Returns the provider when the stored entry is valid. An entry whose address is text but not a plain http(s) URL is
  * kept, flagged addressInvalid; an entry without an address text is dropped.
  * @param {unknown} input - Raw entry.
- * @returns {LocalProvider|null} The provider, or null.
  */
 const normalizeLocalProvider = (input: unknown): LocalProvider | null => {
   if (!input || typeof input !== 'object') return null
@@ -62,7 +60,6 @@ const normalizeLocalProvider = (input: unknown): LocalProvider | null => {
 /**
  * Keeps the valid entries of a stored list; the first entry of an id wins.
  * @param {unknown} input - Raw list.
- * @returns {LocalProvider[]} The providers.
  */
 export const normalizeLocalProviders = (input: unknown): LocalProvider[] => {
   if (!Array.isArray(input)) return []
@@ -79,7 +76,6 @@ export const normalizeLocalProviders = (input: unknown): LocalProvider[] => {
 
 /**
  * Reads the user's local providers; unavailable storage or corrupt JSON give an empty list.
- * @returns {LocalProvider[]} The providers.
  */
 export const loadLocalProviders = ({
   storage,

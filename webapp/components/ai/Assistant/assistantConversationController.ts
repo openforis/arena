@@ -151,7 +151,6 @@ type Selection = { scope: AssistantConversationScope; conversationId: string | n
  * Returns the conversation of the state when it is the selected one (a stale one, or one still loading, is not shown).
  * @param {AssistantConversationState} state - Controller state.
  * @param {string|null} conversationId - Conversation selected in the panel.
- * @returns {Conversation|null} The shown conversation.
  */
 export const selectShownConversation = (
   state: AssistantConversationState,
@@ -161,7 +160,6 @@ export const selectShownConversation = (
 
 /**
  * Returns the key of a scope (history and the provider pick belong to it).
- * @returns {string} The key.
  */
 const toScopeKey = ({ userUuid, surveyId, area }: AssistantConversationScope): string =>
   `${userUuid}|${surveyId}|${area}`
@@ -184,7 +182,6 @@ const requestFrame = (callback: () => void): (() => void) => {
  * Creates the conversation of a first message. A Cleaning conversation has record content from its first turn, so
  * it starts as `data`: the engine is selected for `data` already for that turn.
  * @param {AssistantConversationScope} scope - User, survey and area.
- * @returns {Conversation} The new conversation.
  */
 const createNewConversation = ({ userUuid, surveyId, area }: AssistantConversationScope): Conversation => {
   const created = createConversation({ userUuid, surveyId, area })
@@ -196,7 +193,6 @@ const createNewConversation = ({ userUuid, surveyId, area }: AssistantConversati
 /**
  * Creates the controller of the panel's conversation.
  * @param {AssistantConversationDeps} deps - The store, the panel, the registry and the app services.
- * @returns {AssistantConversationController} The controller.
  */
 export const createAssistantConversationController = (
   deps: AssistantConversationDeps
@@ -618,7 +614,6 @@ export const createAssistantConversationController = (
   /**
    * Reads a conversation by id: the one in memory, or the stored one of the user of the panel.
    * @param {string} id - Conversation id.
-   * @returns {Promise<Conversation|null>} The conversation.
    */
   const readConversation = async (id: string): Promise<Conversation | null> => {
     if (state.conversation?.id === id) return newerThanStored(state.conversation)

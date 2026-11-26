@@ -29,7 +29,6 @@ type ScenesAreaControlProps = {
  * @param {boolean} props.showDrawAgain - Whether to show the Draw again button.
  * @param {Function} props.onChange - Called with the new area.
  * @param {Function} props.onDrawAgain - Starts a new drawing.
- * @returns {React.ReactElement} The control.
  */
 export const ScenesAreaControl = ({
   areaKey,
@@ -93,7 +92,6 @@ type ScenesPeriodControlProps = {
  * @param {ScenePeriodMonths} props.months - Selected number of months.
  * @param {ScenePeriod} props.period - Resulting period.
  * @param {Function} props.onChange - Called with the new number of months.
- * @returns {React.ReactElement} The control.
  */
 export const ScenesPeriodControl = ({ months, period, onChange }: ScenesPeriodControlProps): React.ReactElement => {
   const t = useI18nT()
@@ -147,7 +145,6 @@ const SLIDER_TEST_IDS: Record<ScenesPercentSliderProps['sliderKey'], string> = {
  * @param {string} props.sliderKey - 'maxCloud' or 'minCoverage'.
  * @param {number} props.value - Value in percent.
  * @param {Function} props.onChange - Called with the new value.
- * @returns {React.ReactElement} The slider.
  */
 export const ScenesPercentSlider = ({ sliderKey, value, onChange }: ScenesPercentSliderProps): React.ReactElement => {
   const t = useI18nT()

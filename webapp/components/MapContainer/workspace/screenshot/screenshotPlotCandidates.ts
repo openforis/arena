@@ -51,7 +51,6 @@ export const toPlotLayers = ({
 /**
  * Turns the ancestor key values of a point into non-empty texts.
  * @param {Array<unknown>} [ancestorsKeys] - The key values.
- * @returns {Array<string>} The key texts.
  */
 const toKeyTexts = (ancestorsKeys: unknown[] = []): string[] =>
   ancestorsKeys.map((key) => toKeyText(key).trim()).filter((key) => key.length > 0)
@@ -83,7 +82,6 @@ const toCandidate = (layer: PlotLayer, point: MapLayerPoint): ScreenshotPlotCand
  * Computes a planar distance in degrees, with longitudes shrunk by the cosine of the latitude (fine for sorting).
  * @param {LatLngLiteral} a - First point.
  * @param {LatLngLiteral} b - Second point.
- * @returns {number} The distance.
  */
 export const planarDistance = (a: LatLngLiteral, b: LatLngLiteral): number => {
   const meanLatRad = ((a.lat + b.lat) / 2) * (Math.PI / 180)

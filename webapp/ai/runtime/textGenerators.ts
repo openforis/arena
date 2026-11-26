@@ -12,7 +12,6 @@ const TASK_PROVIDER_OPTIONS = { localServer: { reasoningEffort: 'none' } }
 
 /**
  * Wraps the model as an AiGenerateText (used by the shared tasks).
- * @returns {AiGenerateText} The generator.
  */
 export const createGatewayTextGenerator =
   (model: LanguageModel): AiGenerateText =>
@@ -35,7 +34,6 @@ export const createGatewayTextGenerator =
  * @param {string} [params.prompt] - Prompt (or messages).
  * @param {ModelMessage[]} [params.messages] - Conversation (or prompt).
  * @param {Function} params.onChunk - Called with each text chunk.
- * @returns {Promise<void>} Resolves when the answer is complete.
  */
 export const streamTextChunks = async ({
   model,

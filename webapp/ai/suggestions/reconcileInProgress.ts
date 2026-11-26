@@ -12,7 +12,6 @@ import type { SuggestionStore } from './suggestionStore'
  * @param {Function} load - Loader.
  * @param {string} id - Conversation id.
  * @param {AiLog} log - Reports the store error.
- * @returns {Promise<Conversation|null>} The conversation.
  */
 const loadSafely = async (
   load: (id: string) => Promise<Conversation | null>,

@@ -47,7 +47,6 @@ export const sanitizeFileNamePart = (text: string): string => {
 /**
  * Cuts a text to a number of code points, never splitting a surrogate pair.
  * @param {number} max - The max number of code points.
- * @returns {string} The cut text.
  */
 const cutCodePoints = (text: string, max: number): string => Array.from(text).slice(0, max).join('')
 

@@ -50,7 +50,6 @@ const booleanTrueValues = new Set(['true', 'yes', '1'])
 /**
  * Generates the accepted date formats for a separator.
  * @param {string} sep - The separator between day, month and year.
- * @returns {string[]} The date formats.
  */
 const generateAllowedDateFormats = (sep: string): string[] => [
   `DD${sep}MM${sep}YYYY`,
@@ -81,7 +80,6 @@ const singlePropValueConverter = ({ value }: { value: Record<string, any> }): an
  * @param {object} params - The parameters.
  * @param {object} params.value - The value props.
  * @param {string[]} params.headers - The headers, for the error message.
- * @returns {number} The number.
  */
 const numericValueConverter = ({ value, headers }: { value: Record<string, any>; headers: string[] }): number => {
   const val = singlePropValueConverter({ value })
@@ -433,14 +431,12 @@ type InputParser = (params: InputParserParams) => Promise<ParsedNodeValue>
 
 /**
  * Returns true when the value of the attribute can be set by hand (not an entity, read-only or analysis attribute).
- * @returns {boolean} Whether the value is editable.
  */
 export const isNodeDefValueEditable = (nodeDef: any): boolean =>
   Boolean(nodeDef) && NodeDef.isAttribute(nodeDef) && !NodeDef.isReadOnly(nodeDef) && !NodeDef.isAnalysis(nodeDef)
 
 /**
  * Returns true when the input means "no value".
- * @returns {boolean} Whether the input is empty.
  */
 const isEmptyInput = (input: NodeValueInput): boolean =>
   input === null || input === undefined || (typeof input === 'string' && input.trim() === '')
@@ -448,13 +444,11 @@ const isEmptyInput = (input: NodeValueInput): boolean =>
 /**
  * Returns the headers used in the import error messages: the attribute name.
  * @param {object} nodeDef - The attribute definition.
- * @returns {string[]} The headers.
  */
 const headersOf = (nodeDef: any): string[] => [NodeDef.getName(nodeDef)]
 
 /**
  * Converts an input to text: objects as JSON, so that "[object Object]" never shows up.
- * @returns {string} The text.
  */
 const inputToText = (input: NodeValueInput): string => {
   if (input === null) return 'null'
@@ -463,7 +457,6 @@ const inputToText = (input: NodeValueInput): string => {
 
 /**
  * Converts a scalar to text; any other value (object, array, missing) becomes an empty string.
- * @returns {string} The text.
  */
 const scalarToText = (value: unknown): string =>
   typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
@@ -602,7 +595,6 @@ const getCodeAttributeCode = (survey: any, node: any): string | null => {
 /**
  * Returns the codes of the ancestor code attributes (top-down), [] for a first-level code,
  * or null when they can't be determined (no record, or an ancestor without a value).
- * @returns {string[]|null} The ancestor codes.
  */
 const getAncestorCodes = ({ survey, nodeDef, record, parentNode }: InputParserParams): string[] | null => {
   if (!NodeDef.getParentCodeDefUuid(nodeDef)) return []

@@ -16,7 +16,6 @@ export type SceneIndexCacheDeps<P extends CachedPart> = {
  * part (null) stays cached. Pure: file access is injected.
  *
  * @param {SceneIndexCacheDeps} deps - Part opener, row loader and optional row-group cap.
- * @returns {SceneIndexReader} Reader.
  */
 export const createSceneIndexCache = <P extends CachedPart>({
   openPart,

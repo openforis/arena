@@ -265,7 +265,6 @@ const buildNodeDefItem = ({
 
 /**
  * Fetches the draft survey with its node defs (advanced props included).
- * @returns {Promise<object>} The survey.
  */
 const fetchSurvey = (surveyId: number): Promise<ArenaSurvey> =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })

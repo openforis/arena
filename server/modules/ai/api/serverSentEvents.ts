@@ -34,7 +34,6 @@ export const createSseEventWriter =
  * Waits until the socket buffer has room again; it also resolves when the client goes away or the signal aborts, so
  * a client that never reads cannot hold the call.
  * @param {AbortSignal} [signal] - Aborted when the call is cancelled (timeout).
- * @returns {Promise<void>} Resolves when writing can go on, or must stop.
  */
 export const waitForDrain = (res: SseResponse, signal?: AbortSignal): Promise<void> => {
   if (isSseClosed(res) || signal?.aborted || !res.once) return Promise.resolve()
@@ -61,6 +60,5 @@ export const closeSseStream = (res: SseResponse): void => {
 
 /**
  * Returns true when nothing can be written any more (response ended or client gone).
- * @returns {boolean} True when closed.
  */
 export const isSseClosed = (res: SseResponse): boolean => !!res.writableEnded || !!res.destroyed

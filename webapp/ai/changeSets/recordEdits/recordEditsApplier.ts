@@ -8,7 +8,6 @@ import { isRecordEditOperation, type RecordAttributeUpdateOperation, type Record
  * Converts a result of the endpoint into the result of an operation.
  * @param {string} id - Operation id.
  * @param {RecordEditResult} [result] - Endpoint result.
- * @returns {OperationResult} The operation result.
  */
 const toOperationResult = (id: string, result?: RecordEditResult): OperationResult => {
   if (!result) return { id, status: 'failed', message: 'appErrors:generic', params: { text: 'no result' } }

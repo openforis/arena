@@ -46,7 +46,6 @@ export const isMapLayerDef = (nodeDef: any): boolean => NodeDef.isCoordinate(nod
  * Returns the proposed layer of a successful map_proposeLayer tool part, or null.
  * @param {object} part - Tool part.
  * @param {unknown} part.output - Tool output.
- * @returns {ProposedMapLayer|null} The proposed layer.
  */
 export const getProposedMapLayer = (part: { toolName: string; output: unknown }): ProposedMapLayer | null => {
   const { toolName, output } = part

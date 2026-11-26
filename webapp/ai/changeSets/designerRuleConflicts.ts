@@ -49,7 +49,6 @@ const toConflict = (id: string, { key, params }: KeyedMessage): OperationConflic
  * not in the survey yet, in proposal order. Creates already in the survey were applied.
  * @param {string[]} [operationIds] - Operations to check (default: all).
  * @param {boolean} [onlySelected] - Leave out the creates that are not selected (they will not be applied).
- * @returns {NodeDefOperation[]} The operations.
  */
 const selectOperations = (
   changeSet: ChangeSet,

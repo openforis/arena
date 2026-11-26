@@ -40,7 +40,6 @@ type QueuedEvent = { event: SuggestionEvent; userUuid: string | null; surveyId: 
  * Returns the detector context of an input, or null when nothing may run (setting off, nobody logged in).
  * @param {SuggestionHostInput|null} input - Host input.
  * @param {Function} now - Clock.
- * @returns {DetectorContext|null} The context.
  */
 const contextOf = (
   input: SuggestionHostInput | null,
@@ -109,7 +108,6 @@ const belongsTo = (queued: QueuedEvent, input: SuggestionHostInput): boolean =>
  * @param {TargetResolver[]} [params.resolvers] - Resolvers (default: the registry).
  * @param {number} [params.debounceMs] - Delay after the last survey change.
  * @param {AiLog} [params.log] - Reports a detector that failed.
- * @returns {SuggestionHostController} The controller.
  */
 export const createSuggestionHostController = ({
   store,
@@ -165,7 +163,6 @@ export const createSuggestionHostController = ({
    * Returns the context a detector of an area receives: the generation gets a signal that also aborts with the setting
    * and the area.
    * @param {AssistantArea} area - Area of the detector.
-   * @returns {DetectorContext} The context.
    */
   const contextForArea = (ctx: DetectorContext, area: AssistantArea): DetectorContext => {
     const { generation } = ctx

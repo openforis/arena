@@ -97,7 +97,6 @@ const searchAllAttributes = ({ ctx, search }: { ctx: any; search?: string | null
  * Creates the category_findItems tool.
  * @param {object} params - Parameters.
  * @param {AnalysisApi} params.api - Analysis API (large categories are searched on the server).
- * @returns {AiTool} The tool.
  */
 export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTool<Input, unknown> => {
   /**

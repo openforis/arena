@@ -31,7 +31,6 @@ const TITLE_ID = 'map-screenshot-title'
  * Chooses the notice to show: the last action error, else the capture notice, else a capture error.
  * @param {object} params - The parameters.
  * @param {ScreenshotNotice|null} params.actionError - Error of the last action.
- * @returns {ScreenshotNotice|null} The notice.
  */
 const getDialogNotice = ({
   actionError,
@@ -55,7 +54,6 @@ const getDialogNotice = ({
 /**
  * Map screenshot dialog: preview, capture options, and save to a plot record's image attribute or download.
  * Registered as `screenshot` in Part 1's dialogs host; it takes no props and closes itself.
- * @returns {React.ReactElement} The dialog.
  */
 export const ScreenshotDialog = (): React.ReactElement => {
   const { portalContainer, dispatch } = useMapWorkspace()

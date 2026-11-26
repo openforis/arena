@@ -37,13 +37,11 @@ const isString = (value: unknown, maxChars: number = maxShortStringChars): value
 
 /**
  * Returns true for a non-empty string of at most 255 characters.
- * @returns {boolean} Whether the value is a non-empty short string.
  */
 const isNonEmptyShortString = (value: unknown): boolean => isString(value) && value.trim().length > 0
 
 /**
  * Returns true for a finite number or a string of a plain decimal number.
- * @returns {boolean} Whether the value is numeric.
  */
 const isNumeric = (value: unknown): boolean => {
   if (typeof value === 'number') return Number.isFinite(value)
@@ -52,7 +50,6 @@ const isNumeric = (value: unknown): boolean => {
 
 /**
  * Returns true for a safe integer or a string of digits.
- * @returns {boolean} Whether the value is an integer.
  */
 const isInteger = (value: unknown): boolean => {
   if (typeof value === 'number') return Number.isSafeInteger(value)
@@ -103,7 +100,6 @@ const hasProps = (value: unknown, checkByProp: Record<string, ShapeCheck>, requi
 /**
  * Returns a check that also accepts a missing value.
  * @param {Function} check - The check of a present value.
- * @returns {Function} The check.
  */
 const isOptional =
   (check: ShapeCheck): ShapeCheck =>

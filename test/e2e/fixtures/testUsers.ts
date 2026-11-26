@@ -16,7 +16,6 @@ export type TestUser = {
  * Every worker has its own user because the "current survey" is stored in the user prefs:
  * workers sharing the same user would change each other's current survey.
  * @param {number} parallelIndex - Index of the Playwright worker.
- * @returns {TestUser} - The test user.
  */
 export const getWorkerTestUser = (parallelIndex: number): TestUser => ({
   email: `e2e-worker-${parallelIndex}@openforis-arena.org`,
@@ -45,7 +44,6 @@ const insertTestUser = async ({ tx, user }: { tx: any; user: TestUser }): Promis
  * Inserts the specified user as system administrator, if it does not exist yet,
  * and marks all the "What's new" items as seen, so the dialog does not cover the pages under test.
  * @param {TestUser} user - The user to insert.
- * @returns {Promise<void>} - Resolves when the user exists in the DB.
  */
 export const insertTestUserIfMissing = (user: TestUser): Promise<void> =>
   DB.tx(async (tx) => {
@@ -74,7 +72,6 @@ const aiPrefsKey: ServerOnlyPrefsKey = 'ai'
  * Removes the AI settings and providers (`prefs.ai`) of the user, so a test does not inherit the AI access level,
  * toggles, providers or default provider that the previous test left on the shared worker user. The usage counters
  * (`prefs.aiUsage`) are kept.
- * @returns {Promise<void>} - Resolves when the prefs are reset.
  */
 export const resetTestUserAiPrefs = async (user: TestUser): Promise<void> => {
   await DB.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - $2::text WHERE email = $1`, [
@@ -86,7 +83,6 @@ export const resetTestUserAiPrefs = async (user: TestUser): Promise<void> => {
 /**
  * Returns the survey editor (not survey administrator) used by the worker with the specified parallel index.
  * @param {number} parallelIndex - Index of the Playwright worker.
- * @returns {TestUser} - The user.
  */
 export const getWorkerSurveyEditor = (parallelIndex: number): TestUser => ({
   email: `e2e-editor-${parallelIndex}@openforis-arena.org`,
@@ -97,7 +93,6 @@ export const getWorkerSurveyEditor = (parallelIndex: number): TestUser => ({
 /**
  * Returns the data editor (no record cleanse permission) used by the worker with the specified parallel index.
  * @param {number} parallelIndex - Index of the Playwright worker.
- * @returns {TestUser} - The user.
  */
 export const getWorkerDataEditor = (parallelIndex: number): TestUser => ({
   email: `e2e-data-editor-${parallelIndex}@openforis-arena.org`,

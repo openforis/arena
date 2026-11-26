@@ -96,7 +96,6 @@ const removeLocalProvider = async ({ id, defaultProviderId }: { id: string; defa
 /**
  * Returns the state and the actions of the provider list.
  * @param {Params} params - Loaded settings and the function that reloads them.
- * @returns {ProviderListApi} The list API.
  */
 export const useProviderList = ({ settings, reloadSettings }: Params): ProviderListApi => {
   const t = useI18nT()

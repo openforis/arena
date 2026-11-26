@@ -90,7 +90,6 @@ export const checkBatchEdit = ({
 
 /**
  * Collects the error keys of a validation and of its nested field validations.
- * @returns {string[]} The error keys.
  */
 const collectErrorKeys = (validation: ArenaValidation): string[] => {
   if (!validation) return []

@@ -87,7 +87,6 @@ const KEY_PREFIX = 'arena.ai.suggestions.'
 
 /**
  * Returns the localStorage key of a user's suggestions.
- * @returns {string} The key.
  */
 export const getSuggestionsKey = (userUuid: string): string => `${KEY_PREFIX}${userUuid}`
 
@@ -121,7 +120,6 @@ export const browserSuggestionStorageAccess: SuggestionStorageAccess = {
  * @param {SuggestionStorageAccess} [params.access] - Storage access (default: the browser's).
  * @param {Function} [params.now] - Clock (expiry).
  * @param {Function} [params.log] - Reports what the storage wrapper recovered from.
- * @returns {SuggestionStore} The store.
  */
 export const createSuggestionStore = ({
   access = browserSuggestionStorageAccess,
@@ -140,7 +138,6 @@ export const createSuggestionStore = ({
   /**
    * Parses a stored value; a corrupt one is reported (it loses the dismissals) and replaced by an empty state.
    * @param {string|null} raw - Stored JSON.
-   * @returns {SuggestionUserState} The state.
    */
   const parse = (raw: string | null): SuggestionUserState =>
     parseSuggestionState(raw, (error) => {
@@ -160,7 +157,6 @@ export const createSuggestionStore = ({
 
   /**
    * Reads the state of a user.
-   * @returns {SuggestionUserState} The state.
    */
   const read = (userUuid: string): SuggestionUserState => parse(storage.read(getSuggestionsKey(userUuid)))
 

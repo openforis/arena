@@ -11,7 +11,6 @@ export const isPlainObject = (value: unknown): value is Record<string, unknown> 
 
 /**
  * Returns the own value of a key (inherited keys such as "constructor" are not values).
- * @returns {T|undefined} The value.
  */
 export const own = <T>(record: Record<string, T>, key: string): T | undefined =>
   Object.hasOwn(record, key) ? record[key] : undefined
@@ -19,7 +18,6 @@ export const own = <T>(record: Record<string, T>, key: string): T | undefined =>
 /**
  * Returns a record with one entry set (moved last) or, with null, removed.
  * @param {T|null} value - Value, or null to remove.
- * @returns {Record<string, T>} The new record.
  */
 export const setEntry = <T>(record: Record<string, T>, key: string, value: T | null): Record<string, T> => {
   const rest = Object.entries(record).filter(([entryKey]) => entryKey !== key)
@@ -31,7 +29,6 @@ export const setEntry = <T>(record: Record<string, T>, key: string, value: T | n
  * @param {Record<string, Record<string, T>>} record - Record by bucket and id.
  * @param {string} id - Suggestion id.
  * @param {T|null} value - Value, or null to remove.
- * @returns {Record<string, Record<string, T>>} The new record.
  */
 export const setNested = <T>(
   record: Record<string, Record<string, T>>,

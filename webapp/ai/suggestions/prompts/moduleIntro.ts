@@ -21,7 +21,6 @@ export const isIntroModule = (module: string): module is IntroModule => (INTRO_M
 
 /**
  * Returns the prompt of the introduction of a module.
- * @returns {string} The prompt.
  */
 export const buildModuleIntroPrompt = (module: IntroModule): string =>
   `I'm new to the ${MODULE_INTRO_LABELS[module]}. Explain what it is for and the main steps to get started, using the Arena manual.`

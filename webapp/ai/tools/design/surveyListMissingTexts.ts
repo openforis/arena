@@ -70,7 +70,6 @@ type SlotFilter = {
 
 /**
  * Returns every text slot (node definition × kind) in hierarchy order; the index is the cursor.
- * @returns {Slot[]} The slots.
  */
 const getSlots = (survey: any): Slot[] =>
   getTextNodeDefs(survey)
@@ -155,7 +154,6 @@ const checkLanguage = (input: MissingTextsInput, languages: string[]): string | 
 /**
  * Builds the item of a text missing in a language, with its source text.
  * @param {string} lang - Missing language.
- * @returns {MissingTextItem} The item.
  */
 const toSourceItem = (slot: Slot, lang: string, languages: string[]): MissingTextItem => {
   const sourceLang = getFilledLanguages(slot.nodeDef, slot.kind, languages).find((filled) => filled !== lang)
@@ -173,7 +171,6 @@ const toSourceItem = (slot: Slot, lang: string, languages: string[]): MissingTex
 
 /**
  * Builds the item of a text empty in every language.
- * @returns {MissingTextItem} The item.
  */
 const toEmptyItem = (slot: Slot): MissingTextItem => ({
   nodeDefName: NodeDef.getName(slot.nodeDef),
@@ -188,7 +185,6 @@ const toEmptyItem = (slot: Slot): MissingTextItem => ({
  * @param {SuggestionScope|null} params.scope - Scope of an accepted suggestion.
  * @param {ChangeSet[]} params.pendingChangeSets - Cards not applied yet.
  * @param {number} [params.maxChars] - JSON budget of the page.
- * @returns {MissingTextsPage} The page.
  */
 export const listMissingTexts = ({
   survey,

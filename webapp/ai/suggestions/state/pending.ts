@@ -15,7 +15,6 @@ export const getPendingOf = (state: SuggestionUserState, bucket: string): Assist
 
 /**
  * Returns the state with the pending suggestions of a bucket replaced (an empty list removes the bucket).
- * @returns {SuggestionUserState} The new state.
  */
 export const setPending = (
   state: SuggestionUserState,
@@ -29,7 +28,6 @@ export const setPending = (
 /**
  * Returns the pending suggestion with an id.
  * @param {string} id - Suggestion id.
- * @returns {AssistantSuggestion|undefined} The suggestion.
  */
 export const findPending = (state: SuggestionUserState, bucket: string, id: string): AssistantSuggestion | undefined =>
   getPendingOf(state, bucket).find((item) => item.id === id)
@@ -38,7 +36,6 @@ export const findPending = (state: SuggestionUserState, bucket: string, id: stri
  * Returns the state with one pending suggestion replaced in place (null or no target removes it).
  * @param {string} id - Suggestion id.
  * @param {AssistantSuggestion|null} next - Replacement.
- * @returns {SuggestionUserState} The new state.
  */
 export const replacePending = (
   state: SuggestionUserState,
@@ -85,7 +82,6 @@ export const withAdded = (state: SuggestionUserState, suggestion: AssistantSugge
  * Removes a pending suggestion; its in-progress and dismissed entries stay.
  * @param {object} params - Parameters.
  * @param {string} params.id - Suggestion id.
- * @returns {SuggestionUserState} The new state.
  */
 export const withoutSuggestion = (
   state: SuggestionUserState,

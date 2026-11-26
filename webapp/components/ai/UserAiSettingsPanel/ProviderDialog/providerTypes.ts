@@ -65,7 +65,6 @@ export type SavedProvider = {
  * @param {ProviderDialogType} value - Dialog type.
  * @param {string} providerType - Stored type.
  * @param {object} flags - Kind and field flags.
- * @returns {ProviderTypeSpec} The spec.
  */
 const typeSpec = (
   value: ProviderDialogType,
@@ -129,7 +128,6 @@ export const PROVIDER_TYPE_SPECS: ProviderTypeSpec[] = [
 /**
  * Returns the spec of a dialog type (Local server for an unknown one).
  * @param {string} value - Dialog type.
- * @returns {ProviderTypeSpec} The spec.
  */
 export const getProviderTypeSpec = (value: string): ProviderTypeSpec =>
   PROVIDER_TYPE_SPECS.find((spec) => spec.value === value) ?? PROVIDER_TYPE_SPECS[0]
@@ -140,7 +138,6 @@ export const getProviderTypeSpec = (value: string): ProviderTypeSpec =>
  * @param {string[]} params.allowlist - Org-hosted base URLs (Organisation server only when not empty).
  * @param {boolean} params.encryptionConfigured - The server can store API keys.
  * @param {boolean} params.mockEnabled - The server accepts the mock provider (e2e servers).
- * @returns {ProviderTypeGroup[]} The groups.
  */
 export const getProviderTypeGroups = ({
   allowlist,
@@ -231,7 +228,6 @@ export const toSavedProvider = ({
  * Returns the name a provider of the type gets when none is typed: this is what is stored (English), and a name equal
  * to it is shown translated (see webapp/ai/providers/providerNames).
  * @param {ProviderTypeSpec} spec - Type spec.
- * @returns {string} The default name.
  */
 export const getDefaultNameOf = (spec: ProviderTypeSpec): string =>
   spec.value === 'orgServer' ? ORG_SERVER_NAME : getDefaultProviderName(spec.providerType)

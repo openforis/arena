@@ -162,7 +162,6 @@ export class LogFileTail {
 
   /**
    * Reads what has been appended since the last poll; exposed to let tests poll synchronously.
-   * @returns {Promise<void>} - Resolved when the new content has been notified.
    */
   async poll(): Promise<void> {
     const info = await statOrNull(this.filePath)

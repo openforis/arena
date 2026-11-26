@@ -32,7 +32,6 @@ const _getFileUuidToRemove = ({ record, node }: { record: ArenaRecord; node: Are
  * @param {!object} params - The parameters.
  * @param {!object} params.record - The record, as it was before the update.
  * @param {!object[]} params.nodes - The nodes updated by the dependents update (including the deleted ones).
- * @returns {FileToRemove[]} - The files to remove.
  */
 export const findFilesToRemove = ({
   survey,

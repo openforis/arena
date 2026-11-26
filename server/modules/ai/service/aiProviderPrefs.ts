@@ -70,7 +70,6 @@ const ACCOUNT_PROVIDER_TYPES = new Set<string>([...Object.values(AiProvider), MO
 /**
  * Returns the trimmed value when it is a string with content, else null.
  * @param {unknown} value - Stored or submitted value (untrusted).
- * @returns {string|null} The trimmed string or null.
  */
 export const trimmedOrNull = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
@@ -115,7 +114,6 @@ export const isSameEndpoint = (a: string | null, b: string | null): boolean =>
 /**
  * Returns a stored list item as a provider, or null when it is not a valid account provider.
  * @param {unknown} item - Stored item (untrusted shape).
- * @returns {StoredAiProvider|null} The provider or null.
  */
 const toStoredProvider = (item: unknown): StoredAiProvider | null => {
   if (!item || typeof item !== 'object') return null
@@ -136,7 +134,6 @@ const toStoredProvider = (item: unknown): StoredAiProvider | null => {
 /**
  * Reads a stored provider list: invalid items and duplicate ids are dropped, an unknown default becomes Arena default.
  * @param {object} aiPrefs - Stored AI prefs with a `providers` array.
- * @returns {AiProviderPrefs} The provider prefs.
  */
 const readStoredList = (aiPrefs: Record<string, any>): AiProviderPrefs => {
   const providers: StoredAiProvider[] = []
@@ -181,7 +178,6 @@ const convertLegacySlot = (aiPrefs: Record<string, any>): StoredAiProvider | nul
 /**
  * Returns the providers and the default of the stored AI prefs, converting the old slot when there is no list.
  * @param {object|null} aiPrefs - Stored `user.prefs.ai`.
- * @returns {AiProviderPrefs} The provider prefs.
  */
 export const getProviderPrefs = (aiPrefs: Record<string, any> | null | undefined): AiProviderPrefs => {
   if (aiPrefs && Array.isArray(aiPrefs.providers)) return readStoredList(aiPrefs)
@@ -254,7 +250,6 @@ export const toPublicProvider = ({
  * @param {object} params - Parameters.
  * @param {string} params.userUuid - The user that owns the provider.
  * @param {object} params.provider - The provider (id, type and base URL are used).
- * @returns {string} The AAD.
  */
 export const buildKeyAad = ({
   userUuid,
@@ -372,7 +367,6 @@ const hasUpgradableKey = (
  * @param {KeyCipher} params.cipher - The secret box.
  * @param {string[]} params.allowlist - Org-hosted base URLs.
  * @param {ReadonlySet<string>} params.copied - The old keys found in the record of another user.
- * @returns {StoredAiProvider} The provider.
  */
 const upgradeLegacyKey = ({
   provider,

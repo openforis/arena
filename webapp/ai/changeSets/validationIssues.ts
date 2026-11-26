@@ -17,7 +17,6 @@ const translate = (result: any, t: Translate): string =>
  * @param {Set<string>} options.ignoredFields - Top-level fields to skip.
  * @param {boolean} options.warnings - Whether to include warnings.
  * @param {string} [prefix] - Field path so far.
- * @returns {NodeDefIssue[]} The issues.
  */
 const collectIssues = (
   validation: any,
@@ -58,7 +57,6 @@ export const collectValidationIssues = (validation: any, t: Translate): { field:
 /**
  * Collects the errors and warnings of a stored node definition validation, as the designer shows them.
  * @param {object|null} validation - Node definition validation.
- * @returns {NodeDefIssue[]} The issues.
  */
 export const collectNodeDefIssues = (validation: any, t: Translate): NodeDefIssue[] =>
   collectIssues(validation, { t, ignoredFields: new Set(), warnings: true })

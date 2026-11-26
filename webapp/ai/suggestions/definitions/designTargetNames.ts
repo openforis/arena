@@ -20,7 +20,6 @@ export const getTargetNodeDefs = (suggestion: AssistantSuggestion, survey: any):
 /**
  * Returns the names of the targets that still exist.
  * @param {AssistantSuggestion} suggestion - Suggestion (visible targets).
- * @returns {string[]} The names.
  */
 export const getTargetNodeDefNames = (suggestion: AssistantSuggestion, survey: any): string[] =>
   getTargetNodeDefs(suggestion, survey).map((nodeDef) => NodeDef.getName(nodeDef))

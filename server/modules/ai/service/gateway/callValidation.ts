@@ -43,7 +43,6 @@ const parseSurveyId = (value: unknown, required: boolean): number | undefined =>
 /**
  * Returns the provider id of the request: undefined when absent, else a valid id.
  * @param {unknown} value - `providerId` of the body (untrusted).
- * @returns {string|undefined} The id.
  */
 const parseProviderId = (value: unknown): string | undefined => {
   if (value === undefined || value === null) return undefined
@@ -53,7 +52,6 @@ const parseProviderId = (value: unknown): string | undefined => {
 
 /**
  * Validates the envelope of a gateway request (the call itself is checked by sanitizeCall).
- * @returns {AiGatewayRequest} The request.
  */
 export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {
   if (!isObject(body)) throw invalid('body')
@@ -170,7 +168,6 @@ const messageSize = (message: any): number =>
  * Returns the size of a sanitized call in characters (messages plus tool definitions): what the prompt limit and
  * the daily budget count.
  * @param {AiGatewayCall} call - The sanitized call.
- * @returns {number} The size.
  */
 export const getCallSize = (call: AiGatewayCall): number =>
   call.prompt.reduce((total, message) => total + messageSize(message), call.tools ? jsonSize(call.tools) : 0)

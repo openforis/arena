@@ -82,7 +82,6 @@ const NO_IMAGE: ComposedImage = { blob: null, url: null, composing: false, error
  * @param {boolean} params.includeData - Whether markers and measurements are captured.
  * @param {ScreenshotPlotCandidate|null} params.capturePlot - The plot to fit, or null for the current view.
  * @param {number} params.fitZoom - The fit-to-plot zoom.
- * @returns {CaptureState} The capture state.
  */
 const useMapCapture = ({
   map,
@@ -155,7 +154,6 @@ const useMapCapture = ({
 /**
  * Draws the overlay on a capture and encodes the image.
  * @param {ComposeRequest} request - The capture, the format, what to include and the stamp values.
- * @returns {Promise<Blob>} The image.
  */
 const composePreviewImage = ({
   capture,
@@ -277,7 +275,6 @@ const useComposedImage = ({
  * @param {ScreenshotPlotCandidate|null} params.plot - The selected plot.
  * @param {number} params.fitZoom - The fit-to-plot zoom.
  * @param {ScreenshotStamp} params.stamp - The stamp values.
- * @returns {ScreenshotPreview} The preview.
  */
 export const useScreenshotPreview = ({
   map,

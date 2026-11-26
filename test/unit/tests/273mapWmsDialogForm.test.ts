@@ -55,7 +55,6 @@ const wmtsCapabilities: MapServiceCapabilities = {
 /**
  * Applies actions to the initial state.
  * @param {boolean} [canEditSurvey] - Whether the user can edit the survey.
- * @returns {WmsDialogFormState} The state.
  */
 const run = (actions: WmsDialogFormAction[], canEditSurvey = true): WmsDialogFormState =>
   actions.reduce(wmsDialogFormReducer, createWmsDialogFormState({ canEditSurvey }))

@@ -17,7 +17,6 @@ if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: 
  * and makes it the default provider.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {LocalModelServerStub} stub - The stub server.
- * @returns {Promise<void>} Resolves when registered and saved.
  */
 const seedLocalProvider = async (page: Page, api: ArenaApi, stub: LocalModelServerStub): Promise<void> => {
   const userUuid = await api.getCurrentUserUuid()
@@ -40,7 +39,6 @@ const collectGatewayRequests = (page: Page): string[] => {
 
 /**
  * Opens the dashboard activity section.
- * @returns {Promise<void>} Resolves when open.
  */
 const openActivitySection = async (page: Page): Promise<void> => {
   await page.goto(Urls.dashboard)
@@ -54,7 +52,6 @@ const summaryModal = (page: Page) => page.locator('.ai-activity-log-summary-moda
  * Clicks Summarize and, when the first-use dialog appears, accepts it.
  * @param {object} [options] - Options.
  * @param {boolean} [options.expectConsent] - Whether the dialog must appear (true) or must not (false).
- * @returns {Promise<void>} Resolves when the modal is open.
  */
 const summarize = async (page: Page, { expectConsent }: { expectConsent: boolean }): Promise<void> => {
   await page.locator('.btn-ai-summary').click()
@@ -68,7 +65,6 @@ const summarize = async (page: Page, { expectConsent }: { expectConsent: boolean
 
 /**
  * Closes the summary modal.
- * @returns {Promise<void>} Resolves when closed.
  */
 const closeSummary = async (page: Page): Promise<void> => {
   await summaryModal(page).locator('.modal-close').click()

@@ -30,7 +30,6 @@ const toLabelParams = (input: unknown): Record<string, string> => {
 /**
  * Returns true for the tool calls the chat doesn't list (the conversation title).
  * @param {ConversationToolPart} part - Tool part.
- * @returns {boolean} True when hidden.
  */
 export const isHiddenToolPart = (part: ConversationToolPart): boolean => part.toolName === CONVERSATION_TITLE_TOOL_NAME
 
@@ -38,7 +37,6 @@ export const isHiddenToolPart = (part: ConversationToolPart): boolean => part.to
  * Returns the label of a tool row ("Looked up tree_height"); tools without a label key get the default label.
  * @param {ConversationToolPart} part - Tool part.
  * @param {AiTranslate} t - Translator (returns the key when missing).
- * @returns {string} The label.
  */
 export const getToolRowLabel = (part: ConversationToolPart, t: AiTranslate): string => {
   const key = `aiAssistant.tools.${part.toolName}`
@@ -55,7 +53,6 @@ export const getToolRowLabel = (part: ConversationToolPart, t: AiTranslate): str
 /**
  * Returns the change set a propose tool handed to the conversation (its card goes under the tool row).
  * @param {ConversationToolPart} part - Tool part.
- * @returns {string|null} The change set id.
  */
 export const getProposedChangeSetId = (part: ConversationToolPart): string | null => {
   const changeSetId = (part.output as { changeSetId?: unknown } | undefined)?.changeSetId
@@ -90,7 +87,6 @@ export const getRetryBase = (
  * @param {string} params.text - Note.
  * @param {string} params.changeSetId - Card.
  * @param {string} params.now - Date.
- * @returns {ApplyNoteMessage} The message.
  */
 const toNote = ({
   text,

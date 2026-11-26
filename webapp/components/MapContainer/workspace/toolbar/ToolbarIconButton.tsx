@@ -26,7 +26,6 @@ type ToolbarIconButtonProps = {
  * @param {boolean} [props.active] - Toggle state (sets aria-pressed); undefined for plain buttons.
  * @param {boolean} [props.disabled] - Whether the button is disabled.
  * @param {Function} props.onClick - Action.
- * @returns {React.ReactElement} The button.
  */
 export const ToolbarIconButton = ({
   buttonKey,

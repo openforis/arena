@@ -62,7 +62,6 @@ const nonEmpty = (texts: Record<string, string> | undefined) => (texts && Object
  * @param {object} [params.descriptions] - Descriptions by language.
  * @param {boolean} [params.key] - Key attribute.
  * @param {boolean} [params.multiple] - Multiple (default: true for entities, as in the designer).
- * @returns {object} The node definition.
  */
 export const createProposedNodeDef = ({
   parent,

@@ -25,7 +25,6 @@ export const getDesignDetectorScope = (ctx: DetectorContext): DesignDetectorScop
  * @param {object} params - Parameters.
  * @param {string} params.scopeKey - Id part after the kind.
  * @param {Date} params.now - Creation time.
- * @returns {AssistantSuggestion} The suggestion.
  */
 export const newDesignSuggestion = ({
   kind,
@@ -72,13 +71,11 @@ export const getNewSavedDesignNodeDefs = (survey: any, uuids: string[]): any[] =
 
 /**
  * Returns the node definition uuid of a target key (`<uuid>` or `<uuid>:<kind>`).
- * @returns {string} The uuid.
  */
 export const getTargetNodeDefUuid = (targetKey: string): string => targetKey.split(':')[0]
 
 /**
  * Returns the part of a suggestion id after the kind ('missingTranslations:fr' → 'fr').
  * @param {string} id - Suggestion id.
- * @returns {string} The scope key.
  */
 export const getSuggestionScopeKey = (id: string): string => id.slice(id.indexOf(':') + 1)

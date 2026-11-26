@@ -54,7 +54,6 @@ export const tciPixelToColor: PixelToColor = (values) => {
  *
  * @param {number} dn - Digital number (uint16).
  * @param {number} max - Reflectance shown as 255.
- * @returns {number} Byte.
  */
 export const reflectanceToByte = (dn: number, max: number): number =>
   toByte(((dn * SCENE_REFLECTANCE_SCALE + SCENE_REFLECTANCE_OFFSET) / max) * 255)

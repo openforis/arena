@@ -70,7 +70,6 @@ const fetchCappedRows = async ({ api, requestParams, max }: { api: AnalysisApi; 
  * @param {number} params.total - Rows of the query.
  * @param {boolean} params.sorted - Whether the query has a sort.
  * @param {boolean} params.hasTotals - Whether the result has the totals.
- * @returns {string} The note.
  */
 const getTruncationNote = ({
   shown,

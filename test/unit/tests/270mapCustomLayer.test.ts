@@ -19,7 +19,6 @@ const ids = [
 /**
  * Builds a valid WMS layer.
  * @param {Partial<MapCustomLayer>} [overrides] - Properties to change.
- * @returns {MapCustomLayer} The layer.
  */
 const wmsLayer = (overrides: Partial<MapCustomLayer> = {}): MapCustomLayer => ({
   id: ids[0],
@@ -38,7 +37,6 @@ const wmsLayer = (overrides: Partial<MapCustomLayer> = {}): MapCustomLayer => ({
 /**
  * Builds a valid XYZ base map.
  * @param {Partial<MapCustomLayer>} [overrides] - Properties to change.
- * @returns {MapCustomLayer} The layer.
  */
 const xyzLayer = (overrides: Partial<MapCustomLayer> = {}): MapCustomLayer => ({
   id: ids[1],

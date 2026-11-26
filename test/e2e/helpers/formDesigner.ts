@@ -26,7 +26,6 @@ export class FormDesigner {
 
   /**
    * Waits until the designer is shown and its route loader is gone (use it after a reload too).
-   * @returns {Promise<void>} Resolves when ready.
    */
   async waitReady(): Promise<void> {
     await expect(this.surveyForm).toBeVisible()
@@ -49,7 +48,6 @@ export class FormDesigner {
   /**
    * Moves the mouse over the node def, to make its edit buttons appear.
    * @param {string} name - Node def name.
-   * @returns {Promise<void>} - Resolves when the mouse has been moved.
    */
   private async hoverNodeDef(name: string): Promise<void> {
     const wrapper = this.nodeDefWrapper(name)
@@ -116,7 +114,6 @@ export class FormDesigner {
    * @param {'advanced' | 'boolean' | 'dropdown'} [params.editor] - Editor to use: advanced (code editor) or
    * basic (boolean value or literal value dropdown).
    * @param {string} [params.applyIf] - Optional "apply if" expression (entered with the advanced editor).
-   * @returns {Promise<void>} - Resolves when the expression has been applied.
    */
   async editExpression({
     qualifier,
@@ -176,7 +173,6 @@ export class FormDesigner {
    * Checks the (MUI) checkbox with the specified test id, if not checked already
    * (e.g. entities displayed in their own page are always multiple).
    * @param {string} testId - Checkbox test id.
-   * @returns {Promise<void>} - Resolves when the checkbox is checked.
    */
   private async check(testId: string): Promise<void> {
     const checkbox = this.page.getByTestId(testId)
@@ -187,7 +183,6 @@ export class FormDesigner {
   /**
    * Saves the node def being edited and goes back to the form designer.
    * @param {string} label - Label of the node def (it is expected to be shown in the form after saving).
-   * @returns {Promise<void>} - Resolves when back in the form designer.
    */
   async saveAndBack(label: string): Promise<void> {
     const isNodeDefSaveResponse = (response: Response) =>
@@ -214,7 +209,6 @@ export class FormDesigner {
 
   /**
    * Opens the form designer and defines the root entity cluster with its key cluster_id (required to publish).
-   * @returns {Promise<void>} - Resolves when back in the form designer.
    */
   async gotoWithClusterRootEntity(): Promise<void> {
     await this.goto()
@@ -226,7 +220,6 @@ export class FormDesigner {
 
   /**
    * Returns the names of the children of the specified entity, in the order they are displayed.
-   * @returns {Promise<string[]>} - Child names.
    */
   async childNames(entityName: string): Promise<string[]> {
     const entity = this.page.locator(`[data-node-def-name="${entityName}"]`)

@@ -25,7 +25,6 @@ const normalizeHost = (hostname: string): string =>
 /**
  * Returns true for loopback hosts: localhost, *.localhost, 127.0.0.0/8, ::1 (and ::ffff:127.x.x.x).
  * @param {string} hostname - URL hostname (IPv6 with or without brackets).
- * @returns {boolean} True when loopback.
  */
 export const isLoopbackHost = (hostname: string): boolean => {
   const host = normalizeHost(hostname)
@@ -36,7 +35,6 @@ export const isLoopbackHost = (hostname: string): boolean => {
  * Returns true for hosts of the local network: private and link-local IPv4, CGNAT, IPv6 ULA, link-local and site-local,
  * .local.
  * @param {string} hostname - URL hostname (IPv6 with or without brackets).
- * @returns {boolean} True when private.
  */
 export const isPrivateHost = (hostname: string): boolean => {
   const host = normalizeHost(hostname)

@@ -23,7 +23,6 @@ const hasErrors = (validation: any): boolean => Boolean(validation) && Validatio
  * @param {object} params - Parameters.
  * @param {object} params.before - Validation before the edit.
  * @param {object} params.after - Validation after the edit.
- * @returns {RecordEditBadge} The badge.
  */
 const toBadge = ({ before, after }: { before: any; after: any }): RecordEditBadge => {
   if (hasErrors(after)) return 'stillInvalid'
@@ -37,7 +36,6 @@ const toBadge = ({ before, after }: { before: any; after: any }): RecordEditBadg
  * @param {object} params.validationBefore - Record validation before.
  * @param {object} params.validationAfter - Record validation after.
  * @param {Set<string>} params.editedUuids - Uuids of the edited nodes.
- * @returns {number} The number of new errors.
  */
 const countNewErrors = ({
   validationBefore,

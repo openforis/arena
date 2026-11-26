@@ -42,7 +42,6 @@ export const assertFeatureEnabled = (feature: string, user: ArenaUser | null, en
 /**
  * Returns the keys of the features disabled by AI_FEATURE_FLAGS.
  * @param {GateEnv} [env] - Environment (defaults to ENV).
- * @returns {string[]} Disabled feature keys.
  */
 export const getDisabledFeatureKeys = (env: GateEnv = ENV): string[] =>
   Object.keys(AiFeatures).filter((key) => isDisabledByFlag(env.aiFeatureFlags, key))

@@ -32,7 +32,6 @@ const isVisibleToAudienceByAudience: Record<WhatsNewAudience, (user: any) => boo
  * @param {boolean} [params.experimentalFeatures=false] - Whether experimental features are enabled.
  * @param {boolean} [params.aiFeaturesEnabled=false] - Whether AI features are enabled on the server.
  * @param {WhatsNewItem[]} [params.items] - The items to filter (defaults to the whole catalog).
- * @returns {WhatsNewItem[]} - The visible items.
  */
 export const getVisibleItems = ({
   user,
@@ -104,14 +103,10 @@ export const assocItemsSeen = ({
 
 /**
  * Returns the i18n key of the title of the specified item.
- *
- * @returns {string} - The i18n key.
  */
 export const getTitleKey = (item: WhatsNewItem): string => `whatsNew:items.${item.id}.title`
 
 /**
  * Returns the i18n key of the description (markdown) of the specified item.
- *
- * @returns {string} - The i18n key.
  */
 export const getDescriptionKey = (item: WhatsNewItem): string => `whatsNew:items.${item.id}.description`

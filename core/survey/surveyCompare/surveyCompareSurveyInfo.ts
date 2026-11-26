@@ -199,7 +199,6 @@ const getAreaOfInterestFileEntries = (survey: any): SurveyFileEntry[] => {
 /**
  * Returns the survey files referenced by the survey info (preloaded map layers, survey doc images, branding images,
  * areas of interest).
- * @returns {SurveyFileEntry[]} - The file entries.
  */
 export const getSurveyFileEntries = (survey: any): SurveyFileEntry[] => [
   ...getListFileEntries({ survey, kind: SurveyFileKind.preloadedMapLayers }),
@@ -379,7 +378,6 @@ const planSurveyFileDiff = ({ context, diff }) => {
  * Builds the changes to the survey info and to the survey files needed to apply the selected changes.
  * @param {object} params - The parameters.
  * @param {Set<string>} params.appliedIds - Ids of the changes to apply.
- * @returns {SurveyInfoApplyPlan} - The plan.
  */
 export const buildSurveyInfoApplyPlan = ({
   sourceSurvey,

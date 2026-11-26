@@ -88,7 +88,6 @@ const addManualMatches = ({
  * @param {NodeDefsIndex} params.sourceIndex - Source survey node defs index.
  * @param {NodeDefsIndex} params.targetIndex - Target survey node defs index.
  * @param {Record<string, string>} [params.manualMatches] - Target node def uuid by source node def uuid.
- * @returns {NodeDefMatches} - The matches.
  */
 export const matchNodeDefs = ({
   sourceIndex,

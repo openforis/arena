@@ -11,7 +11,6 @@ const unwrap = (error: any): any[] => [error, error?.lastError, error?.cause, er
 
 /**
  * Returns the AI error key of an error (SystemError from the gateway model), or null.
- * @returns {string|null} The key.
  */
 export const getAiErrorKey = (error: unknown): string | null => {
   const withKey = unwrap(error).find((candidate) => typeof candidate?.key === 'string' && AI_KEY.test(candidate.key))
@@ -20,7 +19,6 @@ export const getAiErrorKey = (error: unknown): string | null => {
 
 /**
  * Returns the interpolation params of an AI error (the `{{baseUrl}}` of the unreachable server).
- * @returns {Record<string, unknown>|undefined} The params.
  */
 export const getAiErrorParams = (error: unknown): Record<string, unknown> | undefined => {
   const aiKey = getAiErrorKey(error)
@@ -37,7 +35,6 @@ export const isAiAbortError = (error: unknown): boolean =>
 
 /**
  * Returns the translated message for an AI error.
- * @returns {string} The message.
  */
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
   /**

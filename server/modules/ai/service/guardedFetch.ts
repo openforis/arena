@@ -83,7 +83,6 @@ const toBodyBytes = (body: BodyInit | null | undefined): Buffer | null => {
 /**
  * Returns the headers of a response.
  * @param {http.IncomingHttpHeaders} raw - Node headers.
- * @returns {Headers} The headers.
  */
 const toHeaders = (raw: http.IncomingHttpHeaders): Headers => {
   const headers = new Headers()
@@ -99,7 +98,6 @@ const toHeaders = (raw: http.IncomingHttpHeaders): Headers => {
  * Returns the error a failed request rejects with: a SystemError of the guard as it is, anything else as the
  * TypeError("fetch failed") of fetch, which is what the AI SDK recognises as a connection failure.
  * @param {unknown} error - The socket error.
- * @returns {Error} The error.
  */
 const toFetchError = (error: unknown): Error =>
   error instanceof SystemError ? error : new TypeError('fetch failed', { cause: error })
@@ -136,7 +134,6 @@ const capBody = (incoming: http.IncomingMessage, maxBodyBytes: number): void => 
  * @param {RequestInit} params.init - Fetch options.
  * @param {Function|undefined} params.lookup - Socket lookup, undefined for an allowlisted host.
  * @param {number} params.maxBodyBytes - The most the body of the response may bring.
- * @returns {Promise<Response>} The response.
  */
 const send = ({
   url,

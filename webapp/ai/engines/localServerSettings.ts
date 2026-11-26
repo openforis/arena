@@ -9,7 +9,6 @@ export const MAX_MODEL_ID_LENGTH = 512
 /**
  * Returns the trimmed string when it is non-empty and not longer than the limit.
  * @param {number} maxLength - Maximum length.
- * @returns {string|null} The trimmed string, or null.
  */
 export const trimmedString = (value: unknown, maxLength: number): string | null => {
   if (typeof value !== 'string') return null

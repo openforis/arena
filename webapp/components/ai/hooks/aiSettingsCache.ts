@@ -83,7 +83,6 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
 
   /**
    * Returns the cached settings, the fetch in flight, or starts a fetch.
-   * @returns {Promise<AiSettingsResponse>} The settings.
    */
   const fetchOnce = (): Promise<AiSettingsResponse> => {
     if (cache) return Promise.resolve(cache)
@@ -92,7 +91,6 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
 
   /**
    * Starts a fetch and registers it as the one in flight.
-   * @returns {Promise<AiSettingsResponse>} The settings.
    */
   const startFetch = (): Promise<AiSettingsResponse> => {
     const startedAt = generation

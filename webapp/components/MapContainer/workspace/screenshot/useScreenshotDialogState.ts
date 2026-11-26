@@ -74,7 +74,6 @@ const readCenter = (map: L.Map | null): LatLngLiteral | null => {
 
 /**
  * Reads the map view when the dialog opens (only the plots inside it are listed), before a capture moves the map.
- * @returns {LatLngBoundsLiteral|null} The bounds.
  */
 const readBounds = (map: L.Map | null): LatLngBoundsLiteral | null => {
   const bounds = map?.getBounds()
@@ -86,7 +85,6 @@ const readBounds = (map: L.Map | null): LatLngBoundsLiteral | null => {
 /**
  * Holds the choices of the screenshot dialog and derives the plot list, the attribute options, the file name, the
  * stamp and the fit-to-plot zoom.
- * @returns {ScreenshotDialogState} The dialog state.
  */
 export const useScreenshotDialogState = (): ScreenshotDialogState => {
   const { map } = useMapWorkspace()

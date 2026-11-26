@@ -9,7 +9,6 @@ import { NodesBatchEdit, NodesBatchMessageKeys, NodesBatchRecordEdit, NodesBatch
  * Builds the 400 error of an invalid request.
  * @param {string} reason - What is wrong.
  * @param {object} [params] - Extra params.
- * @returns {SystemError} The error.
  */
 const invalidRequest = (reason: string, params: Record<string, unknown> = {}): SystemError =>
   new SystemError(NodesBatchMessageKeys.invalidRequest, { reason, ...params }, StatusCodes.BAD_REQUEST)
@@ -23,7 +22,6 @@ const isId = (value: unknown): value is string => typeof value === 'string' && i
 /**
  * Validates one edit (ids and size of the new value) and fills the missing from/to with null.
  * @param {unknown} edit - The edit from the body.
- * @returns {NodesBatchEdit} The edit.
  */
 const parseEdit = (edit: unknown): NodesBatchEdit => {
   if (!edit || typeof edit !== 'object') throw invalidRequest('edit')
@@ -52,7 +50,6 @@ const checkEditsSet = (edits: NodesBatchEdit[]): void => {
  * Validates the body of POST /records/nodes/update.
  * @param {unknown} body - The request body: { cycle, edits: [{ recordUuid, nodeUuid, from, to }] }.
  * @param {string[]} [cycleKeys] - The survey cycle keys; when given, the cycle must be one of them (it becomes a cache key).
- * @returns {NodesBatchRequest} The request.
  */
 export const parseNodesBatchRequest = (body: unknown, cycleKeys?: string[]): NodesBatchRequest => {
   const { cycle, edits } = (body ?? {}) as Record<string, unknown>

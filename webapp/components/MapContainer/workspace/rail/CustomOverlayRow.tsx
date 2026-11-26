@@ -8,7 +8,6 @@ import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 
 /**
  * Row of an added layer in the Layers tab: visibility, opacity and remove.
- * @returns {React.ReactElement} The row.
  */
 export const CustomOverlayRow = ({ overlay }: { overlay: MapCustomOverlay }): ReactElement => {
   const t = useI18nT()

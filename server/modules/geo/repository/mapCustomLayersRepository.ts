@@ -73,7 +73,6 @@ const freshLayersSql = (stored: string): string =>
 
 /**
  * Fetches the layers every user of a survey sees.
- * @returns {Promise<MapCustomLayer[]>} The layers.
  */
 const fetchSurveyMapCustomLayers = async (
   { surveyId }: { surveyId: number },
@@ -138,7 +137,6 @@ const removeSurveyMapCustomLayer = async (
 
 /**
  * Fetches the layers a user added for themselves in a survey.
- * @returns {Promise<MapCustomLayer[]>} The layers.
  */
 const fetchUserMapCustomLayers = async (
   { userUuid, surveyId }: { userUuid: string; surveyId: number },

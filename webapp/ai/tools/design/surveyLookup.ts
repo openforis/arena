@@ -40,13 +40,11 @@ const depthFirst = (childrenByParent: Map<string | null, any[]>): any[] => {
 
 /**
  * Returns the design node definitions depth-first (each entity followed by its descendants).
- * @returns {object[]} The node definitions.
  */
 export const getDesignNodeDefsDepthFirst = (survey: any): any[] => depthFirst(groupByParent(getCurrentNodeDefs(survey)))
 
 /**
  * Returns the node definition with the given name, or throws nodeDefNotFound with the closest names.
- * @returns {object} The node definition.
  */
 export const requireNodeDefByName = (survey: any, name: string): any => {
   const nodeDef = findNodeDefByName(survey, name)
@@ -58,7 +56,6 @@ export const requireNodeDefByName = (survey: any, name: string): any => {
 
 /**
  * Returns the survey of the context, or throws noSurvey.
- * @returns {object} The survey.
  */
 export const requireSurvey = (ctx: AiToolContext): any => {
   if (ctx.survey) return ctx.survey
@@ -81,7 +78,6 @@ export const getNodeDefPathNames = (survey: any, nodeDef: any): string[] => {
 
 /**
  * Returns the label of a node definition in a language, or null.
- * @returns {string|null} The label.
  */
 export const getLabelOrNull = (nodeDef: any, lang: string): string | null => NodeDef.getLabels(nodeDef)[lang] || null
 

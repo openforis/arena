@@ -73,7 +73,6 @@ type PageParams = {
 
 /**
  * Returns the category with a name, or fails for the model.
- * @returns {object} The category.
  */
 export const requireCategory = (survey: any, categoryName: string): any => {
   const category = Survey.getCategoryByName(categoryName)(survey)
@@ -111,7 +110,6 @@ const requireSurveyLanguage = (survey: any, lang: string): string[] => {
 
 /**
  * Returns the items whose label in lang is in a pending card (not applied nor discarded yet).
- * @returns {Set<string>} The item uuids.
  */
 const getPendingItemUuids = (ctx: AiToolContext, categoryUuid: string, lang: string): Set<string> => {
   const result = new Set<string>()
@@ -130,7 +128,6 @@ const getPendingItemUuids = (ctx: AiToolContext, categoryUuid: string, lang: str
  * @param {MissingLabelsItem} item - Server item.
  * @param {string} lang - Language to translate to.
  * @param {string[]} languages - Survey languages, default first.
- * @returns {ListedCategoryItem} The item.
  */
 const toListedItem = (item: MissingLabelsItem, lang: string, languages: string[]): ListedCategoryItem => {
   const source = findTranslationSource({ texts: item.labels, lang, languages })
@@ -177,7 +174,6 @@ const collectItems = (items: MissingLabelsItem[], state: PageState, params: Page
  * Returns the note telling the model how to go on.
  * @param {number} pendingCount - Labels of this category and language in pending cards.
  * @param {string|null} example - An item of the propose tool input, null when nothing is listed.
- * @returns {string} The note.
  */
 const buildNote = (nextCursor: string | null, pendingCount: number, example: string | null): string => {
   const parts = [nextCursor ? 'More items remain: call again with cursor = nextCursor.' : 'No more items.']
@@ -213,7 +209,6 @@ const toCursorFailure = (error: any, cursor: string | null): AiToolFailure | nul
 /**
  * Fetches a server page; a cursor the server refuses becomes a failure the model can act on.
  * @param {FetchMissingLabelsPage} fetchPage - Page fetcher.
- * @returns {Promise<MissingLabelsPage>} The page.
  */
 const fetchServerPage = async (
   fetchPage: FetchMissingLabelsPage,
@@ -230,7 +225,6 @@ const fetchServerPage = async (
  * Creates the tool (the fetcher is injected in tests).
  * @param {object} [deps] - Dependencies.
  * @param {FetchMissingLabelsPage} [deps.fetchPage] - Missing-labels page fetcher.
- * @returns {AiTool} The tool.
  */
 export const createCategoryItemsListMissingLabelsTool = ({
   fetchPage = fetchMissingLabelsPage,

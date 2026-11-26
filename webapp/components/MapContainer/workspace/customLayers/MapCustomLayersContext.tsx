@@ -100,7 +100,6 @@ const useStoredMapCustomLayers = () => {
 
 /**
  * Provides the custom WMS / WMTS / XYZ layers of the current survey to the map (base maps) and the workspace (overlays).
- * @returns {React.ReactElement} The provider.
  */
 export const MapCustomLayersProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const canEditSurveyLayers = Boolean(useAuthCanEditSurvey())

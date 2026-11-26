@@ -10,7 +10,6 @@ import { Urls } from './urls'
  * @param {string} clusterId - Value of the record key attribute.
  * @param {object} [options] - Options.
  * @param {boolean} [options.unlock] - Whether to unlock the record for editing.
- * @returns {Promise<void>} - Resolves when the record editor is ready.
  */
 export const openRecord = async (page: Page, clusterId: string, { unlock = false } = {}): Promise<void> => {
   await page.goto(Urls.records)
@@ -24,7 +23,6 @@ export const openRecord = async (page: Page, clusterId: string, { unlock = false
 
 /**
  * Unlocks the record currently open in the record editor for editing (if it is locked).
- * @returns {Promise<void>} - Resolves when the record is editable.
  */
 export const unlockRecord = async (page: Page): Promise<void> => {
   const lockToggle = page.getByTestId(TestId.record.editLockToggleBtn)

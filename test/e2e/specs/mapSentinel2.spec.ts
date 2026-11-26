@@ -26,7 +26,6 @@ const blockSceneIndex = async (page: Page): Promise<{ aborted: () => number }> =
 
 /**
  * Opens Data › Map and waits for the top bar (same helper as Part 1's mapWorkspace.spec.ts).
- * @returns {Promise<void>} Resolves when the bar is shown.
  */
 const openMap = async (page: Page): Promise<void> => {
   await page.goto(Urls.map)
@@ -37,7 +36,6 @@ const openMap = async (page: Page): Promise<void> => {
 /**
  * Opens Data › Map and flies to coordinates with the search box (zoom 14: one or two Sentinel-2 tiles in view).
  * @param {string} query - Coordinates, e.g. '41.9, 12.5'.
- * @returns {Promise<void>} Resolves at zoom 14.
  */
 const goToCoordinates = async (page: Page, query: string): Promise<void> => {
   await openMap(page)
@@ -49,7 +47,6 @@ const goToCoordinates = async (page: Page, query: string): Promise<void> => {
 
 /**
  * Opens the Sentinel-2 tab from the Imagery menu.
- * @returns {Promise<void>} Resolves when the panel is visible.
  */
 const openScenesPanel = async (page: Page): Promise<void> => {
   await page.getByTestId(ids.menuButton('imagery')).click()

@@ -25,7 +25,6 @@ const MapWorkspaceContext = createContext<MapWorkspaceContextValue | null>(null)
  * @param {object} props - Component props.
  * @param {MapWorkspaceVariant} props.variant - 'full' (Data › Map) or 'compact' (picker, geo panel, dashboard).
  * @param {ReactNode} props.children - Workspace content.
- * @returns {React.ReactElement} The provider.
  */
 export const MapWorkspaceProvider = ({
   variant,
@@ -64,7 +63,6 @@ export const MapWorkspaceProvider = ({
 
 /**
  * Returns the map workspace context.
- * @returns {MapWorkspaceContextValue} The context value.
  */
 export const useMapWorkspace = (): MapWorkspaceContextValue => {
   const context = useContext(MapWorkspaceContext)

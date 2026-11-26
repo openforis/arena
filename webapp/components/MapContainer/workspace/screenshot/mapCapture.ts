@@ -66,7 +66,6 @@ const areTilesLoading = (map: L.Map): boolean => {
 /**
  * Waits for a number of milliseconds.
  * @param {number} ms - The time.
- * @returns {Promise<void>} Resolves after the time.
  */
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => {
@@ -128,7 +127,6 @@ export const captureMapView = async ({
  * @param {object} params - The parameters.
  * @param {boolean} params.includeData - Whether markers and measurements are captured.
  * @param {number} params.zoom - The fit-to-plot zoom.
- * @returns {Promise<MapCaptureResult>} The capture.
  */
 export const captureMapAtPlot = async ({
   map,
@@ -150,7 +148,6 @@ export const captureMapAtPlot = async ({
   })
   /**
    * Captures the current view and locates the plot in it.
-   * @returns {Promise<MapCaptureResult>} The capture.
    */
   const capturePlot = async (): Promise<MapCaptureResult> => {
     const capture = await captureMapView({ map, includeData })

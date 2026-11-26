@@ -12,7 +12,6 @@ type HandbookImporter = () => Promise<unknown>
 /**
  * Creates a loader that imports the handbook and builds its index once (the importer is injectable for tests).
  * @param {HandbookImporter} importer - Imports the handbook module.
- * @returns {Function} The loader.
  */
 export const createHandbookLoader = (importer: HandbookImporter): (() => Promise<LoadedHandbook>) => {
   let loading: Promise<LoadedHandbook> | null = null

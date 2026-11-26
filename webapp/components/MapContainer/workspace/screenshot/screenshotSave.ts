@@ -59,7 +59,6 @@ export type ScreenshotSaveInput = {
  * Builds an error outcome with a key of the screenshot errors section.
  * @param {string} key - The error key, without prefix.
  * @param {object} [params] - The message parameters.
- * @returns {ScreenshotSaveOutcome} The outcome.
  */
 const errorOutcome = (key: string, params?: Record<string, string | number>): ScreenshotSaveOutcome =>
   params
@@ -187,7 +186,6 @@ const checkSize = (input: ScreenshotSaveInput): ScreenshotSaveOutcome | null => 
 /**
  * Maps the socket result to the dialog outcome.
  * @param {NodeSaveResult} result - The socket result.
- * @returns {ScreenshotSaveOutcome} The outcome.
  */
 const toOutcome = (result: NodeSaveResult): ScreenshotSaveOutcome => {
   if (result.status === 'saved') return { status: 'saved' }
@@ -232,7 +230,6 @@ const sendAndWait = async (
  * Sends the change: the new entity row first when the attribute is in a multiple entity, then the image.
  * @param {ScreenshotSaveDeps} deps - The injected dependencies.
  * @param {object} params - The fetched record, the change to send and the save input.
- * @returns {Promise<ScreenshotSaveOutcome>} The outcome.
  */
 const sendChange = async (
   deps: ScreenshotSaveDeps,
@@ -260,7 +257,6 @@ const sendChange = async (
  * the new entity row when the attribute is in a multiple entity), socket result.
  * @param {ScreenshotSaveDeps} deps - The injected dependencies (API, permission, node builder, prompt, socket).
  * @param {ScreenshotSaveInput} input - The record, the image, its name and the size limits.
- * @returns {Promise<ScreenshotSaveOutcome>} The outcome.
  */
 export const saveScreenshotToRecord = async (
   deps: ScreenshotSaveDeps,

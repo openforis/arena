@@ -16,19 +16,16 @@ const DEFAULT_DATA_CLASS: AiDataClass = 'schema'
 
 /**
  * Returns the localStorage key of the user's consent decisions.
- * @returns {string} The key.
  */
 export const getLocalServerConsentKey = (userUuid: string): string => `arena.ai.localServerConsent.${userUuid}`
 
 /**
  * Returns the key of the survey inside the consent map ('none' when there is no survey).
- * @returns {string} The key.
  */
 const surveyKey = (surveyId?: number | null): string => (surveyId ? String(surveyId) : 'none')
 
 /**
  * Reads the consent map of the user; unavailable storage or corrupt JSON give an empty map.
- * @returns {ConsentMap} The map.
  */
 const readMap = (storage: StorageLike, userUuid: string): ConsentMap => {
   try {
@@ -55,7 +52,6 @@ const isEntryOf = (entry: ConsentEntry | undefined, baseUrl: string): entry is C
  * @param {number} [params.surveyId] - Survey (none for Help).
  * @param {string} params.baseUrl - Current server URL.
  * @param {AiDataClass} [params.dataClass] - Data class the request sends (the survey design when absent).
- * @returns {AiConsentDecision|null} The decision.
  */
 export const loadLocalServerConsent = ({
   storage,
@@ -83,7 +79,6 @@ export const loadLocalServerConsent = ({
  * @param {object} params - What is being saved.
  * @param {string} params.baseUrl - Server URL.
  * @param {AiDataClass} params.dataClass - The new class.
- * @returns {AiDataClass} The class.
  */
 const getClassToStore = (
   previous: ConsentEntry | undefined,

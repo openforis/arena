@@ -24,7 +24,6 @@ export type MapCustomLayersService = {
 /**
  * Creates the service storing the custom map layers of a survey ("Everyone in this survey", in the survey config)
  * and of a user ("Only me", in the user prefs, per survey).
- * @returns {MapCustomLayersService} The service.
  */
 export const createMapCustomLayersService = (repository: MapCustomLayersRepositoryType): MapCustomLayersService => {
   /**

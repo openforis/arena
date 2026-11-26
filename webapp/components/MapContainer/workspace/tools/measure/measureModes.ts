@@ -27,7 +27,6 @@ export const measureModeOfTool = (tool: MapToolKey | null): MeasureMode | null =
 
 /**
  * Returns the workspace tool of a measure mode.
- * @returns {MapToolKey} The tool key.
  */
 export const toolOfMeasureMode = (mode: MeasureMode): MapToolKey => TOOL_BY_MODE[mode]
 

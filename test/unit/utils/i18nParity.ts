@@ -18,7 +18,6 @@ export const CYRILLIC = /[Ѐ-ӿ]/
 
 /**
  * Returns a namespace (common, appErrors, userAiSettings...) in every language.
- * @returns {Record<string, any>} The namespace by language.
  */
 export const namespaceByLanguage = (namespace: string): Record<string, any> =>
   Object.fromEntries(LANGUAGES.map((lang) => [lang, RESOURCES[lang][namespace]]))
@@ -87,7 +86,6 @@ export const flattenTexts = (obj: unknown, prefix = ''): Record<string, string> 
 /**
  * Returns the dotted paths of the string leaves, sorted.
  * @param {object} obj - Resource.
- * @returns {string[]} The paths.
  */
 export const leafPaths = (obj: unknown): string[] => Object.keys(flattenTexts(obj)).sort((a, b) => a.localeCompare(b))
 
@@ -108,7 +106,6 @@ export const baseKeyOf = (path: string): string => path.replace(PLURAL_SUFFIX, '
 /**
  * Returns the sorted base keys of flattened texts (plural forms together).
  * @param {Record<string, string>} flat - Texts by path.
- * @returns {string[]} The base keys.
  */
 export const baseKeysOf = (flat: Record<string, string>): string[] =>
   [...new Set(Object.keys(flat).map(baseKeyOf))].sort((a, b) => a.localeCompare(b))

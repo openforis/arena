@@ -58,7 +58,6 @@ export const createSurveyMember = async ({
 /**
  * Deletes persisted users.
  * @param {object[]} users - Users to delete.
- * @returns {Promise<void>} Resolves when deleted.
  */
 export const deleteUsers = async (users: any[]): Promise<void> => {
   for (const user of users) {
@@ -139,7 +138,6 @@ export const createMembersOfAllGroups = async ({
 /**
  * Deletes the users created by createMembersOfAllGroups.
  * @param {Record<string, any>} members - Users by group name.
- * @returns {Promise<void>} Resolves when deleted.
  */
 export const deleteMembersOfAllGroups = async (members: Record<string, any>): Promise<void> => {
   await deleteUsers(
@@ -194,7 +192,6 @@ export const accessGrantedTo = (members: Record<string, any>, allowed: string[])
  * @param {object} params - Parameters.
  * @param {object[]} params.routes - Routes to check.
  * @param {object} params.admin - System admin (also the inviter).
- * @returns {Promise<void>} Resolves when checked; the created users are deleted.
  */
 export const expectEditPermissionOnly = async ({
   routes,

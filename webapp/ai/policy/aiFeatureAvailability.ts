@@ -27,7 +27,6 @@ export type AiFeatureAvailability = {
  * Returns true when the feature works on a survey (checked against the survey policy); the Help chat
  * (`loggedIn`) has no survey and is checked against the instance ceilings only.
  * @param {string} feature - Feature key.
- * @returns {boolean} True when survey-scoped.
  */
 export const isSurveyScopedFeature = (feature: string): boolean =>
   getAiFeature(feature)?.permission !== AiFeaturePermission.loggedIn
@@ -38,7 +37,6 @@ export const isSurveyScopedFeature = (feature: string): boolean =>
  * @param {string} params.dataClass - Data class of the feature.
  * @param {AiPolicyLevel} params.allowed - Effective level of the class.
  * @param {boolean} params.surveyScoped - False for features without a survey.
- * @returns {string[]} The keys.
  */
 export const getPolicyBlockedReasonKeys = ({
   dataClass,
@@ -79,19 +77,16 @@ export const resolveEffectivePolicy = ({
 
 /**
  * Returns true when the feature's entry point is rendered (usable or shown disabled).
- * @returns {boolean} True when shown.
  */
 export const isAiFeatureShown = (availability: AiFeatureAvailability): boolean => availability.status !== 'disabled'
 
 /**
  * Returns true when the feature can be used now.
- * @returns {boolean} True when usable.
  */
 export const isAiFeatureUsable = (availability: AiFeatureAvailability): boolean => availability.status === 'available'
 
 /**
  * Returns the translated data-location text, or null when there is no hosting class.
- * @returns {string|null} The text.
  */
 export const getAiDataLocationText = ({
   location,

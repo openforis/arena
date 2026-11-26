@@ -23,7 +23,6 @@ import {
 
 /**
  * Returns the visible suggestions, all and by area.
- * @returns {{all: AssistantSuggestion[], byArea: SuggestionsByArea}} The suggestions.
  */
 export const useVisibleSuggestions = (): { all: AssistantSuggestion[]; byArea: SuggestionsByArea } => {
   const user = useUser()

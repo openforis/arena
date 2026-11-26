@@ -20,7 +20,6 @@ const ZOOM_TO_DATA_MAX_ZOOM = 16
  * no Tools menu).
  * @param {object} props - Component props.
  * @param {FullScreenState} props.fullScreen - Full screen state of the workspace.
- * @returns {React.ReactElement} The buttons.
  */
 export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState }): ReactElement => {
   const map = useMap()

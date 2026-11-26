@@ -33,7 +33,6 @@ const job = (overrides: Record<string, unknown> = {}) => ({
 /**
  * Returns the event of a succeeded job.
  * @param {object} jobSerialized - The job.
- * @returns {SuggestionEvent} The event.
  */
 const succeeded = (jobSerialized: object): SuggestionEvent => ({ type: 'jobSucceeded', job: jobSerialized })
 

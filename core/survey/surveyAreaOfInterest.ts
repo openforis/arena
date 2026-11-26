@@ -30,7 +30,6 @@ export const AREA_OF_INTEREST_MAX_FILE_SIZE_MB = 10
  * @param {string} params.fileName - Name of the uploaded file.
  * @param {number} params.size - Size of the stored file content.
  * @param {AreaOfInterest} params.areaOfInterest - The geometry (to compute the summary).
- * @returns {AreaOfInterestDescriptor} - The descriptor.
  */
 export const newAreaOfInterestDescriptor = ({
   name,
@@ -75,8 +74,6 @@ export const getLabel =
 
 /**
  * Returns the names of the areas of interest, in the survey order.
- *
- * @returns {string[]} - The names.
  */
 export const getAreaOfInterestNames = (surveyOrSurveyInfo: any): string[] =>
   getAreasOfInterest(surveyOrSurveyInfo).map((descriptor) => descriptor.name)
@@ -92,8 +89,6 @@ export const getAreaOfInterestFileUuids = (surveyOrSurveyInfo: any): string[] =>
 /**
  * Returns the summaries ({ uuid, props: { type, name, size } }) of the area of interest files, used by survey
  * export/import and by the Arena Mobile survey package.
- *
- * @returns {object[]} - The file summaries.
  */
 export const getAreaOfInterestFileSummaries = (
   surveyOrSurveyInfo: any

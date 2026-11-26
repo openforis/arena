@@ -62,7 +62,6 @@ export type FormState = {
 
 /**
  * Returns the form before the settings are loaded.
- * @returns {FormState} The form.
  */
 export const createEmptyForm = (): FormState => ({
   accessLevel: 0,
@@ -71,7 +70,6 @@ export const createEmptyForm = (): FormState => ({
 
 /**
  * Returns the body of PUT /api/ai/settings for the form (no provider field: the server keeps the providers).
- * @returns {SettingsUpdate} The update.
  */
 export const buildSettingsUpdate = (form: FormState): SettingsUpdate => ({
   accessLevel: form.accessLevel,
@@ -85,7 +83,6 @@ export type TFunction = (key: string, params?: Record<string, unknown>) => strin
 /**
  * Returns the form for the loaded settings.
  * @param {AiSettings} data - GET /api/ai/settings response.
- * @returns {FormState} The form.
  */
 export const settingsToForm = (data: AiSettings): FormState => {
   // known categories only: a stored legacy `assistant` is never sent back
@@ -105,7 +102,6 @@ export const settingsToForm = (data: AiSettings): FormState => {
 /**
  * Returns the form with a new access level; a higher level switches on the features it adds.
  * @param {AiAccessLevel} accessLevel - New level.
- * @returns {FormState} The new form.
  */
 export const withAccessLevel = (form: FormState, accessLevel: AiAccessLevel): FormState => ({
   ...form,
@@ -138,7 +134,6 @@ export const countAccessLevelFeatures = ({
  * @param {*} [params.key] - Error key of the response (with or without the `appErrors:` prefix).
  * @param {Record<string, unknown>} [params.params] - Parameters of the key.
  * @param {string} [params.message] - Message to show when there is no key.
- * @returns {string} The text.
  */
 export const getErrorText = ({
   key,

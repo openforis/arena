@@ -9,7 +9,6 @@ import type {
 /**
  * Creates the initial workspace state.
  * @param {MapRailTabKey|null} railTab - Rail tab open at start (null: rail closed).
- * @returns {MapWorkspaceState} The initial state.
  */
 export const initialMapWorkspaceState = (railTab: MapRailTabKey | null): MapWorkspaceState => ({
   railTab,
@@ -20,7 +19,6 @@ export const initialMapWorkspaceState = (railTab: MapRailTabKey | null): MapWork
 /**
  * Sets the rail tab, returning the same state when nothing changes so React skips the re-render.
  * @param {MapRailTabKey|null} railTab - The rail tab to set.
- * @returns {MapWorkspaceState} The new state.
  */
 const withRailTab = (state: MapWorkspaceState, railTab: MapRailTabKey | null): MapWorkspaceState =>
   state.railTab === railTab ? state : { ...state, railTab }
@@ -28,7 +26,6 @@ const withRailTab = (state: MapWorkspaceState, railTab: MapRailTabKey | null): M
 /**
  * Sets the active tool, returning the same state when nothing changes.
  * @param {MapToolKey|null} activeTool - The tool to set.
- * @returns {MapWorkspaceState} The new state.
  */
 const withTool = (state: MapWorkspaceState, activeTool: MapToolKey | null): MapWorkspaceState =>
   state.activeTool === activeTool ? state : { ...state, activeTool }
@@ -36,7 +33,6 @@ const withTool = (state: MapWorkspaceState, activeTool: MapToolKey | null): MapW
 /**
  * Sets the open dialog, returning the same state when nothing changes.
  * @param {MapDialogKey|null} dialog - The dialog to set.
- * @returns {MapWorkspaceState} The new state.
  */
 const withDialog = (state: MapWorkspaceState, dialog: MapDialogKey | null): MapWorkspaceState =>
   state.dialog === dialog ? state : { ...state, dialog }

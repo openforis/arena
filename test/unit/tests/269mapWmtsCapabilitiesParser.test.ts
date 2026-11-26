@@ -8,7 +8,6 @@ import { parseXmlDocument, type XmlElement } from '@server/modules/geo/service/m
  * @param {string} params.prefix - The TileMatrix identifier prefix.
  * @param {number} params.count - The number of matrices.
  * @param {number} [params.firstScale] - The scale denominator of the first matrix.
- * @returns {string} The XML.
  */
 const matrixSetXml = ({
   id,

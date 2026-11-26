@@ -10,7 +10,6 @@ const BASE_URL_TYPES = new Set<string>([AiProvider.openaiCompatible, AiProvider.
 /**
  * Returns true when the provider type calls a base URL chosen by the user.
  * @param {string} type - Provider type.
- * @returns {boolean} Whether the type uses a base URL.
  */
 export const providerTypeUsesBaseUrl = (type: string): boolean => BASE_URL_TYPES.has(type)
 
@@ -28,7 +27,6 @@ export const stripTrailingSlashes = (value: string): string => {
 /**
  * Parses a URL, returning null when it is not valid.
  * @param {string} value - The text to parse.
- * @returns {URL|null} The URL or null.
  */
 export const parseUrl = (value: string): URL | null => {
   try {
@@ -51,7 +49,6 @@ const matchesAllowlistEntry = (url: URL, entry: string): boolean => {
  * Returns true when the URL is under one of the org-hosted base URLs.
  * @param {URL} url - The URL to check.
  * @param {string[]} allowlist - Allowed base URLs (origin + path prefix).
- * @returns {boolean} True when allowlisted.
  */
 export const isAllowlisted = (url: URL, allowlist: string[]): boolean =>
   allowlist.some((entry) => typeof entry === 'string' && matchesAllowlistEntry(url, entry))

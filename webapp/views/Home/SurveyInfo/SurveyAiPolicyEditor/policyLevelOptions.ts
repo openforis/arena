@@ -67,7 +67,6 @@ export const applyPolicyChoice = ({
  * Returns the message of a failed save: the server error key when there is one.
  * @param {object} params - Parameters.
  * @param {any} params.error - Axios error (or any error).
- * @returns {string} The message.
  */
 export const getPolicySaveErrorMessage = ({
   error,

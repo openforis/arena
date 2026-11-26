@@ -57,7 +57,6 @@ export const getProviderStatusPill = (status: AiProviderStatus): ProviderStatusP
 /**
  * Returns the type the monogram shows (Arena default has its own mark, whatever the admin provider is).
  * @param {Pick<AiProviderEntry, 'kind'|'type'>} entry - Provider entry.
- * @returns {string} The monogram type.
  */
 export const getProviderMonogramType = (entry: Pick<AiProviderEntry, 'kind' | 'type'>): string =>
   entry.kind === 'arenaDefault' ? ARENA_DEFAULT_MONOGRAM : entry.type
@@ -67,7 +66,6 @@ export const getProviderMonogramType = (entry: Pick<AiProviderEntry, 'kind' | 't
  * are the user's names).
  * @param {object} params - Parameters.
  * @param {Pick<AiProviderEntry, 'kind'|'name'|'type'>} params.entry - Provider entry.
- * @returns {string} The name.
  */
 export const getProviderDisplayName = ({
   entry,
@@ -104,7 +102,6 @@ export const getProviderMenuActions = ({
  * Returns the rows of the list, in the order of the capabilities (account, local, Arena default last).
  * @param {object} params - Parameters.
  * @param {AiProviderEntry[]} params.providers - Provider entries.
- * @returns {ProviderRow[]} The rows.
  */
 export const buildProviderRows = ({
   providers,
@@ -144,7 +141,6 @@ export const isDefaultProviderMissing = ({
  * @param {object} params - Parameters.
  * @param {AiSettings} params.settings - GET /api/ai/settings response.
  * @param {AiProviderEntry[]} params.providers - Provider entries.
- * @returns {ProviderDialogContext} The context.
  */
 export const getProviderDialogContext = ({
   settings,

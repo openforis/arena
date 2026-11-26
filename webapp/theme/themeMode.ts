@@ -32,8 +32,6 @@ export const getThemePreference = (): ThemePreference => {
 
 /**
  * Detects the color scheme preferred by the operating system.
- *
- * @returns {ThemeMode} The system theme mode.
  */
 export const getSystemThemeMode = (): ThemeMode =>
   window.matchMedia?.(darkColorSchemeQuery).matches ? themeModes.dark : themeModes.light

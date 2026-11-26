@@ -17,7 +17,6 @@ type ImportResult = Record<string, unknown>
 /**
  * Returns a positive count, or 0.
  * @param {unknown} value - A result field.
- * @returns {number} The count.
  */
 const toCount = (value: unknown): number => {
   const count = Number(value)
@@ -94,7 +93,6 @@ const forgetOlderImports = ({
  * @param {string} params.jobUuid - Uuid of the import job.
  * @param {number} params.count - Records added or changed.
  * @param {Date} params.createdAt - Creation date.
- * @returns {AssistantSuggestion} The suggestion.
  */
 export const buildDataImportedSuggestion = ({
   surveyId,

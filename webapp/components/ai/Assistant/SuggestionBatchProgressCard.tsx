@@ -22,7 +22,6 @@ const MINUTE_MS = 60_000
 /**
  * Returns the estimated time left as text.
  * @param {number} remainingMs - Time left.
- * @returns {string} The text.
  */
 const getRemainingText = (remainingMs: number, t: ReturnType<typeof useI18nT>): string =>
   remainingMs < MINUTE_MS

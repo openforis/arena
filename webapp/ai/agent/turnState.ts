@@ -53,7 +53,6 @@ const appendToPart = (message: AssistantMessage, type: 'text' | 'reasoning', tex
  * @param {Conversation} params.conversation - Conversation before the turn.
  * @param {string} [params.displayText] - What the chat shows instead of the user message.
  * @param {Function} params.onUpdate - Called with every new conversation object.
- * @returns {TurnState} The turn state.
  */
 export const createTurnState = ({
   conversation,

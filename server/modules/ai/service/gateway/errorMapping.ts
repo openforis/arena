@@ -54,7 +54,6 @@ export const toAiWireError = (error: unknown): AiWireError => {
 
 /**
  * Converts a logged value to text: a non-string one as JSON (a circular one by its type only).
- * @returns {string} The text.
  */
 const toLogText = (value: unknown): string => {
   if (typeof value === 'string') return value

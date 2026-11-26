@@ -13,7 +13,6 @@ export const PLURAL_FORMS: Record<string, string[]> = Object.fromEntries(
 
 /**
  * Returns the aiSuggestions resource of a language.
- * @returns {Record<string, unknown>} The resource.
  */
 export const getResource = (lang: string): Record<string, unknown> => RESOURCES[lang].aiSuggestions
 
@@ -21,7 +20,6 @@ export const flatten = flattenTexts
 
 /**
  * Returns the sorted keys of a language, plural suffixes stripped.
- * @returns {string[]} The base keys.
  */
 export const baseKeys = (lang: string): string[] =>
   [...new Set(Object.keys(flatten(getResource(lang))).map((key) => key.replace(PLURAL_SUFFIX, '')))].sort((a, b) =>
@@ -31,7 +29,6 @@ export const baseKeys = (lang: string): string[] =>
 /**
  * Returns the English text of a base key (the _other form of a plural).
  * @param {string} key - Key, without plural suffix.
- * @returns {string} The text.
  */
 export const enTextOf = (key: string): string => {
   const texts = flatten(getResource('en'))

@@ -22,7 +22,6 @@ export const getAiPrefs = (user: ArenaUser): Record<string, any> | null => {
 
 /**
  * Returns the toggles of a user who set none: off, except the categories on by default.
- * @returns {AiFeatureToggles} The toggles.
  */
 export const defaultFeatureToggles = (): AiFeatureToggles =>
   Object.fromEntries(
@@ -66,7 +65,6 @@ export const areFeaturesEnabledForUser = (user: ArenaUser): boolean => getAccess
 /**
  * Returns true when the access level covers the category and its toggle is on.
  * @param {string} category - Feature category.
- * @returns {boolean} Whether the category is enabled.
  */
 export const isCategoryEnabledForUser = (user: ArenaUser, category: string): boolean => {
   const level = getAccessLevelForUser(user)

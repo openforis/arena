@@ -100,7 +100,6 @@ const contentText = (content: LanguageModelV4Prompt[number]['content']): string 
 
 /**
  * Finds the assistant marker in the system messages.
- * @returns {string|null} The marker, or null.
  */
 const findMarker = (prompt: LanguageModelV4Prompt): string | null => {
   const system = prompt.filter((message) => message.role === 'system').map((message) => contentText(message.content))
@@ -122,7 +121,6 @@ const lastUserIndex = (prompt: LanguageModelV4Prompt): number => {
 /**
  * Counts the tool results after a message index.
  * @param {number} fromIndex - Index of the last user message.
- * @returns {number} The count.
  */
 const countToolResults = (prompt: LanguageModelV4Prompt, fromIndex: number): number =>
   prompt
@@ -158,7 +156,6 @@ const getLastToolOutput = (prompt: LanguageModelV4Prompt, fromIndex: number): un
 /**
  * Resolves the text or the tool call input of a step computed from the user message or the last tool output.
  * @param {MockScriptParams} params - Parameters of the computed values.
- * @returns {PlayedMockScriptStep} The step with its computed values resolved.
  */
 const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScriptStep => {
   if ('text' in step) return { text: typeof step.text === 'function' ? step.text(params) : step.text }
@@ -187,7 +184,6 @@ export const getScriptedStep = (
 
 /**
  * Returns the id of the scripted tool call.
- * @returns {string} The id.
  */
 const toolCallId = (prompt: LanguageModelV4Prompt): string => `mock-call-${prompt.length}`
 
@@ -235,7 +231,6 @@ export const toScriptedStreamParts = (
 
 /**
  * Returns the stream of a step.
- * @returns {ReadableStream<LanguageModelV4StreamPart>} The stream.
  */
 export const toScriptedStream = (
   step: PlayedMockScriptStep,

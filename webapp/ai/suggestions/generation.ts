@@ -46,7 +46,6 @@ const toSurveyIdNumber = (surveyId: number | string | null): number | null => {
  * @param {boolean} raw.draft - The fetched defs are the draft.
  * @param {boolean} raw.canEditSurvey - The user can edit the survey.
  * @param {number} raw.loadCount - Defs load count.
- * @returns {SuggestionGenerationInput|null} The input.
  */
 export const toGenerationInput = ({
   userUuid,

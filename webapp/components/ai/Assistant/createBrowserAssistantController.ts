@@ -27,7 +27,6 @@ import { assistantTurnRegistry } from './assistantTurnRegistry'
 /**
  * Creates the controller of one panel.
  * @param {object} reduxStore - The app store (the designer's appliers use it).
- * @returns {AssistantConversationController} The controller.
  */
 export const createBrowserAssistantController = (reduxStore: {
   dispatch: (action: any) => any

@@ -30,7 +30,6 @@ export const buildNodesUpdateEvent = ({
  * @param {object} params - The parameters.
  * @param {object} params.record - The record before the update.
  * @param {object} params.validations - The node validations.
- * @returns {RecordSocketEvent} The event.
  */
 export const buildNodeValidationsUpdateEvent = ({
   record,

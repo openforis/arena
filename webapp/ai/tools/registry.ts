@@ -54,7 +54,6 @@ const isAbortError = (error: unknown): boolean => (error as { name?: string })?.
  * the survey does not work on the survey of the start of the turn. Another survey is refused: the turn's policy and
  * engine were resolved for the first one, and the abort of the turn comes after React commits.
  * @param {AiToolContext} ctx - Turn context.
- * @returns {AiToolContext} The context of the call.
  */
 const toCallContext = (ctx: AiToolContext): AiToolContext => {
   if (!ctx.getSurvey) return ctx
@@ -72,7 +71,6 @@ const toCallContext = (ctx: AiToolContext): AiToolContext => {
 
 /**
  * Turns the text a model sent in place of a list into the list: a JSON array, or names separated by commas.
- * @returns {unknown[]} The list.
  */
 const toList = (text: string): unknown[] => {
   try {
@@ -164,7 +162,6 @@ const parseInput = (tool: AiTool, given: unknown) => {
  * result size and honours the abort signal (an abort is re-thrown, so the turn stops).
  * @param {unknown} input - Raw input from the model.
  * @param {number} [maxResultChars] - Cap of the result JSON (default: the wrapper limit).
- * @returns {Promise<unknown>} The result or `{ error: { code, message, … } }`.
  */
 export const runTool = async (
   tool: AiTool,
@@ -188,7 +185,6 @@ export const runTool = async (
 
 /**
  * Returns the JSON schema of a tool input, without the `$schema` key (some providers reject it).
- * @returns {object} The JSON schema.
  */
 const toToolJsonSchema = (tool: AiTool): Record<string, unknown> => {
   const schema = { ...(z.toJSONSchema(tool.inputSchema) as Record<string, unknown>) }
@@ -200,7 +196,6 @@ const toToolJsonSchema = (tool: AiTool): Record<string, unknown> => {
  * Converts tools for streamText. The SDK gets a plain JSON schema (no SDK-side validation): runTool validates, so an
  * invalid input reaches the model as `invalidInput` with the zod message.
  * @param {number} [maxResultChars] - Cap of each result JSON (default: the wrapper limit).
- * @returns {ToolSet} The AI SDK tool set.
  */
 export const toAiSdkTools = (
   tools: AiTool[],

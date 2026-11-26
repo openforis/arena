@@ -30,7 +30,6 @@ export type SuggestionSend = (
 
 /**
  * Returns the store bucket of the suggestion of a request: Help suggestions belong to no survey.
- * @returns {number|null} The survey id of the bucket.
  */
 export const getRequestBucketSurveyId = (request: Pick<SuggestionRequest, 'area' | 'surveyId'>): number | null =>
   request.area === 'help' ? null : request.surveyId

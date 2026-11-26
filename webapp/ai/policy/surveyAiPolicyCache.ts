@@ -61,7 +61,6 @@ export const resetSurveyAiPolicyCache = (): void => {
 /**
  * Creates the cache.
  * @param {SurveyAiPolicyCacheDeps} deps - Transport and clock.
- * @returns {SurveyAiPolicyCache} The cache.
  */
 export const createSurveyAiPolicyCache = ({
   fetchPolicy,
@@ -74,7 +73,6 @@ export const createSurveyAiPolicyCache = ({
 
   /**
    * Returns the survey's entry, creating it when missing.
-   * @returns {Entry} The entry.
    */
   const getEntry = (surveyId: number): Entry => {
     let entry = entries.get(surveyId)
@@ -108,7 +106,6 @@ export const createSurveyAiPolicyCache = ({
   /**
    * Tells whether the entry holds a value within the TTL.
    * @param {Entry} entry - The survey entry.
-   * @returns {boolean} True when fresh.
    */
   const isFresh = (entry: Entry): boolean => entry.value !== null && entry.fresh && now() - entry.fetchedAt < ttlMs
 
@@ -148,7 +145,6 @@ export const createSurveyAiPolicyCache = ({
    * when a later generation stored it, otherwise its own (newer than the cached one) server answer.
    * @param {Entry} entry - The survey entry.
    * @param {Promise<Fetched>} request - The shared request.
-   * @returns {Promise<SurveyAiPolicyClientState>} The policy state.
    */
   const toCachedAnswer = async (entry: Entry, request: Promise<Fetched>): Promise<SurveyAiPolicyClientState> => {
     const { value, superseded, generation } = await request

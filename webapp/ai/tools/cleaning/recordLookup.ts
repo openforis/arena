@@ -8,7 +8,6 @@ import type { CleaningApi } from './cleaningApi'
 /**
  * Returns a key value as text (the tool schema gives strings and numbers).
  * @param {unknown} value - The key value.
- * @returns {string} The text.
  */
 const toKeyText = (value: unknown): string => {
   if (typeof value === 'string') return value

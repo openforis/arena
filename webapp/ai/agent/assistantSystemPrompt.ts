@@ -105,7 +105,6 @@ const buildAreaPrompt = ({
  * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
  * @param {boolean} [params.mapToolAvailable] - Whether map_proposeLayer is offered in the turn (Analysis).
  * @param {boolean} [params.titleToolAvailable] - Whether conversation_setTitle is offered (first message).
- * @returns {string} The system prompt.
  */
 export const buildAssistantSystemPrompt = ({
   titleToolAvailable = false,

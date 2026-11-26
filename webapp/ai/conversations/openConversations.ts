@@ -31,7 +31,6 @@ const NO_SURVEY_ENTRY = 'help'
 
 /**
  * Returns the localStorage key of a user's open conversations.
- * @returns {string} The key.
  */
 export const getOpenConversationsKey = (userUuid: string): string => `${KEY_PREFIX}${userUuid}`
 
@@ -86,7 +85,6 @@ const without = <T>(record: Record<string, T>, key: string): Record<string, T> =
  * Returns the map with one area entry set or removed (an emptied survey entry is removed too).
  * @param {object} params - Parameters.
  * @param {string|null} params.conversationId - Id, or null to remove.
- * @returns {OpenConversationsMap} The new map.
  */
 const withEntry = (
   map: OpenConversationsMap,

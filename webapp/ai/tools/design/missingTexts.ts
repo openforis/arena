@@ -21,7 +21,6 @@ export const getSurveyLanguages = (survey: any): string[] =>
 /**
  * Tells whether a label or description is filled in a language (a blank text counts as missing).
  * @param {LabelKind} kind - Labels or descriptions.
- * @returns {boolean} True when filled.
  */
 export const isTextFilled = (nodeDef: any, kind: LabelKind, lang: string): boolean =>
   (getLabelValue(nodeDef, kind, lang) ?? '').trim().length > 0
@@ -29,7 +28,6 @@ export const isTextFilled = (nodeDef: any, kind: LabelKind, lang: string): boole
 /**
  * Returns the languages in which a text is filled, in survey order.
  * @param {LabelKind} kind - Labels or descriptions.
- * @returns {string[]} The languages.
  */
 export const getFilledLanguages = (nodeDef: any, kind: LabelKind, languages: string[]): string[] =>
   languages.filter((lang) => isTextFilled(nodeDef, kind, lang))
@@ -37,7 +35,6 @@ export const getFilledLanguages = (nodeDef: any, kind: LabelKind, languages: str
 /**
  * Returns the languages a text is missing in; none when it is filled in no language (nothing to translate from).
  * @param {LabelKind} kind - Labels or descriptions.
- * @returns {string[]} The languages.
  */
 export const getMissingLanguages = (nodeDef: any, kind: LabelKind, languages: string[]): string[] => {
   const filled = getFilledLanguages(nodeDef, kind, languages)
@@ -47,7 +44,6 @@ export const getMissingLanguages = (nodeDef: any, kind: LabelKind, languages: st
 
 /**
  * Returns the saved design node definitions in survey hierarchy order (an unsaved one cannot take proposals yet).
- * @returns {object[]} The node definitions.
  */
 export const getTextNodeDefs = (survey: any): any[] =>
   getDesignNodeDefsDepthFirst(survey).filter((nodeDef) => !NodeDef.isTemporary(nodeDef))

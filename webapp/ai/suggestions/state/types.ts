@@ -47,7 +47,6 @@ export const toBucket = (surveyId: number | null): string => (surveyId === null 
 
 /**
  * Returns an empty state.
- * @returns {SuggestionUserState} The state.
  */
 export const emptySuggestionState = (): SuggestionUserState => ({
   pending: {},

@@ -44,7 +44,6 @@ export const createConsentRequestQueue = () => {
      * Asks the user; resolves with their answer ('cancel' when the signal aborts: the dialog closes if nobody else waits).
      * @param {LocalServerConsentRequest} request - What the card shows.
      * @param {AbortSignal} [signal] - Aborts this caller's wait.
-     * @returns {Promise<LocalServerConsentAnswer>} The answer.
      */
     request: (request: LocalServerConsentRequest, signal?: AbortSignal): Promise<LocalServerConsentAnswer> =>
       new Promise((resolve) => {
@@ -78,7 +77,6 @@ export const createConsentRequestQueue = () => {
       }),
     /**
      * Returns the request the dialog must show (same object until the queue changes).
-     * @returns {PendingConsentRequest|null} The request.
      */
     getPending: (): PendingConsentRequest | null => pending,
     /**

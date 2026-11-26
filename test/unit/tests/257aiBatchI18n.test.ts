@@ -5,7 +5,6 @@ const formByLang = namespaceByLanguage('surveyForm')
 
 /**
  * Returns every plural form of the failed translations text of a language.
- * @returns {string[]} The texts.
  */
 const failedTexts = (lang: string): string[] =>
   Object.entries(formByLang[lang].nodeDefsTranslation)

@@ -16,7 +16,6 @@ export const SCENE_INDEX_COLUMNS = [
  *
  * @param {SceneIndexRow} row - Decoded row.
  * @param {string[]} columns - Columns to keep.
- * @returns {SceneIndexRow} Compact row.
  */
 export const compactSceneRow = (row: SceneIndexRow, columns: string[]): SceneIndexRow => {
   const compact: SceneIndexRow = {}
@@ -62,7 +61,6 @@ export const parseCoverage = (nodata: unknown): number | null => {
  * Converts a Date, ISO string or epoch milliseconds into a valid Date.
  *
  * @param {unknown} value - Raw datetime.
- * @returns {Date|null} Valid date or null.
  */
 const toValidDate = (value: unknown): Date | null => {
   let date: Date | null = null

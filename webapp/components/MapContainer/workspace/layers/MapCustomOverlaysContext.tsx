@@ -23,7 +23,6 @@ const MapCustomOverlaysContext = createContext<MapCustomOverlaysContextValue | n
  * Keeps the layers that are not survey data (uploaded files, WMS layers, Sentinel-2 scenes) and syncs them with the map.
  * @param {object} props - Component props.
  * @param {ReactNode} props.children - Workspace content.
- * @returns {React.ReactElement} The provider.
  */
 export const MapCustomOverlaysProvider = ({ children }: { children: ReactNode }): ReactElement => {
   const { map } = useMapWorkspace()

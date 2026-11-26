@@ -11,7 +11,6 @@ import { getVisibleTargets } from './visibility'
 /**
  * Returns the state with the dismissed entry of a suggestion replaced (null or no target removes it).
  * @param {string} id - Suggestion id.
- * @returns {SuggestionUserState} The new state.
  */
 export const setDismissed = (
   state: SuggestionUserState,
@@ -27,7 +26,6 @@ export const setDismissed = (
  * Records targets of a pending suggestion as dismissed (their count, or true) and removes them from pending.
  * @param {AssistantSuggestion} suggestion - The pending suggestion.
  * @param {SuggestionTarget[]} targets - Targets to dismiss.
- * @returns {SuggestionUserState} The new state.
  */
 export const dismissTargets = (
   state: SuggestionUserState,
@@ -52,7 +50,6 @@ export const dismissTargets = (
  * Dismisses the visible targets of a suggestion (the others stay pending).
  * @param {object} params - Parameters.
  * @param {string} params.id - Suggestion id.
- * @returns {SuggestionUserState} The new state.
  */
 export const withDismissed = (
   state: SuggestionUserState,

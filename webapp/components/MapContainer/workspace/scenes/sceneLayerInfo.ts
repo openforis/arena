@@ -8,7 +8,6 @@ const PLOT_HALF_SIZE_DEGREES = 0.01
  * Builds the overlay registry id of a scene layer.
  *
  * @param {boolean} asBase - True when used as base map.
- * @returns {string} Overlay id.
  */
 export const getSceneOverlayId = (sceneId: string, bandMix: SceneBandMix, asBase: boolean): string =>
   `${asBase ? BASE_PREFIX : LAYER_PREFIX}${bandMix}:${sceneId}`
@@ -17,7 +16,6 @@ export const getSceneOverlayId = (sceneId: string, bandMix: SceneBandMix, asBase
  * Tells whether an overlay id is a scene used as base map.
  *
  * @param {string} id - Overlay id.
- * @returns {boolean} True for a base scene.
  */
 export const isBaseSceneOverlayId = (id: string): boolean => id.startsWith(BASE_PREFIX)
 
@@ -25,7 +23,6 @@ export const isBaseSceneOverlayId = (id: string): boolean => id.startsWith(BASE_
  * Returns the attribution required by the Copernicus licence (kept in English, it is the licence wording).
  *
  * @param {string} datetime - Scene ISO datetime.
- * @returns {string} Attribution.
  */
 export const getSceneAttribution = (datetime: string): string =>
   `Contains modified Copernicus Sentinel data ${datetime.slice(0, 4)}`

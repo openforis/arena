@@ -18,7 +18,6 @@ type MenuActionItemProps = {
  * @param {string} props.labelKey - I18n key of the label.
  * @param {boolean} [props.disabled] - Whether the item is disabled.
  * @param {Function} props.onClick - Action.
- * @returns {React.ReactElement} The item.
  */
 export const MenuActionItem = ({ itemKey, labelKey, disabled = false, onClick }: MenuActionItemProps): ReactElement => {
   const t = useI18nT()
@@ -45,7 +44,6 @@ type MenuCheckItemProps = {
  * @param {boolean} props.checked - Whether it is checked.
  * @param {boolean} [props.disabled] - Whether the item is disabled.
  * @param {Function} props.onChange - Called with the new checked value.
- * @returns {React.ReactElement} The item.
  */
 export const MenuCheckItem = ({
   itemKey,
@@ -88,7 +86,6 @@ type MenuRadioItemProps = {
  * @param {string} props.itemKey - Item key (test id suffix).
  * @param {boolean} props.checked - Whether it is the selected choice.
  * @param {Function} props.onSelect - Called when chosen.
- * @returns {React.ReactElement} The item.
  */
 export const MenuRadioItem = ({ itemKey, label, checked, onSelect }: MenuRadioItemProps): ReactElement => (
   <MenuItem
@@ -113,7 +110,6 @@ export const MenuRadioItem = ({ itemKey, label, checked, onSelect }: MenuRadioIt
  * Non-focusable section header inside a menu.
  * @param {object} props - Component props.
  * @param {string} props.labelKey - I18n key of the header.
- * @returns {React.ReactElement} The header.
  */
 export const MenuSectionHeader = ({ labelKey }: { labelKey: string }): ReactElement => {
   const t = useI18nT()

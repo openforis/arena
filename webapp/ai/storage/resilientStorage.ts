@@ -23,7 +23,6 @@ const MAX_SHRINK_LEVELS = 3
 /**
  * Returns true for the error of a full storage (the name differs between browsers).
  * @param {unknown} error - Thrown value.
- * @returns {boolean} True for a quota error.
  */
 export const isQuotaExceededError = (error: unknown): boolean => {
   if (typeof error !== 'object' || error === null) return false
@@ -39,7 +38,6 @@ export const isQuotaExceededError = (error: unknown): boolean => {
 
 /**
  * Returns the browser's localStorage, or null when it is not accessible.
- * @returns {ResilientStorageBackend|null} The storage.
  */
 export const getBrowserLocalStorage = (): ResilientStorageBackend | null => {
   try {

@@ -17,7 +17,6 @@ const UNREACHABLE_KEY = 'aiLocalServerUnreachable'
 
 /**
  * Tells whether an error is a user cancel or a timeout.
- * @returns {boolean} True when abort-like.
  */
 const isAbortLike = (error: any): boolean => error?.name === 'AbortError' || error?.name === 'TimeoutError'
 
@@ -28,7 +27,6 @@ const isAbortLike = (error: any): boolean => error?.name === 'AbortError' || err
  * @param {string} params.bodyText - Response body (only inspected, never shown).
  * @param {string|null} params.modelId - Model the request was for.
  * @param {string} params.method - HTTP method (a 404 on GET /models is a wrong URL, not a missing model).
- * @returns {SystemError} The error.
  */
 export const mapLocalServerHttpError = ({
   status,
@@ -81,7 +79,6 @@ export const withAddressSpace = (init: RequestInit, url: string): RequestInit =>
 /**
  * Returns the URL of a fetch input.
  * @param {RequestInfo|URL} input - Fetch input.
- * @returns {string} The URL.
  */
 const toUrlString = (input: RequestInfo | URL): string => {
   if (typeof input === 'string') return input

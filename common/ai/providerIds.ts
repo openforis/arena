@@ -64,14 +64,12 @@ export const getAiProviderKind = (id: unknown): AiProviderKind | null => {
 /**
  * Builds an account provider id.
  * @param {string} body - Id body (a uuid).
- * @returns {string} The id.
  */
 export const createAccountProviderId = (body: string): string => `${ACCOUNT_PROVIDER_PREFIX}${body}`
 
 /**
  * Builds a local provider id.
  * @param {string} body - Id body (a uuid).
- * @returns {string} The id.
  */
 export const createLocalProviderId = (body: string): string => `${LOCAL_PROVIDER_PREFIX}${body}`
 
@@ -98,7 +96,6 @@ export const getDefaultProviderName = (type: string): string => AI_PROVIDER_TYPE
  * Returns the name to store: whitespace collapsed, at most AI_PROVIDER_NAME_MAX_CHARS, else the type's name.
  * @param {unknown} name - Name typed by the user (untrusted).
  * @param {string} type - Provider type.
- * @returns {string} The name.
  */
 export const normalizeProviderName = (name: unknown, type: string): string => {
   const cleaned =

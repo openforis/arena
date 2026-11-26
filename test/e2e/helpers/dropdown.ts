@@ -6,7 +6,6 @@ import { TestId } from '@webapp/utils/testId'
  * Returns the (react-select based) dropdown with the specified test id, inside the specified container.
  * @param {Page | Locator} container - Page or element containing the dropdown.
  * @param {string | null} testId - Test id of the dropdown wrapper; if null, the first dropdown in the container is used.
- * @returns {Locator} - The dropdown locator.
  */
 export const getDropdown = (container: Page | Locator, testId: string | null = null): Locator =>
   (testId ? container.locator(`.dropdown-wrapper[data-testid="${testId}"]`) : container.locator('.dropdown-wrapper'))
@@ -26,7 +25,6 @@ const openDropdown = async (dropdown: Locator) => {
  * @param {Locator} params.dropdown - The dropdown locator (see getDropdown).
  * @param {string} [params.value] - Option value.
  * @param {string} [params.label] - Option label.
- * @returns {Promise<void>} - Resolves when the option has been selected.
  */
 export const selectDropdownItem = async ({
   page,
@@ -49,7 +47,6 @@ export const selectDropdownItem = async ({
 /**
  * Checks that the dropdown shows the specified value (or no value, when the expected value is empty).
  * @param {Locator} dropdown - The dropdown locator.
- * @returns {Promise<void>} - Resolves when the check completes.
  */
 export const expectDropdownValue = async (dropdown: Locator, expectedLabel: string): Promise<void> => {
   const singleValue = dropdown.locator('.dropdown__single-value')

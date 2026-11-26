@@ -57,7 +57,6 @@ export const isCompactCard = (count: number): boolean => count > COMPACT_CARD_MA
  * @param {ChangeOperation|undefined} op - Operation of the row.
  * @param {string} nodeDefUuid - Node definition of the row.
  * @param {ChangeOperation[]} operations - Operations of the change set (parents of new items).
- * @returns {string} The entity uuid.
  */
 const getEntityUuid = (
   op: ChangeOperation | undefined,
@@ -160,7 +159,6 @@ export const groupReviewItems = (items: ReviewItem[], groupBy: ReviewGroupBy): R
 
 /**
  * Returns the searchable texts of a value.
- * @returns {string[]} Its texts.
  */
 const valueTexts = (value: CardValue | null): string[] => {
   if (value?.kind === 'text') return value.text ? [value.text] : []
@@ -259,7 +257,6 @@ type Translate = (key: string, params?: Record<string, unknown>) => string
 
 /**
  * Returns the text of a review label.
- * @returns {string} The text.
  */
 export const getReviewLabelText = (label: ReviewLabel, t: Translate): string =>
   'text' in label ? label.text : t(label.key, label.params)

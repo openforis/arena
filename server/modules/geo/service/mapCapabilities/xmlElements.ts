@@ -57,7 +57,6 @@ export const childElements = (element: XmlElement | undefined, name?: string): X
  * Returns the first child element with a local name.
  * @param {XmlElement|undefined} element - The parent.
  * @param {string} name - The local name.
- * @returns {XmlElement|undefined} The child.
  */
 export const firstChild = (element: XmlElement | undefined, name: string): XmlElement | undefined =>
   childElements(element, name)[0]
@@ -111,7 +110,6 @@ export const childText = (element: XmlElement | undefined, name: string): string
 /**
  * Returns an attribute by local name ("href" matches "xlink:href").
  * @param {string} name - The local name.
- * @returns {string|undefined} The value.
  */
 export const attributeOf = (element: XmlElement | undefined, name: string): string | undefined => {
   for (const [key, value] of Object.entries(element?.attributes ?? {})) {

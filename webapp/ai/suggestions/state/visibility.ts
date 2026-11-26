@@ -20,7 +20,6 @@ const hasGrown = (kind: SuggestionKind, target: SuggestionTarget, seen: number |
 
 /**
  * Returns the visible targets of a suggestion: not in progress, and not dismissed (or a counted gap that grew).
- * @returns {SuggestionTarget[]} The visible targets.
  */
 export const getVisibleTargets = (state: SuggestionUserState, suggestion: AssistantSuggestion): SuggestionTarget[] => {
   const bucket = toBucket(suggestion.surveyId)
@@ -37,7 +36,6 @@ export const getVisibleTargets = (state: SuggestionUserState, suggestion: Assist
 /**
  * Returns true when a suggestion may show now (area, expiry, cycle).
  * @param {VisibilityParams} params - Visibility parameters.
- * @returns {boolean} True when shown.
  */
 const isShown = (suggestion: AssistantSuggestion, { cycle, availableAreas, now }: VisibilityParams): boolean =>
   availableAreas.includes(suggestion.area) &&

@@ -103,7 +103,6 @@ export class ArenaApi {
   /**
    * Turns on the AI features (access level 3, every category) for the test user, with Arena default as the default
    * provider: an earlier spec of the same worker may have left a local default.
-   * @returns {Promise<void>} - Resolves when saved.
    */
   async enableAiFeatures(): Promise<void> {
     await this.put('/api/ai/settings', { accessLevel: 3, featureToggles: allAiFeatureToggles() })
@@ -112,7 +111,6 @@ export class ArenaApi {
 
   /**
    * Turns off the AI features for the test user (access level 0).
-   * @returns {Promise<void>} - Resolves when saved.
    */
   async disableAiFeatures(): Promise<void> {
     await this.put('/api/ai/settings', { accessLevel: 0 })
@@ -164,7 +162,6 @@ export class ArenaApi {
   /**
    * Removes an account AI provider of the test user.
    * @param {string} id - Provider id (`acct:<id>`).
-   * @returns {Promise<void>} - Resolves when removed.
    */
   async removeAiAccountProvider(id: string): Promise<void> {
     await this.delete(`/api/ai/providers/${encodeURIComponent(id)}`)
@@ -172,7 +169,6 @@ export class ArenaApi {
 
   /**
    * Sets the default AI provider of the test user.
-   * @returns {Promise<void>} - Resolves when saved.
    */
   async setAiDefaultProvider(providerId: string): Promise<void> {
     await this.put('/api/ai/settings/default', { providerId })
@@ -180,7 +176,6 @@ export class ArenaApi {
 
   /**
    * Returns the uuid of the logged-in test user (the key of the localStorage settings).
-   * @returns {Promise<string>} - The user uuid.
    */
   async getCurrentUserUuid(): Promise<string> {
     const { user } = await this.get('/auth/user')
@@ -203,7 +198,6 @@ export class ArenaApi {
 
   /**
    * Counts the validation report rows of a cycle, without filters (what the report shows before any filter).
-   * @returns {Promise<number>} - The count.
    */
   async countValidationReportRows(surveyId: number, cycle = '0'): Promise<number> {
     const { count } = await this.get(`/api/survey/${surveyId}/validationReport/count?cycle=${cycle}`)
@@ -212,7 +206,6 @@ export class ArenaApi {
 
   /**
    * Returns the uuid of the root entity of the published survey.
-   * @returns {Promise<string>} - The uuid.
    */
   async getRootNodeDefUuid(surveyId: number): Promise<string> {
     const { nodeDefs } = await this.get(
@@ -307,7 +300,6 @@ export class ArenaApi {
 
   /**
    * Returns the AI policy of a survey.
-   * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
    */
   async getSurveyAiPolicy(surveyId: number): Promise<any> {
     return this.get(`/api/survey/${surveyId}/ai-policy`)
@@ -315,7 +307,6 @@ export class ArenaApi {
 
   /**
    * Sets the AI policy of a survey (the test user is a system administrator).
-   * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
    */
   async putSurveyAiPolicy(surveyId: number, policy: { schema: string; data: string }): Promise<any> {
     return this.put(`/api/survey/${surveyId}/ai-policy`, policy)
@@ -340,7 +331,6 @@ export class ArenaApi {
    * @param {object} params - Parameters.
    * @param {string} params.name - Survey name.
    * @param {boolean} [params.template] - Whether the survey is a template.
-   * @returns {Promise<void>} - Resolves when the survey has been deleted.
    */
   async deleteSurveyByNameIfExists({ name, template = false }: { name: string; template?: boolean }): Promise<void> {
     const surveyId = await this.findSurveyIdByName({ name, template })
@@ -350,7 +340,6 @@ export class ArenaApi {
   /**
    * Deletes the survey with the specified id; it does nothing if the survey does not exist anymore.
    * @param {number} surveyId - Id of the survey to delete.
-   * @returns {Promise<void>} - Resolves when the survey has been deleted.
    */
   async deleteSurveyIfExists(surveyId: number): Promise<void> {
     await this.requestContext.delete(`/api/survey/${surveyId}`, { headers: this.headers })
@@ -359,7 +348,6 @@ export class ArenaApi {
   /**
    * Deletes the message with the specified UUID; it does nothing if the message does not exist anymore.
    * @param {string} messageUuid - UUID of the message to delete.
-   * @returns {Promise<void>} - Resolves when the message has been deleted.
    */
   async deleteMessageIfExists(messageUuid: string): Promise<void> {
     await this.requestContext.delete(`/api/message/${messageUuid}`, { headers: this.headers })
@@ -368,7 +356,6 @@ export class ArenaApi {
   /**
    * Creates an external login provider (the user must be a system administrator).
    * @param {object} provider - The provider: id, type, props and clientSecret.
-   * @returns {Promise<void>} - Resolves when the provider has been created.
    */
   async createAuthProvider(provider: {
     id: string

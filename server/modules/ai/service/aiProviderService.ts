@@ -114,7 +114,6 @@ const KEY_REQUIRED_TYPES = new Set<string>([
 /**
  * Returns an untrusted value of a request (parsed JSON) as text for an error message, cut to the given length.
  * @param {number} maxLength - Maximum length.
- * @returns {string} The text.
  */
 const clipRequestValue = (value: unknown, maxLength: number): string =>
   (typeof value === 'string' ? value : (JSON.stringify(value) ?? 'undefined')).slice(0, maxLength)
@@ -122,7 +121,6 @@ const clipRequestValue = (value: unknown, maxLength: number): string =>
 /**
  * Builds the 404 of a provider id that is not the user's (or not an id at all).
  * @param {unknown} providerId - Requested id.
- * @returns {SystemError} The error.
  */
 const notFound = (providerId: unknown): SystemError =>
   new SystemError('aiProviderNotFound', { providerId: clipRequestValue(providerId, 80) }, StatusCodes.NOT_FOUND)
@@ -131,7 +129,6 @@ const notFound = (providerId: unknown): SystemError =>
  * Builds a 400 error.
  * @param {string} key - Error key.
  * @param {object} [params] - Error params.
- * @returns {SystemError} The error.
  */
 const badRequest = (key: string, params: Record<string, unknown> = {}): SystemError =>
   new SystemError(key, params, StatusCodes.BAD_REQUEST)
@@ -218,7 +215,6 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
 /**
  * Returns the type when it can be stored (the mock only on test servers), else throws aiProviderInvalid.
  * @param {unknown} type - Requested type (untrusted).
- * @returns {string} The type.
  */
 const assertType = (type: unknown, deps: AiProviderServiceDeps): string => {
   const valid =
@@ -231,7 +227,6 @@ const assertType = (type: unknown, deps: AiProviderServiceDeps): string => {
  * Returns the user's provider with the id, else throws a 404 (the ownership check of every saved-provider operation).
  * @param {AiProviderPrefs} prefs - The user's provider prefs.
  * @param {unknown} id - Requested id (untrusted).
- * @returns {StoredAiProvider} The provider.
  */
 const findOwnProvider = (prefs: AiProviderPrefs, id: unknown): StoredAiProvider => {
   const stored = isAccountProviderId(id) ? findStoredProvider(prefs, id) : null
@@ -243,7 +238,6 @@ const findOwnProvider = (prefs: AiProviderPrefs, id: unknown): StoredAiProvider 
  * Returns the model of the call: the input's when sent, else the saved one.
  * @param {string} type - Provider type.
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
- * @returns {string|null} The model.
  */
 const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
   // the Vercel AI SDK endpoint has no model choice
@@ -255,7 +249,6 @@ const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider
  * Returns the base URL of the call: the input's when sent, else the saved one; null for fixed-URL types.
  * @param {string} type - Provider type.
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
- * @returns {string|null} The base URL.
  * @throws {SystemError} aiBaseUrlNotAllowed (400) for a URL with credentials, a query or a fragment.
  */
 const pickBaseUrl = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
@@ -298,7 +291,6 @@ const resolveCallConfig = ({
  * @param {object} params - Parameters.
  * @param {ResolvedCallConfig} params.resolved - Resolved call config.
  * @param {ArenaUser} params.user - The user (the stored key is bound to them).
- * @returns {ResolvedCallConfig} The config with the key.
  */
 const withStoredKey = ({
   resolved,
@@ -356,7 +348,6 @@ const usesSavedValues = (resolved: ResolvedCallConfig, input: AiProviderInput): 
  * Returns the provider prefs with one provider replaced.
  * @param {AiProviderPrefs} prefs - Provider prefs.
  * @param {StoredAiProvider} provider - Updated provider (same id).
- * @returns {AiProviderPrefs} The new prefs.
  */
 const replaceProvider = (prefs: AiProviderPrefs, provider: StoredAiProvider): AiProviderPrefs => ({
   ...prefs,
@@ -590,7 +581,6 @@ export const testProvider = async ({
  * Lists the models of a draft or a saved provider (same key rules and base URL guard as a call).
  * @param {object} params - Parameters.
  * @param {AiProviderInput} params.input - Draft or `id` plus changed fields.
- * @returns {Promise<{models: AiProviderModel[]}>} The models.
  */
 export const listProviderModels = async ({
   user,
@@ -806,7 +796,6 @@ export const updateProvider = async ({
  * Removes a provider; a removed default becomes Arena default.
  * @param {object} params - Parameters.
  * @param {string} params.id - Provider id (route parameter, untrusted).
- * @returns {Promise<{user: ArenaUser}>} The updated user.
  */
 export const removeProvider = async ({
   user,
@@ -840,7 +829,6 @@ export const removeProvider = async ({
  * checked; `arena-default` is always accepted.
  * @param {object} params - Parameters.
  * @param {unknown} params.providerId - Provider id (untrusted).
- * @returns {Promise<{user: ArenaUser}>} The user.
  */
 export const setDefaultProvider = async ({
   user,

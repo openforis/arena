@@ -73,7 +73,6 @@ export const createAddRecorder = (): { store: SuggestionStore; added: AssistantS
  * @param {boolean} [params.draft] - Whether the defs are the draft (default true).
  * @param {boolean} [params.canEditSurvey] - Whether the user can edit (default true).
  * @param {boolean} [params.noGeneration] - True for a context without generation.
- * @returns {DetectorContext} The context.
  */
 export const createDetectorContext = ({
   survey,
@@ -109,7 +108,6 @@ export const createDetectorContext = ({
 /**
  * Builds a Design suggestion of survey 7, as the store returns it (visible targets only).
  * @param {string} scopeKey - Id part after the kind.
- * @returns {AssistantSuggestion} The suggestion.
  */
 export const buildSuggestion = (kind: SuggestionKind, scopeKey: string, targetKeys: string[]): AssistantSuggestion => ({
   id: `${kind}:${scopeKey}`,
@@ -125,7 +123,6 @@ export const buildSuggestion = (kind: SuggestionKind, scopeKey: string, targetKe
 /**
  * Creates the context of a card or prompt.
  * @param {string} [lang] - Interface language (default en).
- * @returns {SuggestionDescribeContext} The context.
  */
 export const describeContext = (survey: any, lang = 'en'): SuggestionDescribeContext => ({ survey, t: fakeT, lang })
 
@@ -133,7 +130,6 @@ export const describeContext = (survey: any, lang = 'en'): SuggestionDescribeCon
  * Builds survey 7 (en) with categories and a taxonomy: cluster > cluster_id (integer, key), country (code, category
  * countries), region (code, no category), species (taxon, no taxonomy), tree_species (taxon, taxonomy trees),
  * calc_code (code, analysis, no category). Categories land_use (class) and countries (country, region); taxonomy trees.
- * @returns {Promise<object>} The survey.
  */
 export const buildRefSurvey = async (): Promise<any> => {
   const { code, integer, taxon } = NodeDef.nodeDefType

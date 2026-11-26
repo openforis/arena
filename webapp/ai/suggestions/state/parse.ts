@@ -118,7 +118,6 @@ const parseTouchedAt = (value: unknown): Record<string, number> | null =>
  * Parses a stored value.
  * @param {string|null} raw - Stored JSON.
  * @param {Function} [onCorrupt] - Called when the value is not a state: it is dropped, and so are its dismissals.
- * @returns {SuggestionUserState} The state.
  */
 export const parseSuggestionState = (
   raw: string | null,

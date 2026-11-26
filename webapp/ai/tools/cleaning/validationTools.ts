@@ -68,7 +68,6 @@ const resolveAttributeDefUuids = ({ survey, attributes = [] }: { survey: any; at
 /**
  * Creates validation_summarize.
  * @param {Deps} deps - API and translator.
- * @returns {AiTool} The tool.
  */
 const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summarizeInputSchema>, unknown> => ({
   ...common,
@@ -106,7 +105,6 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
 /**
  * Creates validation_list.
  * @param {Deps} deps - API and translator.
- * @returns {AiTool} The tool.
  */
 const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInputSchema>, unknown> => ({
   ...common,

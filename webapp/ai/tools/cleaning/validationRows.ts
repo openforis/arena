@@ -79,7 +79,6 @@ export const getRowNodeDefPath = ({ survey, row }: { survey: any; row: any }): s
  * Returns the translated messages of a report row.
  * @param {object} params - Parameters.
  * @param {object} params.row - The report row.
- * @returns {string[]} The messages.
  */
 export const getRowMessages = ({ i18n, survey, row }: { i18n: CleaningI18n; survey: any; row: any }): string[] =>
   ValidationUtils.getJointMessages({ i18n, survey, showKeys: false })(

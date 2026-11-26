@@ -43,7 +43,6 @@ const addToCounter = <K>(counters: Map<K, number>, key: K, delta: number): void 
 
 /**
  * Creates the slots of a process.
- * @returns {NodesBatchSlots} The slots.
  */
 export const createNodesBatchSlots = (limits: NodesBatchSlotLimits = defaultNodesBatchSlotLimits): NodesBatchSlots => {
   const byUser = new Map<string, number>()

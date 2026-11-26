@@ -21,7 +21,6 @@ export const CATEGORY_ITEM_TRANSLATIONS_KIND = 'categoryItemTranslations'
  * Returns the categories with labels missing in a language, with their counts.
  * @param {MissingLabelsCounts} counts - Counts by category uuid and language.
  * @param {object[]} categories - Survey categories, in display order.
- * @returns {SuggestionTarget[]} The targets.
  */
 const getLanguageTargets = (counts: MissingLabelsCounts, categories: any[], lang: string): SuggestionTarget[] =>
   categories.flatMap((category) => {
@@ -77,7 +76,6 @@ const THROTTLED_EVENTS = new Set<SuggestionEvent['type']>([
 
 /**
  * Returns the throttle key: user, survey and languages (a save that adds a language is never throttled).
- * @returns {string} The key.
  */
 const getThrottleKey = (ctx: DetectorContext, surveyId: number, survey: any): string => {
   const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
@@ -90,7 +88,6 @@ const getThrottleKey = (ctx: DetectorContext, surveyId: number, survey: any): st
  * @param {FetchMissingLabelsCounts} [deps.fetchCounts] - Counts fetcher.
  * @param {number} [deps.throttleMs] - Throttle of the frequent triggers.
  * @param {AiLog} [deps.log] - Reports a failed fetch (not an aborted one).
- * @returns {EventDetector} The detector.
  */
 export const createCategoryItemTranslationsDetector = ({
   fetchCounts = fetchMissingLabelsCounts,
@@ -113,7 +110,6 @@ export const createCategoryItemTranslationsDetector = ({
 
   /**
    * Fetches the counts and stores the suggestions (no throttle check).
-   * @returns {Promise<void>} Resolves when stored, failed or dropped.
    */
   const fetchAndStore = async (ctx: DetectorContext): Promise<void> => {
     const scope = getDesignDetectorScope(ctx)

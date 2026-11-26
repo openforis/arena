@@ -46,7 +46,6 @@ const fitEntries = <T>(entries: T[], emptyResult: object, maxChars?: number): T[
 
 /**
  * Lists the categories by name.
- * @returns {CategoriesList} The list.
  */
 export const listCategories = (survey: any, maxChars?: number): CategoriesList => {
   const entries: CategoryEntry[] = Survey.getCategoriesArray(survey)
@@ -62,7 +61,6 @@ export const listCategories = (survey: any, maxChars?: number): CategoriesList =
 
 /**
  * Lists the taxonomies by name.
- * @returns {TaxonomiesList} The list.
  */
 export const listTaxonomies = (survey: any, maxChars?: number): TaxonomiesList => {
   const entries: TaxonomyEntry[] = Survey.getTaxonomiesArray(survey)

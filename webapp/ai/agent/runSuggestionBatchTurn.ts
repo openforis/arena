@@ -34,7 +34,6 @@ const KEYS = 'aiAssistant.missingTextsBatch'
  * @param {TurnState} params.state - Turn state.
  * @param {string} params.toolCallId - Tool row.
  * @param {string} params.summary - Summary of the card.
- * @returns {Promise<void>} Resolves when the card is added.
  */
 const proposeTexts = async ({
   state,

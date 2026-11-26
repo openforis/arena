@@ -8,7 +8,6 @@ import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 
 /**
  * Legend tab: the symbols on the map, then the names of the added layers.
- * @returns {React.ReactElement} The panel.
  */
 export const LegendPanel = (): ReactElement => {
   const t = useI18nT()

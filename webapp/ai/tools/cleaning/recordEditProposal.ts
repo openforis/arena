@@ -45,7 +45,6 @@ type ProposalContext = {
 /**
  * Builds a rejection of an edit.
  * @param {EditRefusal} refusal - Why it is refused.
- * @returns {RecordEditRejection} The rejection.
  */
 const reject = (edit: IndexedEdit, { code, message }: EditRefusal): RecordEditRejection => ({
   index: edit.index,
@@ -75,7 +74,6 @@ const groupByRecord = (edits: RecordEditInput[]): Map<string, IndexedEdit[]> => 
  * @param {ProposalContext} params.context - Proposal context.
  * @param {object} params.nodeDef - Its definition.
  * @param {NodeValueInput} params.value - The value written by the model.
- * @returns {Promise<{parsed?: ParsedNodeValue, refusal?: EditRefusal}>} The parsed value or the refusal.
  */
 const parseEditValue = async ({
   context,
@@ -113,7 +111,6 @@ const parseEditValue = async ({
  * @param {object} params - Parameters.
  * @param {ProposalContext} params.context - Proposal context.
  * @param {Set<string>} params.seenNodeUuids - Nodes already edited in this proposal.
- * @returns {Promise<{prepared?: PreparedEdit, refusal?: EditRefusal}>} The prepared edit or the refusal.
  */
 const prepareEdit = async ({
   context,

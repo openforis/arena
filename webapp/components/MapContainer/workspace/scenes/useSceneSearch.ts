@@ -16,8 +16,6 @@ let readerPromise: Promise<SceneIndexReader> | null = null
 
 /**
  * Loads the hyparquet reader chunk once; a failed load is retried next time.
- *
- * @returns {Promise<SceneIndexReader>} Reader.
  */
 const loadSceneIndexReader = (): Promise<SceneIndexReader> => {
   if (!readerPromise) {
@@ -41,7 +39,6 @@ export const releaseSceneIndexReader = (): void => {
  * Builds the key that identifies a search request.
  *
  * @param {number} attempt - Retry counter.
- * @returns {string} Request key.
  */
 const getRequestKey = (tiles: string[], period: ScenePeriod, attempt: number): string =>
   `${tiles.join(',')}|${period.start.toISOString()}|${attempt}`
@@ -52,7 +49,6 @@ const getRequestKey = (tiles: string[], period: ScenePeriod, attempt: number): s
  * @param {object} params - Parameters.
  * @param {string[]} params.tiles - Tiles to search (stable array; empty = no search).
  * @param {ScenePeriod} params.period - Period (stable object).
- * @returns {SceneSearchState} Search state.
  */
 export const useSceneSearch = ({ tiles, period }: { tiles: string[]; period: ScenePeriod }): SceneSearchState => {
   const [attempt, setAttempt] = useState(0)

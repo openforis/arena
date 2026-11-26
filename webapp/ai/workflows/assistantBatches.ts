@@ -75,7 +75,6 @@ const toLangLabel = (lang: string): string => getLanguageLabel(lang) || lang
  * Builds the drafts of node definition texts that are still empty.
  * @param {object} survey - Survey as it is now.
  * @param {object[]} texts - Texts: node definition, kind, language and text.
- * @returns {ChangeOperationDraft[]} The drafts.
  */
 const toTextDrafts = (
   survey: any,
@@ -286,7 +285,6 @@ const KINDS: Record<SuggestionBatchKind, BatchKindDef> = {
 /**
  * Returns the definition of a batch.
  * @param {SuggestionBatchKind} kind - Batch.
- * @returns {BatchKindDef} The definition.
  */
 export const getAssistantBatchKind = (kind: SuggestionBatchKind): BatchKindDef => KINDS[kind]
 

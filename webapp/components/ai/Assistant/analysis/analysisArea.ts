@@ -65,7 +65,6 @@ export const shouldShowRecordDataNotice = ({
  * Returns the id of the query shown by a query_propose result.
  * @param {object} params - Parameters.
  * @param {unknown} params.output - Tool output.
- * @returns {string|null} The query id, or null.
  */
 export const getProposedQueryId = ({ toolName, output }: { toolName: string; output: unknown }): string | null => {
   if (toolName !== 'query_propose' || !output || typeof output !== 'object' || isToolErrorOutput(output)) return null

@@ -255,7 +255,6 @@ type RunParams = {
 
 /**
  * Runs a non-streaming call and answers with the wire result.
- * @returns {Promise<void>} Resolves when answered.
  */
 const runGenerate = async ({ model, call, res, control, record, offeredTools }: RunParams): Promise<void> => {
   const result = await model.doGenerate({ ...call, abortSignal: control.signal })
@@ -267,7 +266,6 @@ const runGenerate = async ({ model, call, res, control, record, offeredTools }: 
 
 /**
  * Runs a streaming call; mid-stream errors are logged in full, the client only gets the mapped key.
- * @returns {Promise<void>} Resolves when the stream is closed.
  */
 const runStream = async ({
   model,
@@ -292,7 +290,6 @@ const runStream = async ({
  * @param {object} params - Parameters.
  * @param {object} params.req - Express request (body: AiGatewayRequest).
  * @param {ArenaUser} params.user - Logged-in user (permission already checked by the route middleware).
- * @returns {Promise<void>} Resolves when the response is complete.
  */
 export const handleModelRequest = async ({
   req,
