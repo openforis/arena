@@ -231,7 +231,6 @@ export const TestId = {
     form: {
       addNewNode: 'entity-form-add-new-node-btn',
       nodeSelect: 'entity-form-node-select',
-      nodeSelectOption: (index) => `entity-form-node-select-option-${index}`,
     },
   },
   expressionEditor: {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactElement } from 'react'
 import { useMap } from 'react-leaflet'
@@ -40,14 +40,22 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   const [areaUnit, setAreaUnit] = useState<MeasureAreaUnit>('auto')
   const barRef = useRef<HTMLDivElement | null>(null)
 
-  /**
-   * Keeps the bar element and isolates it from the map mouse events.
-   * @param {HTMLDivElement|null} element - The bar element, null on unmount.
-   */
-  const setBarElement = useCallback((element: HTMLDivElement | null): void => {
-    barRef.current = element
-    if (element) isolateFromMap(element)
-  }, [])
+  // the bar has its own portal container: React listens to the events of a portal container, so the map isolation
+  // registered there afterwards still lets React see mousedown (the unit dropdown opens on it)
+  const [barContainer] = useState(() => document.createElement('div'))
+
+  useLayoutEffect(
+    /**
+     * Mounts the bar container in the map container and isolates it from the map mouse events.
+     * @returns {Function} The cleanup, removing the container.
+     */
+    () => {
+      map.getContainer().appendChild(barContainer)
+      isolateFromMap(barContainer)
+      return () => barContainer.remove()
+    },
+    [barContainer, map]
+  )
 
   const finishedLayer = useGeomanMeasure({ map, mode, dispatch, barRef })
 
@@ -111,7 +119,7 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
 
   return createPortal(
     <MeasureBar
-      barRef={setBarElement}
+      barRef={barRef}
       mode={mode}
       unit={mode === 'distance' ? distanceUnit : areaUnit}
       unitOptions={unitOptionsOf(mode)}
@@ -122,6 +130,6 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
       onUnitChange={onUnitChange}
       onDone={onDone}
     />,
-    map.getContainer()
+    barContainer
   )
 }

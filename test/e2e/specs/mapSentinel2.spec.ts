@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
 import { expect, test } from '../fixtures'
+import { expectDropdownValue, getDropdown } from '../helpers/dropdown'
 import { Urls } from '../helpers/urls'
 
 const ids = TestId.mapWorkspace
@@ -96,7 +97,7 @@ test.describe('Map Sentinel-2 scenes', () => {
     await expect(page.getByTestId(ids.scenesRange)).toContainText('–')
     await expect(page.getByTestId(ids.scenesMaxCloud).getByRole('slider')).toHaveValue('20')
     await expect(page.getByTestId(ids.scenesMinCoverage).getByRole('slider')).toHaveValue('80')
-    await expect(page.getByTestId(ids.scenesBands)).toHaveValue('trueColour')
+    await expectDropdownValue(getDropdown(page, ids.scenesBands), 'True colour (fast, one file)')
 
     const tabIds = await page
       .locator(`[data-testid^="${ids.railTab('')}"]`)

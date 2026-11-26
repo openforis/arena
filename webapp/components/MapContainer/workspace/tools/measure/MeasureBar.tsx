@@ -1,11 +1,12 @@
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import NativeSelect from '@mui/material/NativeSelect'
 import Paper from '@mui/material/Paper'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
-import type { ChangeEvent, KeyboardEvent, ReactElement } from 'react'
+import type { KeyboardEvent, ReactElement, Ref } from 'react'
 
+import Dropdown from '@webapp/components/form/Dropdown'
 import type {
   MeasureMode,
   MeasureUnitOption,
@@ -35,7 +36,7 @@ const toggleSx = {
 }
 
 export type MeasureBarProps = {
-  barRef: (element: HTMLDivElement | null) => void
+  barRef: Ref<HTMLDivElement>
   mode: MeasureMode
   unit: MeasureUnitOption
   unitOptions: MeasureUnitOption[]
@@ -49,11 +50,10 @@ export type MeasureBarProps = {
 
 /**
  * Floating bar of the measure tool: Distance | Area, running total, units and Done.
- * Leaflet stops mousedown on the bar (see isolateFromMap), so only click and native select events are used.
  * Keys pressed on its buttons reach the workspace shortcuts (Escape ends the tool there); the workspace ignores keys
- * typed in the unit select, so the bar handles Escape there itself.
+ * typed in the unit dropdown, so the bar handles Escape there itself.
  * @param {object} props - The component props.
- * @param {Function} props.barRef - Receives the bar element.
+ * @param {Ref} props.barRef - Receives the bar element.
  * @param {MeasureMode} props.mode - The active mode.
  * @param {MeasureUnitOption} props.unit - The chosen unit of the mode.
  * @param {MeasureUnitOption[]} props.unitOptions - The units of the mode.
@@ -68,21 +68,22 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
   const { barRef, mode, unit, unitOptions, total, perimeter, showHint, onModeChange, onUnitChange, onDone } = props
   const t = useI18nT()
 
-  // The test id must sit on the native select (e2e uses selectOption on it)
-  const unitInputProps = {
-    'aria-label': t('mapWorkspace.measure.units'),
-    'data-testid': TestId.mapWorkspace.measureUnit,
-  }
+  const unitItems = unitOptions.map((option) => ({
+    value: option,
+    label: t(`mapWorkspace.measure.unitOptions.${option}`),
+  }))
 
   /**
-   * Handles Escape typed in the unit select, which the workspace shortcuts ignore.
+   * Handles Escape typed in the unit dropdown, which the workspace shortcuts ignore.
    */
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
-    // useMapShortcuts skips text fields (a select is one) and defaultPrevented events: Escape is handled once
-    if (event.key === 'Escape' && event.target instanceof HTMLSelectElement) {
-      event.preventDefault()
-      onDone()
-    }
+    const { currentTarget, key, target } = event
+    if (key !== 'Escape' || !(target instanceof Element) || !target.closest('.dropdown')) return
+    // react-select closes its open menu on the same Escape (still rendered here): only Escape on a closed one ends
+    if (currentTarget.querySelector('.dropdown__menu')) return
+    // useMapShortcuts skips text fields (the dropdown input is one) and defaultPrevented events
+    event.preventDefault()
+    onDone()
   }
 
   /**
@@ -93,13 +94,6 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
   const onToggleChange = (_event: unknown, value: MeasureMode | null): void => {
     if (value) onModeChange(value)
   }
-
-  /**
-   * Reports the unit chosen in the select.
-   * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event.
-   */
-  const onSelectChange = (event: ChangeEvent<HTMLSelectElement>): void =>
-    onUnitChange(event.target.value as MeasureUnitOption)
 
   return (
     <Paper
@@ -171,18 +165,18 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
         </Typography>
       )}
 
-      <NativeSelect
-        value={unit}
-        onChange={onSelectChange}
-        inputProps={unitInputProps}
-        sx={{ fontSize: 12, height: 30, flexShrink: 0 }}
-      >
-        {unitOptions.map((option) => (
-          <option key={option} value={option}>
-            {t(`mapWorkspace.measure.unitOptions.${option}`)}
-          </option>
-        ))}
-      </NativeSelect>
+      <Box sx={{ minWidth: 130, flexShrink: 0, fontSize: 12 }}>
+        <Dropdown
+          ariaLabel={t('mapWorkspace.measure.units')}
+          clearable={false}
+          items={unitItems}
+          menuPosition="absolute"
+          onChange={(item) => onUnitChange(item.value)}
+          searchable={false}
+          selection={unitItems.find((item) => item.value === unit)}
+          testId={TestId.mapWorkspace.measureUnit}
+        />
+      </Box>
 
       <Button
         size="small"

@@ -7,6 +7,7 @@ import { TestId } from '@webapp/utils/testId'
 import { TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 import { expect, test } from '../fixtures'
 import { cluster, clusterImage, sampleRecords } from '../fixtures/seed/sampleSurveyModel'
+import { expectDropdownValue, getDropdown, selectDropdownItem } from '../helpers/dropdown'
 import { RecordForm } from '../helpers/recordForm'
 import { openRecord } from '../helpers/records'
 import { Urls } from '../helpers/urls'
@@ -497,7 +498,7 @@ test.describe('Map workspace', () => {
     await expect(bar).toHaveCount(0)
   })
 
-  test('measures an area, changes its unit and ends with Escape in the unit select', async ({
+  test('measures an area, changes its unit and ends with Escape in the unit dropdown', async ({
     page,
     sampleSurvey: _,
   }) => {
@@ -521,13 +522,18 @@ test.describe('Map workspace', () => {
     await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d.*(m|km)/)
     await expect(measureLabel(page)).toHaveText(AREA_TOTAL)
 
-    const unit = page.getByTestId(ids.measureUnit)
-    await unit.selectOption('ha')
+    const unit = getDropdown(page, ids.measureUnit)
+    await selectDropdownItem({ page, dropdown: unit, value: 'ha' })
     await expect(total).toHaveText(/^\d+(\.\d+)? ha$/)
     await expect(measureLabel(page)).toHaveText(/^\d+(\.\d+)? ha$/)
 
-    // the workspace shortcuts ignore keys typed in a select: the bar ends the tool itself
-    await unit.focus()
+    // the workspace shortcuts ignore keys typed in the dropdown: the bar ends the tool itself, once its menu is closed
+    await unit.locator('input').focus()
+    await page.keyboard.press('ArrowDown')
+    await expect(page.locator('.dropdown__menu')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.dropdown__menu')).toHaveCount(0)
+    await expect(bar).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(bar).toHaveCount(0)
     await expect(measureLabel(page)).toHaveCount(0)
@@ -756,10 +762,11 @@ test.describe('Map screenshot', () => {
     await page.getByTestId(ids.quickButton('screenshot')).click()
     await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
 
-    const plotSelect = page.getByTestId(ids.screenshotPlot)
-    await expect(plotSelect.locator('option')).toHaveCount(sampleRecords.length)
-    await plotSelect.selectOption({ label: plotLabel })
-    await expect(page.getByTestId(ids.screenshotAttribute).locator('option:checked')).toHaveText(clusterImage.label)
+    const plotDropdown = getDropdown(page, ids.screenshotPlot)
+    await plotDropdown.locator('.dropdown__indicator').last().click()
+    await expect(page.locator('.dropdown__option')).toHaveCount(sampleRecords.length)
+    await page.locator('.dropdown__option').getByText(plotLabel, { exact: true }).click()
+    await expectDropdownValue(getDropdown(page, ids.screenshotAttribute), clusterImage.label)
 
     const fileNameInput = page.getByTestId(ids.screenshotFileName)
     await expect(fileNameInput).toHaveValue(
@@ -872,7 +879,7 @@ ${placemarks.join('\n')}</Document></kml>`
     const [lastDx, lastDy] = vertices.at(-1)!
     const lastPoint = await mapPoint(page, lastDx, lastDy)
     await page.mouse.dblclick(lastPoint.x, lastPoint.y)
-    await page.getByTestId(ids.measureUnit).selectOption('ha')
+    await selectDropdownItem({ page, dropdown: getDropdown(page, ids.measureUnit), value: 'ha' })
     await expect(measureLabel(page)).toHaveText(/^\d+(\.\d+)? ha$/)
     await page.mouse.move(0, 0)
     await saveWorkspaceScreenshot(page, 'mapWorkspaceMeasure')
