@@ -118,6 +118,7 @@ Confirmar promoción`,
   },
   nodeDefCoordinate: {
     coordinate: 'Coordenada',
+    latLong: 'Lat, Long',
     srs: 'SRS',
     x: 'X',
     y: 'Y',
