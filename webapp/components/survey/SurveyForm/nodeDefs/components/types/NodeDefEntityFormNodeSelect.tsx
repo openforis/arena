@@ -1,10 +1,9 @@
-import { useCallback } from 'react'
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
+import { useCallback, useMemo } from 'react'
 
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import { Button, ButtonDelete } from '@webapp/components/buttons'
+import Dropdown from '@webapp/components/form/Dropdown'
 import { FormItem } from '@webapp/components/form/Input'
 import { RecordPageStatusIcon } from '@webapp/components/survey/SurveyForm/components/RecordPageStatusIcon'
 import { useAppDispatch } from '@webapp/store'
@@ -14,8 +13,6 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { useEntitySubtreeStatus } from '@webapp/store/ui/record'
 import { useNodeKeysLabelValues } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
-
-const PLACEHOLDER_VALUE = 'placeholder'
 
 /**
  * Renders one entity dropdown option row with its subtree status icon.
@@ -33,35 +30,30 @@ const EntitySelectOptionLabel = ({ nodeUuid, label }: EntitySelectOptionLabelPro
   const { hasErrors, hasWarnings, isComplete } = useEntitySubtreeStatus(nodeUuid)
   return (
     <span className="node-select-option">
-      <span className="node-select-option__label">{label}</span>
+      <span className="node-select-option__label dropdown-option__label">{label}</span>
       <RecordPageStatusIcon hasErrors={hasErrors} hasWarnings={hasWarnings} isComplete={isComplete} />
     </span>
   )
 }
 
 /**
- * Props of the entity instance selector.
- * @typedef {object} EntitySelectProps
- * @property {string} selectedValue - Selected node UUID or placeholder
- * @property {(nodeUuid: string) => void} onChange - Called with the selected node UUID
- * @property {Array} nodes - Sibling entity nodes
- * @property {string[]} nodeKeysLabelValues - Display labels aligned with `nodes`
- * @property {string} placeholderLabel - Placeholder option text
+ * Renders the label of an entity option (or of the selected entity) with its subtree status icon.
+ * @param {object} params - The Dropdown render params.
+ * @param {object} params.data - The entity item.
  */
+const renderEntityLabel = ({ data }) => <EntitySelectOptionLabel nodeUuid={data.value} label={data.label} />
 
-/**
- * MUI Select with per-instance status icons.
- * @param {EntitySelectProps} props - Select props
- * @returns {ReactElement} MUI select with status icons
- */
 type EntitySelectWithStatusProps = {
-  selectedValue: string
-  onChange: (...args: any[]) => any
+  selectedValue: string | null
+  onChange: (nodeUuid: string) => void
   nodes: any[]
   nodeKeysLabelValues: string[]
   placeholderLabel: string
 }
 
+/**
+ * Entity instance selector with per-instance status icons.
+ */
 const EntitySelectWithStatus = ({
   selectedValue,
   onChange,
@@ -69,42 +61,24 @@ const EntitySelectWithStatus = ({
   nodeKeysLabelValues,
   placeholderLabel,
 }: EntitySelectWithStatusProps) => {
-  const renderSelectedValue = useCallback(
-    (value) => {
-      if (!value || value === PLACEHOLDER_VALUE) {
-        return placeholderLabel
-      }
-      const index = nodes.findIndex((n) => Node.getUuid(n) === value)
-      const label = index >= 0 ? nodeKeysLabelValues[index] : placeholderLabel
-      return <EntitySelectOptionLabel nodeUuid={value} label={label} />
-    },
-    [nodeKeysLabelValues, nodes, placeholderLabel]
+  const items = useMemo(
+    () => nodes.map((node, index) => ({ value: Node.getUuid(node), label: nodeKeysLabelValues[index] })),
+    [nodeKeysLabelValues, nodes]
   )
+  const selection = items.find((item) => item.value === selectedValue) ?? null
 
   return (
-    <Select
+    <Dropdown
       className="node-select"
-      data-testid={TestId.entities.form.nodeSelect}
-      value={selectedValue}
-      onChange={(e) => onChange(e.target.value)}
-      displayEmpty
-      renderValue={renderSelectedValue}
-      variant="standard"
-      disableUnderline
-    >
-      <MenuItem value={PLACEHOLDER_VALUE} disabled hidden>
-        {placeholderLabel}
-      </MenuItem>
-      {nodes.map((n, index) => (
-        <MenuItem
-          key={Node.getUuid(n)}
-          value={Node.getUuid(n)}
-          data-testid={TestId.entities.form.nodeSelectOption(index)}
-        >
-          <EntitySelectOptionLabel nodeUuid={Node.getUuid(n)} label={nodeKeysLabelValues[index]} />
-        </MenuItem>
-      ))}
-    </Select>
+      clearable={false}
+      items={items}
+      onChange={(item) => onChange(item.value)}
+      placeholder={placeholderLabel}
+      renderOptionLabel={renderEntityLabel}
+      renderSelectedLabel={renderEntityLabel}
+      selection={selection}
+      testId={TestId.entities.form.nodeSelect}
+    />
   )
 }
 
@@ -118,7 +92,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
   const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes, { includeSummaryAttributes: true })
-  const selectedValue = selectedNode ? Node.getUuid(selectedNode) : PLACEHOLDER_VALUE
+  const selectedValue = selectedNode ? Node.getUuid(selectedNode) : null
   const placeholderLabel = i18n.t('common.select')
 
   const onDeleteClick = useCallback(() => {

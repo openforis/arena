@@ -16,25 +16,6 @@
 
     font-weight: 600;
     font-size: 0.85rem;
-
-    &.MuiInputBase-root {
-      &::before,
-      &::after {
-        display: none;
-      }
-
-      border: 1px solid $colorOutline;
-      border-radius: 0.25rem;
-      padding: 0.25rem 0.5rem;
-
-      .MuiSelect-select {
-        display: flex;
-        align-items: center;
-        min-height: unset;
-        // Leave room for MUI's dropdown arrow so status icons don't overlap it.
-        padding: 0 1.75rem 0 0;
-      }
-    }
   }
 
   .node-select-option {
