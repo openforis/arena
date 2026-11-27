@@ -4,7 +4,7 @@
   margin-bottom: 1rem;
 }
 
-// fields placed in a two-column grid (DOM order comes from UserAccessRequest.editableFields)
+// fields placed in a two-column grid, in DOM order (also the Tab order)
 .access-request__form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -40,37 +40,42 @@
     }
   }
 
-  .access-request__field--firstName {
-    order: 1;
-  }
-  .access-request__field--lastName {
-    order: 2;
-  }
-  .access-request__field--email {
-    order: 3;
-  }
-  .access-request__field--institution {
-    order: 4;
-  }
-  .access-request__field--country {
-    order: 5;
-  }
-  .access-request__field--surveyName {
-    order: 6;
+  .access-request__field--title {
+    grid-column: 1 / -1;
+
+    .dropdown-user-title {
+      width: 16rem;
+      max-width: 100%;
+    }
   }
   .access-request__field--purpose {
-    order: 7;
     grid-column: 1 / -1;
   }
-  .access-request__field--templateUuid {
-    order: 8;
+  .access-request__field--surveyName {
     grid-column: 1 / -1;
   }
 
   .access-request__buttons {
-    order: 9;
     grid-column: 1 / -1;
   }
+}
+
+.access-request__field-content {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.access-request__field-hint {
+  margin: 0;
+
+  p {
+    margin: 0;
+  }
+
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: $colorOnSurfaceVariant;
 }
 
 .access-request__buttons {

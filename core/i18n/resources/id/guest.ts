@@ -3,17 +3,20 @@ export default {
     title: 'Masuk',
     subtitle: 'Selamat datang! Masukkan kredensial Anda untuk melanjutkan ke $t(common.appNameFull).',
     backToLogin: 'Kembali ke halaman masuk',
-    newToArena: 'Baru di $t(common.appNameFull)?',
-    registerBeforeLoggingIn: 'Ajukan permintaan akses terlebih dahulu: hanya pengguna terdaftar yang dapat masuk.',
+    noAccountYet: 'Belum punya akun?',
+    createAccount: 'Buat akun',
+    invitedToSurvey:
+      'Diundang ke survei? Anda tidak perlu membuat akun: buka tautan di email undangan dan ikuti langkah-langkahnya.',
     or: 'atau',
     twoFactorTitle: 'Verifikasi dua langkah',
     verify: 'Verifikasi',
     lostYourDevice: 'Tidak dapat menggunakan aplikasi autentikator Anda?',
     yourName: 'Nama Anda',
     yourEmail: 'Email Anda',
-    yourPassword: 'Kata sandi Anda',
+    email: '$t(common.email)',
+    password: 'Kata sandi',
+    repeatPassword: 'Ulangi kata sandi',
     yourNewPassword: 'Kata sandi baru Anda',
-    repeatYourPassword: 'Ulangi kata sandi Anda',
     repeatYourNewPassword: 'Ulangi kata sandi baru Anda',
     requestAccess: 'Minta akses',
     resetPassword: 'Atur ulang kata sandi',
@@ -41,6 +44,8 @@ Masukkan kode yang dibuat oleh aplikasi autentikator Anda.`,
       emailDomainNotAllowed: 'Akun dengan domain email ini tidak dapat menggunakan opsi masuk ini.',
       userNotFound:
         'Tidak ada akun dengan alamat email ini. Minta undangan kepada administrator survei atau ajukan permintaan akses.',
+      userNotFoundCreateAccount:
+        'Tidak ada akun dengan alamat email ini. Buat akun terlebih dahulu, atau minta undangan kepada administrator survei.',
       ambiguousEmail:
         'Lebih dari satu akun cocok dengan alamat email ini. Masuk dengan kata sandi Anda dan tautkan penyedia dari profil Anda.',
       identityAlreadyLinked: 'Akun penyedia ini sudah ditautkan ke pengguna lain.',
@@ -80,6 +85,7 @@ Masukkan kode yang dibuat oleh aplikasi autentikator Anda.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Nama Depan',
         lastName: 'Nama Belakang',
         institution: 'Institusi',
@@ -99,11 +105,45 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Mohon beri kami waktu beberapa hari untuk memproses permintaan Anda.
 Setelah diterima, kami akan mengirimkan email lain ke **{{email}}** berisi petunjuk cara mengakses $t(common.appName).
 Terima kasih dan selamat menggunakan **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'Nama ini mengidentifikasi survei di seluruh platform $t(common.appName) dan harus **unik**: pilih nama yang spesifik, mis. gabungan organisasi atau negara Anda, proyek, dan tahun, bukan nama umum seperti "survey" atau "test". Hanya huruf kecil, angka, dan garis bawah.',
     sendRequest: 'Kirim Permintaan',
     sendRequestConfirm: 'Minta akses ke $t(common.appNameFull)?',
     templateNotSelected: 'Tidak dipilih (mulai dari awal)',
     title: 'Minta akses',
     whitelistSenderSuggestion: `Jika Anda menemukannya di folder Spam/Junk, tambahkan **{{senderEmail}}** ke kontak Anda (buku alamat) atau tandai sebagai aman/bukan spam, agar email kami berikutnya langsung masuk ke kotak masuk Anda.`,
+  },
+  registrationView: {
+    title: 'Buat akun',
+    introduction:
+      'Buat akun dan survei pertama Anda: beri tahu kami apa yang ingin Anda lakukan dengan $t(common.appName)!',
+    createAccount: 'Buat akun',
+    createAccountConfirm: 'Buat akun Anda di $t(common.appNameFull)?',
+    accountCreated: 'Akun dibuat',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Buka tautan di email untuk mengonfirmasi alamat email Anda dan menyelesaikan pendaftaran: pilih kata sandi Anda, atau masuk dengan salah satu opsi masuk yang tersedia (mis. Google).
+
+Terima kasih dan selamat menggunakan **$t(common.appNameFull)**!`,
+    error: 'Galat saat membuat akun: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Buat akun Anda',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Konfirmasi email Anda',
+        description:
+          'Anda akan menerima email dari **{{senderEmail}}** berisi tautan untuk menyelesaikan pendaftaran. Tidak ada di kotak masuk? Periksa folder Spam/Junk, lalu tambahkan pengirim ke kontak Anda atau tandai email sebagai bukan spam.',
+        descriptionWithoutSender:
+          'Anda akan menerima email berisi tautan untuk menyelesaikan pendaftaran. Tidak ada di kotak masuk? Periksa folder Spam/Junk, lalu tambahkan pengirim ke kontak Anda atau tandai email sebagai bukan spam.',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {
@@ -126,6 +166,8 @@ Terima kasih dan selamat menggunakan **$t(common.appNameFull)**!`,
       containsNumbers: 'Mengandung angka',
     },
     completeRegistration: 'Selesaikan pendaftaran',
+    completeRegistrationWith: 'Selesaikan pendaftaran dengan {{provider}}',
+    definePassword: 'Tetapkan kata sandi',
   },
   forgotPasswordView: {
     title: 'Atur ulang kata sandi Anda',

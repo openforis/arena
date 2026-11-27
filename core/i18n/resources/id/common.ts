@@ -802,6 +802,7 @@ Coba lagi?`,
     status: {
       ACCEPTED: 'Diterima',
       CREATED: 'Tertunda',
+      SELF_REGISTERED: 'Mendaftar sendiri',
     },
     acceptedBy: 'Diterima oleh',
     dateAccepted: 'Tanggal diterima',

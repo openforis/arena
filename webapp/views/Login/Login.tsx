@@ -46,22 +46,19 @@ const useExternalLoginRedirect = () => {
   }, [dispatch, searchParams, setSearchParams])
 }
 
-/**
- * Shown first, so that new users request access before trying to log in (e.g. with an external provider).
- * @returns {React.ReactElement} The banner element.
- */
-const RequestAccessBanner = () => {
+// "No account yet?" link to the access request form (account creation form with self-registration)
+const CreateAccountLink = () => {
   const i18n = useI18n()
+  const linkLabelKey = ProcessUtils.ENV.allowUserSelfRegistration
+    ? 'guest:loginView.createAccount'
+    : 'guest:loginView.requestAccess'
   return (
-    <div className="guest-login__request-access" data-testid="login-request-access-banner">
-      <div className="guest-login__request-access-text">
-        <strong>{i18n.t('guest:loginView.newToArena')}</strong>
-        <span>{i18n.t('guest:loginView.registerBeforeLoggingIn')}</span>
-      </div>
-      <Link className="guest-login__request-access-button" to={appModuleUri(guestModules.accessRequest)}>
-        {i18n.t('guest:loginView.requestAccess')}
+    <p className="guest-login__create-account" data-testid="login-create-account">
+      {i18n.t('guest:loginView.noAccountYet')}{' '}
+      <Link className="guest__link guest-login__link" to={appModuleUri(guestModules.accessRequest)}>
+        {i18n.t(linkLabelKey)}
       </Link>
-    </div>
+    </p>
   )
 }
 
@@ -185,13 +182,12 @@ const Login = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      {allowAccessRequest && <RequestAccessBanner />}
       <GuestViewHeader description="guest:loginView.subtitle" title="guest:loginView.title" />
       <GuestError error={error} />
       <EmailInput
         autoComplete="username"
         defaultValue={email}
-        label="guest:loginView.yourEmail"
+        label="guest:loginView.email"
         name={FormFields.email}
         onChange={onChangeEmail}
       />
@@ -199,14 +195,19 @@ const Login = () => {
         autoComplete="current-password"
         defaultValue={formObject.password}
         name={FormFields.password}
-        label="guest:loginView.yourPassword"
+        label="guest:loginView.password"
         onChange={onChangePassword}
       />
-      <Link className="guest__link guest-login__forgot-password" to={appModuleUri(guestModules.forgotPassword)}>
-        {i18n.t('guest:loginView.forgotPassword')}
-      </Link>
       <Button className="guest__submit" label="guest:loginView.login" onClick={onClickLogin} type="submit" />
       <ExternalLoginButtons captionKey="guest:externalLogin.registeredUsersOnly" />
+      {allowAccessRequest && <CreateAccountLink />}
+      <Link
+        className="guest__link guest-login__link guest-login__forgot-password"
+        to={appModuleUri(guestModules.forgotPassword)}
+      >
+        {i18n.t('guest:loginView.forgotPassword')}
+      </Link>
+      <p className="guest-login__invited">{i18n.t('guest:loginView.invitedToSurvey')}</p>
     </form>
   )
 }

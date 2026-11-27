@@ -3,6 +3,10 @@ export default {
   user: {
     email: '',
     name: '',
+    firstName: '',
+    lastName: '',
+    institution: '',
+    country: '',
     password: '',
     passwordConfirm: '',
     props: {

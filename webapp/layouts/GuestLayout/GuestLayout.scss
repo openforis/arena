@@ -106,7 +106,7 @@ $guestMobileBreakpoint: 900px;
   padding: 1rem 4rem 3rem;
 
   &--wide {
-    grid-template-columns: minmax(0, 1fr) 40rem;
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 54rem);
     padding-bottom: 1.5rem;
 
     .guest__card {
@@ -207,13 +207,33 @@ $guestMobileBreakpoint: 900px;
 }
 
 .guest__card {
+  position: relative;
+  // own stacking context: the blurred background below stays behind the content
+  isolation: isolate;
   color: $colorOnSurface;
   background-color: with-alpha($colorSurface, 0.94);
-  backdrop-filter: blur(16px);
   border: 1px solid with-alpha($colorOnBrandGradient, 0.25);
   border-radius: 20px;
   padding: 2.25rem;
   box-shadow: 0 30px 60px -25px with-alpha($colorShadow, 0.6);
+
+  // blur in a pseudo-element: on the card itself, the backdrop filter would make the fixed dropdown menus
+  // be positioned relative to the card (out of the screen)
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    backdrop-filter: blur(16px);
+  }
+
+  // titles are short: no need for the whole width
+  .dropdown-user-title {
+    justify-self: start;
+    width: 16rem;
+    max-width: 100%;
+  }
 
   // default MUI field height, so that the floating labels fit
   .MuiTextField-root .MuiInputBase-input {
@@ -453,57 +473,94 @@ $guestMobileBreakpoint: 900px;
   }
 }
 
-// login: invite new users to request access before logging in
-.guest-login__request-access {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem 0.9rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: 12px;
-  border: 1px solid with-alpha($colorSuccess, 0.45);
-  background-color: $colorSuccessContainer;
-  font-size: 0.85rem;
+// login: links under the login button
+.guest-login__create-account {
+  margin: 0;
+  font-size: 0.9rem;
+  color: $colorOnSurface;
 }
 
-.guest-login__request-access-text {
-  display: grid;
-  gap: 0.1rem;
-  color: $colorOnSurfaceVariant;
-
-  strong {
-    font-size: 0.9rem;
-    color: $colorOnSurface;
-  }
-}
-
-.guest-login__request-access-button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.25rem;
-  padding: 0 0.9rem;
-  border-radius: 6px;
-  background-color: $colorSuccess;
-  color: $colorOnSuccess;
-  font-weight: 600;
-  white-space: nowrap;
-  text-decoration: none;
-
-  &:hover {
-    background-color: shade($colorSuccess, 10%);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $colorPrimary;
-    outline-offset: 2px;
-  }
+.guest-login__link {
+  font-weight: 500;
+  text-decoration: underline;
 }
 
 .guest-login__forgot-password {
-  justify-self: end;
-  margin-top: -0.5rem;
-  font-size: 0.8rem;
+  justify-self: start;
+  font-size: 0.85rem;
+}
+
+.guest-login__invited {
+  margin: 0;
+  font-size: 0.85rem;
+  color: $colorOnSurfaceVariant;
+}
+
+// complete registration: password or external login provider
+.guest__completion-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+}
+
+// complete registration: two fields per row, in a wider card (to avoid scrolling)
+.guest__form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+
+  .dropdown-user-title {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: calc(#{$guestMobileBreakpoint} + 1px)) {
+  .guest__main:has(.guest__form--registration) {
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 46rem);
+    padding-bottom: 1rem;
+
+    .guest__card {
+      padding: 1.25rem 2rem;
+    }
+  }
+
+  .guest__form--registration {
+    gap: 0.7rem;
+
+    // shorter fields (the floating labels still fit)
+    .MuiTextField-root .MuiInputBase-input {
+      padding: 0.75rem 0.85rem;
+    }
+
+    .dropdown__control {
+      min-height: 2.9rem;
+    }
+
+    .guest__view-header {
+      margin-bottom: 0.5rem;
+    }
+
+    // centered, not as wide as the form
+    .guest__submit.btn,
+    .guest__submit-external {
+      justify-self: center;
+      width: auto;
+      min-width: 16rem;
+      padding: 0 2rem;
+    }
+
+    // the password checks in a single row
+    .password-strength-checker__checks {
+      grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
+    }
+  }
+}
+
+@media screen and (max-width: $guestMobileBreakpoint) {
+  .guest__form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 // keep the password strength checks close to the password field

@@ -3,17 +3,20 @@ export default {
     title: 'Prijava',
     subtitle: 'Dobrodošli! Unesite svoje podatke za nastavak u aplikaciji $t(common.appNameFull).',
     backToLogin: 'Nazad na prijavu',
-    newToArena: 'Novi ste u $t(common.appNameFull)?',
-    registerBeforeLoggingIn: 'Prvo zatražite pristup: samo registrovani korisnici mogu da se prijave.',
+    noAccountYet: 'Još nemate nalog?',
+    createAccount: 'Napravite nalog',
+    invitedToSurvey:
+      'Pozvani ste u istraživanje? Ne morate da pravite nalog: otvorite link iz imejla sa pozivnicom i pratite korake.',
     or: 'ili',
     twoFactorTitle: 'Verifikacija u dva koraka',
     verify: 'Potvrdi',
     lostYourDevice: 'Ne možete koristiti aplikaciju za autentifikaciju?',
     yourName: 'Vaše ime',
     yourEmail: 'Vaša e-adresa',
-    yourPassword: 'Vaša lozinka',
+    email: '$t(common.email)',
+    password: 'Lozinka',
+    repeatPassword: 'Ponovite lozinku',
     yourNewPassword: 'Vaša nova lozinka',
-    repeatYourPassword: 'Ponovite lozinku',
     repeatYourNewPassword: 'Ponovite novu lozinku',
     requestAccess: 'Zatražite pristup',
     resetPassword: 'Resetuj lozinku',
@@ -40,6 +43,8 @@ Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
       emailDomainNotAllowed: 'Nalozi sa ovim domenom e-pošte ne mogu da koriste ovu opciju prijave.',
       userNotFound:
         'Ne postoji nalog sa ovom adresom e-pošte. Zatražite pozivnicu od administratora istraživanja ili zatražite pristup.',
+      userNotFoundCreateAccount:
+        'Ne postoji nalog sa ovom imejl adresom. Prvo napravite nalog ili zatražite pozivnicu od administratora istraživanja.',
       ambiguousEmail:
         'Ovoj adresi e-pošte odgovara više naloga. Prijavite se lozinkom i povežite provajdera iz svog profila.',
       identityAlreadyLinked: 'Ovaj nalog provajdera je već povezan sa drugim korisnikom.',
@@ -77,6 +82,7 @@ Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Ime',
         lastName: 'Prezime',
         institution: 'Institucija',
@@ -96,11 +102,45 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Molimo vas da nam date nekoliko dana da obradimo vaš zahtjev.
 Kada bude prihvaćen, poslaćemo vam još jednu e-poruku na **{{email}}** sa uputstvima kako da pristupite aplikaciji $t(common.appName).
 Hvala vam i uživajte u **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'Ime identifikuje istraživanje na celoj platformi $t(common.appName) i mora biti **jedinstveno**: izaberite konkretno ime, npr. kombinacijom vaše organizacije ili zemlje, projekta i godine, a ne opšte kao što su „survey” ili „test”. Samo mala slova, brojevi i donje crte.',
     sendRequest: 'Pošalji zahtjev',
     sendRequestConfirm: 'Zatražiti pristup aplikaciji $t(common.appNameFull)?',
     templateNotSelected: 'Nije izabrano (počni od početka)',
     title: 'Zatražite pristup',
     whitelistSenderSuggestion: `Ako je pronađete u fascikli Spam/Neželjena pošta, dodajte **{{senderEmail}}** u svoje kontakte (adresar) ili je označite kao bezbjednu/nije spam, kako bi naše buduće e-poruke stizale direktno u vaše prijemno sanduče.`,
+  },
+  registrationView: {
+    title: 'Napravite nalog',
+    introduction:
+      'Napravite svoj nalog i svoje prvo istraživanje: recite nam šta želite da radite sa $t(common.appName)!',
+    createAccount: 'Napravi nalog',
+    createAccountConfirm: 'Napraviti vaš nalog u $t(common.appNameFull)?',
+    accountCreated: 'Nalog je napravljen',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Otvorite link iz imejla da potvrdite svoju imejl adresu i završite registraciju: izaberite lozinku ili se prijavite jednom od dostupnih opcija za prijavu (npr. Google).
+
+Hvala i uživajte u **$t(common.appNameFull)**!`,
+    error: 'Greška pri pravljenju naloga: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Napravite nalog',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Potvrdite imejl',
+        description:
+          'Dobićete imejl od **{{senderEmail}}** sa linkom za završetak registracije. Nije u prijemnom sandučetu? Proverite fasciklu Spam/Junk, a zatim dodajte pošiljaoca u kontakte ili označite imejl kao da nije spam.',
+        descriptionWithoutSender:
+          'Dobićete imejl sa linkom za završetak registracije. Nije u prijemnom sandučetu? Proverite fasciklu Spam/Junk, a zatim dodajte pošiljaoca u kontakte ili označite imejl kao da nije spam.',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {
@@ -123,6 +163,8 @@ Hvala vam i uživajte u **$t(common.appNameFull)**!`,
       containsNumbers: 'Sadrži brojeve',
     },
     completeRegistration: 'Završi registraciju',
+    completeRegistrationWith: 'Završite registraciju preko {{provider}}',
+    definePassword: 'Postavite lozinku',
   },
   forgotPasswordView: {
     title: 'Resetujte lozinku',

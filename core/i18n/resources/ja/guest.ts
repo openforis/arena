@@ -3,17 +3,20 @@ export default {
     title: 'ログイン',
     subtitle: 'ようこそ！$t(common.appNameFull)を利用するには認証情報を入力してください。',
     backToLogin: 'ログインに戻る',
-    newToArena: '$t(common.appNameFull)を初めて利用しますか？',
-    registerBeforeLoggingIn: 'まずアクセスを申請してください。ログインできるのは登録済みユーザーのみです。',
+    noAccountYet: 'アカウントをお持ちでないですか？',
+    createAccount: 'アカウントを作成',
+    invitedToSurvey:
+      '調査に招待されましたか？アカウントを作成する必要はありません。招待メールのリンクを開き、手順に従ってください。',
     or: 'または',
     twoFactorTitle: '2段階認証',
     verify: '確認',
     lostYourDevice: '認証アプリを使用できませんか？',
     yourName: 'お名前',
     yourEmail: 'メールアドレス',
-    yourPassword: 'パスワード',
+    email: '$t(common.email)',
+    password: 'パスワード',
+    repeatPassword: 'パスワード（確認）',
     yourNewPassword: '新しいパスワード',
-    repeatYourPassword: 'パスワード（確認）',
     repeatYourNewPassword: '新しいパスワード（確認）',
     requestAccess: 'アクセスを申請する',
     resetPassword: 'パスワードを再設定',
@@ -41,6 +44,8 @@ export default {
       emailDomainNotAllowed: 'このメールドメインのアカウントはこのサインイン方法を使用できません。',
       userNotFound:
         'このメールアドレスのアカウントはありません。調査の管理者に招待を依頼するか、アクセスをリクエストしてください。',
+      userNotFoundCreateAccount:
+        'このメールアドレスのアカウントはありません。先にアカウントを作成するか、調査の管理者に招待を依頼してください。',
       ambiguousEmail:
         'このメールアドレスに一致するアカウントが複数あります。パスワードでサインインし、プロフィールからプロバイダーを連携してください。',
       identityAlreadyLinked: 'このプロバイダーのアカウントは既に別のユーザーに連携されています。',
@@ -72,6 +77,7 @@ export default {
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: '名',
         lastName: '姓',
         institution: '所属機関',
@@ -91,11 +97,44 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 処理には数日かかりますので、しばらくお待ちください。
 承認され次第、**{{email}}**宛に$t(common.appName)へのアクセス方法をご案内するメールを送信します。
 ありがとうございます。**$t(common.appNameFull)**をお楽しみください！`,
+    surveyNameHint:
+      'この名前は$t(common.appName)プラットフォーム全体で調査を識別するため、**一意**である必要があります。「survey」や「test」のような一般的な名前ではなく、組織または国、プロジェクト、年を組み合わせるなど、具体的な名前を選んでください。使用できるのは小文字、数字、アンダースコアのみです。',
     sendRequest: '申請を送信',
     sendRequestConfirm: '$t(common.appNameFull)へのアクセスを申請しますか？',
     templateNotSelected: '未選択（最初から作成）',
     title: 'アクセスを申請する',
     whitelistSenderSuggestion: `迷惑メールフォルダに入っていた場合は、今後のメールが確実に受信トレイに届くよう、**{{senderEmail}}**を連絡先に追加するか、安全な送信者としてマークしてください。`,
+  },
+  registrationView: {
+    title: 'アカウントを作成',
+    introduction: 'アカウントと最初の調査を作成しましょう。$t(common.appName)で何をしたいか教えてください！',
+    createAccount: 'アカウントを作成',
+    createAccountConfirm: '$t(common.appNameFull)のアカウントを作成しますか？',
+    accountCreated: 'アカウントが作成されました',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+メールのリンクを開いてメールアドレスを確認し、登録を完了してください。パスワードを設定するか、利用可能なサインイン方法（例：Google）でサインインできます。
+
+ありがとうございます。**$t(common.appNameFull)**をお楽しみください！`,
+    error: 'アカウントの作成中にエラーが発生しました：{{error}}',
+    steps: {
+      createAccount: {
+        title: 'アカウントを作成',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'メールアドレスを確認',
+        description:
+          '**{{senderEmail}}** から登録を完了するためのリンクが記載されたメールが届きます。受信トレイにない場合は、迷惑メールフォルダを確認し、送信者を連絡先に追加するか、メールを迷惑メールではないとマークしてください。',
+        descriptionWithoutSender:
+          '登録を完了するためのリンクが記載されたメールが届きます。受信トレイにない場合は、迷惑メールフォルダを確認し、送信者を連絡先に追加するか、メールを迷惑メールではないとマークしてください。',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {
@@ -118,6 +157,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
       containsNumbers: '数字を含む',
     },
     completeRegistration: '登録を完了',
+    completeRegistrationWith: '{{provider}}で登録を完了',
+    definePassword: 'パスワードを設定',
   },
   forgotPasswordView: {
     title: 'パスワードの再設定',

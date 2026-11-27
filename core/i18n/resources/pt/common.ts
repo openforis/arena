@@ -813,6 +813,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     status: {
       ACCEPTED: 'Aceito',
       CREATED: 'Pendente',
+      SELF_REGISTERED: 'Autorregistado',
     },
     acceptedBy: 'Aceito por',
     dateAccepted: 'Data de aceitação',

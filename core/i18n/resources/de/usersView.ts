@@ -53,6 +53,8 @@ Link zum Zurücksetzen des Passworts in die Zwischenablage kopieren?`,
     surveyManagerDescription: 'Kann neue Erhebungen erstellen.',
     twoFactorDescription: 'Geräte, die die bei der Anmeldung abgefragten Bestätigungscodes erzeugen.',
     notifyOnUserAccessRequestDescription: 'Mich per E-Mail benachrichtigen, wenn jemand Zugriff auf Arena anfordert.',
+    notifyOnUserSelfRegistrationDescription:
+      'Benachrichtigen Sie mich per E-Mail, wenn jemand ein Konto in Arena erstellt.',
     removeFromSurveyDescription: 'Der Benutzer hat keinen Zugriff mehr auf die Erhebung „{{survey}}“.',
     sections: {
       personal: 'Persönliche Informationen',
@@ -72,6 +74,7 @@ Link zum Zurücksetzen des Passworts in die Zwischenablage kopieren?`,
   prefs: {
     title: 'Benachrichtigungseinstellungen',
     notifyOnUserAccessRequest: 'Neue Benutzerzugriffsanfragen',
+    notifyOnUserSelfRegistration: 'Neue Selbstregistrierungen von Benutzern',
   },
   roleInCurrentSurvey: 'Rolle in der aktuellen Erhebung',
   roleInSurvey: 'Rolle in der Erhebung',

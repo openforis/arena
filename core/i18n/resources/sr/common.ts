@@ -848,6 +848,7 @@ Pokušati ponovo?`,
     status: {
       ACCEPTED: 'Prihvaćeno',
       CREATED: 'Na čekanju',
+      SELF_REGISTERED: 'Samostalno registrovan',
     },
     acceptedBy: 'Prihvatio',
     dateAccepted: 'Datum prihvatanja',

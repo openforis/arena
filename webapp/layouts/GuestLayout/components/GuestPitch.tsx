@@ -8,6 +8,10 @@ import { useI18nT } from '@webapp/store/system'
 
 const defaultTags = ['forestInventories', 'questionnaires', 'multiCycle', 'statisticalAnalysis']
 const accessRequestSteps = ['sendRequest', 'review', 'invitation', 'startWorking']
+// with self-registration, the account is created right away
+const registrationSteps = ['createAccount', 'confirmEmail', 'startWorking']
+// steps whose description shows the email sender
+const emailSteps = new Set(['invitation', 'confirmEmail'])
 
 type Props = {
   accessRequest?: boolean
@@ -24,10 +28,13 @@ const PitchTags = () => {
   )
 }
 
-// what happens after an access request is sent
+const getStepsPrefix = () =>
+  ProcessUtils.ENV.allowUserSelfRegistration ? 'guest:registrationView.steps' : 'guest:accessRequestView.steps'
+
+// what happens after an access request is sent (or the account is created)
 const getStepDescriptionKey = (step: string, senderEmail: string | undefined): string => {
-  const descriptionKey = step === 'invitation' && !senderEmail ? 'descriptionWithoutSender' : 'description'
-  return `guest:accessRequestView.steps.${step}.${descriptionKey}`
+  const descriptionKey = emailSteps.has(step) && !senderEmail ? 'descriptionWithoutSender' : 'description'
+  return `${getStepsPrefix()}.${step}.${descriptionKey}`
 }
 
 const AccessRequestSteps = () => {
@@ -36,6 +43,8 @@ const AccessRequestSteps = () => {
   const [expanded, setExpanded] = useState(false)
   // emails are sent from this address: users should look for it (also in the spam folder)
   const senderEmail = ProcessUtils.ENV.emailFromResolved
+  const steps = ProcessUtils.ENV.allowUserSelfRegistration ? registrationSteps : accessRequestSteps
+  const stepsPrefix = getStepsPrefix()
   return (
     <>
       <button
@@ -49,9 +58,9 @@ const AccessRequestSteps = () => {
         <AppIcon name={expanded ? 'arrowUp' : 'arrowDown'} size={14} />
       </button>
       <ol id="guest-pitch-steps" className={classNames('guest__pitch-steps', { collapsed: !expanded })}>
-        {accessRequestSteps.map((step) => (
+        {steps.map((step) => (
           <li key={step}>
-            <strong>{t(`guest:accessRequestView.steps.${step}.title`)}</strong>
+            <strong>{t(`${stepsPrefix}.${step}.title`)}</strong>
             <Markdown
               className="guest__pitch-step-description"
               container="span"

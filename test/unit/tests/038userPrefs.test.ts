@@ -58,3 +58,20 @@ describe('User prefs - notifyOnUserAccessRequest', () => {
     })
   })
 })
+
+describe('User prefs - notifyOnUserSelfRegistration', () => {
+  test('defaults to false when the pref is not set', () => {
+    expect(User.getPrefNotifyOnUserSelfRegistration({})).toBe(false)
+    expect(User.getPrefNotifyOnUserSelfRegistration({ prefs: { notifyOnUserSelfRegistration: null } })).toBe(false)
+  })
+
+  test('returns the stored value', () => {
+    expect(User.getPrefNotifyOnUserSelfRegistration({ prefs: { notifyOnUserSelfRegistration: true } })).toBe(true)
+  })
+
+  test('assoc sets the pref without changing the other ones', () => {
+    const user = User.assocPrefNotifyOnUserSelfRegistration(true)({ prefs: { notifyOnUserAccessRequest: false } })
+    expect(User.getPrefNotifyOnUserSelfRegistration(user)).toBe(true)
+    expect(User.getPrefNotifyOnUserAccessRequest(user)).toBe(false)
+  })
+})

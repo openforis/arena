@@ -7,13 +7,15 @@ const titleItems = User.titleKeysArray.map((value) => ({ value }))
 
 type DropdownUserTitleProps = {
   disabled?: boolean
+  // shown on the top border when a title is selected (see Dropdown label)
+  label?: string
   user: any
   validation?: any
   onChange: (...args: any[]) => any
 }
 
 const DropdownUserTitle = (props: DropdownUserTitleProps) => {
-  const { disabled = false, onChange, user, validation = {} } = props
+  const { disabled = false, label = undefined, onChange, user, validation = {} } = props
   const titleSelected = User.getTitle(user)
   const itemSelected = A.isEmpty(titleSelected) ? undefined : { value: titleSelected }
 
@@ -23,7 +25,8 @@ const DropdownUserTitle = (props: DropdownUserTitleProps) => {
     <Dropdown
       className="dropdown-user-title"
       disabled={disabled}
-      placeholder={i18n.t('user.title')}
+      label={label}
+      placeholder={label ? undefined : i18n.t('user.title')}
       onChange={(item) => onChange(User.assocTitle(item?.value)(user))}
       items={titleItems}
       itemLabel={(item) => i18n.t(`user.titleValues.${item.value}`)}

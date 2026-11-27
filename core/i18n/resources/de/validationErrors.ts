@@ -274,6 +274,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Land ist erforderlich',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Vorname ist erforderlich',
     institutionRequired: 'Institution ist erforderlich',
     lastNameRequired: 'Nachname ist erforderlich',
@@ -284,6 +285,9 @@ export default {
     requestAlreadySent: 'Die Zugriffsanfrage für den Benutzer mit der E-Mail-Adresse {{email}} wurde bereits gesendet',
     emailNotReachable: 'Die Bestätigungs-E-Mail konnte nicht an {{email}} zugestellt werden; prüfen Sie die Adresse',
     invalidReCaptcha: 'Ungültiges reCAPTCHA',
+    surveyNameAlreadyUsed:
+      'Eine Erhebung mit dem Namen {{surveyName}} existiert bereits: Bitte schlagen Sie einen anderen Erhebungsnamen vor',
+    registrationNotAvailable: 'Die Registrierung ist derzeit nicht verfügbar; bitte versuchen Sie es später erneut',
   },
 
   userAccessRequestAccept: {

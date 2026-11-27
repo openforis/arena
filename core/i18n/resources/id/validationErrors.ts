@@ -272,6 +272,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Negara wajib diisi',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Nama depan wajib diisi',
     institutionRequired: 'Institusi wajib diisi',
     lastNameRequired: 'Nama belakang wajib diisi',
@@ -282,6 +283,8 @@ export default {
     requestAlreadySent: `Permintaan akses untuk pengguna dengan email {{email}} sudah dikirim`,
     emailNotReachable: 'Email konfirmasi tidak dapat dikirim ke {{email}}; periksa apakah alamatnya sudah benar',
     invalidReCaptcha: 'ReCaptcha tidak valid',
+    surveyNameAlreadyUsed: 'Survei bernama {{surveyName}} sudah ada: usulkan nama survei lain',
+    registrationNotAvailable: 'Pendaftaran tidak tersedia saat ini; silakan coba lagi nanti',
   },
 
   userAccessRequestAccept: {
