@@ -3,8 +3,10 @@ export default {
     title: 'Connexion',
     subtitle: 'Bienvenue ! Saisissez vos identifiants pour accéder à $t(common.appNameFull).',
     backToLogin: 'Retour à la connexion',
-    newToArena: 'Nouveau sur $t(common.appNameFull) ?',
-    registerBeforeLoggingIn: "Demandez d'abord l'accès : seuls les utilisateurs enregistrés peuvent se connecter.",
+    noAccountYet: 'Pas encore de compte ?',
+    createAccount: 'Créer un compte',
+    invitedToSurvey:
+      "Invité à une enquête ? Vous n'avez pas besoin de créer un compte : ouvrez le lien de l'e-mail d'invitation et suivez ses étapes.",
     or: 'ou',
     twoFactorTitle: 'Vérification en deux étapes',
     verify: 'Vérifier',
@@ -41,6 +43,8 @@ Entrez le code généré par votre application d'authentification.`,
       emailDomainNotAllowed: 'Les comptes avec ce domaine e-mail ne peuvent pas utiliser cette option de connexion.',
       userNotFound:
         "Aucun compte n'existe avec cette adresse e-mail. Demandez une invitation à un administrateur de l'enquête ou demandez un accès.",
+      userNotFoundCreateAccount:
+        "Aucun compte n'existe avec cette adresse e-mail. Créez d'abord un compte ou demandez une invitation à un administrateur de l'enquête.",
       ambiguousEmail:
         'Plusieurs comptes correspondent à cette adresse e-mail. Connectez-vous avec votre mot de passe et liez le fournisseur depuis votre profil.',
       identityAlreadyLinked: 'Ce compte du fournisseur est déjà lié à un autre utilisateur.',
@@ -104,6 +108,38 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     title: "Demander l'accès",
     whitelistSenderSuggestion:
       "Si vous le trouvez dans le dossier Spam/Courrier indésirable, veuillez ajouter **{{senderEmail}}** à vos contacts (carnet d'adresses) ou le marquer comme sûr/non indésirable, afin que nos prochains e-mails arrivent directement dans votre boîte de réception.",
+  },
+  registrationView: {
+    title: 'Créer un compte',
+    introduction:
+      'Créez votre compte et votre première enquête : dites-nous ce que vous voulez faire avec $t(common.appName) !',
+    createAccount: 'Créer le compte',
+    createAccountConfirm: 'Créer votre compte dans $t(common.appNameFull) ?',
+    accountCreated: 'Compte créé',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Ouvrez le lien de l'e-mail pour confirmer votre adresse e-mail et terminer votre inscription : choisissez votre mot de passe ou connectez-vous avec l'une des options de connexion disponibles (par ex. Google).
+
+Merci et profitez bien de **$t(common.appNameFull)** !`,
+    error: 'Erreur lors de la création du compte : {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Créez votre compte',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Confirmez votre e-mail',
+        description:
+          "Vous recevrez un e-mail de **{{senderEmail}}** avec le lien pour terminer votre inscription. Pas dans votre boîte de réception ? Vérifiez le dossier Spam/Courrier indésirable, puis ajoutez l'expéditeur à vos contacts ou marquez l'e-mail comme non indésirable.",
+        descriptionWithoutSender:
+          "Vous recevrez un e-mail avec le lien pour terminer votre inscription. Pas dans votre boîte de réception ? Vérifiez le dossier Spam/Courrier indésirable, puis ajoutez l'expéditeur à vos contacts ou marquez l'e-mail comme non indésirable.",
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {

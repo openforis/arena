@@ -32,8 +32,15 @@ const _getPrettyFormatUserName = ({ user, i18n }: { user: ArenaUser; i18n: Arena
   return parts.join(' ')
 }
 
+const newUserInviteMsgKeyDefault = 'emails:userInvite'
+
 const _generateResetPasswordAndSendEmail = async (
-  { email, emailParams, i18n }: { email: string; emailParams: UserInviteEmailParams; i18n: ArenaI18n },
+  {
+    email,
+    emailParams,
+    i18n,
+    msgKey = newUserInviteMsgKeyDefault,
+  }: { email: string; emailParams: UserInviteEmailParams; i18n: ArenaI18n; msgKey?: string },
   t: DbClient
 ) => {
   const { serverUrl } = emailParams
@@ -45,7 +52,7 @@ const _generateResetPasswordAndSendEmail = async (
     urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
-  const { rejected = [] } = await Mailer.sendEmail({ to: email, msgKey: 'emails:userInvite', msgParams, i18n })
+  const { rejected = [] } = await Mailer.sendEmail({ to: email, msgKey, msgParams, i18n })
   if (rejected.length > 0) {
     throw new SystemError('appErrors:userEmailInvalid', { email })
   }
@@ -79,6 +86,7 @@ const _inviteNewUserAndSendEmail = async (
     surveyCycleKey,
     emailParams,
     i18n,
+    newUserMsgKey,
   }: {
     user: ArenaUser
     email: string
@@ -87,6 +95,7 @@ const _inviteNewUserAndSendEmail = async (
     surveyCycleKey: string
     emailParams: UserInviteEmailParams
     i18n: ArenaI18n
+    newUserMsgKey?: string
   },
   t: DbClient
 ) => {
@@ -104,7 +113,7 @@ const _inviteNewUserAndSendEmail = async (
     t
   )
   // Generate reset password and send email
-  await _generateResetPasswordAndSendEmail({ email, emailParams, i18n }, t)
+  await _generateResetPasswordAndSendEmail({ email, emailParams, i18n, msgKey: newUserMsgKey }, t)
 
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
 
@@ -262,6 +271,7 @@ const _inviteUser = (
     repeatInvitation,
     surveyCycleKey,
     serverUrl,
+    newUserMsgKey,
   }: {
     user: ArenaUser
     i18n: ArenaI18n
@@ -272,6 +282,7 @@ const _inviteUser = (
     repeatInvitation: boolean
     surveyCycleKey: string
     serverUrl: string
+    newUserMsgKey?: string
   },
   client: DbClient = db
 ) =>
@@ -315,7 +326,7 @@ const _inviteUser = (
       // User to invite does not exist, he has never been invited
       // Check if he can be invited
       const userInvited = await _inviteNewUserAndSendEmail(
-        { user, email, group, survey, surveyCycleKey, emailParams, i18n },
+        { user, email, group, survey, surveyCycleKey, emailParams, i18n, newUserMsgKey },
         t
       )
       return userInvited
@@ -330,6 +341,7 @@ export const inviteUsers = async (
     invitation,
     serverUrl,
     repeatInvitation = false,
+    newUserMsgKey,
   }: {
     user: ArenaUser
     surveyId: number
@@ -337,6 +349,8 @@ export const inviteUsers = async (
     invitation: UserGroupInvitation.UserGroupInvitation
     serverUrl: string
     repeatInvitation?: boolean
+    // email sent to the users not registered yet (default: invitation email)
+    newUserMsgKey?: string
   },
   client: DbClient = db
 ) => {
@@ -368,6 +382,7 @@ export const inviteUsers = async (
           repeatInvitation,
           surveyCycleKey,
           serverUrl,
+          newUserMsgKey,
         },
         client
       )

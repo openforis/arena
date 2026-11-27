@@ -3,8 +3,10 @@ export default {
     title: 'Вход',
     subtitle: 'Добро пожаловать! Введите свои учетные данные, чтобы продолжить работу в $t(common.appNameFull).',
     backToLogin: 'Вернуться ко входу',
-    newToArena: 'Впервые в $t(common.appNameFull)?',
-    registerBeforeLoggingIn: 'Сначала запросите доступ: войти могут только зарегистрированные пользователи.',
+    noAccountYet: 'Ещё нет учётной записи?',
+    createAccount: 'Создать учётную запись',
+    invitedToSurvey:
+      'Вас пригласили в обследование? Создавать учётную запись не нужно: откройте ссылку в письме-приглашении и следуйте инструкциям.',
     or: 'или',
     twoFactorTitle: 'Двухэтапная проверка',
     verify: 'Подтвердить',
@@ -41,6 +43,8 @@ export default {
       emailDomainNotAllowed: 'Учётные записи с этим почтовым доменом не могут использовать этот способ входа.',
       userNotFound:
         'Учётной записи с этим адресом электронной почты нет. Попросите приглашение у администратора обследования или запросите доступ.',
+      userNotFoundCreateAccount:
+        'Учётной записи с этим адресом электронной почты нет. Сначала создайте учётную запись или попросите приглашение у администратора обследования.',
       ambiguousEmail:
         'Этому адресу электронной почты соответствует несколько учётных записей. Войдите с паролем и привяжите провайдера в своём профиле.',
       identityAlreadyLinked: 'Эта учётная запись провайдера уже привязана к другому пользователю.',
@@ -104,6 +108,38 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
     title: 'Запрос доступа',
     whitelistSenderSuggestion:
       'Если вы найдете его в папке «Спам», добавьте **{{senderEmail}}** в свои контакты (адресную книгу) или отметьте письмо как безопасное/не спам, чтобы наши следующие письма попадали прямо во входящие.',
+  },
+  registrationView: {
+    title: 'Создать учётную запись',
+    introduction:
+      'Создайте учётную запись и своё первое обследование: расскажите, что вы хотите делать в $t(common.appName)!',
+    createAccount: 'Создать учётную запись',
+    createAccountConfirm: 'Создать учётную запись в $t(common.appNameFull)?',
+    accountCreated: 'Учётная запись создана',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Откройте ссылку в письме, чтобы подтвердить адрес электронной почты и завершить регистрацию: выберите пароль или войдите с помощью одного из доступных способов входа (например, Google).
+
+Спасибо, и приятной работы с **$t(common.appNameFull)**!`,
+    error: 'Ошибка при создании учётной записи: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Создайте учётную запись',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Подтвердите адрес почты',
+        description:
+          'Вы получите письмо от **{{senderEmail}}** со ссылкой для завершения регистрации. Нет во входящих? Проверьте папку «Спам», затем добавьте отправителя в контакты или отметьте письмо как «не спам».',
+        descriptionWithoutSender:
+          'Вы получите письмо со ссылкой для завершения регистрации. Нет во входящих? Проверьте папку «Спам», затем добавьте отправителя в контакты или отметьте письмо как «не спам».',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {

@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import { AppInfo } from '@core/app/appInfo'
+import * as ProcessUtils from '@core/processUtils'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 import { SystemActions } from '@webapp/store/system'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
@@ -30,8 +31,14 @@ const externalLoginErrorKeyPrefix = 'externalLogin.'
  * @param {string} errorKey - The error key returned by the server.
  * @returns {string} - The i18n key.
  */
-export const toExternalLoginErrorMessageKey = (errorKey) =>
-  `guest:externalLogin.errors.${String(errorKey).replace(externalLoginErrorKeyPrefix, '')}`
+export const toExternalLoginErrorMessageKey = (errorKey) => {
+  let key = String(errorKey).replace(externalLoginErrorKeyPrefix, '')
+  // with self-registration, new users create their account (instead of requesting access)
+  if (key === 'userNotFound' && ProcessUtils.ENV.userSelfRegistration) {
+    key = 'userNotFoundCreateAccount'
+  }
+  return `guest:externalLogin.errors.${key}`
+}
 
 const toErrorMessageKey = (messageKey) =>
   messageKey?.startsWith(externalLoginErrorKeyPrefix) ? toExternalLoginErrorMessageKey(messageKey) : messageKey

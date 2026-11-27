@@ -282,6 +282,8 @@ export default {
     requestAlreadySent: `Permintaan akses untuk pengguna dengan email {{email}} sudah dikirim`,
     emailNotReachable: 'Email konfirmasi tidak dapat dikirim ke {{email}}; periksa apakah alamatnya sudah benar',
     invalidReCaptcha: 'ReCaptcha tidak valid',
+    surveyNameAlreadyUsed: 'Survei bernama {{surveyName}} sudah ada: usulkan nama survei lain',
+    registrationNotAvailable: 'Pendaftaran tidak tersedia saat ini; silakan coba lagi nanti',
   },
 
   userAccessRequestAccept: {

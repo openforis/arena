@@ -56,6 +56,36 @@ export default {
       <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
       $t(emails:signature)`,
   },
+  userSelfRegistration: {
+    subject: 'Complete your registration to $t(common.appNameFull)',
+    body: `<p>Hello,</p>
+      <p>Thank you for creating your account in $t(common.appNameFull)! Your first survey '{{surveyName}}' is ready.</p>
+      <p><a href="{{urlResetPassword}}">Click here to confirm your email address and complete your registration</a></p>
+      <p>If the link doesn't work, please copy and paste this address into your browser: {{urlResetPassword}}</p>
+      $t(emails:temporaryMsg)
+      <p><i>You have received this email because this address was used to create an account in $t(common.appNameFull) through {{serverUrl}}. If you did not create it, please ignore this email.</i></p>
+      <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
+      <p>$t(common.raiseTicketInSupportForum)</p>
+      $t(emails:signature)`,
+  },
+  userSelfRegistered: {
+    subject: '$t(common.appNameFull) - New user registered',
+    body: `<p>Hello,</p>
+      <p>The following user has created an account in $t(common.appNameFull) (the registration is completed when the user opens the link in the confirmation email).</p>
+      <p>
+        <ul>
+          <li>$t(guest:accessRequestView.fields.email): {{email}}</li>
+          <li>$t(guest:accessRequestView.fields.props.firstName): {{firstName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.lastName): {{lastName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.institution): {{institution}}</li>
+          <li>$t(guest:accessRequestView.fields.props.country): {{country}}</li>
+          <li>$t(guest:accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(guest:accessRequestView.fields.props.surveyName): {{surveyName}}</li>
+        </ul>
+      </p>
+      <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
+      $t(emails:signature)`,
+  },
   recordsUploadedFromMobile: {
     subject_one: `$t(common.appNameFull) - {{count}} record uploaded from Arena Mobile to survey '{{surveyName}}'`,
     subject_other: `$t(common.appNameFull) - {{count}} records uploaded from Arena Mobile to survey '{{surveyName}}'`,

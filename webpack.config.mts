@@ -62,6 +62,7 @@ const plugins: WebpackPluginInstance[] = [
       env: {
         NODE_ENV: JSON.stringify(environment),
         ALLOW_USER_ACCESS_REQUEST: JSON.stringify(process.env.ALLOW_USER_ACCESS_REQUEST),
+        USER_SELF_REGISTRATION: JSON.stringify(process.env.USER_SELF_REGISTRATION),
         APP_VERSION: JSON.stringify(appVersion),
         RECAPTCHA_ENABLED: JSON.stringify(process.env.RECAPTCHA_ENABLED),
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),

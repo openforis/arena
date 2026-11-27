@@ -9,6 +9,8 @@ import { useAppDispatch } from '@webapp/store'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
+import { getAccessRequestTexts } from './accessRequestTexts'
+
 export const useAccessRequest = () => {
   const dispatch = useAppDispatch()
   const i18n = useI18n()
@@ -61,7 +63,7 @@ export const useAccessRequest = () => {
       if (error) {
         const errorMessage = i18n.t(error, errorParams)
         dispatch(
-          NotificationActions.notifyError({ key: 'guest:accessRequestView.error', params: { error: errorMessage } })
+          NotificationActions.notifyError({ key: getAccessRequestTexts().error, params: { error: errorMessage } })
         )
         reCaptchaRef.current?.reset()
       } else {
@@ -72,7 +74,7 @@ export const useAccessRequest = () => {
     if (await checkFormValid()) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'guest:accessRequestView.sendRequestConfirm',
+          key: getAccessRequestTexts().submitConfirm,
           onOk: onSubmitConfirm,
         })
       )

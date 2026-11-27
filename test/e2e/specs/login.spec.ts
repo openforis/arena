@@ -24,10 +24,10 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/\/app\//)
   })
 
-  test('invites new users to request access before logging in', async ({ page }) => {
-    const banner = page.getByTestId('login-request-access-banner')
-    await expect(banner).toContainText('only registered users can log in')
-    await banner.getByRole('link', { name: 'Request access' }).click()
+  test('links new users to the access request (or account creation) form', async ({ page }) => {
+    const createAccount = page.getByTestId('login-create-account')
+    await expect(createAccount).toContainText('No account yet?')
+    await createAccount.getByRole('link', { name: /^(Request access|Create an account)$/ }).click()
 
     await expect(page).toHaveURL(/\/guest\/accessRequest/)
   })

@@ -284,6 +284,8 @@ export default {
     emailNotReachable:
       "L'e-mail de confirmation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
     invalidReCaptcha: 'ReCaptcha invalide',
+    surveyNameAlreadyUsed: 'Une enquête nommée {{surveyName}} existe déjà : veuillez proposer un autre nom',
+    registrationNotAvailable: "L'inscription n'est pas disponible pour le moment ; veuillez réessayer plus tard",
   },
 
   userAccessRequestAccept: {

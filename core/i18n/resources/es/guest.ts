@@ -3,8 +3,10 @@ export default {
     title: 'Iniciar sesión',
     subtitle: '¡Bienvenido! Introduzca sus credenciales para acceder a $t(common.appNameFull).',
     backToLogin: 'Volver al inicio de sesión',
-    newToArena: '¿Nuevo en $t(common.appNameFull)?',
-    registerBeforeLoggingIn: 'Solicite acceso primero: solo los usuarios registrados pueden iniciar sesión.',
+    noAccountYet: '¿Aún no tiene una cuenta?',
+    createAccount: 'Crear una cuenta',
+    invitedToSurvey:
+      '¿Le han invitado a una encuesta? No necesita crear una cuenta: abra el enlace del correo de invitación y siga sus pasos.',
     or: 'o',
     twoFactorTitle: 'Verificación en dos pasos',
     verify: 'Verificar',
@@ -42,6 +44,8 @@ export default {
         'Las cuentas con este dominio de correo electrónico no pueden usar esta opción de inicio de sesión.',
       userNotFound:
         'No existe ninguna cuenta con esta dirección de correo electrónico. Pida una invitación a un administrador de la encuesta o solicite acceso.',
+      userNotFoundCreateAccount:
+        'No existe ninguna cuenta con esta dirección de correo electrónico. Cree primero una cuenta o pida una invitación a un administrador de la encuesta.',
       ambiguousEmail:
         'Más de una cuenta corresponde a esta dirección de correo electrónico. Inicie sesión con su contraseña y vincule el proveedor desde su perfil.',
       identityAlreadyLinked: 'Esta cuenta del proveedor ya está vinculada a otro usuario.',
@@ -102,6 +106,37 @@ Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las
     title: 'Solicitar acceso',
     whitelistSenderSuggestion:
       'Si lo encuentra en la carpeta de Spam/Correo no deseado, añada **{{senderEmail}}** a sus contactos (libreta de direcciones) o márquelo como seguro/no es spam, para que nuestros próximos correos lleguen directamente a su bandeja de entrada.',
+  },
+  registrationView: {
+    title: 'Crear una cuenta',
+    introduction: 'Cree su cuenta y su primera encuesta: ¡cuéntenos qué quiere hacer con $t(common.appName)!',
+    createAccount: 'Crear cuenta',
+    createAccountConfirm: '¿Crear su cuenta en $t(common.appNameFull)?',
+    accountCreated: 'Cuenta creada',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Abra el enlace del correo para confirmar su dirección de correo electrónico y completar el registro: elija su contraseña o inicie sesión con una de las opciones de inicio de sesión disponibles (p. ej., Google).
+
+¡Gracias y disfrute de **$t(common.appNameFull)**!`,
+    error: 'Error al crear la cuenta: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Cree su cuenta',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Confirme su correo',
+        description:
+          'Recibirá un correo de **{{senderEmail}}** con el enlace para completar su registro. ¿No está en su bandeja de entrada? Revise la carpeta de spam/correo no deseado y, después, añada el remitente a sus contactos o marque el correo como no spam.',
+        descriptionWithoutSender:
+          'Recibirá un correo con el enlace para completar su registro. ¿No está en su bandeja de entrada? Revise la carpeta de spam/correo no deseado y, después, añada el remitente a sus contactos o marque el correo como no spam.',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {

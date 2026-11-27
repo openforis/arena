@@ -279,6 +279,8 @@ export default {
     requestAlreadySent: `Запрос на доступ для пользователя с адресом электронной почты {{email}} уже отправлен`,
     emailNotReachable: 'Не удалось доставить письмо с подтверждением на адрес {{email}}; проверьте правильность адреса',
     invalidReCaptcha: 'Неверная ReCaptcha',
+    surveyNameAlreadyUsed: 'Обследование с названием {{surveyName}} уже существует: предложите другое название',
+    registrationNotAvailable: 'Регистрация сейчас недоступна; повторите попытку позже',
   },
 
   userAccessRequestAccept: {

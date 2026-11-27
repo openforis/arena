@@ -280,6 +280,8 @@ export default {
     requestAlreadySent: `Solicitação de acesso para o usuário com email {{email}} já enviada`,
     emailNotReachable: 'O email de confirmação não pôde ser entregue a {{email}}; verifique se o endereço está correto',
     invalidReCaptcha: 'ReCaptcha inválido',
+    surveyNameAlreadyUsed: 'Já existe um inquérito chamado {{surveyName}}: proponha outro nome de inquérito',
+    registrationNotAvailable: 'O registo não está disponível neste momento; tente novamente mais tarde',
   },
 
   userAccessRequestAccept: {

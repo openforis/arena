@@ -278,6 +278,8 @@ export default {
     requestAlreadySent: `Zahtjev za pristup za korisnika sa e-mail adresom {{email}} je već poslat`,
     emailNotReachable: 'E-mail za potvrdu nije moguće dostaviti na {{email}}; provjerite da li je adresa ispravna',
     invalidReCaptcha: 'Nevažeća ReCaptcha',
+    surveyNameAlreadyUsed: 'Istraživanje sa imenom {{surveyName}} već postoji: predložite drugo ime istraživanja',
+    registrationNotAvailable: 'Registracija trenutno nije dostupna; pokušajte ponovo kasnije',
   },
 
   userAccessRequestAccept: {

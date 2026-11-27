@@ -432,6 +432,29 @@ export const fetchUsersWithExpiredInvitation = (client: DbClient = db) =>
     camelize
   )
 
+/**
+ * Fetches the UUID of a system administrator who has completed the registration, preferring the one with the given email.
+ */
+export const fetchSystemAdministratorUuid = (
+  { preferredEmail = null }: { preferredEmail?: string | null } = {},
+  client: DbClient = db
+): Promise<string | null> =>
+  client.oneOrNone(
+    `
+    SELECT u.uuid
+    FROM "user" u
+    JOIN auth_group_user gu ON gu.user_uuid = u.uuid
+    JOIN auth_group g
+      ON g.uuid = gu.group_uuid
+    WHERE g.name = $1
+      AND u.status = $2
+    ORDER BY u.email = $3 DESC NULLS LAST, u.email
+    LIMIT 1
+  `,
+    [AuthGroup.groupNames.systemAdmin, User.userStatus.ACCEPTED, preferredEmail],
+    (row) => row?.uuid ?? null
+  )
+
 export const fetchSystemAdministratorsEmail = (client: DbClient = db) =>
   client.map(
     `

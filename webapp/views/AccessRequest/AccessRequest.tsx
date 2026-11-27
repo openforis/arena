@@ -12,6 +12,7 @@ import { ReCaptcha } from '@webapp/components/ReCaptcha'
 import { useI18n } from '@webapp/store/system'
 
 import { AccessRequestField } from './AccessRequestField'
+import { getAccessRequestTexts } from './accessRequestTexts'
 import { useAccessRequest } from './useAccessRequest'
 
 type AccessRequestSentProps = {
@@ -21,12 +22,13 @@ type AccessRequestSentProps = {
 const AccessRequestSent = ({ email }: AccessRequestSentProps) => {
   const i18n = useI18n()
   const navigate = useNavigate()
+  const texts = getAccessRequestTexts()
   return (
     <div className="access-request">
-      <GuestViewHeader icon="check" iconVariant="success" title="guest:accessRequestView.requestSent" />
+      <GuestViewHeader icon="check" iconVariant="success" title={texts.sent} />
       <Markdown
         className="access-request__sent-message"
-        source={i18n.t('guest:accessRequestView.requestSentMessage', {
+        source={i18n.t(texts.sentMessage, {
           email,
           senderEmail: ProcessUtils.ENV.emailFromResolved,
         })}
@@ -45,13 +47,14 @@ const AccessRequest = () => {
   const i18n = useI18n()
   const { request, requestSentSuccessfully, onFieldValueChange, onSubmit, reCaptchaRef, validation } =
     useAccessRequest()
+  const texts = getAccessRequestTexts()
 
   if (requestSentSuccessfully) {
     return <AccessRequestSent email={request.email} />
   }
   return (
     <div className="access-request">
-      <GuestViewHeader description="guest:accessRequestView.introduction" title="guest:accessRequestView.title" />
+      <GuestViewHeader description={texts.introduction} title={texts.title} />
       <form className="access-request__form" onSubmit={(event) => event.preventDefault()}>
         {UserAccessRequest.editableFields.map((field) => (
           <AccessRequestField
@@ -74,13 +77,7 @@ const AccessRequest = () => {
           </div>
           <div className="access-request__submit">
             <ReCaptcha ref={reCaptchaRef} />
-            <Button
-              iconName="mail"
-              iconSize={14}
-              label="guest:accessRequestView.sendRequest"
-              onClick={onSubmit}
-              type="submit"
-            />
+            <Button iconName={texts.submitIcon} iconSize={14} label={texts.submit} onClick={onSubmit} type="submit" />
           </div>
         </div>
       </form>

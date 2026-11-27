@@ -3,8 +3,10 @@ export default {
     title: 'ログイン',
     subtitle: 'ようこそ！$t(common.appNameFull)を利用するには認証情報を入力してください。',
     backToLogin: 'ログインに戻る',
-    newToArena: '$t(common.appNameFull)を初めて利用しますか？',
-    registerBeforeLoggingIn: 'まずアクセスを申請してください。ログインできるのは登録済みユーザーのみです。',
+    noAccountYet: 'アカウントをお持ちでないですか？',
+    createAccount: 'アカウントを作成',
+    invitedToSurvey:
+      '調査に招待されましたか？アカウントを作成する必要はありません。招待メールのリンクを開き、手順に従ってください。',
     or: 'または',
     twoFactorTitle: '2段階認証',
     verify: '確認',
@@ -41,6 +43,8 @@ export default {
       emailDomainNotAllowed: 'このメールドメインのアカウントはこのサインイン方法を使用できません。',
       userNotFound:
         'このメールアドレスのアカウントはありません。調査の管理者に招待を依頼するか、アクセスをリクエストしてください。',
+      userNotFoundCreateAccount:
+        'このメールアドレスのアカウントはありません。先にアカウントを作成するか、調査の管理者に招待を依頼してください。',
       ambiguousEmail:
         'このメールアドレスに一致するアカウントが複数あります。パスワードでサインインし、プロフィールからプロバイダーを連携してください。',
       identityAlreadyLinked: 'このプロバイダーのアカウントは既に別のユーザーに連携されています。',
@@ -96,6 +100,37 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
     templateNotSelected: '未選択（最初から作成）',
     title: 'アクセスを申請する',
     whitelistSenderSuggestion: `迷惑メールフォルダに入っていた場合は、今後のメールが確実に受信トレイに届くよう、**{{senderEmail}}**を連絡先に追加するか、安全な送信者としてマークしてください。`,
+  },
+  registrationView: {
+    title: 'アカウントを作成',
+    introduction: 'アカウントと最初の調査を作成しましょう。$t(common.appName)で何をしたいか教えてください！',
+    createAccount: 'アカウントを作成',
+    createAccountConfirm: '$t(common.appNameFull)のアカウントを作成しますか？',
+    accountCreated: 'アカウントが作成されました',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+メールのリンクを開いてメールアドレスを確認し、登録を完了してください。パスワードを設定するか、利用可能なサインイン方法（例：Google）でサインインできます。
+
+ありがとうございます。**$t(common.appNameFull)**をお楽しみください！`,
+    error: 'アカウントの作成中にエラーが発生しました：{{error}}',
+    steps: {
+      createAccount: {
+        title: 'アカウントを作成',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'メールアドレスを確認',
+        description:
+          '**{{senderEmail}}** から登録を完了するためのリンクが記載されたメールが届きます。受信トレイにない場合は、迷惑メールフォルダを確認し、送信者を連絡先に追加するか、メールを迷惑メールではないとマークしてください。',
+        descriptionWithoutSender:
+          '登録を完了するためのリンクが記載されたメールが届きます。受信トレイにない場合は、迷惑メールフォルダを確認し、送信者を連絡先に追加するか、メールを迷惑メールではないとマークしてください。',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {

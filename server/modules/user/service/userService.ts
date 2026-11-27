@@ -134,7 +134,72 @@ const _checkUserAccessRequest = async ({
   if (existingRequest) {
     return { error: 'validationErrors:userAccessRequest.requestAlreadySent', errorParams: { email } }
   }
+  // the survey is created right away: its name must be available
+  if (ProcessUtils.ENV.userSelfRegistration) {
+    const { surveyName } = userAccessRequest.props
+    const surveysWithSameName = await SurveyManager.fetchSurveysByName(surveyName)
+    if (surveysWithSameName.length > 0) {
+      return { error: 'validationErrors:userAccessRequest.surveyNameAlreadyUsed', errorParams: { surveyName } }
+    }
+  }
   return { ok: true }
+}
+
+const _getCountryName = (countryCode?: string) => (countryCode ? Countries.getCountryName({ code: countryCode }) : '')
+
+/**
+ * Creates the account of the user and the first survey, as if a system admin accepted the access request;
+ * the user receives the email with the link to complete the registration.
+ */
+const _registerUser = async ({
+  userAccessRequest,
+  serverUrl,
+}: {
+  userAccessRequest: UserAccessRequest.UserAccessRequestSubmission
+  serverUrl: string
+}): Promise<UserAccessRequestInsertResult> => {
+  const { email, props } = userAccessRequest
+  const acceptingUser = await UserManager.fetchSystemAdministrator({ preferredEmail: ProcessUtils.ENV.adminEmail })
+  if (!acceptingUser) {
+    return { error: 'validationErrors:userAccessRequest.registrationNotAvailable' }
+  }
+  const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
+  const i18n = await i18nFactory.createI18nAsync()
+  try {
+    const { validation } = await acceptUserAccessRequest({
+      user: acceptingUser,
+      serverUrl,
+      accessRequestAccept: {
+        accessRequestUuid: requestInserted.uuid,
+        email,
+        surveyName: props.surveyName,
+        surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
+        role: AuthGroup.groupNames.surveyManager,
+        templateUuid: props.templateUuid ?? null,
+      },
+      newUserMsgKey: 'emails:userSelfRegistration',
+    })
+    if (validation) {
+      await UserManager.deleteUserAccessRequestsByEmail({ emails: [email] })
+      return { error: 'validationErrors:userAccessRequest.invalidRequest', validation }
+    }
+  } catch (error) {
+    await UserManager.deleteUserAccessRequestsByEmail({ emails: [email] })
+    if (error.key === 'appErrors:userEmailInvalid') {
+      return { error: 'validationErrors:userAccessRequest.emailNotReachable', errorParams: { email } }
+    }
+    Logger.error(`error registering user ${email}: ${error.stack || error}`)
+    return { error: error.key ?? error.message, errorParams: error.params }
+  }
+  // notify the system admins (bcc: they cannot see each other's email addresses)
+  const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
+  await Mailer.sendEmail({
+    bcc: systemAdminEmails,
+    msgKey: 'emails:userSelfRegistered',
+    msgParams: { ...props, country: _getCountryName(props.country), email, serverUrl },
+  }).catch((error) => Logger.error(`error notifying the registration of user ${email}: ${error}`))
+
+  return { requestInserted }
 }
 
 type UserAccessRequestInsertResult = {
@@ -155,12 +220,15 @@ export const insertUserAccessRequest = async ({
   if (requestCheck.error) {
     return requestCheck
   }
+  if (ProcessUtils.ENV.userSelfRegistration) {
+    return _registerUser({ userAccessRequest, serverUrl })
+  }
   try {
     const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
 
     const { email, props } = userAccessRequest
     const { firstName, country: countryCode } = props
-    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : ''
+    const country = _getCountryName(countryCode)
 
     // send a confirmation email to the requester first, to verify that the given email address can be reached
     let rejected = []
@@ -236,10 +304,13 @@ export const acceptUserAccessRequest = async ({
   user,
   serverUrl,
   accessRequestAccept,
+  newUserMsgKey,
 }: {
   user: ArenaUser
   serverUrl: string
   accessRequestAccept: UserAccessRequestAccept
+  // email sent to the user (default: invitation email)
+  newUserMsgKey?: string
 }): Promise<UserAccessRequestAcceptResult> => {
   const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
@@ -306,6 +377,7 @@ export const acceptUserAccessRequest = async ({
           surveyCycleKey: Survey.cycleOneKey,
           invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
           serverUrl,
+          newUserMsgKey,
         },
         t
       )

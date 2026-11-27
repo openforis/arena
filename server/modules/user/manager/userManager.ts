@@ -290,6 +290,17 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
 /**
+ * Fetches a system administrator (with auth groups), preferring the one with the given email.
+ */
+export const fetchSystemAdministrator = async (
+  { preferredEmail = null }: { preferredEmail?: string | null } = {},
+  client: DbClient = db
+) => {
+  const uuid = await UserRepository.fetchSystemAdministratorUuid({ preferredEmail }, client)
+  return uuid ? fetchUserByUuid(uuid, client) : null
+}
+
+/**
  * Fetches the users (with their auth groups and invitation), optionally paginated, filtered and sorted.
  * @param {object} params - The parameters.
  * @param {boolean} [params.onlyAccepted] - Whether to fetch only the users who accepted the invitation.

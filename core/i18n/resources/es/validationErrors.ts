@@ -280,6 +280,8 @@ export default {
     emailNotReachable:
       'El correo electrónico de confirmación no se pudo entregar a {{email}}; compruebe que la dirección sea correcta',
     invalidReCaptcha: 'ReCaptcha no válido',
+    surveyNameAlreadyUsed: 'Ya existe una encuesta llamada {{surveyName}}: proponga otro nombre de encuesta',
+    registrationNotAvailable: 'El registro no está disponible en este momento; inténtelo de nuevo más tarde',
   },
 
   userAccessRequestAccept: {
