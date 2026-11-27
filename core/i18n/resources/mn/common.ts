@@ -815,6 +815,7 @@ export default {
     status: {
       ACCEPTED: 'Хүлээн авсан',
       CREATED: 'Хүлээгдэж байна',
+      SELF_REGISTERED: 'Өөрөө бүртгүүлсэн',
     },
     acceptedBy: 'Зөвшөөрсөн',
     dateAccepted: 'Зөвшөөрсөн огноо',

@@ -803,6 +803,7 @@ export default {
     status: {
       ACCEPTED: '承認済み',
       CREATED: '保留中',
+      SELF_REGISTERED: 'セルフ登録',
     },
     acceptedBy: '承認者',
     dateAccepted: '承認日',

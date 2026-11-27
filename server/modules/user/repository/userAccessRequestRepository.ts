@@ -24,19 +24,20 @@ const userAccessRequestsSelect = `
     FROM user_access_request ar
     LEFT OUTER JOIN "user" u
       ON u.email = ar.email
-    -- modified_by is set to the user who accepted the request
+    -- modified_by is set to the user who accepted the request (null when self-registered)
     LEFT OUTER JOIN "user" acc
       ON acc.uuid = ar.modified_by
     -- compared as text: templateUuid is a free JSON value
     LEFT OUTER JOIN survey t
       ON t.uuid::text = ar.props ->> 'templateUuid'
-    -- accepting a request invites the new user into the created survey
+    -- accepting a request invites the new user into the created survey (by a system admin when self-registered)
     LEFT JOIN LATERAL (
       SELECT COALESCE(s.props ->> 'name', s.props_draft ->> 'name') AS name
       FROM user_invitation ui
       JOIN survey s
         ON s.uuid = ui.survey_uuid
-      WHERE ui.user_uuid = u.uuid AND ui.invited_by = ar.modified_by
+      WHERE ui.user_uuid = u.uuid
+        AND (ui.invited_by = ar.modified_by OR (ar.modified_by IS NULL AND ar.props ->> 'selfRegistered' = 'true'))
       ORDER BY ui.invited_date
       LIMIT 1
     ) cs ON TRUE
@@ -103,7 +104,11 @@ export const insertUserAccessRequest = (
   )
 
 export const updateUserAccessRequestStatus = (
-  { userUuid, email, status }: { userUuid: string; email: string; status: UserAccessRequest.UserAccessRequestStatus },
+  {
+    userUuid,
+    email,
+    status,
+  }: { userUuid: string | null; email: string; status: UserAccessRequest.UserAccessRequestStatus },
   client: DbClient = db
 ) =>
   client.oneOrNone(

@@ -133,7 +133,83 @@ const _checkUserAccessRequest = async ({
   if (existingRequest) {
     return { error: 'validationErrors:userAccessRequest.requestAlreadySent', errorParams: { email } }
   }
+  // the survey is created right away: its name must be available
+  if (ProcessUtils.ENV.allowUserSelfRegistration) {
+    const { surveyName } = userAccessRequest.props
+    const surveysWithSameName = await SurveyManager.fetchSurveysByName(surveyName)
+    if (surveysWithSameName.length > 0) {
+      return { error: 'validationErrors:userAccessRequest.surveyNameAlreadyUsed', errorParams: { surveyName } }
+    }
+  }
   return { ok: true }
+}
+
+const _getCountryName = (countryCode?: string) => (countryCode ? Countries.getCountryName({ code: countryCode }) : '')
+
+/**
+ * Creates the account of the user and the first survey, as if a system admin accepted the access request;
+ * the user receives the email with the link to complete the registration.
+ */
+const _registerUser = async ({
+  userAccessRequest,
+  serverUrl,
+}: {
+  userAccessRequest: UserAccessRequest.UserAccessRequestSubmission
+  serverUrl: string
+}): Promise<UserAccessRequestInsertResult> => {
+  const { email, props } = userAccessRequest
+  const acceptingUser = await UserManager.fetchSystemAdministrator({ preferredEmail: ProcessUtils.ENV.adminEmail })
+  if (!acceptingUser) {
+    return { error: 'validationErrors:userAccessRequest.registrationNotAvailable' }
+  }
+  const requestInserted = await UserManager.insertUserAccessRequest({
+    userAccessRequest: {
+      email,
+      props: { ...props, [UserAccessRequest.keysPropsSystem.selfRegistered]: true },
+    },
+  })
+  const i18n = await i18nFactory.createI18nAsync()
+  try {
+    const { validation } = await acceptUserAccessRequest({
+      user: acceptingUser,
+      serverUrl,
+      accessRequestAccept: {
+        accessRequestUuid: requestInserted.uuid,
+        email,
+        surveyName: props.surveyName,
+        surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
+        role: AuthGroup.groupNames.surveyManager,
+        templateUuid: props.templateUuid ?? null,
+      },
+      selfRegistration: true,
+    })
+    if (validation) {
+      await UserManager.deleteUserAccessRequestsByEmail({ emails: [email] })
+      return { error: 'validationErrors:userAccessRequest.invalidRequest', validation }
+    }
+  } catch (error) {
+    await UserManager.deleteUserAccessRequestsByEmail({ emails: [email] })
+    if (error.key === 'appErrors:userEmailInvalid') {
+      return { error: 'validationErrors:userAccessRequest.emailNotReachable', errorParams: { email } }
+    }
+    Logger.error(`error registering user ${email}: ${error.stack || error}`)
+    return { error: error.key ?? error.message, errorParams: error.params }
+  }
+  // notify the system admins (bcc: they cannot see each other's email addresses)
+  const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail({
+    notificationPref: User.keysPrefs.notifyOnUserSelfRegistration,
+    notifyByDefault: false,
+  })
+  if (systemAdminEmails.length === 0) {
+    return { requestInserted }
+  }
+  await Mailer.sendEmail({
+    bcc: systemAdminEmails,
+    msgKey: 'emails:userSelfRegistered',
+    msgParams: { ...props, country: _getCountryName(props.country), email, serverUrl },
+  }).catch((error) => Logger.error(`error notifying the registration of user ${email}: ${error}`))
+
+  return { requestInserted }
 }
 
 type UserAccessRequestInsertResult = {
@@ -144,22 +220,30 @@ type UserAccessRequestInsertResult = {
 }
 
 export const insertUserAccessRequest = async ({
-  userAccessRequest,
+  userAccessRequest: userAccessRequestSubmitted,
   serverUrl,
 }: {
   userAccessRequest: UserAccessRequest.UserAccessRequestSubmission
   serverUrl: string
 }): Promise<UserAccessRequestInsertResult> => {
+  // only the props of the form can be submitted
+  const userAccessRequest = {
+    ...userAccessRequestSubmitted,
+    props: UserAccessRequest.pickEditableProps(userAccessRequestSubmitted.props),
+  }
   const requestCheck = await _checkUserAccessRequest({ userAccessRequest })
   if (requestCheck.error) {
     return requestCheck
+  }
+  if (ProcessUtils.ENV.allowUserSelfRegistration) {
+    return _registerUser({ userAccessRequest, serverUrl })
   }
   try {
     const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
 
     const { email, props } = userAccessRequest
     const { firstName, country: countryCode } = props
-    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : ''
+    const country = _getCountryName(countryCode)
 
     // send a confirmation email to the requester first, to verify that the given email address can be reached
     let rejected = []
@@ -192,6 +276,22 @@ export const insertUserAccessRequest = async ({
     return { error: error.message }
   }
 }
+
+type RegistrationInfo = {
+  title?: string
+  firstName?: string
+  lastName?: string
+  institution?: string
+  country?: string
+}
+
+const _getRegistrationInfo = (accessRequest: UserAccessRequest.UserAccessRequest): RegistrationInfo => {
+  const { title, firstName, lastName, institution, country } = accessRequest.props ?? {}
+  return { title, firstName, lastName, institution, country }
+}
+
+const _getFullName = ({ firstName, lastName }: RegistrationInfo): string =>
+  [firstName, lastName].filter(Boolean).join(' ').trim()
 
 const _fetchSurveyTemplateId = async ({ user, templateUuid }: { user: ArenaUser; templateUuid: string }) => {
   const templates = await SurveyManager.fetchUserSurveysInfo({ user, draft: false, template: true })
@@ -235,10 +335,13 @@ export const acceptUserAccessRequest = async ({
   user,
   serverUrl,
   accessRequestAccept,
+  selfRegistration = false,
 }: {
   user: ArenaUser
   serverUrl: string
   accessRequestAccept: UserAccessRequestAccept
+  // accepted automatically: the user gets the registration email and no one is stored as accepting user
+  selfRegistration?: boolean
 }): Promise<UserAccessRequestAcceptResult> => {
   const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
@@ -305,17 +408,35 @@ export const acceptUserAccessRequest = async ({
           surveyCycleKey: Survey.cycleOneKey,
           invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
           serverUrl,
+          newUserMsgKey: selfRegistration ? 'emails:userSelfRegistration' : undefined,
         },
         t
       )
       const userInvited = invitedUsers[0]
       const surveyOwnerUuid = User.getUuid(userInvited)
 
+      // the user completes the registration later (password or external login): keep the info of the request
+      if (!User.hasAccepted(userInvited)) {
+        const registrationInfo = _getRegistrationInfo(accessRequestDb)
+        await UserManager.updateNameAndMergeProps(
+          {
+            userUuid: surveyOwnerUuid,
+            name: _getFullName(registrationInfo),
+            props: {
+              title: registrationInfo.title,
+              institution: registrationInfo.institution,
+              country: registrationInfo.country,
+            },
+          },
+          t
+        )
+      }
+
       await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
 
       // only an explicit acceptance (by a system admin) marks the request as accepted, not any invitation
       await UserManager.updateUserAccessRequestStatus(
-        { email, status: UserAccessRequest.status.ACCEPTED, userUuid: User.getUuid(user) },
+        { email, status: UserAccessRequest.status.ACCEPTED, userUuid: selfRegistration ? null : User.getUuid(user) },
         t
       )
       survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
@@ -636,23 +757,103 @@ export const updateUser = async (
   return updatedUser
 }
 
+// info given in the accepted access request (or self-registration) of a user not registered yet
+const _fetchRegistrationInfo = async (user: ArenaUser): Promise<RegistrationInfo | null> => {
+  if (!user || User.hasAccepted(user)) return null
+  const accessRequest = await UserManager.fetchUserAccessRequestByEmail({ email: User.getEmail(user) })
+  if (accessRequest?.status !== UserAccessRequest.status.ACCEPTED) return null
+  return _getRegistrationInfo(accessRequest)
+}
+
+/**
+ * Fetches the user of a password reset (invitation) and the info given in the access request, if any.
+ */
+export const fetchResetPasswordUserAndRegistrationInfo = async (resetPasswordUuid: string) => {
+  const user = await findResetPasswordUserByUuid(resetPasswordUuid)
+  const registrationInfo = await _fetchRegistrationInfo(user)
+  return { user, registrationInfo }
+}
+
+/**
+ * Saves the personal info of an invited user who is about to complete the registration with an external login
+ * provider (it only sets the name): the info given in an access request is already saved.
+ */
+export const updateResetPasswordUserInfo = async ({
+  uuid: resetPasswordUuid,
+  title,
+  firstName,
+  lastName,
+  institution,
+  country,
+}: {
+  uuid: string
+  title?: string
+  firstName?: string
+  lastName?: string
+  institution?: string
+  country?: string
+}): Promise<boolean> => {
+  const { user, registrationInfo } = await fetchResetPasswordUserAndRegistrationInfo(resetPasswordUuid)
+  if (!user || User.hasAccepted(user)) return false
+  if (registrationInfo) {
+    // only the title can be missing (older requests)
+    if (!registrationInfo.title && title) {
+      await UserManager.updateNameAndMergeProps({
+        userUuid: User.getUuid(user),
+        name: _getFullName(registrationInfo),
+        props: { title },
+      })
+    }
+    return true
+  }
+  const name = _getFullName({ firstName, lastName })
+  if (!name) return false
+  await UserManager.updateNameAndMergeProps({
+    userUuid: User.getUuid(user),
+    name,
+    props: { title, institution, country },
+  })
+  return true
+}
+
 export const resetPassword = async ({
   uuid: resetPasswordUuid,
   name,
   password,
   title,
+  institution,
+  country,
 }: {
   uuid: string
   name: string
   password: string
   title: UserTitle
+  institution?: string
+  country?: string
 }) => {
-  const user = await findResetPasswordUserByUuid(resetPasswordUuid)
+  const { user, registrationInfo } = await fetchResetPasswordUserAndRegistrationInfo(resetPasswordUuid)
   if (user) {
+    // the info given in the access request cannot be changed while completing the registration
+    const info = registrationInfo
+      ? {
+          ...registrationInfo,
+          name: _getFullName(registrationInfo),
+          // older requests have no title: the one chosen now is used
+          title: registrationInfo.title || title,
+        }
+      : { name, title, institution, country }
     const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
     await db.tx(async (t) => {
       await UserManager.updateNamePasswordAndStatus(
-        { userUuid: User.getUuid(user), name, password: passwordEncrypted, status: User.userStatus.ACCEPTED, title },
+        {
+          userUuid: User.getUuid(user),
+          name: info.name,
+          password: passwordEncrypted,
+          status: User.userStatus.ACCEPTED,
+          title: info.title as UserTitle,
+          institution: info.institution,
+          country: info.country,
+        },
         t
       )
       await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid, t)

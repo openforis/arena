@@ -3,11 +3,14 @@ import React from 'react'
 import { type ArenaValidation, Objects } from '@openforis/arena-core'
 
 import { Countries } from '@core/countries'
+import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import Markdown from '@webapp/components/Markdown'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useI18n } from '@webapp/store/system'
 
 import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 
@@ -31,6 +34,24 @@ const CountryField = (props: AccessRequestInputFieldProps) => {
       itemValue="code"
       itemLabel="name"
       onChange={(item) => onChange({ name, value: item?.code })}
+    />
+  )
+}
+
+const titleItems = User.titleKeysArray.map((value) => ({ value }))
+
+const TitleField = (props: AccessRequestInputFieldProps) => {
+  const { field, onChange, value } = props
+  const i18n = useI18n()
+  const { name } = field
+  return (
+    <Dropdown
+      className="dropdown-user-title"
+      itemLabel={(item) => i18n.t(`user.titleValues.${item.value}`)}
+      itemValue="value"
+      items={titleItems}
+      onChange={(item) => onChange({ name, value: item?.value ?? null })}
+      selection={value ? { value } : null}
     />
   )
 }
@@ -76,9 +97,16 @@ const TextField = (props: AccessRequestInputFieldProps) => {
   )
 }
 
+// texts shown under the fields
+const hintKeyByFieldName: Record<string, string> = {
+  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.surveyName}`]:
+    'guest:accessRequestView.surveyNameHint',
+}
+
 const componentsByFieldName = {
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: CountryField,
   [UserAccessRequest.keys.email]: EmailField,
+  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.title}`]: TitleField,
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: TemplateField,
 }
 
@@ -91,6 +119,7 @@ type AccessRequestFieldProps = {
 
 export const AccessRequestField = (props: AccessRequestFieldProps) => {
   const { field, onChange, request, validation = null } = props
+  const i18n = useI18n()
 
   const { name, required } = field
 
@@ -103,6 +132,7 @@ export const AccessRequestField = (props: AccessRequestFieldProps) => {
 
   const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
   const fieldValidation = Validation.getFieldValidation(validationFieldName)(validation)
+  const hintKey = hintKeyByFieldName[name]
 
   return (
     <FormItem
@@ -110,7 +140,10 @@ export const AccessRequestField = (props: AccessRequestFieldProps) => {
       label={`guest:accessRequestView.fields.${name}`}
       required={required}
     >
-      <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
+      <div className="access-request__field-content">
+        <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
+        {hintKey && <Markdown className="access-request__field-hint" source={i18n.t(hintKey)} />}
+      </div>
     </FormItem>
   )
 }

@@ -3,17 +3,20 @@ export default {
     title: 'Entrar',
     subtitle: 'Bem-vindo! Insira suas credenciais para acessar o $t(common.appNameFull).',
     backToLogin: 'Voltar para o login',
-    newToArena: 'Novo no $t(common.appNameFull)?',
-    registerBeforeLoggingIn: 'Solicite acesso primeiro: apenas usuários registrados podem entrar.',
+    noAccountYet: 'Ainda não tem uma conta?',
+    createAccount: 'Criar uma conta',
+    invitedToSurvey:
+      'Foi convidado para um inquérito? Não precisa de criar uma conta: abra o link do e-mail de convite e siga os passos.',
     or: 'ou',
     twoFactorTitle: 'Verificação em duas etapas',
     verify: 'Verificar',
     lostYourDevice: 'Não consegue usar seu aplicativo autenticador?',
     yourName: 'Seu nome',
     yourEmail: 'Seu email',
-    yourPassword: 'Sua senha',
+    email: '$t(common.email)',
+    password: 'Senha',
+    repeatPassword: 'Repetir senha',
     yourNewPassword: 'Sua nova senha',
-    repeatYourPassword: 'Repita sua senha',
     repeatYourNewPassword: 'Repita sua nova senha',
     requestAccess: 'Solicitar acesso',
     resetPassword: 'Redefinir senha',
@@ -41,6 +44,8 @@ Insira o código gerado pelo seu aplicativo autenticador.`,
       emailDomainNotAllowed: 'As contas com este domínio de e-mail não podem usar esta opção de início de sessão.',
       userNotFound:
         'Não existe nenhuma conta com este endereço de e-mail. Peça um convite a um administrador do inquérito ou solicite acesso.',
+      userNotFoundCreateAccount:
+        'Não existe nenhuma conta com este endereço de e-mail. Crie primeiro uma conta ou peça um convite a um administrador do inquérito.',
       ambiguousEmail:
         'Mais de uma conta corresponde a este endereço de e-mail. Entre com a sua palavra-passe e associe o fornecedor a partir do seu perfil.',
       identityAlreadyLinked: 'Esta conta do fornecedor já está associada a outro utilizador.',
@@ -79,6 +84,7 @@ Insira o código gerado pelo seu aplicativo autenticador.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Primeiro nome',
         lastName: 'Sobrenome',
         institution: 'Instituição',
@@ -98,12 +104,46 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Por favor, dê-nos alguns dias para processar sua solicitação.
 Assim que ela for aceita, enviaremos outro email para **{{email}}** com as instruções de como acessar $t(common.appName).
 Obrigado e aproveite **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'O nome identifica o inquérito em toda a plataforma $t(common.appName) e deve ser **único**: escolha um nome específico, por ex., combinando a sua organização ou país, o projeto e o ano, não um nome genérico como "survey" ou "test". Apenas letras minúsculas, números e sublinhados.',
     sendRequest: 'Enviar solicitação',
     sendRequestConfirm: 'Solicitar acesso ao $t(common.appNameFull)?',
     templateNotSelected: 'Não selecionado (começar do zero)',
     title: 'Solicitar acesso',
     whitelistSenderSuggestion:
       'Se você o encontrar na pasta de Spam/Lixo eletrônico, adicione **{{senderEmail}}** aos seus contatos (catálogo de endereços) ou marque-o como seguro/não é spam, para que nossos próximos emails cheguem diretamente à sua caixa de entrada.',
+  },
+  registrationView: {
+    title: 'Criar uma conta',
+    introduction:
+      'Crie a sua conta e o seu primeiro inquérito: diga-nos o que pretende fazer com o $t(common.appName)!',
+    createAccount: 'Criar conta',
+    createAccountConfirm: 'Criar a sua conta no $t(common.appNameFull)?',
+    accountCreated: 'Conta criada',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Abra o link do e-mail para confirmar o seu endereço de e-mail e concluir o registo: escolha a sua senha ou entre com uma das opções de início de sessão disponíveis (por ex., Google).
+
+Obrigado e aproveite o **$t(common.appNameFull)**!`,
+    error: 'Erro ao criar a conta: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Crie a sua conta',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Confirme o seu e-mail',
+        description:
+          'Receberá um e-mail de **{{senderEmail}}** com o link para concluir o registo. Não está na caixa de entrada? Verifique a pasta de Spam/Lixo eletrónico e, depois, adicione o remetente aos seus contactos ou marque o e-mail como não spam.',
+        descriptionWithoutSender:
+          'Receberá um e-mail com o link para concluir o registo. Não está na caixa de entrada? Verifique a pasta de Spam/Lixo eletrónico e, depois, adicione o remetente aos seus contactos ou marque o e-mail como não spam.',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {
@@ -126,6 +166,8 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       containsNumbers: 'Contém números',
     },
     completeRegistration: 'Concluir cadastro',
+    completeRegistrationWith: 'Concluir o registro com {{provider}}',
+    definePassword: 'Definir uma senha',
   },
   forgotPasswordView: {
     title: 'Redefinir sua senha',

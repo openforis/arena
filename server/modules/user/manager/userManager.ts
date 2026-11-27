@@ -36,6 +36,7 @@ export const {
   fetchActiveUserUuidsWithPreferredSurveyId,
   fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
+  updateNameAndMergeProps,
   updatePassword,
   deleteUserPrefsSurvey,
   deleteUserMapCustomLayersSurvey,
@@ -290,6 +291,17 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
 /**
+ * Fetches a system administrator (with auth groups), preferring the one with the given email.
+ */
+export const fetchSystemAdministrator = async (
+  { preferredEmail = null }: { preferredEmail?: string | null } = {},
+  client: DbClient = db
+) => {
+  const uuid = await UserRepository.fetchSystemAdministratorUuid({ preferredEmail }, client)
+  return uuid ? fetchUserByUuid(uuid, client) : null
+}
+
+/**
  * Fetches the users (with their auth groups and invitation), optionally paginated, filtered and sorted.
  * @param {object} params - The parameters.
  * @param {boolean} [params.onlyAccepted] - Whether to fetch only the users who accepted the invitation.
@@ -376,6 +388,9 @@ export {
   updateUserAccessRequestStatus,
 } from '../repository/userAccessRequestRepository'
 
+// self-registered requests are stored as accepted
+const selfRegisteredStatusExport = 'SELF_REGISTERED'
+
 export const exportUserAccessRequestsIntoStream = async ({
   outputStream,
   fileFormat,
@@ -411,6 +426,7 @@ export const exportUserAccessRequestsIntoStream = async ({
     }, {}),
     // format date_created
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
+    status: obj.props?.[UserAccessRequest.keysPropsSystem.selfRegistered] ? selfRegisteredStatusExport : obj.status,
     date_accepted:
       obj.status === UserAccessRequest.status.ACCEPTED && obj.date_modified
         ? DateUtils.formatDateTimeDefault(obj.date_modified)

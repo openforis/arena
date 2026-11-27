@@ -819,6 +819,7 @@ Erneut versuchen?`,
     status: {
       ACCEPTED: 'Angenommen',
       CREATED: 'Ausstehend',
+      SELF_REGISTERED: 'Selbst registriert',
     },
     acceptedBy: 'Angenommen von',
     dateAccepted: 'Angenommen am',

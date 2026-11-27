@@ -809,6 +809,7 @@ Try again?`,
     status: {
       ACCEPTED: 'Accepted',
       CREATED: 'Pending',
+      SELF_REGISTERED: 'Self-registered',
     },
     acceptedBy: 'Accepted by',
     dateAccepted: 'Date accepted',

@@ -112,13 +112,27 @@ export const init = (app: Router): void => {
 
   app.get('/auth/reset-password/:uuid', async (req, res) => {
     const { uuid } = Request.getParams(req)
-    const user = await UserService.findResetPasswordUserByUuid(uuid)
-    res.json({ user })
+    const { user, registrationInfo } = await UserService.fetchResetPasswordUserAndRegistrationInfo(uuid)
+    res.json({ user, registrationInfo })
+  })
+
+  // personal info of an invited user, saved before completing the registration with an external login provider
+  app.put('/auth/reset-password/:uuid/info', async (req, res) => {
+    const { uuid, title, firstName, lastName, institution, country } = Request.getParams(req)
+    const result = await UserService.updateResetPasswordUserInfo({
+      uuid,
+      title,
+      firstName,
+      lastName,
+      institution,
+      country,
+    })
+    res.json({ result })
   })
 
   app.put('/auth/reset-password/:uuid', async (req, res) => {
-    const { uuid, name, password, title } = Request.getParams(req)
-    await UserService.resetPassword({ uuid, name, password, title })
+    const { uuid, name, password, title, institution, country } = Request.getParams(req)
+    await UserService.resetPassword({ uuid, name, password, title, institution, country })
     res.json({ result: true })
   })
 }

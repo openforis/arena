@@ -1,4 +1,5 @@
 import * as AuthGroup from '@core/auth/authGroup'
+import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
 
@@ -92,7 +93,8 @@ export const useUserEditLayout = (params: Params) => {
       integrations: ownSettingsVisible && canUseMap,
       // also hidden when the server reports AI features as disabled (see AiFeaturesSection)
       aiFeatures: ownSettingsVisible && aiFeaturesEnabled,
-      notifications: ownSettingsVisible && User.isSystemAdmin(userToUpdate),
+      // the notifications concern the access requests (or self-registrations)
+      notifications: ownSettingsVisible && User.isSystemAdmin(userToUpdate) && ProcessUtils.ENV.allowUserAccessRequest,
       removeFromSurvey: surveyGroupsVisible && canRemove,
       invitationExpired: surveyGroupsVisible && User.isInvitationExpired(userToUpdate),
     },

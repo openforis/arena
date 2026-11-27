@@ -267,6 +267,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Country is required',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'First name is required',
     institutionRequired: 'Institution is required',
     lastNameRequired: 'Last name is required',
@@ -278,6 +279,8 @@ export default {
     emailNotReachable:
       'The confirmation email could not be delivered to {{email}}; please check that the address is correct',
     invalidReCaptcha: 'Invalid ReCaptcha',
+    surveyNameAlreadyUsed: 'A survey named {{surveyName}} already exists: please propose another survey name',
+    registrationNotAvailable: 'The registration is not available at the moment; please try again later',
   },
 
   userAccessRequestAccept: {

@@ -789,6 +789,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     status: {
       ACCEPTED: 'Aceptado',
       CREATED: 'Pendiente',
+      SELF_REGISTERED: 'Autorregistrado',
     },
     acceptedBy: 'Aceptada por',
     dateAccepted: 'Fecha de aceptación',

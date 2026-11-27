@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { Countries } from '@core/countries'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
@@ -32,8 +33,28 @@ const useTitleColumnWidth = (): string => {
   return `calc(${Math.ceil(maxLength * 1.2)}ch + 5rem)`
 }
 
+// institution and country given when registering (not editable)
+const RegistrationInfoFields = ({ user }: { user: any }) => {
+  const institution = User.getInstitution(user)
+  const countryCode = User.getCountry(user)
+  return (
+    <>
+      {institution && (
+        <FormItem className="user-edit-fields__wide" label="guest:accessRequestView.fields.props.institution">
+          <Input disabled value={institution} />
+        </FormItem>
+      )}
+      {countryCode && (
+        <FormItem className="user-edit-fields__wide" label="guest:accessRequestView.fields.props.country">
+          <Input disabled value={Countries.getCountryName({ code: countryCode }) ?? countryCode} />
+        </FormItem>
+      )}
+    </>
+  )
+}
+
 /**
- * Title, name, email and extra properties of the user.
+ * Title, name, email, registration info and extra properties of the user.
  */
 export const PersonalInfoSection = (props: Props) => {
   const {
@@ -92,6 +113,7 @@ export const PersonalInfoSection = (props: Props) => {
             />
           </FormItem>
         )}
+        {canViewEmail && <RegistrationInfoFields user={userToUpdate} />}
       </div>
       <UserExtraPropsEditor onChange={onExtraChange} readOnly={!canEdit} user={userToUpdate} />
     </UserEditSection>
