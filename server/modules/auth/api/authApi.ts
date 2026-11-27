@@ -112,8 +112,8 @@ export const init = (app: Router): void => {
 
   app.get('/auth/reset-password/:uuid', async (req, res) => {
     const { uuid } = Request.getParams(req)
-    const user = await UserService.findResetPasswordUserByUuid(uuid)
-    res.json({ user })
+    const { user, registrationName } = await UserService.fetchResetPasswordUserAndRegistrationName(uuid)
+    res.json({ user, registrationName })
   })
 
   app.put('/auth/reset-password/:uuid', async (req, res) => {

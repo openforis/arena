@@ -24,9 +24,8 @@ export const useResetPassword = () => {
 
   const { title } = props
 
-  const { data: { user: userFetched } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(
-    `/auth/reset-password/${uuid}`
-  )
+  const { data: { user: userFetched, registrationName = null } = {}, dispatch: getResetPasswordUser } =
+    useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 
   const { data: { result: resetComplete = false } = {}, dispatch: dispatchPostResetPassword } = useAsyncPutRequest(
     `/auth/reset-password/${uuid}`,
@@ -60,7 +59,11 @@ export const useResetPassword = () => {
 
   useOnUpdate(() => {
     if (userFetched) {
-      actions.initUser(userFetched)(dispatch)
+      // the name given in the access request is used (not editable)
+      const fullName = registrationName
+        ? [registrationName.firstName, registrationName.lastName].filter(Boolean).join(' ')
+        : null
+      actions.initUser(fullName ? { ...userFetched, name: fullName } : userFetched)(dispatch)
     } else {
       dispatchRedux(NotificationActions.notifyError({ key: 'guest:resetPasswordView.forgotPasswordLinkInvalid' }))
     }
@@ -72,6 +75,7 @@ export const useResetPassword = () => {
   }, [resetComplete])
 
   return {
+    registrationName,
     state,
     onChangeUser,
     onChangeUserTitle,

@@ -20,6 +20,7 @@ const ResetPassword = () => {
   const externalLoginErrorKey = searchParams.get('externalLoginError')
 
   const {
+    registrationName,
     state: { initialUser, user, error },
     onChangeUser,
     onChangeUserTitle,
@@ -54,13 +55,31 @@ const ResetPassword = () => {
       {!hasAlreadyAccepted && (
         <>
           <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
-          <TextInput
-            defaultValue={user.name}
-            name="name"
-            autoComplete="new-name"
-            label={i18n.t('guest:loginView.yourName')}
-            onChange={(value) => onChangeUser({ prop: 'name', value })}
-          />
+          {registrationName ? (
+            // name given when requesting access (or creating the account): not editable
+            <>
+              <TextInput
+                label={i18n.t('guest:accessRequestView.fields.props.firstName')}
+                name="firstName"
+                readOnly
+                value={registrationName.firstName ?? ''}
+              />
+              <TextInput
+                label={i18n.t('guest:accessRequestView.fields.props.lastName')}
+                name="lastName"
+                readOnly
+                value={registrationName.lastName ?? ''}
+              />
+            </>
+          ) : (
+            <TextInput
+              defaultValue={user.name}
+              name="name"
+              autoComplete="new-name"
+              label={i18n.t('guest:loginView.yourName')}
+              onChange={(value) => onChangeUser({ prop: 'name', value })}
+            />
+          )}
         </>
       )}
       <PasswordInput

@@ -724,6 +724,29 @@ export const updateUser = async (
   return updatedUser
 }
 
+type RegistrationName = { firstName?: string; lastName?: string }
+
+// first and last name given in the accepted access request (or self-registration) of a user not registered yet
+const _fetchRegistrationName = async (user: ArenaUser): Promise<RegistrationName | null> => {
+  if (!user || User.hasAccepted(user)) return null
+  const accessRequest = await UserManager.fetchUserAccessRequestByEmail({ email: User.getEmail(user) })
+  if (accessRequest?.status !== UserAccessRequest.status.ACCEPTED) return null
+  const { firstName, lastName } = accessRequest.props ?? {}
+  return firstName || lastName ? { firstName, lastName } : null
+}
+
+const _getFullName = ({ firstName, lastName }: RegistrationName): string =>
+  [firstName, lastName].filter(Boolean).join(' ').trim()
+
+/**
+ * Fetches the user of a password reset (invitation) and the name given in the access request, if any.
+ */
+export const fetchResetPasswordUserAndRegistrationName = async (resetPasswordUuid: string) => {
+  const user = await findResetPasswordUserByUuid(resetPasswordUuid)
+  const registrationName = await _fetchRegistrationName(user)
+  return { user, registrationName }
+}
+
 export const resetPassword = async ({
   uuid: resetPasswordUuid,
   name,
@@ -735,12 +758,20 @@ export const resetPassword = async ({
   password: string
   title: UserTitle
 }) => {
-  const user = await findResetPasswordUserByUuid(resetPasswordUuid)
+  const { user, registrationName } = await fetchResetPasswordUserAndRegistrationName(resetPasswordUuid)
   if (user) {
+    // the name given in the access request cannot be changed while completing the registration
+    const nameToSave = registrationName ? _getFullName(registrationName) : name
     const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
     await db.tx(async (t) => {
       await UserManager.updateNamePasswordAndStatus(
-        { userUuid: User.getUuid(user), name, password: passwordEncrypted, status: User.userStatus.ACCEPTED, title },
+        {
+          userUuid: User.getUuid(user),
+          name: nameToSave,
+          password: passwordEncrypted,
+          status: User.userStatus.ACCEPTED,
+          title,
+        },
         t
       )
       await UserManager.deleteUserResetPasswordByUuid(resetPasswordUuid, t)
