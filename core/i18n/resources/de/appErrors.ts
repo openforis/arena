@@ -179,7 +179,7 @@ Versuchen Sie, die Seite zu aktualisieren.`,
     'Die Antwort des KI-Anbieters war zu groß und wurde abgeschnitten. Bitte versuchen Sie es erneut oder wählen Sie einen anderen Anbieter.',
   aiSurveyChanged:
     'Die Erhebung hat sich geändert, während der Assistent gearbeitet hat. Fragen Sie erneut, um die aktuelle Erhebung zu verwenden.',
-  aiModelListFailed: 'Modelle konnten nicht vom Anbieter abgerufen werden: {{message}}',
+  aiModelListFailed: 'Modelle konnten nicht vom Anbieter abgerufen werden.',
   aiProviderNotFound: 'Dieser KI-Anbieter existiert nicht oder gehört nicht Ihnen. Wählen Sie einen anderen Anbieter.',
   aiProviderNotGateway:
     'Ein in diesem Browser gespeicherter Anbieter wird vom Browser aus aufgerufen, nie über den Arena-Server.',

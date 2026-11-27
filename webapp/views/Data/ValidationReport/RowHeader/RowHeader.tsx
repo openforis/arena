@@ -19,7 +19,7 @@ const RowHeader = ({ handleSortBy, sort, askAssistantAvailable = false }: RowHea
       </div>
       <div>
         <SortToggle sort={sort} handleSortBy={handleSortBy} field="message" />
-        {i18n.t('common.message_other')}
+        {i18n.t('common.messages')}
       </div>
       <div>
         <SortToggle sort={sort} handleSortBy={handleSortBy} field="owner" />
