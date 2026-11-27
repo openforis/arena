@@ -2,8 +2,7 @@ import i18next, { i18n, TFunction } from 'i18next'
 
 import { ArenaI18n } from '@openforis/arena-core'
 
-import * as ProcessUtils from '@core/processUtils'
-
+import { createI18nParams } from './i18nParams'
 import deTranslation from './resources/de'
 import enTranslation from './resources/en'
 import esTranslation from './resources/es'
@@ -14,8 +13,9 @@ import mnTranslation from './resources/mn'
 import ptTranslation from './resources/pt'
 import ruTranslation from './resources/ru'
 import srTranslation from './resources/sr'
+import { defaultLanguage, supportedLanguages } from './uiLanguages'
 
-// every language of the app (the unit tests derive the languages they check from it)
+// every language of the app, all loaded: for the server and the unit tests (the webapp loads them when used)
 export const resources = {
   de: deTranslation,
   en: enTranslation,
@@ -29,35 +29,14 @@ export const resources = {
   sr: srTranslation,
 }
 
-export const defaultLanguage = 'en'
-
-const namespaces = Object.keys(enTranslation)
-const defaultNamespace = 'common'
-
-export const supportedLanguages = Object.keys(resources)
-
-const createParams = (lang: string = defaultLanguage) => ({
-  fallbackLng: defaultLanguage,
-  debug: ProcessUtils.isEnvDevelopment,
-
-  // React i18next special options (optional)
-  react: {
-    wait: false,
-    nsMode: 'default' as const,
-  },
-  lng: lang,
-  ns: namespaces,
-  defaultNS: defaultNamespace,
-  resources,
-  supportedLngs: supportedLanguages,
-})
+export { defaultLanguage, supportedLanguages }
 
 export const createI18nAsync = (lang: string = defaultLanguage): Promise<ArenaI18n & { lang: string }> => {
   const createInstance = i18next.createInstance || (i18next as any).default.createInstance
 
   return new Promise((resolve, reject) => {
     const instance: i18n = createInstance()
-    instance.init(createParams(lang), (err: unknown, t: TFunction) => {
+    instance.init(createI18nParams({ lang, resources }), (err: unknown, t: TFunction) => {
       if (err) {
         reject(err)
         return
@@ -68,6 +47,6 @@ export const createI18nAsync = (lang: string = defaultLanguage): Promise<ArenaI1
 }
 
 const i18nInstance = i18next.createInstance()
-i18nInstance.init(createParams() as any)
+i18nInstance.init(createI18nParams({ resources }))
 
 export default i18nInstance

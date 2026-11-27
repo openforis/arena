@@ -1,5 +1,5 @@
 import { getLanguageLabel } from '@core/app/languages'
-import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
+import { defaultLanguage, supportedLanguages } from '@core/i18n/uiLanguages'
 
 import { assistantMarkers } from './assistantMarkers'
 import { pq } from './promptSafety'

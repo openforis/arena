@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { getLanguageEndonym, getLanguageLabel } from '@core/app/languages'
-import { supportedLanguages } from '@core/i18n/i18nFactory'
+import { supportedLanguages } from '@core/i18n/uiLanguages'
 import * as User from '@core/user/user'
 import { ButtonMenu } from '@webapp/components'
 import { useAppDispatch } from '@webapp/store'

@@ -114,6 +114,11 @@ export const JobsHeader = ({ onRefresh, highlighted = false }: Props) => {
 - Every UI text goes through i18next. The texts are in `core/i18n/resources/<lang>/<namespace>.ts`, and
   each namespace is registered in `core/i18n/resources/<lang>/index.ts`. Missing texts fall back to English.
   Recent PRs add new keys to every language, and big features get their own namespace (e.g. `systemLogsView.ts`).
+- The webapp bundles only English: the other languages are separate chunks, downloaded the first time they are
+  used (`webapp/store/system/i18n/i18nInstance.ts`). So the webapp never imports `@core/i18n/i18nFactory` (all
+  languages, for the server and the tests) nor `core/i18n/resources/<lang>` (ESLint rule). A new language is
+  added to `core/i18n/uiLanguages.ts`, `i18nFactory.ts` and the loaders of `i18nInstance.ts` (a unit test checks
+  they match).
 - Keys look like `namespace:path.to.key` (`'dataView:dataMatrixExport.preview'`). A key without a namespace
   is looked up in `common` (`'common.refresh'`). For parameters, write `{{name}}` in the text and call
   `i18n.t(key, { name })`.

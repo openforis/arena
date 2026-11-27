@@ -101,6 +101,26 @@ export default defineConfig([
     },
   },
 
+  // the webapp loads the UI languages when used (webapp/store/system/i18n/i18nInstance.ts): importing all of them
+  // statically would put them back in the main bundle
+  {
+    files: ['webapp/**/*.ts', 'webapp/**/*.tsx', 'common/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [{ name: '@core/i18n/i18nFactory', message: 'Use @webapp/store/system/i18n/i18nInstance.' }],
+          patterns: [
+            {
+              group: ['@core/i18n/resources/*', '!@core/i18n/resources/en', '!@core/i18n/resources/en/*'],
+              message: 'Only English is bundled; the other languages are loaded by i18nInstance.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // --- TESTING CONFIGURATIONS (APPLIES ONLY TO TEST FILES) ---
 
   // 4. Jest (Unit/Integration Tests) Configuration

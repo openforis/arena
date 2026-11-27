@@ -9,8 +9,8 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { GeoJSON, MapContainer as RLMapContainer, useMap as useLeafletMap, ZoomControl } from 'react-leaflet'
 
-import i18nInstance from '@core/i18n/i18nFactory'
 import { ButtonSave } from '@webapp/components'
+import i18nInstance from '@webapp/store/system/i18n/i18nInstance'
 
 import { MapContextProvider } from './MapContext'
 import { MapLayersControl } from './MapLayersControl'
