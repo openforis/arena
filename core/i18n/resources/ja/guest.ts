@@ -95,6 +95,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 処理には数日かかりますので、しばらくお待ちください。
 承認され次第、**{{email}}**宛に$t(common.appName)へのアクセス方法をご案内するメールを送信します。
 ありがとうございます。**$t(common.appNameFull)**をお楽しみください！`,
+    surveyNameHint:
+      'この名前は$t(common.appName)プラットフォーム全体で調査を識別するため、一意である必要があります。「survey」や「test」のような一般的な名前ではなく、具体的な名前（例：kenya_nfi_2026）を選んでください。使用できるのは小文字、数字、アンダースコアのみです。',
     sendRequest: '申請を送信',
     sendRequestConfirm: '$t(common.appNameFull)へのアクセスを申請しますか？',
     templateNotSelected: '未選択（最初から作成）',

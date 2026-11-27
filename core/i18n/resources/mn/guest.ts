@@ -97,6 +97,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
 Хүсэлт зөвшөөрөгдсөний дараа бид **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий өөр нэг имэйл илгээх болно.
 Баярлалаа, **$t(common.appNameFull)**-г ашиглаарай!`,
+    surveyNameHint:
+      'Энэ нэр нь $t(common.appName) платформ даяар судалгааг тодорхойлох тул давтагдашгүй байх ёстой: "survey", "test" гэх мэт ерөнхий нэр биш, тодорхой нэр (жишээ нь kenya_nfi_2026) сонгоно уу. Зөвхөн жижиг үсэг, тоо, доогуур зураас.',
     sendRequest: 'Хүсэлт илгээх',
     sendRequestConfirm: '$t(common.appNameFull) руу хандах хүсэлт илгээх үү?',
     templateNotSelected: 'Сонгогдоогүй (эхнээс нь эхлэх)',

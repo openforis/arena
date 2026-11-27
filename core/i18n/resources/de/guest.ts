@@ -102,6 +102,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Bitte geben Sie uns einige Tage für die Bearbeitung Ihrer Anfrage.
 Nach der Annahme senden wir eine weitere E-Mail mit den Zugangsanweisungen für $t(common.appName) an **{{email}}**.
 Vielen Dank und viel Erfolg mit **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'Der Name identifiziert die Erhebung auf der gesamten $t(common.appName)-Plattform und muss eindeutig sein: Wählen Sie einen spezifischen Namen (z. B. kenya_nfi_2026), keinen allgemeinen wie „survey“ oder „test“. Nur Kleinbuchstaben, Ziffern und Unterstriche.',
     sendRequest: 'Anfrage senden',
     sendRequestConfirm: 'Zugriff auf $t(common.appNameFull) anfordern?',
     templateNotSelected: 'Nicht ausgewählt (von Grund auf beginnen)',

@@ -8,6 +8,7 @@ import * as Validation from '@core/validation/validation'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useI18n } from '@webapp/store/system'
 
 import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 
@@ -16,6 +17,9 @@ type AccessRequestInputFieldProps = {
   onChange: (...args: any[]) => any
   value: any
 }
+
+// a fixed menu would be placed relative to the guest card (it has a backdrop filter), out of the screen
+export const dropdownMenuPosition = 'absolute'
 
 const CountryField = (props: AccessRequestInputFieldProps) => {
   const { field, onChange, value } = props
@@ -28,6 +32,7 @@ const CountryField = (props: AccessRequestInputFieldProps) => {
     <Dropdown
       selection={selectedValue ? Countries.list.find((item) => item.code === selectedValue) : null}
       items={Countries.list}
+      menuPosition={dropdownMenuPosition}
       itemValue="code"
       itemLabel="name"
       onChange={(item) => onChange({ name, value: item?.code })}
@@ -42,7 +47,13 @@ const TemplateField = (props: AccessRequestInputFieldProps) => {
 
   const selectedValue = value || defaultValue
 
-  return <SurveyTemplateSelect selectedValue={selectedValue} onChange={(value) => onChange({ name, value })} />
+  return (
+    <SurveyTemplateSelect
+      menuPosition={dropdownMenuPosition}
+      selectedValue={selectedValue}
+      onChange={(value) => onChange({ name, value })}
+    />
+  )
 }
 
 const EmailField = (props: AccessRequestInputFieldProps) => {
@@ -76,6 +87,12 @@ const TextField = (props: AccessRequestInputFieldProps) => {
   )
 }
 
+// texts shown under the fields
+const hintKeyByFieldName: Record<string, string> = {
+  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.surveyName}`]:
+    'guest:accessRequestView.surveyNameHint',
+}
+
 const componentsByFieldName = {
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: CountryField,
   [UserAccessRequest.keys.email]: EmailField,
@@ -91,6 +108,7 @@ type AccessRequestFieldProps = {
 
 export const AccessRequestField = (props: AccessRequestFieldProps) => {
   const { field, onChange, request, validation = null } = props
+  const i18n = useI18n()
 
   const { name, required } = field
 
@@ -103,6 +121,7 @@ export const AccessRequestField = (props: AccessRequestFieldProps) => {
 
   const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
   const fieldValidation = Validation.getFieldValidation(validationFieldName)(validation)
+  const hintKey = hintKeyByFieldName[name]
 
   return (
     <FormItem
@@ -110,7 +129,10 @@ export const AccessRequestField = (props: AccessRequestFieldProps) => {
       label={`guest:accessRequestView.fields.${name}`}
       required={required}
     >
-      <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
+      <div className="access-request__field-content">
+        <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
+        {hintKey && <p className="access-request__field-hint">{i18n.t(hintKey)}</p>}
+      </div>
     </FormItem>
   )
 }

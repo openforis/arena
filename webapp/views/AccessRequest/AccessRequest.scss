@@ -55,14 +55,14 @@
   .access-request__field--country {
     order: 5;
   }
-  .access-request__field--surveyName {
+  .access-request__field--templateUuid {
     order: 6;
   }
   .access-request__field--purpose {
     order: 7;
     grid-column: 1 / -1;
   }
-  .access-request__field--templateUuid {
+  .access-request__field--surveyName {
     order: 8;
     grid-column: 1 / -1;
   }
@@ -71,6 +71,19 @@
     order: 9;
     grid-column: 1 / -1;
   }
+}
+
+.access-request__field-content {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.access-request__field-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: $colorOnSurfaceVariant;
 }
 
 .access-request__buttons {

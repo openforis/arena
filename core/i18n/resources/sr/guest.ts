@@ -100,6 +100,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Molimo vas da nam date nekoliko dana da obradimo vaš zahtjev.
 Kada bude prihvaćen, poslaćemo vam još jednu e-poruku na **{{email}}** sa uputstvima kako da pristupite aplikaciji $t(common.appName).
 Hvala vam i uživajte u **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'Ime identifikuje istraživanje na celoj platformi $t(common.appName) i mora biti jedinstveno: izaberite konkretno ime (npr. kenya_nfi_2026), a ne opšte kao što su „survey” ili „test”. Samo mala slova, brojevi i donje crte.',
     sendRequest: 'Pošalji zahtjev',
     sendRequestConfirm: 'Zatražiti pristup aplikaciji $t(common.appNameFull)?',
     templateNotSelected: 'Nije izabrano (počni od početka)',

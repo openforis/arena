@@ -106,7 +106,7 @@ $guestMobileBreakpoint: 900px;
   padding: 1rem 4rem 3rem;
 
   &--wide {
-    grid-template-columns: minmax(0, 1fr) 40rem;
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 54rem);
     padding-bottom: 1.5rem;
 
     .guest__card {

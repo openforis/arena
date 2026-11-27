@@ -103,6 +103,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Mohon beri kami waktu beberapa hari untuk memproses permintaan Anda.
 Setelah diterima, kami akan mengirimkan email lain ke **{{email}}** berisi petunjuk cara mengakses $t(common.appName).
 Terima kasih dan selamat menggunakan **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'Nama ini mengidentifikasi survei di seluruh platform $t(common.appName) dan harus unik: pilih nama yang spesifik (mis. kenya_nfi_2026), bukan nama umum seperti "survey" atau "test". Hanya huruf kecil, angka, dan garis bawah.',
     sendRequest: 'Kirim Permintaan',
     sendRequestConfirm: 'Minta akses ke $t(common.appNameFull)?',
     templateNotSelected: 'Tidak dipilih (mulai dari awal)',

@@ -98,6 +98,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Please give us a couple of days to process your request.
 We will send you another email to **{{email}}** with the instructions on how to access $t(common.appName), once it's accepted.
 Thank you and enjoy **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'The name identifies the survey in the whole $t(common.appName) platform and must be unique: choose a specific name (e.g. kenya_nfi_2026), not a generic one like "survey" or "test". Only lowercase letters, numbers and underscores.',
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     templateNotSelected: 'Not selected (start from scratch)',

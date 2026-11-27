@@ -102,6 +102,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Por favor, dê-nos alguns dias para processar sua solicitação.
 Assim que ela for aceita, enviaremos outro email para **{{email}}** com as instruções de como acessar $t(common.appName).
 Obrigado e aproveite **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'O nome identifica o inquérito em toda a plataforma $t(common.appName) e deve ser único: escolha um nome específico (por ex., kenya_nfi_2026), não um nome genérico como "survey" ou "test". Apenas letras minúsculas, números e sublinhados.',
     sendRequest: 'Enviar solicitação',
     sendRequestConfirm: 'Solicitar acesso ao $t(common.appNameFull)?',
     templateNotSelected: 'Não selecionado (começar do zero)',
