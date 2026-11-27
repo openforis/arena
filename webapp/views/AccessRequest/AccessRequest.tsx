@@ -15,6 +15,23 @@ import { AccessRequestField } from './AccessRequestField'
 import { getAccessRequestTexts } from './accessRequestTexts'
 import { useAccessRequest } from './useAccessRequest'
 
+const { keys, keysProps } = UserAccessRequest
+
+// fields in the order they are shown (and focused with Tab)
+const formFieldNamesInOrder = [
+  `${keys.props}.${keysProps.firstName}`,
+  `${keys.props}.${keysProps.lastName}`,
+  keys.email,
+  `${keys.props}.${keysProps.institution}`,
+  `${keys.props}.${keysProps.country}`,
+  `${keys.props}.${keysProps.templateUuid}`,
+  `${keys.props}.${keysProps.purpose}`,
+  `${keys.props}.${keysProps.surveyName}`,
+]
+const formFields = formFieldNamesInOrder.map((name) =>
+  UserAccessRequest.editableFields.find((field) => field.name === name)
+)
+
 type AccessRequestSentProps = {
   email: string
 }
@@ -56,7 +73,7 @@ const AccessRequest = () => {
     <div className="access-request">
       <GuestViewHeader description={texts.introduction} title={texts.title} />
       <form className="access-request__form" onSubmit={(event) => event.preventDefault()}>
-        {UserAccessRequest.editableFields.map((field) => (
+        {formFields.map((field) => (
           <AccessRequestField
             key={field.name}
             field={field}
