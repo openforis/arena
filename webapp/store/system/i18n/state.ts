@@ -1,4 +1,4 @@
-import i18nInstance from '@core/i18n/i18nFactory'
+import i18nInstance from './i18nInstance'
 
 export const stateKey = 'i18n'
 
