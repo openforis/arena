@@ -101,7 +101,7 @@ Por favor, concédanos un par de días para procesar su solicitud.
 Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las instrucciones sobre cómo acceder a $t(common.appName).
 ¡Gracias y disfrute de **$t(common.appNameFull)**!`,
     surveyNameHint:
-      'El nombre identifica la encuesta en toda la plataforma $t(common.appName) y debe ser único: elija un nombre específico (p. ej., kenya_nfi_2026), no uno genérico como "survey" o "test". Solo letras minúsculas, números y guiones bajos.',
+      'El nombre identifica la encuesta en toda la plataforma $t(common.appName) y debe ser **único**: elija un nombre específico, p. ej., combinando su organización o país, el proyecto y el año, no uno genérico como "survey" o "test". Solo letras minúsculas, números y guiones bajos.',
     sendRequest: 'Enviar solicitud',
     sendRequestConfirm: '¿Solicitar acceso a $t(common.appNameFull)?',
     templateNotSelected: 'No seleccionado (empezar desde cero)',

@@ -7,6 +7,7 @@ import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import Markdown from '@webapp/components/Markdown'
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
 import { useI18n } from '@webapp/store/system'
 
@@ -131,7 +132,7 @@ export const AccessRequestField = (props: AccessRequestFieldProps) => {
     >
       <div className="access-request__field-content">
         <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
-        {hintKey && <p className="access-request__field-hint">{i18n.t(hintKey)}</p>}
+        {hintKey && <Markdown className="access-request__field-hint" source={i18n.t(hintKey)} />}
       </div>
     </FormItem>
   )
