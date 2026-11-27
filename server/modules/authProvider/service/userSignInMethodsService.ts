@@ -56,7 +56,6 @@ export const unlinkIdentity = async ({
       to: User.getEmail(user),
       msgKey: 'emails:authProviderUnlinked',
       msgParams: { name: User.getName(user), providerLabel: provider?.label ?? identity.providerId },
-      lang: User.getLang(user),
     })
   } catch (error) {
     logger.error(`error sending the unlink notification to user ${userUuid}: ${error.message}`)

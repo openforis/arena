@@ -38,9 +38,8 @@ const _generateResetPasswordAndSendEmail = async (
   {
     email,
     emailParams,
-    i18n,
     msgKey = newUserInviteMsgKeyDefault,
-  }: { email: string; emailParams: UserInviteEmailParams; i18n: ArenaI18n; msgKey?: string },
+  }: { email: string; emailParams: UserInviteEmailParams; msgKey?: string },
   t: DbClient
 ) => {
   const { serverUrl } = emailParams
@@ -52,7 +51,7 @@ const _generateResetPasswordAndSendEmail = async (
     urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
-  const { rejected = [] } = await Mailer.sendEmail({ to: email, msgKey, msgParams, i18n })
+  const { rejected = [] } = await Mailer.sendEmail({ to: email, msgKey, msgParams })
   if (rejected.length > 0) {
     throw new SystemError('appErrors:userEmailInvalid', { email })
   }
@@ -85,7 +84,6 @@ const _inviteNewUserAndSendEmail = async (
     survey,
     surveyCycleKey,
     emailParams,
-    i18n,
     newUserMsgKey,
   }: {
     user: ArenaUser
@@ -94,7 +92,6 @@ const _inviteNewUserAndSendEmail = async (
     survey: ArenaSurvey
     surveyCycleKey: string
     emailParams: UserInviteEmailParams
-    i18n: ArenaI18n
     newUserMsgKey?: string
   },
   t: DbClient
@@ -113,7 +110,7 @@ const _inviteNewUserAndSendEmail = async (
     t
   )
   // Generate reset password and send email
-  await _generateResetPasswordAndSendEmail({ email, emailParams, i18n, msgKey: newUserMsgKey }, t)
+  await _generateResetPasswordAndSendEmail({ email, emailParams, msgKey: newUserMsgKey }, t)
 
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
 
@@ -182,21 +179,19 @@ const _repeatInvitation = async (
     userToInvite,
     email,
     emailParams,
-    i18n,
   }: {
     user: ArenaUser
     survey: ArenaSurvey
     userToInvite: ArenaUser
     email: string
     emailParams: UserInviteEmailParams
-    i18n: ArenaI18n
   },
   t: DbClient
 ) => {
   const surveyUuid = Survey.getUuid(survey)
   const userToInviteUuid = User.getUuid(userToInvite)
   // Generate reset password and send email again
-  await _generateResetPasswordAndSendEmail({ email, emailParams, i18n }, t)
+  await _generateResetPasswordAndSendEmail({ email, emailParams }, t)
   await UserInvitationManager.deleteUserInvitation({ surveyUuid, userUuid: userToInviteUuid }, t)
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
 }
@@ -221,7 +216,6 @@ const _invitePendingUser = async (
     email,
     repeatInvitation,
     emailParams,
-    i18n,
   }: {
     user: ArenaUser
     survey: ArenaSurvey
@@ -230,7 +224,6 @@ const _invitePendingUser = async (
     email: string
     repeatInvitation: boolean
     emailParams: UserInviteEmailParams
-    i18n: ArenaI18n
   },
   t: DbClient
 ) => {
@@ -257,7 +250,7 @@ const _invitePendingUser = async (
     }
     await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
   }
-  await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
+  await _repeatInvitation({ user, survey, userToInvite, email, emailParams }, t)
 }
 
 const _inviteUser = (
@@ -317,16 +310,16 @@ const _inviteUser = (
         // Add user to group (accept automatically the invitation)
         await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
         // Send email
-        await Mailer.sendEmail({ to: email, msgKey: 'emails:userInviteExistingUser', msgParams: emailParams, lang })
+        await Mailer.sendEmail({ to: email, msgKey: 'emails:userInviteExistingUser', msgParams: emailParams })
       } else {
-        await _invitePendingUser({ user, survey, group, userToInvite, email, repeatInvitation, emailParams, i18n }, t)
+        await _invitePendingUser({ user, survey, group, userToInvite, email, repeatInvitation, emailParams }, t)
       }
       return userToInvite
     } else {
       // User to invite does not exist, he has never been invited
       // Check if he can be invited
       const userInvited = await _inviteNewUserAndSendEmail(
-        { user, email, group, survey, surveyCycleKey, emailParams, i18n, newUserMsgKey },
+        { user, email, group, survey, surveyCycleKey, emailParams, newUserMsgKey },
         t
       )
       return userInvited
@@ -362,8 +355,8 @@ export const inviteUsers = async (
 
   _checkCanInviteToGroup({ user, group, surveyInfo })
 
-  const lang = User.getLang(user)
-  const i18n = await i18nFactory.createI18nAsync(lang)
+  // emails are sent only in English
+  const i18n = await i18nFactory.createI18nAsync()
   const emails = UserGroupInvitation.getEmails(invitation)
 
   const invitedUsers = []

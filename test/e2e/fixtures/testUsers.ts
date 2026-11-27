@@ -81,6 +81,16 @@ export const resetTestUserAiPrefs = async (user: TestUser): Promise<void> => {
 }
 
 /**
+ * Removes the preferred UI language of the user (the UI language is then the detected one, English in the tests).
+ */
+export const resetTestUserLanguagePref = async (user: TestUser): Promise<void> => {
+  await DB.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - $2::text WHERE email = $1`, [
+    user.email,
+    User.keysPrefs.language,
+  ])
+}
+
+/**
  * Returns the survey editor (not survey administrator) used by the worker with the specified parallel index.
  * @param {number} parallelIndex - Index of the Playwright worker.
  */

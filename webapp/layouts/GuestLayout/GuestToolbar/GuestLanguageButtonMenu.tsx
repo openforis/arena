@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { getLanguageEndonym } from '@core/app/languages'
-import { supportedLanguages } from '@core/i18n/i18nFactory'
+import { supportedLanguages } from '@core/i18n/uiLanguages'
 import { ButtonMenu, type ButtonMenuItem } from '@webapp/components/buttons'
 import { UILanguageStorage } from '@webapp/service/storage/uiLanguage'
 import { TestId } from '@webapp/utils/testId'

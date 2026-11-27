@@ -97,9 +97,8 @@ export const generateResetPasswordUuid = async (
     return await db.tx(async (t) => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
-      const lang = User.getLang(user)
       const name = User.getName(user)
-      await Mailer.sendEmail({ to: email, msgKey: 'emails:userResetPassword', msgParams: { url, name }, lang })
+      await Mailer.sendEmail({ to: email, msgKey: 'emails:userResetPassword', msgParams: { url, name } })
       return { uuid }
     })
   } catch (error) {
@@ -827,8 +826,7 @@ export const deleteUserFromSurvey = async ({
         surveyName: Survey.getName(surveyInfo),
         surveyLabel: Survey.getDefaultLabel(surveyInfo),
       }
-      const lang = User.getLang(user)
-      await Mailer.sendEmail({ to: User.getEmail(userToDeleteData), msgKey: 'emails:userDeleted', msgParams, lang })
+      await Mailer.sendEmail({ to: User.getEmail(userToDeleteData), msgKey: 'emails:userDeleted', msgParams })
     }
 
     return userToDeleteData
@@ -956,7 +954,7 @@ const _notifyUserRegistrationExpired = async ({
   try {
     const { msgKey, getMsgParams } = UserRegistrationExpiredEmail
     const msgParams = getMsgParams({ i18n, surveys, serverUrl: ProcessUtils.ENV.arenaPublicUrl })
-    await Mailer.sendEmail({ to: email, msgKey, msgParams, i18n })
+    await Mailer.sendEmail({ to: email, msgKey, msgParams })
   } catch (error) {
     Logger.error(`error notifying user ${email} about the account deletion: ${String(error)}`)
   }

@@ -101,6 +101,42 @@ export default defineConfig([
     },
   },
 
+  // the UI languages other than English are loaded when used (core/i18n/languageLoaders.ts): a static import would
+  // load them in every server thread and put them back in the main bundle of the webapp
+  {
+    files: ['webapp/**/*.ts', 'webapp/**/*.tsx', 'common/**/*.ts', 'core/**/*.ts', 'server/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@core/i18n/resources/*', '!@core/i18n/resources/en', '!@core/i18n/resources/en/*'],
+              message: 'Only English is always loaded: the other languages are loaded by core/i18n/languageLoaders.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['webapp/**/*.ts', 'webapp/**/*.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [{ name: '@core/i18n/i18nFactory', message: 'Use @webapp/store/system/i18n/i18nInstance.' }],
+          patterns: [
+            {
+              group: ['@core/i18n/resources/*', '!@core/i18n/resources/en', '!@core/i18n/resources/en/*'],
+              message: 'Only English is always loaded: the other languages are loaded by core/i18n/languageLoaders.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // --- TESTING CONFIGURATIONS (APPLIES ONLY TO TEST FILES) ---
 
   // 4. Jest (Unit/Integration Tests) Configuration
