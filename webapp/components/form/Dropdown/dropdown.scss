@@ -57,6 +57,15 @@
   .dropdown {
     border: 1px solid $colorError;
   }
+
+  // with a floating label, the outline shows the error
+  .dropdown-floating-label--with-label .dropdown {
+    border: none;
+  }
+
+  .dropdown-floating-label__outline {
+    border-color: $colorError;
+  }
 }
 
 // label on the top border, in a gap of the outline, like the outlined text inputs (see the label prop)
@@ -120,14 +129,4 @@
 .dropdown-floating-label:has(.dropdown__control--is-focused) .dropdown-floating-label__outline {
   // thicker border, like the focused text inputs (an inset shadow would cross the label gap)
   border: 2px solid $colorPrimary;
-}
-
-.tooltip-error {
-  .dropdown-floating-label--with-label .dropdown {
-    border: none;
-  }
-
-  .dropdown-floating-label__outline {
-    border-color: $colorError;
-  }
 }
