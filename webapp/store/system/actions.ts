@@ -33,7 +33,8 @@ export const initSystem = () => async (dispatch) => {
       }
       const userPreferredLanguage = User.getPrefLanguage(user)
       if (userPreferredLanguage) {
-        i18n.changeLanguage(userPreferredLanguage)
+        // loaded when first used: wait for it before the app is rendered with the user
+        await i18n.changeLanguage(userPreferredLanguage)
       }
 
       dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n, user }))
