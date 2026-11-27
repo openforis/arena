@@ -91,8 +91,8 @@ export const ENV = {
   adminPassword: process.env.ADMIN_PASSWORD,
   allowUserAccessRequest: isTrue(process.env.ALLOW_USER_ACCESS_REQUEST ?? 'true'),
   // the access request form creates the account directly (no approval by a system admin)
-  userSelfRegistration:
-    isTrue(process.env.ALLOW_USER_ACCESS_REQUEST ?? 'true') && isTrue(process.env.USER_SELF_REGISTRATION),
+  allowUserSelfRegistration:
+    isTrue(process.env.ALLOW_USER_ACCESS_REQUEST ?? 'true') && isTrue(process.env.ALLOW_USER_SELF_REGISTRATION),
   // FILE STORAGE
   fileStoragePath: process.env.FILE_STORAGE_PATH,
   fileStorageAwsAccessKey: process.env.FILE_STORAGE_AWS_ACCESS_KEY,

@@ -49,7 +49,7 @@ const useExternalLoginRedirect = () => {
 // "No account yet?" link to the access request form (account creation form with self-registration)
 const CreateAccountLink = () => {
   const i18n = useI18n()
-  const linkLabelKey = ProcessUtils.ENV.userSelfRegistration
+  const linkLabelKey = ProcessUtils.ENV.allowUserSelfRegistration
     ? 'guest:loginView.createAccount'
     : 'guest:loginView.requestAccess'
   return (

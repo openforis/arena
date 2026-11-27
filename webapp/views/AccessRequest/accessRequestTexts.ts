@@ -37,4 +37,4 @@ const registrationTexts: AccessRequestTexts = {
  * Returns the i18n keys of the texts of the access request form: with self-registration the form creates the account.
  */
 export const getAccessRequestTexts = (): AccessRequestTexts =>
-  ProcessUtils.ENV.userSelfRegistration ? registrationTexts : accessRequestTexts
+  ProcessUtils.ENV.allowUserSelfRegistration ? registrationTexts : accessRequestTexts

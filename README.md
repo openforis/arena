@@ -104,7 +104,7 @@ USE_HTTPS=false
 # ALLOW_USER_ACCESS_REQUEST=true
 
 ## Let users create their account directly, without the approval of a system admin (default: false)
-# USER_SELF_REGISTRATION=false
+# ALLOW_USER_SELF_REGISTRATION=false
 
 ## Number of concurrent background jobs (default: 3)
 # JOB_QUEUE_CONCURRENCY=3

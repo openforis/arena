@@ -29,7 +29,7 @@ const PitchTags = () => {
 }
 
 const getStepsPrefix = () =>
-  ProcessUtils.ENV.userSelfRegistration ? 'guest:registrationView.steps' : 'guest:accessRequestView.steps'
+  ProcessUtils.ENV.allowUserSelfRegistration ? 'guest:registrationView.steps' : 'guest:accessRequestView.steps'
 
 // what happens after an access request is sent (or the account is created)
 const getStepDescriptionKey = (step: string, senderEmail: string | undefined): string => {
@@ -43,7 +43,7 @@ const AccessRequestSteps = () => {
   const [expanded, setExpanded] = useState(false)
   // emails are sent from this address: users should look for it (also in the spam folder)
   const senderEmail = ProcessUtils.ENV.emailFromResolved
-  const steps = ProcessUtils.ENV.userSelfRegistration ? registrationSteps : accessRequestSteps
+  const steps = ProcessUtils.ENV.allowUserSelfRegistration ? registrationSteps : accessRequestSteps
   const stepsPrefix = getStepsPrefix()
   return (
     <>

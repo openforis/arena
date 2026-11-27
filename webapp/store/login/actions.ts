@@ -34,7 +34,7 @@ const externalLoginErrorKeyPrefix = 'externalLogin.'
 export const toExternalLoginErrorMessageKey = (errorKey) => {
   let key = String(errorKey).replace(externalLoginErrorKeyPrefix, '')
   // with self-registration, new users create their account (instead of requesting access)
-  if (key === 'userNotFound' && ProcessUtils.ENV.userSelfRegistration) {
+  if (key === 'userNotFound' && ProcessUtils.ENV.allowUserSelfRegistration) {
     key = 'userNotFoundCreateAccount'
   }
   return `guest:externalLogin.errors.${key}`

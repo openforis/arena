@@ -134,7 +134,7 @@ const _checkUserAccessRequest = async ({
     return { error: 'validationErrors:userAccessRequest.requestAlreadySent', errorParams: { email } }
   }
   // the survey is created right away: its name must be available
-  if (ProcessUtils.ENV.userSelfRegistration) {
+  if (ProcessUtils.ENV.allowUserSelfRegistration) {
     const { surveyName } = userAccessRequest.props
     const surveysWithSameName = await SurveyManager.fetchSurveysByName(surveyName)
     if (surveysWithSameName.length > 0) {
@@ -219,7 +219,7 @@ export const insertUserAccessRequest = async ({
   if (requestCheck.error) {
     return requestCheck
   }
-  if (ProcessUtils.ENV.userSelfRegistration) {
+  if (ProcessUtils.ENV.allowUserSelfRegistration) {
     return _registerUser({ userAccessRequest, serverUrl })
   }
   try {

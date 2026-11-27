@@ -65,7 +65,7 @@ Edit `config.env` or `secrets.env` and run `kubectl apply -k .`: the Arena pods 
 automatically. See [`.env.template`](../../.env.template) for all the available settings.
 
 These settings are fixed when the image is built, so changing them here only affects the server side,
-not the user interface: `ALLOW_USER_ACCESS_REQUEST`, `USER_SELF_REGISTRATION`, `RECAPTCHA_ENABLED`, `RECAPTCHA_SITE_KEY`,
+not the user interface: `ALLOW_USER_ACCESS_REQUEST`, `ALLOW_USER_SELF_REGISTRATION`, `RECAPTCHA_ENABLED`, `RECAPTCHA_SITE_KEY`,
 `RSTUDIO_DOWNLOAD_SERVER_URL`.
 
 ConfigMaps and Secrets of previous configurations are not deleted. To remove them, label-based pruning
