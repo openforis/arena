@@ -252,6 +252,7 @@ export default {
     emailRequired: 'El correo electrónico es obligatorio',
     emailInvalid: 'Correo electrónico no válido',
     emailNotFound: 'Correo electrónico no encontrado',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'El grupo es obligatorio',
     nameRequired: 'El nombre es obligatorio',
     titleRequired: 'El título es obligatorio',

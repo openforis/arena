@@ -78,6 +78,7 @@ export default {
   functionHasTooManyArguments: 'Fungsi {{fnName}} hanya menerima paling banyak {{maxArity}} (diberikan {{numArgs}})',
   generic: 'Kesalahan tak terduga: {{text}}',
   unexpectedServerError: 'Terjadi kesalahan tak terduga di server.',
+  tooManyRequests: 'Terlalu banyak permintaan. Silakan tunggu beberapa menit lalu coba lagi.',
   geoWhispApiError: 'Layanan Whisp untuk sementara tidak tersedia.',
   geoWhispSamplingPointDataCategoryMissing: 'Kategori data titik sampel tidak ditemukan.',
   geoWhispSamplingPointDataLocationsMissing: 'Tidak ditemukan item data titik sampel dengan lokasi yang valid.',

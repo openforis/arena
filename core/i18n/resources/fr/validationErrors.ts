@@ -255,6 +255,7 @@ export default {
     emailRequired: "L'e-mail est requis",
     emailInvalid: "L'e-mail est invalide",
     emailNotFound: 'E-mail introuvable',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'Le groupe est requis',
     nameRequired: 'Le nom est requis',
     titleRequired: 'Le titre est requis',

@@ -103,6 +103,7 @@ export default {
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
   unexpectedServerError: 'Серверт гэнэтийн алдаа гарлаа.',
+  tooManyRequests: 'Хүсэлт хэт олон байна. Хэдэн минут хүлээгээд дахин оролдоно уу.',
   geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   geoWhispSamplingPointDataCategoryMissing: 'Дээж цэгийн өгөгдлийн ангилал олдсонгүй.',
   geoWhispSamplingPointDataLocationsMissing: 'Хүчинтэй байршилтай дээж цэгийн өгөгдлийн элемент олдсонгүй.',

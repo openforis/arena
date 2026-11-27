@@ -41,6 +41,23 @@ export const existsResetPasswordValidByUserUuid = async (userUuid: string, clien
     A.prop('result')
   )
 
+/**
+ * Returns true if the reset link of the user has been created in the last given minutes.
+ */
+export const existsResetPasswordCreatedRecently = async (
+  { userUuid, minutes }: { userUuid: string; minutes: number },
+  client: DbClient = db
+): Promise<boolean> =>
+  await client.one(
+    `SELECT EXISTS (
+      SELECT 1
+      FROM user_reset_password
+      WHERE user_uuid = $1 AND date_created > NOW() - make_interval(mins => $2)
+    ) AS result`,
+    [userUuid, minutes],
+    A.prop('result')
+  )
+
 export const existResetPasswordValidByUserUuids = (userUuids: string[], client: DbClient = db) => {
   return client.query(
     `SELECT user_uuid, COUNT(*) > 0 as result

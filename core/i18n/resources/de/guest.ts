@@ -172,6 +172,9 @@ Vielen Dank und viel Freude mit **$t(common.appNameFull)**!`,
     title: 'Passwort zurücksetzen',
     description:
       'Geben Sie die E-Mail-Adresse Ihres Kontos ein. Wir senden Ihnen einen Link zum Festlegen eines neuen Passworts.',
+    emailSent: `Wenn ein Konto für {{email}} existiert, erhalten Sie eine E-Mail mit einem Link zum Zurücksetzen Ihres Passworts.
+
+Prüfen Sie auch den Spam-Ordner.`,
   },
   pitch: {
     default: {

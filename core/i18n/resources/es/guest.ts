@@ -170,6 +170,9 @@ Abra el enlace del correo para confirmar su dirección de correo electrónico y 
     title: 'Restablecer su contraseña',
     description:
       'Introduzca el correo electrónico de su cuenta y le enviaremos un enlace para elegir una nueva contraseña.',
+    emailSent: `Si existe una cuenta para {{email}}, recibirá un correo electrónico con un enlace para restablecer su contraseña.
+
+Por favor, revise también la carpeta de correo no deseado/spam.`,
   },
   pitch: {
     default: {
