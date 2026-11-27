@@ -387,6 +387,9 @@ export {
   updateUserAccessRequestStatus,
 } from '../repository/userAccessRequestRepository'
 
+// self-registered requests are stored as accepted
+const selfRegisteredStatusExport = 'SELF_REGISTERED'
+
 export const exportUserAccessRequestsIntoStream = async ({
   outputStream,
   fileFormat,
@@ -422,6 +425,7 @@ export const exportUserAccessRequestsIntoStream = async ({
     }, {}),
     // format date_created
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
+    status: obj.props?.[UserAccessRequest.keysPropsSystem.selfRegistered] ? selfRegisteredStatusExport : obj.status,
     date_accepted:
       obj.status === UserAccessRequest.status.ACCEPTED && obj.date_modified
         ? DateUtils.formatDateTimeDefault(obj.date_modified)

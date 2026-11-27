@@ -162,7 +162,12 @@ const _registerUser = async ({
   if (!acceptingUser) {
     return { error: 'validationErrors:userAccessRequest.registrationNotAvailable' }
   }
-  const requestInserted = await UserManager.insertUserAccessRequest({ userAccessRequest })
+  const requestInserted = await UserManager.insertUserAccessRequest({
+    userAccessRequest: {
+      email,
+      props: { ...props, [UserAccessRequest.keysPropsSystem.selfRegistered]: true },
+    },
+  })
   const i18n = await i18nFactory.createI18nAsync()
   try {
     const { validation } = await acceptUserAccessRequest({
@@ -176,7 +181,7 @@ const _registerUser = async ({
         role: AuthGroup.groupNames.surveyManager,
         templateUuid: props.templateUuid ?? null,
       },
-      newUserMsgKey: 'emails:userSelfRegistration',
+      selfRegistration: true,
     })
     if (validation) {
       await UserManager.deleteUserAccessRequestsByEmail({ emails: [email] })
@@ -209,12 +214,17 @@ type UserAccessRequestInsertResult = {
 }
 
 export const insertUserAccessRequest = async ({
-  userAccessRequest,
+  userAccessRequest: userAccessRequestSubmitted,
   serverUrl,
 }: {
   userAccessRequest: UserAccessRequest.UserAccessRequestSubmission
   serverUrl: string
 }): Promise<UserAccessRequestInsertResult> => {
+  // only the props of the form can be submitted
+  const userAccessRequest = {
+    ...userAccessRequestSubmitted,
+    props: UserAccessRequest.pickEditableProps(userAccessRequestSubmitted.props),
+  }
   const requestCheck = await _checkUserAccessRequest({ userAccessRequest })
   if (requestCheck.error) {
     return requestCheck
@@ -303,13 +313,13 @@ export const acceptUserAccessRequest = async ({
   user,
   serverUrl,
   accessRequestAccept,
-  newUserMsgKey,
+  selfRegistration = false,
 }: {
   user: ArenaUser
   serverUrl: string
   accessRequestAccept: UserAccessRequestAccept
-  // email sent to the user (default: invitation email)
-  newUserMsgKey?: string
+  // accepted automatically: the user gets the registration email and no one is stored as accepting user
+  selfRegistration?: boolean
 }): Promise<UserAccessRequestAcceptResult> => {
   const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
@@ -376,7 +386,7 @@ export const acceptUserAccessRequest = async ({
           surveyCycleKey: Survey.cycleOneKey,
           invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
           serverUrl,
-          newUserMsgKey,
+          newUserMsgKey: selfRegistration ? 'emails:userSelfRegistration' : undefined,
         },
         t
       )
@@ -387,7 +397,7 @@ export const acceptUserAccessRequest = async ({
 
       // only an explicit acceptance (by a system admin) marks the request as accepted, not any invitation
       await UserManager.updateUserAccessRequestStatus(
-        { email, status: UserAccessRequest.status.ACCEPTED, userUuid: User.getUuid(user) },
+        { email, status: UserAccessRequest.status.ACCEPTED, userUuid: selfRegistration ? null : User.getUuid(user) },
         t
       )
       survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)

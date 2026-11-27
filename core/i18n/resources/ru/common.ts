@@ -888,6 +888,7 @@ export default {
     status: {
       ACCEPTED: 'Принято',
       CREATED: 'В ожидании',
+      SELF_REGISTERED: 'Самостоятельная регистрация',
     },
     acceptedBy: 'Принято',
     dateAccepted: 'Дата принятия',

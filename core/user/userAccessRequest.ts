@@ -20,6 +20,11 @@ export const keysProps = {
   templateUuid: 'templateUuid',
 } as const
 
+// props set by the server (not by the user filling the form)
+export const keysPropsSystem = {
+  selfRegistered: 'selfRegistered',
+} as const
+
 export const keysPropsNamesLowercase = Object.values(keysProps).map((prop) => prop.toLowerCase())
 
 export const status = {
@@ -38,6 +43,8 @@ export type UserAccessRequestProps = {
   [keysProps.purpose]?: string
   [keysProps.surveyName]?: string
   [keysProps.templateUuid]?: string | null
+  // accepted automatically: the user created the account (self-registration)
+  [keysPropsSystem.selfRegistered]?: boolean
 }
 
 // not defined in @openforis/arena-core yet
@@ -69,6 +76,17 @@ export const editableFields = [
 ]
 
 export const getEmail = A.prop(keys.email)
+export const isSelfRegistered = (userAccessRequest: UserAccessRequest): boolean =>
+  Boolean(userAccessRequest.props?.[keysPropsSystem.selfRegistered])
+/**
+ * Returns the props filled in by the user (without the ones set by the server).
+ */
+export const pickEditableProps = (props: UserAccessRequestProps = {}): UserAccessRequestProps =>
+  Object.fromEntries(
+    Object.values(keysProps)
+      .filter((key) => props[key] !== undefined)
+      .map((key) => [key, props[key]])
+  )
 export const getStatus = (userAccessRequest: UserAccessRequest): UserAccessRequestStatus => userAccessRequest.status
 export const getAcceptedByName = (userAccessRequest: UserAccessRequest) => userAccessRequest.acceptedByName ?? null
 export const getAcceptedByEmail = (userAccessRequest: UserAccessRequest) => userAccessRequest.acceptedByEmail ?? null
