@@ -268,6 +268,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Država je obavezna',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Ime je obavezno',
     institutionRequired: 'Institucija je obavezna',
     lastNameRequired: 'Prezime je obavezno',

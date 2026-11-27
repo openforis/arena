@@ -264,6 +264,7 @@ export default {
   userAccessRequest: {
     countryRequired: '国は必須です',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: '名は必須です',
     institutionRequired: '所属機関は必須です',
     lastNameRequired: '姓は必須です',

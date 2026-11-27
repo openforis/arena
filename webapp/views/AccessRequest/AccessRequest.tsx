@@ -62,8 +62,15 @@ const AccessRequestSent = ({ email }: AccessRequestSentProps) => {
 
 const AccessRequest = () => {
   const i18n = useI18n()
-  const { request, requestSentSuccessfully, onFieldValueChange, onSubmit, reCaptchaRef, validation } =
-    useAccessRequest()
+  const {
+    isFieldValidationVisible,
+    request,
+    requestSentSuccessfully,
+    onFieldValueChange,
+    onSubmit,
+    reCaptchaRef,
+    validation,
+  } = useAccessRequest()
   const texts = getAccessRequestTexts()
 
   if (requestSentSuccessfully) {
@@ -79,7 +86,7 @@ const AccessRequest = () => {
             field={field}
             onChange={onFieldValueChange}
             request={request}
-            validation={validation}
+            validation={isFieldValidationVisible(field.name) ? validation : null}
           />
         ))}
         <div className="access-request__buttons">

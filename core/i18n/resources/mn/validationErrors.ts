@@ -269,6 +269,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Улс шаардлагатай',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Нэр шаардлагатай',
     institutionRequired: 'Байгууллага шаардлагатай',
     lastNameRequired: 'Овог шаардлагатай',

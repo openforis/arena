@@ -274,6 +274,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Land ist erforderlich',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Vorname ist erforderlich',
     institutionRequired: 'Institution ist erforderlich',
     lastNameRequired: 'Nachname ist erforderlich',
