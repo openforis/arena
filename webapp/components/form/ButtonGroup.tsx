@@ -45,7 +45,7 @@ const ButtonGroup = ({
   return (
     <MuiButtonGroup className={classNames('btn-group', className)}>
       {items.map((item) => {
-        const { key, disabled: itemDisabled, icon, iconClassName, label, labelParams, title } = item
+        const { key, disabled: itemDisabled, icon, iconName, iconSize, label, labelParams, title } = item
         const selected = selectedItemKey === key || (multiple && A.includes(key, selectedItemKey))
         const variant = selected ? 'contained' : 'outlined'
         return (
@@ -54,7 +54,8 @@ const ButtonGroup = ({
             className={`btn-s${deselectable ? ' deselectable' : ''}`}
             disabled={Boolean(itemDisabled) || disabled}
             icon={icon}
-            iconClassName={iconClassName}
+            iconName={iconName}
+            iconSize={iconSize}
             onClick={onItemClick({ item, selected })}
             label={label}
             labelParams={labelParams}

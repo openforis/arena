@@ -61,7 +61,8 @@ const UploadButton = (props: UploadButtonProps) => {
         type="button"
         className={className}
         disabled={disabled}
-        iconClassName="icon-upload2 icon-14px"
+        iconName="upload"
+        iconSize={16}
         label={label}
         onClick={() => {
           // First reset current value, then trigger click event

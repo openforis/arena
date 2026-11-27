@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Button } from '@webapp/components/buttons'
 import { useI18nT, useLang } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -68,7 +69,7 @@ export const AssistantStartScreen = ({
                     title={item.title || t('aiAssistant.newConversationTitle')}
                     type="button"
                   >
-                    <span aria-hidden="true" className="icon icon-bubble icon-12px" />
+                    <AppIcon name="chat" size={16} />
                     <span className="ai-assistant-panel__history-title">
                       {item.title || t('aiAssistant.newConversationTitle')}
                     </span>
@@ -100,7 +101,8 @@ export const AssistantStartScreen = ({
         <Button
           className="ai-assistant-panel__home-new"
           disabled={api.busy}
-          iconClassName="icon-plus icon-12px"
+          iconName="add"
+          iconSize={18}
           label="aiAssistant.menu.newConversation"
           onClick={api.newConversation}
           primary

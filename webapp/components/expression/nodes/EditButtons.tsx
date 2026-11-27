@@ -25,7 +25,8 @@ const EditButtons = (props) => {
         {Object.entries(logical).map(([logicalOperatorKey, logicalOperator]) => (
           <Button
             key={logicalOperatorKey}
-            iconClassName="icon-plus icon-8px"
+            iconName="add"
+            iconSize={10}
             label={`expressionEditor.${logicalOperatorKey}`}
             onClick={() => addLogicalExpr(logicalOperator.value)}
             size="small"

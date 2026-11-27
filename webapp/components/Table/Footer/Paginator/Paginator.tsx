@@ -38,14 +38,16 @@ const Paginator = (props: Props) => {
 
       <Button
         disabled={disabled || isFirstPage}
-        iconClassName="icon-backward2 icon-14px"
+        iconName="previous"
+        iconSize={16}
         onClick={() => goToPage(1)}
         title="common.paginator.firstPage"
         variant="text"
       />
       <Button
         disabled={disabled || isFirstPage}
-        iconClassName="icon-play3 icon-14px"
+        iconName="play"
+        iconSize={16}
         onClick={() => goToPage(pageNo - 1)}
         style={{ transform: 'scaleX(-1)' }}
         title="common.paginator.previousPage"
@@ -56,14 +58,16 @@ const Paginator = (props: Props) => {
 
       <Button
         disabled={disabled || isLastPage}
-        iconClassName="icon-play3 icon-14px"
+        iconName="play"
+        iconSize={16}
         onClick={() => goToPage(pageNo + 1)}
         title="common.paginator.nextPage"
         variant="text"
       />
       <Button
         disabled={disabled || isLastPage}
-        iconClassName="icon-forward3 icon-14px"
+        iconName="next"
+        iconSize={16}
         onClick={() => goToPage(totalPages)}
         title="common.paginator.lastPage"
         variant="text"

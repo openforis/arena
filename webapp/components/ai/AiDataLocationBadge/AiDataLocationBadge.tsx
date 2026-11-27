@@ -6,7 +6,8 @@ import type { AiDataClass } from '@common/ai/features'
 import type { AiHostingClass } from '@common/ai/policy'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
-import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
+import { getHostingIcon } from '@webapp/components/ai/hostingIcons'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -57,7 +58,7 @@ export const AiDataLocationBadge = (props: Props) => {
       title={title}
       data-testid={TestId.ai.dataLocationBadge}
     >
-      <span className={`icon ${getHostingIconClass(hostingClass)} icon-12px`} aria-hidden="true" />
+      <AppIcon name={getHostingIcon(hostingClass)} size={14} />
       {!compact && <span className="ai-data-location-badge__text">{text}</span>}
     </span>
   )

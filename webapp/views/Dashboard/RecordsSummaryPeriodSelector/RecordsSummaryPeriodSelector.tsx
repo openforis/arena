@@ -1,6 +1,7 @@
 import './RecordsSummaryPeriodSelector.scss'
 
 import * as DateUtils from '@core/dateUtils'
+import { AppIcon } from '@webapp/components/AppIcon'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { useI18n } from '@webapp/store/system'
 import { useRecordsSummaryContext } from '../RecordsSummaryContext'
@@ -25,7 +26,7 @@ const RecordsSummaryPeriodSelector = (props: RecordsSummaryPeriodSelectorProps) 
     <div className="home-dashboard__records-period-selector" data-testid={testId}>
       <div>{i18n.t('homeView:recordsSummary.recordsAddedInTheLast')}</div>
       <div className="time-range">
-        <span className="icon icon-calendar icon-12px icon-left" />
+        <AppIcon name="calendar" size={14} className="icon-left" />
         <Dropdown
           clearable={false}
           items={timeRangeItems}

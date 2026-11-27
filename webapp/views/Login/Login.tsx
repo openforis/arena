@@ -148,7 +148,7 @@ const Login = () => {
         <GuestViewHeader
           backToLogin
           description="guest:loginView.twoFactorTokenDescription"
-          icon="icon-shield"
+          icon="shield"
           onBackClick={onClickBack}
           title="guest:loginView.twoFactorTitle"
         />

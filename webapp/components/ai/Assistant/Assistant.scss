@@ -29,6 +29,23 @@
     border-bottom: 1px solid var(--color-outline);
   }
 
+  // a primary action: a tonal round button, not a plain icon like the others
+  &__close.btn {
+    min-width: 0;
+    width: 32px;
+    height: 32px;
+    margin-left: 0.25rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    color: var(--color-on-secondary-container);
+    background-color: var(--color-secondary-container);
+
+    &:hover {
+      background-color: var(--color-primary-container);
+    }
+  }
+
   &__title {
     flex: 1;
     margin: 0;
@@ -442,7 +459,7 @@
       outline-offset: 1px;
     }
 
-    .icon {
+    .app-icon {
       color: var(--color-on-surface-variant);
     }
 

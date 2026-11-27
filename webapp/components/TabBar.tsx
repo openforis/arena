@@ -3,6 +3,7 @@ import './TabBar.scss'
 import React, { useState } from 'react'
 import classNames from 'classnames'
 
+import { IconName } from '@webapp/components/AppIcon'
 import { TestId } from '@webapp/utils/testId'
 
 import { Button } from './buttons'
@@ -10,7 +11,7 @@ import { Button } from './buttons'
 type Tab = {
   id?: string
   label: string
-  icon?: string
+  icon?: IconName
   disabled?: boolean
   component?: React.ElementType
   props?: Record<string, unknown>
@@ -29,7 +30,8 @@ const TabBarButtons = ({ tabs, selection, onClick }: TabBarButtonsProps) => (
         key={tab.id ?? tab.label}
         active={i === selection}
         disabled={Boolean(tab.disabled)}
-        iconClassName={tab.icon ? `${tab.icon} icon-12px` : undefined}
+        iconName={tab.icon}
+        iconSize={14}
         label={tab.label}
         onClick={() => onClick(i)}
         testId={tab.id ? TestId.tabBar.tabBarBtn(tab.id) : null}

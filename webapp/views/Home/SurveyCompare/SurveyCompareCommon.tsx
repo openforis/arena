@@ -7,6 +7,7 @@ import {
   SurveyCompareChildItemDiff,
   SurveyCompareStatus,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Checkbox } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
@@ -45,9 +46,7 @@ export const ApplicabilityIcon = ({ applicability }: { applicability?: SurveyCom
   if (!applicability || applicability.status === SurveyCompareApplicabilityStatus.applicable) return null
   const notApplicable = applicability.status === SurveyCompareApplicabilityStatus.notApplicable
   const title = applicability.reasons.map((reason) => i18n.t(`surveyCompareView:reasons.${reason}`)).join('\n')
-  return (
-    <span className={classNames('icon icon-12px', notApplicable ? 'icon-blocked' : 'icon-warning')} title={title} />
-  )
+  return <AppIcon name={notApplicable ? 'block' : 'warning'} size={14} title={title} />
 }
 
 export const SelectionCheckbox = ({

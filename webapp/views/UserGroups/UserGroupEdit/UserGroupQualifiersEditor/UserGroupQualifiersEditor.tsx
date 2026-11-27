@@ -112,7 +112,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
               updateQualifierAt(index, UserGroupQualifier.assocValue(value)(qualifier) as ArenaUserGroupQualifier)
             }
           />
-          {!readOnly && <Button iconClassName="icon-cross icon-12px" variant="text" onClick={() => onRemove(index)} />}
+          {!readOnly && <Button iconName="close" iconSize={14} variant="text" onClick={() => onRemove(index)} />}
         </FormItem>
       ))}
       {!readOnly && <ButtonAdd label="usersView:userGroup.addQualifier" onClick={onAdd} />}

@@ -9,6 +9,7 @@ import * as User from '@core/user/user'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { Button, Spinner } from '@webapp/components'
 import { AssistantButton } from '@webapp/components/ai/Assistant'
+import { AppIcon } from '@webapp/components/AppIcon'
 import ButtonPublishSurvey from '@webapp/components/ButtonPublishSurvey'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/ProfilePicture'
@@ -113,7 +114,8 @@ const Header = () => {
         {hasMessageNotifications && (
           <>
             <Button
-              iconClassName="icon-bell icon-16px"
+              iconName="notifications"
+              iconSize={16}
               onClick={toggleShowMessageNotifications}
               title="common.notification_other"
               variant="text"
@@ -138,7 +140,7 @@ const Header = () => {
           type="button"
         >
           <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKey} thumbnail />
-          <span className="icon icon-ctrl" />
+          <AppIcon name="dropDown" />
         </button>
       </div>
       {showUserPopup && (

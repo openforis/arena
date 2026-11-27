@@ -410,18 +410,21 @@ export const UsersBackupButtons = ({
   return (
     <>
       <ButtonMenu
-        iconClassName="icon-cog icon-14px"
+        iconName="settings"
+        iconSize={16}
         label="usersView:usersBackup.menu"
         items={[
           {
             key: 'users-backup',
-            iconClassName: 'icon-download2 icon-14px',
+            iconName: 'download',
+            iconSize: 16,
             label: 'usersView:usersBackup.backup',
             onClick: () => setOpenModal('export'),
           },
           {
             key: 'users-restore',
-            iconClassName: 'icon-upload2 icon-14px',
+            iconName: 'upload',
+            iconSize: 16,
             label: 'usersView:usersBackup.restore',
             onClick: () => setOpenModal('importFile'),
           },

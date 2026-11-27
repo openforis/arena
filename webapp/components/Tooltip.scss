@@ -50,7 +50,7 @@
 .tooltip-error {
   @extend .tooltip;
 
-  .btn-checkbox .icon {
+  .btn-checkbox .app-icon {
     border: 2px solid with-alpha($colorError, 0.6);
   }
 

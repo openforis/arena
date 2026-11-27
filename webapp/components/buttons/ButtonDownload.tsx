@@ -18,7 +18,6 @@ export const ButtonDownload = forwardRef<HTMLButtonElement, ButtonDownloadProps>
     downloadInMemory = true,
     fileName = null,
     href = null,
-    iconClassName = 'icon-download2 icon-14px',
     label = 'common.download',
     onClick: onClickProp,
     requestParams = null,
@@ -56,9 +55,7 @@ export const ButtonDownload = forwardRef<HTMLButtonElement, ButtonDownloadProps>
     }
   }, [downloadInMemory, handleDownloadInMemory, href, onClickProp, requestParams])
 
-  return (
-    <Button iconClassName={iconClassName} label={label} onClick={onClick} ref={ref} variant={variant} {...otherProps} />
-  )
+  return <Button iconName="download" label={label} onClick={onClick} ref={ref} variant={variant} {...otherProps} />
 })
 
 ButtonDownload.displayName = 'ButtonDownload'

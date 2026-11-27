@@ -261,7 +261,8 @@ const HeaderLeft = ({
         <Button
           testId={TestId.records.addBtn}
           onClick={() => dispatch(RecordActions.createRecord({ navigate }))}
-          iconClassName="icon-plus icon-12px icon-left"
+          iconName="add"
+          iconSize={14}
           label="common.new"
         />
       )}
@@ -278,7 +279,8 @@ const HeaderLeft = ({
         <>
           {exportMenuItems.length > 0 && (
             <ButtonMenu
-              iconClassName="icon-download2 icon-14px"
+              iconName="download"
+              iconSize={16}
               items={exportMenuItems}
               label="common.export"
               variant="outlined"
@@ -292,7 +294,7 @@ const HeaderLeft = ({
           )}
           {selectedItemsCount === 2 && canDeleteSelectedRecords && (
             <Button
-              iconClassName="icon-tree"
+              iconName="tree"
               label="dataView:records.merge.label"
               onClick={mergeSelectedRecords}
               variant="outlined"
@@ -317,7 +319,7 @@ const HeaderLeft = ({
           }
           {canCloneRecords && (
             <Button
-              iconClassName="icon-copy"
+              iconName="copy"
               label="dataView:records.clone"
               onClick={toggleRecordsCloneModalOpen}
               variant="outlined"

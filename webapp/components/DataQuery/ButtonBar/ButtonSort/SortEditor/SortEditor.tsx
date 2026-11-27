@@ -47,7 +47,8 @@ const SortEditor = (props: SortEditorProps) => {
         <div className="button-bar">
           <Button
             disabled={Sort.isEmpty(sort)}
-            iconClassName="icon-undo2 icon-12px"
+            iconName="undo"
+            iconSize={14}
             label="common.reset"
             onClick={() => onChange(Sort.create())}
             size="small"
@@ -57,7 +58,8 @@ const SortEditor = (props: SortEditorProps) => {
             className="btn btn-s btn-primary"
             onClick={() => onChange(sortDraft)}
             disabled={!draft}
-            iconClassName="icon-checkmark icon-12px"
+            iconName="check"
+            iconSize={14}
             label="common.apply"
           />
         </div>

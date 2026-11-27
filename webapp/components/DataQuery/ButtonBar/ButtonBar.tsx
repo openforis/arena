@@ -66,7 +66,8 @@ const ButtonBar = (props: ButtonBarProps) => {
       <div className="data-query-button-bar__internal-container">
         <Button
           className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-          iconClassName="icon-tab icon-14px"
+          iconName="tab"
+          iconSize={16}
           onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
           title={nodeDefsSelectorVisible ? 'dataView:nodeDefsSelector.hide' : 'dataView:nodeDefsSelector.show'}
           variant="outlined"

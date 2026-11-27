@@ -1,6 +1,7 @@
 import { IconButton } from '@mui/material'
 import type { ReactElement } from 'react'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import type { MapCustomOverlay } from '../layers/MapCustomOverlaysContext'
@@ -30,7 +31,7 @@ export const CustomOverlayRow = ({ overlay }: { overlay: MapCustomOverlay }): Re
         aria-label={t('mapWorkspace.layers.remove', nameParams)}
         onClick={() => removeOverlay(id)}
       >
-        <span className="icon icon-10px icon-cross" aria-hidden="true" />
+        <AppIcon name="close" size={12} aria-hidden="true" />
       </IconButton>
       <input
         className="map-overlay-row__opacity"

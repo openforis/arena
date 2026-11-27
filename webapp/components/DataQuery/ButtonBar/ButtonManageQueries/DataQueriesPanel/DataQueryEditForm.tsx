@@ -42,7 +42,8 @@ export const DataQueryEditForm = (props: DataQueryEditFormProps) => {
             <Button
               className="btn-s btn-ai"
               disabled={summarizing || validating || !isAiFeatureUsable(aiSummarize)}
-              iconClassName="icon-magic-wand icon-14px"
+              iconName="magicWand"
+              iconSize={16}
               label="dataView:dataQuery.ai.suggestSummary"
               onClick={onAiSuggestSummary}
               title="dataView:dataQuery.ai.suggestSummaryTitle"

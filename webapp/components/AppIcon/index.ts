@@ -1,1 +1,5 @@
+export type { AppIconProps } from './AppIcon'
 export { AppIcon } from './AppIcon'
+export type { IconName } from './iconComponents'
+export { iconComponents } from './iconComponents'
+export { appIconMarkup } from './appIconMarkup'

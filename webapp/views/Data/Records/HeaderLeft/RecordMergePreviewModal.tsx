@@ -49,7 +49,8 @@ export const RecordMergePreviewModal = (props: RecordMergePreviewModalProps) => 
         <Button
           className="btn-primary"
           onClick={onConfirmClick}
-          iconClassName="icon-floppy-disk icon-12px"
+          iconName="save"
+          iconSize={14}
           label="dataView:records.merge.confirmLabel"
         />
       </div>

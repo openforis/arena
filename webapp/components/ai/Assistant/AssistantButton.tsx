@@ -52,7 +52,8 @@ export const AssistantButton = () => {
         active={open}
         aria-expanded={open}
         aria-label={getAssistantButtonLabel({ count: suggestions.length, t })}
-        iconClassName="icon-magic-wand icon-16px"
+        iconName="magicWand"
+        iconSize={16}
         onClick={toggleAssistantPanel}
         testId={TestId.aiAssistant.openBtn}
         title="aiAssistant.open"

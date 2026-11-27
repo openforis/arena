@@ -9,6 +9,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import { Button } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 import PanelRight from '@webapp/components/PanelRight'
@@ -25,10 +26,10 @@ type FieldRenderer = (params: { fieldValue: string; i18n: any }) => string
 
 const iconByStatus = ({ i18n }: { i18n: any }): Partial<Record<string, ReactNode>> => ({
   [UserAccessRequest.status.ACCEPTED]: (
-    <span className="icon icon-checkmark accepted" title={i18n.t('usersAccessRequestView.status.ACCEPTED')} />
+    <AppIcon name="check" className="accepted" title={i18n.t('usersAccessRequestView.status.ACCEPTED')} />
   ),
   [UserAccessRequest.status.CREATED]: (
-    <span className="icon icon-clock pending" title={i18n.t('usersAccessRequestView.status.CREATED')} />
+    <AppIcon name="time" className="pending" title={i18n.t('usersAccessRequestView.status.CREATED')} />
   ),
 })
 

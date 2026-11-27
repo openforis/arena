@@ -113,7 +113,8 @@ const UserInviteComponent = () => {
           testId={TestId.userInvite.submitBtn}
           className="btn-invite"
           onClick={onInvite}
-          iconClassName="icon-envelop icon-left icon-12px"
+          iconName="mail"
+          iconSize={14}
           label="userInviteView.sendInvitation"
         />
       </div>

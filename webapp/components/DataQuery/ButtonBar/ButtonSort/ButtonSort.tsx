@@ -34,7 +34,8 @@ const ButtonSort = (props: ButtonSortProps) => {
       <Button
         className={classNames('btn-edit', { highlight: !Sort.isEmpty(sort) })}
         disabled={disabled}
-        iconClassName="icon-sort-amount-asc icon-16px"
+        iconName="sortAsc"
+        iconSize={16}
         label="dataView:sort"
         onClick={Actions.togglePanelSort}
         title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : undefined}

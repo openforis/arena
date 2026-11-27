@@ -48,7 +48,8 @@ const RecentActivityContent = () => {
             <Button
               className="btn-s btn-ai-summary"
               disabled={!isAiFeatureUsable(aiSummary)}
-              iconClassName="icon-stats-bars icon-14px"
+              iconName="barChart"
+              iconSize={16}
               label="aiActivityLog.summarizeButton"
               onClick={() => setSummaryOpen(true)}
             />

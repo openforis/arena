@@ -2,6 +2,7 @@ import { useState } from 'react'
 import classNames from 'classnames'
 
 import * as ProcessUtils from '@core/processUtils'
+import { AppIcon } from '@webapp/components/AppIcon'
 import Markdown from '@webapp/components/Markdown'
 import { useI18nT } from '@webapp/store/system'
 
@@ -45,7 +46,7 @@ const AccessRequestSteps = () => {
         onClick={() => setExpanded(!expanded)}
       >
         {t('guest:accessRequestView.whatHappensNext')}
-        <span className={classNames('icon icon-12px', expanded ? 'icon-arrow-up2' : 'icon-arrow-down2')} />
+        <AppIcon name={expanded ? 'arrowUp' : 'arrowDown'} size={14} />
       </button>
       <ol id="guest-pitch-steps" className={classNames('guest__pitch-steps', { collapsed: !expanded })}>
         {accessRequestSteps.map((step) => (

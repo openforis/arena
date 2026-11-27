@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { heicTo } from 'heic-to'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import LoadingBar from '@webapp/components/LoadingBar'
 import { useI18n } from '@webapp/store/system'
 
@@ -110,7 +111,7 @@ export const ImagePreview = ({ path, onLoadComplete = null, file = null }: Image
       )}
       {error && (
         <span className="image-preview__error">
-          <span className="icon error icon-warning" />
+          <AppIcon name="warning" className="error" />
           {i18n.t('surveyForm:nodeDefFile.errorLoadingPreview')}
         </span>
       )}

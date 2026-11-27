@@ -11,7 +11,7 @@ import { ToolbarMenu } from './ToolbarMenu'
 export const ToolsMenu = (): ReactElement => {
   const { dispatch } = useMapWorkspace()
   return (
-    <ToolbarMenu menuKey="tools" labelKey="mapWorkspace.menus.tools" iconClassName="icon-wrench">
+    <ToolbarMenu menuKey="tools" labelKey="mapWorkspace.menus.tools" iconName="tools">
       {(close) => [
         <MenuActionItem
           key="measureDistance"

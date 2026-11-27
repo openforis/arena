@@ -6,6 +6,7 @@ import { Link } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import { appModuleUri, designerModules, homeModules } from '@webapp/app/appModules'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { TransTitle } from '@webapp/components/TransTitle'
 import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyInfo from '../SurveyInfo'
@@ -20,7 +21,7 @@ const HelperFirstTimeSurvey = () => {
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
             title: <TransTitle />,
-            linkWithIcon: <LinkWithIcon to={appModuleUri(homeModules.surveyInfo)} iconLeft="icon-pencil" />,
+            linkWithIcon: <LinkWithIcon to={appModuleUri(homeModules.surveyInfo)} icon="edit" />,
             basicLink: <Link to={appModuleUri(homeModules.surveyInfo)} className="btn-s btn-transparent" />,
           }}
         />
@@ -35,7 +36,7 @@ const HelperFirstTimeSurvey = () => {
           i18nKey="homeView:dashboard.surveyPropUpdate.secondary"
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
-            linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} iconLeft="icon-quill" />,
+            linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} icon="design" />,
           }}
         />
       </div>
@@ -57,7 +58,7 @@ const HelperWithoutAttributes = () => {
             values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
             components={{
               title: <TransTitle />,
-              linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} iconLeft="icon-pencil" />,
+              linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} icon="edit" />,
             }}
           />
         </div>
@@ -78,16 +79,14 @@ const HelpersByType = {
 
 type LinkWithIconProps = {
   to: string
-  iconLeft?: string
-  iconRight?: string
+  icon: IconName
   children?: ReactNode
 }
 
-const LinkWithIcon = ({ to, iconLeft, iconRight, children }: LinkWithIconProps) => (
+const LinkWithIcon = ({ to, icon, children }: LinkWithIconProps) => (
   <Link to={to} className="btn-s btn-transparent">
-    {iconLeft && <span className={`icon ${iconLeft} icon-14px`} />}
+    <AppIcon name={icon} />
     {children}
-    {iconRight && <span className={`icon ${iconRight} icon-14px`} />}
   </Link>
 )
 

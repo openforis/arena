@@ -53,7 +53,8 @@ export const ButtonViewOptions = (props: Props) => {
   return (
     <ButtonMenu
       closeMenuOnItemClick={false}
-      iconClassName="icon-eye icon-14px"
+      iconName="view"
+      iconSize={16}
       items={items}
       label="dataView:dataQuery.viewOptions"
       variant="outlined"

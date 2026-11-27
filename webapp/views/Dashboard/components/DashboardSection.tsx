@@ -1,6 +1,7 @@
 import React, { useId } from 'react'
 import Box from '@mui/material/Box'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 import { dashboardSurfaces } from '../theme/dashboardSurfaces'
 
@@ -39,7 +40,7 @@ const SectionToggle = (props: SectionToggleProps) => {
       sx={dashboardSurfaces.sectionToggle}
     >
       {title}
-      <Box component="span" className="icon icon-ctrl icon-16px" aria-hidden="true" sx={iconSx} />
+      <AppIcon name="expandLess" sx={iconSx} />
     </Box>
   )
 }

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 import * as Chain from '@common/analysis/chain'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -233,12 +234,10 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
               <div className="chain-clone-from-survey-dialog__entity-check-list">
                 {entityCheckItems.map(({ entityName, found }) => (
                   <div key={entityName} className={found ? 'found' : 'missing'}>
-                    <span
-                      className={`icon icon-12px ${
-                        found
-                          ? 'icon-checkmark chain-clone-from-survey-dialog__entity-icon--found'
-                          : 'icon-cross chain-clone-from-survey-dialog__entity-icon--missing'
-                      }`}
+                    <AppIcon
+                      className={`chain-clone-from-survey-dialog__entity-icon--${found ? 'found' : 'missing'}`}
+                      name={found ? 'check' : 'close'}
+                      size={14}
                     />
                     {entityName}
                     {!found && (

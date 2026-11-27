@@ -91,7 +91,7 @@ const ProviderRow = (props: {
         <div className="auth-providers__row-actions">
           <Button
             disabled={readOnly || index === 0}
-            iconClassName="icon-arrow-up"
+            iconName="arrowUp"
             onClick={() => onMove(index, -1)}
             showLabel={false}
             title="authProvidersView:moveUp"
@@ -99,14 +99,14 @@ const ProviderRow = (props: {
           />
           <Button
             disabled={readOnly || index === count - 1}
-            iconClassName="icon-arrow-down"
+            iconName="arrowDown"
             onClick={() => onMove(index, 1)}
             showLabel={false}
             title="authProvidersView:moveDown"
             variant="text"
           />
           <Button
-            iconClassName={readOnly ? 'icon-eye' : 'icon-pencil2'}
+            iconName={readOnly ? 'view' : 'edit'}
             onClick={() => navigate(getProviderUri(provider.id))}
             showLabel={false}
             testId={`auth-provider-edit-${provider.id}`}
@@ -122,7 +122,7 @@ const ProviderRow = (props: {
                 variant="outlined"
               />
               <Button
-                iconClassName="icon-bin2"
+                iconName="delete"
                 onClick={() => onDelete(provider)}
                 showLabel={false}
                 testId={`auth-provider-delete-${provider.id}`}
@@ -202,7 +202,7 @@ const AuthProvidersList = (): React.ReactElement => {
         <div className="auth-providers__header-actions">
           <Button
             disabled={!secretEncryptionAvailable}
-            iconClassName="icon-plus"
+            iconName="add"
             label="authProvidersView:addProvider"
             onClick={() => setAddDialogOpen(true)}
             testId="auth-provider-add"

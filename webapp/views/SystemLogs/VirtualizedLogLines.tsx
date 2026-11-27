@@ -203,7 +203,7 @@ export const VirtualizedLogLines = ({ lines, instanceColors = null }: Props): Re
       {!following && (
         <Button
           className="system-logs__jump-to-latest"
-          iconClassName="icon-arrow-down2"
+          iconName="arrowDown"
           label="systemLogsView:jumpToLatest"
           onClick={scrollToBottom}
           size="small"

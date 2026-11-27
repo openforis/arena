@@ -196,7 +196,8 @@ const SurveyCreate = (props: SurveyCreateProps) => {
         <div className="row">
           <Button
             disabled={createType === createTypes.clone && !cloneFrom}
-            iconClassName="icon-plus icon-12px"
+            iconName="add"
+            iconSize={14}
             label={submitButtonLabel}
             onClick={onCreate}
             testId={TestId.surveyCreate.submitBtn}

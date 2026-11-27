@@ -80,7 +80,7 @@ export const UserEditHeader = (props: Props) => {
       </div>
       {canEdit && (
         <Button
-          iconClassName="icon-camera"
+          iconName="camera"
           label="usersView:profile.changePicture"
           onClick={() => setPictureEditorOpen(true)}
           variant="outlined"

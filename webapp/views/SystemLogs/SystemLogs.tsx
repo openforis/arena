@@ -42,7 +42,7 @@ const InstancesSelector = ({ instances, instanceColors, excludedInstanceIds, onT
         <Button
           key={instanceId}
           className={classNames('system-logs__instance', { lost })}
-          iconClassName="icon-display"
+          iconName="desktop"
           iconEnd={
             <span className="system-logs__instance-color" style={{ backgroundColor: instanceColors[instanceId] }} />
           }
@@ -161,7 +161,7 @@ const SystemLogs = (): React.ReactElement => {
           />
         </div>
         <Button
-          iconClassName={paused ? 'icon-play3' : 'icon-pause2'}
+          iconName={paused ? 'play' : 'pause'}
           label={paused ? 'systemLogsView:resume' : 'systemLogsView:pause'}
           labelParams={{ count: pendingCount }}
           onClick={() => setPaused(!paused)}
@@ -169,14 +169,14 @@ const SystemLogs = (): React.ReactElement => {
         />
         <Button
           disabled={lines.length === 0}
-          iconClassName="icon-download2"
+          iconName="download"
           label="systemLogsView:export"
           onClick={exportLines}
           title="systemLogsView:exportTitle"
           variant="outlined"
         />
-        <Button iconClassName="icon-bin2" label="systemLogsView:clear" onClick={clear} variant="outlined" />
-        <Button iconClassName="icon-loop2" label="systemLogsView:reconnect" onClick={reconnect} variant="outlined" />
+        <Button iconName="delete" label="systemLogsView:clear" onClick={clear} variant="outlined" />
+        <Button iconName="refresh" label="systemLogsView:reconnect" onClick={reconnect} variant="outlined" />
       </div>
 
       {instances.length > 0 && (

@@ -1,13 +1,14 @@
 import { Link } from 'react-router'
 
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 
 type Props = {
   backToLogin?: boolean
   description?: string
   descriptionParams?: Record<string, unknown>
-  icon?: string
+  icon?: IconName
   iconVariant?: 'primary' | 'success'
   onBackClick?: () => void
   title: string
@@ -33,13 +34,13 @@ export const GuestViewHeader = (props: Props) => {
     <div className="guest__view-header">
       {backToLogin && (
         <Link className="guest__back-link" to={appModuleUri(guestModules.login)} onClick={onBackClick}>
-          <span className="icon icon-arrow-left2 icon-12px" />
+          <AppIcon name="arrowBack" size={14} />
           {t('guest:loginView.backToLogin')}
         </Link>
       )}
       {icon && (
         <div className={`guest__view-icon guest__view-icon--${iconVariant}`}>
-          <span className={`icon ${icon} icon-20px`} />
+          <AppIcon name={icon} size={20} />
         </div>
       )}
       <h2 className="guest__view-title">{t(title)}</h2>

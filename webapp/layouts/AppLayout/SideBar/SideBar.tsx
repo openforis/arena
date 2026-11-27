@@ -3,6 +3,7 @@ import './SideBar.scss'
 import { useRef } from 'react'
 import { useLocation } from 'react-router'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { SidebarActions, useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { useIsSurveyDirty, useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
@@ -26,7 +27,7 @@ const SideBar = () => {
           className={`btn-transparent sidebar__btn-${isSideBarOpened ? 'close' : 'open'}`}
           onClick={SidebarActions.toggleSidebar}
         >
-          <span className={`icon icon-16px ${isSideBarOpened ? 'icon-arrow-left2' : 'icon-menu'}`} />
+          <AppIcon name={isSideBarOpened ? 'arrowBack' : 'menu'} />
         </button>
       </div>
       <Modules

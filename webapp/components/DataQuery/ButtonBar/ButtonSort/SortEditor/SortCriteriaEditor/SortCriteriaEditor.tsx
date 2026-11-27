@@ -42,7 +42,7 @@ const SortCriteriaEditor = (props: SortCriteriaEditorProps) => {
             disabled={placeholder}
             className={classNames('btn-xs', { active: !placeholder && SortCriteria.getOrder(sortCriteria) === order })}
             onClick={() => onChange(SortCriteria.assocOrder(order)(sortCriteria))}
-            iconClassName={`icon-sort-amount-${order}`}
+            iconName={order === 'desc' ? 'sortDesc' : 'sortAsc'}
             title={placeholder ? null : titleKeyByOrder[order]}
           />
         ))}

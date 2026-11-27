@@ -179,7 +179,8 @@ const LabelsEditor = (props: LabelsEditorProps) => {
               <Button
                 className="btn-s btn-ai-translate"
                 disabled={!isAiFeatureUsable(aiTranslation)}
-                iconClassName="icon-earth icon-14px"
+                iconName="globe"
+                iconSize={16}
                 onClick={onTranslate}
                 title="aiTranslation.translateButton"
                 titleParams={{ count: emptyLangs.length }}

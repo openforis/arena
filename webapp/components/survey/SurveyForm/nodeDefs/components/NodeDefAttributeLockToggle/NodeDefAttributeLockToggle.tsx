@@ -27,7 +27,8 @@ const NodeDefAttributeLockToggle = (props: NodeDefAttributeLockToggleProps) => {
     <Button
       className={classNameButton}
       closeTooltipOnClick
-      iconClassName={locked ? 'icon-lock icon-12px' : 'icon-unlocked icon-12px'}
+      iconName={locked ? 'lock' : 'lockOpen'}
+      iconSize={14}
       onClick={onClick}
       onMouseDown={(event) => event.preventDefault()}
       showLabel={false}

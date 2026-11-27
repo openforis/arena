@@ -62,20 +62,20 @@ export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState })
           <ToolbarIconButton
             buttonKey="screenshot"
             titleKey="mapWorkspace.screenshot.quickButton"
-            iconClassName="icon-camera"
+            iconName="camera"
             active={dialog === 'screenshot'}
             onClick={() => dispatch({ type: 'openDialog', dialog: 'screenshot' })}
           />
           <ToolbarIconButton
             buttonKey="zoomToData"
             titleKey="mapWorkspace.quick.zoomToData"
-            iconClassName="icon-target"
+            iconName="myLocation"
             onClick={zoomToData}
           />
           <ToolbarIconButton
             buttonKey="fullScreen"
             titleKey={fullScreen.isFullScreen ? 'mapWorkspace.quick.exitFullScreen' : 'mapWorkspace.quick.fullScreen'}
-            iconClassName={fullScreen.isFullScreen ? 'icon-shrink' : 'icon-enlarge'}
+            iconName={fullScreen.isFullScreen ? 'fullscreenExit' : 'fullscreen'}
             active={fullScreen.isFullScreen}
             onClick={fullScreen.toggle}
           />

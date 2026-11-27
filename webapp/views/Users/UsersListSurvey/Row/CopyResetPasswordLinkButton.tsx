@@ -70,7 +70,8 @@ export const CopyPasswordResetLinkButton = (props: CopyPasswordResetLinkButtonPr
   return (
     <Button
       className="icon-invitation-link"
-      iconClassName="icon-left icon-link icon-12px"
+      iconName="link"
+      iconSize={14}
       label={titleKeyByMessageType[messageType]}
       onClick={handleCopyInvitationLink}
       showLabel={false}
