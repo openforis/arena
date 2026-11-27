@@ -101,10 +101,26 @@ export default defineConfig([
     },
   },
 
-  // the webapp loads the UI languages when used (webapp/store/system/i18n/i18nInstance.ts): importing all of them
-  // statically would put them back in the main bundle
+  // the UI languages other than English are loaded when used (core/i18n/languageLoaders.ts): a static import would
+  // load them in every server thread and put them back in the main bundle of the webapp
   {
-    files: ['webapp/**/*.ts', 'webapp/**/*.tsx', 'common/**/*.ts'],
+    files: ['webapp/**/*.ts', 'webapp/**/*.tsx', 'common/**/*.ts', 'core/**/*.ts', 'server/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@core/i18n/resources/*', '!@core/i18n/resources/en', '!@core/i18n/resources/en/*'],
+              message: 'Only English is always loaded: the other languages are loaded by core/i18n/languageLoaders.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['webapp/**/*.ts', 'webapp/**/*.tsx'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -113,7 +129,7 @@ export default defineConfig([
           patterns: [
             {
               group: ['@core/i18n/resources/*', '!@core/i18n/resources/en', '!@core/i18n/resources/en/*'],
-              message: 'Only English is bundled; the other languages are loaded by i18nInstance.',
+              message: 'Only English is always loaded: the other languages are loaded by core/i18n/languageLoaders.',
             },
           ],
         },
