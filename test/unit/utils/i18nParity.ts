@@ -1,9 +1,11 @@
 /**
  * The one place the i18n tests get the languages and their resources from. The languages are the ones the app
- * registers (`core/i18n/i18nFactory`, one folder each in `core/i18n/resources`), never a list written in a test, so a
+ * registers (`core/i18n/uiLanguages`, one folder each in `core/i18n/resources`), never a list written in a test, so a
  * new language is checked by every parity test without touching them.
  */
-import { resources, supportedLanguages } from '@core/i18n/i18nFactory'
+import { supportedLanguages } from '@core/i18n/uiLanguages'
+
+import { resources } from './i18nResources'
 
 export type LanguageResources = Record<string, any>
 

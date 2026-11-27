@@ -87,15 +87,24 @@ export const sendCustomEmail = async ({
   }
 }
 
+let englishI18nPromise: ReturnType<typeof i18nFactory.createI18nAsync> | null = null
+
+/**
+ * Sends an email with the texts of msgKey (subject and body) in English: emails are sent only in English.
+ */
 export const sendEmail = async ({
   to = null,
   bcc = null,
   msgKey,
   msgParams = {},
-  i18n: i18nParam = null,
-  lang = 'en',
+}: {
+  to?: string | string[] | null
+  bcc?: string | string[] | null
+  msgKey: string
+  msgParams?: Record<string, unknown>
 }) => {
-  const i18n = i18nParam ?? (await i18nFactory.createI18nAsync(lang))
+  englishI18nPromise ??= i18nFactory.createI18nAsync()
+  const i18n = await englishI18nPromise
 
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
   const html = i18n.t(`${msgKey}.body`, msgParams)
