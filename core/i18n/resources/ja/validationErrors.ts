@@ -247,6 +247,7 @@ export default {
     emailRequired: 'メールアドレスは必須です',
     emailInvalid: 'メールアドレスが無効です',
     emailNotFound: 'メールアドレスが見つかりません',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'グループは必須です',
     nameRequired: '名前は必須です',
     titleRequired: '敬称は必須です',

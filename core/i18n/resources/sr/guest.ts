@@ -169,6 +169,9 @@ Hvala i uživajte u **$t(common.appNameFull)**!`,
   forgotPasswordView: {
     title: 'Resetujte lozinku',
     description: 'Unesite adresu e-pošte svog naloga i poslaćemo vam link za izbor nove lozinke.',
+    emailSent: `Ako postoji nalog za {{email}}, primićete poruku e-pošte sa linkom za resetovanje lozinke.
+
+Molimo provjerite i fasciklu Spam/Neželjena pošta.`,
   },
   pitch: {
     default: {

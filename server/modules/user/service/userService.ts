@@ -89,20 +89,47 @@ export const insertSystemAdminUserIfNotExisting = (client: DbClient = db) =>
  * @param {!string} serverUrl - Address of the server.
  * @returns {Promise<{uuid?: string, error?: string}>} - The generated password reset uuid, or the error.
  */
-export const generateResetPasswordUuid = async (
-  email: string,
+// a new reset email is not sent before this time: the one just sent is still valid
+const RESET_PASSWORD_EMAIL_COOLDOWN_MINUTES = 2
+
+/**
+ * Sends a password reset link to the user with the given email, if any. The result is the same whether the user
+ * exists or not, so that it does not reveal the registered emails.
+ */
+export const requestPasswordReset = async ({
+  email,
+  reCaptchaToken,
+  serverUrl,
+}: {
+  email: string
+  reCaptchaToken?: string
   serverUrl: string
-): Promise<{ uuid?: string; error?: string }> => {
+}): Promise<{ error?: string }> => {
+  if (!(await ReCaptchaUtils.verifyReCaptcha({ token: reCaptchaToken }))) {
+    return { error: 'validationErrors:user.invalidReCaptcha' }
+  }
+  const user = typeof email === 'string' ? await UserManager.fetchUserByEmail(email) : null
+  if (!user) {
+    Logger.debug('password reset requested for an unknown email')
+    return {}
+  }
+  const userUuid = User.getUuid(user)
+  const minutes = RESET_PASSWORD_EMAIL_COOLDOWN_MINUTES
+  if (await UserManager.existsResetPasswordCreatedRecently({ userUuid, minutes })) {
+    Logger.debug(`password reset email not sent again within ${minutes} minutes`)
+    return {}
+  }
   try {
-    return await db.tx(async (t) => {
-      const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
+    await db.tx(async (t) => {
+      const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const name = User.getName(user)
       await Mailer.sendEmail({ to: email, msgKey: 'emails:userResetPassword', msgParams: { url, name } })
-      return { uuid }
     })
+    return {}
   } catch (error) {
-    return { error: error.message }
+    Logger.error(`error sending the password reset email: ${error?.message ?? error}`)
+    return { error: 'appErrors:unexpectedServerError' }
   }
 }
 

@@ -47,6 +47,7 @@ export const {
 } = UserRepository
 
 export const {
+  existsResetPasswordCreatedRecently,
   fetchResetPasswordUuidByUserUuid,
   findResetPasswordUserUuidByUuid,
   deleteUserResetPasswordByUuid,

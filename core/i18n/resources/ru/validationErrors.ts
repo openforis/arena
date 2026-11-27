@@ -252,6 +252,7 @@ export default {
     emailRequired: 'Электронная почта обязательна',
     emailInvalid: 'Неверный адрес электронной почты',
     emailNotFound: 'Адрес электронной почты не найден',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'Группа обязательна',
     nameRequired: 'Имя обязательно',
     titleRequired: 'Звание обязательно',

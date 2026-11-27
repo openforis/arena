@@ -112,6 +112,7 @@ export default {
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
   unexpectedServerError: 'Se produjo un error inesperado en el servidor.',
+  tooManyRequests: 'Demasiadas solicitudes. Espere unos minutos y vuelva a intentarlo.',
   geoWhispApiError: 'El servicio Whisp no está disponible temporalmente.',
   geoWhispSamplingPointDataCategoryMissing: 'No se encontró la categoría de datos de puntos de muestreo.',
   geoWhispSamplingPointDataLocationsMissing:

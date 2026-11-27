@@ -252,6 +252,7 @@ export default {
     emailRequired: 'Имэйл шаардлагатай',
     emailInvalid: 'Имэйл хүчингүй',
     emailNotFound: 'Имэйл олдсонгүй',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'Бүлэг шаардлагатай',
     nameRequired: 'Нэр шаардлагатай',
     titleRequired: 'Цол шаардлагатай',

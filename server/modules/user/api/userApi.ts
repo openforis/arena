@@ -15,6 +15,7 @@ import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { createGuestRateLimit } from '@server/utils/guestRateLimit'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -59,7 +60,7 @@ export const init = (app: Router) => {
     }
   })
 
-  app.post('/user/request-access', async (req, res) => {
+  app.post('/user/request-access', createGuestRateLimit(), async (req, res) => {
     const userAccessRequest = Request.getBody(req)
     const serverUrl = Request.getServerUrl(req)
 
