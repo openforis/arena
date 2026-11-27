@@ -127,7 +127,7 @@ Deseja prosseguir?`,
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Gerenciar',
-    message_other: 'Mensagens',
+    messages: 'Mensagens',
     measure: 'Medida',
     measure_other: 'Medidas',
     measurePrevSteps: 'Medida das etapas anteriores',
@@ -399,7 +399,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     instances: 'Sessões RStudio',
 
     message: 'Mensagem',
-    message_other: '$t(common.message_other)',
+    message_other: '$t(common.messages)',
 
     systemAdmin: 'Administração do sistema',
     jobMonitor: 'Monitor de tarefas',

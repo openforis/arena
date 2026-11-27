@@ -9,6 +9,7 @@ import ja from '@core/i18n/resources/ja/common'
 import mn from '@core/i18n/resources/mn/common'
 import pt from '@core/i18n/resources/pt/common'
 import ru from '@core/i18n/resources/ru/common'
+import { PLURAL_SUFFIX, pluralCategoriesOf } from '../utils/i18nParity'
 
 type Messages = Record<string, unknown>
 
@@ -67,7 +68,11 @@ describe('Sentinel-2 scene panel translations (284)', () => {
 
   test.each(LANGUAGE_CODES)('%s has every English key with the same placeholders', (lang) => {
     const scenes = scenesOf(LANGUAGES[lang])
+    const pluralCategories = pluralCategoriesOf(lang)
     for (const [key, text] of Object.entries(enScenes)) {
+      // a plural form the language does not have (e.g. _one in Japanese)
+      const form = PLURAL_SUFFIX.exec(key)?.[1]
+      if (form && !pluralCategories.includes(form)) continue
       expect([key, typeof scenes[key]]).toEqual([key, 'string'])
       expect([key, placeholders(scenes[key] ?? '')]).toEqual([key, placeholders(text)])
     }
