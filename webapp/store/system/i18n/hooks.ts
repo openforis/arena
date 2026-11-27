@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
-import detector from 'i18next-browser-languagedetector'
-import { initReactI18next } from 'react-i18next'
 
-import i18nInstance, { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
+import { defaultLanguage, supportedLanguages } from '@core/i18n/uiLanguages'
 import { UILanguageStorage } from '@webapp/service/storage/uiLanguage'
 import * as DomUtils from '@webapp/utils/domUtils'
 
-const browserI18n = i18nInstance.use(detector).use(initReactI18next)
+import i18nInstance from './i18nInstance'
+
+const browserI18n = i18nInstance
 
 const getBrowserLanguageCode = () => (navigator.language ?? defaultLanguage).trim().split(/[-_]/)[0]
 
@@ -18,10 +18,10 @@ export const detectUILanguage = () =>
   [UILanguageStorage.getUILanguage(), getBrowserLanguageCode()].find((lang) => supportedLanguages.includes(lang)) ??
   defaultLanguage
 
-const detectedLanguage = detectUILanguage()
-if (browserI18n.language !== detectedLanguage) {
-  browserI18n.changeLanguage(detectedLanguage)
-}
+/**
+ * Resolves when the detected UI language is loaded (the UI is rendered after it, to avoid a flash of English).
+ */
+export const i18nReady: Promise<unknown> = browserI18n.changeLanguage(detectUILanguage()).catch(() => null)
 
 export const useI18n = () => browserI18n
 

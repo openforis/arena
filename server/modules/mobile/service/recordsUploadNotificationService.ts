@@ -70,7 +70,7 @@ export const notifySurveyAdmins = async ({
     const email = User.getEmail(surveyAdmin)
     try {
       const msgParams = getMsgParams({ ...commonParams, recipientName: User.getName(surveyAdmin) })
-      await Mailer.sendEmail({ to: email, msgKey, msgParams, i18n }) // NOSONAR
+      await Mailer.sendEmail({ to: email, msgKey, msgParams }) // NOSONAR
       notifiedCount += 1
     } catch (error) {
       // a failure sending to one admin must not prevent notifying the others

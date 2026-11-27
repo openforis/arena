@@ -1,12 +1,13 @@
 import { useCallback, useMemo } from 'react'
 
 import { getLanguageEndonym, getLanguageLabel } from '@core/app/languages'
-import { supportedLanguages } from '@core/i18n/i18nFactory'
+import { supportedLanguages } from '@core/i18n/uiLanguages'
 import * as User from '@core/user/user'
 import { ButtonMenu } from '@webapp/components'
 import { useAppDispatch } from '@webapp/store'
 import { detectUILanguage, useI18n } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 const autoLanguageKey = '__auto__'
 
@@ -18,11 +19,12 @@ export const PreferredUILanguageButtonMenu = () => {
   const detectedLanguageCode = useMemo(() => detectUILanguage(), [])
 
   const onItemClick = useCallback(
-    (item) => {
+    async (item) => {
       const preferredLangNext = item.key === autoLanguageKey ? null : item.key
+      // the language is loaded when first used: the UI is updated (re-rendered by the prefs update) once it is set
+      await i18n.changeLanguage(preferredLangNext ?? detectedLanguageCode)
       const userUpdated = User.assocPrefLanguage({ lang: preferredLangNext })(user)
       dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
-      i18n.changeLanguage(preferredLangNext ?? detectedLanguageCode)
     },
     [dispatch, i18n, user, detectedLanguageCode]
   )
@@ -40,6 +42,7 @@ export const PreferredUILanguageButtonMenu = () => {
         key: langCode,
         label: getLanguageEndonym(langCode),
         labelIsI18nKey: false,
+        testId: TestId.header.uiLanguageItem(langCode),
       })),
     ]
   }, [detectedLanguageCode])
@@ -56,6 +59,7 @@ export const PreferredUILanguageButtonMenu = () => {
       labelIsI18nKey={false}
       onItemClick={onItemClick}
       selectedItemKey={preferredLanguageCode ?? autoLanguageKey}
+      testId={TestId.header.uiLanguageBtn}
       title="userView.preferredUILanguage.label"
       variant="text"
     />

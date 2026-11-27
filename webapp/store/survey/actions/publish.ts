@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-import i18n from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
 import { JobActions } from '@webapp/store/app'
+import i18n from '@webapp/store/system/i18n/i18nInstance'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import * as SurveyState from '../state'
 

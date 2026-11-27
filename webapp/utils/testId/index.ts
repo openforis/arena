@@ -257,6 +257,8 @@ export const TestId = {
     surveyPublishBtn: 'survey-publish-btn',
     templateCreateBtn: 'template-create-btn',
     templateListBtn: 'template-list-btn',
+    uiLanguageBtn: 'header-ui-language-btn',
+    uiLanguageItem: (lang) => `header-ui-language-item-${lang}`,
     userBtn: 'user-btn',
     userProfileBtn: 'user-profile-btn',
     userLogoutBtn: 'user-logout-btn',

@@ -14,7 +14,7 @@ import {
 const resourcesDir = path.join(__dirname, '../../../core/i18n/resources')
 
 describe('i18n parity helper (461)', () => {
-  test('the languages are the folders of core/i18n/resources (a new folder must be registered in the factory)', () => {
+  test('the languages are the folders of core/i18n/resources (a new folder must be registered in uiLanguages)', () => {
     const folders = fs
       .readdirSync(resourcesDir, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
