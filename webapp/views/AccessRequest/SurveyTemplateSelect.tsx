@@ -8,13 +8,12 @@ import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 
 type SurveyTemplateSelectProps = {
-  menuPosition?: 'absolute' | 'fixed'
   selectedValue?: string
   onChange: (...args: any[]) => any
 }
 
 export const SurveyTemplateSelect = (props: SurveyTemplateSelectProps) => {
-  const { menuPosition, selectedValue, onChange } = props
+  const { selectedValue, onChange } = props
 
   const [state, setState] = useState({ loading: true, items: null })
   const { loading, items } = state
@@ -45,7 +44,6 @@ export const SurveyTemplateSelect = (props: SurveyTemplateSelectProps) => {
       }}
       itemLabel={(item) => Survey.getDefaultLabel(item) || Survey.getName(item)}
       itemValue={Survey.getUuid}
-      menuPosition={menuPosition}
       onChange={(item) => onChange(Survey.getUuid(item))}
       placeholder={i18n.t('guest:accessRequestView.templateNotSelected')}
       selection={selectedItem}

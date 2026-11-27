@@ -207,13 +207,33 @@ $guestMobileBreakpoint: 900px;
 }
 
 .guest__card {
+  position: relative;
+  // own stacking context: the blurred background below stays behind the content
+  isolation: isolate;
   color: $colorOnSurface;
   background-color: with-alpha($colorSurface, 0.94);
-  backdrop-filter: blur(16px);
   border: 1px solid with-alpha($colorOnBrandGradient, 0.25);
   border-radius: 20px;
   padding: 2.25rem;
   box-shadow: 0 30px 60px -25px with-alpha($colorShadow, 0.6);
+
+  // blur in a pseudo-element: on the card itself, the backdrop filter would make the fixed dropdown menus
+  // be positioned relative to the card (out of the screen)
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    backdrop-filter: blur(16px);
+  }
+
+  // titles are short: no need for the whole width
+  .dropdown-user-title {
+    justify-self: start;
+    width: 16rem;
+    max-width: 100%;
+  }
 
   // default MUI field height, so that the floating labels fit
   .MuiTextField-root .MuiInputBase-input {

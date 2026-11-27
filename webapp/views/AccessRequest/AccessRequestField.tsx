@@ -19,9 +19,6 @@ type AccessRequestInputFieldProps = {
   value: any
 }
 
-// a fixed menu would be placed relative to the guest card (it has a backdrop filter), out of the screen
-export const dropdownMenuPosition = 'absolute'
-
 const CountryField = (props: AccessRequestInputFieldProps) => {
   const { field, onChange, value } = props
 
@@ -33,7 +30,6 @@ const CountryField = (props: AccessRequestInputFieldProps) => {
     <Dropdown
       selection={selectedValue ? Countries.list.find((item) => item.code === selectedValue) : null}
       items={Countries.list}
-      menuPosition={dropdownMenuPosition}
       itemValue="code"
       itemLabel="name"
       onChange={(item) => onChange({ name, value: item?.code })}
@@ -48,13 +44,7 @@ const TemplateField = (props: AccessRequestInputFieldProps) => {
 
   const selectedValue = value || defaultValue
 
-  return (
-    <SurveyTemplateSelect
-      menuPosition={dropdownMenuPosition}
-      selectedValue={selectedValue}
-      onChange={(value) => onChange({ name, value })}
-    />
-  )
+  return <SurveyTemplateSelect selectedValue={selectedValue} onChange={(value) => onChange({ name, value })} />
 }
 
 const EmailField = (props: AccessRequestInputFieldProps) => {
