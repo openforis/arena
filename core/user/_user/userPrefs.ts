@@ -11,6 +11,7 @@ export const keysPrefs = {
   current: 'current',
   language: 'language',
   notifyOnUserAccessRequest: 'notifyOnUserAccessRequest',
+  notifyOnUserSelfRegistration: 'notifyOnUserSelfRegistration',
   whatsNewSeenIds: 'whatsNewSeenIds',
   mapCustomLayers: 'mapCustomLayers', // { [surveyId]: MapCustomLayer[] }, written only by the custom layers API
 } as const
@@ -32,6 +33,7 @@ const surveyPrefPath = ({ surveyId, key }: { surveyId: SurveyId; key: string }) 
 ]
 const pathLanguage = [keys.prefs, keysPrefs.language]
 const pathNotifyOnUserAccessRequest = [keys.prefs, keysPrefs.notifyOnUserAccessRequest]
+const pathNotifyOnUserSelfRegistration = [keys.prefs, keysPrefs.notifyOnUserSelfRegistration]
 const pathWhatsNewSeenIds = [keys.prefs, keysPrefs.whatsNewSeenIds]
 
 const surveyCyclePrefPath = (surveyId: SurveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.cycle })
@@ -77,6 +79,10 @@ export const getPrefLanguage = A.path(pathLanguage)
 export const getPrefNotifyOnUserAccessRequest = (user: Record<string, unknown>): boolean =>
   A.pathOr(true, pathNotifyOnUserAccessRequest, user) as boolean
 
+// defaults to false: system admins choose to be notified of the self-registrations
+export const getPrefNotifyOnUserSelfRegistration = (user: Record<string, unknown>): boolean =>
+  A.pathOr(false, pathNotifyOnUserSelfRegistration, user) as boolean
+
 // ids of the "What's new" items the user chose not to see again
 export const getPrefWhatsNewSeenIds = (user: Record<string, unknown>): string[] =>
   A.pathOr([], pathWhatsNewSeenIds, user) as string[]
@@ -100,6 +106,8 @@ export const assocPrefSurveyCurrentAndCycle = (surveyId: SurveyId, cycle: unknow
 export const assocPrefLanguage = ({ lang }: { lang: string }) => A.assocPath(pathLanguage, lang)
 
 export const assocPrefNotifyOnUserAccessRequest = (value: boolean) => A.assocPath(pathNotifyOnUserAccessRequest, value)
+export const assocPrefNotifyOnUserSelfRegistration = (value: boolean) =>
+  A.assocPath(pathNotifyOnUserSelfRegistration, value)
 
 export const assocPrefWhatsNewSeenIds = (ids: string[]) => A.assocPath(pathWhatsNewSeenIds, ids)
 

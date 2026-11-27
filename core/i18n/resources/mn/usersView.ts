@@ -51,6 +51,7 @@ export default {
     surveyManagerDescription: 'Шинэ судалгаа үүсгэх боломжтой.',
     twoFactorDescription: 'Нэвтрэх үед асуудаг баталгаажуулах кодыг үүсгэдэг төхөөрөмжүүд.',
     notifyOnUserAccessRequestDescription: 'Хэн нэгэн Arena-д хандах хүсэлт гаргахад надад имэйл илгээх.',
+    notifyOnUserSelfRegistrationDescription: 'Хэн нэгэн Arena-д бүртгэл үүсгэх үед надад имэйл илгээх.',
     removeFromSurveyDescription: 'Хэрэглэгч "{{survey}}" судалгаанд хандах эрхгүй болно.',
     sections: {
       personal: 'Хувийн мэдээлэл',
@@ -70,6 +71,7 @@ export default {
   prefs: {
     title: 'Мэдэгдлийн тохиргоо',
     notifyOnUserAccessRequest: 'Шинэ хэрэглэгчийн хандалтын хүсэлт',
+    notifyOnUserSelfRegistration: 'Хэрэглэгчийн шинэ бие даасан бүртгэл',
   },
   roleInCurrentSurvey: 'Одоогийн судалгаан дахь үүрэг',
   roleInSurvey: 'Судалгаан дахь үүрэг',

@@ -196,7 +196,13 @@ const _registerUser = async ({
     return { error: error.key ?? error.message, errorParams: error.params }
   }
   // notify the system admins (bcc: they cannot see each other's email addresses)
-  const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
+  const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail({
+    notificationPref: User.keysPrefs.notifyOnUserSelfRegistration,
+    notifyByDefault: false,
+  })
+  if (systemAdminEmails.length === 0) {
+    return { requestInserted }
+  }
   await Mailer.sendEmail({
     bcc: systemAdminEmails,
     msgKey: 'emails:userSelfRegistered',

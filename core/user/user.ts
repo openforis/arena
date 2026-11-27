@@ -145,6 +145,7 @@ export const {
   getPrefSurveyCurrentCycle,
   getPrefLanguage,
   getPrefNotifyOnUserAccessRequest,
+  getPrefNotifyOnUserSelfRegistration,
   getPrefWhatsNewSeenIds,
   assocPrefSurveyCurrent,
   assocPrefSurveyCycle,
@@ -153,6 +154,7 @@ export const {
   deletePrefSurvey,
   assocPrefLanguage,
   assocPrefNotifyOnUserAccessRequest,
+  assocPrefNotifyOnUserSelfRegistration,
   assocPrefWhatsNewSeenIds,
 } = UserPrefs
 

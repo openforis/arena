@@ -52,6 +52,8 @@ export default {
     surveyManagerDescription: 'Может создавать новые опросы.',
     twoFactorDescription: 'Устройства, генерирующие коды подтверждения, запрашиваемые при входе.',
     notifyOnUserAccessRequestDescription: 'Сообщать мне по эл. почте, когда кто-то запрашивает доступ к Arena.',
+    notifyOnUserSelfRegistrationDescription:
+      'Сообщать мне по электронной почте, когда кто-то создаёт учётную запись в Arena.',
     removeFromSurveyDescription: 'Пользователь больше не будет иметь доступа к опросу "{{survey}}".',
     sections: {
       personal: 'Личные данные',
@@ -71,6 +73,7 @@ export default {
   prefs: {
     title: 'Настройки уведомлений',
     notifyOnUserAccessRequest: 'Новые запросы на доступ',
+    notifyOnUserSelfRegistration: 'Новые самостоятельные регистрации пользователей',
   },
   roleInCurrentSurvey: 'Роль в текущем опросе',
   roleInSurvey: 'Роль в опросе',

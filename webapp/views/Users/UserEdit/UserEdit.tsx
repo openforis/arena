@@ -3,6 +3,7 @@ import './UserEdit.scss'
 import { useCallback, useRef, useState } from 'react'
 import { useParams } from 'react-router'
 
+import * as A from '@core/arena'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -46,19 +47,33 @@ const useNotificationPrefs = (user) => {
   const [notifyOnUserAccessRequest, setNotifyOnUserAccessRequest] = useState(() =>
     User.getPrefNotifyOnUserAccessRequest(user)
   )
+  const [notifyOnUserSelfRegistration, setNotifyOnUserSelfRegistration] = useState(() =>
+    User.getPrefNotifyOnUserSelfRegistration(user)
+  )
   const onNotifyOnUserAccessRequestChange = useCallback((value: boolean) => {
     setNotifyOnUserAccessRequest(value)
     setDirty(true)
   }, [])
+  const onNotifyOnUserSelfRegistrationChange = useCallback((value: boolean) => {
+    setNotifyOnUserSelfRegistration(value)
+    setDirty(true)
+  }, [])
   const save = useCallback(async () => {
-    await dispatch(
-      UserActions.updateUserPrefs({
-        user: User.assocPrefNotifyOnUserAccessRequest(notifyOnUserAccessRequest)(user),
-      }) as any
-    )
+    const userUpdated = A.pipe(
+      User.assocPrefNotifyOnUserAccessRequest(notifyOnUserAccessRequest),
+      User.assocPrefNotifyOnUserSelfRegistration(notifyOnUserSelfRegistration)
+    )(user)
+    await dispatch(UserActions.updateUserPrefs({ user: userUpdated }) as any)
     setDirty(false)
-  }, [dispatch, notifyOnUserAccessRequest, user])
-  return { dirty, notifyOnUserAccessRequest, onNotifyOnUserAccessRequestChange, save }
+  }, [dispatch, notifyOnUserAccessRequest, notifyOnUserSelfRegistration, user])
+  return {
+    dirty,
+    notifyOnUserAccessRequest,
+    onNotifyOnUserAccessRequestChange,
+    notifyOnUserSelfRegistration,
+    onNotifyOnUserSelfRegistrationChange,
+    save,
+  }
 }
 
 const UserEdit = (props: Props) => {
@@ -208,6 +223,8 @@ const UserEdit = (props: Props) => {
           <NotificationsSection
             notifyOnUserAccessRequest={notificationPrefs.notifyOnUserAccessRequest}
             onNotifyOnUserAccessRequestChange={notificationPrefs.onNotifyOnUserAccessRequestChange}
+            notifyOnUserSelfRegistration={notificationPrefs.notifyOnUserSelfRegistration}
+            onNotifyOnUserSelfRegistrationChange={notificationPrefs.onNotifyOnUserSelfRegistrationChange}
           />
         )}
         {visible.removeFromSurvey && (

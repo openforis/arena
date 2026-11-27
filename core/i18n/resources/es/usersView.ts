@@ -49,6 +49,7 @@ export default {
     surveyManagerDescription: 'Puede crear nuevas encuestas.',
     twoFactorDescription: 'Dispositivos que generan los códigos de verificación solicitados al iniciar sesión.',
     notifyOnUserAccessRequestDescription: 'Enviarme un correo cuando alguien solicite acceso a Arena.',
+    notifyOnUserSelfRegistrationDescription: 'Enviarme un correo cuando alguien cree una cuenta en Arena.',
     removeFromSurveyDescription: 'El usuario ya no tendrá acceso a la encuesta "{{survey}}".',
     sections: {
       personal: 'Información personal',
@@ -68,6 +69,7 @@ export default {
   prefs: {
     title: 'Preferencias de notificación',
     notifyOnUserAccessRequest: 'Nuevas solicitudes de acceso de usuarios',
+    notifyOnUserSelfRegistration: 'Nuevos autorregistros de usuarios',
   },
   roleInCurrentSurvey: 'Rol en la encuesta actual',
   roleInSurvey: 'Rol en la encuesta',

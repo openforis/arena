@@ -455,7 +455,17 @@ export const fetchSystemAdministratorUuid = (
     (row) => row?.uuid ?? null
   )
 
-export const fetchSystemAdministratorsEmail = (client: DbClient = db) =>
+/**
+ * Fetches the emails of the system administrators who want to receive the specified notification
+ * (by default, the notification of new access requests).
+ */
+export const fetchSystemAdministratorsEmail = (
+  {
+    notificationPref = User.keysPrefs.notifyOnUserAccessRequest,
+    notifyByDefault = true,
+  }: { notificationPref?: string; notifyByDefault?: boolean } = {},
+  client: DbClient = db
+) =>
   client.map(
     `
     SELECT u.email
@@ -464,10 +474,10 @@ export const fetchSystemAdministratorsEmail = (client: DbClient = db) =>
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
     WHERE g.name = $1
-      -- users who haven't set the pref (NULL) still get notified
-      AND COALESCE((u.prefs ->> $2)::boolean, true) = true
+      -- users who haven't set the pref (NULL) get the default
+      AND COALESCE((u.prefs ->> $2)::boolean, $3) = true
   `,
-    [AuthGroup.groupNames.systemAdmin, User.keysPrefs.notifyOnUserAccessRequest],
+    [AuthGroup.groupNames.systemAdmin, notificationPref, notifyByDefault],
     (row) => row.email
   )
 
