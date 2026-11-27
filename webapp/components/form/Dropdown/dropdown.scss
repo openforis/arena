@@ -19,6 +19,8 @@
 
   .dropdown__indicators {
     height: 30px;
+    // centered also in controls taller than the indicators (react-select stretches them to the top)
+    align-self: center;
   }
 
   .dropdown__menu-portal {
