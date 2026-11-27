@@ -596,6 +596,14 @@ $guestMobileBreakpoint: 900px;
       margin-bottom: 0.5rem;
     }
 
+    // centered, not as wide as the form
+    .guest__submit.btn {
+      justify-self: center;
+      width: auto;
+      min-width: 16rem;
+      padding: 0 2rem;
+    }
+
     // the password checks in a single row
     .password-strength-checker__checks {
       grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
