@@ -13,7 +13,7 @@ import mnTranslation from './resources/mn'
 import ptTranslation from './resources/pt'
 import ruTranslation from './resources/ru'
 import srTranslation from './resources/sr'
-import { defaultLanguage, supportedLanguages } from './uiLanguages'
+import { defaultLanguage } from './uiLanguages'
 
 // every language of the app, all loaded: for the server and the unit tests (the webapp loads them when used)
 export const resources = {
@@ -29,7 +29,7 @@ export const resources = {
   sr: srTranslation,
 }
 
-export { defaultLanguage, supportedLanguages }
+export { defaultLanguage, supportedLanguages } from './uiLanguages'
 
 export const createI18nAsync = (lang: string = defaultLanguage): Promise<ArenaI18n & { lang: string }> => {
   const createInstance = i18next.createInstance || (i18next as any).default.createInstance

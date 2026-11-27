@@ -21,8 +21,7 @@ import { applyThemeMode, getThemePreference, resolveThemeMode } from '@webapp/th
 // apply the theme before the first render to avoid a flash of the light theme
 applyThemeMode(resolveThemeMode(getThemePreference()))
 
-// the preloader stays until the UI language is loaded
-i18nReady.then(() => {
+const renderApp = (): void => {
   document.getElementById('preloader-wrapper').remove()
 
   const container = document.getElementById('main')
@@ -40,4 +39,7 @@ i18nReady.then(() => {
       </SurveyThemeBridge>
     </Provider>
   )
-})
+}
+
+// the preloader stays until the UI language is loaded (also if loading it fails: the app is then in English)
+i18nReady.then(renderApp, renderApp)
