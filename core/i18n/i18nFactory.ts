@@ -8,6 +8,7 @@ import deTranslation from './resources/de'
 import enTranslation from './resources/en'
 import esTranslation from './resources/es'
 import frTranslation from './resources/fr'
+import idTranslation from './resources/id'
 import jaTranslation from './resources/ja'
 import mnTranslation from './resources/mn'
 import ptTranslation from './resources/pt'
@@ -20,6 +21,7 @@ export const resources = {
   en: enTranslation,
   es: esTranslation,
   fr: frTranslation,
+  id: idTranslation,
   ja: jaTranslation,
   mn: mnTranslation,
   pt: ptTranslation,

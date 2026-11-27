@@ -33,11 +33,12 @@ export const getLanguageLabel = (lang: string, translationLang: string = en): st
   _getLanguageLabel(standards.ISO_639_1)({ lang, translationLang })
 
 // names of the UI languages in their own language (Intl.DisplayNames misses some in some browsers)
-const endonyms: Record<string, string> = {
+export const endonyms: Record<string, string> = {
   de: 'Deutsch',
   en: 'English',
   es: 'Español',
   fr: 'Français',
+  id: 'Bahasa Indonesia',
   ja: '日本語',
   mn: 'Монгол',
   pt: 'Português',
