@@ -25,7 +25,7 @@ const config: Config = {
   // transformed based on its own immediate package name, instead of being skipped just because an
   // earlier, non-allowlisted wrapper package appears earlier in the path.
   transformIgnorePatterns: [
-    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|openid-client/|oauth4webapi/|jose/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/)',
+    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|openid-client/|oauth4webapi/|jose/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/|fontkit/|restructure/|unicode-properties/|unicode-trie/|dfa/|brotli/|png-js/|linebreak/)',
   ],
   // Path aliases (mirrors tsconfig.json / the webpack configs): unit and integration tests are bundled
   // by webpack, which resolves them; they are needed here only for tests run directly through Jest.
@@ -35,6 +35,8 @@ const config: Config = {
     '^@server/(.*)$': `${rootDir}/server/$1`,
     '^@webapp/(.*)$': `${rootDir}/webapp/$1`,
     '^@test/(.*)$': `${rootDir}/test/$1`,
+    // pdfkit (via arena-server) deps are ESM only; the node variant of this import uses import.meta
+    '^#binary-trie$': `${rootDir}/node_modules/unicode-properties/binaryTrie.browser.js`,
   },
   verbose: true,
 }
