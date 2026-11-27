@@ -172,6 +172,9 @@ Terima kasih dan selamat menggunakan **$t(common.appNameFull)**!`,
   forgotPasswordView: {
     title: 'Atur ulang kata sandi Anda',
     description: 'Masukkan alamat email akun Anda dan kami akan mengirimkan tautan untuk memilih kata sandi baru.',
+    emailSent: `Jika akun untuk {{email}} ada, Anda akan menerima email berisi tautan untuk mengatur ulang kata sandi Anda.
+
+Mohon periksa juga folder Spam/Junk.`,
   },
   pitch: {
     default: {

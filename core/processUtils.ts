@@ -80,6 +80,10 @@ export const ENV = {
   reCaptchaEnabled: isTrue(process.env.RECAPTCHA_ENABLED),
   reCaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
   reCaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
+  // Rate limit of the guest endpoints (password reset, access request), per client IP and server process
+  guestRateLimitEnabled: isTrue(process.env.GUEST_RATE_LIMIT_ENABLED ?? 'true'),
+  guestRateLimitWindowMs: Number(process.env.GUEST_RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  guestRateLimitRequestsPerWindow: Number(process.env.GUEST_RATE_LIMIT_REQUESTS_PER_WINDOW) || 20,
   // Map
   mapApiKeyPlanet: process.env.MAP_API_KEY_PLANET,
   // SYSTEM ADMIN USER

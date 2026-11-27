@@ -167,6 +167,9 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
   forgotPasswordView: {
     title: 'Нууц үгээ шинэчлэх',
     description: 'Бүртгэлийнхээ имэйл хаягийг оруулна уу, бид шинэ нууц үг сонгох холбоос илгээх болно.',
+    emailSent: `Хэрэв {{email}} хаягаар бүртгэл байгаа бол нууц үгээ шинэчлэх холбоос бүхий имэйл хүлээн авна.
+
+Спам/Хог шуудангийн хавтсыг шалгана уу.`,
   },
   pitch: {
     default: {

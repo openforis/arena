@@ -12,6 +12,7 @@ import * as Log from '@server/log/log'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { omitServerOnlyPrefsFromUser } from '@server/modules/user/serverOnlyPrefs'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { createGuestRateLimit } from '@server/utils/guestRateLimit'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as RecordService from '../../record/service/recordService'
@@ -102,22 +103,26 @@ export const init = (app: Router): void => {
   })
 
   // ===== RESET PASSWORD
-  app.post('/auth/reset-password', async (req, res) => {
-    const { email } = Request.getParams(req)
+  // counted apart: sending reset emails must not use up the requests of the reset links, and vice versa
+  const resetPasswordRequestRateLimit = createGuestRateLimit()
+  const resetPasswordLinkRateLimit = createGuestRateLimit()
+
+  app.post('/auth/reset-password', resetPasswordRequestRateLimit, async (req, res) => {
+    const { email, reCaptchaToken } = Request.getParams(req)
     const serverUrl = Request.getPublicServerUrl(req)
     // never return the reset token: it is only sent by email
-    const { error } = await UserService.generateResetPasswordUuid(email, serverUrl)
+    const { error } = await UserService.requestPasswordReset({ email, reCaptchaToken, serverUrl })
     res.json({ error })
   })
 
-  app.get('/auth/reset-password/:uuid', async (req, res) => {
+  app.get('/auth/reset-password/:uuid', resetPasswordLinkRateLimit, async (req, res) => {
     const { uuid } = Request.getParams(req)
     const { user, registrationInfo } = await UserService.fetchResetPasswordUserAndRegistrationInfo(uuid)
     res.json({ user, registrationInfo })
   })
 
   // personal info of an invited user, saved before completing the registration with an external login provider
-  app.put('/auth/reset-password/:uuid/info', async (req, res) => {
+  app.put('/auth/reset-password/:uuid/info', resetPasswordLinkRateLimit, async (req, res) => {
     const { uuid, title, firstName, lastName, institution, country } = Request.getParams(req)
     const result = await UserService.updateResetPasswordUserInfo({
       uuid,
@@ -130,7 +135,7 @@ export const init = (app: Router): void => {
     res.json({ result })
   })
 
-  app.put('/auth/reset-password/:uuid', async (req, res) => {
+  app.put('/auth/reset-password/:uuid', resetPasswordLinkRateLimit, async (req, res) => {
     const { uuid, name, password, title, institution, country } = Request.getParams(req)
     await UserService.resetPassword({ uuid, name, password, title, institution, country })
     res.json({ result: true })

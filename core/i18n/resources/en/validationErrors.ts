@@ -249,6 +249,7 @@ export default {
     emailRequired: 'Email is required',
     emailInvalid: 'Email is invalid',
     emailNotFound: 'Email not found',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'Group is required',
     nameRequired: 'Name is required',
     titleRequired: 'Title is required',

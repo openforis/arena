@@ -163,6 +163,9 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
   forgotPasswordView: {
     title: 'パスワードの再設定',
     description: 'アカウントのメールアドレスを入力してください。新しいパスワードを設定するためのリンクをお送りします。',
+    emailSent: `{{email}}のアカウントが存在する場合、パスワードを再設定するためのリンクを記載したメールが届きます。
+
+迷惑メールフォルダもご確認ください。`,
   },
   pitch: {
     default: {

@@ -2,11 +2,18 @@ import axios from 'axios'
 
 // ==== CREATE
 export const createAccessRequest = async ({ accessRequest: accessRequestParam }) => {
-  const {
-    data: { accessRequest, error, errorParams, validation },
-  } = await axios.post(`/api/user/request-access`, accessRequestParam)
+  try {
+    const {
+      data: { accessRequest, error, errorParams, validation },
+    } = await axios.post(`/api/user/request-access`, accessRequestParam)
 
-  return { accessRequest, error, errorParams, validation }
+    return { accessRequest, error, errorParams, validation }
+  } catch (error) {
+    // e.g. too many requests: the error key is in the response
+    const errorKey = error?.response?.data?.key
+    if (!errorKey) throw error
+    return { accessRequest: null, error: errorKey, errorParams: error.response.data.params, validation: null }
+  }
 }
 
 export const acceptAccessRequest = async ({ accessRequestAccept }) => {

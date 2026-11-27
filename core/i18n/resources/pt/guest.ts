@@ -172,6 +172,9 @@ Obrigado e aproveite o **$t(common.appNameFull)**!`,
   forgotPasswordView: {
     title: 'Redefinir sua senha',
     description: 'Insira o e-mail da sua conta e enviaremos um link para escolher uma nova senha.',
+    emailSent: `Se existir uma conta para {{email}}, você receberá um email com um link para redefinir sua senha.
+
+Verifique também a pasta de Spam/Lixo eletrônico.`,
   },
   pitch: {
     default: {

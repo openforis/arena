@@ -254,6 +254,7 @@ export default {
     emailRequired: 'Email wajib diisi',
     emailInvalid: 'Email tidak valid',
     emailNotFound: 'Email tidak ditemukan',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'Grup wajib diisi',
     nameRequired: 'Nama wajib diisi',
     titleRequired: 'Sapaan wajib diisi',
