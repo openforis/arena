@@ -264,6 +264,7 @@ export default {
   userAccessRequest: {
     countryRequired: '国は必須です',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: '名は必須です',
     institutionRequired: '所属機関は必須です',
     lastNameRequired: '姓は必須です',
@@ -274,6 +275,8 @@ export default {
     requestAlreadySent: `メールアドレス{{email}}のユーザーのアクセス申請は既に送信済みです`,
     emailNotReachable: '確認メールを{{email}}に送信できませんでした。アドレスが正しいか確認してください',
     invalidReCaptcha: 'reCAPTCHAが無効です',
+    surveyNameAlreadyUsed: '{{surveyName}} という名前の調査は既に存在します。別の調査名を提案してください',
+    registrationNotAvailable: '現在、登録を利用できません。後でもう一度お試しください',
   },
 
   userAccessRequestAccept: {

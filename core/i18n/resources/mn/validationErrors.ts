@@ -269,6 +269,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Улс шаардлагатай',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Нэр шаардлагатай',
     institutionRequired: 'Байгууллага шаардлагатай',
     lastNameRequired: 'Овог шаардлагатай',
@@ -279,6 +280,8 @@ export default {
     requestAlreadySent: `Имэйл {{email}}-тэй хэрэглэгчийн хандалтын хүсэлт аль хэдийн илгээгдсэн`,
     emailNotReachable: 'Баталгаажуулах имэйлийг {{email}} хаяг руу хүргэж чадсангүй; хаяг зөв эсэхийг шалгана уу',
     invalidReCaptcha: 'Хүчингүй ReCaptcha',
+    surveyNameAlreadyUsed: '{{surveyName}} нэртэй судалгаа аль хэдийн байна: өөр судалгааны нэр санал болгоно уу',
+    registrationNotAvailable: 'Бүртгэл одоогоор боломжгүй байна; дараа дахин оролдоно уу',
   },
 
   userAccessRequestAccept: {

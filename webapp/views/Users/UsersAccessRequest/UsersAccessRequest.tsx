@@ -24,7 +24,16 @@ type UserAccessRequestItem = UserAccessRequest.UserAccessRequest
 
 type FieldRenderer = (params: { fieldValue: string; i18n: any }) => string
 
+const selfRegisteredStatus = 'SELF_REGISTERED'
+
+// self-registered requests are stored as accepted
+const getDisplayStatus = (item: UserAccessRequestItem): string =>
+  UserAccessRequest.isSelfRegistered(item) ? selfRegisteredStatus : UserAccessRequest.getStatus(item)
+
 const iconByStatus = ({ i18n }: { i18n: any }): Partial<Record<string, ReactNode>> => ({
+  [selfRegisteredStatus]: (
+    <AppIcon name="user" className="accepted" title={i18n.t(`usersAccessRequestView.status.${selfRegisteredStatus}`)} />
+  ),
   [UserAccessRequest.status.ACCEPTED]: (
     <AppIcon name="check" className="accepted" title={i18n.t('usersAccessRequestView.status.ACCEPTED')} />
   ),
@@ -68,6 +77,8 @@ export const UsersAccessRequest = () => {
   const [currentUserAccessRequest, setCurrentUserAccessRequest] = useState<UserAccessRequestItem | null>(null)
 
   const columnContentRendererByFieldName: Record<string, FieldRenderer> = {
+    [`props.${UserAccessRequest.keysProps.title}`]: ({ fieldValue, i18n }) =>
+      fieldValue ? i18n.t(`user.titleValues.${fieldValue}`) : '',
     [`props.${UserAccessRequest.keysProps.country}`]: ({ fieldValue }) =>
       Countries.getCountryName({ code: fieldValue }),
     [`props.${UserAccessRequest.keysProps.templateUuid}`]: ({ fieldValue, i18n }) => {
@@ -105,8 +116,7 @@ export const UsersAccessRequest = () => {
     {
       key: 'status',
       header: 'common.status',
-      renderItem: ({ item }: { item: UserAccessRequestItem }) =>
-        iconByStatus({ i18n })[UserAccessRequest.getStatus(item)],
+      renderItem: ({ item }: { item: UserAccessRequestItem }) => iconByStatus({ i18n })[getDisplayStatus(item)],
       width: isMobile ? '4rem' : '5rem',
     },
     {
@@ -115,7 +125,11 @@ export const UsersAccessRequest = () => {
       hidden: isMobile,
       renderItem: ({ item }: { item: UserAccessRequestItem }) => (
         <LabelWithTooltip
-          label={UserAccessRequest.getAcceptedByName(item) || UserAccessRequest.getAcceptedByEmail(item)}
+          label={
+            UserAccessRequest.isSelfRegistered(item)
+              ? i18n.t(`usersAccessRequestView.status.${selfRegisteredStatus}`)
+              : UserAccessRequest.getAcceptedByName(item) || UserAccessRequest.getAcceptedByEmail(item)
+          }
         />
       ),
       width: defaultFieldWidth,

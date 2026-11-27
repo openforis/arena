@@ -269,6 +269,7 @@ export default {
   userAccessRequest: {
     countryRequired: 'Страна обязательна',
     emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailInvalid: '$t(validationErrors:user.emailInvalid)',
     firstNameRequired: 'Имя обязательно',
     institutionRequired: 'Учреждение обязательна',
     lastNameRequired: 'Фамилия обязательна',
@@ -279,6 +280,8 @@ export default {
     requestAlreadySent: `Запрос на доступ для пользователя с адресом электронной почты {{email}} уже отправлен`,
     emailNotReachable: 'Не удалось доставить письмо с подтверждением на адрес {{email}}; проверьте правильность адреса',
     invalidReCaptcha: 'Неверная ReCaptcha',
+    surveyNameAlreadyUsed: 'Обследование с названием {{surveyName}} уже существует: предложите другое название',
+    registrationNotAvailable: 'Регистрация сейчас недоступна; повторите попытку позже',
   },
 
   userAccessRequestAccept: {

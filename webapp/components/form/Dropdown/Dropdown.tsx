@@ -1,14 +1,16 @@
 import './dropdown.scss'
 
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import classNames from 'classnames'
 import ReactSelect, { components, createFilter } from 'react-select'
 
 import type { ArenaValidation } from '@openforis/arena-core'
 
 import ValidationTooltip from '@webapp/components/ValidationTooltip'
+import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import { LabelWithTooltip } from '../LabelWithTooltip'
+import { translatePlaceholder } from '../translatePlaceholder'
 
 import { dropdownTheme } from './dropdownTheme'
 import { useDropdown } from './useDropdown'
@@ -46,6 +48,25 @@ const SingleValueComponent =
     )
   }
 
+const isValueNotEmpty = (value: unknown): boolean =>
+  Array.isArray(value) ? value.length > 0 : value !== null && value !== undefined
+
+type FloatingLabelProps = {
+  label: string
+}
+
+// label on the top border, in a gap of the outline (drawn by a fieldset), like the outlined text inputs
+const FloatingLabel = ({ label }: FloatingLabelProps) => (
+  <>
+    <fieldset aria-hidden="true" className="dropdown-floating-label__outline">
+      <legend>
+        <span>{label}</span>
+      </legend>
+    </fieldset>
+    <span className="dropdown-floating-label__label">{label}</span>
+  </>
+)
+
 type DropdownProps = {
   ariaLabel?: string
   className?: string
@@ -59,6 +80,8 @@ type DropdownProps = {
   itemLabel?: string | ((...args: any[]) => any) // item label function or property name
   itemValue?: string | ((...args: any[]) => any)
   items: any[] | ((...args: any[]) => any)
+  // i18n key or text: shown as placeholder when empty, and on the top border when a value is selected
+  label?: string
   loading?: boolean
   menuPlacement?: 'auto' | 'top' | 'bottom'
   menuPosition?: 'absolute' | 'fixed'
@@ -92,6 +115,7 @@ const Dropdown = (props: DropdownProps) => {
     itemLabel = 'label',
     itemValue = 'value',
     items: itemsProp,
+    label: labelProp = undefined,
     loading: loadingProp = false,
     menuPlacement = 'auto',
     menuPosition = 'fixed',
@@ -139,6 +163,20 @@ const Dropdown = (props: DropdownProps) => {
     title,
   })
 
+  const i18n = useI18n()
+  const label = translatePlaceholder(i18n, labelProp)
+
+  // uncontrolled dropdowns (no selection prop): keep track of the selected value to show the floating label
+  const [uncontrolledHasValue, setUncontrolledHasValue] = useState(() => isValueNotEmpty(defaultValue))
+  const hasValue = selection === undefined ? uncontrolledHasValue : isValueNotEmpty(value)
+  const onSelectChange = useCallback(
+    (newValue) => {
+      setUncontrolledHasValue(isValueNotEmpty(newValue))
+      return onChange(newValue)
+    },
+    [onChange]
+  )
+
   // stable components: new ones at every render would remount the options and the selected value
   const selectComponents = useMemo(
     () => ({
@@ -146,6 +184,34 @@ const Dropdown = (props: DropdownProps) => {
       SingleValue: SingleValueComponent({ renderSelectedLabel }),
     }),
     [renderOptionLabel, renderSelectedLabel]
+  )
+
+  const reactSelect = (
+    <ReactSelect
+      aria-label={ariaLabel}
+      className="dropdown"
+      classNamePrefix="dropdown"
+      components={selectComponents}
+      defaultValue={defaultValue}
+      filterOption={createFilter({ stringify: (option) => option.label })}
+      inputId={inputId}
+      isClearable={clearable && !readOnly}
+      isDisabled={disabled}
+      isLoading={loading || loadingProp}
+      isMulti={multiple}
+      isSearchable={searchable && !readOnly}
+      onChange={onSelectChange}
+      openMenuOnClick={openMenuOnClick}
+      menuPlacement={menuPlacement}
+      menuPosition={menuPosition}
+      menuIsOpen={menuIsOpen}
+      onInputChange={onInputChange}
+      options={options}
+      placeholder={placeholder ?? label}
+      ref={selectRef}
+      theme={dropdownTheme}
+      value={value}
+    />
   )
 
   return (
@@ -156,31 +222,19 @@ const Dropdown = (props: DropdownProps) => {
       validation={validation}
       position={validationTooltipPosition}
     >
-      <ReactSelect
-        aria-label={ariaLabel}
-        className="dropdown"
-        classNamePrefix="dropdown"
-        components={selectComponents}
-        defaultValue={defaultValue}
-        filterOption={createFilter({ stringify: (option) => option.label })}
-        inputId={inputId}
-        isClearable={clearable && !readOnly}
-        isDisabled={disabled}
-        isLoading={loading || loadingProp}
-        isMulti={multiple}
-        isSearchable={searchable && !readOnly}
-        onChange={onChange}
-        openMenuOnClick={openMenuOnClick}
-        menuPlacement={menuPlacement}
-        menuPosition={menuPosition}
-        menuIsOpen={menuIsOpen}
-        onInputChange={onInputChange}
-        options={options}
-        placeholder={placeholder}
-        ref={selectRef}
-        theme={dropdownTheme}
-        value={value}
-      />
+      {label ? (
+        // only dropdowns with a label get the extra container (with the outline and the floating label)
+        <div
+          className={classNames('dropdown-floating-label', {
+            'dropdown-floating-label--with-label': hasValue,
+          })}
+        >
+          {reactSelect}
+          {hasValue && <FloatingLabel label={label} />}
+        </div>
+      ) : (
+        reactSelect
+      )}
     </ValidationTooltip>
   )
 }

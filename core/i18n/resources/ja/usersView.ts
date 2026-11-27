@@ -51,6 +51,7 @@ export default {
     surveyManagerDescription: '新しい調査を作成できます。',
     twoFactorDescription: 'サインイン時に求められる確認コードを生成するデバイス。',
     notifyOnUserAccessRequestDescription: 'Arenaへのアクセス申請があったときにメールで通知します。',
+    notifyOnUserSelfRegistrationDescription: '誰かがArenaでアカウントを作成したときにメールで通知します。',
     removeFromSurveyDescription: 'ユーザーは調査「{{survey}}」にアクセスできなくなります。',
     sections: {
       personal: '個人情報',
@@ -70,6 +71,7 @@ export default {
   prefs: {
     title: '通知設定',
     notifyOnUserAccessRequest: '新規ユーザーのアクセス申請',
+    notifyOnUserSelfRegistration: '新しいユーザーのセルフ登録',
   },
   roleInCurrentSurvey: '現在の調査での役割',
   roleInSurvey: '調査での役割',

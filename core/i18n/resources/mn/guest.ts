@@ -3,17 +3,20 @@ export default {
     title: 'Нэвтрэх',
     subtitle: 'Тавтай морил! $t(common.appNameFull)-д нэвтрэхийн тулд мэдээллээ оруулна уу.',
     backToLogin: 'Нэвтрэх хуудас руу буцах',
-    newToArena: '$t(common.appNameFull)-д шинээр ирсэн үү?',
-    registerBeforeLoggingIn: 'Эхлээд хандалтын хүсэлт илгээнэ үү: зөвхөн бүртгэлтэй хэрэглэгчид нэвтрэх боломжтой.',
+    noAccountYet: 'Бүртгэл байхгүй юу?',
+    createAccount: 'Бүртгэл үүсгэх',
+    invitedToSurvey:
+      'Судалгаанд уригдсан уу? Бүртгэл үүсгэх шаардлагагүй: урилгын имэйл дэх холбоосыг нээж, алхмуудыг дагана уу.',
     or: 'эсвэл',
     twoFactorTitle: 'Хоёр шаттай баталгаажуулалт',
     verify: 'Баталгаажуулах',
     lostYourDevice: 'Баталгаажуулах аппликейшнаа ашиглаж чадахгүй байна уу?',
     yourName: 'Таны нэр',
     yourEmail: 'Таны имэйл',
-    yourPassword: 'Таны нууц үг',
+    email: '$t(common.email)',
+    password: 'Нууц үг',
+    repeatPassword: 'Нууц үгээ давтах',
     yourNewPassword: 'Таны шинэ нууц үг',
-    repeatYourPassword: 'Нууц үгээ давтана уу',
     repeatYourNewPassword: 'Шинэ нууц үгээ давтана уу',
     requestAccess: 'Хандалтын хүсэлт илгээх',
     resetPassword: 'Нууц үг сэргээх',
@@ -40,6 +43,8 @@ export default {
         'Үйлчилгээ үзүүлэгч таны имэйл хаягийг баталгаажуулаагүй тул бүртгэлтэй тааруулах боломжгүй. Нууц үгээрээ нэвтэрч, профайлаасаа үйлчилгээ үзүүлэгчийг холбоно уу.',
       emailDomainNotAllowed: 'Энэ имэйлийн домэйнтэй бүртгэлүүд энэ нэвтрэх сонголтыг ашиглах боломжгүй.',
       userNotFound: 'Энэ имэйл хаягтай бүртгэл байхгүй байна. Судалгааны админаас урилга хүсэх эсвэл хандалт хүснэ үү.',
+      userNotFoundCreateAccount:
+        'Энэ имэйл хаягтай бүртгэл байхгүй байна. Эхлээд бүртгэл үүсгэх эсвэл судалгааны админаас урилга хүснэ үү.',
       ambiguousEmail:
         'Энэ имэйл хаягт нэгээс олон бүртгэл таарч байна. Нууц үгээрээ нэвтэрч, профайлаасаа үйлчилгээ үзүүлэгчийг холбоно уу.',
       identityAlreadyLinked: 'Үйлчилгээ үзүүлэгчийн энэ бүртгэл өөр хэрэглэгчтэй аль хэдийн холбогдсон байна.',
@@ -74,6 +79,7 @@ export default {
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Нэр',
         lastName: 'Овог',
         institution: 'Байгууллага',
@@ -93,12 +99,46 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
 Хүсэлт зөвшөөрөгдсөний дараа бид **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий өөр нэг имэйл илгээх болно.
 Баярлалаа, **$t(common.appNameFull)**-г ашиглаарай!`,
+    surveyNameHint:
+      'Энэ нэр нь $t(common.appName) платформ даяар судалгааг тодорхойлох тул **давтагдашгүй** байх ёстой: "survey", "test" гэх мэт ерөнхий нэр биш, жишээ нь байгууллага эсвэл улс, төсөл, оныг хослуулсан тодорхой нэр сонгоно уу. Зөвхөн жижиг үсэг, тоо, доогуур зураас.',
     sendRequest: 'Хүсэлт илгээх',
     sendRequestConfirm: '$t(common.appNameFull) руу хандах хүсэлт илгээх үү?',
     templateNotSelected: 'Сонгогдоогүй (эхнээс нь эхлэх)',
     title: 'Хандалтын хүсэлт',
     whitelistSenderSuggestion:
       'Хэрэв та үүнийг Спам/Хэрэггүй имэйлийн хавтаснаас олсон бол **{{senderEmail}}** хаягийг харилцагчдын жагсаалтдаа (хаягийн дэвтэр) нэмэх эсвэл аюулгүй/спам биш гэж тэмдэглэнэ үү. Ингэснээр бидний дараагийн имэйлүүд таны ирсэн имэйлийн хайрцагт шууд очих болно.',
+  },
+  registrationView: {
+    title: 'Бүртгэл үүсгэх',
+    introduction:
+      'Бүртгэл болон анхны судалгаагаа үүсгээрэй: $t(common.appName)-аар юу хийхийг хүсэж байгаагаа бидэнд хэлээрэй!',
+    createAccount: 'Бүртгэл үүсгэх',
+    createAccountConfirm: '$t(common.appNameFull)-д бүртгэл үүсгэх үү?',
+    accountCreated: 'Бүртгэл үүсгэгдлээ',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Имэйл хаягаа баталгаажуулж, бүртгэлээ дуусгахын тулд имэйл дэх холбоосыг нээнэ үү: нууц үгээ сонгох эсвэл боломжтой нэвтрэх аргуудын аль нэгээр (жишээ нь Google) нэвтэрнэ үү.
+
+Баярлалаа, **$t(common.appNameFull)**-ийг сайхан ашиглаарай!`,
+    error: 'Бүртгэл үүсгэхэд алдаа гарлаа: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Бүртгэлээ үүсгэх',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'Имэйлээ баталгаажуулах',
+        description:
+          'Та **{{senderEmail}}**-ээс бүртгэлээ дуусгах холбоостой имэйл хүлээн авна. Ирсэн мэйлд байхгүй юу? Spam/Junk хавтсыг шалгаад, илгээгчийг харилцагчиддаа нэмэх эсвэл имэйлийг спам биш гэж тэмдэглэнэ үү.',
+        descriptionWithoutSender:
+          'Та бүртгэлээ дуусгах холбоостой имэйл хүлээн авна. Ирсэн мэйлд байхгүй юу? Spam/Junk хавтсыг шалгаад, илгээгчийг харилцагчиддаа нэмэх эсвэл имэйлийг спам биш гэж тэмдэглэнэ үү.',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {
@@ -121,6 +161,8 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
       containsNumbers: 'Тоонууд агуулсан',
     },
     completeRegistration: 'Бүртгэлээ гүйцээх',
+    completeRegistrationWith: '{{provider}}-ээр бүртгэлээ дуусгах',
+    definePassword: 'Нууц үг тохируулах',
   },
   forgotPasswordView: {
     title: 'Нууц үгээ шинэчлэх',

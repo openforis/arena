@@ -3,17 +3,20 @@ export default {
     title: 'Anmelden',
     subtitle: 'Willkommen! Geben Sie Ihre Zugangsdaten ein, um mit $t(common.appNameFull) fortzufahren.',
     backToLogin: 'Zurück zur Anmeldung',
-    newToArena: 'Neu bei $t(common.appNameFull)?',
-    registerBeforeLoggingIn: 'Fordern Sie zuerst Zugriff an: Nur registrierte Benutzer können sich anmelden.',
+    noAccountYet: 'Noch kein Konto?',
+    createAccount: 'Konto erstellen',
+    invitedToSurvey:
+      'Zu einer Erhebung eingeladen? Sie müssen kein Konto erstellen: Öffnen Sie den Link in der Einladungs-E-Mail und folgen Sie den Schritten.',
     or: 'oder',
     twoFactorTitle: 'Zwei-Faktor-Authentifizierung',
     verify: 'Bestätigen',
     lostYourDevice: 'Sie können Ihre Authenticator-App nicht verwenden?',
     yourName: 'Ihr Name',
     yourEmail: 'Ihre E-Mail-Adresse',
-    yourPassword: 'Ihr Passwort',
+    email: '$t(common.email)',
+    password: 'Passwort',
+    repeatPassword: 'Passwort wiederholen',
     yourNewPassword: 'Ihr neues Passwort',
-    repeatYourPassword: 'Passwort wiederholen',
     repeatYourNewPassword: 'Neues Passwort wiederholen',
     requestAccess: 'Zugriff anfordern',
     resetPassword: 'Passwort zurücksetzen',
@@ -42,6 +45,8 @@ Geben Sie den von Ihrer Authenticator-App erzeugten Code ein.`,
       emailDomainNotAllowed: 'Konten mit dieser E-Mail-Domain können diese Anmeldeoption nicht verwenden.',
       userNotFound:
         'Für diese E-Mail-Adresse ist kein Konto vorhanden. Bitten Sie einen Erhebungsadministrator um eine Einladung oder fordern Sie Zugriff an.',
+      userNotFoundCreateAccount:
+        'Für diese E-Mail-Adresse ist kein Konto vorhanden. Erstellen Sie zuerst ein Konto oder bitten Sie einen Erhebungsadministrator um eine Einladung.',
       ambiguousEmail:
         'Mehrere Konten stimmen mit dieser E-Mail-Adresse überein. Melden Sie sich mit Ihrem Passwort an und verknüpfen Sie den Anbieter in Ihrem Profil.',
       identityAlreadyLinked: 'Dieses Konto des Anbieters ist bereits mit einem anderen Benutzer verknüpft.',
@@ -79,6 +84,7 @@ Geben Sie den von Ihrer Authenticator-App erzeugten Code ein.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Vorname',
         lastName: 'Nachname',
         institution: 'Institution',
@@ -98,11 +104,45 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
 Bitte geben Sie uns einige Tage für die Bearbeitung Ihrer Anfrage.
 Nach der Annahme senden wir eine weitere E-Mail mit den Zugangsanweisungen für $t(common.appName) an **{{email}}**.
 Vielen Dank und viel Erfolg mit **$t(common.appNameFull)**!`,
+    surveyNameHint:
+      'Der Name identifiziert die Erhebung auf der gesamten $t(common.appName)-Plattform und muss **eindeutig** sein: Wählen Sie einen spezifischen Namen, z. B. aus Ihrer Organisation oder Ihrem Land, dem Projekt und dem Jahr, keinen allgemeinen wie „survey“ oder „test“. Nur Kleinbuchstaben, Ziffern und Unterstriche.',
     sendRequest: 'Anfrage senden',
     sendRequestConfirm: 'Zugriff auf $t(common.appNameFull) anfordern?',
     templateNotSelected: 'Nicht ausgewählt (von Grund auf beginnen)',
     title: 'Zugriff anfordern',
     whitelistSenderSuggestion: `Falls Sie die E-Mail im Spam-Ordner finden, fügen Sie **{{senderEmail}}** Ihren Kontakten hinzu oder markieren Sie sie als sicher bzw. „Kein Spam“, damit zukünftige E-Mails von uns direkt Ihren Posteingang erreichen.`,
+  },
+  registrationView: {
+    title: 'Konto erstellen',
+    introduction:
+      'Erstellen Sie Ihr Konto und Ihre erste Erhebung: Erzählen Sie uns, was Sie mit $t(common.appName) vorhaben!',
+    createAccount: 'Konto erstellen',
+    createAccountConfirm: 'Ihr Konto in $t(common.appNameFull) erstellen?',
+    accountCreated: 'Konto erstellt',
+    accountCreatedMessage: `$t(common.emailSentToSelfConfirmation)
+$t(guest:accessRequestView.whitelistSenderSuggestion)
+
+Öffnen Sie den Link in der E-Mail, um Ihre E-Mail-Adresse zu bestätigen und Ihre Registrierung abzuschließen: Wählen Sie Ihr Passwort oder melden Sie sich mit einer der verfügbaren Anmeldeoptionen an (z. B. Google).
+
+Vielen Dank und viel Freude mit **$t(common.appNameFull)**!`,
+    error: 'Fehler beim Erstellen des Kontos: {{error}}',
+    steps: {
+      createAccount: {
+        title: 'Konto erstellen',
+        description: '$t(guest:accessRequestView.steps.sendRequest.description)',
+      },
+      confirmEmail: {
+        title: 'E-Mail bestätigen',
+        description:
+          'Sie erhalten eine E-Mail von **{{senderEmail}}** mit dem Link zum Abschließen Ihrer Registrierung. Nicht in Ihrem Posteingang? Prüfen Sie den Spam-/Junk-Ordner und fügen Sie den Absender zu Ihren Kontakten hinzu oder markieren Sie die E-Mail als kein Spam.',
+        descriptionWithoutSender:
+          'Sie erhalten eine E-Mail mit dem Link zum Abschließen Ihrer Registrierung. Nicht in Ihrem Posteingang? Prüfen Sie den Spam-/Junk-Ordner und fügen Sie den Absender zu Ihren Kontakten hinzu oder markieren Sie die E-Mail als kein Spam.',
+      },
+      startWorking: {
+        title: '$t(guest:accessRequestView.steps.startWorking.title)',
+        description: '$t(guest:accessRequestView.steps.startWorking.description)',
+      },
+    },
   },
   resetPasswordView: {
     description: {
@@ -125,6 +165,8 @@ Vielen Dank und viel Erfolg mit **$t(common.appNameFull)**!`,
       containsNumbers: 'Enthält Ziffern',
     },
     completeRegistration: 'Registrierung abschließen',
+    completeRegistrationWith: 'Registrierung mit {{provider}} abschließen',
+    definePassword: 'Passwort festlegen',
   },
   forgotPasswordView: {
     title: 'Passwort zurücksetzen',

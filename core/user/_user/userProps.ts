@@ -9,6 +9,9 @@ export const { mergeProps } = ObjectUtils
 
 export const keysProps = {
   title: 'title',
+  institution: 'institution',
+  // country code
+  country: 'country',
   // private props (visible only to the user itself)
   mapApiKeyByProvider: 'mapApiKeyByProvider',
   // restricted props (editable only by system admins)
@@ -40,6 +43,8 @@ export const newProps = (propsParam: Record<string, unknown>) =>
 // ====== READ
 export const getProps = A.prop(userKeys.props)
 export const getTitle = A.pipe(getProps, A.propOr('', keysProps.title))
+export const getInstitution = A.pipe(getProps, A.propOr('', keysProps.institution))
+export const getCountry = A.pipe(getProps, A.propOr('', keysProps.country))
 export const getMapApiKey = ({ provider }: { provider: string }) =>
   A.pipe(getProps, A.path([keysProps.mapApiKeyByProvider, provider]))
 export const getMaxSurveys = A.pipe(getProps, A.propOr(defaultMaxSurveys, keysProps.maxSurveys))

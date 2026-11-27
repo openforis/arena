@@ -432,7 +432,40 @@ export const fetchUsersWithExpiredInvitation = (client: DbClient = db) =>
     camelize
   )
 
-export const fetchSystemAdministratorsEmail = (client: DbClient = db) =>
+/**
+ * Fetches the UUID of a system administrator who has completed the registration, preferring the one with the given email.
+ */
+export const fetchSystemAdministratorUuid = (
+  { preferredEmail = null }: { preferredEmail?: string | null } = {},
+  client: DbClient = db
+): Promise<string | null> =>
+  client.oneOrNone(
+    `
+    SELECT u.uuid
+    FROM "user" u
+    JOIN auth_group_user gu ON gu.user_uuid = u.uuid
+    JOIN auth_group g
+      ON g.uuid = gu.group_uuid
+    WHERE g.name = $1
+      AND u.status = $2
+    ORDER BY u.email = $3 DESC NULLS LAST, u.email
+    LIMIT 1
+  `,
+    [AuthGroup.groupNames.systemAdmin, User.userStatus.ACCEPTED, preferredEmail],
+    (row) => row?.uuid ?? null
+  )
+
+/**
+ * Fetches the emails of the system administrators who want to receive the specified notification
+ * (by default, the notification of new access requests).
+ */
+export const fetchSystemAdministratorsEmail = (
+  {
+    notificationPref = User.keysPrefs.notifyOnUserAccessRequest,
+    notifyByDefault = true,
+  }: { notificationPref?: string; notifyByDefault?: boolean } = {},
+  client: DbClient = db
+) =>
   client.map(
     `
     SELECT u.email
@@ -441,10 +474,10 @@ export const fetchSystemAdministratorsEmail = (client: DbClient = db) =>
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
     WHERE g.name = $1
-      -- users who haven't set the pref (NULL) still get notified
-      AND COALESCE((u.prefs ->> $2)::boolean, true) = true
+      -- users who haven't set the pref (NULL) get the default
+      AND COALESCE((u.prefs ->> $2)::boolean, $3) = true
   `,
-    [AuthGroup.groupNames.systemAdmin, User.keysPrefs.notifyOnUserAccessRequest],
+    [AuthGroup.groupNames.systemAdmin, notificationPref, notifyByDefault],
     (row) => row.email
   )
 
@@ -496,6 +529,23 @@ export const updateUser = (
     camelize
   )
 
+/**
+ * Updates the name of a user and adds the specified props to the existing ones.
+ */
+export const updateNameAndMergeProps = (
+  { userUuid, name, props }: { userUuid: string; name: string; props: Record<string, unknown> },
+  client: DbClient = db
+) =>
+  client.one(
+    `
+    UPDATE "user" u
+    SET name = $1, props = COALESCE(u.props, '{}'::jsonb) || $3::jsonb
+    WHERE u.uuid = $2
+    RETURNING ${columnsCommaSeparated}`,
+    [name, userUuid, User.newProps(props)],
+    camelize
+  )
+
 export const updateNamePasswordAndStatus = (
   {
     userUuid,
@@ -503,16 +553,26 @@ export const updateNamePasswordAndStatus = (
     password,
     status,
     title,
-  }: { userUuid: string; name: string; password: string; status: string; title: UserTitle },
+    institution,
+    country,
+  }: {
+    userUuid: string
+    name: string
+    password: string
+    status: string
+    title: UserTitle
+    institution?: string
+    country?: string
+  },
   client: DbClient = db
 ) =>
   client.one(
     `
     UPDATE "user" u
-    SET name = $1, password = $2, status = $3, props = $5::jsonb
+    SET name = $1, password = $2, status = $3, props = COALESCE(u.props, '{}'::jsonb) || $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${columnsCommaSeparated}`,
-    [name, password, status, userUuid, User.newProps({ title })],
+    [name, password, status, userUuid, User.newProps({ title, institution, country })],
     camelize
   )
 

@@ -819,6 +819,7 @@ Réessayer ?`,
     status: {
       ACCEPTED: 'Accepté',
       CREATED: 'En attente',
+      SELF_REGISTERED: 'Auto-inscrit',
     },
     acceptedBy: 'Acceptée par',
     dateAccepted: "Date d'acceptation",

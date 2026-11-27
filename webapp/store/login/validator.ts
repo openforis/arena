@@ -44,7 +44,8 @@ export const validateResetPasswordObj = async (obj) => {
   if (!obj.hasAlreadyAccepted) {
     Object.assign(propsValidations, {
       [User.keysProps.title]: [Validator.validateRequired(Validation.messageKeys.user.titleRequired)],
-      name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
+      firstName: [Validator.validateRequired(Validation.messageKeys.userAccessRequest.firstNameRequired)],
+      lastName: [Validator.validateRequired(Validation.messageKeys.userAccessRequest.lastNameRequired)],
     })
   }
   return Validator.validate(obj, propsValidations)
