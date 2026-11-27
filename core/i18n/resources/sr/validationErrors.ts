@@ -251,6 +251,7 @@ export default {
     emailRequired: 'E-mail adresa je obavezna',
     emailInvalid: 'E-mail adresa nije važeća',
     emailNotFound: 'E-mail adresa nije pronađena',
+    invalidReCaptcha: '$t(validationErrors:userAccessRequest.invalidReCaptcha)',
     groupRequired: 'Grupa je obavezna',
     nameRequired: 'Ime je obavezno',
     titleRequired: 'Titula je obavezna',

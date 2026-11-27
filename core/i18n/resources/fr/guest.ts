@@ -173,6 +173,9 @@ Merci et profitez bien de **$t(common.appNameFull)** !`,
     title: 'Réinitialiser votre mot de passe',
     description:
       "Saisissez l'adresse e-mail de votre compte et nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+    emailSent: `Si un compte existe pour {{email}}, vous recevrez un e-mail avec un lien pour réinitialiser votre mot de passe.
+
+Veuillez également vérifier le dossier Spam/Courrier indésirable.`,
   },
   pitch: {
     default: {

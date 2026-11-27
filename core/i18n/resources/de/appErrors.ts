@@ -79,6 +79,7 @@ export default {
     'Funktion {{fnName}} akzeptiert höchstens {{maxArity}} Argumente (erhalten: {{numArgs}})',
   generic: 'Unerwarteter Fehler: {{text}}',
   unexpectedServerError: 'Auf dem Server ist ein unerwarteter Fehler aufgetreten.',
+  tooManyRequests: 'Zu viele Anfragen. Bitte warten Sie einige Minuten und versuchen Sie es erneut.',
   geoWhispApiError: 'Der Whisp-Dienst ist vorübergehend nicht verfügbar.',
   geoWhispSamplingPointDataCategoryMissing: 'Kategorie für Stichprobenpunktdaten nicht gefunden.',
   geoWhispSamplingPointDataLocationsMissing: 'Kein Stichprobenpunktdatenelement mit gültigem Standort gefunden.',

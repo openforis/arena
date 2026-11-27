@@ -166,6 +166,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   forgotPasswordView: {
     title: 'Reset your password',
     description: "Enter the email address of your account and we'll send you a link to choose a new password.",
+    emailSent: `If an account exists for {{email}}, you will receive an email with a link to reset your password.
+
+Please check also the Spam/Junk mail folder.`,
   },
   pitch: {
     default: {

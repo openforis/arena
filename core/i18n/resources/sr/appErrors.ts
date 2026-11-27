@@ -75,6 +75,7 @@ export default {
   functionHasTooManyArguments: 'Funkcija {{fnName}} prihvata najviše {{maxArity}} (dobijeno {{numArgs}})',
   generic: 'Neočekivana greška: {{text}}',
   unexpectedServerError: 'Došlo je do neočekivane greške na serveru.',
+  tooManyRequests: 'Previše zahtjeva. Molimo sačekajte nekoliko minuta i pokušajte ponovo.',
   geoWhispApiError: 'Whisp servis je privremeno nedostupan.',
   geoWhispSamplingPointDataCategoryMissing: 'Kategorija podataka o tačkama uzorka nije pronađena.',
   geoWhispSamplingPointDataLocationsMissing:

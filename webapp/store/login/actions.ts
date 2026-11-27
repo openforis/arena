@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { AppInfo } from '@core/app/appInfo'
 import * as ProcessUtils from '@core/processUtils'
+import { StatusCodes } from '@core/systemError'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 import { SystemActions } from '@webapp/store/system'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
@@ -51,7 +52,10 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
     await handlerFn(dispatch, getState)
   } catch (error) {
     // no message from the server (e.g. server unreachable): don't show technical details like "AxiosError: ..."
-    const messageKey = toErrorMessageKey(error?.response?.data?.message) || 'appErrors:networkError'
+    const { status, data } = error?.response ?? {}
+    // arena-server errors have a message; too many requests to the Arena guest endpoints have a key
+    const serverMessageKey = data?.message ?? (status === StatusCodes.TOO_MANY_REQUESTS ? data?.key : null)
+    const messageKey = toErrorMessageKey(serverMessageKey) || 'appErrors:networkError'
     dispatch(setLoginError(messageKey))
   } finally {
     dispatch(LoaderActions.hideLoader())
@@ -99,16 +103,16 @@ export const logout =
     navigate(appModuleUri(appModules.home))
   }
 
-export const sendPasswordResetEmail = (email, navigate) =>
+export const sendPasswordResetEmail = ({ email, reCaptchaToken, navigate }) =>
   _createAction(async (dispatch) => {
     const {
       data: { error },
-    } = await axios.post('/auth/reset-password', { email })
+    } = await axios.post('/auth/reset-password', { email, reCaptchaToken })
 
     if (error) {
       dispatch(setLoginError(error))
     } else {
-      dispatch(NotificationActions.notifyInfo({ key: 'common.emailSentToSelfConfirmation', params: { email } }))
+      dispatch(NotificationActions.notifyInfo({ key: 'guest:forgotPasswordView.emailSent', params: { email } }))
       navigate(-1)
     }
   })

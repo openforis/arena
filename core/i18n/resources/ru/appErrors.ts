@@ -105,6 +105,7 @@ export default {
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
   unexpectedServerError: 'На сервере произошла непредвиденная ошибка.',
+  tooManyRequests: 'Слишком много запросов. Подождите несколько минут и повторите попытку.',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
   geoWhispSamplingPointDataCategoryMissing: 'Категория данных точек выборки не найдена.',
   geoWhispSamplingPointDataLocationsMissing:

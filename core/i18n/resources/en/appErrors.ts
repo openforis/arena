@@ -74,6 +74,7 @@ export default {
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
   unexpectedServerError: 'An unexpected error occurred on the server.',
+  tooManyRequests: 'Too many requests. Please wait a few minutes and try again.',
   geoWhispApiError: 'The Whisp service is temporarily unavailable.',
   geoWhispSamplingPointDataCategoryMissing: 'Sampling point data category not found.',
   geoWhispSamplingPointDataLocationsMissing: 'No sampling point data item with a valid location found.',
