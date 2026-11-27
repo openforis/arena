@@ -1,0 +1,43 @@
+export default {
+  error: 'Kesalahan saat mengekspor data: {{details}}',
+  optionNotCompatibleWithDataImport: 'Tidak kompatibel dengan impor data',
+  options: {
+    header: '$t(common.options)',
+    fileFormatLabel: 'Format file',
+    fileFormat: {
+      csv: 'CSV',
+      xlsx: 'Excel',
+    },
+    includeCategoryItemsLabels: 'Sertakan label item kategori',
+    includeCategories: 'Sertakan kategori',
+    expandCategoryItems: 'Perluas item kategori',
+    exportSingleEntitiesIntoSeparateFiles: 'Ekspor entitas tunggal ke file terpisah',
+    includeAncestorAttributes: 'Sertakan atribut leluhur',
+    includeAnalysis: 'Sertakan variabel hasil',
+    includeDataFromAllCycles: 'Sertakan data dari semua siklus',
+    includeDateCreated: 'Sertakan tanggal pembuatan',
+    includeFiles: 'Sertakan file',
+    includeFileAttributeDefs: 'Sertakan kolom atribut file',
+    includeInternalUuids: 'Sertakan UUID internal',
+    recordsModifiedAfter: 'Catatan yang diubah setelah',
+    recordsModifiedBefore: 'Catatan yang diubah sebelum',
+  },
+  optionsInfo: {
+    expandCategoryItems:
+      'menambahkan satu kolom boolean untuk setiap item kategori dengan nilai TRUE jika item telah dipilih, FALSE jika tidak',
+    exportSingleEntitiesIntoSeparateFiles: `mengekspor entitas tunggal dalam file terpisah; jika tidak dicentang, atribut yang termasuk dalam entitas tunggal akan disertakan di antara atribut entitas jamak leluhur terdekatnya`,
+    includeAnalysis: 'menyertakan atribut analisis',
+    includeAncestorAttributes: 'menyertakan atribut yang termasuk dalam entitas leluhur, hingga entitas akar',
+    includeCategoryItemsLabels: 'menambahkan kolom berisi label untuk setiap item kategori',
+    includeCategories: `kategori akan diekspor ke subfolder bernama "categories"`,
+    includeDataFromAllCycles:
+      'data dari semua siklus akan disertakan; jika tidak, hanya siklus yang dipilih yang akan dipertimbangkan',
+    includeDateCreated: 'menyertakan tanggal pembuatan setiap entitas (baris) dalam kolom bernama "date_created"',
+    includeFiles: `mengekspor file yang terkait dengan catatan ke subfolder bernama "files"`,
+    includeFileAttributeDefs: `menambahkan kolom atribut file: pengenal internal file (file_uuid) dan nama (file_name)`,
+    includeInternalUuids: 'menyertakan pengenal internal (UUID) dalam kolom yang diakhiri dengan sufiks "_uuid"',
+    recordsModifiedAfter: 'hanya mengekspor data dari catatan yang diubah setelah tanggal yang ditentukan',
+    recordsModifiedBefore: 'hanya mengekspor data dari catatan yang diubah sebelum tanggal yang ditentukan',
+  },
+  startExport: 'Mulai ekspor',
+}

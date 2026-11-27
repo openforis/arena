@@ -127,7 +127,7 @@ export default {
     max: 'Хамгийн их',
     med: 'Дундаж',
     manage: 'Удирдах',
-    message_other: 'Мессежүүд',
+    messages: 'Мессежүүд',
     measure: 'Хэмжилт',
     measure_other: 'Хэмжилтүүд',
     measurePrevSteps: 'Өмнөх алхмуудыг хэмжих',
@@ -398,7 +398,7 @@ export default {
     virtualEntity_other: '$t(appModules.entities)',
     instances: 'RStudio сешнүүд',
     message: 'Мессеж',
-    message_other: '$t(common.message_other)',
+    message_other: '$t(common.messages)',
 
     systemAdmin: 'Системийн удирдлага',
     jobMonitor: 'Ажлын хяналт',

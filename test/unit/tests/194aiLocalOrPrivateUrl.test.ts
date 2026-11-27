@@ -78,6 +78,7 @@ describe('aiBaseUrlNotAllowed points to the local AI server', () => {
     en: 'Local AI server',
     es: 'Servidor de IA local',
     fr: "Serveur d'IA local",
+    id: 'server AI lokal',
     ja: 'ローカル AI サーバー',
     mn: 'Дотоод AI сервер',
     pt: 'Servidor de IA local',

@@ -127,7 +127,7 @@ export default {
     max: '最大',
     med: '中央値',
     manage: '管理',
-    message_other: 'メッセージ',
+    messages: 'メッセージ',
     measure: 'メジャー',
     measure_other: 'メジャー',
     measurePrevSteps: '前ステップのメジャー',
@@ -394,7 +394,7 @@ export default {
     instances: 'RStudioセッション',
 
     message: 'メッセージ',
-    message_other: '$t(common.message_other)',
+    message_other: '$t(common.messages)',
 
     systemAdmin: 'システム管理',
     jobMonitor: 'ジョブモニター',
@@ -490,7 +490,6 @@ export default {
       period: {
         label: '期間',
         hint: '最大 6 か月前まで',
-        months_one: '{{count}} か月',
         months_other: '{{count}} か月',
       },
       maxCloud: '最大雲量',
@@ -499,12 +498,9 @@ export default {
       chart: {
         title: '月ごとの晴天シーン',
         allMonths: 'すべての月',
-        bar_one: '{{month}}: {{count}} シーン',
         bar_other: '{{month}}: {{count}} シーン',
       },
-      count_one: '{{count}} シーン',
       count_other: '{{count}} シーン',
-      countInMonth_one: '{{month}} の {{count}} シーン',
       countInMonth_other: '{{month}} の {{count}} シーン',
       sort: {
         label: '並べ替え',
@@ -541,7 +537,6 @@ export default {
         outside: 'Sentinel-2 タイルは南緯 80° から北緯 84° までしかカバーしていません。',
         error: 'シーンのインデックスを読み込めませんでした。',
         retry: '再試行',
-        searching_one: '{{count}} タイルを検索中…',
         searching_other: '{{count}} タイルを検索中…',
         empty: '条件に合うシーンがありません。雲量の上限を上げるか、期間を長くしてください。',
         layerError: 'シーンを表示できませんでした。',
@@ -558,7 +553,6 @@ export default {
       insecureUrlHint:
         'このサービスは http を使用しています。この https ページではブラウザがタイルをブロックすることがあります',
       layersCount: '{{count}} レイヤー',
-      layersCount_one: '{{count}} レイヤー',
       layersCount_other: '{{count}} レイヤー',
       webMercatorSupported: 'Web メルカトル対応',
       webMercatorMissing: 'Web メルカトルのレイヤーがありません',
@@ -582,10 +576,8 @@ export default {
       scopeSurvey: 'この調査の全員',
       scopeUser: '自分のみ',
       submitOverlays: 'オーバーレイを {{count}} 件追加',
-      submitOverlays_one: 'オーバーレイを {{count}} 件追加',
       submitOverlays_other: 'オーバーレイを {{count}} 件追加',
       submitBaseMaps: 'ベースマップを {{count}} 件追加',
-      submitBaseMaps_one: 'ベースマップを {{count}} 件追加',
       submitBaseMaps_other: 'ベースマップを {{count}} 件追加',
       removeSelectedBaseMap: '選択中のカスタムベースマップを削除',
       hiddenForSession:
@@ -675,7 +667,6 @@ export default {
       },
       zoom: 'ズーム',
       scale: '縮尺',
-      recordsInView_one: '表示中の記録 {{count}} 件',
       recordsInView_other: '表示中の記録 {{count}} 件',
     },
     upload: {
@@ -1501,11 +1492,9 @@ $t(common.cantUndoWarning)`,
   },
 
   aiTranslation: {
-    translateButton_one: '他の{{count}}言語に翻訳',
     translateButton_other: '他の{{count}}言語に翻訳',
     translateButton: '他の言語に翻訳',
 
-    success_one: '{{count}}言語に翻訳しました。確認して保存してください。',
     success_other: '{{count}}言語に翻訳しました。確認して保存してください。',
     success: '翻訳しました。確認して保存してください。',
 
