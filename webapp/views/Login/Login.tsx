@@ -187,7 +187,7 @@ const Login = () => {
       <EmailInput
         autoComplete="username"
         defaultValue={email}
-        label="guest:loginView.yourEmail"
+        label="guest:loginView.email"
         name={FormFields.email}
         onChange={onChangeEmail}
       />
@@ -195,7 +195,7 @@ const Login = () => {
         autoComplete="current-password"
         defaultValue={formObject.password}
         name={FormFields.password}
-        label="guest:loginView.yourPassword"
+        label="guest:loginView.password"
         onChange={onChangePassword}
       />
       <Button className="guest__submit" label="guest:loginView.login" onClick={onClickLogin} type="submit" />

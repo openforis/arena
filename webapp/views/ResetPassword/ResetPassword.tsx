@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import classNames from 'classnames'
 import { useParams, useSearchParams } from 'react-router'
 
@@ -5,7 +6,8 @@ import * as User from '@core/user/user'
 import { Button } from '@webapp/components'
 import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/components/form'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
-import { ExternalLoginButtons } from '@webapp/components/guest/ExternalLoginButtons'
+import Radiobox from '@webapp/components/form/Radiobox'
+import { ExternalLoginButton, useLoginProviders } from '@webapp/components/guest/ExternalLoginButtons'
 import GuestError from '@webapp/components/guest/GuestError'
 import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
 import { LoginActions } from '@webapp/store/login'
@@ -13,6 +15,8 @@ import { useI18n } from '@webapp/store/system'
 
 import { RegistrationFields } from './RegistrationFields'
 import { useResetPassword } from './store/hooks'
+
+const passwordCompletionMethod = 'password'
 
 const ResetPassword = () => {
   const i18n = useI18n()
@@ -31,6 +35,10 @@ const ResetPassword = () => {
     navigateToHomePage,
   } = useResetPassword()
 
+  const providers = useLoginProviders()
+  // how the registration is completed: password or id of an external login provider
+  const [completionMethod, setCompletionMethod] = useState(passwordCompletionMethod)
+
   if (!user?.email)
     return (
       <form onSubmit={(event) => event.preventDefault()} className="guest__form">
@@ -42,13 +50,19 @@ const ResetPassword = () => {
   const viewKey = hasAlreadyAccepted ? 'setYourNewPassword' : 'completeRegistration'
 
   const emailInput = (
-    <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
+    <TextInput
+      label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourEmail' : 'guest:loginView.email')}
+      value={user.email}
+      readOnly
+      type="text"
+      name="email"
+    />
   )
   const passwordInput = (
     <PasswordInput
       autoComplete="new-password"
       defaultValue={user.password}
-      label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourNewPassword' : 'guest:loginView.yourPassword')}
+      label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourNewPassword' : 'guest:loginView.password')}
       onChange={(value) => onChangeUser({ prop: 'password', value })}
     />
   )
@@ -56,12 +70,22 @@ const ResetPassword = () => {
     <PasswordInput
       autoComplete="new-password"
       defaultValue={user.passwordConfirm}
-      label={i18n.t(
-        hasAlreadyAccepted ? 'guest:loginView.repeatYourNewPassword' : 'guest:loginView.repeatYourPassword'
-      )}
+      label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.repeatYourNewPassword' : 'guest:loginView.repeatPassword')}
       onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
     />
   )
+
+  const submitButton = (
+    <Button
+      className="guest__submit"
+      label={
+        hasAlreadyAccepted ? 'guest:resetPasswordView.setNewPassword' : 'guest:resetPasswordView.completeRegistration'
+      }
+      onClick={onSubmit}
+      type="submit"
+    />
+  )
+  const selectedProvider = providers.find((provider) => provider.id === completionMethod)
 
   return (
     <form
@@ -86,6 +110,7 @@ const ResetPassword = () => {
           {passwordInput}
           <PasswordStrengthChecker password={user.password} />
           {passwordConfirmInput}
+          {submitButton}
         </>
       ) : (
         // two fields per row (one on small screens), to avoid scrolling
@@ -100,29 +125,44 @@ const ResetPassword = () => {
             />
           </div>
           <RegistrationFields onChangeUser={onChangeUser} readOnly={Boolean(registrationInfo)} user={user} />
-          <div className="guest__form-row">
-            {passwordInput}
-            {passwordConfirmInput}
-          </div>
-          <PasswordStrengthChecker password={user.password} />
+          {providers.length > 0 && (
+            // the choice is shown only when there are external login providers
+            <div className="guest__completion-methods" role="radiogroup">
+              <Radiobox
+                checked={completionMethod === passwordCompletionMethod}
+                label="guest:resetPasswordView.definePassword"
+                onChange={() => setCompletionMethod(passwordCompletionMethod)}
+              />
+              {providers.map((provider) => (
+                <Radiobox
+                  key={provider.id}
+                  checked={completionMethod === provider.id}
+                  label={i18n.t('guest:externalLogin.continueWith', { provider: provider.label })}
+                  onChange={() => setCompletionMethod(provider.id)}
+                />
+              ))}
+            </div>
+          )}
+          {selectedProvider ? (
+            // accept the invitation with the external provider instead of a password
+            <ExternalLoginButton
+              className="guest__submit-external"
+              labelKey="guest:resetPasswordView.completeRegistrationWith"
+              onBeforeNavigate={onBeforeExternalLogin}
+              provider={selectedProvider}
+              query={{ invitation: invitationUuid, name: [user.firstName, user.lastName].filter(Boolean).join(' ') }}
+            />
+          ) : (
+            <>
+              <div className="guest__form-row">
+                {passwordInput}
+                {passwordConfirmInput}
+              </div>
+              <PasswordStrengthChecker password={user.password} />
+              {submitButton}
+            </>
+          )}
         </>
-      )}
-
-      <Button
-        className="guest__submit"
-        label={
-          hasAlreadyAccepted ? 'guest:resetPasswordView.setNewPassword' : 'guest:resetPasswordView.completeRegistration'
-        }
-        onClick={onSubmit}
-        type="submit"
-      />
-      {!hasAlreadyAccepted && (
-        // accept the invitation with an external provider instead of a password
-        <ExternalLoginButtons
-          labelKey="guest:externalLogin.continueWith"
-          onBeforeNavigate={onBeforeExternalLogin}
-          query={{ invitation: invitationUuid, name: [user.firstName, user.lastName].filter(Boolean).join(' ') }}
-        />
       )}
     </form>
   )

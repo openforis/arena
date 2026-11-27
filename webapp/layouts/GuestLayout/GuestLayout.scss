@@ -496,6 +496,13 @@ $guestMobileBreakpoint: 900px;
   color: $colorOnSurfaceVariant;
 }
 
+// complete registration: password or external login provider
+.guest__completion-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+}
+
 // complete registration: two fields per row, in a wider card (to avoid scrolling)
 .guest__form-row {
   display: grid;
@@ -535,7 +542,8 @@ $guestMobileBreakpoint: 900px;
     }
 
     // centered, not as wide as the form
-    .guest__submit.btn {
+    .guest__submit.btn,
+    .guest__submit-external {
       justify-self: center;
       width: auto;
       min-width: 16rem;
