@@ -23,7 +23,7 @@ const AccessRequestSent = ({ email }: AccessRequestSentProps) => {
   const navigate = useNavigate()
   return (
     <div className="access-request">
-      <GuestViewHeader icon="icon-checkmark" iconVariant="success" title="guest:accessRequestView.requestSent" />
+      <GuestViewHeader icon="check" iconVariant="success" title="guest:accessRequestView.requestSent" />
       <Markdown
         className="access-request__sent-message"
         source={i18n.t('guest:accessRequestView.requestSentMessage', {
@@ -75,7 +75,8 @@ const AccessRequest = () => {
           <div className="access-request__submit">
             <ReCaptcha ref={reCaptchaRef} />
             <Button
-              iconClassName="icon-envelop icon-12px"
+              iconName="mail"
+              iconSize={14}
               label="guest:accessRequestView.sendRequest"
               onClick={onSubmit}
               type="submit"

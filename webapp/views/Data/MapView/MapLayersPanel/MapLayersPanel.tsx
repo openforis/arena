@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 
 import { SortOrder } from '@core/sortOrder'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { useI18n } from '@webapp/store/system'
 import { themeColors, withAlpha } from '@webapp/theme/tokens'
@@ -89,7 +90,7 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
     none: 'common.sortAsc',
   }
   const tooltipKey = tooltipKeyBySortOrder[sortOrder]
-  const iconClass = sortOrder === SortOrder.desc ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
+  const iconName = sortOrder === SortOrder.desc ? 'sortDesc' : 'sortAsc'
   return (
     <Tooltip title={i18n.t(tooltipKey)} placement="right" slotProps={{ popper: { container: portalContainer } }}>
       <IconButton
@@ -105,7 +106,7 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
           '&:hover': { bgcolor: withAlpha(themeColors.primary, 0.12), opacity: 1 },
         }}
       >
-        <span className={`icon icon-12px ${iconClass}`} />
+        <AppIcon name={iconName} size={14} />
         <Typography component="span" sx={{ fontSize: '0.68rem', lineHeight: 1, color: 'inherit' }}>
           {i18n.t('common.sort')}
         </Typography>
@@ -227,7 +228,7 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
       }}
     >
       <AccordionSummary
-        expandIcon={isSingleLayer ? null : <span className="icon icon-12px icon-arrow-down" />}
+        expandIcon={isSingleLayer ? null : <AppIcon name="arrowDown" size={14} />}
         sx={{
           bgcolor: themeColors.secondaryContainer,
           color: themeColors.onSecondaryContainer,

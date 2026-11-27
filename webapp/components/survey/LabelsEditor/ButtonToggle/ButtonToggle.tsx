@@ -8,7 +8,8 @@ type ButtonToggleProps = {
 const ButtonToggle = ({ open, onClick }: ButtonToggleProps) => (
   <Button
     className="btn-s labels-editor__btn-toggle"
-    iconClassName={`icon icon-${open ? 'shrink2' : 'enlarge2'} icon-12px`}
+    iconName={open ? 'collapse' : 'expand'}
+    iconSize={14}
     onClick={onClick}
     variant="text"
   />

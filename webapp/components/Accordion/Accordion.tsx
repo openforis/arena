@@ -1,10 +1,10 @@
-import './Accordion.scss'
-
 import React from 'react'
 import MuiAccordion from '@mui/material/Accordion'
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import MuiAccordionSummary from '@mui/material/AccordionSummary'
 import MuiTypography from '@mui/material/Typography'
+
+import { AppIcon } from '@webapp/components/AppIcon'
 
 type AccordionItem = {
   key: string
@@ -26,7 +26,7 @@ export const Accordion = (props: AccordionProps) => {
       {items.map((item) => (
         <MuiAccordion key={item.key} defaultExpanded={item.defaultExpanded}>
           <MuiAccordionSummary
-            expandIcon={<span className="icon icon-ctrl icon-20px expand-icon" />}
+            expandIcon={<AppIcon name="dropDown" size={20} />}
             aria-controls={`panel${item.key}-content`}
             id={`panel${item.key}-header`}
           >

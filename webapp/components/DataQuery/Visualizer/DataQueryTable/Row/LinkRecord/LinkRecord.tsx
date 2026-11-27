@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 
 import * as Record from '@core/record/record'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 
 type LinkRecordProps = {
@@ -22,7 +23,7 @@ const LinkRecord = (props: LinkRecordProps) => {
   return (
     <Link type="button" className="btn-transparent" title={i18n.t('dataExplorerView.editRecord')} to={recordEditUrl}>
       {rowNo}
-      <span className="icon icon-link icon-right icon-12px" />
+      <AppIcon name="link" size={14} className="icon-right" />
     </Link>
   )
 }

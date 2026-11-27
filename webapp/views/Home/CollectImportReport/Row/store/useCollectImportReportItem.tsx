@@ -3,6 +3,7 @@ import { useState } from 'react'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { useSurvey, useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -16,7 +17,7 @@ const _isValidationRule = (type) =>
 const _getTypeIcon = (type) => {
   if (_isValidationRule(type)) {
     const severity = type === CollectImportReportItem.exprTypes.validationRuleError ? 'error' : 'warning'
-    return <span className={`icon icon-12px icon-left icon-warning ${severity}`} />
+    return <AppIcon className={`icon-left ${severity}`} name="warning" size={14} />
   }
   return null
 }

@@ -49,7 +49,7 @@ const RECORDS_RAIL_TABS: MapRailTab[] = [
     key: 'records',
     labelKey: 'mapWorkspace.rail.tabs.records',
     titleKey: 'mapWorkspace.rail.titles.records',
-    iconClassName: 'icon-list',
+    iconName: 'list',
     content: <MapLayersPanel />,
   },
 ]

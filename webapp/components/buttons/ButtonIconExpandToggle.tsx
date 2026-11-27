@@ -5,7 +5,7 @@ import classNames from 'classnames'
 
 import { Button, ButtonProps } from './Button'
 
-type Props = Omit<ButtonProps, 'icon' | 'iconClassName' | 'label' | 'title'> & {
+type Props = Omit<ButtonProps, 'icon' | 'iconName' | 'label' | 'title'> & {
   expanded: boolean
 }
 

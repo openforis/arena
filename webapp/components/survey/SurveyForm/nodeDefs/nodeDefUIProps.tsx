@@ -1,9 +1,12 @@
+import { cloneElement, isValidElement } from 'react'
+
 import { FormHeaderColor } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { NumberFormats } from '@webapp/components/form/Input'
 
 import NodeDefBoolean from './components/types/NodeDefBoolean'
@@ -29,49 +32,49 @@ export const headerColorRgbCodesByColor = {
   [FormHeaderColor.yellow]: '#fffdaf',
 }
 
-const singleEntityIcon = <span className="icon icon-file-empty icon-left" />
+const singleEntityIcon = <AppIcon name="file" className="icon-left" />
 const multipleAttributeIcon = <span title="Multiple">M</span>
-const keyIcon = <span className="icon icon-key icon-left" />
+const keyIcon = <AppIcon name="key" className="icon-left" />
 
 const propsUI = {
   [integer]: {
-    icon: <span className="icon icon-left node_def__icon">123</span>,
+    icon: <span className="icon-left node_def__icon">123</span>,
     numberFormat: NumberFormats.integer(),
     defaultValue: '',
   },
 
   [decimal]: {
-    icon: <span className="icon icon-left node_def__icon">1.23</span>,
+    icon: <span className="icon-left node_def__icon">1.23</span>,
     numberFormat: NumberFormats.decimal(),
     defaultValue: '',
   },
 
   [text]: {
-    icon: <span className="icon icon-left node_def__icon">ABC</span>,
+    icon: <span className="icon-left node_def__icon">ABC</span>,
     defaultValue: '',
   },
 
   [date]: {
     component: NodeDefDate,
-    icon: <span className="icon icon-calendar icon-left" />,
+    icon: <AppIcon name="calendar" className="icon-left" />,
     defaultValue: '',
   },
 
   [time]: {
     component: NodeDefTime,
-    icon: <span className="icon icon-clock icon-left" />,
+    icon: <AppIcon name="time" className="icon-left" />,
     defaultValue: '',
   },
 
   [boolean]: {
     component: NodeDefBoolean,
-    icon: <span className="icon icon-checkbox-checked icon-left" />,
+    icon: <AppIcon name="checkboxChecked" className="icon-left" />,
     defaultValue: '',
   },
 
   [code]: {
     component: NodeDefCode,
-    icon: <span className="icon icon-list icon-left" />,
+    icon: <AppIcon name="list" className="icon-left" />,
     defaultValue: '',
     defaultProps: (cycle) => ({
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.dropdown),
@@ -80,7 +83,7 @@ const propsUI = {
 
   [coordinate]: {
     component: NodeDefCoordinate,
-    icon: <span className="icon icon-location2 icon-left" />,
+    icon: <AppIcon name="place" className="icon-left" />,
     defaultValue: { x: '', y: '', srs: '' },
     formFieldsFn: (nodeDef) => [
       { field: valuePropsCoordinate.x, labelKey: 'surveyForm:nodeDefCoordinate.x' },
@@ -95,12 +98,12 @@ const propsUI = {
 
   [geo]: {
     component: NodeDefGeo,
-    icon: <span className="icon icon-codepen icon-left" />,
+    icon: <AppIcon name="geo" className="icon-left" />,
   },
 
   [taxon]: {
     component: NodeDefTaxon,
-    icon: <span className="icon icon-leaf icon-left" />,
+    icon: <AppIcon name="taxon" className="icon-left" />,
     defaultValue: {
       taxonUuid: null,
       vernacularNameUuid: null,
@@ -122,13 +125,13 @@ const propsUI = {
 
   [file]: {
     component: NodeDefFile,
-    icon: <span className="icon icon-file-picture icon-left" />,
+    icon: <AppIcon name="fileImage" className="icon-left" />,
     validations: true,
   },
 
   [entity]: {
     component: NodeDefEntitySwitch,
-    icon: <span className="icon icon-table2 icon-left" />,
+    icon: <AppIcon name="table" className="icon-left" />,
     defaultProps: (cycle) => ({
       [NodeDef.propKeys.multiple]: true,
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
@@ -137,7 +140,7 @@ const propsUI = {
 
   [formHeader]: {
     component: NodeDefFormHeader,
-    icon: <span className="icon icon-minus icon-left" />,
+    icon: <AppIcon name="remove" className="icon-left" />,
     defaultProps: () => ({
       [NodeDef.propKeys.headerColor]: FormHeaderColor.blue,
     }),
@@ -151,7 +154,18 @@ const getPropByType =
 
 const getProp = (prop, defaultValue = null) => A.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
-export const getIconByType = getPropByType('icon')
+const getIconProp = getPropByType('icon')
+
+// the icons are AppIcon elements (or text, e.g. "123"): a size, when given, is set on the AppIcon ones
+const withSize = (icon, size?: number) =>
+  size && isValidElement(icon) && icon.type === AppIcon
+    ? cloneElement(icon as React.ReactElement<{ size?: number }>, { size })
+    : icon
+
+/**
+ * Returns the icon of the given node definition type, optionally with the given size (px).
+ */
+export const getIconByType = (nodeDefType, size?: number) => withSize(getIconProp(nodeDefType), size)
 
 const getEntityIcon = ({ nodeDef, cycle }) => {
   if (NodeDef.isRoot(nodeDef)) {
@@ -162,36 +176,38 @@ const getEntityIcon = ({ nodeDef, cycle }) => {
   }
   // multiple entity with form layout
   if (NodeDefLayout.isRenderForm(cycle)(nodeDef)) {
-    return <span className="icon icon-files-empty icon-left" />
+    return <AppIcon name="files" className="icon-left" />
   }
   // multiple entity with table layout
-  return <span className="icon icon-table2 icon-left" />
+  return <AppIcon name="table" className="icon-left" />
 }
 
-export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false }) => (
+export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false, size = undefined }) => (
   <div className="node-def__icon-wrapper">
-    {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
+    {includeKey && NodeDef.isKey(nodeDef) && withSize(keyIcon, size)}
     {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
-    {NodeDef.isEntity(nodeDef) ? getEntityIcon({ nodeDef, cycle }) : getIconByType(NodeDef.getType(nodeDef))}
+    {NodeDef.isEntity(nodeDef)
+      ? withSize(getEntityIcon({ nodeDef, cycle }), size)
+      : getIconByType(NodeDef.getType(nodeDef), size)}
   </div>
 )
 
 /**
- * Extracts the CSS class name and text content of the given icon React element.
+ * Extracts the CSS class name, the AppIcon name and the text content of the given icon React element.
  * Used to render the same node def type icons outside of React (e.g. in a D3 chart).
  * @param {ReactElement} element - Icon element defined in this module.
- * @returns {{className: string, text: string|null}|null} Icon descriptor, or null if no element is given.
+ * @returns {{className: string, iconName: string|null, text: string|null}|null} Icon descriptor, or null if no element is given.
  */
 const getIconDescriptor = (element) => {
   if (!element) return null
-  const { className, children } = element.props
-  return { className, text: typeof children === 'string' ? children : null }
+  const { className, children, name } = element.props
+  return { className, iconName: name ?? null, text: typeof children === 'string' ? children : null }
 }
 
 /**
  * Returns a plain descriptor (CSS class name and optional text content) of the icon
  * representing the type of the given node definition, for use outside of React rendering.
- * @returns {{className: string, text: string|null}|null} Icon descriptor, or null for the root entity.
+ * @returns {{className: string, iconName: string|null, text: string|null}|null} Icon descriptor, or null for the root entity.
  */
 export const getIconDescriptorByNodeDef = ({ nodeDef, cycle }) =>
   NodeDef.isEntity(nodeDef)

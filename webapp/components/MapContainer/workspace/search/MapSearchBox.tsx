@@ -4,6 +4,7 @@ import type { KeyboardEvent, ReactElement } from 'react'
 import { useMap } from 'react-leaflet'
 
 import { formatCoordinates } from '@core/geo/coordinateFormat'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import type { MapRecordCandidate, MapWorkspaceRecords } from '../mapWorkspaceTypes'
@@ -206,7 +207,7 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   return (
     <div className="map-search">
-      <span className="icon icon-search map-search__icon" aria-hidden="true" />
+      <AppIcon name="search" className="map-search__icon" aria-hidden="true" />
       <input
         ref={inputRef}
         type="search"

@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { ExpansionPanel } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useAppDispatch } from '@webapp/store'
 import { SystemActions, useI18n, useSystemError, useSystemStatusReady } from '@webapp/store/system'
 
@@ -42,7 +43,7 @@ const Arena = () => {
       <div className="main__system-error">
         <div className="main__system-error-container">
           <span className="error-message">
-            <span className="icon icon-warning icon-24px icon-left" />
+            <AppIcon name="warning" size={24} className="icon-left" />
             {i18n.t('appErrors:networkError')}
           </span>
           <span className="error-message__second-line">{i18n.t('appErrors:sessionExpiredRefreshPage')}</span>

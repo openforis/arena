@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 import { isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
 import { AiBatchProgressDialog } from '@webapp/components/ai/AiBatchProgressDialog'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu, ButtonMenuItem } from '@webapp/components/buttons'
 import { OpenFileUploadDialogButton } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { useAppDispatch } from '@webapp/store'
@@ -98,7 +98,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
     [closeCloneFromSurveyDialog, dispatch]
   )
 
-  const items = useMemo(
+  const items = useMemo<ButtonMenuItem[]>(
     () => [
       {
         key: 'schema-summary-csv',
@@ -114,7 +114,8 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
       ...(dataDictionaryAiEnabled
         ? schemaSummaryAiFileFormats.map((fileFormat) => ({
             key: `schema-summary-${fileFormat}-ai`,
-            iconClassName: 'icon-download2 icon-14px',
+            iconName: 'download' as const,
+            iconSize: 16,
             label: `surveyForm:schemaSummaryAiDescriptions_${fileFormat}`,
             onClick: () => startDataDictionaryExport(fileFormat),
             testId: TestId.surveyForm.schemaSummaryAi(fileFormat),
@@ -126,7 +127,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
               key: 'node-clone-from-other-survey',
               content: (
                 <Button
-                  iconClassName="icon-copy"
+                  iconName="copy"
                   label="surveyForm:cloneFromAnotherSurvey.title"
                   onClick={openCloneFromSurveyDialog}
                   variant="text"
@@ -140,7 +141,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
         content: (
           <ButtonDownload
             href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-            iconClassName="icon-file-word"
+            iconName="fileDoc"
             label="surveyForm:downloadPrintableDocument"
             variant="text"
           />
@@ -151,7 +152,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
         content: (
           <ButtonDownload
             href={API.getSurveyPdfExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-            iconClassName="icon-file-pdf"
+            iconName="filePdf"
             label="surveyForm:downloadPrintableDocumentPdf"
             variant="text"
           />
@@ -183,7 +184,8 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
         ? [
             {
               key: 'translate-labels-ai',
-              iconClassName: 'icon-earth icon-14px',
+              iconName: 'globe' as const,
+              iconSize: 16,
               label: 'surveyForm:aiTranslateLabels',
               onClick: startTranslation,
               testId: TestId.surveyForm.aiTranslateLabelsBtn,
@@ -212,7 +214,8 @@ const FormHeaderAdvancedButton = ({ canEditDef }: FormHeaderAdvancedButtonProps)
       <ButtonMenu
         className="btn-menu-advanced"
         disabled={surveyIsDirty}
-        iconClassName="icon-cog icon-14px"
+        iconName="settings"
+        iconSize={16}
         label="common.advancedFunctions"
         items={items}
         size="small"

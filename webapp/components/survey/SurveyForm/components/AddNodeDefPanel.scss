@@ -31,8 +31,7 @@
     }
   }
 
-  .icon {
-    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
+  .app-icon {
     opacity: 0.6;
   }
 
@@ -43,16 +42,12 @@
     letter-spacing: 0;
   }
 
-  .icon-text-color {
-    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
-  }
-
   .add-to-label {
     font-weight: 600;
     font-size: 0.7rem;
     opacity: 0.8;
 
-    .icon {
+    .app-icon {
       opacity: 0.5;
     }
   }
@@ -61,7 +56,7 @@
     position: absolute;
     left: 1.3rem;
 
-    .icon {
+    .app-icon {
       opacity: 1;
     }
   }

@@ -16,7 +16,8 @@ type ModalCloseProps = {
 export const ModalClose = ({ onClose }: ModalCloseProps) => (
   <Button
     className="modal-close"
-    iconClassName="icon-cross icon-20px"
+    iconName="close"
+    iconSize={20}
     onClick={onClose}
     title="common.close"
     variant="text"

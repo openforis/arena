@@ -12,10 +12,11 @@ import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvaila
 import { useAiEngineActions } from '@webapp/components/ai/AiNotAvailable/useAiEngineActions'
 import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
-import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
+import { getHostingIcon } from '@webapp/components/ai/hostingIcons'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { getApiErrorMessage, type TFunction } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
 import { getProviderDisplayName, getProviderMonogramType } from '@webapp/components/ai/UserAiSettingsPanel/providerList'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useNotifyError } from '@webapp/components/hooks'
 import { setDefaultProvider } from '@webapp/service/api/ai/providers'
 import { useI18nT } from '@webapp/store/system'
@@ -271,7 +272,7 @@ export const AssistantProviderChip = (props: Props) => {
   const fullLabel = getProviderChipFullLabel({ view, t })
   const tone = view.kind === 'provider' ? view.tone : 'bad'
   // a default missing on this browser is a local provider of another computer: no location to show
-  const iconClass = getHostingIconClass(view.kind === 'provider' ? view.entry.hostingClass : null)
+  const hostingIcon = getHostingIcon(view.kind === 'provider' ? view.entry.hostingClass : null)
 
   return (
     <>
@@ -287,7 +288,7 @@ export const AssistantProviderChip = (props: Props) => {
         title={fullLabel}
         type="button"
       >
-        <span aria-hidden="true" className={`ai-provider-chip__icon icon ${iconClass} icon-14px`} />
+        <AppIcon className="ai-provider-chip__icon" name={hostingIcon} size={18} />
         <span aria-hidden="true" className="ai-provider-chip__caret">
           ▾
         </span>

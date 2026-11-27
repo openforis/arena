@@ -143,7 +143,8 @@ const AdvancedFunctionsMenu = () => {
         content: (
           <Button
             disabled={uploadingMauFile}
-            iconClassName="icon-upload2 icon-12px icon-left"
+            iconName="upload"
+            iconSize={14}
             label="chainView.mauFile.upload"
             onClick={onUploadButtonClick}
             variant="text"
@@ -199,7 +200,8 @@ const AdvancedFunctionsMenu = () => {
       <input ref={mauFileInputRef} accept=".zip" onChange={onMauFileSelected} style={{ display: 'none' }} type="file" />
       <ButtonMenu
         className="advanced-functions-menu-btn"
-        iconClassName="icon-cog icon-14px"
+        iconName="settings"
+        iconSize={16}
         items={items}
         label="common.advancedFunctions"
         size="small"

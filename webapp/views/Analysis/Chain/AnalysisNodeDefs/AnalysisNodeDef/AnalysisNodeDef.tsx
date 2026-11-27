@@ -7,6 +7,7 @@ import { Link } from 'react-router'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { AppIcon } from '@webapp/components/AppIcon'
 import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/WarningBadge'
 import { useAppDispatch } from '@webapp/store'
@@ -57,7 +58,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }: AnalysisNodeDef
     <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
       <div>
         <button className="analysis-node-def__btn-move" type="button" disabled={!editable}>
-          <span className="icon icon-menu" />
+          <AppIcon name="menu" />
         </button>
       </div>
       <div className={classNames('analysis-node-def__entity-name', { 'with-warning': warningShown })}>
@@ -72,9 +73,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }: AnalysisNodeDef
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
       <div className="analysis-node-def__area-based">
-        {NodeDef.isDecimal(nodeDef) && NodeDef.hasAreaBasedEstimated(nodeDef) && (
-          <span className="icon icon-checkmark" />
-        )}
+        {NodeDef.isDecimal(nodeDef) && NodeDef.hasAreaBasedEstimated(nodeDef) && <AppIcon name="check" />}
       </div>
       <div className="analysis-node-def__type">
         {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}
@@ -91,7 +90,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }: AnalysisNodeDef
           className="btn btn-xs btn-transparent"
           to={`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
-          <span className={`icon ${editable ? 'icon-pencil2' : 'icon-eye'} icon-10px icon-left`} />
+          <AppIcon className="icon-left" name={editable ? 'edit' : 'view'} size={12} />
           {i18n.t(editable ? 'common.edit' : 'common.view')}
         </Link>
       </div>

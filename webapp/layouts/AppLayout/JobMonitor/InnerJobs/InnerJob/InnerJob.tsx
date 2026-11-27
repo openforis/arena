@@ -3,16 +3,17 @@ import { useEffect, useRef } from 'react'
 import type { ArenaJobSerialized } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
+import { Spinner } from '@webapp/components/Spinner'
 import { useI18n } from '@webapp/store/system'
 import JobErrors from '../../JobErrors'
 import JobProgress from '../../JobProgress'
 import JobTiming from '../../JobTiming'
 
-const getStatusIconClass = (innerJob, isCurrentJob) => {
-  if (JobSerialized.isSucceeded(innerJob)) return 'icon-checkbox-checked'
-  if (JobSerialized.isFailed(innerJob)) return 'icon-cross'
-  if (isCurrentJob) return 'icon-spinner'
-  return 'icon-checkbox-unchecked'
+const getStatusIcon = (innerJob): IconName => {
+  if (JobSerialized.isSucceeded(innerJob)) return 'checkboxChecked'
+  if (JobSerialized.isFailed(innerJob)) return 'close'
+  return 'checkboxUnchecked'
 }
 
 type InnerJobProps = {
@@ -26,7 +27,7 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }: InnerJobProps) => {
   const elementRef = useRef(null)
 
   const isRunning = JobSerialized.isRunning(innerJob)
-  const statusIconClass = getStatusIconClass(innerJob, isCurrentJob)
+  const statusIcon = getStatusIcon(innerJob)
 
   useEffect(() => {
     if (isRunning && elementRef.current) {
@@ -38,7 +39,13 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }: InnerJobProps) => {
     <>
       <div className="job" ref={elementRef}>
         <div className="name">
-          <span className={`icon status-icon ${statusIconClass}`} />
+          {isCurrentJob && !JobSerialized.isEnded(innerJob) ? (
+            <span className="status-icon">
+              <Spinner size={14} />
+            </span>
+          ) : (
+            <AppIcon className="status-icon" name={statusIcon} />
+          )}
           {index + 1}. {i18n.t(`jobs:${JobSerialized.getType(innerJob)}`)}
         </div>
         {(isCurrentJob || JobSerialized.isEnded(innerJob)) && (

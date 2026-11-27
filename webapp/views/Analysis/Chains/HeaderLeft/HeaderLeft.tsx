@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useAppDispatch } from '@webapp/store'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
@@ -19,11 +20,11 @@ const HeaderLeft = () => {
   return (
     <>
       <button className="btn btn-s" onClick={createChain} type="button">
-        <span className="icon icon-plus icon-12px icon-left" />
+        <AppIcon name="add" size={14} className="icon-left" />
         {i18n.t('common.new')}
       </button>
       <button className="btn btn-s" onClick={() => setCloneDialogOpen(true)} type="button">
-        <span className="icon icon-copy icon-12px icon-left" />
+        <AppIcon name="copy" size={14} className="icon-left" />
         {i18n.t('chainView.cloneFromAnotherSurvey')}
       </button>
       {cloneDialogOpen && <ChainCloneFromSurveyDialog onClose={() => setCloneDialogOpen(false)} />}

@@ -32,6 +32,24 @@ const _getLanguageLabel =
 export const getLanguageLabel = (lang: string, translationLang: string = en): string | undefined =>
   _getLanguageLabel(standards.ISO_639_1)({ lang, translationLang })
 
+// names of the UI languages in their own language (Intl.DisplayNames misses some in some browsers)
+const endonyms: Record<string, string> = {
+  de: 'Deutsch',
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  ja: '日本語',
+  mn: 'Монгол',
+  pt: 'Português',
+  ru: 'Русский',
+  sr: 'Српски',
+}
+
+/**
+ * Returns the name of a UI language in that language (e.g. "Deutsch", "日本語"), as language pickers show it; the English name for other languages.
+ */
+export const getLanguageEndonym = (lang: string): string | undefined => endonyms[lang] ?? getLanguageLabel(lang)
+
 export const getLanguageISO639part2Label = (lang: string, translationLang: string = en): string | undefined =>
   _getLanguageLabel(standards.ISO_639_2)({ lang, translationLang })
 

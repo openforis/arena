@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useAppDispatch } from '@webapp/store'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
@@ -17,7 +18,7 @@ const HeaderLeft = () => {
 
   return (
     <button data-testid={TestId.entities.addBtn} className="btn btn-s" onClick={createVirtualEntity} type="button">
-      <span className="icon icon-plus icon-12px icon-left" />
+      <AppIcon name="add" size={14} className="icon-left" />
       {i18n.t('chainView.entities.new')}
     </button>
   )

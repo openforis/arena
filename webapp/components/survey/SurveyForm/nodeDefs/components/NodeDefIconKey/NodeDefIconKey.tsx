@@ -1,6 +1,7 @@
 import type { ArenaAnyNodeDef } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { AppIcon } from '@webapp/components/AppIcon'
 
 type NodeDefIconKeyProps = {
   nodeDef: ArenaAnyNodeDef
@@ -9,7 +10,7 @@ type NodeDefIconKeyProps = {
 const NodeDefIconKey = (props: NodeDefIconKeyProps) => {
   const { nodeDef } = props
 
-  return NodeDef.isKey(nodeDef) && <span className="icon icon-key2 icon-left icon-10px node-def__icon-key" />
+  return NodeDef.isKey(nodeDef) && <AppIcon name="key" size={12} className="icon-left node-def__icon-key" />
 }
 
 export default NodeDefIconKey

@@ -35,7 +35,7 @@ export const BaseMapMenu = (): ReactElement => {
   )
 
   return (
-    <ToolbarMenu menuKey="baseMap" labelKey="mapWorkspace.menus.baseMap" iconClassName="icon-map2">
+    <ToolbarMenu menuKey="baseMap" labelKey="mapWorkspace.menus.baseMap" iconName="map">
       {(close) => [
         ...selectableBaseLayers.map((baseLayer) => (
           <MenuRadioItem

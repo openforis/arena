@@ -48,7 +48,7 @@ const ButtonBar = (props: ButtonBarProps) => {
           className="btn-previous"
           testId={TestId.nodeDefDetails.previousBtn}
           onClick={() => Actions.goToNodeDef({ state, offset: -1 })}
-          iconClassName="icon-arrow-left2"
+          iconName="arrowBack"
           title="common.previous"
           disabled={!previousDefUuid}
         />
@@ -67,7 +67,8 @@ const ButtonBar = (props: ButtonBarProps) => {
             testId={TestId.nodeDefDetails.saveAndBackBtn}
             onClick={() => Actions.saveEdits({ state, goBackOnEnd: true })}
             disabled={saveDisabled}
-            iconClassName="icon-floppy-disk icon-12px"
+            iconName="save"
+            iconSize={14}
             label="common.saveAndBack"
           />
         </>
@@ -86,7 +87,8 @@ const ButtonBar = (props: ButtonBarProps) => {
         testId={TestId.nodeDefDetails.saveBtn}
         onClick={() => Actions.saveEdits({ state })}
         disabled={saveDisabled}
-        iconClassName="icon-floppy-disk icon-12px"
+        iconName="save"
+        iconSize={14}
         label="common.save"
       />
       {canNavigateNodeDefs && (
@@ -94,7 +96,7 @@ const ButtonBar = (props: ButtonBarProps) => {
           className="btn-next"
           testId={TestId.nodeDefDetails.nextBtn}
           onClick={() => Actions.goToNodeDef({ state, offset: 1 })}
-          iconClassName="icon-arrow-right2"
+          iconName="arrowForward"
           title="common.next"
           disabled={!nextDefUuid}
         />

@@ -31,7 +31,7 @@ export const VisibleColumnsMenu = (props: VisibleColumnsMenuProps) => {
     <ButtonMenu
       className="btn-s"
       closeMenuOnItemClick={false}
-      iconClassName="icon-cog"
+      iconName="settings"
       items={availableColumns.map((column) => {
         const { key, header } = column
         const selected = selectedColumnKeys.includes(key)

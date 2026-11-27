@@ -61,7 +61,8 @@ export const ButtonAiGenerateQuery = (props: Props) => {
         <Button
           className="btn-s btn-ai"
           disabled={disabled || !isAiFeatureUsable(availability)}
-          iconClassName="icon-magic-wand icon-14px"
+          iconName="magicWand"
+          iconSize={16}
           label="dataView:dataQuery.ai.button"
           onClick={Actions.togglePanelAi}
           title="dataView:dataQuery.ai.buttonTitle"

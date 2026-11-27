@@ -1,5 +1,5 @@
 import { AppInfo } from '@core/app/appInfo'
-import { AppIcon } from '@webapp/components/AppIcon'
+import { CreatedWithAppIcon } from '@webapp/components/CreatedWithAppIcon'
 import { useI18n } from '@webapp/store/system'
 
 const stackedIconOffset = 12
@@ -36,7 +36,7 @@ ${sortedAppCountsEntries
       <span>{recordsCount}</span>
       <span className="app-icons-wrapper">
         {sortedAppCountsEntries.map(([appId], index) => (
-          <AppIcon
+          <CreatedWithAppIcon
             key={appId}
             appId={appId}
             style={{ zIndex: stackedIconZindexStart - index, left: `${stackedIconOffset * index}px` }}

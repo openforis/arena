@@ -3,6 +3,7 @@ import { IconButton } from '@mui/material'
 import classNames from 'classnames'
 import type { KeyboardEvent, ReactElement } from 'react'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import { useMapWorkspace, WorkspaceLeafletProvider } from '../MapWorkspaceContext'
@@ -69,7 +70,7 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
               data-testid={TestId.mapWorkspace.railTab(tab.key)}
               onClick={() => dispatch({ type: 'toggleRailTab', tab: tab.key })}
             >
-              <span className={`icon icon-16px ${tab.iconClassName}`} aria-hidden="true" />
+              <AppIcon name={tab.iconName} />
               <span className="map-rail__tab-label">{t(tab.labelKey)}</span>
             </button>
           )
@@ -95,7 +96,7 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
                 aria-label={t('mapWorkspace.rail.close')}
                 onClick={() => dispatch({ type: 'closeRail' })}
               >
-                <span className="icon icon-12px icon-arrow-left" aria-hidden="true" />
+                <AppIcon name="arrowBack" size={14} aria-hidden="true" />
               </IconButton>
             </header>
             <div className="map-rail__panel-body">

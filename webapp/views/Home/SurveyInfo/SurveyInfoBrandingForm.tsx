@@ -17,6 +17,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -178,7 +179,7 @@ const BrandingImageSection = (props: BrandingImageSectionProps) => {
       {loadError && (
         <div className="survey-info-branding-form__image-preview-row">
           <div className="survey-info-branding-form__image-error" role="alert">
-            <span className="icon icon-warning icon-12px icon-left" />
+            <AppIcon name="warning" size={14} className="icon-left" />
             {i18n.t(`homeView:surveyInfo.branding.${canRemove ? 'imageLoadError' : 'imageLoadErrorReadOnly'}`, {
               name: image?.[brandingKeys.name] ?? '',
             })}

@@ -10,6 +10,7 @@ import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -203,7 +204,7 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
               disabled={crumbs.length === 0}
               onClick={handleCopyPath}
             >
-              <span className="icon icon-copy icon-12px" />
+              <AppIcon name="copy" size={14} />
             </IconButton>
           </span>
         </Tooltip>

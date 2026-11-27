@@ -19,7 +19,8 @@ const ButtonManageQueries = (props: ButtonManageQueriesProps) => {
       <Button
         className={classNames('btn-s', 'btn-edit')}
         disabled={disabled}
-        iconClassName="icon-list icon-16px"
+        iconName="list"
+        iconSize={16}
         onClick={Actions.togglePanelQueries}
         label="dataView:dataQuery.manageQueries"
       />

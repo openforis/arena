@@ -102,11 +102,12 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
     <ButtonMenu
       className="btn-s"
       disabled={api.busy}
-      icon={<MoreHorizIcon fontSize="small" />}
+      icon={<MoreHorizIcon style={{ fontSize: 22 }} />}
       items={[
         {
           key: 'aiSettings',
-          iconClassName: 'icon-cog icon-12px',
+          iconName: 'settings',
+          iconSize: 18,
           label: 'aiAssistant.menu.aiSettings',
           // own profile: the AI settings panel (as the not-available actions do)
           onClick: () => void navigate(appModuleUri(userModules.user)),
@@ -115,7 +116,8 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
         {
           key: 'deleteAll',
           className: 'ai-assistant-panel__menu-danger',
-          iconClassName: 'icon-bin2 icon-12px',
+          iconName: 'delete',
+          iconSize: 18,
           label: 'aiAssistant.menu.deleteAll',
           // onCancel is required by useConfirm's inferred (untyped) parameter
           onClick: () =>
@@ -232,11 +234,18 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
           disabled={api.busy}
           label="aiAssistant.menu.newConversation"
           onClick={api.newConversation}
+          iconSize={20}
           size="small"
           testId={TestId.aiAssistant.newConversationBtn}
         />
         <AssistantMenu api={api} />
-        <ButtonIconClose label="aiAssistant.close" onClick={closeAssistantPanel} testId={TestId.aiAssistant.closeBtn} />
+        <ButtonIconClose
+          className="close-btn ai-assistant-panel__close"
+          iconSize={20}
+          label="aiAssistant.close"
+          onClick={closeAssistantPanel}
+          testId={TestId.aiAssistant.closeBtn}
+        />
       </div>
       <AssistantTabs area={area} busy={api.busy} byArea={byArea} statuses={statuses} />
       <AssistantBody

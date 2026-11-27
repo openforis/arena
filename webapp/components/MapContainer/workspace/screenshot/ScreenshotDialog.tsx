@@ -5,6 +5,7 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { ScreenshotAttachFields } from '@webapp/components/MapContainer/workspace/screenshot/ScreenshotAttachFields'
 import {
@@ -117,7 +118,7 @@ export const ScreenshotDialog = (): React.ReactElement => {
             disabled={closeDisabled}
             onClick={onRequestClose}
           >
-            <span className="icon icon-cross" />
+            <AppIcon name="close" />
           </button>
         </DialogTitle>
         <DialogContent className="map-screenshot-dialog__content">

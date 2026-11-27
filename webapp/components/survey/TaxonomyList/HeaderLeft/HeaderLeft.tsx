@@ -59,7 +59,7 @@ const HeaderLeft = (props: HeaderLeftProps) => {
       <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.taxonomy} />
 
       <Button
-        iconClassName="icon-copy"
+        iconName="copy"
         label="taxonomy.cloneFromAnotherSurvey.title"
         onClick={openCloneFromSurveyDialog}
         size="small"

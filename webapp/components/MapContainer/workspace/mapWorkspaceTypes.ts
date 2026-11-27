@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { IconName } from '@webapp/components/AppIcon'
+
 export type MapWorkspaceVariant = 'full' | 'compact'
 export type MapRailTabKey = 'layers' | 'records' | 'scenes' | 'legend'
 export type MapToolKey = 'measureDistance' | 'measureArea'
@@ -25,7 +27,7 @@ export type MapRailTab = {
   key: MapRailTabKey
   labelKey: string // i18n key of the tab button
   titleKey?: string // i18n key of the panel title, default labelKey
-  iconClassName: string // icomoon class, e.g. 'icon-stack'
+  iconName: IconName
   width?: number // panel width in px, default 288
   content: ReactNode
 }

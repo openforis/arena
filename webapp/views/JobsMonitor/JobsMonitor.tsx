@@ -39,7 +39,7 @@ const JobsMonitor = (): React.ReactElement => {
         <h1>{i18n.t('jobMonitorView:title')}</h1>
         <div className="jobs-monitor__header-actions">
           <Checkbox checked={activeOnly} label="jobMonitorView:activeOnly" onChange={setActiveOnly} />
-          <Button iconClassName="icon-loop2" label="common.refresh" onClick={refresh} />
+          <Button iconName="refresh" label="common.refresh" onClick={refresh} />
         </div>
       </div>
       <DataGrid className="jobs-monitor__grid" columns={columns} rows={visibleJobs} getRowId={(row) => row.uuid} />

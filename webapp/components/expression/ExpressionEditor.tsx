@@ -147,7 +147,8 @@ const ExpressionEditor = (props: ExpressionEditorProps) => {
           {!readOnly && (
             <Button
               className="btn-s btn-edit"
-              iconClassName="icon-pencil2 icon-14px"
+              iconName="edit"
+              iconSize={16}
               id={`${idPrefix}-edit-btn`}
               onClick={() => setEdit(true)}
               testId={TestId.expressionEditor.editBtn(qualifier, index)}
@@ -167,7 +168,8 @@ const ExpressionEditor = (props: ExpressionEditorProps) => {
               <Button
                 className="btn-s btn-ai-explain"
                 disabled={!isAiFeatureUsable(aiExplain)}
-                iconClassName="icon-question icon-14px"
+                iconName="help"
+                iconSize={16}
                 id={`${idPrefix}-ai-explain-btn`}
                 onClick={() => setExplainOpen(true)}
                 testId={TestId.expressionEditor.explainBtn(qualifier, index)}

@@ -72,7 +72,8 @@ const Header = (props: HeaderProps) => {
             <ButtonMenu
               className="date-import-template-menu-btn"
               label="dataImportView:templateForImport"
-              iconClassName="icon-download2 icon-14px"
+              iconName="download"
+              iconSize={16}
               items={Object.values(DataImportTemplateTypes).flatMap((templateType) =>
                 templateFileFormats.map((fileFormat) => ({
                   key: `taxonomy-import-template-${templateType}-${fileFormat}`,
@@ -90,7 +91,8 @@ const Header = (props: HeaderProps) => {
             />
 
             <ButtonMenu
-              iconClassName="icon-cog icon-14px"
+              iconName="settings"
+              iconSize={16}
               items={[
                 {
                   key: 'extra-props-edit',

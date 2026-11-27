@@ -1,5 +1,6 @@
 import './SortToggle.scss'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 
 const tooltipKeyByOrder = {
@@ -36,7 +37,7 @@ const SortToggle = ({ disabled = false, sort, field, handleSortBy, priority = nu
       aria-label={tooltip}
       aria-pressed={active}
     >
-      <span className="icon icon-play3 icon-10px arrow-toggle" />
+      <AppIcon name="play" size={12} className="arrow-toggle" />
       {priority ? <span className="btn-sort-toggle-priority">{priority}</span> : null}
     </button>
   )
