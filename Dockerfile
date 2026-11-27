@@ -37,8 +37,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # pm2 is installed as a local package (not with `npm install -g`) from a
-# lockfile, so that `overrides` can be applied to its pinned dependencies
-# (js-yaml 4.3.1 is vulnerable to CVE-2026-84375, basic-ftp 5.x to CVE-2026-102990).
+# lockfile, so that its dependency tree is pinned (and `overrides` can be added
+# there for vulnerable dependencies if needed).
 # npm itself is only needed to install pm2; remove it (and its own vendored
 # dependencies) afterwards rather than carrying their CVEs into the image.
 WORKDIR /opt/pm2
