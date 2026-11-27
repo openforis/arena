@@ -2,7 +2,7 @@
 # to make this work faster when there have been changes.
 ############################################################
 
-FROM node:24.11.1 AS test
+FROM node:24.22.3 AS test
 
 # Install git, netcat and PM2 (cross-env is a project dependency)
 RUN apt-get update; \
