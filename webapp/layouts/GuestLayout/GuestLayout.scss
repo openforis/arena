@@ -496,6 +496,77 @@ $guestMobileBreakpoint: 900px;
   color: $colorOnSurfaceVariant;
 }
 
+// dropdown with the label on the top border, like the outlined text inputs
+.guest-floating-label-field {
+  position: relative;
+  min-width: 0;
+}
+
+.guest-floating-label-field__label {
+  position: absolute;
+  top: 0;
+  left: 0.6rem;
+  transform: translateY(-50%);
+  padding: 0 0.3rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: $colorOnSurfaceVariant;
+  background-color: $colorSurface;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// complete registration: two fields per row, in a wider card (to avoid scrolling)
+.guest__form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+
+  .dropdown-user-title {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: calc(#{$guestMobileBreakpoint} + 1px)) {
+  .guest__main:has(.guest__form--registration) {
+    grid-template-columns: minmax(18rem, 1fr) minmax(0, 46rem);
+    padding-bottom: 1rem;
+
+    .guest__card {
+      padding: 1.25rem 2rem;
+    }
+  }
+
+  .guest__form--registration {
+    gap: 0.7rem;
+
+    // shorter fields (the floating labels still fit)
+    .MuiTextField-root .MuiInputBase-input {
+      padding: 0.75rem 0.85rem;
+    }
+
+    .dropdown__control {
+      min-height: 2.9rem;
+    }
+
+    .guest__view-header {
+      margin-bottom: 0.5rem;
+    }
+
+    // the password checks in a single row
+    .password-strength-checker__checks {
+      grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
+    }
+  }
+}
+
+@media screen and (max-width: $guestMobileBreakpoint) {
+  .guest__form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 // keep the password strength checks close to the password field
 .guest__form .password-strength-checker {
   margin-top: -0.5rem;

@@ -277,11 +277,17 @@ export const insertUserAccessRequest = async ({
   }
 }
 
-type RegistrationInfo = { firstName?: string; lastName?: string; institution?: string; country?: string }
+type RegistrationInfo = {
+  title?: string
+  firstName?: string
+  lastName?: string
+  institution?: string
+  country?: string
+}
 
 const _getRegistrationInfo = (accessRequest: UserAccessRequest.UserAccessRequest): RegistrationInfo => {
-  const { firstName, lastName, institution, country } = accessRequest.props ?? {}
-  return { firstName, lastName, institution, country }
+  const { title, firstName, lastName, institution, country } = accessRequest.props ?? {}
+  return { title, firstName, lastName, institution, country }
 }
 
 const _getFullName = ({ firstName, lastName }: RegistrationInfo): string =>
@@ -416,7 +422,11 @@ export const acceptUserAccessRequest = async ({
           {
             userUuid: surveyOwnerUuid,
             name: _getFullName(registrationInfo),
-            props: { institution: registrationInfo.institution, country: registrationInfo.country },
+            props: {
+              title: registrationInfo.title,
+              institution: registrationInfo.institution,
+              country: registrationInfo.country,
+            },
           },
           t
         )
@@ -764,6 +774,48 @@ export const fetchResetPasswordUserAndRegistrationInfo = async (resetPasswordUui
   return { user, registrationInfo }
 }
 
+/**
+ * Saves the personal info of an invited user who is about to complete the registration with an external login
+ * provider (it only sets the name): the info given in an access request is already saved.
+ */
+export const updateResetPasswordUserInfo = async ({
+  uuid: resetPasswordUuid,
+  title,
+  firstName,
+  lastName,
+  institution,
+  country,
+}: {
+  uuid: string
+  title?: string
+  firstName?: string
+  lastName?: string
+  institution?: string
+  country?: string
+}): Promise<boolean> => {
+  const { user, registrationInfo } = await fetchResetPasswordUserAndRegistrationInfo(resetPasswordUuid)
+  if (!user || User.hasAccepted(user)) return false
+  if (registrationInfo) {
+    // only the title can be missing (older requests)
+    if (!registrationInfo.title && title) {
+      await UserManager.updateNameAndMergeProps({
+        userUuid: User.getUuid(user),
+        name: _getFullName(registrationInfo),
+        props: { title },
+      })
+    }
+    return true
+  }
+  const name = _getFullName({ firstName, lastName })
+  if (!name) return false
+  await UserManager.updateNameAndMergeProps({
+    userUuid: User.getUuid(user),
+    name,
+    props: { title, institution, country },
+  })
+  return true
+}
+
 export const resetPassword = async ({
   uuid: resetPasswordUuid,
   name,
@@ -783,8 +835,13 @@ export const resetPassword = async ({
   if (user) {
     // the info given in the access request cannot be changed while completing the registration
     const info = registrationInfo
-      ? { ...registrationInfo, name: _getFullName(registrationInfo) }
-      : { name, institution, country }
+      ? {
+          ...registrationInfo,
+          name: _getFullName(registrationInfo),
+          // older requests have no title: the one chosen now is used
+          title: registrationInfo.title || title,
+        }
+      : { name, title, institution, country }
     const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
     await db.tx(async (t) => {
       await UserManager.updateNamePasswordAndStatus(
@@ -793,7 +850,7 @@ export const resetPassword = async ({
           name: info.name,
           password: passwordEncrypted,
           status: User.userStatus.ACCEPTED,
-          title,
+          title: info.title as UserTitle,
           institution: info.institution,
           country: info.country,
         },

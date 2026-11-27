@@ -76,6 +76,7 @@ export default {
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: '名',
         lastName: '姓',
         institution: '所属機関',

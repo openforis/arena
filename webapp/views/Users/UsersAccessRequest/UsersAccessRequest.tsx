@@ -77,6 +77,8 @@ export const UsersAccessRequest = () => {
   const [currentUserAccessRequest, setCurrentUserAccessRequest] = useState<UserAccessRequestItem | null>(null)
 
   const columnContentRendererByFieldName: Record<string, FieldRenderer> = {
+    [`props.${UserAccessRequest.keysProps.title}`]: ({ fieldValue, i18n }) =>
+      fieldValue ? i18n.t(`user.titleValues.${fieldValue}`) : '',
     [`props.${UserAccessRequest.keysProps.country}`]: ({ fieldValue }) =>
       Countries.getCountryName({ code: fieldValue }),
     [`props.${UserAccessRequest.keysProps.templateUuid}`]: ({ fieldValue, i18n }) => {

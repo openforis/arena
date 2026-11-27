@@ -11,6 +11,7 @@ export const keys = {
 } as const
 
 export const keysProps = {
+  title: 'title',
   firstName: 'firstName',
   lastName: 'lastName',
   country: 'country',
@@ -36,6 +37,8 @@ export const status = {
 export type UserAccessRequestStatus = (typeof status)[keyof typeof status]
 
 export type UserAccessRequestProps = {
+  // user title key (see User.titleKeys)
+  [keysProps.title]?: string
   [keysProps.firstName]?: string
   [keysProps.lastName]?: string
   [keysProps.country]?: string
@@ -66,6 +69,7 @@ export type UserAccessRequestSubmission = Pick<UserAccessRequest, 'email' | 'pro
 
 export const editableFields = [
   { name: keys.email, required: true },
+  { name: `props.${keysProps.title}`, required: true },
   { name: `props.${keysProps.firstName}`, required: true },
   { name: `props.${keysProps.lastName}`, required: true },
   { name: `props.${keysProps.institution}`, required: true },

@@ -9,6 +9,9 @@ export const validateUserAccessRequest = async (userAccessRequest: Record<string
       Validator.validateRequired(Validation.messageKeys.userAccessRequest.emailRequired),
       Validator.validateEmail({ errorKey: Validation.messageKeys.userAccessRequest.emailInvalid }),
     ],
+    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.title}`]: [
+      Validator.validateRequired(Validation.messageKeys.user.titleRequired),
+    ],
     [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.firstName}`]: [
       Validator.validateRequired(Validation.messageKeys.userAccessRequest.firstNameRequired),
     ],

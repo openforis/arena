@@ -83,6 +83,7 @@ Insira o código gerado pelo seu aplicativo autenticador.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Primeiro nome',
         lastName: 'Sobrenome',
         institution: 'Instituição',

@@ -84,6 +84,7 @@ Masukkan kode yang dibuat oleh aplikasi autentikator Anda.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Nama Depan',
         lastName: 'Nama Belakang',
         institution: 'Institusi',

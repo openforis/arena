@@ -19,6 +19,7 @@ const { keys, keysProps } = UserAccessRequest
 
 // fields in the order they are shown (and focused with Tab)
 const formFieldNamesInOrder = [
+  `${keys.props}.${keysProps.title}`,
   `${keys.props}.${keysProps.firstName}`,
   `${keys.props}.${keysProps.lastName}`,
   keys.email,

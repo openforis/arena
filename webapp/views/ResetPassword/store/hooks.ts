@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react'
+import axios from 'axios'
 import { useNavigate, useParams } from 'react-router'
 
 import * as User from '@core/user/user'
@@ -18,8 +19,14 @@ const getFullName = ({ firstName, lastName }) => [firstName, lastName].filter(Bo
 // fields of the registration form: from the access request (not editable) or from the invited user
 const getInitialRegistrationFields = ({ user, registrationInfo }) => {
   if (registrationInfo) {
-    const { firstName = '', lastName = '', institution = '', country = '' } = registrationInfo
-    return { firstName, lastName, institution, country }
+    const { title, firstName = '', lastName = '', institution = '', country = '' } = registrationInfo
+    return {
+      firstName,
+      lastName,
+      institution,
+      country,
+      ...(title ? { props: { ...user.props, title } } : {}),
+    }
   }
   // name possibly set when inviting the user: first word as first name
   const [firstName = '', ...lastNameParts] = (user.name ?? '').trim().split(/\s+/)
@@ -79,6 +86,32 @@ export const useResetPassword = () => {
     }
   }, [dispatchPostResetPassword, firstName, hasAlreadyAccepted, lastName, password, passwordConfirm, title])
 
+  // external login providers set only the name: the other info is saved before leaving the page
+  const onBeforeExternalLogin = useCallback(async (): Promise<boolean> => {
+    const missingFieldErrorKey = [
+      [title, Validation.messageKeys.user.titleRequired],
+      [firstName, Validation.messageKeys.userAccessRequest.firstNameRequired],
+      [lastName, Validation.messageKeys.userAccessRequest.lastNameRequired],
+    ].find(([value]) => !value)?.[1]
+    if (missingFieldErrorKey) {
+      actions.updateError(missingFieldErrorKey)(dispatch)
+      return false
+    }
+    try {
+      const { data } = await axios.put(`/auth/reset-password/${uuid}/info`, {
+        title,
+        firstName,
+        lastName,
+        institution,
+        country,
+      })
+      return Boolean(data?.result)
+    } catch {
+      dispatchRedux(NotificationActions.notifyError({ key: 'guest:resetPasswordView.forgotPasswordLinkInvalid' }))
+      return false
+    }
+  }, [country, dispatchRedux, firstName, institution, lastName, title, uuid])
+
   useEffect(() => {
     getResetPasswordUser()
   }, [])
@@ -99,6 +132,7 @@ export const useResetPassword = () => {
   }, [resetComplete])
 
   return {
+    onBeforeExternalLogin,
     registrationInfo,
     state,
     onChangeUser,

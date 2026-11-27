@@ -1,6 +1,7 @@
 import { Countries } from '@core/countries'
 import { TextInput } from '@webapp/components/form'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { GuestFloatingLabelField } from '@webapp/components/guest/GuestFloatingLabelField'
 import { useI18n } from '@webapp/store/system'
 
 type Props = {
@@ -33,19 +34,25 @@ export const RegistrationFields = (props: Props) => {
   const countryCode = user.country
   return (
     <>
-      {textField('firstName', 'given-name')}
-      {textField('lastName', 'family-name')}
-      {textField('institution', 'organization')}
-      <Dropdown
-        className="registration-fields__country"
-        disabled={readOnly}
-        itemLabel="name"
-        itemValue="code"
-        items={Countries.list}
-        onChange={(item) => onChangeUser({ prop: 'country', value: item?.code ?? '' })}
-        placeholder={i18n.t(fieldLabelKey('country'))}
-        selection={countryCode ? Countries.list.find((item) => item.code === countryCode) : null}
-      />
+      <div className="guest__form-row">
+        {textField('firstName', 'given-name')}
+        {textField('lastName', 'family-name')}
+      </div>
+      <div className="guest__form-row">
+        {textField('institution', 'organization')}
+        <GuestFloatingLabelField hasValue={Boolean(countryCode)} label={fieldLabelKey('country')}>
+          <Dropdown
+            className="registration-fields__country"
+            disabled={readOnly}
+            itemLabel="name"
+            itemValue="code"
+            items={Countries.list}
+            onChange={(item) => onChangeUser({ prop: 'country', value: item?.code ?? '' })}
+            placeholder={i18n.t(fieldLabelKey('country'))}
+            selection={countryCode ? Countries.list.find((item) => item.code === countryCode) : null}
+          />
+        </GuestFloatingLabelField>
+      </div>
     </>
   )
 }

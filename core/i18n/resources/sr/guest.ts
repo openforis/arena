@@ -81,6 +81,7 @@ Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Ime',
         lastName: 'Prezime',
         institution: 'Institucija',

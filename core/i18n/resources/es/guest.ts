@@ -81,6 +81,7 @@ export default {
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Nombre',
         lastName: 'Apellido',
         institution: 'Institución',

@@ -20,6 +20,8 @@ type Props = {
   dividerLabelKey?: string
   // shown under the provider name in every button (e.g. "Registered users only")
   captionKey?: string
+  // called before leaving the page for the provider: the sign-in does not start if it returns false
+  onBeforeNavigate?: () => Promise<boolean>
 }
 
 /**
@@ -31,6 +33,7 @@ export const ExternalLoginButtons = (props: Props) => {
     query,
     dividerLabelKey = 'guest:loginView.or',
     captionKey,
+    onBeforeNavigate,
   } = props
   const i18n = useI18n()
   const [providers, setProviders] = useState<LoginProvider[]>([])
@@ -54,6 +57,17 @@ export const ExternalLoginButtons = (props: Props) => {
             className="guest-external-login__button"
             data-testid={`external-login-${provider.id}`}
             href={getExternalLoginStartUrl({ providerId: provider.id, query })}
+            onClick={
+              onBeforeNavigate
+                ? async (event) => {
+                    event.preventDefault()
+                    const href = event.currentTarget.href
+                    if (await onBeforeNavigate()) {
+                      globalThis.location.assign(href)
+                    }
+                  }
+                : undefined
+            }
           >
             <AuthProviderIcon iconKind={provider.iconKind} providerId={provider.id} type={provider.type} />
             <span className="guest-external-login__label">

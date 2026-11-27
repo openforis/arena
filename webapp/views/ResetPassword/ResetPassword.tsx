@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import { useParams, useSearchParams } from 'react-router'
 
 import * as User from '@core/user/user'
@@ -6,6 +7,7 @@ import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/compo
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ExternalLoginButtons } from '@webapp/components/guest/ExternalLoginButtons'
 import GuestError from '@webapp/components/guest/GuestError'
+import { GuestFloatingLabelField } from '@webapp/components/guest/GuestFloatingLabelField'
 import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
 import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
@@ -21,6 +23,7 @@ const ResetPassword = () => {
   const externalLoginErrorKey = searchParams.get('externalLoginError')
 
   const {
+    onBeforeExternalLogin,
     registrationInfo,
     state: { initialUser, user, error },
     onChangeUser,
@@ -39,11 +42,38 @@ const ResetPassword = () => {
   const hasAlreadyAccepted = User.hasAccepted(initialUser)
   const viewKey = hasAlreadyAccepted ? 'setYourNewPassword' : 'completeRegistration'
 
+  const emailInput = (
+    <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
+  )
+  const passwordInput = (
+    <PasswordInput
+      autoComplete="new-password"
+      defaultValue={user.password}
+      label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourNewPassword' : 'guest:loginView.yourPassword')}
+      onChange={(value) => onChangeUser({ prop: 'password', value })}
+    />
+  )
+  const passwordConfirmInput = (
+    <PasswordInput
+      autoComplete="new-password"
+      defaultValue={user.passwordConfirm}
+      label={i18n.t(
+        hasAlreadyAccepted ? 'guest:loginView.repeatYourNewPassword' : 'guest:loginView.repeatYourPassword'
+      )}
+      onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
+    />
+  )
+
   return (
-    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+    <form
+      onSubmit={(event) => event.preventDefault()}
+      className={classNames('guest__form', { 'guest__form--registration': !hasAlreadyAccepted })}
+    >
       <GuestViewHeader
-        description={`guest:resetPasswordView.description.${viewKey}`}
-        icon={hasAlreadyAccepted ? 'key' : 'userAdd'}
+        // the registration form has no description, to save vertical space
+        description={hasAlreadyAccepted ? `guest:resetPasswordView.description.${viewKey}` : undefined}
+        // no icon in the registration form, to save vertical space
+        icon={hasAlreadyAccepted ? 'key' : undefined}
         title={`guest:resetPasswordView.title.${viewKey}`}
       />
       <GuestError error={error} />
@@ -51,31 +81,30 @@ const ResetPassword = () => {
         <GuestError error={LoginActions.toExternalLoginErrorMessageKey(externalLoginErrorKey)} />
       )}
 
-      <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
-
-      {!hasAlreadyAccepted && (
+      {hasAlreadyAccepted ? (
         <>
-          <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
+          {emailInput}
+          {passwordInput}
+          <PasswordStrengthChecker password={user.password} />
+          {passwordConfirmInput}
+        </>
+      ) : (
+        // two fields per row (one on small screens), to avoid scrolling
+        <>
+          <div className="guest__form-row">
+            {emailInput}
+            <GuestFloatingLabelField hasValue={Boolean(User.getTitle(user))} label="user.title">
+              <DropdownUserTitle disabled={Boolean(registrationInfo?.title)} user={user} onChange={onChangeUserTitle} />
+            </GuestFloatingLabelField>
+          </div>
           <RegistrationFields onChangeUser={onChangeUser} readOnly={Boolean(registrationInfo)} user={user} />
+          <div className="guest__form-row">
+            {passwordInput}
+            {passwordConfirmInput}
+          </div>
+          <PasswordStrengthChecker password={user.password} />
         </>
       )}
-      <PasswordInput
-        autoComplete="new-password"
-        defaultValue={user.password}
-        label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourNewPassword' : 'guest:loginView.yourPassword')}
-        onChange={(value) => onChangeUser({ prop: 'password', value })}
-      />
-
-      <PasswordStrengthChecker password={user.password} />
-
-      <PasswordInput
-        autoComplete="new-password"
-        defaultValue={user.passwordConfirm}
-        label={i18n.t(
-          hasAlreadyAccepted ? 'guest:loginView.repeatYourNewPassword' : 'guest:loginView.repeatYourPassword'
-        )}
-        onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
-      />
 
       <Button
         className="guest__submit"
@@ -89,6 +118,7 @@ const ResetPassword = () => {
         // accept the invitation with an external provider instead of a password
         <ExternalLoginButtons
           labelKey="guest:externalLogin.continueWith"
+          onBeforeNavigate={onBeforeExternalLogin}
           query={{ invitation: invitationUuid, name: [user.firstName, user.lastName].filter(Boolean).join(' ') }}
         />
       )}

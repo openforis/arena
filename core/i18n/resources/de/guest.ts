@@ -83,6 +83,7 @@ Geben Sie den von Ihrer Authenticator-App erzeugten Code ein.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Vorname',
         lastName: 'Nachname',
         institution: 'Institution',

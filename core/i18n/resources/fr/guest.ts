@@ -83,6 +83,7 @@ Entrez le code généré par votre application d'authentification.`,
     fields: {
       email: '$t(common.email)',
       props: {
+        title: '$t(user.title)',
         firstName: 'Prénom',
         lastName: 'Nom de famille',
         institution: 'Institution',

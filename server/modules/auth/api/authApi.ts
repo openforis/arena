@@ -116,6 +116,20 @@ export const init = (app: Router): void => {
     res.json({ user, registrationInfo })
   })
 
+  // personal info of an invited user, saved before completing the registration with an external login provider
+  app.put('/auth/reset-password/:uuid/info', async (req, res) => {
+    const { uuid, title, firstName, lastName, institution, country } = Request.getParams(req)
+    const result = await UserService.updateResetPasswordUserInfo({
+      uuid,
+      title,
+      firstName,
+      lastName,
+      institution,
+      country,
+    })
+    res.json({ result })
+  })
+
   app.put('/auth/reset-password/:uuid', async (req, res) => {
     const { uuid, name, password, title, institution, country } = Request.getParams(req)
     await UserService.resetPassword({ uuid, name, password, title, institution, country })

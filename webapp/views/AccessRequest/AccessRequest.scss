@@ -40,6 +40,14 @@
     }
   }
 
+  .access-request__field--title {
+    grid-column: 1 / -1;
+
+    .dropdown-user-title {
+      width: 16rem;
+      max-width: 100%;
+    }
+  }
   .access-request__field--purpose {
     grid-column: 1 / -1;
   }

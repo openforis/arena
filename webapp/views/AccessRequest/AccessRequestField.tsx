@@ -3,6 +3,7 @@ import React from 'react'
 import { type ArenaValidation, Objects } from '@openforis/arena-core'
 
 import { Countries } from '@core/countries'
+import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
@@ -33,6 +34,24 @@ const CountryField = (props: AccessRequestInputFieldProps) => {
       itemValue="code"
       itemLabel="name"
       onChange={(item) => onChange({ name, value: item?.code })}
+    />
+  )
+}
+
+const titleItems = User.titleKeysArray.map((value) => ({ value }))
+
+const TitleField = (props: AccessRequestInputFieldProps) => {
+  const { field, onChange, value } = props
+  const i18n = useI18n()
+  const { name } = field
+  return (
+    <Dropdown
+      className="dropdown-user-title"
+      itemLabel={(item) => i18n.t(`user.titleValues.${item.value}`)}
+      itemValue="value"
+      items={titleItems}
+      onChange={(item) => onChange({ name, value: item?.value ?? null })}
+      selection={value ? { value } : null}
     />
   )
 }
@@ -87,6 +106,7 @@ const hintKeyByFieldName: Record<string, string> = {
 const componentsByFieldName = {
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: CountryField,
   [UserAccessRequest.keys.email]: EmailField,
+  [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.title}`]: TitleField,
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.templateUuid}`]: TemplateField,
 }
 
