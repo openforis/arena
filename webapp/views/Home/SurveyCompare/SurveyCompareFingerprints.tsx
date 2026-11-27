@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { ButtonIconInfo } from '@webapp/components/buttons'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
@@ -52,7 +53,7 @@ const FingerprintCopyButton = ({ value }: { value: string }) => {
   return (
     <Tooltip title={title}>
       <IconButton aria-label={title} color="inherit" onClick={onCopy} size="small">
-        <span className="icon icon-copy icon-12px" />
+        <AppIcon name="copy" size={14} />
       </IconButton>
     </Tooltip>
   )
@@ -85,8 +86,10 @@ const FingerprintRow = ({
             </span>
             <FingerprintCopyButton value={value} />
             {equal !== null && (
-              <span
-                className={`icon icon-12px ${equal ? 'icon-checkmark survey-compare__fingerprint--equal' : 'icon-cross survey-compare__fingerprint--different'}`}
+              <AppIcon
+                className={`survey-compare__fingerprint--${equal ? 'equal' : 'different'}`}
+                name={equal ? 'check' : 'close'}
+                size={14}
                 title={i18n.t(`surveyCompareView:fingerprint.${equal ? 'equal' : 'different'}`)}
               />
             )}
@@ -122,7 +125,7 @@ export const SurveyCompareFingerprints = ({
 
   return (
     <div className="survey-compare__fingerprints">
-      <span className="icon icon-key icon-12px" />
+      <AppIcon name="key" size={14} />
       <span>{i18n.t('surveyCompareView:fingerprint.label')}</span>
       <ButtonIconInfo title="surveyCompareView:fingerprint.info" titleMaxWidth={500} />
       <div className="survey-compare__fingerprint-grid">

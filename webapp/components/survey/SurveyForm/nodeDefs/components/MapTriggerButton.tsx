@@ -58,7 +58,8 @@ export const MapTriggerButton = (props: MapTriggerButtonProps) => {
     <Button
       className="map-trigger-btn btn-transparent"
       disabled={disabled}
-      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
+      iconName="map"
+      iconSize={insideTable ? 16 : 24}
       onClick={onClick ?? onClickDefault}
       title={title}
       variant="text"

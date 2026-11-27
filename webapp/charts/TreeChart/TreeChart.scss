@@ -6,7 +6,8 @@
   width: 100%;
   overflow: auto;
 
-  svg {
+  // the chart: not the icons inside its nodes
+  > svg {
     position: absolute;
   }
 

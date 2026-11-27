@@ -127,7 +127,8 @@ const ExpressionEditorPopup = (props: ExpressionEditorPopupProps) => {
         <div className="expression-editor-popup__footer">
           <Button
             disabled={A.isEmpty(query)}
-            iconClassName="icon-undo2 icon-12px"
+            iconName="undo"
+            iconSize={14}
             label="common.reset"
             onClick={() => onChange('')}
             size="small"
@@ -137,7 +138,8 @@ const ExpressionEditorPopup = (props: ExpressionEditorPopupProps) => {
           <Button
             className="btn-primary"
             disabled={!expressionCanBeApplied}
-            iconClassName="icon-checkmark icon-12px"
+            iconName="check"
+            iconSize={14}
             label="common.apply"
             onClick={onApply}
             size="small"

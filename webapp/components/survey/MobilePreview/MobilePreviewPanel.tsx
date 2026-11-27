@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
 
 import { ENV } from '@core/processUtils'
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { Button, ButtonIconInfo } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { useOnResize } from '@webapp/components/hooks'
@@ -24,7 +25,7 @@ type Device = keyof typeof deviceSizes
 type Orientation = 'portrait' | 'landscape'
 
 const devices: Device[] = ['phone', 'tablet']
-const deviceIconClassName: Record<Device, string> = { phone: 'icon-mobile', tablet: 'icon-tablet' }
+const deviceIconName: Record<Device, IconName> = { phone: 'mobile', tablet: 'tablet' }
 const orientations: Orientation[] = ['portrait', 'landscape']
 
 // panel padding (and some margin) around the device frame
@@ -145,7 +146,7 @@ export const MobilePreviewPanel = (props: Props) => {
           groupName="mobilePreviewDevice"
           items={devices.map((key) => ({
             key,
-            iconClassName: deviceIconClassName[key],
+            iconName: deviceIconName[key],
             title: `surveyForm:mobilePreview.device.${key}`,
           }))}
           // ButtonGroup (JS) passes the selected item key to onChange, but its inferred type has no params
@@ -157,7 +158,12 @@ export const MobilePreviewPanel = (props: Props) => {
           items={orientations.map((key) => ({
             key,
             // no landscape icon: the device icon rotated
-            iconClassName: classNames(deviceIconClassName[device], { 'icon-rotate-90': key === 'landscape' }),
+            icon: (
+              <AppIcon
+                className={classNames({ 'icon-rotate-90': key === 'landscape' })}
+                name={deviceIconName[device]}
+              />
+            ),
             title: `surveyForm:mobilePreview.orientation.${key}`,
           }))}
           onChange={setOrientation as () => void}
@@ -165,7 +171,8 @@ export const MobilePreviewPanel = (props: Props) => {
         />
         <Button
           disabled={loading || readyCount === 0}
-          iconClassName="icon-loop2 icon-12px"
+          iconName="refresh"
+          iconSize={14}
           onClick={() => setReloadCount((count) => count + 1)}
           size="small"
           title="surveyForm:mobilePreview.reload"

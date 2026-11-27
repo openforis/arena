@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as StringUtils from '@core/stringUtils'
+import { AppIcon } from '@webapp/components/AppIcon'
 import Markdown from '@webapp/components/Markdown'
 import { useAppDispatch } from '@webapp/store'
 import { ServiceErrorActions, useI18n } from '@webapp/store/system'
@@ -39,7 +40,7 @@ const ServiceError = React.forwardRef<HTMLDivElement, ServiceErrorProps>((props,
         className="btn-s btn-close"
         onClick={() => dispatch(ServiceErrorActions.closeServiceError(error))}
       >
-        <span className="icon icon-cross icon-12px" />
+        <AppIcon name="close" size={14} />
       </button>
 
       <div className="status">ERROR {status}</div>

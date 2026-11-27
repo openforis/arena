@@ -3,6 +3,7 @@ import { Button, Menu } from '@mui/material'
 import classNames from 'classnames'
 import type { ReactElement, ReactNode } from 'react'
 
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import { useMapWorkspace } from '../MapWorkspaceContext'
@@ -10,7 +11,7 @@ import { useMapWorkspace } from '../MapWorkspaceContext'
 type ToolbarMenuProps = {
   menuKey: string
   labelKey: string
-  iconClassName: string
+  iconName: IconName
   children: (close: (afterClose?: () => void) => void) => ReactNode[]
 }
 
@@ -19,11 +20,11 @@ type ToolbarMenuProps = {
  * @param {object} props - Component props.
  * @param {string} props.menuKey - Menu key (test id suffix).
  * @param {string} props.labelKey - I18n key of the button label.
- * @param {string} props.iconClassName - Icon class of the button.
+ * @param {string} props.iconName - Icon of the button.
  * @param {Function} props.children - (close) => menu items; close(afterClose) runs afterClose once the menu is gone.
  * @returns {React.ReactElement} The menu button and its menu.
  */
-export const ToolbarMenu = ({ menuKey, labelKey, iconClassName, children }: ToolbarMenuProps): ReactElement => {
+export const ToolbarMenu = ({ menuKey, labelKey, iconName, children }: ToolbarMenuProps): ReactElement => {
   const t = useI18nT()
   const { portalContainer } = useMapWorkspace()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
@@ -57,7 +58,7 @@ export const ToolbarMenu = ({ menuKey, labelKey, iconClassName, children }: Tool
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         data-testid={TestId.mapWorkspace.menuButton(menuKey)}
-        startIcon={<span className={`icon icon-14px ${iconClassName}`} aria-hidden="true" />}
+        startIcon={<AppIcon name={iconName} />}
         endIcon={
           <span className="map-toolbar__menu-button__caret" aria-hidden="true">
             ▾

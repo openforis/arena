@@ -7,6 +7,7 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Button, ButtonEditLockToggle } from '@webapp/components/buttons'
 import { useAppDispatch } from '@webapp/store'
 import { useI18n } from '@webapp/store/system'
@@ -64,13 +65,13 @@ const RecordEntryButtons = (props: RecordEntryButtonsProps) => {
           to={`${appModuleUri(dataModules.recordValidationReport)}${recordUuid}`}
           title={i18n.t('dataView:showValidationReport')}
         >
-          <span className="icon icon-12px icon-warning icon-left" />
+          <AppIcon name="warning" size={14} className="icon-left" />
           {i18n.t('dataView:invalidRecord')}
         </Link>
       )}
       {!noHeader && (
         <Button
-          iconClassName="icon-file-pdf"
+          iconName="filePdf"
           onClick={() => setPrintableExportOpen(true)}
           showLabel={false}
           title="surveyForm:printableExport.exportDocument"
@@ -87,7 +88,8 @@ const RecordEntryButtons = (props: RecordEntryButtonsProps) => {
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (
           <Button
-            iconClassName="icon-reply icon-12px"
+            iconName="reply"
+            iconSize={14}
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
@@ -113,7 +115,8 @@ const RecordEntryButtons = (props: RecordEntryButtonsProps) => {
 
         {canPromote && (
           <Button
-            iconClassName="icon-redo2 icon-12px"
+            iconName="redo"
+            iconSize={14}
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({

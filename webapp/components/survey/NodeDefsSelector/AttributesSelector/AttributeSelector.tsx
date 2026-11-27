@@ -61,7 +61,7 @@ const AttributeSelector = (props: AttributeSelectorProps) => {
         <NodeDefIconKey nodeDef={nodeDef} />
         {label}
       </span>
-      {NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle })}
+      {NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle, size: 12 })}
     </button>
   )
 }

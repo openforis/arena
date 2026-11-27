@@ -2,6 +2,7 @@ import './Row.scss'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import WarningBadge from '@webapp/components/WarningBadge'
@@ -28,7 +29,7 @@ const Row = (props) => {
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
       <div>{Taxonomy.getDescription(lang)(taxonomy)}</div>
-      <div>{Taxonomy.getExtraPropsDefsArray(taxonomy).length > 0 && <span className="icon icon-checkmark" />}</div>
+      <div>{Taxonomy.getExtraPropsDefsArray(taxonomy).length > 0 && <AppIcon name="check" />}</div>
       <div>{Taxonomy.getTaxaCount(taxonomy)}</div>
       <div className="taxonomy-row__badge-container">
         <ErrorBadge validation={taxonomy.validation} />
@@ -39,7 +40,8 @@ const Row = (props) => {
 
       {(canSelect || selected) && (
         <Button
-          iconClassName={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px `}
+          iconName={selected ? 'checkboxChecked' : 'checkboxUnchecked'}
+          iconSize={14}
           label={selected ? 'common.selected' : 'common.select'}
           onClick={() => Actions.select({ state })}
           size="small"

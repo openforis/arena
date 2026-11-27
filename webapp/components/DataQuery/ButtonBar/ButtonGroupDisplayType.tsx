@@ -1,34 +1,35 @@
 import { useCallback, useEffect, useMemo } from 'react'
 
 import { Query } from '@common/model/query'
+import { IconName } from '@webapp/components/AppIcon'
 import { ButtonGroup } from '@webapp/components/form'
 import { useAppDispatch } from '@webapp/store'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
 const { displayTypes, chartTypes, isChartTypeAvailable } = DataExplorerState
 
-const iconByDisplayType = {
-  [displayTypes.chart]: 'icon-pie-chart',
-  [displayTypes.table]: 'icon-table2',
+const iconByDisplayType: Record<string, IconName> = {
+  [displayTypes.chart]: 'pieChart',
+  [displayTypes.table]: 'table',
 }
 
 const displayTypeItems = Object.keys(displayTypes).map((displayType) => ({
   key: displayType,
-  iconClassName: iconByDisplayType[displayType],
+  iconName: iconByDisplayType[displayType],
   label: `dataView:dataQuery.displayType.${displayType}`,
 }))
 
-const iconByChartType = {
-  [chartTypes.area]: 'icon-stats-dots',
-  [chartTypes.bar]: 'icon-stats-bars',
-  [chartTypes.line]: 'icon-stats-bars2',
-  [chartTypes.pie]: 'icon-pie-chart',
-  [chartTypes.scatter]: 'icon-stats-dots',
+const iconByChartType: Record<string, IconName> = {
+  [chartTypes.area]: 'areaChart',
+  [chartTypes.bar]: 'barChart',
+  [chartTypes.line]: 'lineChart',
+  [chartTypes.pie]: 'pieChart',
+  [chartTypes.scatter]: 'scatterChart',
 }
 
 const getChartTypeItemByKey = (chartType) => ({
   key: chartType,
-  iconClassName: iconByChartType[chartType],
+  iconName: iconByChartType[chartType],
   title: `dataView:charts.type.${chartType}`,
 })
 

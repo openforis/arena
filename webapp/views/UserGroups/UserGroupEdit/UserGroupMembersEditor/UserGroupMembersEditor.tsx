@@ -39,7 +39,7 @@ export const UserGroupMembersEditor = (props: Props): React.ReactElement => {
           <div key={userUuid} className="user-group-members-editor__row">
             <span>{getUserLabel(member)}</span>
             {canEdit && (
-              <Button iconClassName="icon-cross icon-12px" variant="text" onClick={() => onRemoveMember(userUuid)} />
+              <Button iconName="close" iconSize={14} variant="text" onClick={() => onRemoveMember(userUuid)} />
             )}
           </div>
         )

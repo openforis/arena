@@ -14,10 +14,6 @@
     cursor: default;
   }
 
-  .icon {
-    font-size: 11px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
-  }
-
   .node-def__icon-wrapper {
     display: flex;
     gap: 2px;

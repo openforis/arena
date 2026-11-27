@@ -108,7 +108,8 @@ export const ProviderList = ({ settings, reloadSettings }: Props) => {
       <div className="user-ai-settings-panel__providers-header">
         <Button
           variant="outlined"
-          iconClassName="icon-plus icon-12px"
+          iconName="add"
+          iconSize={14}
           label="userAiSettings:list.add"
           onClick={list.openAdd}
           testId={TestId.ai.providersAdd}

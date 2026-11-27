@@ -16,7 +16,8 @@ export const AskAssistantButton = ({ row }: Props) => {
   return (
     <Button
       className="validation-report__ask-assistant"
-      iconClassName="icon-bubbles icon-12px"
+      iconName="forum"
+      iconSize={14}
       showLabel={false}
       title="aiCleaning.rowAction.askAssistant"
       variant="text"

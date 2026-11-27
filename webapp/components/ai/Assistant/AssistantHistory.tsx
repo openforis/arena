@@ -89,7 +89,8 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
     <div className="ai-assistant-panel__history" data-testid={TestId.aiAssistant.history}>
       <div className="ai-assistant-panel__bar">
         <Button
-          iconClassName="icon-arrow-left2 icon-12px"
+          iconName="arrowBack"
+          iconSize={18}
           label="aiAssistant.back"
           onClick={assistantPanelStore.showHome}
           showLabel={false}

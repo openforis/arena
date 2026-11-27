@@ -1,6 +1,7 @@
 import * as ProcessUtils from '@core/processUtils'
+import type { IconName } from '@webapp/components/AppIcon'
 
-export type AppModule = { key: string; path: string; icon?: string }
+export type AppModule = { key: string; path: string; icon?: IconName }
 
 // link to an external page (e.g. in the help menu)
 export type ExternalAppModule = { key: string; uri: string; external: true }
@@ -45,22 +46,22 @@ export const appModules = {
   home: {
     key: 'home',
     path: 'home',
-    icon: 'home2',
+    icon: 'home',
   },
   dashboard: {
     key: 'dashboard',
     path: 'dashboard',
-    icon: 'stats-bars',
+    icon: 'barChart',
   },
   designer: {
     key: 'designer',
     path: 'designer',
-    icon: 'quill',
+    icon: 'design',
   },
   data: {
     key: 'data',
     path: 'data',
-    icon: 'table2',
+    icon: 'table',
   },
   users: {
     key: 'users',
@@ -70,17 +71,17 @@ export const appModules = {
   analysis: {
     key: 'analysis',
     path: 'analysis',
-    icon: 'stats-dots',
+    icon: 'scatterChart',
   },
   systemAdmin: {
     key: 'systemAdmin',
     path: 'systemAdmin',
-    icon: 'cogs',
+    icon: 'admin',
   },
   help: {
     key: 'help',
     path: 'help',
-    icon: 'question',
+    icon: 'help',
   },
 } satisfies Record<string, AppModule>
 

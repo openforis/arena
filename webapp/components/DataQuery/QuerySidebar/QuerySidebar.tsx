@@ -10,8 +10,8 @@ import QueryNodeDefsSelector from '../QueryNodeDefsSelector'
 const { modes } = Query
 
 const modeButtonItems = [
-  { key: modes.raw, iconClassName: 'icon-file-text2', label: 'dataView:dataQuery.mode.raw' },
-  { key: modes.aggregate, iconClassName: 'icon-sigma', label: 'dataView:dataQuery.mode.aggregate' },
+  { key: modes.raw, iconName: 'fileText', label: 'dataView:dataQuery.mode.raw' },
+  { key: modes.aggregate, iconName: 'sum', label: 'dataView:dataQuery.mode.aggregate' },
 ]
 
 // raw edit mode shown as "raw" in the mode button group

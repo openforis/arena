@@ -1,0 +1,1 @@
+export { CreatedWithAppIcon } from './CreatedWithAppIcon'

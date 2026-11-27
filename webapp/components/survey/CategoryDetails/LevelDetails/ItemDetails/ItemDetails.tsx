@@ -217,14 +217,16 @@ const ItemDetails = (props: ItemDetailsProps) => {
               <Button
                 disabled={CategoryItem.getIndex(item) === 0}
                 className="move-up-btn"
-                iconClassName="icon-arrow-up2 icon-12px"
+                iconName="arrowUp"
+                iconSize={14}
                 label="common.moveUp"
                 onClick={onMoveUpClick}
                 variant="outlined"
               />
               <Button
                 className="move-down-btn"
-                iconClassName="icon-arrow-down2 icon-12px"
+                iconName="arrowDown"
+                iconSize={14}
                 label="common.moveDown"
                 onClick={onMoveDownClick}
                 variant="outlined"

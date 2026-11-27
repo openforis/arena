@@ -6,6 +6,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { Button } from '@webapp/components/buttons'
 import Checkbox from '@webapp/components/form/Checkbox'
@@ -332,7 +333,7 @@ const SidePanel = ({ draft }: { draft: Draft }) => {
       <h4>{i18n.t('authProvidersView:form.redirectUri')}</h4>
       <div className="auth-provider-edit__redirect-uri">
         <code data-testid="auth-provider-redirect-uri">{redirectUri}</code>
-        <Button iconClassName="icon-copy" onClick={onCopy} showLabel={false} title="common.copy" variant="text" />
+        <Button iconName="copy" onClick={onCopy} showLabel={false} title="common.copy" variant="text" />
       </div>
       <h4>{i18n.t('authProvidersView:form.setupStepsTitle')}</h4>
       <ol className="auth-provider-edit__steps">
@@ -347,7 +348,7 @@ const SidePanel = ({ draft }: { draft: Draft }) => {
         target="_blank"
       >
         {i18n.t(`authProvidersView:form.setupGuide.${draft.type ?? 'oidc'}`)}
-        <span className="icon icon-new-tab icon-12px" />
+        <AppIcon name="openInNew" size={14} />
       </a>
       <h4>{i18n.t('authProvidersView:form.loginPagePreview')}</h4>
       <div className="auth-provider-edit__preview">
@@ -466,12 +467,7 @@ const AuthProviderEdit = (): React.ReactElement => {
             ? i18n.t('authProvidersView:form.newTitle', { type: i18n.t(`authProvidersView:types.${draft.type}`) })
             : draft.label}
         </h1>
-        <Button
-          iconClassName="icon-arrow-left"
-          label="common.back"
-          onClick={() => navigate(listUri())}
-          variant="text"
-        />
+        <Button iconName="arrowBack" label="common.back" onClick={() => navigate(listUri())} variant="text" />
       </div>
       {readOnly && (
         <div className="auth-providers__alert auth-providers__alert--info" role="note">
@@ -487,13 +483,13 @@ const AuthProviderEdit = (): React.ReactElement => {
             {!isNew && (
               <>
                 <Button
-                  iconClassName="icon-play3"
+                  iconName="play"
                   label="authProvidersView:form.testConnection"
                   onClick={onTestConnection}
                   variant="outlined"
                 />
                 <Button
-                  iconClassName="icon-new-tab"
+                  iconName="openInNew"
                   label="authProvidersView:form.testSignIn"
                   onClick={onTestSignIn}
                   variant="text"

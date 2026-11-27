@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import * as DateUtils from '@core/dateUtils'
 import * as User from '@core/user/user'
 import { ButtonIconEdit } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/ProfilePicture'
 import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
@@ -38,20 +39,20 @@ export const useUsersListColumns = ({ isRowOpenable, onRowOpen, selectable = fal
         key: 'status',
         header: 'usersView:accepted',
         width: '7rem',
-        renderItem: ({ item }) => User.hasAccepted(item) && <span className="icon icon-checkmark" />,
+        renderItem: ({ item }) => User.hasAccepted(item) && <AppIcon name="check" />,
         sortable: true,
       },
       {
         key: 'is-system-admin',
         header: 'auth:authGroups.systemAdmin.label',
         width: '12rem',
-        renderItem: ({ item }) => User.isSystemAdmin(item) && <span className="icon icon-checkmark" />,
+        renderItem: ({ item }) => User.isSystemAdmin(item) && <AppIcon name="check" />,
       },
       {
         key: 'is-survey-manager',
         header: 'auth:authGroups.surveyManager.label',
         width: '11rem',
-        renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
+        renderItem: ({ item }) => User.isSurveyManager(item) && <AppIcon name="check" />,
       },
       {
         key: 'last_login_time',

@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
+import { IconName } from '@webapp/components/AppIcon'
 import { useAppDispatch } from '@webapp/store'
 import { NodeDefsActions, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
@@ -15,9 +16,9 @@ import { NodeDefEntitySelectorDialog } from './NodeDefEntitySelectorDialog'
 
 const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
 
-const iconByAction = {
-  [actionsWithEntitySelection.clone]: 'icon-copy',
-  [actionsWithEntitySelection.move]: 'icon-arrow-up-right2',
+const iconByAction: Record<string, IconName> = {
+  [actionsWithEntitySelection.clone]: 'copy',
+  [actionsWithEntitySelection.move]: 'move',
 }
 
 const canEntityDefBeTargetOfCreation = ({ cycle, entityDef, nodeDef }) =>
@@ -146,7 +147,7 @@ export const NodeDefEditButtonsMenu = (props: NodeDefEditButtonsMenuProps) => {
         key: `node-${action}`,
         content: (
           <Button
-            iconClassName={iconByAction[action]}
+            iconName={iconByAction[action]}
             label={`surveyForm:${action}`}
             labelParams={{ nodeDefLabel }}
             onClick={openEntitySelectDialog(action)}
@@ -163,7 +164,8 @@ export const NodeDefEditButtonsMenu = (props: NodeDefEditButtonsMenuProps) => {
         key: 'node-convert',
         content: (
           <Button
-            iconClassName="icon-loop2 icon-12px"
+            iconName="refresh"
+            iconSize={14}
             label="surveyForm:convert"
             labelParams={{ nodeDefLabel }}
             onClick={openConvertIntoDialog}
@@ -196,7 +198,7 @@ export const NodeDefEditButtonsMenu = (props: NodeDefEditButtonsMenuProps) => {
 
   return (
     <>
-      <ButtonMenu className="btn-transparent" iconClassName="icon-menu icon-16px" items={menuItems} />
+      <ButtonMenu className="btn-transparent" iconName="menu" iconSize={16} items={menuItems} />
       {entitySelectDialogOpen && (
         <NodeDefEntitySelectorDialog
           filterFn={(entityDef) => isEntityVisibleByAction[action]({ cycle, entityDef, nodeDef })}

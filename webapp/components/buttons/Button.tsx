@@ -6,6 +6,7 @@ import classNames from 'classnames'
 import { Objects } from '@openforis/arena-core'
 
 import { useI18nT } from '@webapp/store/system'
+import { AppIcon, IconName } from '../AppIcon'
 import { TooltipNew } from '../TooltipNew'
 
 export type ButtonProps = Omit<MuiButtonProps, 'color' | 'title' | 'variant' | 'size'> & {
@@ -14,12 +15,14 @@ export type ButtonProps = Omit<MuiButtonProps, 'color' | 'title' | 'variant' | '
   color?: string
   icon?: React.ReactNode
   iconAlt?: string
-  iconClassName?: string
   iconHeight?: number
   iconSrc?: string
   iconEnd?: React.ReactNode
-  iconEndClassName?: string
+  iconEndName?: IconName
   iconEndSrc?: string
+  iconName?: IconName
+  /** Size in px of the icon specified with iconName / iconEndName. */
+  iconSize?: number
   iconWidth?: number
   isTitleMarkdown?: boolean
   label?: string
@@ -46,19 +49,19 @@ type IconProps = {
   alignRight?: boolean
   icon?: React.ReactNode
   iconAlt?: string
-  iconClassName?: string
   iconHeight?: number
+  iconName?: IconName
+  iconSize?: number
   iconSrc?: string
   iconWidth?: number
 }
 
 const Icon = (props: IconProps) => {
-  const { icon, iconAlt, iconClassName, iconHeight, iconSrc, iconWidth, alignLeft, alignRight } = props
+  const { icon, iconAlt, iconHeight, iconName, iconSize, iconSrc, iconWidth, alignLeft, alignRight } = props
+  const alignClassName = classNames({ 'icon-left': alignLeft, 'icon-right': alignRight })
   return (
     <>
-      {iconClassName && (
-        <span className={classNames('icon', iconClassName, { 'icon-left': alignLeft, 'icon-right': alignRight })} />
-      )}
+      {iconName && <AppIcon className={alignClassName} name={iconName} size={iconSize} />}
       {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
       {icon}
     </>
@@ -105,12 +108,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
     disabled = false,
     icon = null,
     iconAlt,
-    iconClassName,
     iconHeight,
     iconSrc,
     iconEnd = null,
-    iconEndClassName = null,
+    iconEndName,
     iconEndSrc = null,
+    iconName,
+    iconSize,
     iconWidth,
     id,
     isTitleMarkdown = false,
@@ -153,12 +157,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
       disabled={disabled || undefined}
       endIcon={
         showIcon &&
-        (iconEnd || iconEndClassName || iconEndSrc) && (
+        (iconEnd || iconEndName || iconEndSrc) && (
           <Icon
             icon={iconEnd}
             iconAlt={iconAlt}
-            iconClassName={iconEndClassName ?? undefined}
             iconHeight={iconHeight}
+            iconName={iconEndName}
+            iconSize={iconSize}
             iconSrc={iconEndSrc ?? undefined}
             iconWidth={iconWidth}
             alignRight={Boolean(label)}
@@ -168,13 +173,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) =>
       onClick={onClick}
       startIcon={
         showIcon &&
-        (icon || iconClassName || iconSrc) && (
+        (icon || iconName || iconSrc) && (
           <Icon
             alignLeft={Boolean(label)}
             icon={icon}
             iconAlt={iconAlt}
-            iconClassName={iconClassName}
             iconHeight={iconHeight}
+            iconName={iconName}
+            iconSize={iconSize}
             iconSrc={iconSrc}
             iconWidth={iconWidth}
           />

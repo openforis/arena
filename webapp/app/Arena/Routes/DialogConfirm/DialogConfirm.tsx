@@ -17,7 +17,7 @@ const DialogConfirm = () => {
     params,
     okButtonLabel,
     okButtonClass,
-    okButtonIconClass,
+    okButtonIcon,
     checkboxLabel,
     checkboxChecked,
     okButtonLabelChecked,
@@ -92,7 +92,8 @@ const DialogConfirm = () => {
             'btn-primary modal-footer__item',
             checkboxChecked ? (okButtonClassChecked ?? okButtonClass) : okButtonClass
           )}
-          iconClassName={okButtonIconClass}
+          iconName={okButtonIcon}
+          iconSize={14}
           onClick={onOk}
           disabled={strongConfirmActive && strongConfirmRequiredText !== strongConfirmText}
           label={checkboxChecked && okButtonLabelChecked ? okButtonLabelChecked : okButtonLabel}

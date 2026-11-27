@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
@@ -29,7 +30,7 @@ export const TableCellFiles = (props: TableCellFilesProps) => {
       {filesSize && <TooltipNew title={title}>{filesCount}</TooltipNew>}
       {filesMissing > 0 && (
         <TooltipNew title={i18n.t('files.missing', { count: filesMissing })}>
-          <span className="icon icon-warning icon-12px icon-left" />
+          <AppIcon name="warning" size={14} className="icon-left" />
         </TooltipNew>
       )}
     </>

@@ -5,6 +5,7 @@ import MuiCardActionArea from '@mui/material/CardActionArea'
 import MuiCardContent from '@mui/material/CardContent'
 import MuiCollapse from '@mui/material/Collapse'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 import { themeColors, withAlpha } from '@webapp/theme/tokens'
 import { type DashboardAccentKind, getDashboardAccent } from '../theme/dashboardAccents'
@@ -95,9 +96,10 @@ const KpiHeader = (props: KpiHeaderProps) => {
         {value}
       </Box>
       {expandable && (
-        <Box
-          component="span"
-          className={`icon icon-ctrl icon-12px${expanded ? ' expanded' : ''}`}
+        <AppIcon
+          className={expanded ? 'expanded' : undefined}
+          name="expandLess"
+          size={14}
           sx={{
             position: 'absolute',
             top: 16,

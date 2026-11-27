@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 
 import { Button } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { AuthProviderIcon } from '@webapp/components/authProvider/AuthProviderIcon'
 import { useConfirm, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import {
@@ -184,7 +185,7 @@ export const SignInMethodsPanel = (props: Props) => {
     <div className="sign-in-methods">
       <h3 className="sign-in-methods__title">{i18n.t('usersView:signInMethods.title')}</h3>
       <div className="sign-in-methods__row">
-        <span aria-hidden="true" className="icon icon-key sign-in-methods__password-icon" />
+        <AppIcon className="sign-in-methods__password-icon" name="key" size={20} />
         <div className="sign-in-methods__text">
           <span className="sign-in-methods__label">{i18n.t('usersView:signInMethods.password')}</span>
           <span className="sign-in-methods__details">
@@ -194,7 +195,7 @@ export const SignInMethodsPanel = (props: Props) => {
         {!hasPassword && (editingLoggedInUser || systemAdmin) && (
           <Button
             className="btn-s"
-            iconClassName="icon-pencil"
+            iconName="edit"
             label="usersView:signInMethods.setPassword"
             onClick={onSetPasswordClick}
             variant="outlined"

@@ -2,6 +2,7 @@ import { IconButton, Tooltip } from '@mui/material'
 import classNames from 'classnames'
 import type { ReactElement } from 'react'
 
+import { AppIcon, IconName } from '@webapp/components/AppIcon'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import { useMapWorkspace } from '../MapWorkspaceContext'
@@ -9,7 +10,7 @@ import { useMapWorkspace } from '../MapWorkspaceContext'
 type ToolbarIconButtonProps = {
   buttonKey: string
   titleKey: string
-  iconClassName?: string
+  iconName?: IconName
   iconSrc?: string
   active?: boolean
   disabled?: boolean
@@ -21,7 +22,7 @@ type ToolbarIconButtonProps = {
  * @param {object} props - Component props.
  * @param {string} props.buttonKey - Button key (test id suffix).
  * @param {string} props.titleKey - I18n key of the label.
- * @param {string} [props.iconClassName] - Icon class (when no iconSrc).
+ * @param {string} [props.iconName] - Icon (when no iconSrc).
  * @param {string} [props.iconSrc] - Image URL of the icon.
  * @param {boolean} [props.active] - Toggle state (sets aria-pressed); undefined for plain buttons.
  * @param {boolean} [props.disabled] - Whether the button is disabled.
@@ -30,7 +31,7 @@ type ToolbarIconButtonProps = {
 export const ToolbarIconButton = ({
   buttonKey,
   titleKey,
-  iconClassName,
+  iconName,
   iconSrc,
   active,
   disabled = false,
@@ -52,11 +53,7 @@ export const ToolbarIconButton = ({
           className={classNames('map-toolbar__icon-button', { 'map-toolbar__icon-button--active': active })}
           data-testid={TestId.mapWorkspace.quickButton(buttonKey)}
         >
-          {iconSrc ? (
-            <img src={iconSrc} alt="" width={18} height={18} />
-          ) : (
-            <span className={`icon icon-16px ${iconClassName}`} aria-hidden="true" />
-          )}
+          {iconSrc ? <img src={iconSrc} alt="" width={18} height={18} /> : <AppIcon name={iconName} size={18} />}
         </IconButton>
       </span>
     </Tooltip>

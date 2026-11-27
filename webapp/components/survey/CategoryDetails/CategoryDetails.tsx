@@ -9,6 +9,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 import { Button, ButtonDownload, ButtonIconInfo, ButtonMenu } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -168,7 +169,8 @@ const CategoryDetails = (props: CategoryDetailsProps) => {
                   <ButtonMenu
                     className="date-import-template-menu-btn"
                     label="dataImportView:templateForImport"
-                    iconClassName="icon-download2 icon-14px"
+                    iconName="download"
+                    iconSize={16}
                     items={Object.keys(templateTypes).flatMap((templateType) =>
                       templateFileFormats.map((fileFormat) => ({
                         key: `data-import-template-${templateType}-${fileFormat}`,
@@ -193,7 +195,8 @@ const CategoryDetails = (props: CategoryDetailsProps) => {
                     variant="outlined"
                   />
                   <ButtonMenu
-                    iconClassName="icon-cog icon-14px"
+                    iconName="settings"
+                    iconSize={16}
                     items={[
                       ...(!Category.isReportingData(category)
                         ? [
@@ -247,7 +250,8 @@ const CategoryDetails = (props: CategoryDetailsProps) => {
               {!readOnly && hasLocationExtraProp && (
                 <Button
                   className="export-geopackage-btn"
-                  iconClassName="icon-download2 icon-14px"
+                  iconName="download"
+                  iconSize={16}
                   label="categoryEdit.exportToGeoPackage"
                   onClick={() => Actions.exportToGeoPackage({ categoryUuid })}
                   variant="outlined"
@@ -300,7 +304,7 @@ const CategoryDetails = (props: CategoryDetailsProps) => {
             {isSamplingPointData && !hasLocationExtraProp && (
               <div className="row">
                 <span className="category-type-warning">
-                  <span className="icon icon-warning icon-12px" />
+                  <AppIcon name="warning" size={14} />
                   {i18n.t('categoryEdit.samplingPointDataCategoryLocationMissing')}
                 </span>
               </div>
@@ -348,7 +352,8 @@ const CategoryDetails = (props: CategoryDetailsProps) => {
                   className="btn-s btn-add-level"
                   testId={TestId.categoryDetails.addLevelBtn}
                   onClick={() => Actions.createLevel({ category })}
-                  iconClassName="icon icon-plus icon-16px icon-left"
+                  iconName="add"
+                  iconSize={16}
                   label="categoryEdit.addLevel"
                 />
               </div>

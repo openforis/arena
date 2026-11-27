@@ -46,7 +46,7 @@ const OpenFileUploadDialogButton = (props: OpenFileUploadDialogButtonProps) => {
       className={className}
       disabled={disabled}
       onClick={onClick}
-      iconClassName={showIcon ? 'icon-upload2' : null}
+      iconName={showIcon ? 'upload' : undefined}
       label={showLabel ? label : null}
       variant={variant}
     />

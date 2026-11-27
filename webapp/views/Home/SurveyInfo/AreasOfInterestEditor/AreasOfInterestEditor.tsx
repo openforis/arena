@@ -103,7 +103,8 @@ export const AreasOfInterestEditor = (props: Props) => {
         {!readOnly && <ButtonAdd onClick={() => setDialog({ open: true, edited: null })} size="small" />}
         {canUseMap && areasOfInterest.length > 0 && (
           <Button
-            iconClassName="icon-map icon-12px"
+            iconName="map"
+            iconSize={14}
             label="homeView:surveyInfo.areasOfInterest.showAllOnMap"
             onClick={onShowAllOnMap}
             size="small"

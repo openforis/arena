@@ -5,6 +5,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/ErrorBadge'
 import Table from '@webapp/components/Table'
 import type { TableColumn } from '@webapp/components/Table/tableColumn'
@@ -75,7 +76,7 @@ const CategoryList = (props: CategoryListProps) => {
       key: 'extraProps',
       header: 'extraProp.label_other',
       renderItem: ({ item: category }) =>
-        Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
+        Category.getItemExtraDefsArray(category).length > 0 ? <AppIcon name="check" /> : null,
       width: '8rem',
     },
     // STRUCTURE (flat / hierarchical)
@@ -134,7 +135,8 @@ const CategoryList = (props: CategoryListProps) => {
           <Button
             className={`btn btn-s${selected ? ' active' : ''}`}
             onClick={() => Actions.select({ category })}
-            iconClassName={`icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}
+            iconName={selected ? 'checkboxChecked' : 'checkboxUnchecked'}
+            iconSize={14}
             label={selected ? 'common.selected' : 'common.select'}
           />
         )

@@ -13,7 +13,7 @@ const keys = {
   onCancel: 'onCancel', // optional, applicable only if dismissable is true
   okButtonLabel: 'okButtonLabel',
   okButtonClass: 'okButtonClass',
-  okButtonIconClass: 'okButtonIconClass',
+  okButtonIcon: 'okButtonIcon',
   // optional checkbox (unchecked by default) offering an alternative, less prominent action; when
   // checked, onOkChecked/okButtonLabelChecked/okButtonClassChecked replace onOk/okButtonLabel/
   // okButtonClass, and strong confirmation (if requested) is only enforced while it's checked
@@ -44,7 +44,7 @@ export const isDismissable = A.pipe(getState, A.propEq(keys.dismissable, true))
 export const getOnCancel = A.pipe(getState, A.prop(keys.onCancel))
 export const getOkButtonLabel = A.pipe(getState, A.propOr('common.ok', keys.okButtonLabel))
 export const getOkButtonClass = A.pipe(getState, A.prop(keys.okButtonClass))
-export const getOkButtonIconClass = A.pipe(getState, A.propOr('icon-checkmark icon-12px', keys.okButtonIconClass))
+export const getOkButtonIcon = A.pipe(getState, A.propOr('check', keys.okButtonIcon))
 // checkbox option
 export const getCheckboxLabel = A.pipe(getState, A.propOr(null, keys.checkboxLabel))
 export const getOnOkChecked = A.pipe(getState, A.prop(keys.onOkChecked))
@@ -71,7 +71,7 @@ export const show = ({
   onCancel,
   okButtonLabel = 'common.ok',
   okButtonClass = undefined,
-  okButtonIconClass = undefined,
+  okButtonIcon = undefined,
   checkboxLabel = null,
   onOkChecked = null,
   okButtonLabelChecked = null,
@@ -91,7 +91,7 @@ export const show = ({
   [keys.onCancel]: onCancel,
   [keys.okButtonLabel]: okButtonLabel,
   [keys.okButtonClass]: okButtonClass,
-  [keys.okButtonIconClass]: okButtonIconClass,
+  [keys.okButtonIcon]: okButtonIcon,
   [keys.checkboxLabel]: checkboxLabel,
   [keys.onOkChecked]: onOkChecked,
   [keys.okButtonLabelChecked]: okButtonLabelChecked,

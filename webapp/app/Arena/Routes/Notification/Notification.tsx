@@ -3,6 +3,7 @@ import './Notification.scss'
 import { useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useAppDispatch } from '@webapp/store'
 import { useI18nT } from '@webapp/store/system'
 import { NotificationActions, useNotification } from '@webapp/store/ui'
@@ -21,7 +22,7 @@ const Notification = () => {
           className="btn-s btn-transparent notification__btn-close"
           onClick={() => dispatch(NotificationActions.hideNotification())}
         >
-          <span className="icon icon-cross icon-8px" />
+          <AppIcon name="close" size={10} />
         </button>
 
         <div className="notification-content">{messageText ?? t(messageKey, messageParams)}</div>

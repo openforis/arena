@@ -141,7 +141,8 @@ export const ResizableModal = (props: ResizableModalProps) => {
           {onDetach && (
             <Button
               className="btn-s detach-btn"
-              iconClassName="icon-display icon-10px"
+              iconName="desktop"
+              iconSize={12}
               onClick={onDetach}
               title="common.openInNewWindow"
             />

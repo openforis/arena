@@ -30,12 +30,12 @@
       height: auto;
     }
 
-    .survey-form__node-def-error-badge .badge__content > *:first-child {
+    .survey-form__node-def-error-badge .badge__content > *:first-child:not(.app-icon) {
       width: auto;
       height: auto;
     }
 
-    .survey-form__node-def-error-badge .badge__content .icon-warning {
+    .survey-form__node-def-error-badge .badge__content .app-icon--warning {
       position: static;
     }
   }

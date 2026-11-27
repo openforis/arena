@@ -1,5 +1,6 @@
 import './AuthProviderIcon.scss'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { getProviderIconUrl } from '@webapp/service/api/authProviders'
 
 const builtinIconByType: Record<string, string> = {
@@ -27,5 +28,5 @@ export const AuthProviderIcon = ({ providerId, type, iconKind, iconVersion }: Pr
     const src = getProviderIconUrl(providerId) + versionQuery
     return <img alt="" aria-hidden="true" className="auth-provider-icon" src={src} />
   }
-  return <span aria-hidden="true" className="icon icon-enter auth-provider-icon auth-provider-icon--generic" />
+  return <AppIcon className="auth-provider-icon--generic" name="login" size={20} />
 }

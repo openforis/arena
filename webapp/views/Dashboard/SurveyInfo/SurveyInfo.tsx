@@ -8,6 +8,7 @@ import { Objects } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import ButtonPublishSurvey from '@webapp/components/ButtonPublishSurvey'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
@@ -91,7 +92,8 @@ const SurveyInfo = (props: SurveyInfoProps) => {
         key: 'survey-compare',
         content: (
           <Button
-            iconClassName="icon-loop2 icon-12px icon-left"
+            iconName="refresh"
+            iconSize={14}
             label="appModules.surveyCompare"
             onClick={navigateToSurveyCompare}
             variant="text"
@@ -106,7 +108,8 @@ const SurveyInfo = (props: SurveyInfoProps) => {
         content: (
           <Button
             className="btn-danger"
-            iconClassName="icon-eye-blocked icon-12px icon-left"
+            iconName="viewOff"
+            iconSize={14}
             label="homeView:surveyInfo.unpublish"
             onClick={onUnpublishClick}
             variant="text"
@@ -121,7 +124,8 @@ const SurveyInfo = (props: SurveyInfoProps) => {
         content: (
           <Button
             className="btn-danger"
-            iconClassName="icon-bin icon-12px icon-left"
+            iconName="delete"
+            iconSize={14}
             label="homeView:surveyInfo.deleteActivityLog"
             onClick={onDeleteActivityLogDataClick}
             variant="text"
@@ -212,7 +216,8 @@ const SurveyInfo = (props: SurveyInfoProps) => {
 
       <div>
         <Button
-          iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
+          iconName={canEditSurvey ? 'edit' : 'view'}
+          iconSize={14}
           label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
           onClick={navigateToSurveyInfo}
           size="small"
@@ -226,7 +231,8 @@ const SurveyInfo = (props: SurveyInfoProps) => {
           <ButtonMenu
             className="btn-menu-export"
             items={exportMenuItems}
-            iconClassName="icon-download2 icon-14px"
+            iconName="download"
+            iconSize={16}
             label="common.export"
             size="small"
             testId={TestId.dashboard.surveyExportBtn}
@@ -235,7 +241,8 @@ const SurveyInfo = (props: SurveyInfoProps) => {
         {canEditSurvey && (
           <ButtonMenu
             className="btn-menu-advanced"
-            iconClassName="icon-cog icon-14px"
+            iconName="settings"
+            iconSize={16}
             items={advancedFunctionsItems}
             label="common.advancedFunctions"
             size="small"
@@ -248,7 +255,7 @@ const SurveyInfo = (props: SurveyInfoProps) => {
             to={appModuleUri(homeModules.collectImportReport)}
             className="btn-s btn-transparent"
           >
-            <span className="icon icon-clipboard icon-12px icon-left" />
+            <AppIcon name="clipboard" size={14} className="icon-left" />
             {i18n.t('appModules.collectImportReport')}
           </Link>
         )}

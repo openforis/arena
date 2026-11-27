@@ -15,7 +15,8 @@ const ButtonAiGenerateExpression = (props: ButtonAiGenerateExpressionProps) => {
     <Button
       className="btn-s btn-ai"
       disabled={disabled}
-      iconClassName="icon-magic-wand icon-14px"
+      iconName="magicWand"
+      iconSize={16}
       id={id}
       onClick={onClick}
       testId={testId}

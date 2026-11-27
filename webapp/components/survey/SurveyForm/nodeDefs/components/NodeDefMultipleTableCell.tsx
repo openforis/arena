@@ -8,6 +8,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import NodeDefMultipleEditDialog from './NodeDefMultipleEditDialog'
@@ -69,7 +70,7 @@ const NodeDefMultipleTableCell = (props: NodeDefMultipleTableCellProps) => {
         <LabelWithTooltip label={nodeValues} />
       </span>
       <button type="button" className="btn-s" onClick={() => setShowEditDialog(true)}>
-        <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`} />
+        <AppIcon name={canEditRecord ? 'edit' : 'view'} size={14} />
       </button>
     </div>
   )

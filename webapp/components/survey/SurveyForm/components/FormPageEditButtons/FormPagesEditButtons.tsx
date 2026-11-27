@@ -9,14 +9,16 @@ export const FormPagesEditButtons = () => {
     <div className="survey-form__page-edit-buttons">
       <Button
         size="small"
-        iconClassName="icon-arrow-up2 icon-12px"
+        iconName="arrowUp"
+        iconSize={14}
         title="surveyForm:movePageUp"
         disabled={upDisabled}
         onClick={onMoveUp}
       />
       <Button
         size="small"
-        iconClassName="icon-arrow-down2 icon-12px"
+        iconName="arrowDown"
+        iconSize={14}
         title="surveyForm:movePageDown"
         disabled={downDisabled}
         onClick={onMoveDown}

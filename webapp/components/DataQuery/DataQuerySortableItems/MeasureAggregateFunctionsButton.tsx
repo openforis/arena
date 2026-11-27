@@ -62,7 +62,8 @@ export const MeasureAggregateFunctionsButton = (props: Props) => {
     {
       key: 'manageCustom',
       closeMenuOnClick: true,
-      iconClassName: 'icon-cog icon-12px',
+      iconName: 'settings',
+      iconSize: 14,
       label: 'dataView:dataQuery.customAggregateFunctions',
       onClick: () => setPanelOpen(true),
     },

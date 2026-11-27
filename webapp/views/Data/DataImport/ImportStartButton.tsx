@@ -169,7 +169,8 @@ export const ImportStartButton = (props: ImportStartButtonProps) => {
         <>
           {status === stata.running ? (
             <Button
-              iconClassName="icon-pause icon-12px"
+              iconName="pause"
+              iconSize={14}
               label="common.pause"
               onClick={onUploadPauseClick}
               showLabel={false}
@@ -177,7 +178,8 @@ export const ImportStartButton = (props: ImportStartButtonProps) => {
             />
           ) : (
             <Button
-              iconClassName="icon-play3 icon-12px"
+              iconName="play"
+              iconSize={14}
               label="common.resume"
               onClick={onUploadResumeClick}
               showLabel={false}

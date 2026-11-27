@@ -3,6 +3,7 @@ import './PasswordInput.scss'
 import React, { useState } from 'react'
 import classNames from 'classnames'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 import { Button } from '../../buttons'
 import { SimpleTextInput, type SimpleTextInputProps } from '../SimpleTextInput'
@@ -37,7 +38,7 @@ export const PasswordInput = (props: PasswordInputProps) => {
 
   const onClickPasswordVisibility = () => setPasswordShown(!passwordShown)
 
-  const iconClassName = passwordShown ? 'icon-eye' : 'icon-eye-blocked'
+  const iconName = passwordShown ? 'view' : 'viewOff'
 
   return (
     <SimpleTextInput
@@ -53,7 +54,7 @@ export const PasswordInput = (props: PasswordInputProps) => {
           onMouseDown={onMouseDownPasswordVisibility}
           variant="text"
         >
-          <span className={classNames('icon', iconClassName)} />
+          <AppIcon name={iconName} />
         </Button>
       }
     />

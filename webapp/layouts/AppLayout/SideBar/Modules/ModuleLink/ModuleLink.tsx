@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import { Link } from 'react-router'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import * as SideBarModule from '../utils'
@@ -34,7 +35,7 @@ const ModuleLink = (props: ModuleLinkProps) => {
 
   const linkContent = (
     <>
-      {icon && <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`} />}
+      {icon && <AppIcon className={showLabel ? 'icon-left-2x' : undefined} name={icon} />}
       {showLabel && <span>{i18n.t(`appModules.${key}`)}</span>}
     </>
   )

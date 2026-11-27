@@ -9,6 +9,7 @@ import TableRow from '@mui/material/TableRow'
 import classNames from 'classnames'
 
 import { ButtonIconExpandToggle } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
 import { ButtonGroup, Checkbox, TextInput } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
@@ -182,7 +183,7 @@ const UserRow = ({
           {email}
         </TableCell>
         <TableCell>{name}</TableCell>
-        <TableCell align="center">{isSystemAdmin && <span className="icon icon-checkmark icon-14px" />}</TableCell>
+        <TableCell align="center">{isSystemAdmin && <AppIcon name="check" size={16} />}</TableCell>
         <TableCell>
           <span
             className={classNames('users-backup-user-status', {

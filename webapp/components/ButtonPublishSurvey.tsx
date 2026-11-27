@@ -33,7 +33,8 @@ const ButtonPublishSurvey = (props: ButtonPublishSurveyProps) => {
     <Button
       className={classNames('btn-publish-survey', className)}
       disabled={disabled || surveyIsDirty}
-      iconClassName="icon-warning icon-left icon-10px"
+      iconName="warning"
+      iconSize={12}
       label="common.publish"
       onClick={() => {
         // suggestion 3: offer to fix the entries with errors before the server refuses the publish

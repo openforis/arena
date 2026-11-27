@@ -48,7 +48,7 @@ const ForgotPassword = () => {
       <GuestViewHeader
         backToLogin
         description="guest:forgotPasswordView.description"
-        icon="icon-key"
+        icon="key"
         title="guest:forgotPasswordView.title"
       />
       <GuestError error={error} />

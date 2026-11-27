@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router'
 
 import { ENV } from '@core/processUtils'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
-import { Button, ButtonSplit } from '@webapp/components/buttons'
+import { Button, ButtonProps, ButtonSplit } from '@webapp/components/buttons'
 import { MobilePreviewPanel } from '@webapp/components/survey/MobilePreview'
 
 /**
@@ -16,8 +16,9 @@ export const FormPreviewButton = () => {
 
   const openDesktopPreview = () => navigate(appModuleUri(dataModules.formPreview))
 
-  const buttonProps = {
-    iconClassName: 'icon-eye icon-12px',
+  const buttonProps: ButtonProps = {
+    iconName: 'view',
+    iconSize: 14,
     label: 'dataView:records.formPreview',
     onClick: openDesktopPreview,
     title: 'dataView:records.formPreviewInfo',
@@ -32,13 +33,15 @@ export const FormPreviewButton = () => {
           items={[
             {
               key: 'desktop',
-              iconClassName: 'icon-display icon-12px',
+              iconName: 'desktop',
+              iconSize: 14,
               label: 'surveyForm:formEditActions.previewDesktop',
               onClick: openDesktopPreview,
             },
             {
               key: 'mobile',
-              iconClassName: 'icon-mobile icon-12px',
+              iconName: 'mobile',
+              iconSize: 14,
               label: 'surveyForm:formEditActions.previewMobile',
               onClick: () => setMobilePreviewOpen(true),
             },

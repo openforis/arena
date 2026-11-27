@@ -9,7 +9,7 @@ export const ButtonEditLockToggle = (props: ButtonEditLockToggleProps) => {
   return (
     <Button
       {...otherProps}
-      iconClassName={locked ? 'icon-lock' : 'icon-unlocked'}
+      iconName={locked ? 'lock' : 'lockOpen'}
       label={`common.${locked ? 'unlock' : 'lock'}`}
       variant="text"
     />

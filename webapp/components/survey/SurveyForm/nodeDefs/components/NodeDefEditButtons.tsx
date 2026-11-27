@@ -79,7 +79,8 @@ const NodeDefEditButtons = (props: NodeDefEditButtonsProps) => {
 
       <Button
         className="survey-form__node-def-edit-button"
-        iconClassName="icon-pencil2 icon-16px"
+        iconName="edit"
+        iconSize={16}
         onClick={() => navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
         size="small"
         testId={TestId.surveyForm.nodeDefEditBtn(nodeDefName)}
@@ -92,7 +93,7 @@ const NodeDefEditButtons = (props: NodeDefEditButtonsProps) => {
 
       {NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && (
         <Button
-          iconClassName="icon-stack"
+          iconName="layers"
           onClick={() => dispatch(NodeDefsActions.compressFormItems(nodeDef))}
           onMouseDown={(e) => e.stopPropagation()}
           size="small"
@@ -104,7 +105,8 @@ const NodeDefEditButtons = (props: NodeDefEditButtonsProps) => {
 
       {NodeDef.isEntity(nodeDef) && (
         <Button
-          iconClassName="icon-plus icon-12px"
+          iconName="add"
+          iconSize={14}
           onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
           onMouseDown={(e) => e.stopPropagation()}
           size="small"
