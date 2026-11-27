@@ -122,7 +122,7 @@ export default {
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Administrar',
-    message_other: 'Mensajes',
+    messages: 'Mensajes',
     measure: 'Medida',
     measure_other: 'Medidas',
     measurePrevSteps: 'Medir pasos previos',
@@ -375,7 +375,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     virtualEntity_other: '$t(appModules.entities)',
     instances: 'Sesiones RStudio',
     message: 'Mensaje',
-    message_other: '$t(common.message_other)',
+    message_other: '$t(common.messages)',
 
     systemAdmin: 'Administración del sistema',
     jobMonitor: 'Monitor de trabajos',

@@ -84,7 +84,6 @@ export default {
   records: {
     clone: '複製',
     confirmDeleteRecord: `記録「{{keyValues}}」を削除しますか？`,
-    confirmDeleteSelectedRecord_one: `選択した記録を削除しますか？`,
     confirmDeleteSelectedRecord_other: `選択した{{count}}件の記録を削除しますか？`,
     confirmMergeSelectedRecords: `### 選択した記録を1つに統合しますか？
 
@@ -151,7 +150,6 @@ export default {
       selectedRecords: '選択した{{selectedRecordsCount}}件の記録のみ',
     },
   },
-  recordDeleted_one: `記録を削除しました！`,
   recordDeleted_other: `{{count}}件の記録を削除しました！`,
   recordsSource: {
     label: 'ソース',
@@ -222,7 +220,6 @@ export default {
     },
     layersPanel: {
       markers: '{{count}}件のマーカー',
-      markers_one: '{{count}}件のマーカー',
       markers_other: '{{count}}件のマーカー',
     },
   },
