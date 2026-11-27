@@ -37,11 +37,8 @@ export default {
       <p><i>You have received this email because this address was submitted in an access request on {{serverUrl}}. If you did not make this request, please let us know by writing to <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</i></p>
       $t(emails:signature)`,
   },
-  userAccessRequest: {
-    subject: '$t(common.appNameFull) - User Access Request',
-    body: `<p>Hello,</p>
-      <p>The following user has requested access to $t(common.appNameFull).</p>
-      <p>
+  // details of the user who requested access (or created an account), sent to the system admins
+  userAccessRequestDetails: `<p>
         <ul>
           <li>$t(guest:accessRequestView.fields.email): {{email}}</li>
           <li>$t(guest:accessRequestView.fields.props.firstName): {{firstName}}</li>
@@ -51,7 +48,12 @@ export default {
           <li>$t(guest:accessRequestView.fields.props.purpose): {{purpose}}</li>
           <li>$t(guest:accessRequestView.fields.props.surveyName): {{surveyName}}</li>
         </ul>
-      </p>
+      </p>`,
+  userAccessRequest: {
+    subject: '$t(common.appNameFull) - User Access Request',
+    body: `<p>Hello,</p>
+      <p>The following user has requested access to $t(common.appNameFull).</p>
+      $t(emails:userAccessRequestDetails)
       <p>Please evaluate this request and get back to the user as soon as possible.</p>
       <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
       $t(emails:signature)`,
@@ -72,17 +74,7 @@ export default {
     subject: '$t(common.appNameFull) - New user registered',
     body: `<p>Hello,</p>
       <p>The following user has created an account in $t(common.appNameFull) (the registration is completed when the user opens the link in the confirmation email).</p>
-      <p>
-        <ul>
-          <li>$t(guest:accessRequestView.fields.email): {{email}}</li>
-          <li>$t(guest:accessRequestView.fields.props.firstName): {{firstName}}</li>
-          <li>$t(guest:accessRequestView.fields.props.lastName): {{lastName}}</li>
-          <li>$t(guest:accessRequestView.fields.props.institution): {{institution}}</li>
-          <li>$t(guest:accessRequestView.fields.props.country): {{country}}</li>
-          <li>$t(guest:accessRequestView.fields.props.purpose): {{purpose}}</li>
-          <li>$t(guest:accessRequestView.fields.props.surveyName): {{surveyName}}</li>
-        </ul>
-      </p>
+      $t(emails:userAccessRequestDetails)
       <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
       $t(emails:signature)`,
   },
