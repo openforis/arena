@@ -10,6 +10,7 @@ import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
 import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
 
+import { RegistrationFields } from './RegistrationFields'
 import { useResetPassword } from './store/hooks'
 
 const ResetPassword = () => {
@@ -20,7 +21,7 @@ const ResetPassword = () => {
   const externalLoginErrorKey = searchParams.get('externalLoginError')
 
   const {
-    registrationName,
+    registrationInfo,
     state: { initialUser, user, error },
     onChangeUser,
     onChangeUserTitle,
@@ -55,31 +56,7 @@ const ResetPassword = () => {
       {!hasAlreadyAccepted && (
         <>
           <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
-          {registrationName ? (
-            // name given when requesting access (or creating the account): not editable
-            <>
-              <TextInput
-                label={i18n.t('guest:accessRequestView.fields.props.firstName')}
-                name="firstName"
-                readOnly
-                value={registrationName.firstName ?? ''}
-              />
-              <TextInput
-                label={i18n.t('guest:accessRequestView.fields.props.lastName')}
-                name="lastName"
-                readOnly
-                value={registrationName.lastName ?? ''}
-              />
-            </>
-          ) : (
-            <TextInput
-              defaultValue={user.name}
-              name="name"
-              autoComplete="new-name"
-              label={i18n.t('guest:loginView.yourName')}
-              onChange={(value) => onChangeUser({ prop: 'name', value })}
-            />
-          )}
+          <RegistrationFields onChangeUser={onChangeUser} readOnly={Boolean(registrationInfo)} user={user} />
         </>
       )}
       <PasswordInput
@@ -112,7 +89,7 @@ const ResetPassword = () => {
         // accept the invitation with an external provider instead of a password
         <ExternalLoginButtons
           labelKey="guest:externalLogin.continueWith"
-          query={{ invitation: invitationUuid, name: user.name ?? '' }}
+          query={{ invitation: invitationUuid, name: [user.firstName, user.lastName].filter(Boolean).join(' ') }}
         />
       )}
     </form>

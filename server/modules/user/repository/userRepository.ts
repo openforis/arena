@@ -529,6 +529,23 @@ export const updateUser = (
     camelize
   )
 
+/**
+ * Updates the name of a user and adds the specified props to the existing ones.
+ */
+export const updateNameAndMergeProps = (
+  { userUuid, name, props }: { userUuid: string; name: string; props: Record<string, unknown> },
+  client: DbClient = db
+) =>
+  client.one(
+    `
+    UPDATE "user" u
+    SET name = $1, props = COALESCE(u.props, '{}'::jsonb) || $3::jsonb
+    WHERE u.uuid = $2
+    RETURNING ${columnsCommaSeparated}`,
+    [name, userUuid, User.newProps(props)],
+    camelize
+  )
+
 export const updateNamePasswordAndStatus = (
   {
     userUuid,
@@ -536,16 +553,26 @@ export const updateNamePasswordAndStatus = (
     password,
     status,
     title,
-  }: { userUuid: string; name: string; password: string; status: string; title: UserTitle },
+    institution,
+    country,
+  }: {
+    userUuid: string
+    name: string
+    password: string
+    status: string
+    title: UserTitle
+    institution?: string
+    country?: string
+  },
   client: DbClient = db
 ) =>
   client.one(
     `
     UPDATE "user" u
-    SET name = $1, password = $2, status = $3, props = $5::jsonb
+    SET name = $1, password = $2, status = $3, props = COALESCE(u.props, '{}'::jsonb) || $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${columnsCommaSeparated}`,
-    [name, password, status, userUuid, User.newProps({ title })],
+    [name, password, status, userUuid, User.newProps({ title, institution, country })],
     camelize
   )
 

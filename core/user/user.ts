@@ -161,6 +161,8 @@ export const {
 // PROPS
 export const {
   getTitle,
+  getInstitution,
+  getCountry,
   getMapApiKey,
   getMaxSurveys,
   assocTitle,

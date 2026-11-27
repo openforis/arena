@@ -112,13 +112,13 @@ export const init = (app: Router): void => {
 
   app.get('/auth/reset-password/:uuid', async (req, res) => {
     const { uuid } = Request.getParams(req)
-    const { user, registrationName } = await UserService.fetchResetPasswordUserAndRegistrationName(uuid)
-    res.json({ user, registrationName })
+    const { user, registrationInfo } = await UserService.fetchResetPasswordUserAndRegistrationInfo(uuid)
+    res.json({ user, registrationInfo })
   })
 
   app.put('/auth/reset-password/:uuid', async (req, res) => {
-    const { uuid, name, password, title } = Request.getParams(req)
-    await UserService.resetPassword({ uuid, name, password, title })
+    const { uuid, name, password, title, institution, country } = Request.getParams(req)
+    await UserService.resetPassword({ uuid, name, password, title, institution, country })
     res.json({ result: true })
   })
 }

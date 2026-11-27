@@ -36,6 +36,7 @@ export const {
   fetchActiveUserUuidsWithPreferredSurveyId,
   fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
+  updateNameAndMergeProps,
   updatePassword,
   deleteUserPrefsSurvey,
   deleteUserMapCustomLayersSurvey,

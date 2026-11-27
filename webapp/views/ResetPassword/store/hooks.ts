@@ -13,23 +13,42 @@ import * as actions from './actions'
 import initialState from './initialState'
 import reducer from './reducer'
 
+const getFullName = ({ firstName, lastName }) => [firstName, lastName].filter(Boolean).join(' ').trim()
+
+// fields of the registration form: from the access request (not editable) or from the invited user
+const getInitialRegistrationFields = ({ user, registrationInfo }) => {
+  if (registrationInfo) {
+    const { firstName = '', lastName = '', institution = '', country = '' } = registrationInfo
+    return { firstName, lastName, institution, country }
+  }
+  // name possibly set when inviting the user: first word as first name
+  const [firstName = '', ...lastNameParts] = (user.name ?? '').trim().split(/\s+/)
+  return {
+    firstName,
+    lastName: lastNameParts.join(' '),
+    institution: User.getInstitution(user),
+    country: User.getCountry(user),
+  }
+}
+
 export const useResetPassword = () => {
   const dispatchRedux = useAppDispatch()
   const { uuid } = useParams()
   const navigate = useNavigate()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { user } = state
-  const { name, password, passwordConfirm, props = {} } = user
+  const { firstName, lastName, institution, country, password, passwordConfirm, props = {} } = user
+  const name = getFullName({ firstName, lastName })
   const hasAlreadyAccepted = User.hasAccepted(user)
 
   const { title } = props
 
-  const { data: { user: userFetched, registrationName = null } = {}, dispatch: getResetPasswordUser } =
+  const { data: { user: userFetched, registrationInfo = null } = {}, dispatch: getResetPasswordUser } =
     useAsyncGetRequest(`/auth/reset-password/${uuid}`)
 
   const { data: { result: resetComplete = false } = {}, dispatch: dispatchPostResetPassword } = useAsyncPutRequest(
     `/auth/reset-password/${uuid}`,
-    { name, title, password }
+    { name, title, password, institution, country }
   )
 
   const navigateToHomePage = () => navigate(appModuleUri(homeModules.landing))
@@ -39,7 +58,8 @@ export const useResetPassword = () => {
 
   const onSubmit = useCallback(async () => {
     const validation = await LoginValidator.validateResetPasswordObj({
-      name,
+      firstName,
+      lastName,
       title,
       password,
       passwordConfirm,
@@ -48,10 +68,16 @@ export const useResetPassword = () => {
     if (Validation.isValid(validation)) {
       dispatchPostResetPassword()
     } else {
-      const error = LoginValidator.getFirstError(validation, ['name', 'title', 'password', 'passwordConfirm'])
+      const error = LoginValidator.getFirstError(validation, [
+        'title',
+        'firstName',
+        'lastName',
+        'password',
+        'passwordConfirm',
+      ])
       actions.updateError(error)(dispatch)
     }
-  }, [dispatchPostResetPassword, hasAlreadyAccepted, name, password, passwordConfirm, title])
+  }, [dispatchPostResetPassword, firstName, hasAlreadyAccepted, lastName, password, passwordConfirm, title])
 
   useEffect(() => {
     getResetPasswordUser()
@@ -59,11 +85,9 @@ export const useResetPassword = () => {
 
   useOnUpdate(() => {
     if (userFetched) {
-      // the name given in the access request is used (not editable)
-      const fullName = registrationName
-        ? [registrationName.firstName, registrationName.lastName].filter(Boolean).join(' ')
-        : null
-      actions.initUser(fullName ? { ...userFetched, name: fullName } : userFetched)(dispatch)
+      actions.initUser({ ...userFetched, ...getInitialRegistrationFields({ user: userFetched, registrationInfo }) })(
+        dispatch
+      )
     } else {
       dispatchRedux(NotificationActions.notifyError({ key: 'guest:resetPasswordView.forgotPasswordLinkInvalid' }))
     }
@@ -75,7 +99,7 @@ export const useResetPassword = () => {
   }, [resetComplete])
 
   return {
-    registrationName,
+    registrationInfo,
     state,
     onChangeUser,
     onChangeUserTitle,

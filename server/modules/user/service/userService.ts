@@ -277,6 +277,16 @@ export const insertUserAccessRequest = async ({
   }
 }
 
+type RegistrationInfo = { firstName?: string; lastName?: string; institution?: string; country?: string }
+
+const _getRegistrationInfo = (accessRequest: UserAccessRequest.UserAccessRequest): RegistrationInfo => {
+  const { firstName, lastName, institution, country } = accessRequest.props ?? {}
+  return { firstName, lastName, institution, country }
+}
+
+const _getFullName = ({ firstName, lastName }: RegistrationInfo): string =>
+  [firstName, lastName].filter(Boolean).join(' ').trim()
+
 const _fetchSurveyTemplateId = async ({ user, templateUuid }: { user: ArenaUser; templateUuid: string }) => {
   const templates = await SurveyManager.fetchUserSurveysInfo({ user, draft: false, template: true })
   const template = templates.find((t) => Survey.getUuid(t) === templateUuid)
@@ -398,6 +408,19 @@ export const acceptUserAccessRequest = async ({
       )
       const userInvited = invitedUsers[0]
       const surveyOwnerUuid = User.getUuid(userInvited)
+
+      // the user completes the registration later (password or external login): keep the info of the request
+      if (!User.hasAccepted(userInvited)) {
+        const registrationInfo = _getRegistrationInfo(accessRequestDb)
+        await UserManager.updateNameAndMergeProps(
+          {
+            userUuid: surveyOwnerUuid,
+            name: _getFullName(registrationInfo),
+            props: { institution: registrationInfo.institution, country: registrationInfo.country },
+          },
+          t
+        )
+      }
 
       await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
 
@@ -724,27 +747,21 @@ export const updateUser = async (
   return updatedUser
 }
 
-type RegistrationName = { firstName?: string; lastName?: string }
-
-// first and last name given in the accepted access request (or self-registration) of a user not registered yet
-const _fetchRegistrationName = async (user: ArenaUser): Promise<RegistrationName | null> => {
+// info given in the accepted access request (or self-registration) of a user not registered yet
+const _fetchRegistrationInfo = async (user: ArenaUser): Promise<RegistrationInfo | null> => {
   if (!user || User.hasAccepted(user)) return null
   const accessRequest = await UserManager.fetchUserAccessRequestByEmail({ email: User.getEmail(user) })
   if (accessRequest?.status !== UserAccessRequest.status.ACCEPTED) return null
-  const { firstName, lastName } = accessRequest.props ?? {}
-  return firstName || lastName ? { firstName, lastName } : null
+  return _getRegistrationInfo(accessRequest)
 }
 
-const _getFullName = ({ firstName, lastName }: RegistrationName): string =>
-  [firstName, lastName].filter(Boolean).join(' ').trim()
-
 /**
- * Fetches the user of a password reset (invitation) and the name given in the access request, if any.
+ * Fetches the user of a password reset (invitation) and the info given in the access request, if any.
  */
-export const fetchResetPasswordUserAndRegistrationName = async (resetPasswordUuid: string) => {
+export const fetchResetPasswordUserAndRegistrationInfo = async (resetPasswordUuid: string) => {
   const user = await findResetPasswordUserByUuid(resetPasswordUuid)
-  const registrationName = await _fetchRegistrationName(user)
-  return { user, registrationName }
+  const registrationInfo = await _fetchRegistrationInfo(user)
+  return { user, registrationInfo }
 }
 
 export const resetPassword = async ({
@@ -752,25 +769,33 @@ export const resetPassword = async ({
   name,
   password,
   title,
+  institution,
+  country,
 }: {
   uuid: string
   name: string
   password: string
   title: UserTitle
+  institution?: string
+  country?: string
 }) => {
-  const { user, registrationName } = await fetchResetPasswordUserAndRegistrationName(resetPasswordUuid)
+  const { user, registrationInfo } = await fetchResetPasswordUserAndRegistrationInfo(resetPasswordUuid)
   if (user) {
-    // the name given in the access request cannot be changed while completing the registration
-    const nameToSave = registrationName ? _getFullName(registrationName) : name
+    // the info given in the access request cannot be changed while completing the registration
+    const info = registrationInfo
+      ? { ...registrationInfo, name: _getFullName(registrationInfo) }
+      : { name, institution, country }
     const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
     await db.tx(async (t) => {
       await UserManager.updateNamePasswordAndStatus(
         {
           userUuid: User.getUuid(user),
-          name: nameToSave,
+          name: info.name,
           password: passwordEncrypted,
           status: User.userStatus.ACCEPTED,
           title,
+          institution: info.institution,
+          country: info.country,
         },
         t
       )
