@@ -7,7 +7,6 @@ import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/compo
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ExternalLoginButtons } from '@webapp/components/guest/ExternalLoginButtons'
 import GuestError from '@webapp/components/guest/GuestError'
-import { GuestFloatingLabelField } from '@webapp/components/guest/GuestFloatingLabelField'
 import { GuestViewHeader } from '@webapp/components/guest/GuestViewHeader'
 import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
@@ -93,9 +92,12 @@ const ResetPassword = () => {
         <>
           <div className="guest__form-row">
             {emailInput}
-            <GuestFloatingLabelField hasValue={Boolean(User.getTitle(user))} label="user.title">
-              <DropdownUserTitle disabled={Boolean(registrationInfo?.title)} user={user} onChange={onChangeUserTitle} />
-            </GuestFloatingLabelField>
+            <DropdownUserTitle
+              disabled={Boolean(registrationInfo?.title)}
+              label="user.title"
+              user={user}
+              onChange={onChangeUserTitle}
+            />
           </div>
           <RegistrationFields onChangeUser={onChangeUser} readOnly={Boolean(registrationInfo)} user={user} />
           <div className="guest__form-row">

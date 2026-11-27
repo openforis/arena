@@ -1,7 +1,6 @@
 import { Countries } from '@core/countries'
 import { TextInput } from '@webapp/components/form'
 import Dropdown from '@webapp/components/form/Dropdown'
-import { GuestFloatingLabelField } from '@webapp/components/guest/GuestFloatingLabelField'
 import { useI18n } from '@webapp/store/system'
 
 type Props = {
@@ -40,18 +39,16 @@ export const RegistrationFields = (props: Props) => {
       </div>
       <div className="guest__form-row">
         {textField('institution', 'organization')}
-        <GuestFloatingLabelField hasValue={Boolean(countryCode)} label={fieldLabelKey('country')}>
-          <Dropdown
-            className="registration-fields__country"
-            disabled={readOnly}
-            itemLabel="name"
-            itemValue="code"
-            items={Countries.list}
-            onChange={(item) => onChangeUser({ prop: 'country', value: item?.code ?? '' })}
-            placeholder={i18n.t(fieldLabelKey('country'))}
-            selection={countryCode ? Countries.list.find((item) => item.code === countryCode) : null}
-          />
-        </GuestFloatingLabelField>
+        <Dropdown
+          className="registration-fields__country"
+          disabled={readOnly}
+          itemLabel="name"
+          itemValue="code"
+          items={Countries.list}
+          onChange={(item) => onChangeUser({ prop: 'country', value: item?.code ?? '' })}
+          label={fieldLabelKey('country')}
+          selection={countryCode ? Countries.list.find((item) => item.code === countryCode) : null}
+        />
       </div>
     </>
   )
