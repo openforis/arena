@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: postgres
-          image: postgis/postgis:17-3.5
+          image: postgis/postgis:17-3.7
           ports:
             - name: postgres
               containerPort: 5432
