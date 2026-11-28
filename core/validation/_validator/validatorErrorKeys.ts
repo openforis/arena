@@ -112,6 +112,7 @@ export const ValidatorErrorKeys = {
     keysExceedingMax: 'validationErrors:nodeDefEdit.keysExceedingMax',
     mapMarkerColorInvalid: 'validationErrors:nodeDefEdit.mapMarkerColorInvalid',
     maxFileSizeInvalid: 'validationErrors:nodeDefEdit.maxFileSizeInvalid',
+    nameCannotBeRootKeyReservedWord: 'validationErrors:nodeDefEdit.nameCannotBeRootKeyReservedWord',
     nameInvalid: 'validationErrors:nodeDefEdit.nameInvalid',
     qualifierCannotHaveApplicableExpression: 'validationErrors:nodeDefEdit.qualifierCannotHaveApplicableExpression',
     qualifierCannotHaveDefaultValues: 'validationErrors:nodeDefEdit.qualifierCannotHaveDefaultValues',

@@ -160,6 +160,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
     qualifierCannotHaveDefaultValues: 'O atributo qualificador não pode ter valores padrão',
     qualifierCannotHaveValidations: 'O atributo qualificador não pode ter regras de validação definidas',
+    nameCannotBeRootKeyReservedWord:
+      'O nome "{{value}}" não pode ser usado para um atributo chave ou qualificador da entidade raiz: é uma palavra reservada',
   },
 
   record: {

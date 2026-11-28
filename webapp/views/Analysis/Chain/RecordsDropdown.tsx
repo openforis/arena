@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { RecordSummary } from '@core/record/recordSummary'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { Dropdown } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
@@ -45,7 +44,7 @@ const RecordsDropdown = (props: RecordsDropdownProps) => {
   const recordLabelFunction = useCallback(
     (record) => {
       const rootKeys = Survey.getNodeDefRootKeys(survey)
-      return rootKeys.map((keyDef) => RecordSummary.getKeyValue(NodeDef.getName(keyDef))(record)).join(', ')
+      return rootKeys.map((keyDef) => RecordSummary.getKeyValueFromKeysObj(keyDef)(record)).join(', ')
     },
     [survey]
   )

@@ -1,9 +1,8 @@
 import { Objects, RecordCloner, SystemError } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-import * as NodeDef from '@core/survey/nodeDef'
+import { RecordSummary } from '@core/record/recordSummary'
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import Job, { type JobParams } from '@server/job/job'
@@ -63,8 +62,8 @@ export default class RecordsCloneJob extends Job {
       throw new SystemError('validationErrors:recordClone.differentKeyAttributes')
     }
 
-    const keys = nodeDefKeysCycleFrom.map((nodeDefKey) => A.camelize(NodeDef.getName(nodeDefKey)))
-    const getKeyValues = (recordSummary) => keys.map((key) => recordSummary[key])
+    const getKeyValues = (recordSummary) =>
+      nodeDefKeysCycleFrom.map((nodeDefKey) => RecordSummary.getKeyValueFromKeysObj(nodeDefKey)(recordSummary))
 
     const recordsToClone = recordsCycleFrom.filter((recordCycleFrom) => {
       if (!Objects.isEmpty(recordsUuids) && !recordsUuids.includes(Record.getUuid(recordCycleFrom))) {
