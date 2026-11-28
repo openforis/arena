@@ -100,6 +100,7 @@ const createReaderFromStream = ({
     valuesByDefUuid: { [nodeDefUuid: string]: unknown }
     refDataByDefUuid: { [nodeDefUuid: string]: unknown }
     errors: unknown[]
+    hasInvalidKeys: boolean
   }) => Promise<void> | void
   onTotalChange?: (total: number) => void
   includeAnalysis?: boolean
@@ -152,6 +153,7 @@ const createReaderFromStream = ({
 
       // prepare attribute values
       const errors = []
+      let hasInvalidKeys = false
       const valuesByDefUuid = {}
       const refDataByDefUuid = {}
       for (const [nodeDefUuid, valueTemp] of Object.entries(valuesByDefUuidTemp)) {
@@ -173,9 +175,10 @@ const createReaderFromStream = ({
           refDataByDefUuid[nodeDefUuid] = refData
         } catch (error) {
           errors.push(error)
+          hasInvalidKeys ||= NodeDef.isKey(nodeDef)
         }
       }
-      await onRowItem({ row, valuesByDefUuid, refDataByDefUuid, errors })
+      await onRowItem({ row, valuesByDefUuid, refDataByDefUuid, errors, hasInvalidKeys })
     },
     onTotalChange,
   })

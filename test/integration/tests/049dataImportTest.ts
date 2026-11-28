@@ -13,6 +13,9 @@ describe.each(fileFormats)('Data import (%s)', (fileFormat) => {
   test('A row with an invalid value makes the import fail without persisting anything', () =>
     DataImportTest.dataImportInvalidValueTest(params()))
 
+  test('A row with an invalid key value reports all its invalid values', () =>
+    DataImportTest.dataImportInvalidKeyTest(params()))
+
   test('Importing values into a not existing entity without insertMissingNodes fails', () =>
     DataImportTest.dataImportEntityNotFoundTest(params()))
 
