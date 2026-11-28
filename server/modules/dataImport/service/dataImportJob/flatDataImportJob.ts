@@ -264,7 +264,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     })
   }
 
-  async onRowItem({ valuesByDefUuid, refDataByDefUuid, errors }) {
+  async onRowItem({ valuesByDefUuid, refDataByDefUuid, errors, hasInvalidKeys }) {
     const { context } = this
     const { includeFiles, insertMissingNodes } = context
 
@@ -282,6 +282,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     errors.forEach((error) => {
       this._addError(error.key || error.toString(), error.params)
     })
+
+    // the row cannot be matched with a record or entity: trying it would only add misleading "key not specified" errors
+    if (hasInvalidKeys) return
 
     try {
       const previousRecord = this.currentRecord
@@ -530,9 +533,16 @@ export default class FlatDataImportJob extends DataImportBaseJob {
   }
 
   _addError(key, params = {}) {
-    this.addError({
-      [defaultErrorKey]: Validation.newInstance(false, {}, [ValidationResult.newInstance(key, params)]),
-    })
+    // keep the errors already found in the same row
+    const errorKey = String(this.processed + 1)
+    const rowValidation = this.errors[errorKey]?.[defaultErrorKey]
+    const rowErrors = rowValidation ? Validation.getErrors(rowValidation) : []
+    this.addError(
+      {
+        [defaultErrorKey]: Validation.newInstance(false, {}, [...rowErrors, ValidationResult.newInstance(key, params)]),
+      },
+      errorKey
+    )
   }
 
   getError() {
