@@ -156,6 +156,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'グループ識別属性には編集可能ルールを設定できません',
     qualifierCannotHaveDefaultValues: 'グループ識別属性にはデフォルト値を設定できません',
     qualifierCannotHaveValidations: 'グループ識別属性には検証ルールを設定できません',
+    nameCannotBeRootKeyReservedWord:
+      '名前「{{value}}」はルートエンティティのキー属性またはグループ識別属性には使用できません: 予約語です',
   },
 
   record: {

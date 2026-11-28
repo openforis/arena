@@ -160,6 +160,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
     qualifierCannotHaveDefaultValues: 'Атрибут-квалификатор не может иметь значения по умолчанию',
     qualifierCannotHaveValidations: 'Атрибут-квалификатор не может иметь правил проверки',
+    nameCannotBeRootKeyReservedWord:
+      'Имя "{{value}}" нельзя использовать для ключевого атрибута или атрибута-квалификатора корневой сущности: это зарезервированное слово',
   },
 
   record: {

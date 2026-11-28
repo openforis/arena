@@ -240,10 +240,21 @@ const validateNameIsNotKeyword = (propName: string, nodeDef: ArenaAnyNodeDef) =>
   return Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword)(propName, nodeDef)
 }
 
+// key and qualifier attribute columns of the root entity table are selected in the records summary next to the record columns
+const validateNameIsNotRootKeyReservedWord = (survey: ArenaSurvey) => (_propName: string, nodeDef: ArenaAnyNodeDef) => {
+  if (!NodeDef.isKey(nodeDef) && !NodeDef.isQualifier(nodeDef)) return null
+  const tableEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  if (!tableEntityDef || !NodeDef.isRoot(tableEntityDef)) return null
+  const name = NodeDef.getName(nodeDef)
+  if (!Validator.isRecordSummaryColumnName(name)) return null
+  return { key: Validation.messageKeys.nodeDefEdit.nameCannotBeRootKeyReservedWord, params: { value: name } }
+}
+
 const propsValidations = (survey: ArenaSurvey) => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     validateNameIsNotKeyword,
+    validateNameIsNotRootKeyReservedWord(survey),
     Validator.validateName(Validation.messageKeys.nodeDefEdit.nameInvalid),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey)),
   ],

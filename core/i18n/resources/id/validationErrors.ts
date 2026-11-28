@@ -161,6 +161,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'Atribut kualifikasi tidak boleh memiliki aturan dapat-disunting',
     qualifierCannotHaveDefaultValues: 'Atribut kualifikasi tidak boleh memiliki nilai default',
     qualifierCannotHaveValidations: 'Atribut kualifikasi tidak boleh memiliki aturan validasi',
+    nameCannotBeRootKeyReservedWord:
+      'Nama "{{value}}" tidak dapat digunakan untuk atribut kunci atau kualifikasi dari entitas akar: ini adalah kata yang dicadangkan',
   },
 
   record: {
