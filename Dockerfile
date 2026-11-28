@@ -20,7 +20,14 @@ WORKDIR /app
 # (and their transitive ones) at runtime.
 RUN yarn install --immutable --mode=skip-build \
     && yarn build \
-    && YARN_ENABLE_SCRIPTS=false yarn workspaces focus --production
+    && YARN_ENABLE_SCRIPTS=false yarn workspaces focus --production \
+    && find node_modules -name .devcontainer -prune -exec rm -rf {} +
+
+# Of the server sources only the non-TS assets (R scripts read from __dirname by the analysis chains)
+# and the files parsed by swagger-jsdoc (apis in server/system/swaggerInitializer.ts) are read at runtime.
+# mobile-preview/ is missing when its (non fatal) download failed: create it for the COPY below.
+RUN find server -type f \( -name '*.ts' -o -name '*.tsx' \) ! -name '*Api.ts' ! -path 'server/apiDocs/*' -delete \
+    && mkdir -p mobile-preview
 
 ############################################################
 
@@ -49,7 +56,14 @@ RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
 
 WORKDIR /app
 
-COPY --chown=node:node --from=builder /app /app/
+# Only what the server reads at runtime (paths relative to /app, the working directory and ARENA_ROOT)
+COPY --chown=node:node --from=builder /app/package.json /app/CHANGELOG.md /app/
+COPY --chown=node:node --from=builder /app/node_modules /app/node_modules/
+COPY --chown=node:node --from=builder /app/dist /app/dist/
+COPY --chown=node:node --from=builder /app/server /app/server/
+COPY --chown=node:node --from=builder /app/web-resources/img /app/web-resources/img/
+COPY --chown=node:node --from=builder /app/web-resources/geo /app/web-resources/geo/
+COPY --chown=node:node --from=builder /app/mobile-preview /app/mobile-preview/
 
 # /app is owned by root: create the default log folder (LOG_FOLDER, ./logs) writable by the node user
 RUN ln -s dist/server.js . \
