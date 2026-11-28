@@ -162,6 +162,8 @@ export default {
       'Für ein Qualifikatorattribut dürfen keine Bearbeitbarkeitsregeln definiert sein',
     qualifierCannotHaveDefaultValues: 'Ein Qualifikatorattribut darf keine Standardwerte besitzen',
     qualifierCannotHaveValidations: 'Für ein Qualifikatorattribut dürfen keine Validierungsregeln definiert sein',
+    nameCannotBeRootKeyReservedWord:
+      'Der Name "{{value}}" kann nicht für ein Schlüssel- oder Qualifikatorattribut der Stammentität verwendet werden: Es ist ein reserviertes Wort',
   },
 
   record: {

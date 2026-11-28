@@ -11,11 +11,11 @@ import {
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
-import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { NodeValues } from '@core/record/nodeValues'
 import * as Record from '@core/record/record'
+import { RecordSummary } from '@core/record/recordSummary'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
@@ -23,8 +23,8 @@ import SystemError from '@core/systemError'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
-// record summary, with the root key values in props named after the camelized key node def names
-type RecordSummary = ArenaRecord & { [keyProp: string]: unknown }
+// record summary, with the root key values in its keys object (see RecordSummary.getKeyValueFromKeysObj)
+type RecordSummaryItem = ArenaRecord & { [keyProp: string]: unknown }
 
 const formatKeyValue = async ({
   survey,
@@ -95,14 +95,20 @@ const findExistingRecordSummaryWithSameKeys = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  existingRecordsSummary: RecordSummary[]
-}): Promise<RecordSummary | undefined> => {
+  existingRecordsSummary: RecordSummaryItem[]
+}): Promise<RecordSummaryItem | undefined> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
-  const recordSummaryKeyProps = keyDefs.map((keyDef: ArenaAnyNodeDef) => A.camelize(NodeDef.getName(keyDef)))
   const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
   return existingRecordsSummary.find((recordSummary) => {
-    const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])
+    // formatted like the record key values: the summary values are JSON values (e.g. numbers)
+    const recordSummaryKeyValues = keyDefs.map((keyDef: ArenaAnyNodeDef) =>
+      NodeValueFormatter.format({
+        survey,
+        nodeDef: keyDef,
+        value: RecordSummary.getKeyValueFromKeysObj(keyDef)(recordSummary),
+      })
+    )
     return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
   })
 }
@@ -119,9 +125,9 @@ export const findExistingRecordSummary = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  existingRecordsSummary: RecordSummary[]
+  existingRecordsSummary: RecordSummaryItem[]
   conflictResolutionStrategy: string
-}): Promise<RecordSummary | null | undefined> => {
+}): Promise<RecordSummaryItem | null | undefined> => {
   const recordUuid = Record.getUuid(record)
   const existingRecordWithSameUuid = existingRecordsSummary.find(
     (recordSummary) => Record.getUuid(recordSummary) === recordUuid
@@ -150,7 +156,7 @@ export const determineRecordAction = async ({
 }: {
   survey: ArenaSurvey
   record: ArenaRecord
-  existingRecordSummary: RecordSummary | null | undefined
+  existingRecordSummary: RecordSummaryItem | null | undefined
   conflictResolutionStrategy: string
 }): Promise<{ action: RecordImportActionType; existingRecordUuid: string | null }> => {
   if (!existingRecordSummary) {

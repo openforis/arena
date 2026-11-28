@@ -118,7 +118,7 @@ export const validateEmails =
     return hasErrors ? { key: errorKey } : null
   }
 
-export const { isKeyword } = ValidatorNameKeywords
+export const { isKeyword, isRecordSummaryColumnName } = ValidatorNameKeywords
 
 export const validateMinLength =
   ({

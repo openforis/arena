@@ -159,6 +159,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',
     qualifierCannotHaveDefaultValues: 'Квалификатор шинж чанар өгөгдмөл утгатай байж болохгүй',
     qualifierCannotHaveValidations: 'Квалификатор шинж чанар баталгаажуулах дүрэмтэй байж болохгүй',
+    nameCannotBeRootKeyReservedWord:
+      '"{{value}}" нэрийг үндсэн нэгжийн түлхүүр эсвэл квалификатор шинж чанарт ашиглах боломжгүй: энэ нь нөөцлөгдсөн үг юм',
   },
 
   record: {
