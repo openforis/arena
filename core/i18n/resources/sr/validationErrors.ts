@@ -159,6 +159,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'Atribut kvalifikatora ne može imati definisana pravila uređivanja',
     qualifierCannotHaveDefaultValues: 'Atribut kvalifikatora ne može imati podrazumijevane vrijednosti',
     qualifierCannotHaveValidations: 'Atribut kvalifikatora ne može imati definisana pravila validacije',
+    nameCannotBeRootKeyReservedWord:
+      'Naziv "{{value}}" ne može se koristiti za ključni atribut ili atribut kvalifikatora korenskog entiteta: to je rezervisana reč',
   },
 
   record: {

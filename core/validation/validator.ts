@@ -105,4 +105,5 @@ export const {
   validateEmails,
   isEmailValueValid,
   isKeyword,
+  isRecordSummaryColumnName,
 } = ValidatorFunctions

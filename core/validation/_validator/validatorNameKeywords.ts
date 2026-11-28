@@ -1,4 +1,5 @@
 const keywords = new Set([
+  'ancestor_uuid',
   'asc',
   'category',
   'date_created',
@@ -18,6 +19,7 @@ const keywords = new Set([
   'props',
   'record',
   'record_cycle',
+  'record_owner_uuid',
   'record_step',
   'record_uuid',
   'step',
@@ -29,3 +31,25 @@ const keywords = new Set([
 ])
 
 export const isKeyword = (value: unknown): boolean => keywords.has(value as string)
+
+// columns of the records summary query (see recordRepository fetchRecordsSummaryBySurveyId), selected next to the
+// root key and qualifier attribute columns: an attribute with the same name would clash with them
+const recordSummaryColumnNames = new Set([
+  'cycle',
+  'date_created',
+  'date_modified',
+  'info',
+  'keys_obj',
+  'merged_into_record_uuid',
+  'owner_name',
+  'owner_uuid',
+  'preview',
+  'read_only',
+  'step',
+  'summary_attributes_obj',
+  'survey_uuid',
+  'uuid',
+  'validation',
+])
+
+export const isRecordSummaryColumnName = (value: unknown): boolean => recordSummaryColumnNames.has(value as string)

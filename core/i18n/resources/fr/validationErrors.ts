@@ -161,6 +161,8 @@ export default {
     qualifierCannotHaveEditabilityRule: "Un attribut qualificatif ne peut pas avoir de règles d'éditabilité définies",
     qualifierCannotHaveDefaultValues: 'Un attribut qualificatif ne peut pas avoir de valeurs par défaut',
     qualifierCannotHaveValidations: 'Un attribut qualificatif ne peut pas avoir de règles de validation définies',
+    nameCannotBeRootKeyReservedWord:
+      'Le nom "{{value}}" ne peut pas être utilisé pour un attribut clé ou qualificatif de l\'entité racine : c\'est un mot réservé',
   },
 
   record: {

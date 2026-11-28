@@ -30,7 +30,6 @@ import {
 } from '@common/record/printableExport'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import { AppInfo } from '@core/app/appInfo'
-import * as A from '@core/arena'
 import * as DateUtils from '@core/dateUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as Node from '@core/record/node'
@@ -242,9 +241,10 @@ export const exportRecordsSummary = async ({
       ...nodeDefKeys.reduce((keysAcc, nodeDefKey) => {
         const nodeDefKeyColumnNames = NodeDefTable.getColumnNames(nodeDefKey)
         nodeDefKeyColumnNames.forEach((nodeDefKeyColumnName) => {
-          const value = recordSummary[A.camelize(nodeDefKeyColumnName)]
+          const value = Record.getKeysObj(recordSummary)[nodeDefKeyColumnName]
           const formatter = valueFormattersByType[NodeDef.getType(nodeDefKey)]
-          const valueFormatted = formatter ? formatter({ value, nodeDef: nodeDefKey }) : value
+          // only date and time values (strings) are formatted
+          const valueFormatted = formatter ? formatter({ value: value as string, nodeDef: nodeDefKey }) : value
           keysAcc[nodeDefKeyColumnName] = valueFormatted
         })
         return keysAcc
