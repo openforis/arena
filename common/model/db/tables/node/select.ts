@@ -19,16 +19,18 @@ export type GetSelectParams = {
   draft?: boolean
 }
 
-const _isInsideSingleEntity = ({
+// number of levels between the nodes of the given node def and the nodes of its first ancestor multiple entity
+const _getLevelsFromAncestorMultipleEntity = ({
   survey,
   nodeDefUuid,
 }: {
   survey: TableNode['survey']
   nodeDefUuid: string
-}): boolean => {
+}): number => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  return NodeDef.isSingle(nodeDefParent)
+  const nodeDefAncestor = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  if (!nodeDefAncestor) return 1
+  return NodeDef.getMetaHierarchy(nodeDef).length - NodeDef.getMetaHierarchy(nodeDefAncestor).length
 }
 
 // select query for the node table (bound to a TableNode instance)
@@ -56,16 +58,27 @@ export function getSelect(this: TableNode, params: GetSelectParams): string {
   }
 
   const _addParentNodeCondition = () => {
-    if (nodeDefUuid && _isInsideSingleEntity({ survey: this.survey, nodeDefUuid })) {
-      // node def is inside a single entity
-      // parentUuid is the uuid of the first ancestor multiple entity
-      // use node hierarchy in the where condition
-      whereConditions.push(
-        `${parentUuid}::text IN (SELECT jsonb_array_elements_text(${this.columnMeta} -> '${Node.metaKeys.hierarchy}'))`
-      )
-    } else {
+    const levels = nodeDefUuid ? _getLevelsFromAncestorMultipleEntity({ survey: this.survey, nodeDefUuid }) : 1
+    if (!parentUuid || levels <= 1) {
       _addUuidEqualCondition(this.columnParentUuid, parentUuid)
+      return
     }
+    // node def is inside single entities: parentUuid is the uuid of the first ancestor multiple entity;
+    // go down from it through the single entities (a1 is its child, a2 its grandchild, ...)
+    const singleEntityAliases = Array.from({ length: levels - 1 }, (_, i) => `${this.alias}_a${i + 1}`)
+    const [firstAlias] = singleEntityAliases
+    const lastAlias = singleEntityAliases.at(-1)
+    const joins = singleEntityAliases
+      .slice(1)
+      .map((alias, i) => `JOIN ${this.nameQualified} ${alias} ON ${alias}.parent_uuid = ${singleEntityAliases[i]}.uuid`)
+    const parentUuidSql = isUuid(parentUuid) ? `'${parentUuid}'` : parentUuid
+    whereConditions.push(
+      `${this.columnParentUuid} IN (
+        SELECT ${lastAlias}.uuid
+        FROM ${this.nameQualified} ${firstAlias} ${joins.join(' ')}
+        WHERE ${firstAlias}.parent_uuid = ${parentUuidSql}
+      )`
+    )
   }
 
   _addUuidEqualCondition(this.columnUuid, uuid)

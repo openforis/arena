@@ -89,6 +89,29 @@ const getMetaKeysWithDefaultValue = (meta?: ArenaRecordNodeMeta | null): string[
 const compactMeta = (meta?: ArenaRecordNodeMeta | null): ArenaRecordNodeMeta =>
   Object.fromEntries(Object.entries(meta ?? {}).filter((entry) => !_isMetaValueDefault(entry)))
 
+// meta keys not stored in the db: the hierarchy is rebuilt from the parent uuids when reading the nodes
+const metaKeysNotStored = new Set<string>([metaKeys.hierarchy])
+
+/**
+ * Returns the node meta to store in the db: compacted (see compactMeta) and without the items rebuilt when reading the nodes.
+ * @param meta - The node meta.
+ * @returns The node meta to store.
+ */
+const toStoredMeta = (meta?: ArenaRecordNodeMeta | null): ArenaRecordNodeMeta =>
+  Object.fromEntries(
+    Object.entries(meta ?? {}).filter((entry) => !metaKeysNotStored.has(entry[0]) && !_isMetaValueDefault(entry))
+  )
+
+/**
+ * Returns the keys to delete from the stored node meta when merging the given meta into it (see toStoredMeta).
+ * @param meta - The node meta being merged.
+ * @returns The keys to delete from the stored meta.
+ */
+const getStoredMetaKeysToDelete = (meta?: ArenaRecordNodeMeta | null): string[] => [
+  ...getMetaKeysWithDefaultValue(meta),
+  ...metaKeysNotStored,
+]
+
 // UPDATE
 
 const assocMeta =
@@ -165,6 +188,8 @@ export const NodeMeta = {
   isChildRequired,
   getMetaKeysWithDefaultValue,
   compactMeta,
+  toStoredMeta,
+  getStoredMetaKeysToDelete,
 
   assocMeta,
   mergeMeta,

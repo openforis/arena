@@ -9,29 +9,50 @@ import type { DbClient } from '@server/db/db'
 import { insertAllQueryBatch } from '@server/db/dbUtils'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
+// number of levels between the nodes of the given node defs and the nodes of the ancestor def, by node def uuid
+const getAncestorLevelsByNodeDefUuid = ({
+  nodeDefs,
+  ancestorDef,
+}: {
+  nodeDefs: ArenaAnyNodeDef[]
+  ancestorDef: ArenaAnyNodeDef | null
+}): Record<string, number> => {
+  if (!ancestorDef) return {}
+  const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
+  const ancestorDepth = NodeDef.getMetaHierarchy(ancestorDef).length
+  const result: Record<string, number> = {}
+  for (const nodeDef of nodeDefs) {
+    const hierarchy = NodeDef.getMetaHierarchy(nodeDef)
+    if (hierarchy.includes(ancestorDefUuid)) {
+      result[NodeDef.getUuid(nodeDef)] = hierarchy.length - ancestorDepth
+    }
+  }
+  return result
+}
+
 const getSelectQuery = ({
   surveyId,
   nodeDef,
   nodeDefContext,
   nodeDefAncestorMultipleEntity,
-  nodeDefColumnsUuids,
+  nodeDefColumns,
 }: {
   surveyId: number
   nodeDef: ArenaAnyNodeDef
   nodeDefContext: ArenaAnyNodeDef
-  nodeDefAncestorMultipleEntity: ArenaNodeDefEntity
-  nodeDefColumnsUuids: string[]
+  nodeDefAncestorMultipleEntity: ArenaNodeDefEntity | null
+  nodeDefColumns: ArenaAnyNodeDef[]
 }) => {
-  const getNodeSelectQuery = (ancestorDef) =>
+  const getNodeSelectQuery = ({ nodeDefs, ancestorDef }) =>
     NodeRepository.getNodeSelectQuery({
       surveyId,
-      ancestorDef,
+      ancestorLevelsByNodeDefUuid: getAncestorLevelsByNodeDefUuid({ nodeDefs, ancestorDef }),
       includeRefData: true,
       includeRecordInfo: true,
       includeSurveyUuid: false,
     })
 
-  const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
+  const nodesSelect = `${getNodeSelectQuery({ nodeDefs: [nodeDef], ancestorDef: nodeDefAncestorMultipleEntity })}
     WHERE n.node_def_uuid = $/nodeDefUuid/
     ORDER BY n.id`
 
@@ -39,7 +60,13 @@ const getSelectQuery = ({
     return nodesSelect
   }
 
-  const childrenNodesSelect = getNodeSelectQuery(nodeDefContext)
+  // only the column nodes are needed: their ancestor uuid (the context entity) can be computed knowing their node def
+  const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
+  const childrenNodesSelect =
+    nodeDefColumnsUuids.length > 0
+      ? `${getNodeSelectQuery({ nodeDefs: nodeDefColumns, ancestorDef: nodeDefContext })}
+        WHERE n.node_def_uuid IN ($/nodeDefColumnsUuids:csv/)`
+      : `${getNodeSelectQuery({ nodeDefs: [], ancestorDef: null })} WHERE FALSE`
 
   // join node table with node table itself to get children attribute values
 
@@ -64,7 +91,6 @@ const getSelectQuery = ({
           FROM c
           WHERE
             c.value IS NOT NULL
-            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($/nodeDefColumnsUuids:csv/)' : ''} 
           GROUP BY
             c.ancestor_uuid
         ) c
@@ -106,7 +132,7 @@ export const populateTable = async (
       nodeDef,
       nodeDefContext,
       nodeDefAncestorMultipleEntity,
-      nodeDefColumnsUuids,
+      nodeDefColumns,
     })
     await client.none(`CREATE MATERIALIZED VIEW ${materializedViewFullName} AS ${selectQuery}`, {
       surveyId,

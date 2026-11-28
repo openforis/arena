@@ -56,3 +56,27 @@ describe('Node.getMetaKeysWithDefaultValue', () => {
     expect(Node.getMetaKeysWithDefaultValue(null)).toEqual([])
   })
 })
+
+describe('Node.toStoredMeta', () => {
+  it('removes the hierarchy and the items having the default value', () => {
+    const meta = { h: ['root-uuid', 'plot-uuid'], hCode: [], cVis: { 'def-1': false }, defaultValueApplied: false }
+    expect(Node.toStoredMeta(meta)).toEqual({ cVis: { 'def-1': false } })
+  })
+
+  it('returns an empty object when the meta is missing', () => {
+    expect(Node.toStoredMeta(undefined)).toEqual({})
+  })
+})
+
+describe('Node.getStoredMetaKeysToDelete', () => {
+  it('returns the keys of the items having the default value and the hierarchy key', () => {
+    expect(Node.getStoredMetaKeysToDelete({ h: ['root-uuid'], cReq: {}, cVis: { 'def-1': false } })).toEqual([
+      'cReq',
+      'h',
+    ])
+  })
+
+  it('returns the hierarchy key when the meta is missing', () => {
+    expect(Node.getStoredMetaKeysToDelete(null)).toEqual(['h'])
+  })
+})

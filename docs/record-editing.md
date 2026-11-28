@@ -181,7 +181,10 @@ HTTP response only means "queued": results and errors come back over the WebSock
    - **the node itself**: `NodeUpdateManager.updateNode` (existing node; also clears dependent code
      attributes and replaces old files) or `NodeCreationManager.insertNode` (new node; for an entity,
      arena-core `RecordNodesUpdater.addDescendants` creates its descendants in memory). Written to the
-     `node` table with an activity log entry. Then a first `nodesUpdate`.
+     `node` table with an activity log entry. Then a first `nodesUpdate`. The node `meta` is stored
+     without default value items and without the ancestors hierarchy (`meta.h`), which is rebuilt from the
+     parent uuids when reading the nodes (`RecordNodesHierarchy` for a whole record, a recursive subquery
+     in `NodeRepository` for single nodes).
    - **dependent nodes** (`NodeUpdateManager.updateNodesDependents` → `Record.updateNodesDependents` =
      arena-core `RecordNodesUpdater.updateNodesDependents`): walks the dependency graph from the changed
      nodes and runs on each affected node the `dependentsUpdaters`: min/max count, applicability,

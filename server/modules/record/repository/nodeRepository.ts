@@ -1,13 +1,15 @@
-import { type ArenaNodeDefEntity, type ArenaRecordNode, Dates } from '@openforis/arena-core'
+import { type ArenaRecordNode, Dates } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
 import * as A from '@core/arena'
 import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
+import { RecordNodesHierarchy } from '@core/record/_record/recordNodesHierarchy'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
+import { isUuid } from '@core/uuid'
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -28,6 +30,9 @@ export const tableColumnsInsert = [
 
 const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
+// computed column with the node hierarchy (not stored in the db), moved into meta by dbTransformCallback
+const hierarchyColumnName = 'hierarchy'
+
 // ============== UTILS
 
 // cache of camelized keys
@@ -41,6 +46,7 @@ const dbTransformCallback = (row: Record<string, unknown>): ArenaRecordNode => {
   // build a new object instead of deleting the row keys: "delete" would switch it to the (much bigger) V8 dictionary mode
   const node: Record<string, any> = {}
   for (const [columnName, value] of Object.entries(row)) {
+    if (columnName === hierarchyColumnName) continue
     let nodeKey = nodeKeyByColumnName[columnName]
     if (!nodeKey) {
       nodeKey = A.camelize(columnName)
@@ -53,6 +59,10 @@ const dbTransformCallback = (row: Record<string, unknown>): ArenaRecordNode => {
   // ISO strings (as in arena-core nodes) take much less memory than Date objects
   node.dateCreated = _toISOString(node.dateCreated)
   node.dateModified = _toISOString(node.dateModified)
+  const hierarchy = row[hierarchyColumnName]
+  if (hierarchy !== undefined) {
+    node.meta = { ...node.meta, [Node.metaKeys.hierarchy]: hierarchy }
+  }
   return node as ArenaRecordNode
 }
 
@@ -64,11 +74,64 @@ const createDbTransformCallbackCompacting = () => {
 
 const _toValueQueryParam = (value: unknown) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
 
-const _getAncestorUuidSelectField = (ancestorDef: ArenaNodeDefEntity) => {
-  const nodeAncestorEntityHierarchyIndex = ancestorDef ? NodeDef.getMetaHierarchy(ancestorDef).length : null
-  return nodeAncestorEntityHierarchyIndex === null
-    ? 'null'
-    : `(n.meta -> '${Node.metaKeys.hierarchy}' ->> ${nodeAncestorEntityHierarchyIndex})::uuid`
+/**
+ * Returns the SQL expression of the hierarchy (ancestor uuids, root first, as a jsonb array) of the node with the given alias,
+ * following the parent uuids (one primary key lookup per level). Use it when fetching only some nodes of a record:
+ * when fetching all of them, the hierarchy is rebuilt in memory (see RecordNodesHierarchy).
+ * @param {!object} params - The parameters.
+ * @param {!string} params.schema - The survey schema.
+ * @param {string} [params.nodeAlias] - The alias of the node table.
+ * @returns {string} - The SQL expression (a scalar subquery).
+ */
+const _getHierarchySelectField = ({ schema, nodeAlias = 'n' }: { schema: string; nodeAlias?: string }) =>
+  `(WITH RECURSIVE ancestor AS (
+      SELECT a.uuid, a.parent_uuid, 1 AS level FROM ${schema}.node a WHERE a.uuid = ${nodeAlias}.parent_uuid
+      UNION ALL
+      SELECT a.uuid, a.parent_uuid, ancestor.level + 1 FROM ${schema}.node a JOIN ancestor ON a.uuid = ancestor.parent_uuid
+    )
+    SELECT coalesce(jsonb_agg(ancestor.uuid ORDER BY ancestor.level DESC), '[]'::jsonb) FROM ancestor
+  ) AS ${hierarchyColumnName}`
+
+/**
+ * Builds the select field and the joins to get the uuid of an ancestor of the selected nodes (n),
+ * found going up by a number of levels that depends on the node definition (n.node_def_uuid).
+ * @param {!object} params - The parameters.
+ * @param {!string} params.schema - The survey schema.
+ * @param {!object} params.ancestorLevelsByNodeDefUuid - Number of levels (>= 1) between the nodes and their ancestor, by node def uuid.
+ * @returns {{field: string, joins: string[]}} - The select field and the joins.
+ */
+const _getAncestorUuidSelect = ({
+  schema,
+  ancestorLevelsByNodeDefUuid,
+}: {
+  schema: string
+  ancestorLevelsByNodeDefUuid: Record<string, number>
+}): { field: string; joins: string[] } => {
+  const nodeDefUuidsByLevels = new Map<number, string[]>()
+  for (const [nodeDefUuid, levels] of Object.entries(ancestorLevelsByNodeDefUuid)) {
+    if (!isUuid(nodeDefUuid)) throw new Error(`Invalid node def uuid: ${nodeDefUuid}`)
+    if (levels < 1) continue
+    nodeDefUuidsByLevels.set(levels, [...(nodeDefUuidsByLevels.get(levels) ?? []), nodeDefUuid])
+  }
+  if (nodeDefUuidsByLevels.size === 0) {
+    return { field: 'NULL::uuid', joins: [] }
+  }
+  const maxLevels = Math.max(...nodeDefUuidsByLevels.keys())
+  // a{k} is the ancestor of n k levels above it
+  const joins = []
+  for (let k = 1; k < maxLevels; k++) {
+    const childAlias = k === 1 ? 'n' : 'a' + (k - 1)
+    joins.push(`LEFT JOIN ${schema}.node a${k} ON a${k}.uuid = ${childAlias}.parent_uuid`)
+  }
+  const getAncestorUuid = (levels: number) => (levels === 1 ? 'n.parent_uuid' : `a${levels - 1}.parent_uuid`)
+  if (nodeDefUuidsByLevels.size === 1) {
+    return { field: getAncestorUuid(maxLevels), joins }
+  }
+  const cases = [...nodeDefUuidsByLevels.entries()].map(([levels, nodeDefUuids]) => {
+    const nodeDefUuidsSql = nodeDefUuids.map((uuid) => "'" + uuid + "'").join(', ')
+    return `WHEN n.node_def_uuid IN (${nodeDefUuidsSql}) THEN ${getAncestorUuid(levels)}`
+  })
+  return { field: `CASE ${cases.join(' ')} END`, joins }
 }
 
 /**
@@ -78,7 +141,8 @@ const _getAncestorUuidSelectField = (ancestorDef: ArenaNodeDefEntity) => {
  * @param {boolean} [params.includeRecordUuid] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
  * @param {boolean} [params.includeSurveyUuid] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
  * @param {boolean} [params.includeRecordInfo] - If true, record info will be included in the fetch.
- * @param {object|null} [params.ancestorDef] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
+ * @param {object} [params.ancestorLevelsByNodeDefUuid] - Used with includeRecordInfo to populate the ancestorUuid field: number of levels between the nodes and their ancestor, by node def uuid.
+ * @param {boolean} [params.includeHierarchy] - If true, the node hierarchy (not stored in the db) will be computed in the query (see _getHierarchySelectField).
  * @param {boolean} [params.draft] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
  * @returns {string} - The SQL SELECT query for fetching nodes.
  */
@@ -88,7 +152,8 @@ export const getNodeSelectQuery = ({
   includeRecordUuid = true,
   includeRecordInfo = false,
   includeSurveyUuid = true,
-  ancestorDef = null,
+  ancestorLevelsByNodeDefUuid = {},
+  includeHierarchy = false,
   draft = true,
 }: {
   surveyId: number
@@ -96,7 +161,8 @@ export const getNodeSelectQuery = ({
   includeRecordUuid?: boolean
   includeRecordInfo?: boolean
   includeSurveyUuid?: boolean
-  ancestorDef?: ArenaNodeDefEntity
+  ancestorLevelsByNodeDefUuid?: Record<string, number>
+  includeHierarchy?: boolean
   draft?: boolean
 }) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
@@ -106,22 +172,29 @@ export const getNodeSelectQuery = ({
   )
 
   const fromParts = [`${schema}.node n`]
+  if (includeHierarchy) {
+    selectFields.push(_getHierarchySelectField({ schema }))
+  }
   if (includeSurveyUuid) {
     selectFields.push('si.survey_uuid')
     fromParts.push(`CROSS JOIN survey_info si`)
   }
 
   if (includeRecordInfo) {
+    const ancestorUuidSelect = _getAncestorUuidSelect({ schema, ancestorLevelsByNodeDefUuid })
     selectFields.push(
       'r.cycle AS record_cycle',
       'r.step AS record_step',
       'r.owner_uuid AS record_owner_uuid',
-      `${_getAncestorUuidSelectField(ancestorDef)} AS ancestor_uuid`
+      `${ancestorUuidSelect.field} AS ancestor_uuid`
     )
-    fromParts.push(`JOIN ${schema}.record r 
+    fromParts.push(
+      `JOIN ${schema}.record r 
       ON r.uuid = n.record_uuid
       -- exclude merged records
-      AND r.merged_into_record_uuid IS NULL`)
+      AND r.merged_into_record_uuid IS NULL`,
+      ...ancestorUuidSelect.joins
+    )
   }
 
   if (includeRefData) {
@@ -219,9 +292,8 @@ export const countNodesWithMissingFileByRecordUuids = async (
 
 /**
  * Finds file-attribute-value nodes belonging to PREVIEW records only, that either have one of the
- * given node def UUIDs themselves, or are descendants of a node that does - found via the node's
- * immutable meta.hierarchy ancestor-chain (no recursive query needed: hierarchy is set once at node
- * creation and only ever merged, never overwritten, by updateNode).
+ * given node def UUIDs themselves, or are descendants of a node that does (found going down the
+ * parent uuids with a recursive query).
  * Used by deleteNodesByNodeDefUuids, whose delete is NOT scoped to a single record (it can affect
  * nodes - and therefore files - across many records of the survey at once), which is why this needs
  * a DB-wide query rather than filtering an in-memory record's nodes.
@@ -239,21 +311,23 @@ export const fetchFileValueNodesByNodeDefUuids = (
 
   const schema = Schemata.getSchemaSurvey(surveyId)
 
+  // UNION (not UNION ALL) visits once the nodes found both as roots and as descendants of other roots
   return client.manyOrNone(
     `
+    WITH RECURSIVE subtree AS (
+      SELECT n.uuid, n.record_uuid, n.node_def_uuid, n.value
+      FROM ${schema}.node n
+      JOIN ${schema}.record r ON r.uuid = n.record_uuid AND r.preview = true
+      WHERE n.node_def_uuid IN ($/nodeDefUuids:csv/)
+      UNION
+      SELECT c.uuid, c.record_uuid, c.node_def_uuid, c.value
+      FROM ${schema}.node c
+      JOIN subtree ON c.parent_uuid = subtree.uuid
+    )
     SELECT n.record_uuid AS "recordUuid", n.value ->> '${Node.valuePropsFile.fileUuid}' AS "fileUuid"
-    FROM ${schema}.node n
+    FROM subtree n
     JOIN ${schema}.node_def nd ON nd.uuid = n.node_def_uuid AND nd.type = '${NodeDef.nodeDefType.file}'
-    JOIN ${schema}.record r ON r.uuid = n.record_uuid AND r.preview = true
-    WHERE n.value ->> '${Node.valuePropsFile.fileUuid}' IS NOT NULL
-      AND (
-        n.node_def_uuid IN ($/nodeDefUuids:csv/)
-        OR n.meta -> '${Node.metaKeys.hierarchy}' ?| (
-             SELECT coalesce(array_agg(root.uuid::text), ARRAY[]::text[])
-             FROM ${schema}.node root
-             WHERE root.node_def_uuid IN ($/nodeDefUuids:csv/)
-           )
-      )`,
+    WHERE n.value ->> '${Node.valuePropsFile.fileUuid}' IS NOT NULL`,
     { nodeDefUuids }
   )
 }
@@ -261,11 +335,8 @@ export const fetchFileValueNodesByNodeDefUuids = (
 // ============== CREATE
 
 export const insertNode = async (surveyId: number, node: ArenaRecordNode, draft: boolean, client: DbClient = db) => {
-  // items with default values (e.g. empty child applicability) are not stored to save space
-  const meta = {
-    ...Node.compactMeta(Node.getMeta(node)),
-    [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
-  }
+  // items with default values (e.g. empty child applicability) and the hierarchy are not stored to save space
+  const meta = Node.toStoredMeta(Node.getMeta(node))
 
   await client.query(
     `
@@ -310,7 +381,7 @@ export const insertNodesInBatch = async (
       parent_uuid: Node.getParentUuid(node),
       node_def_uuid: Node.getNodeDefUuid(node),
       value: _toValueQueryParam(Node.getValue(node)),
-      meta: Node.compactMeta(Node.getMeta(node)),
+      meta: Node.toStoredMeta(Node.getMeta(node)),
     }))
   )
   // Passing no parameters (rather than []) tells pg-promise to send the query as-is: `query` was
@@ -324,7 +395,7 @@ export const insertNodesInBatch = async (
 
 // ============== READ
 
-export const fetchNodesByRecordUuid = (
+export const fetchNodesByRecordUuid = async (
   {
     surveyId,
     recordUuid,
@@ -342,19 +413,22 @@ export const fetchNodesByRecordUuid = (
   },
   client: DbClient = db
 ) =>
-  client.map(
-    `${getNodeSelectQuery({ surveyId, includeRefData, includeSurveyUuid, includeRecordUuid, draft })}
-    WHERE n.record_uuid = $/recordUuid/
-    ORDER BY n.date_created`,
-    { surveyId, recordUuid },
-    createDbTransformCallbackCompacting()
+  RecordNodesHierarchy.assocHierarchies(
+    await client.map(
+      `${getNodeSelectQuery({ surveyId, includeRefData, includeSurveyUuid, includeRecordUuid, draft })}
+      WHERE n.record_uuid = $/recordUuid/
+      ORDER BY n.date_created`,
+      { surveyId, recordUuid },
+      createDbTransformCallbackCompacting()
+    )
   )
 
 export const fetchNodeByUuid = (surveyId: number, uuid: string, client: DbClient = db) =>
   client.one(
     `
-    SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.node
-    WHERE uuid = $1`,
+    SELECT n.*, ${_getHierarchySelectField({ schema: Schemata.getSchemaSurvey(surveyId) })}
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.node n
+    WHERE n.uuid = $1`,
     [uuid],
     dbTransformCallback
   )
@@ -375,7 +449,7 @@ export const fetchNodesWithRefDataByUuids = (
 ) =>
   client.map(
     `
-    ${getNodeSelectQuery({ surveyId, draft })}
+    ${getNodeSelectQuery({ surveyId, draft, includeHierarchy: true })}
     WHERE n.uuid IN ($/nodeUuids:list/)
   `,
     { surveyId, nodeUuids },
@@ -396,7 +470,7 @@ export const fetchChildNodesByNodeDefUuids = (
 ) =>
   client.map(
     `
-    ${getNodeSelectQuery({ surveyId, draft: false })}
+    ${getNodeSelectQuery({ surveyId, draft: false, includeHierarchy: true })}
     WHERE n.record_uuid = $/recordUuid/
       AND n.parent_uuid ${nodeUuid ? '= $/nodeUuid/' : 'is null'}
       AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
@@ -423,7 +497,7 @@ export const updateNode = async (
   },
   client: DbClient = db
 ) => {
-  // meta is merged into the stored one: items with default values are deleted instead of stored, to save space
+  // meta is merged into the stored one: items with default values and the hierarchy are deleted instead of stored, to save space
   await client.query(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node
@@ -432,7 +506,7 @@ export const updateNode = async (
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [_toValueQueryParam(value), Node.compactMeta(meta), nodeUuid, Node.getMetaKeysWithDefaultValue(meta)]
+    [_toValueQueryParam(value), Node.toStoredMeta(meta), nodeUuid, Node.getStoredMetaKeysToDelete(meta)]
   )
   if (!reloadNode) return null
 
@@ -449,8 +523,8 @@ export const updateNodes = async (
   const values = nodes.map((node) => [
     Node.getId(node),
     _toValueQueryParam(Node.getValue(node)),
-    // meta is replaced as a whole: items with default values are not stored to save space
-    Node.compactMeta(Node.getMeta(node)),
+    // meta is replaced as a whole: items with default values and the hierarchy are not stored to save space
+    Node.toStoredMeta(Node.getMeta(node)),
     Dates.formatForStorage(Node.getDateModified(node)),
   ])
   await client.none(
@@ -472,9 +546,9 @@ export const updateNodes = async (
 export const deleteNode = (surveyId: number, nodeUuid: string, client: DbClient = db) =>
   client.one(
     `
-    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node
-    WHERE uuid = $1
-    RETURNING *, true as ${Node.keys.deleted}
+    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node n
+    WHERE n.uuid = $1
+    RETURNING n.*, ${_getHierarchySelectField({ schema: Schemata.getSchemaSurvey(surveyId) })}, true as ${Node.keys.deleted}
     `,
     [nodeUuid],
     dbTransformCallback
@@ -501,9 +575,10 @@ export const deleteNodesByNodeDefUuids = (surveyId: number, nodeDefUuids: string
 
 export const deleteNodesByUuids = (surveyId: number, nodeUuids: string[], client: DbClient = db) =>
   client.map(
-    `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node
-    WHERE uuid IN ($1:csv)
-    RETURNING *, true as ${Node.keys.deleted}`,
+    // the hierarchy subquery still sees the ancestors deleted by the same statement (statement snapshot)
+    `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.node n
+    WHERE n.uuid IN ($1:csv)
+    RETURNING n.*, ${_getHierarchySelectField({ schema: Schemata.getSchemaSurvey(surveyId) })}, true as ${Node.keys.deleted}`,
     [nodeUuids],
     dbTransformCallback
   )
