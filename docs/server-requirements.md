@@ -15,7 +15,7 @@ All free and open source:
 - Linux server (e.g. Ubuntu Server LTS) with [Docker](https://www.docker.com/): Arena is distributed as the
   [`openforis/arena`](https://hub.docker.com/r/openforis/arena) Docker image. For a Kubernetes cluster, see
   the [Kubernetes deployment](../infra/k8s/README.md).
-- PostgreSQL with the PostGIS extension (e.g. the `postgis/postgis:17-3.5` image), on the same machine or as
+- PostgreSQL with the PostGIS extension (e.g. the `postgis/postgis:17-3.7` image), on the same machine or as
   a managed database service (AWS RDS, Azure Database for PostgreSQL, Google Cloud SQL...). The database user
   must be able to create the `postgis` and `uuid-ossp` extensions.
 - Optional: RStudio Server, for the statistical analysis module (analysis chains).

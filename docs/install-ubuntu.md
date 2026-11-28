@@ -19,7 +19,7 @@ docker run -d --name arena-db --restart unless-stopped \
   -p 127.0.0.1:5444:5432 --shm-size=1g \
   -v arena-data:/var/lib/postgresql/data \
   -e POSTGRES_DB=arena -e POSTGRES_USER=arena -e POSTGRES_PASSWORD=CHANGE_ME \
-  postgis/postgis:17-3.5
+  postgis/postgis:17-3.7
 ```
 
 - `127.0.0.1:5444`: the database is reachable only from the server itself.
