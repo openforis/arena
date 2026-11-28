@@ -8,10 +8,10 @@ import {
   SystemError,
 } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { NodeValues } from '@core/record/nodeValues'
 import * as Record from '@core/record/record'
+import { RecordSummary } from '@core/record/recordSummary'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -22,11 +22,11 @@ import type { QualifierFilter } from '@server/modules/record/repository/qualifie
 
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
-// existing record summary, with the root key values as props named after the camelized key node def names
-type RecordSummary = ArenaRecord & { [keyProp: string]: unknown }
+// existing record summary, with the root key values in its keys object (see RecordSummary.getKeyValueFromKeysObj)
+type RecordSummaryItem = ArenaRecord & { [keyProp: string]: unknown }
 
 // record summaries by the composite key of their root key values
-type RecordsSummaryIndex = Map<string, RecordSummary[]>
+type RecordsSummaryIndex = Map<string, RecordSummaryItem[]>
 
 // the (data import) job context
 type RecordProviderContext = {
@@ -38,7 +38,7 @@ type RecordProviderContext = {
   insertNewRecords?: boolean
   updateRecordsInAnalysis?: boolean
   userQualifierFilters?: QualifierFilter[]
-  recordsSummary: RecordSummary[]
+  recordsSummary: RecordSummaryItem[]
   recordsSummaryIndex?: RecordsSummaryIndex | null
 }
 
@@ -101,7 +101,7 @@ const getRecordSummaryKey = ({
       NodeValues.getFastEqualityKeyWithoutRecordContext({
         survey,
         nodeDef: rootKeyDef,
-        value: record[A.camelize(NodeDef.getName(rootKeyDef))],
+        value: RecordSummary.getKeyValueFromKeysObj(rootKeyDef)(record),
       }),
   })
 
@@ -124,7 +124,7 @@ const buildRecordsSummaryIndex = ({
 }: {
   survey: ArenaSurvey
   rootKeyDefs: ArenaAnyNodeDef[]
-  recordsSummary: RecordSummary[]
+  recordsSummary: RecordSummaryItem[]
 }): RecordsSummaryIndex | null => {
   if (!rootKeyDefs.every((rootKeyDef) => NodeValues.isTypeFastIndexable(NodeDef.getType(rootKeyDef)))) {
     return null
@@ -176,11 +176,11 @@ const findRecordSummariesMatchingKeysByScan = ({
   survey: ArenaSurvey
   rootKeyDefs: ArenaAnyNodeDef[]
   valuesByDefUuid: Record<string, any>
-  recordsSummary: RecordSummary[]
-}): RecordSummary[] =>
+  recordsSummary: RecordSummaryItem[]
+}): RecordSummaryItem[] =>
   recordsSummary.filter((record) =>
     rootKeyDefs.every((rootKeyDef) => {
-      const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
+      const keyValueInRecord = RecordSummary.getKeyValueFromKeysObj(rootKeyDef)(record)
       const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
 
       return NodeValues.isValueEqual({
