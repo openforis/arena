@@ -221,6 +221,33 @@ export const dataImportInvalidValueTest = async ({ user, fileFormat }) => {
   expect((await _fetchRecordsSummaries({ survey }))[0].plots).toEqual({})
 }
 
+export const dataImportInvalidKeyTest = async ({ user, fileFormat }) => {
+  const survey = await _buildSurvey({ user })
+  _expectJobSucceeded(await _insertClusters({ user, survey, fileFormat }))
+
+  // every invalid value of the row is reported, without a misleading "key value not specified" error
+  const job = await _runImport({
+    user,
+    survey,
+    fileFormat,
+    entityName: plotName,
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 'invalid_id', 'invalid_size'],
+      [1, 1, 10],
+    ],
+    insertMissingNodes: true,
+    dryRun: true,
+    JobClass: DataImportValidationJob,
+  })
+  expect(Object.keys(job.errors)).toEqual(['2'])
+  const [{ error }] = Object.values<any>(job.errors)
+  expect(error.errors.map(({ key, params }) => [key, params.value])).toEqual([
+    ['validationErrors:dataImport.invalidNumber', 'invalid_id'],
+    ['validationErrors:dataImport.invalidNumber', 'invalid_size'],
+  ])
+}
+
 export const dataImportEntityNotFoundTest = async ({ user, fileFormat }) => {
   const survey = await _buildSurvey({ user })
   await _runImport({
