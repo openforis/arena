@@ -1,18 +1,17 @@
 import type { ArenaAnyNodeDef, ArenaCategoryItem, ArenaSurvey } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
+import { RecordSummary } from '@core/record/recordSummary'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 type RootEntityKeyDef = ArenaAnyNodeDef
-type RecordSummary = Record<string, any>
+type RecordSummaryItem = Record<string, any>
 type SamplingPointDataItem = ArenaCategoryItem
 type SurveyWithNodeDefs = ArenaSurvey
 
-type SamplingPointDataRecordFinder = (samplingPointDataItem: SamplingPointDataItem) => RecordSummary | undefined
+type SamplingPointDataRecordFinder = (samplingPointDataItem: SamplingPointDataItem) => RecordSummaryItem | undefined
 
 type ExtractRecordKeyParams = {
   rootEntityKeyDefs: RootEntityKeyDef[]
@@ -33,14 +32,8 @@ const keySeparator = '\x1f'
 
 const extractRecordKey =
   ({ rootEntityKeyDefs }: ExtractRecordKeyParams) =>
-  (record: RecordSummary): string =>
-    rootEntityKeyDefs
-      .map((keyDef) => {
-        const keyDefName = NodeDef.getName(keyDef)
-        const recordKeyValue = record[A.camelize(keyDefName) as string]
-        return recordKeyValue ?? ''
-      })
-      .join(keySeparator)
+  (record: RecordSummaryItem): string =>
+    rootEntityKeyDefs.map((keyDef) => RecordSummary.getKeyValueFromKeysObj(keyDef)(record) ?? '').join(keySeparator)
 
 const extractSamplingPointItemKey =
   ({ rootEntityKeyDefs, survey }: ExtractSamplingPointItemKeyParams) =>
@@ -79,13 +72,13 @@ export const createSamplingPointDataRecordFinder = async ({
   const { list: records } = recordsSummary
 
   const extractRecordKeyFn = extractRecordKey({ rootEntityKeyDefs })
-  const recordsByKey = new Map(records.map((record: RecordSummary) => [extractRecordKeyFn(record), record]))
+  const recordsByKey = new Map(records.map((record: RecordSummaryItem) => [extractRecordKeyFn(record), record]))
 
   const extractSamplingPointItemKeyFn = extractSamplingPointItemKey({
     rootEntityKeyDefs,
     survey: surveyWithNodeDefs,
   })
 
-  return (samplingPointDataItem: SamplingPointDataItem): RecordSummary | undefined =>
+  return (samplingPointDataItem: SamplingPointDataItem): RecordSummaryItem | undefined =>
     recordsByKey.get(extractSamplingPointItemKeyFn(samplingPointDataItem))
 }
