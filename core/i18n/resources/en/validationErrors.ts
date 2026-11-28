@@ -158,6 +158,8 @@ export default {
     qualifierCannotHaveEditabilityRule: 'Qualifier attribute cannot have editability rules defined',
     qualifierCannotHaveDefaultValues: 'Qualifier attribute cannot have default values',
     qualifierCannotHaveValidations: 'Qualifier attribute cannot have validation rules defined',
+    nameCannotBeRootKeyReservedWord:
+      'Name "{{value}}" cannot be used for a key or qualifier attribute of the root entity: it\'s a reserved word',
   },
 
   record: {
