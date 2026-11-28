@@ -97,6 +97,52 @@ jobs:
       - name: Run tests
         run: ${{ matrix.test-command }}
 
+  # the e2e tests run the dist build directly: check that the Docker image (only the runtime files) starts and serves the app
+  docker-image:
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+    services:
+      postgres:
+        image: postgis/postgis:17-3.7
+        env:
+          POSTGRES_USER: arena
+          POSTGRES_PASSWORD: arena
+          POSTGRES_DB: of-arena-test
+        ports:
+          - 5444:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          load: true
+          tags: arena:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Start container
+        run: |
+          docker run -d --name arena --network host \
+            -e PGHOST -e PGPORT -e PGDATABASE -e PGUSER -e PGPASSWORD -e ADMIN_EMAIL -e ADMIN_PASSWORD \
+            -e SENDGRID_API_KEY -e RATE_LIMIT_ENABLED -e USER_AUTH_TOKEN_SECRET -e USER_2FA_SECRET \
+            -e AUTH_PROVIDER_SECRET_ENCRYPTION_KEY \
+            arena:ci
+      - name: Check the app is served
+        run: |
+          timeout 300 bash -c 'until curl -fs -o /dev/null http://localhost:9090/app/home/; do sleep 5; done'
+          for path in /app/home/ /img/map-layers-toggle.png /geo/natural-earth-equal-earth-eq2merc.geojson; do
+            curl -fsSL -o /dev/null -w "%{http_code} $path\n" "http://localhost:9090$path"
+          done
+      - name: Container logs
+        if: always()
+        run: docker logs arena
+
   # e2e and load tests drive the running server over HTTP, so they need the production build
   # started with pm2 first.
   test-server:
