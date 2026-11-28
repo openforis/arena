@@ -1,25 +1,30 @@
-version: '3.4'
 services:
 
   db:
-    image: "mdillon/postgis:11"
+    image: "postgis/postgis:17-3.7"
     environment:
       # Must duplicate due to limitations of docker-compose:
       POSTGRES_DB: of-arena-dev
       POSTGRES_USER: arena
       POSTGRES_PASSWORD: arena
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arena -d of-arena-dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   app_server:
     env_file:
       - ../../.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "9990:9090"
     build:
       context: ../..
       dockerfile: Dockerfile
-      target: arena-server
+      target: arena
 
     environment:
       PGHOST: db
@@ -30,12 +35,6 @@ services:
       TEMP_FOLDER: /tmp/arena_upload
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
 
-    # Start application server when Postgres is ready:
-    command: "sh -c '
-      while ! nc -z $$PGHOST $$PGPORT; do sleep 0.1; done;
-      exec pm2-runtime server.js
-    '"
-
   web:
     env_file:
       - ../../.env
@@ -45,7 +44,7 @@ services:
       - "9880:80"
     build:
       context: ../..
-      dockerfile: Dockerfile
+      dockerfile: infra/web/Dockerfile
       target: arena-web
     environment:
       ARENA_HOST: app_server:9090
