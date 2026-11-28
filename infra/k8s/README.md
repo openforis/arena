@@ -86,6 +86,9 @@ interrupted.
 - `db.env` is only read when the data volume is empty. Changing it later does not change the
   credentials of the existing database.
 - The volume size is set in `components/postgres/statefulset.yaml`.
+- After changing the PostGIS version of the image on an existing volume, run
+  `ALTER EXTENSION postgis UPDATE;` in the Arena database. A new PostgreSQL major version needs a
+  dump and restore instead.
 
 **`external-db`** only needs the connection settings: `PGHOST`, `PGPORT` and `PGSSL` in `config.env`,
 database name and credentials in `db.env`.
